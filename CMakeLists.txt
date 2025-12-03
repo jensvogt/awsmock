@@ -13,7 +13,7 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 # External directories
 # -------------------------------------------------------------------------
 set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
-set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
+set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include ${EXTERNAL_ROOT}/include/boost-1_89)
 set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
 
 # -------------------------------------------------------------------------
@@ -31,6 +31,17 @@ set(BSONCXX_USE_STATIC_LIBS ON)
 set(MONGOCXX_USE_STATIC_LIBS ON)
 add_definitions(-UBOOST_LOG_DYN_LINK)
 add_definitions(-UBOOST_ALL_DYN_LINK)
+
+#if(WIN32)
+    add_definitions(-D_WIN32_WINNT=0x0A00)
+    add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MD>" "$<$<CONFIG:DEBUG>:/MDd>" /D "_WIN32")
+    add_compile_options("$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)
+    add_compile_options(/FS)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    set(CMAKE_SYSTEM_NAME Windows)
+    set(CMAKE_GENERATOR_PLATFORM x64)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS")
+#endif()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Core library
@@ -65,7 +76,7 @@ if (APPLE)
 elseif (WIN32)
     target_include_directories(awsmockcore PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    target_link_directories(awsmockcore ${EXTERNAL_LIB_DIR})
+    target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockcore PUBLIC boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib
             boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
             boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib pdh.lib)
@@ -128,7 +139,7 @@ if (APPLE)
 elseif (WIN32)
     target_include_directories(awsmockdto PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    target_link_directories(awsmockdto ${EXTERNAL_LIB_DIR})
+    target_link_directories(awsmockdto PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockdto PUBLIC awsmockcore mongocxx-v_noabi-rhi-x64-v145-md.lib
             bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib
             boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
@@ -197,7 +208,7 @@ if (APPLE)
 elseif (WIN32)
     target_include_directories(awsmockdb PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    target_link_directories(awsmockdb ${EXTERNAL_LIB_DIR})
+    target_link_directories(awsmockdb PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockdb PUBLIC awsmockcore awsmockdto
             mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
             boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
@@ -270,7 +281,7 @@ if (APPLE)
 elseif (WIN32)
     target_include_directories(awsmocksrv PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    target_link_directories(awsmocksrv ${EXTERNAL_LIB_DIR})
+    target_link_directories(awsmocksrv PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto
             mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
             boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
@@ -314,7 +325,7 @@ elseif (WIN32)
     set_target_properties(awsmockmgr PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
     target_include_directories(awsmockcore PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    target_link_directories(awsmockcore ${EXTERNAL_LIB_DIR})
+    target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockmgr awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
             libboost_filesystem-vc143-mt-x64-1_89.lib libboost_url-vc143-mt-x64-1_89.lib
