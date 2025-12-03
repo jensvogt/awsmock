@@ -72,6 +72,7 @@ jobs:
           curl -L https://zlib.net/zlib131.zip -o zlib_source\zlib.zip
           cd zlib_source
           unzip zlib.zip
+          cd zlib-1.3.1
           mkdir build
           cd build
           cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern
