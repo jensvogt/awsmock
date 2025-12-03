@@ -262,6 +262,7 @@ if (APPLE)
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
             boost_log_setup boost_chrono boost_exception boost_regex boost_program_options boost_process boost_json
             boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto pthread resolv
+            "-framework CoreFoundation" "-framework Security" "-framework SystemConfiguration"
             -Wl,-rpath,/usr/local/lib)
     target_include_directories(awsmockmgr PRIVATE /opt/homebrew/opt/icu4c/include)
     target_link_libraries(awsmockmgr PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
@@ -271,7 +272,7 @@ elseif (WIN32)
     add_executable(awsmockmgr WIN32 manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/main.cpp)
     set_target_properties(awsmockmgr PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
+    target_link_libraries(awsmockmgr awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
             libboost_filesystem-vc143-mt-x64-1_89.lib libboost_url-vc143-mt-x64-1_89.lib
             libboost_thread-vc143-mt-x64-1_89.lib libboost_locale-vc143-mt-x64-1_89.lib
             libboost_program_options-vc143-mt-x64-1_89.lib libboost_log-vc143-mt-x64-1_89.lib
@@ -351,10 +352,10 @@ if (APPLE)
     target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
     add_executable(awslocal WIN32 awslocal/src/AwsLocal.cpp awslocal/src/main.cpp)
-    set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
-    target_include_directories(${BINARY} PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
-    target_link_directories(${BINARY} PUBLIC ${BOOST_LIB_DIR})
-    target_link_libraries(${BINARY} awsmockcore libboost_filesystem-vc143-mt-x64-1_89.lib
+    set_target_properties(awslocal PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+    target_include_directories(awslocal PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
+    target_link_directories(awslocal PUBLIC ${BOOST_LIB_DIR})
+    target_link_libraries(awslocal awsmockcore libboost_filesystem-vc143-mt-x64-1_89.lib
             libboost_url-vc143-mt-x64-1_89.lib libboost_thread-vc143-mt-x64-1_89.lib libboost_locale-vc143-mt-x64-1_89.lib
             libboost_program_options-vc143-mt-x64-1_89.lib libboost_log-vc143-mt-x64-1_89.lib
             libboost_log_setup-vc143-mt-x64-1_89.lib libboost_json-vc143-mt-x64-1_89.lib
