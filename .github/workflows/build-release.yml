@@ -85,7 +85,7 @@ jobs:
           cd libzip
           mkdir build
           cd build
-          cmake -S . -B . -DBUILD_SHARED_LIBS=OFF
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF
           cmake --build . --config Release
           cmake --install .
 
