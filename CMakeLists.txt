@@ -254,7 +254,7 @@ if (APPLE)
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
             boost_log_setup boost_chrono boost_exception boost_regex boost_program_options boost_process boost_json
-            boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto acl pthread resolv
+            boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto pthread resolv
             -Wl,-rpath,/usr/local/lib)
     target_include_directories(awslocal PRIVATE /opt/homebrew/opt/icu4c/include)
     target_link_libraries(awslocal PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a

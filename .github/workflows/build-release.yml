@@ -85,12 +85,7 @@ jobs:
         run: |
           cd mongo-cxx-driver/build
           cmake --build . --config Release --parallel
-
-      - name: Wait for File Lock Release
-        shell: powershell
-        run: |
           Start-Sleep -Seconds 3
-          cd build
           cmake --install .
 
       - name: Build boost
