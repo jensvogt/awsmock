@@ -79,6 +79,9 @@ dist/samples/database-data
 **/awsmockmgr
 **/awslocal
 
+# External
+extern
+
 # Examples
 **/out.json
 
