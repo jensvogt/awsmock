@@ -71,18 +71,20 @@ jobs:
           mkdir zlib_source
           curl -L https://zlib.net/zlib131.zip -o zlib_source\zlib.zip
           cd zlib_source
+          unzip zlib.zip
           mkdir build
           cd build
           cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern
           cmake --build .
           cmake --install .
 
-      #      - name: Build openssl
-      #        run: |
-      #          git clone https://github.com/openssl/openssl.git
-      #          cd openssl
-      #          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-      #          cmake --build .
+      - name: Build openssl
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          perl Configure VC-WIN64A no-shared no-dso no-asm --prefix=${{ github.workspace }}/extern
+          nmake
+          nmake install
 
       #      - name: Build magic
       #        run: |
