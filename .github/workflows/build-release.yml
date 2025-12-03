@@ -79,12 +79,32 @@ jobs:
           cmake --build . --config Release
           cmake --install .
 
+      - name: Build libzip
+        run: |
+          git clone https://github.com/nih-at/libzip.git
+          cd libzip
+          mkdir build
+          cd build
+          cmake -S . -B . -DBUILD_SHARED_LIBS=OFF
+          cmake --build . --config Release
+          cmake --install .
+
+      - name: Build libarchive
+        run: |
+          git clone https://github.com/libarchive/libarchive.git
+          cd libarchive
+          mkdir build
+          cd build
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_ZSTD=ON
+          cmake --build .
+          cmake --install .
+
       - name: Build openssl
         run: |
           git clone https://github.com/openssl/openssl.git
           cd openssl
           perl Configure VC-WIN64A no-shared no-dso no-asm --prefix=${{ github.workspace }}/extern
-          nmake
+          nmake > NUL
           nmake install
 
       #      - name: Build magic
