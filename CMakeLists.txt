@@ -25,7 +25,7 @@ elseif (APPLE)
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
             "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
     link_directories(${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
-            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib" "/opt/local/lib")
+            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
 endif ()
 
 # -------------------------------------------------------------------------
@@ -107,9 +107,13 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMB
         ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${MONITORING_SOURCES})
 add_library(awsmockdto STATIC ${SOURCES})
-target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
-        boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread rt
-)
+if (APPLE)
+    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+            boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread)
+else ()
+    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+            boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread rt)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Database library
@@ -152,9 +156,15 @@ set(SOURCES db/src/repository/Database.cpp db/src/utils/TestUtils.cpp ${SQS_SOUR
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${UTIL_SOURCES}
         ${MONITORING_SOURCES})
 add_library(awsmockdb STATIC ${SOURCES})
-target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
-        boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
-        magic lzma bz2 lz4 z zstd icuuc icui18n icudata pthread rt)
+if (APPLE)
+    target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+            boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
+            magic lzma bz2 lz4 z zstd pthread)
+else ()
+    target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+            boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
+            magic lzma bz2 lz4 z zstd icuuc icui18n icudata pthread rt)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -198,9 +208,15 @@ set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRAN
         ${CONTAINER_SOURCES} ${GATEWAY_SOURCES} ${APPLICATION_SOURCES} ${API_GATEWAY_SOURCES} ${MODULE_SOURCES}
         ${MONITORING_SOURCES} ${FRONTEND_SOURCES})
 add_library(awsmocksrv STATIC ${SOURCES})
-target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
-        boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
-        boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp acl icuuc icui18n icudata ssh ssl crypto)
+if (APPLE)
+    target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
+            boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
+            boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp ssh ssl crypto)
+else ()
+    target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
+            boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
+            boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp acl icuuc icui18n icudata ssh ssl crypto)
+endif ()
 
 target_include_directories(awsmockcore PUBLIC core/include dto/include)
 target_include_directories(awsmockdb PUBLIC core/include dto/include db/include)
