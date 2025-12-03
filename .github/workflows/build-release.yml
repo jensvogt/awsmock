@@ -90,11 +90,11 @@ jobs:
 
       - name: Build boost
         run: |
-          set BOOST_URL=https://boostorg.jfrog.io/artifactory/main/release/%BOOST_VERSION%/source/boost_%BOOST_VERSION%.zip
           mkdir boost_source
           curl -L https://archives.boost.io/release/1.89.0/source/boost_1_89_0.zip -o boost_source\boost.zip
           unzip boost_source\boost.zip -d boost_source > NUL
-          move boost_source\boost_%BOOST_VERSION% boost_source\boost_source_root
+          move boost_source\boost_1.89 boost_source\boost_source_root
+          cd boost_source\boost_source_root
           .\bootstrap.bat
           .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
 

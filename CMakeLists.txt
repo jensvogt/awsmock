@@ -64,8 +64,13 @@ set(LOGGING_SOURCES core/src/logging/LogStream.cpp core/src/logging/LogWebsocket
 set(MONITORING_SOURCES core/src/monitoring/MonitoringCollector.cpp)
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 add_library(awsmockcore STATIC ${SOURCES})
-target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
-        boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread rt)
+if (APPLE)
+    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+            boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread)
+else ()
+    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+            boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread rt)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
