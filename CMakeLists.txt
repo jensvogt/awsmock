@@ -16,7 +16,7 @@ set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
 set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
 set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
 
-if (LINUX)
+if (WIN32)
     include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
     link_directories(${EXTERNAL_LIB_DIR})
@@ -26,6 +26,10 @@ elseif (APPLE)
             "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
     link_directories(${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
             "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
+else ()
+    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    link_directories(${EXTERNAL_LIB_DIR})
 endif ()
 
 # -------------------------------------------------------------------------
@@ -76,6 +80,7 @@ else ()
     target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread rt)
 endif ()
+target_include_directories(awsmockcore PUBLIC core/include dto/include)
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
@@ -125,6 +130,7 @@ else ()
     target_link_libraries(awsmockdto PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread rt)
 endif ()
+target_include_directories(awsmockdto PUBLIC core/include db/include dto/include)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Database library
@@ -182,6 +188,7 @@ else ()
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
             magic lzma bz2 lz4 z zstd icuuc icui18n icudata pthread rt)
 endif ()
+target_include_directories(awsmockdb PUBLIC core/include dto/include db/include)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -240,25 +247,12 @@ else ()
             boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
             boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp acl icuuc icui18n icudata ssh ssl crypto)
 endif ()
-
-target_include_directories(awsmockcore PUBLIC core/include dto/include)
-target_include_directories(awsmockdb PUBLIC core/include dto/include db/include)
-target_include_directories(awsmockdto PUBLIC core/include db/include dto/include)
 target_include_directories(awsmocksrv PUBLIC core/include dto/include db/include srv/include)
-
-# -------------------------------------------------------------------------
-# Compiler options
-# -------------------------------------------------------------------------
-target_compile_options(awsmockcore PRIVATE -Wno-deprecated-declarations)
-target_compile_options(awsmockdb PRIVATE -Wno-deprecated-declarations)
-target_compile_options(awsmockdto PRIVATE -Wno-deprecated-declarations)
-target_compile_options(awsmocksrv PRIVATE -Wno-deprecated-declarations)
 
 # -------------------------------------------------------------------------
 # AWSMock Manager (main program)
 # -------------------------------------------------------------------------
 
-target_include_directories(awsmockmgr PUBLIC manager/include core/include dto/include db/include srv/include)
 if (APPLE)
     add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/main.cpp)
     target_link_libraries(awsmockmgr PRIVATE awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static
@@ -276,7 +270,6 @@ if (APPLE)
 elseif (WIN32)
     add_executable(awsmockmgr WIN32 manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/main.cpp)
     set_target_properties(awsmockmgr PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
-    target_include_directories(awsmockmgr PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
             libboost_filesystem-vc143-mt-x64-1_89.lib libboost_url-vc143-mt-x64-1_89.lib
@@ -296,12 +289,12 @@ else ()
     )
     target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
 endif ()
+target_include_directories(awsmockmgr PUBLIC manager/include core/include dto/include db/include srv/include)
 
 # -------------------------------------------------------------------------
 # AWSMock Controller
 # -------------------------------------------------------------------------
 
-target_include_directories(awsmockctl PUBLIC controller/include core/include dto/include db/include)
 if (APPLE)
     add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
     target_link_libraries(awsmockctl PRIVATE awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
@@ -337,11 +330,12 @@ else ()
     )
     target_compile_options(awsmockctl PRIVATE -Wno-deprecated-declarations)
 endif ()
+target_include_directories(awsmockctl PUBLIC controller/include core/include dto/include db/include)
+
 # -------------------------------------------------------------------------
 # AWSMock awslocal
 # -------------------------------------------------------------------------
 
-target_include_directories(awslocal PUBLIC awslocal/include core/include dto/include)
 if (APPLE)
     add_executable(awslocal awslocal/src/AwsLocal.cpp awslocal/src/main.cpp)
     target_link_libraries(awslocal PRIVATE awsmockcore
@@ -375,6 +369,7 @@ else ()
             -Wl,--end-group)
     target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
 endif ()
+target_include_directories(awslocal PUBLIC awslocal/include core/include dto/include)
 
 # -------------------------------------------------------------------------
 # Build documentation
