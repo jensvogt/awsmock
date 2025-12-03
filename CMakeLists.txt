@@ -25,7 +25,7 @@ elseif (APPLE)
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
             "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
     link_directories(${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
-            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
+            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib" "/opt/local/lib")
 endif ()
 
 # -------------------------------------------------------------------------

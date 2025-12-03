@@ -78,10 +78,7 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
-          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern ^ 
-                           -DBUILD_SHARED_LIBS=OFF -DBSONCXX_POLY_USE_REAL=ON -DBSONCXX_POLY_USE_MNMLSTC=OFF ^
-                           -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON ^
-                           -DCMAKE_PREFIX_PATH=${{ github.workspace }}\extern -DCMAKE_CXX_STANDARD=23
+          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern -DBUILD_SHARED_LIBS=OFF -DBSONCXX_POLY_USE_REAL=ON -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}\extern -DCMAKE_CXX_STANDARD=23
 
       - name: Build mongo-cxx-driver
         shell: cmd
@@ -103,8 +100,7 @@ jobs:
           unzip boost_source\boost.zip -d boost_source > NUL
           move boost_source\boost_%BOOST_VERSION% boost_source\boost_source_root
           .\bootstrap.bat
-          .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc ^
-             --prefix=${{ github.workspace }}/extern install > NUL
+          .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
 
       - name: Configure CMake (Windows)
         run: |
