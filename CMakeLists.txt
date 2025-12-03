@@ -237,32 +237,80 @@ target_compile_options(awsmocksrv PRIVATE -Wno-deprecated-declarations)
 
 add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/main.cpp)
 target_include_directories(awsmockmgr PUBLIC manager/include core/include dto/include db/include srv/include)
-target_link_libraries(awsmockmgr PRIVATE
-        -Wl,--start-group
-        awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup
-        boost_thread boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
-        boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
-        crypto acl pthread rt resolv
-        -Wl,--end-group
-)
-target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
-
+if (APPLE)
+    target_link_libraries(awsmockmgr PRIVATE awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static
+            mongoc2 bson2
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
+            boost_log_setup boost_chrono boost_exception boost_regex boost_program_options boost_process boost_json
+            boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto pthread resolv
+            -Wl,-rpath,/usr/local/lib)
+    target_include_directories(awsmockmgr PRIVATE /opt/homebrew/opt/icu4c/include)
+    target_link_libraries(awsmockmgr PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
+            /opt/homebrew/opt/icu4c/lib/libicudata.a)
+    target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
+elseif (WIN32)
+    add_executable(awsmockmgr WIN32 ${SOURCES})
+    set_target_properties(awsmockmgr PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+    target_include_directories(awsmockmgr PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
+    target_link_directories(awsmockmgr PUBLIC ${BOOST_LIB_DIR})
+    target_link_libraries(awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
+            libboost_filesystem-vc143-mt-x64-1_89.lib libboost_url-vc143-mt-x64-1_89.lib
+            libboost_thread-vc143-mt-x64-1_89.lib libboost_locale-vc143-mt-x64-1_89.lib
+            libboost_program_options-vc143-mt-x64-1_89.lib libboost_log-vc143-mt-x64-1_89.lib
+            libboost_log_setup-vc143-mt-x64-1_89.lib libboost_json-vc143-mt-x64-1_89.lib
+            ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+else ()
+    target_link_libraries(awsmockmgr PRIVATE
+            -Wl,--start-group
+            awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup
+            boost_thread boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
+            boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
+            crypto acl pthread rt resolv
+            -Wl,--end-group
+    )
+    target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
+endif ()
 # -------------------------------------------------------------------------
 # AWSMock Controller
 # -------------------------------------------------------------------------
 
 add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
 target_include_directories(awsmockctl PUBLIC controller/include core/include dto/include db/include)
-target_link_libraries(awsmockctl PRIVATE
-        -Wl,--start-group
-        awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread
-        boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
-        boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
-        crypto acl pthread rt resolv
-        -Wl,--end-group
-)
-target_compile_options(awsmockctl PRIVATE -Wno-deprecated-declarations)
-
+if (APPLE)
+    target_link_libraries(awsmockctl PRIVATE awsmockcore
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
+            boost_log_setup boost_chrono boost_exception boost_regex boost_program_options boost_process boost_json
+            boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto pthread resolv
+            -Wl,-rpath,/usr/local/lib)
+    target_include_directories(awsmockctl PRIVATE /opt/homebrew/opt/icu4c/include)
+    target_link_libraries(awsmockctl PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
+            /opt/homebrew/opt/icu4c/lib/libicudata.a)
+    target_compile_options(awsmockctl PRIVATE -Wno-deprecated-declarations)
+elseif (WIN32)
+    add_executable(awsmockctl WIN32 ${SOURCES})
+    set_target_properties(awsmockctl PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+    target_include_directories(awsmockctl PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
+    target_link_directories(awsmockctl PUBLIC ${BOOST_LIB_DIR})
+    target_link_libraries(awsmockctl awsmockcore libboost_filesystem-vc143-mt-x64-1_89.lib
+            libboost_url-vc143-mt-x64-1_89.lib libboost_thread-vc143-mt-x64-1_89.lib libboost_locale-vc143-mt-x64-1_89.lib
+            libboost_program_options-vc143-mt-x64-1_89.lib libboost_log-vc143-mt-x64-1_89.lib
+            libboost_log_setup-vc143-mt-x64-1_89.lib libboost_json-vc143-mt-x64-1_89.lib
+            ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+else ()
+    target_link_libraries(awsmockctl PRIVATE
+            -Wl,--start-group
+            awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread
+            boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
+            boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
+            crypto acl pthread rt resolv
+            -Wl,--end-group
+    )
+    target_compile_options(awsmockctl PRIVATE -Wno-deprecated-declarations)
+endif ()
 # -------------------------------------------------------------------------
 # AWSMock awslocal
 # -------------------------------------------------------------------------
