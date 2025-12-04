@@ -57,6 +57,7 @@ jobs:
           arch: x64
 
       - name: Install JWT-CPP
+        shell: cmd
         run: |
           git clone https://github.com/Thalhammer/jwt-cpp.git
           cd jwt-cpp
@@ -66,7 +67,8 @@ jobs:
           cmake --build . --parallel $(nproc)
           cmake --install .
 
-      - name: Build zlib
+      - name: Install zlib
+        shell: cmd
         run: |
           mkdir zlib_source
           curl -L https://zlib.net/zlib131.zip -o zlib_source\zlib.zip
@@ -79,7 +81,8 @@ jobs:
           cmake --build . --config Release
           cmake --install . --config Release
 
-      - name: Build libzip
+      - name: Install libzip
+        shell: cmd
         run: |
           git clone https://github.com/nih-at/libzip.git
           cd libzip
@@ -89,7 +92,8 @@ jobs:
           cmake --build . --config Release
           cmake --install . --config Release
 
-      - name: Build libarchive
+      - name: Install libarchive
+        shell: cmd
         run: |
           git clone https://github.com/libarchive/libarchive.git
           cd libarchive/build
@@ -111,7 +115,6 @@ jobs:
           copy .\Release\libmagic.lib ${{ github.workspace }}\extern\lib
           copy .\Release\libmagic.dll ${{ github.workspace }}\extern\lib
           copy ..\file\src\magic.h ${{ github.workspace }}\extern\include
-          dir ${{ github.workspace }}\extern\include
 
       - name: Install openssl
         shell: cmd
@@ -119,9 +122,8 @@ jobs:
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib" ${{ github.workspace }}\extern\lib
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/openssl.lib" ${{ github.workspace }}\extern\lib
           robocopy  /E /NFL /NDL "C:/Program Files/OpenSSL/include" ${{ github.workspace }}\extern\include
-          dir ${{ github.workspace }}\extern\include
 
-      - name: Build mongo-cxx-driver
+      - name: Install mongo-cxx-driver
         shell: cmd
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
@@ -131,7 +133,8 @@ jobs:
           Timeout 3
           cmake --install .
 
-      - name: Build boost
+      - name: Install boost
+        shell: cmd
         run: |
           mkdir boost_source
           curl -L https://archives.boost.io/release/1.89.0/source/boost_1_89_0.zip -o boost_source\boost.zip
@@ -141,10 +144,10 @@ jobs:
           .\bootstrap.bat
           .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
 
-      - name: Configure CMake (Windows)
+      - name: Build AwsMock
         shell: cmd
         run: |
-          dir /S ${{ github.workspace }}\extern\include
+          dir ${{ github.workspace }}\extern\include
           mkdir build
           cd build
           cmake -S .. -B . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
