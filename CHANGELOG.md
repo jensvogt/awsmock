@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.80](https://github.com/jensvogt/awsmock/compare/v1.9.79...v1.9.80) (2025-12-04)
+
+
+### Bug Fixes
+
+* add installer packages ([ea8526b](https://github.com/jensvogt/awsmock/commit/ea8526b4953eafcc4771492e34f6a664a53ab68b))
+
 ## [1.9.79](https://github.com/jensvogt/awsmock/compare/v1.9.78...v1.9.79) (2025-12-04)
 
 
