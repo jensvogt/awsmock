@@ -85,7 +85,7 @@ jobs:
           cd libzip
           mkdir build
           cd build
-          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/ -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD =OFF -DENABLE_TEST=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/ -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include
           cmake --build . --config Release
           cmake --install . --config Release
 
