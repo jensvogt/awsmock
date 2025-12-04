@@ -93,9 +93,9 @@ jobs:
         run: |
           git clone https://github.com/libarchive/libarchive.git
           cd libarchive/build
-          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_ZSTD=ON
-          cmake --build .
-          cmake --install .
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_ZSTD=ON -DENABLE_TEST=OFF -DENABLE_PCRE2POSIX=OFF -DENABLE_PCREPOSIX=OFF
+          cmake --build . --config Release
+          cmake --install . --config Release
 
 #      - name: Build openssl
 #        run: |
@@ -107,10 +107,13 @@ jobs:
 
       #      - name: Build magic
       #        run: |
-      #          git clone https://github.com/mongodb/mongo-c-driver
-      #          cd mongo-c-driver/build
-      #          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+      #          git https://github.com/nmaier/libmagic-win32
+      #          cd libmagic-win32
+      #          mkdir build
+      #          cd build
+      #          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
       #          cmake --build .
+      #          cmake --install . --config Release
 
       - name: Build mongo-cxx-driver
         shell: cmd
