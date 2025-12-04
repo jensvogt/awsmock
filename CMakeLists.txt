@@ -12,27 +12,37 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 # -------------------------------------------------------------------------
 # External directories
 # -------------------------------------------------------------------------
-if(WIN32)
-set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-windows-static)
-else()
-    set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
-endif ()
-set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include ${EXTERNAL_ROOT}/include/boost-1_89)
-set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
+#set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+# ------------------------------------------------------
+# Enable vcpkg toolchain when building outside IDEs
+# (GitHub Action passes this via command line)
+# ------------------------------------------------------
+#if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+#    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+#endif()
+
+find_package(OpenSSL CONFIG REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(libzip REQUIRED)
+find_package(boost REQUIRED COMPONENTS log log_setup filesystem system )
+find_package(libarchive CONFIG REQUIRED)
+find_package(unofficial-libmagic CONFIG REQUIRED)
+find_package(jwt-cpp CONFIG REQUIRED)
+find_package(mongo-cxx-driver CONFIG REQUIRED)
 
 # -------------------------------------------------------------------------
 # Global link flags
 # -------------------------------------------------------------------------
 
-if (!APPLE)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -pthread")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -pthread")
-endif ()
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-set(BSONCXX_USE_STATIC_LIBS ON)
-set(MONGOCXX_USE_STATIC_LIBS ON)
+#if (!APPLE)
+#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -pthread")
+#    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -pthread")
+#endif ()
+#set(Boost_USE_STATIC_LIBS ON)
+#set(Boost_USE_MULTITHREADED ON)
+#set(Boost_USE_STATIC_RUNTIME OFF)
+#set(BSONCXX_USE_STATIC_LIBS ON)
+#set(MONGOCXX_USE_STATIC_LIBS ON)
 add_definitions(-UBOOST_LOG_DYN_LINK)
 add_definitions(-UBOOST_ALL_DYN_LINK)
 
@@ -77,12 +87,12 @@ if (APPLE)
             boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread)
     target_compile_options(awsmockcore PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
-    target_include_directories(awsmockcore PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR}
-            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockcore PUBLIC boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib
-            boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
-            boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib pdh.lib)
+
+    add_library(awsmockcore STATIC ${SOURCES})
+    target_include_directories(awsmockcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(awsmockcore PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB Boost::filesystem Boost::system libarchive::libarchive libmagic::libmagicjwt-cpp::jwt-cpp)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+
 else ()
     target_include_directories(awsmockcore PUBLIC core/include ${EXTERNAL_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
@@ -92,6 +102,7 @@ else ()
             pthread rt)
     target_compile_options(awsmockcore PRIVATE -Wno-deprecated-declarations)
 endif ()
+
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
