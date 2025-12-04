@@ -118,7 +118,7 @@ jobs:
         run: |
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib" ${{ github.workspace }}\extern\lib
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/openssl.lib" ${{ github.workspace }}\extern\lib
-          robocopy  /MIR "C:/Program Files/OpenSSL/include" ${{ github.workspace }}\extern\include
+          robocopy  /E /NFL /NDL "C:/Program Files/OpenSSL/include" ${{ github.workspace }}\extern\include
           dir ${{ github.workspace }}\extern\include
 
       - name: Build mongo-cxx-driver
