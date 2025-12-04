@@ -97,17 +97,6 @@ jobs:
           cmake --build . --config Release
           cmake --install . --config Release
 
-      - name: Clone vcpkg
-        shell: cmd
-        run: |
-          git clone https://github.com/microsoft/vcpkg C:\vcpkg
-
-      - name: Bootstrap vcpkg
-        shell: cmd
-        run: |
-          cd C:\vcpkg
-          bootstrap-vcpkg.bat
-
       - name: Install libmagic (dynamic)
         shell: cmd
         run: |
