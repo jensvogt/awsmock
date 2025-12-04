@@ -85,7 +85,7 @@ jobs:
           cd libzip
           mkdir build
           cd build
-          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_TEST=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/zlib.lib -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_TEST=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/zlib.lib -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release
           cmake --install . --config Release
 
@@ -93,7 +93,7 @@ jobs:
         run: |
           git clone https://github.com/libarchive/libarchive.git
           cd libarchive/build
-          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_ZSTD=ON -DENABLE_TEST=OFF -DENABLE_PCRE2POSIX=OFF -DENABLE_PCREPOSIX=OFF
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_ZSTD=ON -DENABLE_TEST=OFF -DENABLE_PCRE2POSIX=OFF -DENABLE_PCREPOSIX=OFF -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release
           cmake --install . --config Release
 
