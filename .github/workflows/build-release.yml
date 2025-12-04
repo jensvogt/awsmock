@@ -110,6 +110,7 @@ jobs:
 #          cmake --install . --config Release
 
       - name: Install openssl
+        shell: cmd
         run: |
           dir /S "C:/Program Files/OpenSSL/"
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib" ${{ github.workspace }}/extern/lib
