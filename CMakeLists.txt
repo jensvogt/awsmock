@@ -21,15 +21,15 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 #    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 #endif()
 
-find_package(OpenSSL REQUIRED)
+
+find_package(OpenSSL CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(libzip REQUIRED)
 find_package(Boost CONFIG REQUIRED COMPONENTS log log_setup filesystem program_options thread process )
 find_package(LibArchive REQUIRED)
 find_package(unofficial-libmagic CONFIG REQUIRED)
 find_package(jwt-cpp CONFIG REQUIRED)
-find_package(bsoncxx CONFIG REQUIRED)
-find_package(mongocxx CONFIG REQUIRED)
+find_package(mongo-cxx-driver CONFIG REQUIRED)
 
 # -------------------------------------------------------------------------
 # Global link flags
@@ -91,9 +91,7 @@ elseif (WIN32)
 
     add_library(awsmockcore STATIC ${SOURCES})
     target_include_directories(awsmockcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(awsmockcore PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB Boost::log Boost::log_setup
-            Boost::thread Boost::atomic Boost::chrono boost::container Boost:date_time Boost::url Boost::exception
-            Boost::filesystem Boost::regex pthread Boost::system libarchive::libarchive libmagic::libmagic jwt-cpp::jwt-cpp)
+    target_link_libraries(awsmockcore PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB Boost::filesystem Boost::system libarchive::libarchive libmagic::libmagic jwt-cpp::jwt-cpp)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 else ()
@@ -105,6 +103,7 @@ else ()
             pthread rt)
     target_compile_options(awsmockcore PRIVATE -Wno-deprecated-declarations)
 endif ()
+
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
@@ -153,14 +152,13 @@ if (APPLE)
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread)
     target_compile_options(awsmockdto PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
-
-    add_library(awsmockdto STATIC ${SOURCES})
-    target_include_directories(awsmockdto PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(awsmockdto PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB Boost::log Boost::log_setup
-            Boost::thread Boost::atomic Boost::chrono boost::container Boost:date_time Boost::url Boost::exception
-            Boost::filesystem Boost::regex pthread Boost::system libarchive::libarchive libmagic::libmagic jwt-cpp::jwt-cpp)
-    target_compile_definitions(awsmockdto PRIVATE _CRT_SECURE_NO_WARNINGS)
-
+    target_include_directories(awsmockdto PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockdto PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockdto PUBLIC awsmockcore mongocxx-v_noabi-rhi-x64-v145-md.lib
+            bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib
+            boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
+            boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib pdh.lib)
 else ()
     target_include_directories(awsmockdto PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
@@ -223,17 +221,15 @@ if (APPLE)
             magic lzma bz2 lz4 z zstd pthread)
     target_compile_options(awsmockdb PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
-
-    add_library(awsmockdb STATIC ${SOURCES})
-    target_include_directories(awsmockdb PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(awsmockdb PRIVATE mongo::mongocxx_static mongo::bsoncxx_static OpenSSL::SSL OpenSSL::Crypto
-            ZLIB::ZLIB Boost::log Boost::log_setup Boost::thread Boost::atomic Boost::chrono boost::container
-            Boost:date_time Boost::url Boost::exception Boost::filesystem Boost::regex pthread Boost::system
-            libarchive::libarchive libmagic::libmagic jwt-cpp::jwt-cpp)
-    target_compile_definitions(awsmockdb PRIVATE _CRT_SECURE_NO_WARNINGS)
-
+    target_include_directories(awsmockdb PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockdb PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockdb PUBLIC awsmockcore awsmockdto
+            mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
+            boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
+            boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
+            archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
 else ()
-
     target_include_directories(awsmockdb PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
     target_link_directories(awsmockdb PUBLIC ${EXTERNAL_LIB_DIR})
