@@ -90,7 +90,7 @@ elseif (WIN32)
 
     add_library(awsmockcore STATIC ${SOURCES})
     target_include_directories(awsmockcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(awsmockcore PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB Boost::filesystem Boost::system libarchive::libarchive libmagic::libmagicjwt-cpp::jwt-cpp)
+    target_link_libraries(awsmockcore PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB Boost::filesystem Boost::system libarchive::libarchive libmagic::libmagic jwt-cpp::jwt-cpp)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 else ()
