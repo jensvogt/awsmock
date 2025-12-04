@@ -21,7 +21,6 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 #    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 #endif()
 
-
 find_package(OpenSSL CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(libzip REQUIRED)
