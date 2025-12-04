@@ -77,7 +77,7 @@ jobs:
           cd build
           cmake -S .. -B . -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release
-          cmake --install .
+          cmake --install . --config Release
 
       - name: Build libzip
         run: |
@@ -85,9 +85,9 @@ jobs:
           cd libzip
           mkdir build
           cd build
-          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/z.lib -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/ -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include
           cmake --build . --config Release
-          cmake --install .
+          cmake --install . --config Release
 
       - name: Build libarchive
         run: |
