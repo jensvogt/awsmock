@@ -138,6 +138,7 @@ jobs:
 
       - name: Configure CMake (Windows)
         run: |
+          dir /S ${{ github.workspace }}\extern\include
           mkdir build
           cd build
           cmake -S .. -B . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
