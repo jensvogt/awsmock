@@ -137,6 +137,7 @@ jobs:
           .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
 
       - name: Configure CMake (Windows)
+        shell: cmd
         run: |
           dir /S ${{ github.workspace }}\extern\include
           mkdir build
