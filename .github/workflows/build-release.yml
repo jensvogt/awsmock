@@ -97,28 +97,23 @@ jobs:
           cmake --build . --config Release
           cmake --install . --config Release
 
-      - name: Install libmagic (dynamic)
+      - name: Install libmagic
         shell: cmd
         run: |
-          C:\vcpkg\vcpkg.exe install libmagic:x64-windows-static
+          git clone https://github.com/julian-r/file-windows.git
+          cd file-windows
+          git submodule update --init
+          mkdir build
+          cd build1
+          cmake -S .. -B . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake --build . --config Release
+          cmake --install . --config Release
 
-#      - name: Build openssl
-#        run: |
-#          git clone https://github.com/openssl/openssl.git
-#          cd openssl
-#          perl Configure VC-WIN64A no-shared no-dso no-asm --prefix=${{ github.workspace }}/extern
-#          nmake > NUL
-#          nmake install
-
-      #      - name: Build magic
-      #        run: |
-      #          git https://github.com/nmaier/libmagic-win32
-      #          cd libmagic-win32
-      #          mkdir build
-      #          cd build
-      #          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-      #          cmake --build .
-      #          cmake --install . --config Release
+      - name: Install openssl
+        run: |
+          copy C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib ${{ github.workspace }}/extern/lib
+          copy C:/Program Files/OpenSSL/lib/VC/x64/MD/libssl.lib ${{ github.workspace }}/extern/lib
+          dir /S C:/Program Files/OpenSSL/
 
       - name: Build mongo-cxx-driver
         shell: cmd
