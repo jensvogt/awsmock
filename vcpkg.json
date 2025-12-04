@@ -1,0 +1,16 @@
+{
+  "name": "awsmock",
+  "version": "1.0.0",
+  "dependencies": [
+    "openssl",
+    "jwt-cpp",
+    "boost",
+    "zlib",
+    "libzip",
+    "libarchive",
+    "libmagic",
+    "libmagic",
+    "mongo-cxx-driver"
+  ],
+  "builtin-baseline": "latest"
+}
