@@ -17,6 +17,8 @@
 #endif
 #include <io.h>
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
 #include <Windows.h>
 #include <boost/asio.hpp>
 #endif
