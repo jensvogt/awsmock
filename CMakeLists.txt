@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(awsmock LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Turn off shared libs globally
@@ -24,8 +24,8 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 find_package(OpenSSL CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(libzip REQUIRED)
-find_package(boost REQUIRED COMPONENTS log log_setup filesystem system )
-find_package(libarchive CONFIG REQUIRED)
+find_package(Boost CONFIG REQUIRED COMPONENTS log log_setup filesystem program_options thread process )
+find_package(LibArchive REQUIRED)
 find_package(unofficial-libmagic CONFIG REQUIRED)
 find_package(jwt-cpp CONFIG REQUIRED)
 find_package(mongo-cxx-driver CONFIG REQUIRED)
