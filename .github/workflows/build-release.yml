@@ -38,8 +38,8 @@ jobs:
     needs: release-please
 #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
-      BUILD_DIR: "${{ github.workspace }}\\build-windows"
-      PACKAGE_DIR: "${{ github.workspace }}\\package"
+      BUILD_DIR: "${{ github.workspace }}\build-windows"
+      PACKAGE_DIR: "${{ github.workspace }}\package"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
       VCPKG_ROOT: ${{ github.workspace }}\vcpkg
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
@@ -74,21 +74,16 @@ jobs:
           cd vcpkg
           bootstrap-vcpkg.bat
 
-      - name: Install dependencies
-        shell: cmd
-        run: |
-          vcpkg\vcpkg.exe install jwt-cpp:$env:VCPKG_DEFAULT_TRIPLET openssl:$env:VCPKG_DEFAULT_TRIPLET zlib:$env:VCPKG_DEFAULT_TRIPLET libzip:$env:VCPKG_DEFAULT_TRIPLET libarchive:$env:VCPKG_DEFAULT_TRIPLET libmagic:$env:VCPKG_DEFAULT_TRIPLET mongo-cxx-driver:$env:VCPKG_DEFAULT_TRIPLET boost:x86-windows-static 
-
       - name: Install libraries via vcpkg
         run: |
-          $pkgs = @("openssl","jwt-cpp","zlib","libzip","libarchive","libmagic","mongo-cxx-driver","boost")
+          $pkgs = @("openssl", "jwt-cpp", "zlib", "libzip", "libarchive", "libmagic", "mongo-cxx-driver", "boost")
           foreach ($pkg in $pkgs) {
             & "$env:VCPKG_ROOT\vcpkg.exe" install "$pkg:$env:VCPKG_DEFAULT_TRIPLET"
           }
 
       - name: Configure CMake
         run: |
-          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=$env:VCPKG_DEFAULT_TRIPLET -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$env:VCPKG_DEFAULT_TRIPLET" -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --parallel
 
 #      - name: Install JWT-CPP
