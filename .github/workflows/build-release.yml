@@ -6,12 +6,11 @@ on:
   workflow_dispatch:
 
 env:
-  #  QT_VERSION: "6.10.1"
   APP_NAME: "awsmock"
   INSTALLER_ID: "de.jensvogt.awsmock" # used for IFW package path
 
 permissions:
-  contents: write       # required for tagging + releasing
+  contents: write
   pull-requests: write
   id-token: write
   pages: write
@@ -42,6 +41,8 @@ jobs:
       BUILD_DIR: "${{ github.workspace }}\\build-windows"
       PACKAGE_DIR: "${{ github.workspace }}\\package"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+      VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+      VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,6 +51,16 @@ jobs:
 
       - name: Normalize SEMVER
         run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
+
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.VCPKG_ROOT }}\installed
+            ${{ env.VCPKG_ROOT }}\packages
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
 
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -66,7 +77,19 @@ jobs:
       - name: Install dependencies
         shell: cmd
         run: |
-          vcpkg\vcpkg.exe install jwt-cpp:x64-windows-static openssl:x64-windows-static zlib:x64-windows-static libzip:x64-windows-static libarchive:x64-windows-static libmagic:x64-windows-static mongo-cxx-driver:x64-windows-static boost:x86-windows-static 
+          vcpkg\vcpkg.exe install jwt-cpp:$env:VCPKG_DEFAULT_TRIPLET openssl:$env:VCPKG_DEFAULT_TRIPLET zlib:$env:VCPKG_DEFAULT_TRIPLET libzip:$env:VCPKG_DEFAULT_TRIPLET libarchive:$env:VCPKG_DEFAULT_TRIPLET libmagic:$env:VCPKG_DEFAULT_TRIPLET mongo-cxx-driver:$env:VCPKG_DEFAULT_TRIPLET boost:x86-windows-static 
+
+      - name: Install libraries via vcpkg
+        run: |
+          $pkgs = @("openssl","jwt-cpp","zlib","libzip","libarchive","libmagic","mongo-cxx-driver","boost")
+          foreach ($pkg in $pkgs) {
+            & "$env:VCPKG_ROOT\vcpkg.exe" install "$pkg:$env:VCPKG_DEFAULT_TRIPLET"
+          }
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=$env:VCPKG_DEFAULT_TRIPLET -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --parallel
 
 #      - name: Install JWT-CPP
 #        shell: cmd
@@ -166,14 +189,14 @@ jobs:
 #          .\bootstrap.bat
 #          .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
 
-      - name: Build AwsMock
-        shell: cmd
-        run: |
-          dir ${{ github.workspace }}\extern\include
-          mkdir build
-          cd build
-          cmake -S .. -B . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-          cmake --build . --config Release --parallel
+#      - name: Build AwsMock
+#        shell: cmd
+#        run: |
+#          dir ${{ github.workspace }}\extern\include
+#          mkdir build
+#          cd build
+#          cmake -S .. -B . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+#          cmake --build . --config Release --parallel
 
       - name: Create package structure
         shell: powershell
