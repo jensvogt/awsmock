@@ -104,7 +104,7 @@ jobs:
           cd file-windows
           git submodule update --init
           mkdir build
-          cd build1
+          cd build
           cmake -S .. -B . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release
           cmake --install . --config Release
