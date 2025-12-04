@@ -85,7 +85,7 @@ jobs:
           "mongo-cxx-driver",
           "jwt-cpp")
           foreach ($lib in $libs) {
-            & "$env:VCPKG_ROOT\vcpkg.exe" install "$lib:$env:VCPKG_DEFAULT_TRIPLET"
+            & "$env:VCPKG_ROOT\vcpkg.exe" install "${lib}:${env:VCPKG_DEFAULT_TRIPLET}"
           }
 
       - name: Configure CMake
