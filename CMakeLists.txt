@@ -12,7 +12,11 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 # -------------------------------------------------------------------------
 # External directories
 # -------------------------------------------------------------------------
-set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
+if(WIN32)
+set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/vcpkg/installed/x64-windows-static)
+else()
+    set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
+endif ()
 set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include ${EXTERNAL_ROOT}/include/boost-1_89)
 set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
 
@@ -32,16 +36,15 @@ set(MONGOCXX_USE_STATIC_LIBS ON)
 add_definitions(-UBOOST_LOG_DYN_LINK)
 add_definitions(-UBOOST_ALL_DYN_LINK)
 
-#if(WIN32)
+if(WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
-    add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MD>" "$<$<CONFIG:DEBUG>:/MDd>" /D "_WIN32")
+    add_compile_options(/MP16 /FS "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MD>" "$<$<CONFIG:DEBUG>:/MDd>" /D "_WIN32")
     add_compile_options("$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)
     add_compile_options(/FS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     set(CMAKE_SYSTEM_NAME Windows)
     set(CMAKE_GENERATOR_PLATFORM x64)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FS")
-#endif()
+endif()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Core library
