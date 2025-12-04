@@ -108,7 +108,8 @@ jobs:
           cmake -S .. -B . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release
           cmake --install . --config Release
-          copy .\Release\libmagic ${{ github.workspace }}\extern\lib
+          copy .\Release\libmagic.lib ${{ github.workspace }}\extern\lib
+          copy .\Release\libmagic.dll ${{ github.workspace }}\extern\lib
           copy ..\file\src\magic.h ${{ github.workspace }}\extern\include
 
       - name: Install openssl
@@ -116,7 +117,8 @@ jobs:
         run: |
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib" ${{ github.workspace }}\extern\lib
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/openssl.lib" ${{ github.workspace }}\extern\lib
-          robocopy "C:/Program Files/OpenSSL/include/openssl" ${{ github.workspace }}\extern\include /MIR
+          robocopy  /MIR "C:/Program Files/OpenSSL/include/openssl" ${{ github.workspace }}\extern\include
+          dir /S ${{ github.workspace }}\extern\include
 
       - name: Build mongo-cxx-driver
         shell: cmd
