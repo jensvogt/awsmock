@@ -111,14 +111,15 @@ jobs:
           copy .\Release\libmagic.lib ${{ github.workspace }}\extern\lib
           copy .\Release\libmagic.dll ${{ github.workspace }}\extern\lib
           copy ..\file\src\magic.h ${{ github.workspace }}\extern\include
+          dir ${{ github.workspace }}\extern\include
 
       - name: Install openssl
         shell: cmd
         run: |
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib" ${{ github.workspace }}\extern\lib
           copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/openssl.lib" ${{ github.workspace }}\extern\lib
-          robocopy  /MIR "C:/Program Files/OpenSSL/include/openssl" ${{ github.workspace }}\extern\include
-          dir /S ${{ github.workspace }}\extern\include
+          robocopy  /MIR "C:/Program Files/OpenSSL/include" ${{ github.workspace }}\extern\include
+          dir ${{ github.workspace }}\extern\include
 
       - name: Build mongo-cxx-driver
         shell: cmd
