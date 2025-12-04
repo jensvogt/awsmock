@@ -78,7 +78,7 @@ jobs:
         run: |
           $pkgs = @("openssl", "jwt-cpp", "zlib", "libzip", "libarchive", "libmagic", "mongo-cxx-driver", "boost")
           foreach ($pkg in $pkgs) {
-            & "$env:VCPKG_ROOT\vcpkg.exe" install "$pkg:$env:VCPKG_DEFAULT_TRIPLET"
+            & "$env:VCPKG_ROOT\vcpkg.exe" install "${pkg}:$env:VCPKG_DEFAULT_TRIPLET"
           }
 
       - name: Configure CMake
