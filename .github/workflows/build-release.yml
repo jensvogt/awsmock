@@ -22,7 +22,7 @@ jobs:
 
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
+      tag_name: ${{ steps.stripv.outputs.clean }}
 
     steps:
       - name: Release Please
@@ -32,6 +32,13 @@ jobs:
           release-type: simple
           token: ${{ secrets.GH_AUTH_TOKEN }}
 
+      - name: Strip leading 'v'
+        id: stripv
+        run: |
+          CLEAN_TAG="${{ steps.release.outputs.tag_name }}"
+          CLEAN_TAG="${CLEAN_TAG#v}"
+          echo "clean=$CLEAN_TAG" >> $GITHUB_OUTPUT
+
   build-windows:
     name: Build & Package (Windows)
     runs-on: windows-latest
@@ -39,7 +46,7 @@ jobs:
     #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
-      PACKAGE_DIR: "${{ github.workspace }}/package"
+      PACKAGE_DIR: "${{ github.workspace }}/package--windows"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
       - name: Checkout
@@ -47,14 +54,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Normalize SEMVER
-        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
-
-      - name: Configure CMake
+      - name: Build (Backend)
         shell: cmd
         run: |
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
-          cmake --build ${{ env.BUILD_DIR }} --config Release
+          type nul > empty_file.txt
+      #          cmake -B ${{ env.BUILD_DIR }} -S .
+      #          cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Build (Frontend)
         shell: cmd
@@ -67,27 +72,23 @@ jobs:
       - name: Prepare package structure
         shell: cmd
         run: |
-          set PACKAGE_DIR=package-windows
-          echo "PACKAGE_DIR=$PACKAGE_DIR" >> $GITHUB_ENV
-
-          mkdir -p $PACKAGE_DIR/bin
-          mkdir -p $PACKAGE_DIR/etc
-          mkdir -p $PACKAGE_DIR/log
-          mkdir -p $PACKAGE_DIR/frontend
-          mkdir -p $PACKAGE_DIR/data/s3
-          mkdir -p $PACKAGE_DIR/data/sqs
-          mkdir -p $PACKAGE_DIR/data/sns
-          mkdir -p $PACKAGE_DIR/data/lambda
-          mkdir -p $PACKAGE_DIR/data/application
-
+          mkdir ${{ env.BUILD_DIR }}/bin
+          mkdir ${{ env.BUILD_DIR }}/etc
+          mkdir ${{ env.BUILD_DIR }}/log
+          mkdir ${{ env.BUILD_DIR }}/frontend
+          mkdir ${{ env.BUILD_DIR }}/data/s3
+          mkdir ${{ env.BUILD_DIR }}/data/sqs
+          mkdir ${{ env.BUILD_DIR }}/data/sns
+          mkdir ${{ env.BUILD_DIR }}/data/lambda
+          mkdir ${{ env.BUILD_DIR }}/data/application
+          
           # Copy your app
-          copy ${{ env.BUILD_DIR }}/awsmockmgr $PACKAGE_DIR/bin
-          copy ${{ env.BUILD_DIR }}/awsmockctl $PACKAGE_DIR/bin
-          copy ${{ env.BUILD_DIR }}/awslocal $PACKAGE_DIR/bin
-          copy dist/etc/awsmock_windows.json $PACKAGE_DIR/etc/awsmock.json
-          copy dist/etc/magic_linux.mgc $PACKAGE_DIR/etc/magic.mgc
-          copy dist/etc/ssh_host_key $PACKAGE_DIR/etc/ssh_host_key
-          robocopy /E /NFL /NDL ${{ github.workspace }}/awsmock-ui/dist/awsmock-ui/browser/* $PACKAGE_DIR/frontend
+          #          copy ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.BUILD_DIR }}/awsmockctl ${{ env.BUILD_DIR }}/awslocal ${{ env.BUILD_DIR }}/bin
+          #          copy dist/etc/awsmock_windows.json ${{ env.BUILD_DIR }}/etc/awsmock.json
+          #          copy dist/etc/magic_linux.mgc ${{ env.BUILD_DIR }}/etc/magic.mgc
+          #          copy dist/etc/ssh_host_key ${{ env.BUILD_DIR }}/etc/ssh_host_key
+          #          copy dist/etc/ssh_host_key ${{ env.BUILD_DIR }}/etc/ssh_host_key
+               robocopy /E /NFL /NDL ${{ github.workspace }}/awsmock-ui/dist/awsmock-ui/browser/* $PACKAGE_DIR/frontend
 
       - name: Create ZIP using tar.exe via CMD
         shell: cmd
