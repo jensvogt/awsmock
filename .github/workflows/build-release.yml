@@ -57,11 +57,8 @@ jobs:
       - name: Build (Backend)
         shell: cmd
         run: |
-          type nul > ${{ env.BUILD_DIR }}/awsmockmgr.exe
-          type nul > ${{ env.BUILD_DIR }}/awsmockctl.exe
-          type nul > ${{ env.BUILD_DIR }}/local.exe
-      #          cmake -B ${{ env.BUILD_DIR }} -S .
-      #          cmake --build ${{ env.BUILD_DIR }} --config Release
+          cmake -B ${{ env.BUILD_DIR }} -S .
+          cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Build (Frontend)
         shell: cmd
