@@ -2,8 +2,7 @@
 // Created by vogje01 on 3/30/25.
 //
 
-#include "awsmock/repository/CognitoDatabase.h"
-
+#include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/sftpserver/SftpServer.h>
 #include <awsmock/sftpserver/SftpUser.h>
@@ -15,7 +14,7 @@ extern HANDLE g_ServiceStopEvent;
 namespace AwsMock::Service {
     SftpUsers SftpServer::_sftpUsers;
 }
-
+HANDLE g_ServiceStopEvent{};
 //================================= sftpserver =======================================
 extern "C" {
 
@@ -49,19 +48,22 @@ char *mystrndup(const char *s, size_t n) {
 }
 #endif// _WIN32
 
-extern void sftp_set_error(const sftp_session sftp, int errnum);
+/*extern "C" {
+
+void sftp_set_error(const sftp_session sftp, int errnum);
 extern int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uint32_t len);
 extern int sftp_channel_default_data_callback([[maybe_unused]] ssh_session session, [[maybe_unused]] ssh_channel channel, void *data, const uint32_t len, [[maybe_unused]] int is_stderr, void *userdata);
 extern int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel channel, const char *subsystem, void *userdata);
 extern int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 extern int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap);
-extern int sftp_reply_version(sftp_client_message client_msg);
+int sftp_reply_version(sftp_client_message client_msg);
 extern int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 extern void _ssh_set_error_oom(void *error, const char *function);
 extern void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...);
 extern ssize_t ssh_writen(int fd, const void *buf, size_t nbytes);
 extern ssize_t ssh_readn(int fd, void *buf, size_t nbytes);
 extern void ssh_log_function(const int verbosity, const char *function, const char *buffer);
+    }*/
 
 // User home directory
 char *userBasePath;
@@ -97,11 +99,11 @@ static char *FtpFileNameToRealPath(const char *filename) {
     return realFilename;
 }
 
-// void sftp_set_error(const sftp_session sftp, int errnum) {
-//     if (sftp != nullptr) {
-//         sftp->errnum = errnum;
-//     }
-// }
+ void sftp_set_error(const sftp_session sftp, int errnum) {
+     if (sftp != nullptr) {
+         sftp->errnum = errnum;
+     }
+ }
 
 static const char *ssh_str_error(int u_errno) {
     switch (u_errno) {
@@ -204,12 +206,12 @@ static const char *get_s3_key(const char *name, const char *prefix) {
  * @param  error       The place to store the error.
  *
  */
-/*void _ssh_set_error_oom(void *error, const char *function) {
+void _ssh_set_error_oom(void *error, const char *function) {
     auto *err = static_cast<error_struct *>(error);
 
     snprintf(err->error_buffer, sizeof(err->error_buffer), "%s: Out of memory", function);
     err->error_code = SSH_FATAL;
-}*/
+}
 
 /**
  * @internal
@@ -320,7 +322,7 @@ static void ssh_log_custom(ssh_logging_callback log_fn, int verbosity, const cha
     log_fn(verbosity, function, buf, ssh_get_log_userdata());
 }
 
-/*void ssh_log_function(const int verbosity, const char *function, const char *buffer) {
+void ssh_log_function(const int verbosity, const char *function, const char *buffer) {
 
     if (const ssh_logging_callback log_fn = ssh_get_log_callback()) {
         ssh_log_custom(log_fn, verbosity, function, buffer);
@@ -328,7 +330,7 @@ static void ssh_log_custom(ssh_logging_callback log_fn, int verbosity, const cha
     }
 
     ssh_log_stderr(verbosity, function, buffer);
-}*/
+}
 
 /**
  * @internal
@@ -340,7 +342,7 @@ static void ssh_log_custom(ssh_logging_callback log_fn, int verbosity, const cha
  * @param  descr       The description, which can be a format string.
  * @param  ...         The arguments for the format string.
  */
-/*void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) {
+void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) {
     auto *err = static_cast<struct ssh_common_struct *>(error);
     va_list va;
 
@@ -352,7 +354,7 @@ static void ssh_log_custom(ssh_logging_callback log_fn, int verbosity, const cha
     if (ssh_get_log_level() == SSH_LOG_TRACE) {
         ssh_log_function(SSH_LOG_TRACE, function, err->error.error_buffer);
     }
-}*/
+}
 
 /**
  * @internal
@@ -755,7 +757,7 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
  * @returns             SSH_OK on success, SSH_ERROR on error
  * @warning             when using 'P' with a constant size (e.g. 8), do not forget to cast to (size_t).
  */
-/*int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
+int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
     va_list ap;
 
     if (argc > 256) {
@@ -775,7 +777,7 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
     va_end(ap);
 
     return rc;
-}*/
+}
 
 /**
  * @brief Add data at the head of a buffer.
@@ -1136,7 +1138,7 @@ error:
  * @param[in] nbytes      Number of bytes to read.
  * @returns               Number of bytes read on success, SSH_ERROR on error with errno set to indicate the error.
  */
-/*ssize_t ssh_readn(int fd, void *buf, size_t nbytes) {
+ssize_t ssh_readn(int fd, void *buf, size_t nbytes) {
     size_t total_bytes_read = 0;
 
     if (fd < 0 || buf == nullptr || nbytes == 0) {
@@ -1164,7 +1166,7 @@ error:
     } while (total_bytes_read < nbytes);
 
     return total_bytes_read;
-}*/
+}
 
 static int process_read(sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
@@ -1233,7 +1235,7 @@ static int process_read(sftp_client_message client_msg) {
  * @param[in] nbytes      Number of bytes to write.
  * @returns               Number of bytes written on success,SSH_ERROR on error with errno set to indicate theerror.
  */
-/*ssize_t ssh_writen(int fd, const void *buf, size_t nbytes) {
+ssize_t ssh_writen(int fd, const void *buf, size_t nbytes) {
     size_t total_bytes_written = 0;
 
     if (fd < 0 || buf == nullptr || nbytes == 0) {
@@ -1256,7 +1258,7 @@ static int process_read(sftp_client_message client_msg) {
     } while (total_bytes_written < nbytes);
 
     return static_cast<int>(total_bytes_written);
-}*/
+}
 
 static int process_write(sftp_client_message client_msg) {
 
@@ -1973,7 +1975,7 @@ error:
  * @return SSH_OK when the SFTP server was successfully initialized, SSH_ERROR
  *         otherwise.
  */
-/*int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel channel, const char *subsystem, void *userdata) {
+int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel channel, const char *subsystem, void *userdata) {
 
     if (strcmp(subsystem, "sftp") == 0) {
         auto *sftp = static_cast<sftp_session *>(userdata);
@@ -1987,9 +1989,9 @@ error:
         return SSH_OK;
     }
     return SSH_ERROR;
-}*/
+}
 
-/*int sftp_reply_version(sftp_client_message client_msg) {
+int sftp_reply_version(sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
     const ssh_session session = sftp->session;
 
@@ -2027,7 +2029,7 @@ error:
     }
 
     return SSH_OK;
-}*/
+}
 
 /**
  * Functions to convert between host and network byte order.
@@ -2890,7 +2892,7 @@ bignum ssh_make_string_bn(ssh_string string) {
  *                      SSH_ERROR on error
  * @see ssh_buffer_get_format() for format list values.
  */
-/*int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
+int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
     int rc = SSH_ERROR;
     const char *p = format;
     union {
@@ -3129,7 +3131,7 @@ cleanup:
     va_end(ap_copy);
 
     return rc;
-}*/
+}
 
 /**
  * @brief Get multiple values from a buffer on a single function call
@@ -3151,14 +3153,14 @@ cleanup:
  *                      SSH_ERROR on error
  * @warning             when using 'P' with a constant size (e.g. 8), do not forget to cast to (size_t).
  */
-/*int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
+int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
     va_list ap;
 
     va_start(ap, argc);
     const int rc = ssh_buffer_unpack_va(buffer, format, argc, ap);
     va_end(ap);
     return rc;
-}*/
+}
 
 // ======================================================================================================================
 

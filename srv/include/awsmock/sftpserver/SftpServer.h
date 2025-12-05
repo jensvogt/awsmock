@@ -158,11 +158,11 @@ struct sftp_message_handler {
     sftp_server_message_callback cb;
 };
 
-LIBSSH_API int sftp_channel_default_subsystem_request(ssh_session session,
+int sftp_channel_default_subsystem_request(ssh_session session,
                                                       ssh_channel channel,
                                                       const char *subsystem,
                                                       void *userdata);
-LIBSSH_API int sftp_channel_default_data_callback(ssh_session session,
+int sftp_channel_default_data_callback(ssh_session session,
                                                   ssh_channel channel,
                                                   void *data,
                                                   uint32_t len,
