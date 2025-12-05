@@ -62,7 +62,7 @@ namespace AwsMock::Service::Frontend {
 
         boost::beast::http::response<boost::beast::http::string_body> res{boost::beast::http::status::ok, req_.version()};
         res.set(boost::beast::http::field::server, "Beast");
-        res.set(boost::beast::http::field::content_type, mime_type(path));
+        res.set(boost::beast::http::field::content_type, mime_type(path.string()));
         res.body() = std::move(body);
         res.prepare_payload();
 

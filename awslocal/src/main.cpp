@@ -46,13 +46,13 @@
  */
 void ShowHelp(const boost::program_options::options_description &desc) {
     std::cout << std::endl
-              << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-              << std::endl
-              << "Usage: " << std::endl
-              << "  awslocal [Options] Commands" << std::endl
-              << std::endl
-              << desc << std::endl
-              << "\nCommands:\nAny AWS command" << std::endl;
+            << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+            << std::endl
+            << "Usage: " << std::endl
+            << "  awslocal [Options] Commands" << std::endl
+            << std::endl
+            << desc << std::endl
+            << "\nCommands:\nAny AWS command" << std::endl;
 }
 
 /**
@@ -63,49 +63,51 @@ void ShowHelp(const boost::program_options::options_description &desc) {
  * @return system exit code.
  */
 int main(const int argc, char *argv[]) {
-
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
 
     // Declare the supported options.
     boost::program_options::options_description desc("Options");
-    desc.add_options()("host", boost::program_options::value<std::string>()->default_value(DEFAULT_HOST), "AWS host name");
+    desc.add_options()("host", boost::program_options::value<std::string>()->default_value(DEFAULT_HOST),
+                       "AWS host name");
     desc.add_options()("port", boost::program_options::value<int>()->default_value(DEFAULT_PORT), "AWS port");
-    desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "AwsMock configuration");
+    desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE),
+                       "AwsMock configuration");
     desc.add_options()("profile", boost::program_options::value<std::string>(), "AWS profile");
     desc.add_options()("loglevel", boost::program_options::value<std::string>(), "AwsMock log level");
     desc.add_options()("help", "produce help message");
 
     // Get command line options.
     boost::program_options::variables_map vm;
-    const boost::program_options::parsed_options parsed = boost::program_options::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
+    const boost::program_options::parsed_options parsed = boost::program_options::command_line_parser(argc, argv).
+            options(desc).allow_unregistered().run();
     store(parsed, vm);
     notify(vm);
 
     // Show usage.
-    if (vm.empty() || vm.contains("help")) {
+    if (vm.empty() || vm.find("help") != vm.end()) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show the version
-    if (vm.contains("version")) {
+    if (vm.find("version") != vm.end()) {
         std::cout << std::endl
-                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-                  << std::endl;
+                << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                << std::endl;
         return EXIT_SUCCESS;
     }
 
     // Read the configuration.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.contains("config")) {
+    if (vm.find("config") != vm.end()) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
     // Set the log level
-    if (vm.contains("loglevel")) {
+    if (vm.find("loglevel") != vm.end()) {
         const auto value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);

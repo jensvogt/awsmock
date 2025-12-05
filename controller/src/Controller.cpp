@@ -4,9 +4,7 @@
 #include <awsmock/controller/Controller.h>
 
 namespace AwsMock::Controller {
-
     AwsMockCtl::AwsMockCtl() {
-
         // Initialize database
         _host = Core::Configuration::instance().GetValue<std::string>("awsmock.gateway.http.host");
         _port = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.port");
@@ -26,11 +24,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::Run() {
-
         const std::string action = _commands[0];
         _commands.erase(_commands.begin());
         switch (CommandTypeFromString(action)) {
-
             case CommandType::CONFIG: {
                 return GetConfig();
             }
@@ -43,14 +39,14 @@ namespace AwsMock::Controller {
             case CommandType::STATUS: {
                 std::cout << "Applications: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                          << std::setw(10) << std::left << "Enabled"
-                          << std::setw(10) << std::left << "Status"
-                          << std::setw(12) << std::left << "Ports"
-                          << std::endl;
+                        << std::setw(10) << std::left << "Enabled"
+                        << std::setw(10) << std::left << "Status"
+                        << std::setw(12) << std::left << "Ports"
+                        << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
+                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
                     if (application.enabled) {
                         std::cout << std::setw(12) << std::left << (std::to_string(application.privatePort) + "->" + std::to_string(application.publicPort));
                     }
@@ -58,14 +54,14 @@ namespace AwsMock::Controller {
                 }
                 std::cout << "Lambdas: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                          << std::setw(10) << std::left << "Enabled"
-                          << std::setw(10) << std::left << "Status"
-                          << std::setw(12) << std::left << "Ports"
-                          << std::endl;
+                        << std::setw(10) << std::left << "Enabled"
+                        << std::setw(10) << std::left << "Status"
+                        << std::setw(12) << std::left << "Ports"
+                        << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
+                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
                     if (lambda.enabled) {
                         std::vector<Dto::Lambda::InstanceCounter> instances = GetLambdaInstances(lambda);
                         std::string portStr = "8080->";
@@ -85,16 +81,16 @@ namespace AwsMock::Controller {
                     std::cout << "Applications: " << std::endl;
                     for (const auto &application: _applications) {
                         std::cout << "  " << std::setw(32) << std::left << application.name
-                                  << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                                  << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                                << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                                << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
                     }
                 }
                 if (_commands.empty() || _commands[0] == "lambdas") {
                     std::cout << "Lambdas: " << std::endl;
                     for (const auto &lambda: _lambdas) {
                         std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                                  << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                                  << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                                << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                                << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
                     }
                 }
                 break;
@@ -216,8 +212,8 @@ namespace AwsMock::Controller {
                     modules = GetAllModules();
                 }
 
-                const bool pretty = _vm.contains("pretty");
-                const bool includeObjects = _vm.contains("include-objects");
+                const bool pretty = _vm.find("pretty") != _vm.end();
+                const bool includeObjects = _vm.find("include-objects") != _vm.end();
 
                 ExportInfrastructure(modules, pretty, includeObjects);
                 break;
@@ -256,11 +252,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::EnableApplications(const std::vector<Dto::Apps::Application> &applications) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "enable-application");
         for (const auto &application: applications) {
-
             Dto::Apps::EnableApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
@@ -275,7 +269,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::EnableAllApplications() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "enable-all-applications");
 
@@ -290,11 +283,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::DisableApplications(const std::vector<Dto::Apps::Application> &applications) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "disable-application");
         for (const auto &application: applications) {
-
             Dto::Apps::DisableApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
@@ -309,7 +300,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::DisableAllApplications() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "disable-all-applications");
 
@@ -324,11 +314,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StartApplications(const std::vector<Dto::Apps::Application> &applications) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "start-application");
         for (const auto &application: applications) {
-
             Dto::Apps::StartApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
@@ -343,7 +331,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StartAllApplications() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "start-all-applications");
         Dto::Apps::StartAllApplicationsRequest appRequest;
@@ -357,11 +344,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::RestartApplications(const std::vector<Dto::Apps::Application> &applications) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "restart-application");
         for (const auto &application: applications) {
-
             Dto::Apps::RestartApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
@@ -376,7 +361,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::RestartAllApplications() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "restart-all-applications");
 
@@ -388,11 +372,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StopApplications(const std::vector<Dto::Apps::Application> &applications) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "stop-application");
         for (const auto &application: applications) {
-
             Dto::Apps::StopApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
@@ -407,7 +389,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StopAllApplications() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "application", "stop-all-applications");
         Dto::Apps::StopAllApplicationsRequest appRequest;
@@ -421,11 +402,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::EnableLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "enable-lambda");
         for (const auto &lambda: lambdas) {
-
             Dto::Lambda::EnableLambdaRequest appRequest;
             appRequest.region = _region;
             appRequest.function.functionName = lambda.functionName;
@@ -439,7 +418,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::EnableAllLambdas() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "enable-all-lambdas");
 
@@ -454,7 +432,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::DisableAllLambdas() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "disable-all-lambdas");
 
@@ -469,11 +446,9 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::DisableLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "disable-lambda");
         for (const auto &lambda: lambdas) {
-
             Dto::Lambda::DisableLambdaRequest appRequest;
             appRequest.region = _region;
             appRequest.function.functionName = lambda.functionName;
@@ -487,7 +462,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StartLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "start-lambda");
         for (const auto &lambda: lambdas) {
@@ -504,7 +478,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StartAllLambdas() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "start-all-lambdas");
         Dto::Lambda::StartAllLambasRequest appRequest;
@@ -518,7 +491,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::RestartLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "restart-lambda");
         for (const auto &lambda: lambdas) {
@@ -535,7 +507,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::RestartAllLambdas() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "restart-all-lambdas");
         Dto::Lambda::StartAllLambasRequest appRequest;
@@ -549,7 +520,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StopLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "stop-lambda");
         for (const auto &lambda: lambdas) {
@@ -566,7 +536,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::StopAllLambdas() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "lambda", "stop-all-lambdas");
         Dto::Lambda::StopAllLambasRequest appRequest;
@@ -629,7 +598,6 @@ namespace AwsMock::Controller {
 #endif
 
     void AwsMockCtl::SetLogLevel(const std::string &level) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "set-log-level");
         if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", level, headers); response.statusCode != boost::beast::http::status::ok) {
@@ -653,7 +621,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::GetConfig() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "get-config");
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
@@ -682,7 +649,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, const bool pretty, const bool includeObjects) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "export");
 
@@ -703,7 +669,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::ImportInfrastructure() const {
-
         std::string line;
         std::stringstream jsonString;
         while (std::getline(std::cin, line)) {
@@ -719,7 +684,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::CleanInfrastructure(const Dto::Module::Module::ModuleList &modules) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "clean");
 
@@ -732,7 +696,6 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::CleanObjects(Dto::Module::Module::ModuleList &modules) const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "clean-objects");
 
@@ -756,7 +719,6 @@ namespace AwsMock::Controller {
     }
 
     std::vector<Dto::Apps::Application> AwsMockCtl::GetAllApplications() const {
-
         Dto::Apps::ListApplicationCountersRequest request;
         request.region = _region;
         request.user = _user;
@@ -786,7 +748,6 @@ namespace AwsMock::Controller {
     }
 
     std::vector<Dto::Lambda::Function> AwsMockCtl::GetAllLambdas() const {
-
         Dto::Lambda::ListFunctionCountersRequest request;
         request.region = _region;
         request.user = _user;
@@ -815,7 +776,6 @@ namespace AwsMock::Controller {
     }
 
     std::vector<Dto::Lambda::InstanceCounter> AwsMockCtl::GetLambdaInstances(const Dto::Lambda::Function &function) const {
-
         Dto::Lambda::ListLambdaInstanceCountersRequest request;
         request.region = _region;
         request.user = _user;
@@ -836,7 +796,7 @@ namespace AwsMock::Controller {
                 Dto::Lambda::InstanceCounter instance;
                 instance.containerId = element.at("containerId").as_string().data();
                 instance.instanceId = element.at("instanceId").as_string().data();
-                instance.port = element.at("port").as_int64();
+                instance.port = static_cast<int>(element.at("port").as_int64());
                 instances.push_back(instance);
             }
         }
@@ -844,7 +804,6 @@ namespace AwsMock::Controller {
     }
 
     std::vector<Dto::Module::Module> AwsMockCtl::GetAllModules() const {
-
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "list-modules");
 
@@ -896,5 +855,4 @@ namespace AwsMock::Controller {
         }
         return modules;
     }
-
-}// namespace AwsMock::Controller
+} // namespace AwsMock::Controller

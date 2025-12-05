@@ -51,7 +51,6 @@
  * @return system exit code.
  */
 int main(const int argc, char *argv[]) {
-
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
 
@@ -60,17 +59,24 @@ int main(const int argc, char *argv[]) {
     desc.add_options()("help", "produce help message");
     desc.add_options()("version", "application version");
     desc.add_options()("loglevel", boost::program_options::value<std::string>(), "set log level");
-    desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "set configuration file");
-    desc.add_options()("logfile", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_PREFIX), "set log file");
+    desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE),
+                       "set configuration file");
+    desc.add_options()("logfile", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_PREFIX),
+                       "set log file");
 #ifdef _WIN32
     desc.add_options()("foreground", "run as foreground process");
     desc.add_options()("install", "install windows service");
     desc.add_options()("check", "check windows service");
     desc.add_options()("uninstall", "uninstall windows service");
-    desc.add_options()("name", boost::program_options::value<std::string>()->default_value("awsmock"), "windows service name");
-    desc.add_options()("description", boost::program_options::value<std::string>()->default_value("AWS Cloud Simulation"), "windows service description");
-    desc.add_options()("display", boost::program_options::value<std::string>()->default_value("AWS Mock"), "windows service display name");
-    desc.add_options()("path", boost::program_options::value<std::string>()->default_value(DEFAULT_SERVICE_PATH), "windows service path");
+    desc.add_options()("name", boost::program_options::value<std::string>()->default_value("awsmock"),
+                       "windows service name");
+    desc.add_options()("description",
+                       boost::program_options::value<std::string>()->default_value("AWS Cloud Simulation"),
+                       "windows service description");
+    desc.add_options()("display", boost::program_options::value<std::string>()->default_value("AWS Mock"),
+                       "windows service display name");
+    desc.add_options()("path", boost::program_options::value<std::string>()->default_value(DEFAULT_SERVICE_PATH),
+                       "windows service path");
 #endif
 
     boost::program_options::variables_map vm;
@@ -78,28 +84,28 @@ int main(const int argc, char *argv[]) {
     notify(vm);
 
     // Show usage
-    if (vm.contains("help")) {
+    if (vm.find("help") != vm.end()) {
         std::cout << std::endl
-                  << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-                  << std::endl
-                  << "Usage: " << std::endl
-                  << "  awsmockmgr [Options]" << std::endl
-                  << std::endl
-                  << desc << std::endl;
+                << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                << std::endl
+                << "Usage: " << std::endl
+                << "  awsmockmgr [Options]" << std::endl
+                << std::endl
+                << desc << std::endl;
         return 0;
     }
 
     // Show the version
-    if (vm.contains("version")) {
+    if (vm.find("version") != vm.end()) {
         std::cout << std::endl
-                  << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-                  << std::endl;
+                << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                << std::endl;
         return 0;
     }
 
 #ifdef WIN32
     // Install Windows service
-    if (vm.contains("install")) {
+    if (vm.find("install") != vm.end()) {
         if (vm["name"].as<std::string>().empty()) {
             std::cerr << "Service name is required" << std::endl;
             return 1;
@@ -109,7 +115,7 @@ int main(const int argc, char *argv[]) {
     }
 
     // Uninstall Windows service
-    if (vm.contains("uninstall")) {
+    if (vm.find("uninstall") != vm.end()) {
         if (vm["name"].as<std::string>().empty()) {
             std::cerr << "Service name is required" << std::endl;
             return 1;
@@ -120,13 +126,13 @@ int main(const int argc, char *argv[]) {
 #endif
 
     // Read configuration, log to stderr, as we do not have logging yet
-    if (vm.contains("config")) {
+    if (vm.find("config") != vm.end()) {
         const std::string configFilename = vm["config"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetFilename(configFilename);
     }
 
     // Set the log level
-    if (vm.contains("loglevel")) {
+    if (vm.find("loglevel") != vm.end()) {
         auto value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
@@ -147,8 +153,7 @@ int main(const int argc, char *argv[]) {
 #ifdef WIN32
 
     // Run as a foreground process on windows
-    if (vm.contains("foreground")) {
-
+    if (vm.find("foreground") != vm.end()) {
         // Run the detached frontend server thread
         boost::thread frontendThread;
         AwsMock::Service::Frontend::FrontendServer server;
@@ -175,8 +180,9 @@ int main(const int argc, char *argv[]) {
 
     // Windows service table entries
     constexpr SERVICE_TABLE_ENTRY serviceTable[] = {
-            {const_cast<LPSTR>(DEFAULT_SERVICE_NAME), static_cast<LPSERVICE_MAIN_FUNCTIONA>(ServiceMain)},
-            {nullptr, nullptr}};
+        {const_cast<LPSTR>(DEFAULT_SERVICE_NAME), static_cast<LPSERVICE_MAIN_FUNCTIONA>(ServiceMain)},
+        {nullptr, nullptr}
+    };
 
     // Windows service start
     if (!StartServiceCtrlDispatcher(serviceTable)) {
