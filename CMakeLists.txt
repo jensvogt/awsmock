@@ -33,11 +33,16 @@ if (WIN32)
 endif ()
 
 #find_package(LibArchive)
-#find_package(mongocxx)
+#find_package(bsoncxx CONFIG REQUIRED)
+#find_package(mongocxx CONFIG REQUIRED)
 #find_package(Boost COMPONENTS Boost::json Boost::headers Boost::system Boost::serialization)
-#find_package(jwt-cpp)
-#find_package(libssh)
-#find_package(OpenSSL COMPONENTS SSL Crypto)
+#find_package(jwt-cpp REQUIRED)
+#find_package(libssh REQUIRED)
+#find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
+#message(STATUS "OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
+#message(STATUS "OPENSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
+#message(STATUS "OPENSSL_CRYPTO_LIBRARY: ${OPENSSL_CRYPTO_LIBRARY}")
+#message(STATUS "OPENSSL_SSL_LIBRARY: ${OPENSSL_SSL_LIBRARY}")
 
 # -------------------------------------------------------------------------
 # Build AWSMock Core library

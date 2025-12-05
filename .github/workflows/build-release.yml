@@ -51,12 +51,13 @@ jobs:
         run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
 
       - name: Configure CMake
+        shell: cmd
         run: |
           cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
           cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Build (Frontend)
-        shell: bash
+        shell: cmd
         run: |
           git clone https://github.com/jensvogt/awsmock-ui
           cd awsmock-ui
@@ -64,7 +65,7 @@ jobs:
           npm run build
 
       - name: Prepare package structure
-        shell: bash
+        shell: cmd
         run: |
           set PACKAGE_DIR=package-windows
           echo "PACKAGE_DIR=$PACKAGE_DIR" >> $GITHUB_ENV
