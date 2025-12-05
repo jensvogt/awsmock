@@ -57,7 +57,9 @@ jobs:
       - name: Build (Backend)
         shell: cmd
         run: |
-          type nul > empty_file.txt
+          type nul > ${{ env.BUILD_DIR }}/awsmockmgr.exe
+          type nul > ${{ env.BUILD_DIR }}/awsmockctl.exe
+          type nul > ${{ env.BUILD_DIR }}/local.exe
       #          cmake -B ${{ env.BUILD_DIR }} -S .
       #          cmake --build ${{ env.BUILD_DIR }} --config Release
 
@@ -72,23 +74,23 @@ jobs:
       - name: Prepare package structure
         shell: cmd
         run: |
-          mkdir ${{ env.BUILD_DIR }}/bin
-          mkdir ${{ env.BUILD_DIR }}/etc
-          mkdir ${{ env.BUILD_DIR }}/log
-          mkdir ${{ env.BUILD_DIR }}/frontend
-          mkdir ${{ env.BUILD_DIR }}/data/s3
-          mkdir ${{ env.BUILD_DIR }}/data/sqs
-          mkdir ${{ env.BUILD_DIR }}/data/sns
-          mkdir ${{ env.BUILD_DIR }}/data/lambda
-          mkdir ${{ env.BUILD_DIR }}/data/application
-          
-          # Copy your app
-          #          copy ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.BUILD_DIR }}/awsmockctl ${{ env.BUILD_DIR }}/awslocal ${{ env.BUILD_DIR }}/bin
-          #          copy dist/etc/awsmock_windows.json ${{ env.BUILD_DIR }}/etc/awsmock.json
-          #          copy dist/etc/magic_linux.mgc ${{ env.BUILD_DIR }}/etc/magic.mgc
-          #          copy dist/etc/ssh_host_key ${{ env.BUILD_DIR }}/etc/ssh_host_key
-          #          copy dist/etc/ssh_host_key ${{ env.BUILD_DIR }}/etc/ssh_host_key
-               robocopy /E /NFL /NDL ${{ github.workspace }}/awsmock-ui/dist/awsmock-ui/browser/* $PACKAGE_DIR/frontend
+          mkdir ${{ env.PACKAGE_DIR }}/bin
+          mkdir ${{ env.PACKAGE_DIR }}/etc
+          mkdir ${{ env.PACKAGE_DIR }}/log
+          mkdir ${{ env.PACKAGE_DIR }}/frontend
+          mkdir ${{ env.PACKAGE_DIR }}/data/s3
+          mkdir ${{ env.PACKAGE_DIR }}/data/sqs
+          mkdir ${{ env.PACKAGE_DIR }}/data/sns
+          mkdir ${{ env.PACKAGE_DIR }}/data/lambda
+          mkdir ${{ env.PACKAGE_DIR }}/data/application
+
+          copy ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/awsmockctl ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/bin
+          robocopy /E /NFL /NDL ${{ github.workspace }}/extern/win32/bin/* $PACKAGE_DIR/bin
+          copy dist/etc/awsmock_windows.json ${{ env.PACKAGE_DIR }}/etc/awsmock.json
+          copy dist/etc/magic_linux.mgc ${{ env.PACKAGE_DIR }}/etc/magic.mgc
+          copy dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/etc/ssh_host_key
+          copy dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/etc/ssh_host_key
+          robocopy /E /NFL /NDL ${{ github.workspace }}/awsmock-ui/dist/awsmock-ui/browser/* $PACKAGE_DIR/frontend
 
       - name: Create ZIP using tar.exe via CMD
         shell: cmd
