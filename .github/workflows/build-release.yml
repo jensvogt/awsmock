@@ -54,8 +54,8 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B $BUILD_DIR -S . -DCMAKE_BUILD_TYPE=Release
-          cmake --build $BUILD_DIR --config Release --parallel
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
+          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Prepare package structure
         run: |
@@ -71,15 +71,11 @@ jobs:
           mkdir -p $PACKAGE_DIR/data/sns
           mkdir -p $PACKAGE_DIR/data/lambda
           mkdir -p $PACKAGE_DIR/data/application
-          mkdir -p $PACKAGE_DIR/usr/local/share/man/man1
-          mkdir -p $PACKAGE_DIR/etc/systemd/system
-          mkdir -p $PACKAGE_DIR/etc/ld.so.conf.d
-          mkdir -p $PACKAGE_DIR/DEBIAN
 
           # Copy your app
-          copy $BUILD_DIR/awsmockmgr $PACKAGE_DIR/bin
-          copy $BUILD_DIR/awsmockctl $PACKAGE_DIR/bin
-          copy $BUILD_DIR/awslocal $PACKAGE_DIR/bin
+          copy ${{ env.BUILD_DIR }}/awsmockmgr $PACKAGE_DIR/bin
+          copy ${{ env.BUILD_DIR }}/awsmockctl $PACKAGE_DIR/bin
+          copy ${{ env.BUILD_DIR }}/awslocal $PACKAGE_DIR/bin
           copy dist/etc/awsmock_windows.json $PACKAGE_DIR/etc/awsmock.json
           copy dist/etc/magic_linux.mgc $PACKAGE_DIR/etc/magic.mgc
           copy dist/etc/ssh_host_key $PACKAGE_DIR/etc/ssh_host_key
