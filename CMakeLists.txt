@@ -19,9 +19,8 @@ set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
 
 if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
-    add_compile_options(/MP16 /FS "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MD>" "$<$<CONFIG:DEBUG>:/MDd>" /D "_WIN32")
+    add_compile_options(/MP8 /FS "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MD>" "$<$<CONFIG:DEBUG>:/MDd>" /D "_WIN32")
     add_compile_options("$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)
-    add_compile_options(/FS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     set(CMAKE_SYSTEM_NAME Windows)
     set(CMAKE_GENERATOR_PLATFORM x64)
@@ -44,23 +43,23 @@ endif ()
 # Build AWSMock Core library
 # -------------------------------------------------------------------------
 
-set(UTILS_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp core/src/utils/DirUtils.cpp core/src/utils/DateTimeUtils.cpp
-        core/src/utils/CryptoUtils.cpp core/src/utils/AwsUtils.cpp core/src/utils/SystemUtils.cpp core/src/utils/TarUtils.cpp
-        core/src/utils/RandomUtils.cpp core/src/utils/TestUtils.cpp core/src/utils/HttpUtils.cpp core/src/utils/NumberUtils.cpp
-        core/src/utils/MemoryMappedFile.cpp core/src/utils/XmlUtils.cpp core/src/utils/UnixSocket.cpp core/src/utils/HttpSocket.cpp
-        core/src/utils/JwtUtils.cpp core/src/scheduler/PeriodicTask.cpp core/src/scheduler/Scheduler.cpp core/src/utils/BackupUtils.cpp
-        core/src/config/Configuration.cpp core/src/utils/SrpUtils.cpp core/src/utils/DomainSocket.cpp core/src/scheduler/CronTask.cpp
-        core/src/utils/WindowsSocket.cpp core/src/utils/CronUtils.cpp core/src/scheduler/OneTimeTask.cpp core/src/utils/ZipUtils.cpp)
-set(EXCEPTION_SOURCES core/src/exception/CoreException.cpp core/src/exception/DatabaseException.cpp
+set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp core/src/utils/DirUtils.cpp
+        core/src/utils/DateTimeUtils.cpp core/src/utils/CryptoUtils.cpp core/src/utils/AwsUtils.cpp
+        core/src/utils/SystemUtils.cpp core/src/utils/TarUtils.cpp core/src/utils/RandomUtils.cpp
+        core/src/utils/TestUtils.cpp core/src/utils/HttpUtils.cpp core/src/utils/NumberUtils.cpp
+        core/src/utils/MemoryMappedFile.cpp core/src/utils/XmlUtils.cpp core/src/utils/UnixSocket.cpp
+        core/src/utils/HttpSocket.cpp core/src/utils/JwtUtils.cpp core/src/scheduler/PeriodicTask.cpp
+        core/src/scheduler/Scheduler.cpp core/src/utils/BackupUtils.cpp core/src/config/Configuration.cpp
+        core/src/utils/SrpUtils.cpp core/src/utils/DomainSocket.cpp core/src/scheduler/CronTask.cpp
+        core/src/utils/WindowsSocket.cpp core/src/utils/CronUtils.cpp core/src/scheduler/OneTimeTask.cpp
+        core/src/utils/ZipUtils.cpp core/src/exception/CoreException.cpp core/src/exception/DatabaseException.cpp
         core/src/exception/ServiceException.cpp core/src/exception/JsonException.cpp core/src/exception/NotFoundException.cpp
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
-        core/src/exception/BadRequestException.cpp)
-set(LOGGING_SOURCES core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/logging/LogStream.cpp
-        core/src/logging/LogWebsocketSink.cpp)
-set(MONITORING_SOURCES core/src/monitoring/MonitoringCollector.cpp)
+        core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
+        core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp)
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
-#add_library(awsmockcore STATIC ${SOURCES})
+add_library(awsmockcore SHARED ${CORE_SOURCES})
 if (APPLE)
     target_include_directories(awsmockcore PUBLIC ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
@@ -73,7 +72,6 @@ if (APPLE)
 
 elseif (WIN32)
 
-    add_library(awsmockcore SHARED ${SOURCES})
     target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${EXTERNAL_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
     target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR})
@@ -151,44 +149,35 @@ endif ()
 # Build AWSMock Database library
 # -------------------------------------------------------------------------
 
-set(SQS_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.cpp db/src/repository/SQSDatabase.cpp
+set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.cpp db/src/repository/SQSDatabase.cpp
         db/src/memorydb/SQSMemoryDb.cpp db/src/entity/sqs/Queue.cpp db/src/entity/sqs/QueueAttribute.cpp
-        db/src/entity/sqs/RedrivePolicy.cpp)
-set(SNS_SOURCES db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp db/src/entity/sns/Topic.cpp
-        db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp db/src/repository/SNSDatabase.cpp
-        db/src/memorydb/SNSMemoryDb.cpp)
-set(S3_SOURCES db/src/entity/s3/Bucket.cpp db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp
-        db/src/repository/S3Database.cpp db/src/memorydb/S3MemoryDb.cpp db/src/entity/s3/FilterRule.cpp
-        db/src/entity/s3/QueueNotification.cpp db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp
-        db/src/entity/s3/BucketEncryption.cpp)
-set(LAMBDA_SOURCES db/src/entity/lambda/Tags.cpp db/src/entity/lambda/Environment.cpp db/src/entity/lambda/Lambda.cpp
+        db/src/entity/sqs/RedrivePolicy.cpp db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp
+        db/src/entity/sns/Topic.cpp db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
+        db/src/repository/SNSDatabase.cpp db/src/memorydb/SNSMemoryDb.cpp db/src/entity/s3/Bucket.cpp
+        db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp db/src/repository/S3Database.cpp
+        db/src/memorydb/S3MemoryDb.cpp db/src/entity/s3/FilterRule.cpp db/src/entity/s3/QueueNotification.cpp
+        db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp db/src/entity/s3/BucketEncryption.cpp
+        db/src/entity/lambda/Tags.cpp db/src/entity/lambda/Environment.cpp db/src/entity/lambda/Lambda.cpp
         db/src/entity/lambda/Code.cpp db/src/entity/lambda/EphemeralStorage.cpp db/src/repository/LambdaDatabase.cpp
         db/src/memorydb/LambdaMemoryDb.cpp db/src/entity/lambda/Instance.cpp db/src/entity/lambda/EventSourceMapping.cpp
-        db/src/entity/lambda/LambdaResult.cpp)
-set(TRANSFER_SOURCES db/src/repository/TransferDatabase.cpp db/src/entity/transfer/User.cpp db/src/entity/transfer/Transfer.cpp
-        db/src/memorydb/TransferMemoryDb.cpp)
-set(COGNITO_SOURCES db/src/entity/cognito/UserPool.cpp db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp
-        db/src/entity/cognito/Group.cpp db/src/memorydb/CognitoMemoryDb.cpp db/src/repository/CognitoDatabase.cpp)
-set(DYNAMODB_SOURCES db/src/entity/dynamodb/Item.cpp db/src/entity/dynamodb/Table.cpp db/src/entity/dynamodb/AttributeValue.cpp
-        db/src/entity/dynamodb/ProvisionedThroughput.cpp db/src/repository/DynamoDbDatabase.cpp
-        db/src/memorydb/DynamoDbMemoryDb.cpp)
-set(SECRETSMANAGER_SOURCES db/src/entity/secretsmanager/Secret.cpp db/src/entity/secretsmanager/SecretVersion.cpp
-        db/src/entity/secretsmanager/RotationRules.cpp db/src/repository/SecretsManagerDatabase.cpp
-        db/src/memorydb/SecretsManagerMemoryDb.cpp)
-set(KMS_SOURCES db/src/entity/kms/Key.cpp db/src/repository/KMSDatabase.cpp db/src/memorydb/KMSMemoryDb.cpp)
-set(SSM_SOURCES db/src/entity/ssm/Parameter.cpp db/src/repository/SSMDatabase.cpp db/src/memorydb/SSMMemoryDb.cpp)
-set(MODULE_SOURCES db/src/entity/module/Module.cpp db/src/repository/ModuleDatabase.cpp db/src/memorydb/ModuleMemoryDb.cpp)
-set(APPS_SOURCES db/src/entity/apps/Application.cpp db/src/repository/ApplicationDatabase.cpp db/src/memorydb/ApplicationMemoryDb.cpp)
-set(UTIL_SOURCES db/src/utils/MongoUtils.cpp db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp)
-set(API_GATEWAY_SOURCES db/src/repository/ApiGatewayDatabase.cpp db/src/memorydb/ApiGatewayMemoryDb.cpp
-        db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp)
-set(MONITORING_SOURCES db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp)
-set(SOURCES db/src/repository/Database.cpp db/src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
-        ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${UTIL_SOURCES}
-        ${MONITORING_SOURCES})
+        db/src/entity/lambda/LambdaResult.cpp db/src/repository/TransferDatabase.cpp db/src/entity/transfer/User.cpp
+        db/src/entity/transfer/Transfer.cpp db/src/memorydb/TransferMemoryDb.cpp db/src/entity/cognito/UserPool.cpp
+        db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp db/src/entity/cognito/Group.cpp
+        db/src/memorydb/CognitoMemoryDb.cpp db/src/repository/CognitoDatabase.cpp db/src/entity/dynamodb/Item.cpp
+        db/src/entity/dynamodb/Table.cpp db/src/entity/dynamodb/AttributeValue.cpp db/src/entity/dynamodb/ProvisionedThroughput.cpp
+        db/src/repository/DynamoDbDatabase.cpp db/src/memorydb/DynamoDbMemoryDb.cpp db/src/entity/secretsmanager/Secret.cpp
+        db/src/entity/secretsmanager/SecretVersion.cpp db/src/entity/secretsmanager/RotationRules.cpp
+        db/src/repository/SecretsManagerDatabase.cpp db/src/memorydb/SecretsManagerMemoryDb.cpp db/src/entity/kms/Key.cpp
+        db/src/repository/KMSDatabase.cpp db/src/memorydb/KMSMemoryDb.cpp db/src/entity/ssm/Parameter.cpp
+        db/src/repository/SSMDatabase.cpp db/src/memorydb/SSMMemoryDb.cpp db/src/entity/module/Module.cpp
+        db/src/repository/ModuleDatabase.cpp db/src/memorydb/ModuleMemoryDb.cpp db/src/entity/apps/Application.cpp
+        db/src/repository/ApplicationDatabase.cpp db/src/memorydb/ApplicationMemoryDb.cpp db/src/utils/MongoUtils.cpp
+        db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/repository/ApiGatewayDatabase.cpp
+        db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp
+        db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp db/src/repository/Database.cpp
+        db/src/utils/TestUtils.cpp)
 
-add_library(awsmockdb SHARED ${SOURCES})
+add_library(awsmockdb SHARED ${DB_SOURCES})
 if (APPLE)
     target_include_directories(awsmockdb PUBLIC ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
