@@ -41,8 +41,6 @@ jobs:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-      VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,7 +53,7 @@ jobs:
       - name: Configure CMake
         run: |
           cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+          cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Prepare package structure
         run: |
