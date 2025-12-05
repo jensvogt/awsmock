@@ -6,8 +6,8 @@
 #include <awsmock/service/frontend/FrontendSession.h>
 
 namespace AwsMock::Service::Frontend {
-
-    FrontendSession::FrontendSession(boost::asio::ip::tcp::socket socket) : socket_(std::move(socket)) {}
+    FrontendSession::FrontendSession(boost::asio::ip::tcp::socket socket) : socket_(std::move(socket)) {
+    }
 
     void FrontendSession::run() {
         dispatch(socket_.get_executor(), boost::beast::bind_front_handler(&FrontendSession::do_read, shared_from_this()));
@@ -62,7 +62,7 @@ namespace AwsMock::Service::Frontend {
 
         boost::beast::http::response<boost::beast::http::string_body> res{boost::beast::http::status::ok, req_.version()};
         res.set(boost::beast::http::field::server, "Beast");
-        res.set(boost::beast::http::field::content_type, mime_type(path));
+        res.set(boost::beast::http::field::content_type, mime_type(path.string()));
         res.body() = std::move(body);
         res.prepare_payload();
 
@@ -73,5 +73,4 @@ namespace AwsMock::Service::Frontend {
         boost::beast::error_code ec;
         socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
     }
-
-}// namespace AwsMock::Service::Frontend
+} // namespace AwsMock::Service::Frontend
