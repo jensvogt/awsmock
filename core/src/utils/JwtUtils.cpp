@@ -8,20 +8,23 @@ namespace AwsMock::Core {
 
     std::string JwtUtils::CreateTokenRs256(const std::string &privateKey, const std::string &issuer, const std::map<std::string, std::string> &payload) {
 
-        auto token = jwt::create()
-                             .set_issuer(issuer)
+        /*auto token = jwt::create<jwt::traits::picojson>(jwt::default_clock{})
+        .set_issuer(issuer)
                              .set_type("JWT")
                              .set_id("awsmock-rsa256")
                              .set_issued_at(jwt::date::clock::now())
                              .set_expires_at(jwt::date::clock::now() + std::chrono::seconds{36000});
         for (const auto &[fst, snd]: payload) {
-            token.set_payload_claim(fst, jwt::claim(snd));
+            token.set_payload_claim(fst, jwt::basic_claim<>(snd));
         }
         return token.sign(jwt::algorithm::rs256("", privateKey, "", ""));
+        */
+        return {};
     }
 
     std::string JwtUtils::CreateTokenHs256(const std::string &secret, const std::string &issuer, const std::map<std::string, std::string> &payload) {
 
+        /*
         auto token = jwt::create()
                              .set_issuer(issuer)
                              .set_type("JWT")
@@ -32,10 +35,12 @@ namespace AwsMock::Core {
             token.set_payload_claim(fst, jwt::claim(snd));
         }
         return token.sign(jwt::algorithm::hs256(secret));
+        */
+        return {};
     }
 
     bool JwtUtils::VerifyTokenRs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer) {
-        try {
+/*        try {
             auto verify = jwt::verify()
                                   // We only need an RSA public key to verify tokens
                                   .allow_algorithm(jwt::algorithm::rs256(publicKey, "", "", ""))
@@ -44,12 +49,12 @@ namespace AwsMock::Core {
         } catch (jwt::error::token_verification_error &ex) {
             //log_error << "Invalid JWT token, code: " << make_error_code(ex);
             return false;
-        }
+        }*/
         return true;
     }
 
     bool JwtUtils::VerifyTokenHs256(const std::string &secret, const std::string &jwt, const std::string &issuer) {
-        try {
+        /*try {
             auto verify = jwt::verify()
                                   // We only need an RSA public key to verify tokens
                                   .allow_algorithm(jwt::algorithm::hs256(secret))
@@ -58,7 +63,7 @@ namespace AwsMock::Core {
         } catch (jwt::error::token_verification_error &ex) {
             //log_error << "Invalid JWT token, code: " << make_error_code(ex);
             return false;
-        }
+        }*/
         return true;
     }
 

@@ -1,16 +1,8 @@
 {
-  "name": "awsmock",
-  "version": "1.0.0",
-  "dependencies": [
-    "openssl",
-    "jwt-cpp",
-    "boost",
-    "zlib",
-    "libzip",
-    "libarchive",
-    "libmagic",
-    "libssh",
-    "mongo-cxx-driver"
+  "name" : "awsmock",
+  "version" : "1.0.0",
+  "dependencies" : [ "openssl", "jwt-cpp", "boost", "libzip", "libarchive", "libmagic", "libssh", "mongo-cxx-driver",
+    {"name" : "beast", "version>=" : "0#2"}
   ],
-  "builtin-baseline": "b1b19307e2d2ec1eefbdb7ea069de7d4bcd31f01"
+  "builtin-baseline" : "e7d7451462697d77ef319ddf2da8ff7320a82662"
 }

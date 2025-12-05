@@ -3,9 +3,6 @@
 //
 
 #include <awsmock/core/DateTimeUtils.h>
-#include <boost/chrono/duration.hpp>
-#include <boost/chrono/system_clocks.hpp>
-#include <boost/system/detail/enable_if.hpp>
 
 namespace AwsMock::Core {
 
