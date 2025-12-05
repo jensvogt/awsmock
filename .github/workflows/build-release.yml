@@ -55,9 +55,18 @@ jobs:
           cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
           cmake --build ${{ env.BUILD_DIR }} --config Release
 
-      - name: Prepare package structure
+      - name: Build (Frontend)
+        shell: bash
         run: |
-          PACKAGE_DIR=package-macos
+          git clone https://github.com/jensvogt/awsmock-ui
+          cd awsmock-ui
+          npm install
+          npm run build
+
+      - name: Prepare package structure
+        shell: bash
+        run: |
+          set PACKAGE_DIR=package-windows
           echo "PACKAGE_DIR=$PACKAGE_DIR" >> $GITHUB_ENV
 
           mkdir -p $PACKAGE_DIR/bin
@@ -77,7 +86,7 @@ jobs:
           copy dist/etc/awsmock_windows.json $PACKAGE_DIR/etc/awsmock.json
           copy dist/etc/magic_linux.mgc $PACKAGE_DIR/etc/magic.mgc
           copy dist/etc/ssh_host_key $PACKAGE_DIR/etc/ssh_host_key
-      #          copy -R ${{ github.workspace }}/frontend/dist/awsmock-ui/browser/* $PACKAGE_DIR/frontend
+          robocopy /E /NFL /NDL ${{ github.workspace }}/awsmock-ui/dist/awsmock-ui/browser/* $PACKAGE_DIR/frontend
 
       - name: Create ZIP using tar.exe via CMD
         shell: cmd
@@ -87,8 +96,8 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: installer-windows
-          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-win32.zip
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-x64.zip
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-x64.zip
 
   #
   # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
