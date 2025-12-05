@@ -40,8 +40,9 @@
 // Allowed actions
 static std::list<std::string> allowedActions() {
     return {
-            "logLevel", "logs", "list", "enable", "disable", "start", "stop", "restart", "status",
-            "export", "import", "clean", "clean-objects", "config", "ping", "loglevel"};
+        "logLevel", "logs", "list", "enable", "disable", "start", "stop", "restart", "status",
+        "export", "import", "clean", "clean-objects", "config", "ping", "loglevel"
+    };
 }
 
 /**
@@ -50,40 +51,45 @@ static std::list<std::string> allowedActions() {
 void ShowHelp(const boost::program_options::options_description &desc) {
     constexpr int leftIndent = 64;
     std::cout << std::endl
-              << "AwsMock awsmockctl v" << APP_VERSION << std::endl
-              << std::endl
-              << "Usage: " << std::endl
-              << "  awsmockctl [Options] Commands" << std::endl
-              << std::endl
-              << "Options:" << std::endl
-              << std::left << std::setw(leftIndent) << "  --help" << ": show this usage" << std::endl
-              << std::left << std::setw(leftIndent) << "  --version" << ": show current version" << std::endl
-              << std::left << std::setw(leftIndent) << "  --host" << ": connect to manager on 'host'" << std::endl
-              << std::left << std::setw(leftIndent) << "  --port" << ": use 'port' for the manager connection" << std::endl
-              << std::endl
-              << "Commands: " << std::endl
-              << std::left << std::setw(leftIndent) << "  status: shows the status of all available applications and lambdas." << std::endl
-              << std::left << std::setw(leftIndent) << "  list [applications|lambdas]" << ": list all available applications or lambdas. If no argument is given, both are listed." << std::endl
-              << std::left << std::setw(leftIndent) << "  enable [applications|lambdas|<applications...>|<lambda...>]" << ": enable the given application(s) or lambda(s). If no argument is given, enables all applications and lambdas. Several applications should be separated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  disable [applications|lambdas|<applications...>|<lambda...>]" << ": disable the given application(s) or lambda(s). If no argument is given, disables all applications and lambdas. Several applications should be separated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  start [applications|lambdas|<applications...>|<lambda...>]" << ": starts the given application(s) or lambda(s). If no argument is given, starts all applications and lambdas. Several applications should be separated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  stop [applications|lambdas|<applications...>|<lambda...>]" << ": stops the given application(s) or lambda(s). If no argument is given, stops all applications and lambdas. Several applications should be separated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  restart [applications|lambdas|<applications...>|<lambda...>]" << ": restarts the given application(s) or lambda(s). If no argument is given, restarts all applications and lambdas. Several applications should be separated by spaces." << std::endl;
+            << "AwsMock awsmockctl v" << APP_VERSION << std::endl
+            << std::endl
+            << "Usage: " << std::endl
+            << "  awsmockctl [Options] Commands" << std::endl
+            << std::endl
+            << "Options:" << std::endl
+            << std::left << std::setw(leftIndent) << "  --help" << ": show this usage" << std::endl
+            << std::left << std::setw(leftIndent) << "  --version" << ": show current version" << std::endl
+            << std::left << std::setw(leftIndent) << "  --host" << ": connect to manager on 'host'" << std::endl
+            << std::left << std::setw(leftIndent) << "  --port" << ": use 'port' for the manager connection" << std::endl
+            << std::endl
+            << "Commands: " << std::endl
+            << std::left << std::setw(leftIndent) << "  status: shows the status of all available applications and lambdas." << std::endl
+            << std::left << std::setw(leftIndent) << "  list [applications|lambdas]" << ": list all available applications or lambdas. If no argument is given, both are listed." << std::endl
+            << std::left << std::setw(leftIndent) << "  enable [applications|lambdas|<applications...>|<lambda...>]" <<
+            ": enable the given application(s) or lambda(s). If no argument is given, enables all applications and lambdas. Several applications should be separated by spaces." << std::endl
+            << std::left << std::setw(leftIndent) << "  disable [applications|lambdas|<applications...>|<lambda...>]" <<
+            ": disable the given application(s) or lambda(s). If no argument is given, disables all applications and lambdas. Several applications should be separated by spaces." << std::endl
+            << std::left << std::setw(leftIndent) << "  start [applications|lambdas|<applications...>|<lambda...>]" <<
+            ": starts the given application(s) or lambda(s). If no argument is given, starts all applications and lambdas. Several applications should be separated by spaces." << std::endl
+            << std::left << std::setw(leftIndent) << "  stop [applications|lambdas|<applications...>|<lambda...>]" <<
+            ": stops the given application(s) or lambda(s). If no argument is given, stops all applications and lambdas. Several applications should be separated by spaces." << std::endl
+            << std::left << std::setw(leftIndent) << "  restart [applications|lambdas|<applications...>|<lambda...>]" <<
+            ": restarts the given application(s) or lambda(s). If no argument is given, restarts all applications and lambdas. Several applications should be separated by spaces." << std::endl;
 #ifdef HAS_SYSTEMD
     std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
 #endif
     std::cout << std::left << std::setw(leftIndent) << "  loglevel <level>" << ": sets the manager log to level" << std::endl
-              << std::left << std::setw(leftIndent) << "  config" << ": shows the gateway configuration" << std::endl
-              << std::left << std::setw(leftIndent) << "  export [<modules>] [export-options]" << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl
-              << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
-              << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
-              << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
-              << std::left << std::setw(leftIndent) << "  ping" << ": ping the manager." << std::endl
-              << "\nExport options:\n"
-              << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
-              << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl
-              << "\nValid log levels are: fatal, error, warning, info, debug, verbose." << std::endl
-              << std::endl;
+            << std::left << std::setw(leftIndent) << "  config" << ": shows the gateway configuration" << std::endl
+            << std::left << std::setw(leftIndent) << "  export [<modules>] [export-options]" << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl
+            << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
+            << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
+            << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
+            << std::left << std::setw(leftIndent) << "  ping" << ": ping the manager." << std::endl
+            << "\nExport options:\n"
+            << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
+            << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl
+            << "\nValid log levels are: fatal, error, warning, info, debug, verbose." << std::endl
+            << std::endl;
 }
 
 /**
@@ -94,7 +100,6 @@ void ShowHelp(const boost::program_options::options_description &desc) {
  * @return system exit code.
  */
 int main(const int argc, char *argv[]) {
-
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
     AwsMock::Core::LogStream::RemoveConsoleLogs();
@@ -126,29 +131,29 @@ int main(const int argc, char *argv[]) {
     const std::vector<std::string> commands = collect_unrecognized(parsed.options, boost::program_options::include_positional);
 
     // Show usage.
-    if (vm.contains("help")) {
+    if (vm.find("help") != vm.end()) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show the version
-    if (vm.contains("version")) {
+    if (vm.find("version") != vm.end()) {
         std::cout << std::endl
-                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-                  << std::endl;
+                << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                << std::endl;
         return EXIT_SUCCESS;
     }
 
     // Read the configuration file.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.contains("config")) {
+    if (vm.find("config") != vm.end()) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
     // Set the log level.
-    if (vm.contains("loglevel")) {
+    if (vm.find("loglevel") != vm.end()) {
         const std::string value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
@@ -165,11 +170,11 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::LogStream::AddFile(logDir, prefix, size, count);
     }
 
-    if (vm.contains("host")) {
+    if (vm.find("host") != vm.end()) {
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.gateway.http.host", vm["host"].as<std::string>());
     }
 
-    if (vm.contains("port")) {
+    if (vm.find("port") != vm.end()) {
         AwsMock::Core::Configuration::instance().SetValue<int>("awsmock.gateway.http.port", vm["port"].as<int>());
     }
 
@@ -184,7 +189,7 @@ int main(const int argc, char *argv[]) {
     }
     if (!found) {
         std::cerr << std::endl
-                  << "Unknown command: " << action << std::endl;
+                << "Unknown command: " << action << std::endl;
         ShowHelp(desc);
         return EXIT_FAILURE;
     }

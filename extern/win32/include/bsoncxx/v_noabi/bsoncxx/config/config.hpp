@@ -12,5 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define BSONCXX_POLY_USE_IMPLS
-/* #undef BSONCXX_POLY_USE_STD */
+// For backward compatibility.
+#include <bsoncxx/v1/config/config.hpp>
+
+///
+/// @file
+/// Provides macros describing the bsoncxx library configuration.
+///
+/// @par Includes
+/// - @ref bsoncxx/v1/config/config.hpp
+///

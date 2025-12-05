@@ -12,7 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define BSONCXX_VERSION_MAJOR 4
-#define BSONCXX_VERSION_MINOR 0
-#define BSONCXX_VERSION_PATCH 0
-#define BSONCXX_VERSION_EXTRA 
+// For backward compatibility.
+#include <bsoncxx/v1/config/version.hpp>
+
+///
+/// @file
+/// Provides macros describing the bsoncxx library version.
+///
+/// @par Includes
+/// - @ref bsoncxx/v1/config/version.hpp
+///

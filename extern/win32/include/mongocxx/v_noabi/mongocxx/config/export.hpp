@@ -1,54 +1,26 @@
+// Copyright 2009-present MongoDB, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef MONGOCXX_ABI_EXPORT_H
-#define MONGOCXX_ABI_EXPORT_H
+// For backward compatibility.
+#include <mongocxx/v1/config/export.hpp>
 
-#ifdef MONGOCXX_STATIC
-#  define MONGOCXX_ABI_EXPORT
-#  define MONGOCXX_ABI_NO_EXPORT
-#else
-#  ifndef MONGOCXX_ABI_EXPORT
-#    ifdef MONGOCXX_EXPORTS
-        /* We are building this library */
-#      define MONGOCXX_ABI_EXPORT __declspec(dllexport)
-#    else
-        /* We are using this library */
-#      define MONGOCXX_ABI_EXPORT __declspec(dllimport)
-#    endif
-#  endif
-
-#  ifndef MONGOCXX_ABI_NO_EXPORT
-#    define MONGOCXX_ABI_NO_EXPORT 
-#  endif
-#endif
-
-#ifndef MONGOCXX_DEPRECATED
-#  define MONGOCXX_DEPRECATED __declspec(deprecated)
-#endif
-
-#ifndef MONGOCXX_DEPRECATED_EXPORT
-#  define MONGOCXX_DEPRECATED_EXPORT MONGOCXX_ABI_EXPORT MONGOCXX_DEPRECATED
-#endif
-
-#ifndef MONGOCXX_DEPRECATED_NO_EXPORT
-#  define MONGOCXX_DEPRECATED_NO_EXPORT MONGOCXX_ABI_NO_EXPORT MONGOCXX_DEPRECATED
-#endif
-
-/* NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if) */
-#if 0 /* DEFINE_NO_DEPRECATED */
-#  ifndef MONGOCXX_ABI_NO_DEPRECATED
-#    define MONGOCXX_ABI_NO_DEPRECATED
-#  endif
-#endif
-
-#undef MONGOCXX_DEPRECATED_EXPORT
-#undef MONGOCXX_DEPRECATED_NO_EXPORT
-
-#if defined(_MSC_VER)
-#define MONGOCXX_ABI_CDECL __cdecl
-#else
-#define MONGOCXX_ABI_CDECL
-#endif
-
-#define MONGOCXX_ABI_EXPORT_CDECL(...) MONGOCXX_ABI_EXPORT __VA_ARGS__ MONGOCXX_ABI_CDECL
-
-#endif /* MONGOCXX_ABI_EXPORT_H */
+///
+/// @file
+/// Provides macros to control the set of symbols exported in the ABI.
+///
+/// @warning For internal use only!
+///
+/// @par Includes
+/// - @ref mongocxx/v1/config/export.hpp
+///

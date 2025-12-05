@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define MONGOCXX_VERSION_STRING "4.0.0"
-#define MONGOCXX_VERSION_MAJOR 4
-#define MONGOCXX_VERSION_MINOR 0
-#define MONGOCXX_VERSION_PATCH 0
-#define MONGOCXX_VERSION_EXTRA 
+// For backward compatibility.
+#include <mongocxx/v1/config/version.hpp>
+
+///
+/// @file
+/// Provides macros describing the mongocxx library version.
+///
+/// @par Includes
+/// - @ref mongocxx/v1/config/version.hpp
+///

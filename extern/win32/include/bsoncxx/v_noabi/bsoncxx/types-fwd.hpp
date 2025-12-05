@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/v1/types/view-fwd.hpp>
+
 #include <cstdint>
 
 #include <bsoncxx/config/prelude.hpp>
@@ -24,12 +26,26 @@ namespace v_noabi {
 enum class type : std::uint8_t;
 enum class binary_sub_type : std::uint8_t;
 
-}  // namespace v_noabi
-}  // namespace bsoncxx
+} // namespace v_noabi
+} // namespace bsoncxx
 
 namespace bsoncxx {
 namespace v_noabi {
 namespace types {
+
+///
+/// Equivalent to @ref bsoncxx::v_noabi::type.
+///
+/// To support incremental migration to @ref bsoncxx::v1::types::id.
+///
+using id = v_noabi::type;
+
+///
+/// Equivalent to @ref bsoncxx::v_noabi::binary_sub_type.
+///
+/// To support incremental migration to @ref bsoncxx::v1::types::binary_subtype.
+///
+using binary_subtype = v_noabi::binary_sub_type;
 
 struct b_double;
 struct b_string;
@@ -53,44 +69,47 @@ struct b_decimal128;
 struct b_maxkey;
 struct b_minkey;
 
-}  // namespace types
-}  // namespace v_noabi
-}  // namespace bsoncxx
+} // namespace types
+} // namespace v_noabi
+} // namespace bsoncxx
 
 namespace bsoncxx {
 
-using ::bsoncxx::v_noabi::binary_sub_type;
-using ::bsoncxx::v_noabi::type;
+using v_noabi::binary_sub_type;
+using v_noabi::type;
 
-}  // namespace bsoncxx
+} // namespace bsoncxx
 
 namespace bsoncxx {
 namespace types {
 
-using ::bsoncxx::v_noabi::types::b_array;
-using ::bsoncxx::v_noabi::types::b_binary;
-using ::bsoncxx::v_noabi::types::b_bool;
-using ::bsoncxx::v_noabi::types::b_code;
-using ::bsoncxx::v_noabi::types::b_codewscope;
-using ::bsoncxx::v_noabi::types::b_date;
-using ::bsoncxx::v_noabi::types::b_dbpointer;
-using ::bsoncxx::v_noabi::types::b_decimal128;
-using ::bsoncxx::v_noabi::types::b_document;
-using ::bsoncxx::v_noabi::types::b_double;
-using ::bsoncxx::v_noabi::types::b_int32;
-using ::bsoncxx::v_noabi::types::b_int64;
-using ::bsoncxx::v_noabi::types::b_maxkey;
-using ::bsoncxx::v_noabi::types::b_minkey;
-using ::bsoncxx::v_noabi::types::b_null;
-using ::bsoncxx::v_noabi::types::b_oid;
-using ::bsoncxx::v_noabi::types::b_regex;
-using ::bsoncxx::v_noabi::types::b_string;
-using ::bsoncxx::v_noabi::types::b_symbol;
-using ::bsoncxx::v_noabi::types::b_timestamp;
-using ::bsoncxx::v_noabi::types::b_undefined;
+using v_noabi::types::binary_subtype;
+using v_noabi::types::id;
 
-}  // namespace types
-}  // namespace bsoncxx
+using v_noabi::types::b_array;
+using v_noabi::types::b_binary;
+using v_noabi::types::b_bool;
+using v_noabi::types::b_code;
+using v_noabi::types::b_codewscope;
+using v_noabi::types::b_date;
+using v_noabi::types::b_dbpointer;
+using v_noabi::types::b_decimal128;
+using v_noabi::types::b_document;
+using v_noabi::types::b_double;
+using v_noabi::types::b_int32;
+using v_noabi::types::b_int64;
+using v_noabi::types::b_maxkey;
+using v_noabi::types::b_minkey;
+using v_noabi::types::b_null;
+using v_noabi::types::b_oid;
+using v_noabi::types::b_regex;
+using v_noabi::types::b_string;
+using v_noabi::types::b_symbol;
+using v_noabi::types::b_timestamp;
+using v_noabi::types::b_undefined;
+
+} // namespace types
+} // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>
 
@@ -98,76 +117,8 @@ using ::bsoncxx::v_noabi::types::b_undefined;
 /// @file
 /// Declares entities used to represent BSON types.
 ///
-
-#if defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
-
-namespace bsoncxx {
-namespace types {
-
-/// @ref bsoncxx::v_noabi::types::b_double
-struct b_double {};
-
-/// @ref bsoncxx::v_noabi::types::b_string
-struct b_string {};
-
-/// @ref bsoncxx::v_noabi::types::b_document
-struct b_document {};
-
-/// @ref bsoncxx::v_noabi::types::b_array
-struct b_array {};
-
-/// @ref bsoncxx::v_noabi::types::b_binary
-struct b_binary {};
-
-/// @ref bsoncxx::v_noabi::types::b_undefined
-struct b_undefined {};
-
-/// @ref bsoncxx::v_noabi::types::b_oid
-struct b_oid {};
-
-/// @ref bsoncxx::v_noabi::types::b_bool
-struct b_bool {};
-
-/// @ref bsoncxx::v_noabi::types::b_date
-struct b_date {};
-
-/// @ref bsoncxx::v_noabi::types::b_null
-struct b_null {};
-
-/// @ref bsoncxx::v_noabi::types::b_regex
-struct b_regex {};
-
-/// @ref bsoncxx::v_noabi::types::b_dbpointer
-struct b_dbpointer {};
-
-/// @ref bsoncxx::v_noabi::types::b_code
-struct b_code {};
-
-/// @ref bsoncxx::v_noabi::types::b_symbol
-struct b_symbol {};
-
-/// @ref bsoncxx::v_noabi::types::b_codewscope
-struct b_codewscope {};
-
-/// @ref bsoncxx::v_noabi::types::b_int32
-struct b_int32 {};
-
-/// @ref bsoncxx::v_noabi::types::b_timestamp
-struct b_timestamp {};
-
-/// @ref bsoncxx::v_noabi::types::b_int64
-struct b_int64 {};
-
-/// @ref bsoncxx::v_noabi::types::b_decimal128
-struct b_decimal128 {};
-
-/// @ref bsoncxx::v_noabi::types::b_maxkey
-struct b_maxkey {};
-
-/// @ref bsoncxx::v_noabi::types::b_minkey
-struct b_minkey {};
-
-}  // namespace types
-}  // namespace bsoncxx
-
-#endif  // defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
+/// @deprecated Use @ref bsoncxx/types/id-fwd.hpp or @ref bsoncxx/types/view-fwd.hpp instead.
+///
+/// @par Includes
+/// - @ref bsoncxx/v1/types/view-fwd.hpp
+///

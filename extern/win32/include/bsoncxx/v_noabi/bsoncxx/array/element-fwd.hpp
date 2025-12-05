@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/v1/element/view-fwd.hpp>
+
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
@@ -22,17 +24,17 @@ namespace array {
 
 class element;
 
-}  // namespace array
-}  // namespace v_noabi
-}  // namespace bsoncxx
+} // namespace array
+} // namespace v_noabi
+} // namespace bsoncxx
 
 namespace bsoncxx {
 namespace array {
 
-using ::bsoncxx::v_noabi::array::element;
+using v_noabi::array::element;
 
-}  // namespace array
-}  // namespace bsoncxx
+} // namespace array
+} // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>
 
@@ -40,16 +42,6 @@ using ::bsoncxx::v_noabi::array::element;
 /// @file
 /// Declares @ref bsoncxx::v_noabi::array::element.
 ///
-
-#if defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
-
-namespace bsoncxx {
-namespace array {
-
-/// @ref bsoncxx::v_noabi::array::element
-class element {};
-
-}  // namespace array
-}  // namespace bsoncxx
-
-#endif  // defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
+/// @par Includes
+/// - @ref bsoncxx/v1/element/view-fwd.hpp
+///

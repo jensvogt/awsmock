@@ -14,22 +14,25 @@
 
 #pragma once
 
-#include <system_error>
-
 #include <bsoncxx/exception/exception-fwd.hpp>
+
+//
+
+#include <bsoncxx/v1/exception.hpp>
+
+#include <system_error>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
 namespace v_noabi {
 
-BSONCXX_PUSH_WARNINGS();
-BSONCXX_DISABLE_WARNING(MSVC(4251));
-BSONCXX_DISABLE_WARNING(MSVC(4275));
+BSONCXX_PRIVATE_WARNINGS_PUSH();
+BSONCXX_PRIVATE_WARNINGS_DISABLE(MSVC(4251));
+BSONCXX_PRIVATE_WARNINGS_DISABLE(MSVC(4275));
 
 ///
-/// Class representing any exceptions emitted from the bsoncxx library or
-/// its underlying implementation.
+/// Base class for all exceptions thrown by the bsoncxx library unless otherwise specified.
 ///
 class exception : public std::system_error {
    public:
@@ -37,20 +40,23 @@ class exception : public std::system_error {
 
     exception(exception&&) = default;
     exception& operator=(exception&&) = default;
-    exception(const exception&) = default;
-    exception& operator=(const exception&) = default;
+    exception(exception const&) = default;
+    exception& operator=(exception const&) = default;
 
     using std::system_error::system_error;
 };
 
-BSONCXX_POP_WARNINGS();
+BSONCXX_PRIVATE_WARNINGS_POP();
 
-}  // namespace v_noabi
-}  // namespace bsoncxx
+} // namespace v_noabi
+} // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>
 
 ///
 /// @file
 /// Provides @ref bsoncxx::v_noabi::exception.
+///
+/// @par Includes
+/// - @ref bsoncxx/v1/exception.hpp
 ///

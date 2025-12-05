@@ -11,3 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+// For backward compatibility.
+#include <mongocxx/v1/config/config.hpp>
+
+///
+/// @file
+/// Provides macros describing the mongocxx library configuration.
+///
+/// @par Includes
+/// - @ref mongocxx/v1/config/config.hpp
+///

@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/v1/oid-fwd.hpp>
+
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
@@ -21,14 +23,14 @@ namespace v_noabi {
 
 class oid;
 
-}  // namespace v_noabi
-}  // namespace bsoncxx
+} // namespace v_noabi
+} // namespace bsoncxx
 
 namespace bsoncxx {
 
-using ::bsoncxx::v_noabi::oid;
+using v_noabi::oid;
 
-}  // namespace bsoncxx
+} // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>
 
@@ -36,14 +38,6 @@ using ::bsoncxx::v_noabi::oid;
 /// @file
 /// Declares @ref bsoncxx::v_noabi::oid.
 ///
-
-#if defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
-
-namespace bsoncxx {
-
-/// @ref bsoncxx::v_noabi::oid
-class oid {};
-
-}  // namespace bsoncxx
-
-#endif  // defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
+/// @par Includes
+/// - @ref bsoncxx/v1/oid-fwd.hpp
+///

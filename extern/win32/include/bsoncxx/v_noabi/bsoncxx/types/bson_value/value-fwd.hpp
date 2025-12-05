@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/v1/types/value-fwd.hpp>
+
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
@@ -23,20 +25,31 @@ namespace bson_value {
 
 class value;
 
-}  // namespace bson_value
-}  // namespace types
-}  // namespace v_noabi
-}  // namespace bsoncxx
+} // namespace bson_value
+
+///
+/// Equivalent to @ref bsoncxx::v_noabi::types::bson_value::value.
+///
+/// To support incremental migration to @ref bsoncxx::v1::types::value.
+///
+using value = bson_value::value;
+
+} // namespace types
+} // namespace v_noabi
+} // namespace bsoncxx
 
 namespace bsoncxx {
 namespace types {
 namespace bson_value {
 
-using ::bsoncxx::v_noabi::types::bson_value::value;
+using v_noabi::types::bson_value::value;
 
-}  // namespace bson_value
-}  // namespace types
-}  // namespace bsoncxx
+} // namespace bson_value
+
+using v_noabi::types::value;
+
+} // namespace types
+} // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>
 
@@ -44,18 +57,8 @@ using ::bsoncxx::v_noabi::types::bson_value::value;
 /// @file
 /// Declares @ref bsoncxx::v_noabi::types::bson_value::value.
 ///
-
-#if defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
-
-namespace bsoncxx {
-namespace types {
-namespace bson_value {
-
-/// @ref bsoncxx::v_noabi::types::bson_value::value
-class value {};
-
-}  // namespace bson_value
-}  // namespace types
-}  // namespace bsoncxx
-
-#endif  // defined(BSONCXX_PRIVATE_DOXYGEN_PREPROCESSOR)
+/// @deprecated Use @ref bsoncxx/types/value-fwd.hpp instead (renamed).
+///
+/// @par Includes
+/// - @ref bsoncxx/v1/types/value-fwd.hpp
+///

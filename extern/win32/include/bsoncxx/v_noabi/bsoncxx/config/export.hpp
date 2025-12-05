@@ -1,54 +1,26 @@
+// Copyright 2009-present MongoDB, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#ifndef BSONCXX_ABI_EXPORT_H
-#define BSONCXX_ABI_EXPORT_H
+// For backward compatibility.
+#include <bsoncxx/v1/config/export.hpp>
 
-#ifdef BSONCXX_STATIC
-#  define BSONCXX_ABI_EXPORT
-#  define BSONCXX_ABI_NO_EXPORT
-#else
-#  ifndef BSONCXX_ABI_EXPORT
-#    ifdef BSONCXX_EXPORT
-        /* We are building this library */
-#      define BSONCXX_ABI_EXPORT __declspec(dllexport)
-#    else
-        /* We are using this library */
-#      define BSONCXX_ABI_EXPORT __declspec(dllimport)
-#    endif
-#  endif
-
-#  ifndef BSONCXX_ABI_NO_EXPORT
-#    define BSONCXX_ABI_NO_EXPORT 
-#  endif
-#endif
-
-#ifndef BSONCXX_DEPRECATED
-#  define BSONCXX_DEPRECATED __declspec(deprecated)
-#endif
-
-#ifndef BSONCXX_DEPRECATED_EXPORT
-#  define BSONCXX_DEPRECATED_EXPORT BSONCXX_ABI_EXPORT BSONCXX_DEPRECATED
-#endif
-
-#ifndef BSONCXX_DEPRECATED_NO_EXPORT
-#  define BSONCXX_DEPRECATED_NO_EXPORT BSONCXX_ABI_NO_EXPORT BSONCXX_DEPRECATED
-#endif
-
-/* NOLINTNEXTLINE(readability-avoid-unconditional-preprocessor-if) */
-#if 0 /* DEFINE_NO_DEPRECATED */
-#  ifndef BSONCXX_ABI_NO_DEPRECATED
-#    define BSONCXX_ABI_NO_DEPRECATED
-#  endif
-#endif
-
-#undef BSONCXX_DEPRECATED_EXPORT
-#undef BSONCXX_DEPRECATED_NO_EXPORT
-
-#if defined(_MSC_VER)
-#define BSONCXX_ABI_CDECL __cdecl
-#else
-#define BSONCXX_ABI_CDECL
-#endif
-
-#define BSONCXX_ABI_EXPORT_CDECL(...) BSONCXX_ABI_EXPORT __VA_ARGS__ BSONCXX_ABI_CDECL
-
-#endif /* BSONCXX_ABI_EXPORT_H */
+///
+/// @file
+/// Provides macros to control the set of symbols exported in the ABI.
+///
+/// @warning For internal use only!
+///
+/// @par Includes
+/// - @ref bsoncxx/v1/config/export.hpp
+///

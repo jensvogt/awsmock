@@ -14,7 +14,8 @@ if (!APPLE)
     #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -pthread")
     #    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -pthread")
 endif ()
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_BINARY_DIR}/conan_toolchain.cmake" CACHE STRING "")
+#set(CMAKE_TOOLCHAIN_FILE "${CMAKE_BINARY_DIR}/conan_toolchain.cmake" CACHE STRING "")
+set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
 
 if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
@@ -24,8 +25,9 @@ if (WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     set(CMAKE_SYSTEM_NAME Windows)
     set(CMAKE_GENERATOR_PLATFORM x64)
-    set(EXTERNAL_LIB_DIR ${CMAKE_SOURCE_DIR}/extern/win32/lib)
-    set(EXTERNAL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/extern/win32/include)
+    set(EXTERNAL_WIN32 ${EXTERNAL_ROOT}/win32)
+    set(EXTERNAL_LIB_DIR ${EXTERNAL_WIN32}/lib)
+    set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_WIN32}/include)
     set(EXTERNAL_LIBS boost_log-vc145-mt-x64-1_89.lib boost_log_setup-vc145-mt-x64-1_89.lib boost_process-vc145-mt-x64-1_89.lib
             boost_url-vc145-mt-x64-1_89.lib boost_filesystem-vc145-mt-x64-1_89.lib boost_thread-vc145-mt-x64-1_89.lib
             magic.lib libssl.lib libcrypto.lib archive.lib)
@@ -205,8 +207,8 @@ elseif (WIN32)
             ${CMAKE_SOURCE_DIR}/dto/include ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
             ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
     target_link_directories(awsmockdb PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockdb PUBLIC awsmockcore mongocxx-v_noabi-rhi-md.lib mongoc2.lib bsoncxx-v_noabi-rhi-md.lib
-            bson2.lib boost_url-vc145-mt-x64-1_89.lib boost_filesystem-vc145-mt-x64-1_89.lib
+    target_link_libraries(awsmockdb PUBLIC awsmockcore mongocxx-v_noabi-rhi-md.lib bsoncxx-v_noabi-rhi-md.lib
+            mongoc2.lib bson2.lib boost_url-vc145-mt-x64-1_89.lib boost_filesystem-vc145-mt-x64-1_89.lib
             boost_locale-vc145-mt-x64-1_89.lib boost_log-vc145-mt-x64-1_89.lib
             boost_log_setup-vc145-mt-x64-1_89.lib boost_process-vc145-mt-x64-1_89.lib libssl.lib libcrypto.lib
             archive.lib magic.lib ssh.lib pdh.lib)
@@ -363,11 +365,11 @@ elseif (WIN32)
     target_include_directories(awsmockctl PUBLIC ${CMAKE_SOURCE_DIR}/controller/include ${CMAKE_SOURCE_DIR}/core/include
             ${CMAKE_SOURCE_DIR}/dto/include ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(awsmockctl PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockctl awsmockdto awsmockcore mongocxx bsoncxx mongoc2.lib bson2.lib
-            libboost_filesystem-vc145-mt-x64-1_89.lib libboost_url-vc145-mt-x64-1_89.lib
-            libboost_thread-vc145-mt-x64-1_89.lib libboost_locale-vc145-mt-x64-1_89.lib
-            libboost_program_options-vc145-mt-x64-1_89.lib libboost_log-vc145-mt-x64-1_89.lib
-            libboost_log_setup-vc145-mt-x64-1_89.lib libboost_json-vc145-mt-x64-1_89.lib
+    target_link_libraries(awsmockctl awsmockdto awsmockcore mongocxx-v_noabi-rhi-md.lib bsoncxx-v_noabi-rhi-md.lib
+            mongoc2.lib bson2.lib boost_filesystem-vc145-mt-x64-1_89.lib boost_url-vc145-mt-x64-1_89.lib
+            boost_thread-vc145-mt-x64-1_89.lib boost_locale-vc145-mt-x64-1_89.lib
+            boost_program_options-vc145-mt-x64-1_89.lib boost_log-vc145-mt-x64-1_89.lib
+            boost_log_setup-vc145-mt-x64-1_89.lib boost_json-vc145-mt-x64-1_89.lib
             ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 else ()
     add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
@@ -430,7 +432,24 @@ add_subdirectory(docs)
 # -------------------------------------------------------------------------
 # Install
 # -------------------------------------------------------------------------
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/log)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/frontend)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/samples)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/s3)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/sqs)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/sns)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/lambda)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/transfer)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/tmp)
+install(DIRECTORY dist/samples/ DESTINATION ${CMAKE_INSTALL_PREFIX}/samples)
+install(FILES dist/etc/ssh_host_key DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
 
-#install(TARGETS awsmockmgr DESTINATION bin)
-#install(DIRECTORY ${EXTERNAL_ROOT}/lib DESTINATION .)
-#install(DIRECTORY ${EXTERNAL_ROOT}/include DESTINATION .)
+if (WIN32)
+    install(FILES dist/etc/awsmock_win32.json DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.json)
+    install(FILES dist/etc/magic.mgc DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
+endif ()
