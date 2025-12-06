@@ -10,11 +10,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Global link flags
 # -------------------------------------------------------------------------
 
-if (LINUX)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -pthread")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -pthread")
-endif ()
-
 if (WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     add_definitions(-D_WIN32_WINNT=0x0A00)
@@ -24,14 +19,17 @@ endif ()
 
 find_package(LibArchive REQUIRED)
 find_package(mongocxx CONFIG REQUIRED)
-find_package(Boost REQUIRED COMPONENTS asio filesystem thread process date_time program_options json url chrono log log_setup)
+find_package(Boost REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup)
 find_package(jwt-cpp REQUIRED)
 find_package(libssh REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
-find_package(utf8proc REQUIRED)
-find_package(unofficial-libmagic CONFIG REQUIRED)
 find_package(libssh CONFIG REQUIRED)
 find_path(PICOJSON_INCLUDE_DIRS "picojson/picojson.h")
+if (WIN32)
+    find_package(utf8proc REQUIRED)
+    find_package(unofficial-libmagic CONFIG REQUIRED)
+    find_package(Boost REQUIRED COMPONENTS system)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Core library
@@ -55,9 +53,16 @@ set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORIN
 
 add_library(awsmockcore SHARED ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${PICOJSON_INCLUDE_DIRS})
-target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared mongo::bsoncxx_shared
-        Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::system Boost::chrono LibArchive::LibArchive unofficial::libmagic::libmagic)
+
+if (LINUX)
+    target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared mongo::bsoncxx_shared
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
+            Boost::chrono LibArchive::LibArchive magic)
+elseif (WIN32)
+    target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared mongo::bsoncxx_shared
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
+            Boost::chrono Boost::system unofficial::libmagic::libmagic LibArchive::LibArchive)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
@@ -90,7 +95,10 @@ target_include_directories(awsmockdto PRIVATE ${CMAKE_SOURCE_DIR}/core/include $
         ${CMAKE_SOURCE_DIR}/db/include)
 target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared
         mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time
-        Boost::url Boost::chrono Boost::json Boost::system LibArchive::LibArchive unofficial::libmagic::libmagic)
+        Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
+if (WIN32)
+    target_link_libraries(awsmockdto PUBLIC Boost::system unofficial::libmagic::libmagic)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Database library
@@ -129,7 +137,10 @@ target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${
         ${CMAKE_SOURCE_DIR}/db/include)
 target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared
         mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time
-        Boost::url Boost::system Boost::chrono Boost::json LibArchive::LibArchive unofficial::libmagic::libmagic)
+        Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
+if (WIN32)
+    target_link_libraries(awsmockdb PUBLIC Boost::system unofficial::libmagic::libmagic)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -167,8 +178,11 @@ target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include $
         ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
 target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
         mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
-        Boost::process Boost::date_time Boost::url Boost::system Boost::chrono LibArchive::LibArchive
-        unofficial::libmagic::libmagic ssh crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+        Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive ssh)
+if (WIN32)
+    target_link_libraries(awsmocksrv PUBLIC Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib
+            pdh.lib ntdll.lib shlwapi.lib)
+endif ()
 
 # -------------------------------------------------------------------------
 # AWSMock Manager (main program)
@@ -180,8 +194,18 @@ target_include_directories(awsmockmgr PRIVATE ${CMAKE_SOURCE_DIR}/manager/includ
         ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
 target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
         mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
-        Boost::process Boost::date_time Boost::url Boost::program_options Boost::system Boost::chrono LibArchive::LibArchive
-        unofficial::libmagic::libmagic)
+        Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive)
+if (LINUX)
+    target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
+            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
+            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive
+            magic)
+elseif (WIN32)
+    target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
+            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
+            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive
+            Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+endif ()
 
 # -------------------------------------------------------------------------
 # AWSMock Controller
@@ -190,10 +214,16 @@ target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmock
 add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
 target_include_directories(awsmockctl PRIVATE ${CMAKE_SOURCE_DIR}/controller/include ${CMAKE_SOURCE_DIR}/core/include
         ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
-target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
-        mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
-        Boost::process Boost::date_time Boost::url Boost::program_options Boost::system Boost::chrono
-        LibArchive::LibArchive unofficial::libmagic::libmagic)
+if (LINUX)
+    target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
+            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
+            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive)
+elseif (WIN32)
+    target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
+            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
+            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono Boost::system
+            unofficial::libmagic::libmagic LibArchive::LibArchive)
+endif ()
 
 # -------------------------------------------------------------------------
 # AWSMock awslocal
@@ -204,7 +234,10 @@ target_include_directories(awslocal PRIVATE ${CMAKE_SOURCE_DIR}/awslocal/include
         ${CMAKE_SOURCE_DIR}/dto/include)
 target_link_libraries(awslocal PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared
         mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time
-        Boost::url Boost::program_options Boost::system Boost::chrono LibArchive::LibArchive unofficial::libmagic::libmagic)
+        Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive)
+if (WIN32)
+    target_link_libraries(awslocal PUBLIC Boost::system unofficial::libmagic::libmagic)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build documentation
