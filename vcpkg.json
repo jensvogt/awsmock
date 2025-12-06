@@ -1,0 +1,19 @@
+{
+  "name": "awsmock",
+  "version": "1.0.0",
+  "dependencies": [
+    {
+      "name": "jwt-cpp",
+      "default-features": false,
+      "features": [
+        "picojson"
+      ]
+    },
+    "boost",
+    "libarchive",
+    "libmagic",
+    "libssh",
+    "openssl",
+    "mongo-cxx-driver"
+  ]
+}

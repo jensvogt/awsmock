@@ -17,19 +17,25 @@ if (WIN32)
             /D "_WIN32" "$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)
 endif ()
 
+# -------------------------------------------------------------------------
+# Dependencies
+# -------------------------------------------------------------------------
 find_package(LibArchive REQUIRED)
 find_package(bsoncxx CONFIG REQUIRED)
 find_package(mongocxx CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup)
-find_package(jwt-cpp[picojson] REQUIRED)
-find_package(libssh REQUIRED)
+find_package(jwt-cpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
 if (WIN32)
-    find_path(PICOJSON_INCLUDE_DIRS "picojson/picojson.h")
     find_package(utf8proc REQUIRED)
     find_package(unofficial-libmagic CONFIG REQUIRED)
     find_package(Boost REQUIRED COMPONENTS system)
+elseif (UNIX)
+    pkg_check_modules(LIBMAGIC REQUIRED libmagic)
+    include_directories(${LIBMAGIC_INCLUDE_DIRS})
+    link_directories(${LIBMAGIC_LIBRARY_DIRS})
+    add_definitions(${LIBMAGIC_CFLAGS_OTHER})
 endif ()
 
 # -------------------------------------------------------------------------
@@ -61,9 +67,9 @@ if (LINUX)
     target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
             Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive magic)
 elseif (WIN32)
-    target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared mongo::bsoncxx_shared
-            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-            Boost::chrono Boost::system unofficial::libmagic::libmagic LibArchive::LibArchive)
+    target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
+            Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::system LibArchive::LibArchive
+            unofficial::libmagic::libmagic)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -206,14 +212,13 @@ target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_sta
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 if (LINUX)
     target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
-            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
-            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive
-            magic)
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
+            Boost::program_options Boost::chrono LibArchive::LibArchive magic)
 elseif (WIN32)
     target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
-            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
-            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive
-            Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
+            Boost::program_options Boost::chrono LibArchive::LibArchive Boost::system unofficial::libmagic::libmagic
+            crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
