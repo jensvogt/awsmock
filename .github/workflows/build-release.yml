@@ -298,7 +298,7 @@ jobs:
 
       - name: Build (Backend)
         run: |
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{steps.vcpkg-installation.outputs.vcpkgToolchainFile}}
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
           cmake --build build --config Release
 
       - name: Build (Frontend)
@@ -428,7 +428,7 @@ jobs:
 
       - name: Build (Backend)
         run: |
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{steps.vcpkg-installation.outputs.vcpkgToolchainFile}}
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
           cmake --build build --config Release
 
       - name: Build (Frontend)
