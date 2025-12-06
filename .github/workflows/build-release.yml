@@ -290,13 +290,15 @@ jobs:
           sudo gem install --no-document fpm
 
       - name: Setup vcpkg
-        uses: microsoft/setup-vcpkg@v1.2.0
+        id: vcpkg-installation
+        uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: main
+          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+          runVcpkgInstall: true
 
       - name: Build (Backend)
         run: |
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{steps.vcpkg-installation.outputs.vcpkgToolchainFile}}
           cmake --build build --config Release
 
       - name: Build (Frontend)
@@ -418,13 +420,15 @@ jobs:
           sudo gem install --no-document fpm
 
       - name: Setup vcpkg
-        uses: microsoft/setup-vcpkg@v1
+        id: vcpkg-installation
+        uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: master
+          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+          runVcpkgInstall: true
 
       - name: Build (Backend)
         run: |
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{steps.vcpkg-installation.outputs.vcpkgToolchainFile}}
           cmake --build build --config Release
 
       - name: Build (Frontend)
