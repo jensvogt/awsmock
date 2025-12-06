@@ -32,6 +32,7 @@ if (WIN32)
             magic.lib libssl.lib libcrypto.lib archive.lib)
 endif ()
 
+
 #find_package(LibArchive)
 #find_package(bsoncxx CONFIG REQUIRED)
 #find_package(mongocxx CONFIG REQUIRED)
