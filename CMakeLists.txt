@@ -31,6 +31,7 @@ find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(utf8proc REQUIRED)
 find_package(unofficial-libmagic CONFIG REQUIRED)
 find_package(libssh CONFIG REQUIRED)
+find_path(PICOJSON_INCLUDE_DIRS "picojson/picojson.h")
 
 # -------------------------------------------------------------------------
 # Build AWSMock Core library
@@ -53,7 +54,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
 add_library(awsmockcore SHARED ${CORE_SOURCES})
-target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
+target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${PICOJSON_INCLUDE_DIRS})
 target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared mongo::bsoncxx_shared
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
         Boost::system Boost::chrono LibArchive::LibArchive unofficial::libmagic::libmagic)
