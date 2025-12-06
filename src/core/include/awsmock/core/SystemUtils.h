@@ -18,8 +18,8 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/readable_pipe.hpp>
-#include <boost/process.hpp>
 #include <boost/thread.hpp>
+#include <boost/asio/deadline_timer.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>

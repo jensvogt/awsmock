@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
-#include <boost/asio/deadline_timer.hpp>
 #ifdef _WIN32
 #include <winsock2.h>
 #else
@@ -115,7 +114,7 @@ namespace AwsMock::Core {
     }
 
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, std::string &output, std::string &error) {
-
+/*
         log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
         boost::asio::io_context ctx;
         boost::asio::readable_pipe outPipe{ctx};
@@ -126,11 +125,11 @@ namespace AwsMock::Core {
         assert(!ec || (ec == boost::asio::error::eof));
         boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
         assert(!ec || (ec == boost::asio::error::eof));
-        proc.wait();
+        proc.wait();*/
     }
 
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
-
+/*
         log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
         boost::asio::io_context ctx;
         boost::asio::readable_pipe inPipe{ctx};
@@ -142,6 +141,6 @@ namespace AwsMock::Core {
         assert(!ec || (ec == boost::asio::error::eof));
         boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
         assert(!ec || (ec == boost::asio::error::eof));
-        proc.wait();
+        proc.wait();*/
     }
 }// namespace AwsMock::Core

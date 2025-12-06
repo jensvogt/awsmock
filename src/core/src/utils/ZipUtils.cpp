@@ -144,10 +144,11 @@ namespace AwsMock::Core {
     int ZipUtils::CopyData(archive *ar, archive *aw) {
         const void *buff;
         size_t size;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(BOOST_OS_MACOS)
         long long offset;
+
 #else
-        long offset;
+        long long offset;
 #endif
 
         for (;;) {

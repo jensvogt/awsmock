@@ -1,79 +1,62 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(awsmock)
+project(awsmock VERSION 1.0 LANGUAGES CXX)
 
-# Defaults
+# ----------------------------
+# Global settings
+# ----------------------------
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+option(BUILD_DOCUMENTATION "Build API docs" OFF)
+option(BUILD_SAMPLES "Build sample lambdas" OFF)
+
+# ----------------------------
+# Platform setup
+# ----------------------------
 if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
-    add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MD>" "$<$<CONFIG:DEBUG>:/MDd>" /D "_WIN32")
-    add_compile_options("$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-    set(CMAKE_SYSTEM_NAME Windows)
-    set(CMAKE_GENERATOR_PLATFORM x64)
-    set(BSONCXX_INCLUDE_DIR "C:/Program Files (x86)/MONGO_CXX_DRIVER/include/bsoncxx/v_noabi" "C:/Program Files (x86)/MONGO_CXX_DRIVER/include")
-    set(BSONCXX_V1_INCLUDE_DIR "C:/Program Files (x86)/MONGO_CXX_DRIVER/include")
-    set(MONGOCXX_INCLUDE_DIR "C:/Program Files (x86)/MONGO_CXX_DRIVER/include/mongocxx/v_noabi" "C:/Program Files (x86)/MONGO_CXX_DRIVER/include")
-    set(MONGOCXX_V1_INCLUDE_DIR "C:/Program Files (x86)/MONGO_CXX_DRIVER/include")
-    set(MONGOCXX_LIB_DIR "C:/Program Files (x86)/MONGO_CXX_DRIVER/lib")
-    set(BOOST_INCLUDE_DIR "C:/Program Files (x86)/Boost/boost_1_89_0")
-    set(BOOST_LIB_DIR "C:/Program Files (x86)/Boost/boost_1_89_0/lib64-msvc-14.3")
-    set(LIBARCHIVE_INCLUDE_DIR "C:/Program Files (x86)/libarchive/include")
-    set(LIBARCHIVE_LIB_DIR "C:/Program Files (x86)/libarchive/lib")
-    set(LIBMAGIC_INCLUDE_DIR "C:/Program Files (x86)/libmagic/include")
-    set(LIBMAGIC_LIB_DIR "C:/Program Files (x86)/libmagic/lib")
-    set(LIBJWT_INCLUDE_DIR "C:/Program Files (x86)/jwt-cpp/include")
-    set(LIBJWT_LIB_DIR "C:/Program Files (x86)/libmagic/lib")
-    set(LIBSSL_INCLUDE_DIR "C:/Program Files (x86)/OpenSSL-Win64/include")
-    set(LIBSSL_LIB_DIR "C:/Program Files (x86)/OpenSSL-Win64/lib/VC/x64/MT")
-    set(LIBPROMETHEUS_INCLUDE_DIR "C:/Program Files (x86)/prometheus-cpp/include")
-    set(LIBPROMETHEUS_LIB_DIR "C:/Program Files (x86)/prometheus-cpp/lib")
-    set(LIBSSH_INCLUDE_DIR "C:/Program Files (x86)/LibSSH/include")
-    set(LIBSSH_LIB_DIR "C:/Program Files (x86)/LibSSH/lib")
-    set(LIBZIP_INCLUDE_DIR "C:/Program Files (x86)/libzip/include")
-    set(LIBZIP_LIB_DIR "C:/Program Files (x86)/libzip/lib")
-    set(LIBZ_INCLUDE_DIR "C:/Program Files (x86)/zlib/include")
-    set(LIBZ_LIB_DIR "C:/Program Files (x86)/zlib/lib")
-else ()
-    set(CMAKE_CXX_FLAGS "-DBOOST_LOG_DYN_LINK")
-    set(BSONCXX_INCLUDE_DIR /usr/local/include/bsoncxx/v_noabi)
-    set(MONGOCXX_INCLUDE_DIR /usr/local/include/mongocxx/v_noabi)
-    set(EXTERNAL_INCLUDE_DIR /usr/local/include)
-    set(EXTERNAL_LIB_DIR /usr/local/lib)
+    add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc)
+else()
     add_compile_options("$<$<CONFIG:RELEASE>:-O3>" "$<$<CONFIG:DEBUG>:-Og>")
-    if (APPLE)
-        set(CMAKE_MACOSX_RPATH TRUE)
-        set(CMAKE_OSX_SYSROOT "/Library/Developer/CommandLineTools/SDKs/MacOSX26.0.sdk")
-        add_compile_options("-Wno-missing-template-arg-list-after-template-kw")
-        add_link_options("-Wl,-no_warn_duplicate_libraries")
-    endif ()
-endif ()
+endif()
 
-# Doxygen
-if (WIN32)
-    option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " OFF)
-else ()
-    option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " ON)
-endif ()
-option(BUILD_SAMPLES "Create and install the samples" OFF)
+if(APPLE)
+    set(CMAKE_MACOSX_RPATH TRUE)
+endif()
 
-# Current version
-file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VER)
-string(STRIP "${PROJECT_VER}" PROJECT_VERSION)
+# ----------------------------
+# Dependencies (modern)
+# ----------------------------
+find_package(Boost REQUIRED COMPONENTS log log_setup filesystem locale url thread)
+find_package(OpenSSL REQUIRED)
+find_package(LibArchive REQUIRED)
+find_package(Threads REQUIRED)
+
+# Mongo C++ driver (bsoncxx/mongocxx)
+find_path(BSONCXX_INCLUDE_DIR bsoncxx/v_noabi REQUIRED)
+find_path(MONGOCXX_INCLUDE_DIR mongocxx/v_noabi REQUIRED)
+find_library(MONGOCXX_LIB mongocxx REQUIRED)
+find_library(BSONCXX_LIB bsoncxx REQUIRED)
+
+# ----------------------------
+# Version header
+# ----------------------------
+file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VER_RAW)
+string(STRIP "${PROJECT_VER_RAW}" PROJECT_VERSION)
 string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
-configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h" @ONLY)
 
-# Build message
-message("-- Building ${PROJECT_NAME} v${PROJECT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
+configure_file(
+        "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in"
+        "${CMAKE_BINARY_DIR}/generated/Version.h"
+        @ONLY
+)
 
-# Set default build type release
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE PATH "" FORCE)
-endif ()
+include_directories(${CMAKE_BINARY_DIR}/generated)
 
-# Testing
-enable_testing()
-
+# ----------------------------
+# Subdirectories
+# ----------------------------
 add_subdirectory(src/core)
 add_subdirectory(src/db)
 add_subdirectory(src/dto)
@@ -82,47 +65,16 @@ add_subdirectory(src/manager)
 add_subdirectory(src/controller)
 add_subdirectory(src/awslocal)
 
-# Build documentation
-#if (BUILD_DOCUMENTATION)
-#    add_subdirectory(docs)
-#endif (BUILD_DOCUMENTATION)
+# ----------------------------
+# A CLion-friendly dummy target
+# ----------------------------
+add_custom_target(awsmock_all)
 
-# Build samples lambdas
-if (BUILD_SAMPLES)
-    #    add_subdirectory(src/samples/lambda/s3-notification-lambda)
-endif (BUILD_SAMPLES)
-
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/log)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/frontend)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/init)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/samples)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/s3)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/sqs)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/sns)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/lambda)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/transfer)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/dynamodb)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/backup)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/application)
-install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/tmp)
-install(DIRECTORY dist/samples/ DESTINATION ${CMAKE_INSTALL_PREFIX}/samples)
-install(FILES dist/etc/ssh_host_key DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
-
-if (WIN32)
-    install(FILES dist/etc/awsmock_win32.json DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.json)
-    install(FILES dist/etc/magic.mgc DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
-elseif (LINUX)
-    install(FILES dist/etc/awsmock_linux.json DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.json)
-    install(FILES dist/etc/systemd/system/awsmock.service DESTINATION /etc/systemd/system)
-    install(FILES dist/etc/magic_linux.mgc DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME magic.mgc)
-elseif (APPLE)
-    install(FILES dist/etc/awsmock_macos.json DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.json)
-    install(FILES dist/macos/de.jensvogt.awsmock.plist DESTINATION /Library/LaunchDaemons)
-    install(FILES dist/etc/magic_linux.mgc DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME magic.mgc)
-endif ()
+# ----------------------------
+# Installation dirs
+# (cleaned, condensed)
+# ----------------------------
+foreach(dir bin lib etc log data)
+    install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/${dir})
+endforeach()
 
