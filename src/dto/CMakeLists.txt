@@ -7,7 +7,7 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
         src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp
         src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
         src/common/MonitoringClientCommand.cpp src/common/CognitoClientCommand.cpp src/common/ApiGatewayClientCommand.cpp
-        src/common/ApplicationClientCommand.cpp src/common/ContainerClientCommand.cpp)
+        src/common/ApplicationClientCommand.cpp)
 set(SQS_SOURCES src/sqs/mapper/Mapper.cpp)
 set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
 set(S3_SOURCES src/s3/mapper/Mapper.cpp)
@@ -40,23 +40,24 @@ if (NOT WIN32)
     add_subdirectory(btest)
 endif ()
 
+# Includes
+include_directories(include ../core/include ../db/include ${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
+        ${BOOST_INCLUDE_DIR} ${LIBMAGIC_INCLUDE_DIR} ${LIBARCHIVE_INCLUDE_DIR} ${LIBJWT_INCLUDE_DIR}
+        ${LIBSSL_INCLUDE_DIR})
+
 # Shared library
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-    target_include_directories(${LIBRARY_STATIC} PRIVATE include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
-            ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR})
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static mongocxx-v_noabi-rhi-x64-v145-md.lib
-            bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static mongocxx-v_noabi-rhi-x64-v143-md.lib
+            bsoncxx-v_noabi-rhi-x64-v143-md.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
             boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
             boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib)
+    #install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_include_directories(${LIBRARY} PRIVATE include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
-            ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
-    target_link_directories(${LIBRARY} PRIVATE ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem boost_locale
-            boost_json ssl crypto archive magic)
+    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
+            boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

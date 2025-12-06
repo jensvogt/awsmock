@@ -151,9 +151,9 @@ Building of the AwsMock executables is CMake based. Supported platforms are Linu
 #### Minimum Requirements:
 
 - GNU Compiler Collection (GCC) 4.9 or later or Clang 3.3 or later (Linux)
-- jwt-cpp, boost
-- CXX driver (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
-- Development releases of libssl, libcrypto, libarchive, libmagic, libssh
+- jwt-cpp, prometheus-cpp, boost
+- MongoDB C and CXX driver (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
+- Development releases of boost, libz, libssl, libcrypto, libarchive, libmagic, libssh
 - 4GB of RAM.
 
 #### Building the manager from source:
@@ -187,13 +187,19 @@ As already said, this can be a time-consuming procedure, depending on your machi
 
 #### Building the frontend from source:
 
-In order to build the frontend, you need Node.js >16.0, Currently it is using Node v20. The source code is on github:
+In order to build the frontend, you need Node.js >16.0, Currently it is using Node v20. The sourcecode is located at
 
 ```
-git clone https://github.com/jensvogt/awsmock-ui
-npm run build
-cp -R dist/awsmock-ui/browser <awsmock_install_dir>/frontend
+http://github.com/jensvogt/awsmock-ui
 ```
+
+To build the frontend part, use:
+
+```
+npm run build --omit-dev
+```
+
+and copy the result to ```<awsmock_install_dir>/frontend```.
 
 ### Using the docker image
 
@@ -202,13 +208,17 @@ Using the provided docker image is much simpler (assuming Docker is already inst
 To start the docker image:
 
 1. Pull the docker image:
-```
-docker pull jensvogt/awsmock:latest
-```
+
+  ```
+  docker pull jensvogt/awsmock:latest
+  ```
+
 2. Start the container
+
   ```  
   docker run -p 4566-4568:4566-4568 -p 2121:2121 -p 2222:2222 -p 6000-6100:6000:6100 -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
   ```
+
 Port ```4566``` (gateway) and ```4567``` (frontend) and ```4568``` (websocket) should be reachable.
 ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and
 ```-v /var/run/docker.sock:/var/run/docker.sock```
@@ -242,8 +252,8 @@ a docker-compose file.
 To connect a MongoDB instance, use the provided docker-compose file:
 
 ```
-cd /usr/local/share/awsmock/docker
-docker compose up
+  cd /usr/local/share/awsmock/docker
+  docker compose up
 ```
 
 This will start a mongo DB instance an awsmock docker image. Remote access to the MongoDB image must be configured

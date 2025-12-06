@@ -30,7 +30,6 @@
 *.exe
 *.out
 *.app
-**/dto_s3
 
 # Python
 **/.venv
@@ -75,9 +74,9 @@ docs/man/**.1
 dist/samples/database-data
 
 # executables
-**/awsmockctl
-**/awsmockmgr
-**/awslocal
+src/controller/awsmockctl
+src/manager/awsmockmgr
+src/awslocal/awslocal
 
 # Examples
 **/out.json
@@ -108,7 +107,6 @@ x86
 **/*.txt
 **/*.bin
 **/*.sqlite
-**/*.slnx
 **/CMake Overview
 
 # Tests

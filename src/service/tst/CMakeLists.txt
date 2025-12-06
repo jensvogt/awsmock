@@ -19,7 +19,7 @@ include_directories(../include ../../core/include ../../db/include ../../dto/inc
 add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb boost_locale boost_program_options
-        boost_process boost_log boost_log_setup boost_process ssl crypto archive magic gtest gmock ssh)
+        boost_log boost_log_setup boost_process ssl crypto archive magic gtest gmock ssh)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 

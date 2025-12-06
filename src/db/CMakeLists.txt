@@ -46,26 +46,24 @@ if (NOT WIN32)
 endif ()
 
 # Includes
+include_directories(./include ../core/include ${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
+        ${BOOST_INCLUDE_DIR} ${LIBMAGIC_INCLUDE_DIR} ${LIBARCHIVE_INCLUDE_DIR} ${LIBJWT_INCLUDE_DIR}
+        ${LIBSSL_INCLUDE_DIR})
 
 # Shared library
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-    target_include_directories(${LIBRARY_STATIC} PRIVATE ./include ../core/include ${BSONCXX_INCLUDE_DIR}
-            ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR})
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static bsoncxx-v_noabi-rhi-x64-v145-md.lib
-            mongocxx-v_noabi-rhi-x64-v145-md.lib boost_filesystem-vc143-mt-x64-1_89.lib
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static bsoncxx-v_noabi-rhi-x64-v143-md.lib
+            mongocxx-v_noabi-rhi-x64-v143-md.lib boost_filesystem-vc143-mt-x64-1_89.lib
             boost_url-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
             boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
             archive.lib magic.lib)
     #install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_include_directories(${LIBRARY} PRIVATE ./include ../core/include ${BSONCXX_INCLUDE_DIR}
-            ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
-    target_link_directories(${LIBRARY} PRIVATE ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${LIBRARY} PRIVATE awsmockcore mongocxx bsoncxx boost_filesystem boost_process
+    target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

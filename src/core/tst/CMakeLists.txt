@@ -5,10 +5,10 @@ set(CMAKE_BUILD_TYPE "Debug")
 set(SOURCES Main.cpp)
 
 add_executable(${BINARY} ${SOURCES})
-target_include_directories(${BINARY} PUBLIC ../include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
+target_include_directories(${BINARY} PUBLIC ../include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
 target_link_directories(${BINARY} PUBLIC ${EXTERNAL_LIB_DIR})
-target_link_libraries(${BINARY} awsmockcore boost_filesystem boost_process boost_program_options boost_locale boost_log
-        boost_log_setup boost_unit_test_framework ssl crypto archive magic)
+target_link_libraries(${BINARY} awsmockcore boost_filesystem boost_url boost_thread boost_locale boost_program_options
+        boost_log boost_log_setup boost_process boost_unit_test_framework ssl crypto archive magic)
 target_compile_options(${BINARY} PRIVATE -coverage)
 target_link_options(${BINARY} PRIVATE -coverage)
 
