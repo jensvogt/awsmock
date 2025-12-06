@@ -1,0 +1,11 @@
+//~/work/awsmock/.git/hooks/
+// Created by vogje01 on 16/06/2023.
+//
+
+#ifndef AWSMOCK_CORE_VERSION_H_IN_H
+#define AWSMOCK_CORE_VERSION_H_IN_H
+
+#cmakedefine PROJECT_NAME "@PROJECT_NAME@"
+#cmakedefine PROJECT_VERSION "@PROJECT_VERSION@"
+
+#endif //AWSMOCK_CORE_VERSION_H_IN_H

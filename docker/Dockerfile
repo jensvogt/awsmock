@@ -1,60 +1,17 @@
-FROM debian:stable-slim AS build
-
-RUN apt update && apt install -y ca-certificates git cmake build-essential gcc-13 g++-13 cmake libicu-dev curl unzip \
-    doxygen pandoc automake autoconf libarchive-dev libmagic-dev python3 python3-dev libssh-dev wget libtool
-RUN apt clean
+FROM jensvogt/awsmock-base:latest AS build
 
 # Create build environment
 RUN mkdir -p /usr/src
-RUN mkdir -p /usr/extern
-
-# Install jwt-cpp
-RUN cd /usr/src && \
-    git clone https://github.com/Thalhammer/jwt-cpp.git && \
-    cd jwt-cpp && \
-    mkdir build && \
-    cd build && \
-    cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=/usr/extern && \
-    cmake --build . --parallel $(nproc) && \
-    cmake --install .
-
-# 1️⃣ Install Mongo C Driver first
-RUN cd /usr/src && \
-    git clone https://github.com/mongodb/mongo-c-driver.git && \
-    cd mongo-c-driver/build && \
-    cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF \
-             -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=/usr/extern && \
-    cmake --build . && \
-    cmake --install .
-
-# Install mongo-cxx-driver
-RUN cd /usr/src && \
-    git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
-    cd mongo-cxx-driver/build && \
-    cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
-             -DCMAKE_INSTALL_PREFIX=/usr/extern \
-             -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=/usr/extern && \
-    cmake --build . --config Release -j$(($(nproc)/2)) && \
-    cmake --install .
-
-# Install boost 1.83
-RUN cd /usr/src && \
-    wget -nv https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz && \
-    tar -xzf boost_1_83_0.tar.gz && \
-    cd boost_1_83_0 && \
-    ./bootstrap.sh --prefix=/usr/local && \
-    ./b2 install -j$(($(nproc)/2)) > /dev/null
+RUN git config --global http.postBuffer 524288000
+RUN git config --global http.version HTTP/1.1
 
 # Install aws-mock
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
-    mkdir build && \
-    cd build && \
-    cmake -S .. -B . -DBUILD_DOCUMENTATION=ON -DBSONCXX_INCLUDE_DIR=/usr/extern/include/bsoncxx/v_noabi \
-                -DMONGOCXX_INCLUDE_DIR=/usr/extern/include/mongocxx/v_noabi -DEXTERNAL_INCLUDE_DIR=usr/extern/include \
-                -DEXTERNAL_LIB_DIR=/usr/extern/lib && \
-    cmake --build . --parallel $(($(nproc)/2))
+    cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/awsmock && \
+    cmake --build . --config Release -j 8 && \
+    cmake --install . --config Release
 
 FROM node:22-bookworm AS buildfrontend
 
@@ -69,9 +26,11 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     npm run build --prod
 
 # Stick to alpine:latest
-FROM debian:stable-slim
+FROM debian:trixie-slim
 
-RUN apt update && apt upgrade && apt install -y curl unzip libssh-4 libarchive13 libmagic1
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libssh-4 libquadmath0 curl unzip groff less
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -84,6 +43,7 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/data/tmp && \
     mkdir -p /usr/local/awsmock/data/application && \
     mkdir -p /usr/local/awsmock/bin && \
+    mkdir -p /usr/local/awsmock/lib && \
     mkdir -p /usr/local/awsmock/etc && \
     mkdir -p /usr/local/awsmock/init && \
     mkdir -p /usr/local/awsmock/log && \
@@ -98,15 +58,21 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 
 # Just in case, ensure it's available at /usr/local/bin/aws
 RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
+RUN rm -rf /lib/x86_64-linux-gnu/libmagic* || true
 
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
 # Install aws-mock
-COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/awsmock/bin
-COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/awsmock/bin
-COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/awsmock/bin
-COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
+COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/bin/awsmockctl /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/lib/* /usr/local/awsmock/lib
+COPY --from=build /usr/local/awsmock/etc/* /usr/local/awsmock/etc
+COPY --from=build /usr/local/lib/* /usr/local/lib
+COPY --from=build /lib/x86_64-linux-gnu/libicudata.so.72 /lib/x86_64-linux-gnu/
+COPY --from=build /lib/x86_64-linux-gnu/libicui18n.so.72 /lib/x86_64-linux-gnu/
+COPY --from=build /lib/x86_64-linux-gnu/libicuuc.so.72 /lib/x86_64-linux-gnu/
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
