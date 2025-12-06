@@ -17,19 +17,25 @@ if (WIN32)
             /D "_WIN32" "$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)
 endif ()
 
+# -------------------------------------------------------------------------
+# Dependencies
+# -------------------------------------------------------------------------
 find_package(LibArchive REQUIRED)
 find_package(bsoncxx CONFIG REQUIRED)
 find_package(mongocxx CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup)
-find_package(jwt-cpp[picojson] REQUIRED)
-find_package(libssh REQUIRED)
+find_package(jwt-cpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
 if (WIN32)
-    find_path(PICOJSON_INCLUDE_DIRS "picojson/picojson.h")
     find_package(utf8proc REQUIRED)
     find_package(unofficial-libmagic CONFIG REQUIRED)
     find_package(Boost REQUIRED COMPONENTS system)
+elseif (UNIX)
+    pkg_check_modules(LIBMAGIC REQUIRED libmagic)
+    include_directories(${LIBMAGIC_INCLUDE_DIRS})
+    link_directories(${LIBMAGIC_LIBRARY_DIRS})
+    add_definitions(${LIBMAGIC_CFLAGS_OTHER})
 endif ()
 
 # -------------------------------------------------------------------------
