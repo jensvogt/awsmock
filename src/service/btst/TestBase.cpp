@@ -77,6 +77,8 @@ namespace AwsMock::Service {
         // Create services
         Database::TestUtils::CreateServices();
 
+        // Initialize monitoring
+        Monitoring::MetricService::instance().Initialize();
         return true;
     }
 
