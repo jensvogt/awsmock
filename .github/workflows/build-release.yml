@@ -87,7 +87,7 @@ jobs:
           copy dist\etc\magic_linux.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
           copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
           copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
-          robocopy /E /NFL /NDL ${{ github.workspace }}\awsmock-ui\dist\awsmock-ui\browser\* $PACKAGE_DIR\frontend
+          robocopy /E /NFL /NDL ${{ github.workspace }}\awsmock-ui\dist\awsmock-ui\browser $PACKAGE_DIR\frontend
 
       - name: Create ZIP using tar.exe via CMD
         shell: cmd
