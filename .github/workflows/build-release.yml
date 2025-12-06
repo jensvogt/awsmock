@@ -82,12 +82,12 @@ jobs:
           mkdir ${{ env.PACKAGE_DIR }}\data\application
 
           copy ${{ env.BUILD_DIR }}\awsmockmgr ${{ env.PACKAGE_DIR }}\awsmockctl ${{ env.BUILD_DIR }}\awslocal ${{ env.PACKAGE_DIR }}\bin
-          robocopy \E \NFL \NDL ${{ github.workspace }}\extern\win32\bin\* $PACKAGE_DIR\bin
+          robocopy /E /NFL /NDL ${{ github.workspace }}\extern\win32\bin\* $PACKAGE_DIR\bin
           copy dist\etc\awsmock_windows.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
           copy dist\etc\magic_linux.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
           copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
           copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
-          robocopy \E \NFL \NDL ${{ github.workspace }}\awsmock-ui\dist\awsmock-ui\browser\* $PACKAGE_DIR\frontend
+          robocopy /E /NFL /NDL ${{ github.workspace }}\awsmock-ui\dist\awsmock-ui\browser\* $PACKAGE_DIR\frontend
 
       - name: Create ZIP using tar.exe via CMD
         shell: cmd
