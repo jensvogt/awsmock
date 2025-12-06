@@ -54,6 +54,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Vcpkg Dependencies
+        uses: s-kris/vcpkg-action@v1
+        with:
+          triplet: x64-windows
+
       - name: Build (Backend)
         shell: cmd
         run: |
@@ -85,7 +90,6 @@ jobs:
           robocopy /E /NFL /NDL ${{ github.workspace }}\extern\win32\bin $PACKAGE_DIR\bin
           copy dist\etc\awsmock_windows.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
           copy dist\etc\magic_linux.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
-          copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
           copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
           robocopy /E /NFL /NDL ${{ github.workspace }}\awsmock-ui\dist\awsmock-ui\browser $PACKAGE_DIR\frontend
 
@@ -344,18 +348,11 @@ jobs:
       - name: Build (Frontend)
         shell: bash
         run: |
-          # Create a directory for the app
           mkdir -p ${{ github.workspace }}/frontend
           cd ${{ github.workspace }}/frontend
-
-          # Clone the npm application repository (or download a tarball)
           git clone https://github.com/jensvogt/awsmock-ui
           cd awsmock-ui
-
-          # Install dependencies
           npm install
-
-          # Build the application (if it has a build step)
           npm run build
 
       - name: Build (Linux)
@@ -481,9 +478,6 @@ jobs:
                               libtool pandoc libarchive-dev libmagic-dev libssh-dev
           sudo gem install --no-document fpm
 
-      - name: Normalize version
-        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
-
       - name: Create extern directories
         shell: bash
         run: |
@@ -537,18 +531,11 @@ jobs:
       - name: Build (Frontend)
         shell: bash
         run: |
-          # Create a directory for the app
           mkdir -p ${{ github.workspace }}/frontend
           cd ${{ github.workspace }}/frontend
-
-          # Clone the npm application repository (or download a tarball)
           git clone https://github.com/jensvogt/awsmock-ui
           cd awsmock-ui
-
-          # Install dependencies
           npm install
-
-          # Build the application (if it has a build step)
           npm run build
 
       - name: Build (Linux)
