@@ -67,9 +67,9 @@ if (LINUX)
     target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
             Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive magic)
 elseif (WIN32)
-    target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto mongo::mongocxx_shared mongo::bsoncxx_shared
-            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-            Boost::chrono Boost::system unofficial::libmagic::libmagic LibArchive::LibArchive)
+    target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
+            Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::system LibArchive::LibArchive
+            unofficial::libmagic::libmagic)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -212,14 +212,13 @@ target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_sta
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 if (LINUX)
     target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
-            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
-            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive
-            magic)
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
+            Boost::program_options Boost::chrono LibArchive::LibArchive magic)
 elseif (WIN32)
     target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
-            mongo::mongocxx_shared mongo::bsoncxx_shared Boost::boost Boost::log Boost::log_setup Boost::thread
-            Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive
-            Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
+            Boost::program_options Boost::chrono LibArchive::LibArchive Boost::system unofficial::libmagic::libmagic
+            crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
