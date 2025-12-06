@@ -145,7 +145,6 @@ struct error_struct {
 };
 
 extern "C" {
-
 #define SSH_SFTP_CALLBACK(name) static int name(sftp_client_message message)
 
 typedef int (*sftp_server_message_callback)(sftp_client_message message);
@@ -158,24 +157,28 @@ struct sftp_message_handler {
     sftp_server_message_callback cb;
 };
 
-LIBSSH_API int sftp_channel_default_subsystem_request(ssh_session session,
-                                                      ssh_channel channel,
-                                                      const char *subsystem,
-                                                      void *userdata);
-LIBSSH_API int sftp_channel_default_data_callback(ssh_session session,
-                                                  ssh_channel channel,
-                                                  void *data,
-                                                  uint32_t len,
-                                                  int is_stderr,
-                                                  void *userdata);
+int sftp_channel_default_subsystem_request(ssh_session session,
+                                           ssh_channel channel,
+                                           const char *subsystem,
+                                           void *userdata);
+
+int sftp_channel_default_data_callback(ssh_session session,
+                                       ssh_channel channel,
+                                       void *data,
+                                       uint32_t len,
+                                       int is_stderr,
+                                       void *userdata);
 
 void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) PRINTF_ATTRIBUTE(4, 5);
+
 #define ssh_set_error(error, code, ...) _ssh_set_error(error, code, __func__, __VA_ARGS__)
 
 void _ssh_set_error_oom(void *error, const char *function);
+
 #define ssh_set_error_oom(error) _ssh_set_error_oom(error, __func__)
 
 void _ssh_set_error_invalid(void *error, const char *function);
+
 #define ssh_set_error_invalid(error) _ssh_set_error_invalid(error, __func__)
 
 void ssh_reset_error(void *error);
@@ -185,13 +188,13 @@ void ssh_reset_error(void *error);
 #define __VA_NARG_(...) \
     VA_APPLY_VARIADIC_MACRO(__VA_ARG_N, (__VA_ARGS__))
 #define __VA_ARG_N(                                       \
-        _1, _2, _3, _4, _5, _6, _7, _8, _9, _10,          \
-        _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, \
-        _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, \
-        _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, \
-        _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, \
-        _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, \
-        _61, _62, _63, N, ...) N
+    _1, _2, _3, _4, _5, _6, _7, _8, _9, _10,          \
+    _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, \
+    _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, \
+    _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, \
+    _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, \
+    _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, \
+    _61, _62, _63, N, ...) N
 #define __RSEQ_N()                                  \
     63, 62, 61, 60,                                 \
             59, 58, 57, 56, 55, 54, 53, 52, 51, 50, \
@@ -268,6 +271,7 @@ struct ssh_buffer_struct {
     uint32_t pos;
     uint8_t *data;
 };
+
 #define bignum_set_word(bn, n) BN_set_word(bn, n)
 #define bignum_bin2bn(data, datalen, dest)     \
     do {                                       \
@@ -284,12 +288,17 @@ struct ssh_string_struct {
     uint32_t size;
     unsigned char data[1];
 };
+
 typedef ssh_string_struct *ssh_string;
+
 int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
+
 #define ssh_buffer_pack(buffer, format, ...) _ssh_buffer_pack((buffer), (format), __VA_NARG__(__VA_ARGS__), __VA_ARGS__, SSH_BUFFER_PACK_END)
 
 int awsmock_ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap);
+
 int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
+
 #define ssh_buffer_unpack(buffer, format, ...) _ssh_buffer_unpack((buffer), (format), __VA_NARG__(__VA_ARGS__), __VA_ARGS__, SSH_BUFFER_PACK_END)
 #define MAX_ENTRIES_NUM_IN_PACKET 50
 #define MAX_LONG_NAME_LEN 350
@@ -304,11 +313,8 @@ int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t arg
 inline char authorizedkeys[DEF_STR_SIZE] = {0};
 
 namespace AwsMock::Service {
-
     class SftpServer {
-
-      public:
-
+    public:
         /**
          * Constructor
          */
@@ -334,8 +340,7 @@ namespace AwsMock::Service {
          */
         static SftpUsers _sftpUsers;
 
-      private:
-
+    private:
         /**
          * Server port
          */
@@ -351,7 +356,6 @@ namespace AwsMock::Service {
          */
         std::string _address = "0.0.0.0";
     };
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H

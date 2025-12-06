@@ -5,17 +5,16 @@
 #include <awsmock/awslocal/AwsLocal.h>
 
 namespace AwsMock::AwsLocal {
-
     void AwsLocal::Initialize(const boost::program_options::variables_map &vm) {
-        if (vm.contains("host")) {
+        if (vm.find("host") != vm.end()) {
             _host = vm.at("host").as<std::string>();
             _baseUrl = "http://" + _host + ":" + std::to_string(_port);
         }
-        if (vm.contains("port")) {
+        if (vm.find("port") != vm.end()) {
             _port = vm.at("port").as<int>();
             _baseUrl = "http://" + _host + ":" + std::to_string(_port);
         }
-        if (vm.contains("profile")) {
+        if (vm.find("profile") != vm.end()) {
             _profile = vm.at("profile").as<std::string>();
             ReadAwsConfigFile();
         }
@@ -36,7 +35,6 @@ namespace AwsMock::AwsLocal {
     }
 
     void AwsLocal::ReadAwsConfigFile() {
-
         const std::string fileName = Core::SystemUtils::GetHomeDir() + "/.aws/config";
         if (!Core::FileUtils::FileExists(fileName)) {
 #ifdef _WIN32
@@ -52,4 +50,4 @@ namespace AwsMock::AwsLocal {
             _baseUrl = pt.get<std::string>(_profile + ".endpoint_url");
         }
     }
-}// namespace AwsMock::AwsLocal
+} // namespace AwsMock::AwsLocal

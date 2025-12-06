@@ -36,7 +36,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-#    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package"
@@ -76,115 +76,115 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$env:VCPKG_DEFAULT_TRIPLET" -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$env:VCPKG_DEFAULT_TRIPLET" -DCMAKE_BUILD_TYPE=Release -Wno-dev
           cmake --build build --config Release --parallel
 
-#      - name: Install JWT-CPP
-#        shell: cmd
-#        run: |
-#          git clone https://github.com/Thalhammer/jwt-cpp.git
-#          cd jwt-cpp
-#          mkdir build
-#          cd build
-#          cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-#          cmake --build . --parallel $(nproc)
-#          cmake --install .
+      #      - name: Install JWT-CPP
+      #        shell: cmd
+      #        run: |
+      #          git clone https://github.com/Thalhammer/jwt-cpp.git
+      #          cd jwt-cpp
+      #          mkdir build
+      #          cd build
+      #          cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+      #          cmake --build . --parallel $(nproc)
+      #          cmake --install .
 
-#      - name: Install zlib
-#        shell: cmd
-#        run: |
-#          mkdir zlib_source
-#          curl -L https://zlib.net/zlib131.zip -o zlib_source\zlib.zip
-#          cd zlib_source
-#          unzip zlib.zip
-#          cd zlib-1.3.1
-#          mkdir build
-#          cd build
-#          cmake -S .. -B . -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-#          cmake --build . --config Release
-#          cmake --install . --config Release
+      #      - name: Install zlib
+      #        shell: cmd
+      #        run: |
+      #          mkdir zlib_source
+      #          curl -L https://zlib.net/zlib131.zip -o zlib_source\zlib.zip
+      #          cd zlib_source
+      #          unzip zlib.zip
+      #          cd zlib-1.3.1
+      #          mkdir build
+      #          cd build
+      #          cmake -S .. -B . -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+      #          cmake --build . --config Release
+      #          cmake --install . --config Release
 
-#      - name: Install libzip
-#        shell: cmd
-#        run: |
-#          git clone https://github.com/nih-at/libzip.git
-#          cd libzip
-#          mkdir build
-#          cd build
-#          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_TEST=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/zlib.lib -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-#          cmake --build . --config Release
-#          cmake --install . --config Release
+      #      - name: Install libzip
+      #        shell: cmd
+      #        run: |
+      #          git clone https://github.com/nih-at/libzip.git
+      #          cd libzip
+      #          mkdir build
+      #          cd build
+      #          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_BZIP2=OFF -DENABLE_LZMA=OFF -DENABLE_ZSTD=OFF -DENABLE_TEST=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/zlib.lib -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+      #          cmake --build . --config Release
+      #          cmake --install . --config Release
 
-#      - name: Install libarchive
-#        shell: cmd
-#        run: |
-#          git clone https://github.com/libarchive/libarchive.git
-#          cd libarchive/build
-#          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_ZSTD=ON -DENABLE_TEST=OFF -DENABLE_PCRE2POSIX=OFF -DENABLE_PCREPOSIX=OFF -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-#          cmake --build . --config Release
-#          cmake --install . --config Release
+      #      - name: Install libarchive
+      #        shell: cmd
+      #        run: |
+      #          git clone https://github.com/libarchive/libarchive.git
+      #          cd libarchive/build
+      #          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DENABLE_ZSTD=ON -DENABLE_TEST=OFF -DENABLE_PCRE2POSIX=OFF -DENABLE_PCREPOSIX=OFF -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+      #          cmake --build . --config Release
+      #          cmake --install . --config Release
 
-#      - name: Install libmagic
-#        shell: cmd
-#        run: |
-#          git clone https://github.com/julian-r/file-windows.git
-#          cd file-windows
-#          git submodule update --init
-#          mkdir build
-#          cd build
-#          cmake -S .. -B . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern
-#          cmake --build . --config Release
-#          cmake --install . --config Release
-#          copy .\Release\libmagic.lib ${{ github.workspace }}\extern\lib
-#          copy .\Release\libmagic.dll ${{ github.workspace }}\extern\lib
-#          copy ..\file\src\magic.h ${{ github.workspace }}\extern\include
+      #      - name: Install libmagic
+      #        shell: cmd
+      #        run: |
+      #          git clone https://github.com/julian-r/file-windows.git
+      #          cd file-windows
+      #          git submodule update --init
+      #          mkdir build
+      #          cd build
+      #          cmake -S .. -B . -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern
+      #          cmake --build . --config Release
+      #          cmake --install . --config Release
+      #          copy .\Release\libmagic.lib ${{ github.workspace }}\extern\lib
+      #          copy .\Release\libmagic.dll ${{ github.workspace }}\extern\lib
+      #          copy ..\file\src\magic.h ${{ github.workspace }}\extern\include
 
-#      - name: Install openssl vcpkg
-#        shell: cmd
-#        run: |
-#          git clone https://github.com/microsoft/vcpkg.git
-#          cd vcpkg
-#          bootstrap-vcpkg.bat
-#          cd ..
-#          vcpkg\vcpkg.exe install openssl:x64-windows-static
-#          copy vcpkg\installed\x64-windows-static\lib\libssl.lib ${{ github.workspace }}\extern\lib
-#          copy vcpkg\installed\x64-windows-static\lib\libcrypto.lib ${{ github.workspace }}\extern\lib
-#          robocopy /E /NFL /NDL vcpkg\installed\x64-windows-static\include ${{ github.workspace }}\extern
+      #      - name: Install openssl vcpkg
+      #        shell: cmd
+      #        run: |
+      #          git clone https://github.com/microsoft/vcpkg.git
+      #          cd vcpkg
+      #          bootstrap-vcpkg.bat
+      #          cd ..
+      #          vcpkg\vcpkg.exe install openssl:x64-windows-static
+      #          copy vcpkg\installed\x64-windows-static\lib\libssl.lib ${{ github.workspace }}\extern\lib
+      #          copy vcpkg\installed\x64-windows-static\lib\libcrypto.lib ${{ github.workspace }}\extern\lib
+      #          robocopy /E /NFL /NDL vcpkg\installed\x64-windows-static\include ${{ github.workspace }}\extern
 
-#        shell: cmd
-#        run: |
-#          copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib" ${{ github.workspace }}\extern\lib
-#          copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/openssl.lib" ${{ github.workspace }}\extern\lib
-#          robocopy  /E /NFL /NDL "C:/Program Files/OpenSSL/include" ${{ github.workspace }}\extern\include
+      #        shell: cmd
+      #        run: |
+      #          copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/libcrypto.lib" ${{ github.workspace }}\extern\lib
+      #          copy "C:/Program Files/OpenSSL/lib/VC/x64/MD/openssl.lib" ${{ github.workspace }}\extern\lib
+      #          robocopy  /E /NFL /NDL "C:/Program Files/OpenSSL/include" ${{ github.workspace }}\extern\include
 
-#      - name: Install mongo-cxx-driver vcpkg
-#        shell: cmd
-#        run: |
-#          git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
-#          cd mongo-cxx-driver/build
-#          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern -DBUILD_SHARED_LIBS=OFF -DCMAKE_PREFIX_PATH=${{ github.workspace }}\extern -DCMAKE_CXX_STANDARD=23
-#          cmake --build . --config Release --parallel
-#          cmake --install .
+      #      - name: Install mongo-cxx-driver vcpkg
+      #        shell: cmd
+      #        run: |
+      #          git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
+      #          cd mongo-cxx-driver/build
+      #          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern -DBUILD_SHARED_LIBS=OFF -DCMAKE_PREFIX_PATH=${{ github.workspace }}\extern -DCMAKE_CXX_STANDARD=23
+      #          cmake --build . --config Release --parallel
+      #          cmake --install .
 
-#      - name: Install boost
-#        shell: cmd
-#        run: |
-#          mkdir boost_source
-#          curl -L https://archives.boost.io/release/1.89.0/source/boost_1_89_0.zip -o boost_source\boost.zip
-#          cd boost_source
-#          unzip boost.zip > NUL
-#          cd boost_1_89_0
-#          .\bootstrap.bat
-#          .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
+      #      - name: Install boost
+      #        shell: cmd
+      #        run: |
+      #          mkdir boost_source
+      #          curl -L https://archives.boost.io/release/1.89.0/source/boost_1_89_0.zip -o boost_source\boost.zip
+      #          cd boost_source
+      #          unzip boost.zip > NUL
+      #          cd boost_1_89_0
+      #          .\bootstrap.bat
+      #          .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
 
-#      - name: Build AwsMock
-#        shell: cmd
-#        run: |
-#          dir ${{ github.workspace }}\extern\include
-#          mkdir build
-#          cd build
-#          cmake -S .. -B . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-#          cmake --build . --config Release --parallel
+      #      - name: Build AwsMock
+      #        shell: cmd
+      #        run: |
+      #          dir ${{ github.workspace }}\extern\include
+      #          mkdir build
+      #          cd build
+      #          cmake -S .. -B . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+      #          cmake --build . --config Release --parallel
 
       - name: Create package structure
         shell: powershell
