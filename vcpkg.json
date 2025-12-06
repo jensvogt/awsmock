@@ -1,8 +1,0 @@
-{
-  "name" : "awsmock",
-  "version" : "1.0.0",
-  "dependencies" : [ "openssl", "jwt-cpp", "boost", "libzip", "libarchive", "libmagic", "libssh", "mongo-cxx-driver",
-    {"name" : "beast", "version>=" : "0#2"}
-  ],
-  "builtin-baseline" : "e7d7451462697d77ef319ddf2da8ff7320a82662"
-}
