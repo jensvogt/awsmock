@@ -54,10 +54,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install vcpkg (Windows)
+        run: |
+          git clone https://github.com/microsoft/vcpkg $env:RUNNER_TEMP/vcpkg
+          $env:RUNNER_TEMP/vcpkg/bootstrap-vcpkg.bat -disableMetrics
+
+      - name: Install vcpkg packages (Windows)
+        shell: pwsh
+        run: |
+          $env:RUNNER_TEMP\vcpkg\vcpkg install openssl jwt-cpp libarchive libmagic libssh mongo-cxx-driver boost-filesystem boost-asio boost-thread boost-process boost-date-time boost-program-options boost-json boost-url boost-chrono boost-log boost-system
+
       - name: Build (Backend)
         shell: cmd
         run: |
-          cmake -B ${{ env.BUILD_DIR }} -S .
+          cmake -B ${{ env.BUILD_DIR }} -S . -G Ninja -DCMAKE_TOOLCHAIN_FILE=${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Build (Frontend)
