@@ -286,7 +286,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y ninja-build doxygen pandoc 
+          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
 
       - name: Setup vcpkg
@@ -416,7 +416,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential ninja-build doxygen pandoc
+          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
 
       - name: Setup vcpkg
