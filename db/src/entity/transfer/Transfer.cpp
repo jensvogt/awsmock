@@ -73,7 +73,7 @@ namespace AwsMock::Database::Entity::Transfer {
             for (const auto &p: ports) {
                 portsArray.append(p);
             }
-            transferDoc.append(kvp("ports", portsArray));
+            transferDoc.append(kvp("vcpkg-ports", portsArray));
         }
 
         // Tags
@@ -111,8 +111,8 @@ namespace AwsMock::Database::Entity::Transfer {
         }
 
         // Ports
-        if (mResult.view().find("ports") != mResult.view().end()) {
-            for (const bsoncxx::array::view jsonArray = mResult.view()["ports"].get_array().value; auto &p: jsonArray) {
+        if (mResult.view().find("vcpkg-ports") != mResult.view().end()) {
+            for (const bsoncxx::array::view jsonArray = mResult.view()["vcpkg-ports"].get_array().value; auto &p: jsonArray) {
                 if (const int port = p.get_int32().value; std::ranges::find(ports.begin(), ports.end(), port) == ports.end()) {
                     ports.emplace_back(p.get_int32().value);
                 }

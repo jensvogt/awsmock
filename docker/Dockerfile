@@ -79,15 +79,15 @@ RUN ln -s /usr/local/bin/awslocal /usr/bin/awslocal || true
 RUN ln -s /usr/local/bin/awsmockctl /usr/bin/awsmockctl || true
 RUN ln -s /usr/local/bin/awsmockmgr /usr/bin/awsmockmgr || true
 
-# Expose manager/awslocal ports
+# Expose manager/awslocal vcpkg-ports
 EXPOSE 4566-4567 4566-4567
-# Prometheus ports
+# Prometheus vcpkg-ports
 EXPOSE 9091 9091
-# FTP server ports
+# FTP server vcpkg-ports
 EXPOSE 21 21
 EXPOSE 2121 2121
 EXPOSE 2222 2222
-# FTP passive mode ports
+# FTP passive mode vcpkg-ports
 EXPOSE 6000-6100 6000-6100
 
 VOLUME /var/run/docker.sock /var/run/docker.sock

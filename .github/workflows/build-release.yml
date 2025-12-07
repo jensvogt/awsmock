@@ -67,11 +67,12 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
           bootstrap-vcpkg.bat
+          "${{ github.workspace }}/vcpkg" install --triplet "${env:VCPKG_DEFAULT_TRIPLET}" --overlay-ports "${{ github.workspace }}/vcpkg-ports" -Wno-dev
 
       - name: Configure CMake
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_TOOLCHAIN_FILE="${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}" -DVCPKG_OVERLAY_PORTS="${{ github.workspace }}/ports" -DCMAKE_BUILD_TYPE=Release -Wno-dev
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
