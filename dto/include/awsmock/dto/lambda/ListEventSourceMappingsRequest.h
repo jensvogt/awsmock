@@ -101,21 +101,27 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Maximal item count
          */
-        int maxItems;
+        int maxItems{};
 
-        /**
-         * @brief Parse a JSON stream.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend ListEventSourceMappingsRequest tag_invoke(boost::json::value_to_tag<ListEventSourceMappingsRequest>, boost::json::value const &v) {
+            ListEventSourceMappingsRequest r;
+            r.functionName = Core::Json::GetStringValue(v, "FunctionName");
+            r.eventSourceArn = Core::Json::GetStringValue(v, "EventSourceArn");
+            r.marker = Core::Json::GetStringValue(v, "Marker");
+            r.maxItems = Core::Json::GetIntValue(v, "MaxItems");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListEventSourceMappingsRequest const &obj) {
+            jv = {
+                    {"FunctionName", obj.functionName},
+                    {"EventSourceArn", obj.eventSourceArn},
+                    {"Marker", obj.marker},
+                    {"MaxItems", obj.maxItems},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda
