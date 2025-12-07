@@ -72,7 +72,7 @@ jobs:
       - name: Configure CMake
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="{env:VCPKG_DEFAULT_TRIPLET}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}"
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}"
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
