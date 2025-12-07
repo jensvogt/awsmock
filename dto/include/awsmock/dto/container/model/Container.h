@@ -179,7 +179,7 @@ namespace AwsMock::Dto::Docker {
         std::string status;
 
         /**
-         * The ports exposed by this container
+         * The vcpkg-ports exposed by this container
          */
         std::vector<ContainerPort> ports{};
 

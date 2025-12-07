@@ -1,4 +1,4 @@
-# ports/unofficial-libmagic/portfile.cmake
+# vcpkg-ports/unofficial-libmagic/portfile.cmake
 vcpkg_from_github(
         OUT_SOURCE_PATH SOURCE_PATH
         REPO mcmilk/unofficial-libmagic

@@ -47,12 +47,12 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::sendRawFtpMessage(const std::string &raw_message) {
         command_write_strand_.post([me = shared_from_this(), raw_message]() {
-                                       const bool write_in_progress = !me->command_output_queue_.empty();
-                                       me->command_output_queue_.push_back(raw_message);
-                                       if (!write_in_progress) {
-                                           me->startSendingMessages();
-                                       }
-                                   },
+            const bool write_in_progress = !me->command_output_queue_.empty();
+            me->command_output_queue_.push_back(raw_message);
+            if (!write_in_progress) {
+                me->startSendingMessages();
+            }
+        },
                                    nullptr);
     }
 
@@ -129,7 +129,7 @@ namespace AwsMock::FtpServer {
             parameters = command.substr(space_index + 1, std::string::npos);
         }
 
-        const std::map<std::string, std::function<void(std::string)> > command_map{
+        const std::map<std::string, std::function<void(std::string)>> command_map{
                 // Access control commands
                 {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
                 {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
@@ -291,7 +291,7 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        // In the case of a dockerized FTP server, we need to use some special ports
+        // In the case of a dockerized FTP server, we need to use some special vcpkg-ports
         boost::asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
             int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");
@@ -538,7 +538,7 @@ namespace AwsMock::FtpServer {
         }
 
         // Split address and port into bytes and get the port the OS chose for us
-//        const auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+        //        const auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
         const auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string
@@ -1183,7 +1183,7 @@ namespace AwsMock::FtpServer {
 
                 stream << (file_status.type() == FileType::Dir ? 'd' : '-') << file_status.permissionString() << "   1 ";
                 stream << std::setw(10) << file_status.ownerString() << " " << std::setw(10)
-                        << file_status.groupString() << " ";
+                       << file_status.groupString() << " ";
                 stream << std::setw(10) << file_status.fileSize() << " ";
                 stream << file_status.timeString() << " ";
                 stream << filename;
@@ -1192,13 +1192,13 @@ namespace AwsMock::FtpServer {
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
-            const auto dir_listing_rawdata = std::make_shared<std::vector<char> >();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
             dir_listing_rawdata->reserve(dir_listing_string.size());
             std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
             // Send the string out
             me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
         });
     }
 
@@ -1222,13 +1222,13 @@ namespace AwsMock::FtpServer {
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
-            const auto dir_listing_rawdata = std::make_shared<std::vector<char> >();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
             dir_listing_rawdata->reserve(dir_listing_string.size());
             std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
             // Send the string out
             me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
             // Nullpointer indicates the end of transmission
         });
     }
@@ -1254,39 +1254,39 @@ namespace AwsMock::FtpServer {
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file,
                                              const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
         file_rw_strand_.post([me = shared_from_this(), file, data_socket]() {
-                                 if (file->file_stream_.eof()) return;
+            if (file->file_stream_.eof()) return;
 
-                                 const auto buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
-                                 file->file_stream_.read(buffer->data(), static_cast<std::streamsize>(buffer->size()));
-                                 const auto bytes_read = file->file_stream_.gcount();
-                                 buffer->resize(static_cast<size_t>(bytes_read));
+            const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
+            file->file_stream_.read(buffer->data(), static_cast<std::streamsize>(buffer->size()));
+            const auto bytes_read = file->file_stream_.gcount();
+            buffer->resize(static_cast<size_t>(bytes_read));
 
-                                 if (!file->file_stream_.eof()) {
-                                     me->addDataToBufferAndSend(buffer,
-                                                                data_socket,
-                                                                [me, file, data_socket]() {
-                                                                    me->readDataFromFileAndSend(file, data_socket);
-                                                                });
-                                 } else {
-                                     me->addDataToBufferAndSend(buffer, data_socket);
-                                     me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(nullptr), data_socket);
-                                 }
-                             },
+            if (!file->file_stream_.eof()) {
+                me->addDataToBufferAndSend(buffer,
+                                           data_socket,
+                                           [me, file, data_socket]() {
+                                               me->readDataFromFileAndSend(file, data_socket);
+                                           });
+            } else {
+                me->addDataToBufferAndSend(buffer, data_socket);
+                me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(nullptr), data_socket);
+            }
+        },
                              nullptr);
     }
 
-    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char> > &data,
+    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char>> &data,
                                             const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
                                             const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post([me = shared_from_this(), data, data_socket, fetch_more]() {
-                                     const bool write_in_progress = (!me->data_buffer_.empty());
+            const bool write_in_progress = (!me->data_buffer_.empty());
 
-                                     me->data_buffer_.push_back(data);
+            me->data_buffer_.push_back(data);
 
-                                     if (!write_in_progress) {
-                                         me->writeDataToSocket(data_socket, fetch_more);
-                                     }
-                                 },
+            if (!write_in_progress) {
+                me->writeDataToSocket(data_socket, fetch_more);
+            }
+        },
                                  nullptr);
     }
 
@@ -1300,8 +1300,8 @@ namespace AwsMock::FtpServer {
                                     boost::asio::buffer(*data),
                                     me->data_buffer_strand_.wrap(
                                             [me, data_socket, data, fetch_more](
-                                            const boost::beast::error_code ec,
-                                            std::size_t /*bytes_to_transfer*/) {
+                                                    const boost::beast::error_code ec,
+                                                    std::size_t /*bytes_to_transfer*/) {
                                                 me->data_buffer_.pop_front();
 
                                                 if (ec) {
@@ -1344,7 +1344,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
-        const auto buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
+        const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
 
         async_read(*data_socket,
                    boost::asio::buffer(*buffer),
@@ -1364,23 +1364,23 @@ namespace AwsMock::FtpServer {
                    });
     }
 
-    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char> > &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more) {
+    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more) {
         file_rw_strand_.post([me = shared_from_this(), data, file, fetch_more] {
-                                 fetch_more();
-                                 file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
-                             },
+            fetch_more();
+            file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
+        },
                              nullptr);
     }
 
     void FtpSession::endDataReceiving(const std::shared_ptr<IoFile> &file) {
         file_rw_strand_.post([me = shared_from_this(), file] {
-                                 file->file_stream_.flush();
-                                 file->file_stream_.close();
-                                 me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
+            file->file_stream_.flush();
+            file->file_stream_.close();
+            me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
 
-                                 // Send to AWS S3
-                                 me->SendCreateObjectRequest(file->_user, file->_fileName);
-                             },
+            // Send to AWS S3
+            me->SendCreateObjectRequest(file->_user, file->_fileName);
+        },
                              nullptr);
     }
 

@@ -69,12 +69,12 @@ namespace AwsMock::Dto::Docker {
         std::string image;
 
         /**
-         * Container ports
+         * Container vcpkg-ports
          */
         std::string containerPort;
 
         /**
-         * Host ports
+         * Host vcpkg-ports
          */
         std::string hostPort;
 
@@ -84,7 +84,7 @@ namespace AwsMock::Dto::Docker {
         HostConfig hostConfig;
 
         /**
-         * Exposed ports
+         * Exposed vcpkg-ports
          */
         std::map<std::string, ExposedPort> exposedPorts;
 
