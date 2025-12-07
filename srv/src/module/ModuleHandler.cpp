@@ -23,21 +23,21 @@ namespace AwsMock::Service {
                 auto address = configuration.GetValue<std::string>("awsmock.gateway.http.address");
                 int port = configuration.GetValue<int>("awsmock.gateway.http.port");
                 std::string endpoint = "http://" + host + ":" + std::to_string(port);
-                Dto::Module::GatewayConfig config = {
-                        .region = configuration.GetValue<std::string>("awsmock.region"),
-                        .endpoint = endpoint,
-                        .host = host,
-                        .address = address,
-                        .port = port,
+                Dto::Module::GatewayConfig config;
+                config.region = configuration.GetValue<std::string>("awsmock.region");
+                config.endpoint = endpoint;
+                config.host = host;
+                config.address = address;
+                config.port = port;
 #ifndef WIN32
-                        .pid = getppid(),
+                config.pid = getppid();
 #endif
-                        .user = configuration.GetValue<std::string>("awsmock.user"),
-                        .accessId = configuration.GetValue<std::string>("awsmock.access.account-id"),
-                        .clientId = configuration.GetValue<std::string>("awsmock.access.client-id"),
-                        .dataDir = configuration.GetValue<std::string>("awsmock.data-dir"),
-                        .version = Core::Configuration::GetVersion(),
-                        .databaseActive = configuration.GetValue<bool>("awsmock.mongodb.active")};
+                config.user = configuration.GetValue<std::string>("awsmock.user");
+                config.accessId = configuration.GetValue<std::string>("awsmock.access.account-id");
+                config.clientId = configuration.GetValue<std::string>("awsmock.access.client-id");
+                config.dataDir = configuration.GetValue<std::string>("awsmock.data-dir");
+                config.version = Core::Configuration::GetVersion();
+                config.databaseActive = configuration.GetValue<bool>("awsmock.mongodb.active");
                 return SendOkResponse(request, config.ToJson());
             }
             if (action == "list-modules") {

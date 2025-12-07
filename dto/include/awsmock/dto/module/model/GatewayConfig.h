@@ -9,24 +9,18 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/SystemUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Module {
 
     /**
-     * Gateway configuration
+     * @brief Gateway configuration
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GatewayConfig {
-
-        /**
-         * Default region
-         */
-        std::string region;
+    struct GatewayConfig final : Common::BaseCounter<GatewayConfig> {
 
         /**
          * Endpoint
@@ -103,36 +97,47 @@ namespace AwsMock::Dto::Module {
          */
         bool databaseActive = false;
 
-        /**
-         * Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Convert from JSON representation
-         *
-         * @param payload JSON representation
-         * @return GatewayConfig
-         */
-        static GatewayConfig FromJson(const std::string &payload);
+        friend GatewayConfig tag_invoke(boost::json::value_to_tag<GatewayConfig>, boost::json::value const &v) {
+            GatewayConfig r;
+            r.endpoint = Core::Json::GetStringValue(v, "endpoint");
+            r.protocol = Core::Json::GetStringValue(v, "protocol");
+            r.host = Core::Json::GetStringValue(v, "host");
+            r.address = Core::Json::GetStringValue(v, "address");
+            r.port = Core::Json::GetIntValue(v, "port");
+            r.pid = Core::Json::GetIntValue(v, "pid");
+            r.user = Core::Json::GetStringValue(v, "user");
+            r.accessId = Core::Json::GetStringValue(v, "accessId");
+            r.clientId = Core::Json::GetStringValue(v, "clientId");
+            r.accessKeyId = Core::Json::GetStringValue(v, "accessKeyId");
+            r.secretAccessKey = Core::Json::GetStringValue(v, "secretAccessKey");
+            r.dataDir = Core::Json::GetStringValue(v, "dataDir");
+            r.version = Core::Json::GetStringValue(v, "version");
+            r.prettyPrint = Core::Json::GetBoolValue(v, "prettyPrint");
+            r.databaseActive = Core::Json::GetBoolValue(v, "databaseActive");
+            return r;
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @param os output stream
-         * @param m module struct
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GatewayConfig &m);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GatewayConfig const &obj) {
+            jv = {
+                    {"endpoint", obj.endpoint},
+                    {"protocol", obj.protocol},
+                    {"host", obj.host},
+                    {"address", obj.address},
+                    {"port", obj.port},
+                    {"pid", obj.pid},
+                    {"user", obj.user},
+                    {"accessId", obj.accessId},
+                    {"clientId", obj.clientId},
+                    {"accessKeyId", obj.accessKeyId},
+                    {"secretAccessKey", obj.secretAccessKey},
+                    {"dataDir", obj.dataDir},
+                    {"version", obj.version},
+                    {"prettyPrint", obj.prettyPrint},
+                    {"databaseActive", obj.databaseActive},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Module

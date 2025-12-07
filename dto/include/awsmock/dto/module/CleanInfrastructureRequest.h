@@ -10,9 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Module {
 
@@ -29,7 +28,7 @@ namespace AwsMock::Dto::Module {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CleanInfrastructureRequest {
+    struct CleanInfrastructureRequest final : Common::BaseCounter<CleanInfrastructureRequest> {
 
         /**
          * Modules
@@ -39,40 +38,30 @@ namespace AwsMock::Dto::Module {
         /**
          * Only objects
          */
-        bool onlyObjects;
+        bool onlyObjects{};
 
         /**
          * Pretty print
          */
-        bool prettyPrint;
+        bool prettyPrint{};
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+        friend CleanInfrastructureRequest tag_invoke(boost::json::value_to_tag<CleanInfrastructureRequest>, boost::json::value const &v) {
+            CleanInfrastructureRequest r;
+            r.modules = boost::json::value_to<std::vector<std::string>>(v.at("modules"));
+            r.onlyObjects = Core::Json::GetBoolValue(v, "onlyObjects");
+            r.prettyPrint = Core::Json::GetBoolValue(v, "prettyPrint");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CleanInfrastructureRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CleanInfrastructureRequest const &obj) {
+            jv = {
+                    {"modules", boost::json::value_from(obj.modules)},
+                    {"onlyObjects", obj.onlyObjects},
+                    {"prettyPrint", obj.prettyPrint},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Module
