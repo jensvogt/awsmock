@@ -249,7 +249,7 @@ target_link_libraries(awslocal PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSS
 if (WIN32)
     target_link_libraries(awslocal PUBLIC Boost::system unofficial::libmagic::libmagic)
 else ()
-    target_link_libraries(awslocal magic)
+    target_link_libraries(awslocal PUBLIC magic)
 endif ()
 
 # -------------------------------------------------------------------------
