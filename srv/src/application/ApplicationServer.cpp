@@ -179,9 +179,7 @@ namespace AwsMock::Service {
         for (const auto &container: ContainerService::instance().ListContainers().containerList) {
 
             std::string name{}, tag{};
-            if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ":"); parts.size() == 1) {
-                name = parts[0];
-            } else if (parts.size() == 2) {
+            if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ":"); parts.size() > 0) {
                 name = parts[0];
             }
             if (_applicationDatabase.ApplicationExists(region, name)) {
