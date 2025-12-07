@@ -21,7 +21,6 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     mkdir build && \
     cmake -S . -B build -DBUILD_DOCUMENTATION=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -Wno-dev && \
     cmake --build build --parallel $(($(nproc)/2)) && \
-    find .
 
 FROM node:22-bookworm AS buildfrontend
 
@@ -50,7 +49,6 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/data/backup && \
     mkdir -p /usr/local/awsmock/data/tmp && \
     mkdir -p /usr/local/awsmock/data/application && \
-    mkdir -p /usr/local/awsmock/bin && \
     mkdir -p /usr/local/awsmock/etc && \
     mkdir -p /usr/local/awsmock/init && \
     mkdir -p /usr/local/awsmock/log && \
@@ -73,13 +71,13 @@ COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/loca
 COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/bin
 COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/bin
 COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/bin
-COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/etc/awsmock.json
+COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
 
 # Set library search path
-ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
-RUN ln -s /usr/local/awsmock/bin/awslocal /usr/bin/awslocal || true
-RUN ln -s /usr/local/awsmock/bin/awsmockctl /usr/bin/awsmockctl || true
-RUN ln -s /usr/local/awsmock/bin/awsmockmgr /usr/bin/awsmockmgr || true
+ENV LD_LIBRARY_PATH=/usr/local/lib
+RUN ln -s /usr/local/bin/awslocal /usr/bin/awslocal || true
+RUN ln -s /usr/local/bin/awsmockctl /usr/bin/awsmockctl || true
+RUN ln -s /usr/local/bin/awsmockmgr /usr/bin/awsmockmgr || true
 
 # Expose manager/awslocal ports
 EXPOSE 4566-4567 4566-4567
@@ -94,4 +92,4 @@ EXPOSE 6000-6100 6000-6100
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-CMD ["/usr/local/bin/awsmockmgr", "--config", "/usr/local/etc/awsmock.json"]
+CMD ["/usr/local/bin/awsmockmgr"]
