@@ -20,7 +20,7 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
     mkdir build && \
     cmake -S . -B build -DBUILD_DOCUMENTATION=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -Wno-dev && \
-    cmake --build build --parallel $(($(nproc)/2)) && \
+    cmake --build build --parallel
 
 FROM node:22-bookworm AS buildfrontend
 

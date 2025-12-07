@@ -161,11 +161,13 @@ namespace AwsMock::Service {
                 continue;
             }
 
-            if (Dto::Docker::Container response = ContainerService::instance().GetContainerByName(application.containerName); response.id.empty()) {
-                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application.containerId = "";
-                application.containerName = "";
-                application = _applicationDatabase.UpdateApplication(application);
+            if (!application.containerName.empty()) {
+                if (Dto::Docker::Container response = ContainerService::instance().GetContainerByName(application.containerName); response.id.empty()) {
+                    application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                    application.containerId = "";
+                    application.containerName = "";
+                    application = _applicationDatabase.UpdateApplication(application);
+                }
             }
         }
     }
