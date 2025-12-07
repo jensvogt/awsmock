@@ -140,7 +140,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install doxygen pandoc file icu4c autoconf automake libtool
+          brew install doxygen pandoc file icu4c autoconf autoconf-archive automake libtool
 
       - name: Setup vcpkg
         id: vcpkg-installation
