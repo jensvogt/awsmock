@@ -7,7 +7,7 @@ on:
 
 env:
   APP_NAME: "awsmock"
-  INSTALLER_ID: "de.jensvogt.awsmock" # used for IFW package path
+  INSTALLER_ID: "de.jensvogt.awsmock"
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
 
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
+      tag_name: ${{ steps.strip_tag.outputs.clean_tag }}
 
     steps:
       - name: Release Please
@@ -31,6 +31,13 @@ jobs:
         with:
           release-type: simple
           token: ${{ secrets.GH_AUTH_TOKEN }}
+
+      - name: Strip leading 'v' from tag
+        id: strip_tag
+        run: |
+          TAG="${{ steps.release.outputs.tag_name }}"
+          CLEAN="${TAG#v}"   # remove leading 'v'
+          echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
   build-windows:
     name: Build & Package (Windows)
