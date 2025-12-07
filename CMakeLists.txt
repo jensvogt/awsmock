@@ -89,9 +89,9 @@ set(DTO_SOURCES dto/src/common/UserAgent.cpp dto/src/common/S3ClientCommand.cpp 
         dto/src/transfer/GetServerDetailsRequest.cpp dto/src/transfer/GetServerDetailsResponse.cpp
         dto/src/transfer/DeleteUserRequest.cpp dto/src/transfer/DeleteProtocolRequest.cpp dto/src/dynamodb/mapper/Mapper.cpp
         dto/src/secretsmanager/mapper/Mapper.cpp dto/src/ssm/mapper/Mapper.cpp dto/src/apps/mapper/Mapper.cpp
-        dto/src/apigateway/mapper/Mapper.cpp dto/src/module/model/Module.cpp dto/src/module/model/GatewayConfig.cpp
+        dto/src/apigateway/mapper/Mapper.cpp dto/src/module/model/Module.cpp
         dto/src/module/mapper/Mapper.cpp dto/src/module/ExportInfrastructureResponse.cpp
-        dto/src/module/CleanInfrastructureRequest.cpp dto/src/module/ListModuleNamesResponse.cpp
+        dto/src/module/ListModuleNamesResponse.cpp
         dto/src/module/ImportInfrastructureRequest.cpp dto/src/monitoring/mapper/Mapper.cpp)
 
 add_library(awsmockdto STATIC ${DTO_SOURCES})
