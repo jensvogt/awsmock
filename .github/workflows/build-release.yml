@@ -67,7 +67,7 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
           bootstrap-vcpkg.bat
-          "${{ github.workspace }}/vcpkg/vcpkg" install --triplet "${env:VCPKG_DEFAULT_TRIPLET}" --overlay-ports "${{ github.workspace }}/vcpkg-ports" -Wno-dev
+          "${{ github.workspace }}\vcpkg\vcpkg" install --triplet "${env:VCPKG_DEFAULT_TRIPLET}" --overlay-ports "${{ github.workspace }}\vcpkg-ports" -Wno-dev
 
       - name: Configure CMake
         run: |
