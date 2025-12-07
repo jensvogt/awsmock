@@ -106,168 +106,116 @@ jobs:
     # Load the service using the launchctl command:
     # launchctl load -w ~/Library/LaunchAgents/de.jensvogt.awsmock.plist.plist
     #
-    #  build-macos:
-    #    name: Build & Package (macOS)
-    #    runs-on: macos-latest
-    #    needs: release-please
-    #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    #    env:
-    #      BUILD_DIR: "${{ github.workspace }}/build-macos"
-    #      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-    #      OPENSSL_ROOT_DIR: "/opt/homebrew/opt/openssl@3"
-    #      OPENSSL_LIB_DIR: "/opt/homebrew/opt/openssl@3/lib"
-    #      OPENSSL_INCLUDE_DIR: "/opt/homebrew/opt/openssl@3/include"
-    #      SERVICE_NAME: de.jensvogt.awsmock
-    #    steps:
-    #      - name: Checkout
-    #        uses: actions/checkout@v4
-    #        with:
-    #          fetch-depth: 0
-    #
-    #      - name: Create extern directories
-    #        shell: bash
-    #        run: |
-    #          mkdir -p ${{ github.workspace }}/extern
-    #
-    #      - name: Install system dependencies
-    #        shell: bash
-    #        run: |
-    #          brew install doxygen pandoc libmagic libarchive libssh file icu4c
-    #
-    #      - name: Install JWT-CPP
-    #        shell: bash
-    #        run: |
-    #          git clone https://github.com/Thalhammer/jwt-cpp.git
-    #          cd jwt-cpp
-    #          mkdir build
-    #          cd build
-    #          cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-    #          cmake --build . --parallel $(nproc)
-    #          cmake --install .
-    #
-    #      - name: Install mongo-c-driver
-    #        shell: bash
-    #        run: |
-    #          git clone https://github.com/mongodb/mongo-c-driver.git
-    #          cd mongo-c-driver/build
-    #          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
-    #                   -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
-    #                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-    #          cmake --build .
-    #          cmake --install .
-    #
-    #      - name: Install mongo-cxx-driver
-    #        shell: bash
-    #        run: |
-    #          git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
-    #          cd mongo-cxx-driver/build
-    #          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-    #                -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern -DBSONCXX_POLY_USE_REAL=ON \
-    #                -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON \
-    #                -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern -DCMAKE_CXX_STANDARD=23
-    #          cmake --build . --config Release --parallel $(sysctl -n hw.logicalcpu)
-    #          cmake --install .
-    #
-    #      - name: Install Boost
-    #        shell: bash
-    #        run: |
-    #          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
-    #          tar -xzf boost_1_89_0.tar.gz
-    #          cd boost_1_89_0
-    #          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-    #          ./b2 install -j$(sysctl -n hw.logicalcpu) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
-    #           variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern > /dev/null
-    #
-    #      - name: Build (macOS)
-    #        shell: bash
-    #        run: |
-    #          mkdir -p $BUILD_DIR
-    #          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release
-    #          cmake --build $BUILD_DIR --config Release --parallel $(sysctl -n hw.logicalcpu)
-    #
-    #      - name: Build (Frontend)
-    #        shell: bash
-    #        run: |
-    #          # Create a directory for the app
-    #          mkdir -p ${{ github.workspace }}/frontend
-    #          cd ${{ github.workspace }}/frontend
-    #
-    #          # Clone the npm application repository (or download a tarball)
-    #          git clone https://github.com/jensvogt/awsmock-ui
-    #          cd awsmock-ui
-    #
-    #          # Install dependencies
-    #          npm install
-    #
-    #          # Build the application (if it has a build step)
-    #          npm run build
-    #
-    #      - name: Prepare package structure
-    #        run: |
-    #          PACKAGE_DIR=package-macos
-    #          echo "PACKAGE_DIR=$PACKAGE_DIR" >> $GITHUB_ENV
-    #
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/bin
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/etc
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/log
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/frontend
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/s3
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sqs
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sns
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/lambda
-    #          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/application
-    #          mkdir -p $PACKAGE_DIR/usr/local/share/man/man1
-    #          mkdir -p $PACKAGE_DIR/etc/systemd/system
-    #          mkdir -p $PACKAGE_DIR/etc/ld.so.conf.d
-    #          mkdir -p $PACKAGE_DIR/DEBIAN
-    #
-    #          # Copy your app
-    #          cp $BUILD_DIR/awsmockmgr $PACKAGE_DIR/usr/local/awsmock/bin/
-    #          cp $BUILD_DIR/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
-    #          cp $BUILD_DIR/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
-    #          cp dist/etc/awsmock_linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
-    #          cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
-    #          cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
-    #          cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
-    #          cp docs/man/*.1 $PACKAGE_DIR/usr/local/share/man/man1
-    #          cp -R ${{ github.workspace }}/frontend/dist/awsmock-ui/browser/* $PACKAGE_DIR/usr/local/awsmock/frontend
-    #
-    #      - name: Create Launch Agent Plist
-    #        run: |
-    #          cat > $PACKAGE_DIR/service/awsmock.plist <<- EOF
-    #          <?xml version="1.0" encoding="UTF-8"?>
-    #          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    #          <plist version="1.0">
-    #          <dict>
-    #           <key>Label</key>
-    #           <string>${{ env.SERVICE_NAME }}</string>
-    #           <key>ProgramArguments</key>
-    #           <array>
-    #               <string>${{ env.EXECUTABLE_NAME }}</string>
-    #               <string>--config</string>
-    #               <string>/usr/local/awsmock/etc/awsmock.json</string>
-    #           </array>
-    #           <key>RunAtLoad</key>
-    #           <true/>
-    #           <key>KeepAlive</key>
-    #           <false/>
-    #           <key>StandardOutPath</key>
-    #           <string>/tmp/${{ env.SERVICE_NAME }}.log</string>
-    #          </dict>
-    #          </plist>
-    #          EOF
-    #
-    #      - name: Package Service Files
-    #        # Create a simple tarball containing the executable and the plist for easy distribution
-    #        run: |
-    #          tar -czf awsmock-${{ env.SEMVER }}-macos.tgz -C $PACKAGE_DIR .
-    #
-    #      - name: Upload macOS ZIP
-    #        uses: actions/upload-artifact@v4
-    #        with:
-    #          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.dmg
-    #          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.dmg
-    #
+  build-macos:
+    name: Build & Package (macOS)
+    runs-on: macos-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    env:
+      BUILD_DIR: "${{ github.workspace }}/build-macos"
+      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+      OPENSSL_ROOT_DIR: "/opt/homebrew/opt/openssl@3"
+      OPENSSL_LIB_DIR: "/opt/homebrew/opt/openssl@3/lib"
+      OPENSSL_INCLUDE_DIR: "/opt/homebrew/opt/openssl@3/include"
+      SERVICE_NAME: de.jensvogt.awsmock
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install system dependencies
+        shell: bash
+        run: |
+          brew install doxygen pandoc libmagic libarchive libssh file icu4c
+
+      - name: Setup vcpkg
+        id: vcpkg-installation
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+          runVcpkgInstall: true
+
+      - name: Build (Backend)
+        run: |
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake --build build --config Release
+
+      - name: Build (Frontend)
+        shell: bash
+        run: |
+          mkdir -p ${{ github.workspace }}/frontend
+          cd ${{ github.workspace }}/frontend
+          git clone https://github.com/jensvogt/awsmock-ui
+          cd awsmock-ui
+          npm install
+          npm run build
+
+      - name: Prepare package structure
+        run: |
+          PACKAGE_DIR=package-macos
+          echo "PACKAGE_DIR=$PACKAGE_DIR" >> $GITHUB_ENV
+
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/bin
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/etc
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/log
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/frontend
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/s3
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sqs
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sns
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/lambda
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/application
+          mkdir -p $PACKAGE_DIR/usr/local/share/man/man1
+          mkdir -p $PACKAGE_DIR/etc/systemd/system
+          mkdir -p $PACKAGE_DIR/etc/ld.so.conf.d
+          mkdir -p $PACKAGE_DIR/DEBIAN
+
+          # Copy your app
+          cp $BUILD_DIR/awsmockmgr $PACKAGE_DIR/usr/local/awsmock/bin/
+          cp $BUILD_DIR/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
+          cp $BUILD_DIR/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
+          cp dist/etc/awsmock_linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
+          cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
+          cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
+          cp docs/man/*.1 $PACKAGE_DIR/usr/local/share/man/man1
+          cp -R ${{ github.workspace }}/frontend/dist/awsmock-ui/browser/* $PACKAGE_DIR/usr/local/awsmock/frontend
+
+      - name: Create Launch Agent Plist
+        run: |
+          cat > $PACKAGE_DIR/service/awsmock.plist <<- EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+           <key>Label</key>
+           <string>${{ env.SERVICE_NAME }}</string>
+           <key>ProgramArguments</key>
+           <array>
+               <string>${{ env.EXECUTABLE_NAME }}</string>
+               <string>--config</string>
+               <string>/usr/local/awsmock/etc/awsmock.json</string>
+           </array>
+           <key>RunAtLoad</key>
+           <true/>
+           <key>KeepAlive</key>
+           <false/>
+           <key>StandardOutPath</key>
+           <string>/tmp/${{ env.SERVICE_NAME }}.log</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Package Service Files
+        run: |
+          tar -czf awsmock-${{ env.SEMVER }}-macos.tgz -C $PACKAGE_DIR .
+
+      - name: Upload macOS ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+
   build-linux-deb:
     name: Build & Package (Linux DEB)
     runs-on: ubuntu-latest
@@ -299,7 +247,7 @@ jobs:
       - name: Build (Backend)
         run: |
           cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          cmake --build build --config Release
+          cmake --build build --config Release --parallel
 
       - name: Build (Frontend)
         shell: bash
@@ -429,7 +377,7 @@ jobs:
       - name: Build (Backend)
         run: |
           cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          cmake --build build --config Release
+          cmake --build build --config Release --parallel
 
       - name: Build (Frontend)
         shell: bash
@@ -552,7 +500,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-windows ]
+    needs: [ release-please, build-windows, build-linux-deb, build-linux-rpm, build-macos ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:

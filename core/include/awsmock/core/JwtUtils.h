@@ -18,7 +18,7 @@
 
 // JWT-cpp includes
 #include <jwt-cpp/jwt.h>
-#include <jwt-cpp/jwt.h>
+#include <jwt-cpp/traits/kazuho-picojson/traits.h>
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
@@ -30,7 +30,8 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class JwtUtils {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -76,6 +77,6 @@ namespace AwsMock::Core {
          */
         static bool VerifyTokenHs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer);
     };
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
 #endif// AWSMOCK_CORE_JWT_UTILS_H

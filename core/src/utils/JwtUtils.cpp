@@ -8,18 +8,16 @@ namespace AwsMock::Core {
 
     std::string JwtUtils::CreateTokenRs256(const std::string &privateKey, const std::string &issuer, const std::map<std::string, std::string> &payload) {
 
-        /*auto token = jwt::create<jwt::traits::picojson>(jwt::default_clock{})
-        .set_issuer(issuer)
+        auto token = jwt::create<jwt::traits::kazuho_picojson>()
+                             .set_issuer(issuer)
                              .set_type("JWT")
                              .set_id("awsmock-rsa256")
                              .set_issued_at(jwt::date::clock::now())
                              .set_expires_at(jwt::date::clock::now() + std::chrono::seconds{36000});
         for (const auto &[fst, snd]: payload) {
-            token.set_payload_claim(fst, jwt::basic_claim<>(snd));
+            token.set_payload_claim(fst, jwt::basic_claim<jwt::traits::kazuho_picojson>(snd));
         }
         return token.sign(jwt::algorithm::rs256("", privateKey, "", ""));
-        */
-        return {};
     }
 
     std::string JwtUtils::CreateTokenHs256(const std::string &secret, const std::string &issuer, const std::map<std::string, std::string> &payload) {
@@ -40,7 +38,7 @@ namespace AwsMock::Core {
     }
 
     bool JwtUtils::VerifyTokenRs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer) {
-/*        try {
+        /*        try {
             auto verify = jwt::verify()
                                   // We only need an RSA public key to verify tokens
                                   .allow_algorithm(jwt::algorithm::rs256(publicKey, "", "", ""))
