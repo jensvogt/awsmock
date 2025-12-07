@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.90](https://github.com/jensvogt/awsmock/compare/v1.9.89...v1.9.90) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([6cad047](https://github.com/jensvogt/awsmock/commit/6cad047b4a62d40f895d4d4d1ac9c4a620f9405c))
+* link statically ([b183b21](https://github.com/jensvogt/awsmock/commit/b183b210245abf3b4f5d4ed3219ecb25e7f29186))
+* link statically ([0e49a9e](https://github.com/jensvogt/awsmock/commit/0e49a9edfa4323d56497d5f774a2698c31000a54))
+* link statically ([aebd1c4](https://github.com/jensvogt/awsmock/commit/aebd1c4a260e7ff3a935fe4c5f505ea82e3e8bec))
+* link statically ([c4d4f74](https://github.com/jensvogt/awsmock/commit/c4d4f7487216412ee2d27058dde2ab9b30e9de74))
+
 ## [1.9.89](https://github.com/jensvogt/awsmock/compare/v1.9.88...v1.9.89) (2025-12-07)
 
 
