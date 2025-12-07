@@ -29,12 +29,19 @@ namespace AwsMock::Dto::Lambda {
          */
         std::vector<EventSourceMapping> eventSourceMappings;
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend ListEventSourceMappingsResponse tag_invoke(boost::json::value_to_tag<ListEventSourceMappingsResponse>, boost::json::value const &v) {
+            ListEventSourceMappingsResponse r;
+            r.eventSourceMappings = boost::json::value_to<std::vector<EventSourceMapping>>(v.at("EventSourceMappings"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListEventSourceMappingsResponse const &obj) {
+            jv = {
+                    {"EventSourceMappings", boost::json::value_from(obj.eventSourceMappings)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

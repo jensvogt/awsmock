@@ -81,8 +81,7 @@ set(DTO_SOURCES dto/src/common/UserAgent.cpp dto/src/common/S3ClientCommand.cpp 
         dto/src/common/MonitoringClientCommand.cpp dto/src/common/CognitoClientCommand.cpp
         dto/src/common/ApiGatewayClientCommand.cpp dto/src/common/ApplicationClientCommand.cpp
         dto/src/common/ContainerClientCommand.cpp dto/src/sqs/mapper/Mapper.cpp dto/src/sns/mapper/Mapper.cpp
-        dto/src/s3/mapper/Mapper.cpp dto/src/lambda/mapper/Mapper.cpp dto/src/lambda/ListEventSourceMappingsRequest.cpp
-        dto/src/lambda/ListEventSourceMappingsResponse.cpp dto/src/cognito/mapper/Mapper.cpp
+        dto/src/s3/mapper/Mapper.cpp dto/src/lambda/mapper/Mapper.cpp dto/src/cognito/mapper/Mapper.cpp
         dto/src/transfer/ListUsersRequest.cpp dto/src/transfer/ListUsersResponse.cpp
         dto/src/transfer/CreateUserRequest.cpp dto/src/transfer/CreateUserResponse.cpp
         dto/src/transfer/DeleteServerRequest.cpp dto/src/transfer/StartServerRequest.cpp
@@ -209,8 +208,7 @@ target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_sta
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono -Wl,--whole-archive Boost::json -Wl,--no-whole-archive
-        LibArchive::LibArchive)
+        Boost::program_options Boost::chrono Boost::json LibArchive::LibArchive)
 if (WIN32)
     target_link_libraries(awsmockmgr PUBLIC Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib
             pdh.lib ntdll.lib shlwapi.lib)
