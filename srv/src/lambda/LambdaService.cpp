@@ -585,10 +585,10 @@ namespace AwsMock::Service {
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
-            Dto::Lambda::GetFunctionResponse response = {
-                    .region = lambda.region,
-                    .configuration = function,
-                    .tags = lambda.tags};
+            Dto::Lambda::GetFunctionResponse response;
+            response.region = lambda.region;
+            response.configuration = function;
+            response.tags = lambda.tags;
 
             log_info << "Lambda function: " + response.ToJson();
             return response;

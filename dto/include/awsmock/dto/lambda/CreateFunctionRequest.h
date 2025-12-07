@@ -91,7 +91,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateFunctionRequest final : Common::BaseDto<CreateFunctionRequest> {
+    struct CreateFunctionRequest final : Common::BaseCounter<CreateFunctionRequest> {
 
         /**
          * Name of the function
@@ -148,19 +148,47 @@ namespace AwsMock::Dto::Lambda {
          */
         int timeout = 15 * 60;
 
-        /**
-         * @brief Parse a JSON string.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend CreateFunctionRequest tag_invoke(boost::json::value_to_tag<CreateFunctionRequest>, boost::json::value const &v) {
+            CreateFunctionRequest r;
+            r.functionName = Core::Json::GetStringValue(v, "FunctionName");
+            r.runtime = Core::Json::GetStringValue(v, "Runtime");
+            r.role = Core::Json::GetStringValue(v, "Role");
+            r.version = Core::Json::GetStringValue(v, "Version");
+            r.handler = Core::Json::GetStringValue(v, "Handler");
+            r.memorySize = Core::Json::GetLongValue(v, "MemorySize");
+            r.timeout = Core::Json::GetIntValue(v, "Timeout");
+            if (Core::Json::AttributeExists(v, "Environment")) {
+                r.environment = boost::json::value_to<EnvironmentVariables>(v.at("Environment"));
+            }
+            if (Core::Json::AttributeExists(v, "EphemeralStorage")) {
+                r.ephemeralStorage = boost::json::value_to<EphemeralStorage>(v.at("EphemeralStorage"));
+            }
+            if (Core::Json::AttributeExists(v, "Code")) {
+                r.code = boost::json::value_to<Code>(v.at("Code"));
+            }
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateFunctionRequest const &obj) {
+            jv = {
+                    {"FunctionName", obj.functionName},
+                    {"Runtime", obj.runtime},
+                    {"Role", obj.role},
+                    {"Version", obj.version},
+                    {"Handler", obj.handler},
+                    {"MemorySize", obj.memorySize},
+                    {"Timeout", obj.timeout},
+                    {"Environment", boost::json::value_from(obj.environment)},
+                    {"EphemeralStorage", boost::json::value_from(obj.ephemeralStorage)},
+                    {"Code", boost::json::value_from(obj.code)},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -11,11 +11,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/lambda/model/EphemeralStorage.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct CreateTagRequest {
+    struct CreateTagRequest final : Common::BaseCounter<CreateTagRequest> {
 
         /**
          * ARN
@@ -27,33 +27,23 @@ namespace AwsMock::Dto::Lambda {
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * @brief Convert from a JSON string.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend CreateTagRequest tag_invoke(boost::json::value_to_tag<CreateTagRequest>, boost::json::value const &v) {
+            CreateTagRequest r;
+            r.arn = Core::Json::GetStringValue(v, "Arn");
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateTagRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateTagRequest const &obj) {
+            jv = {
+                    {"Arn", obj.arn},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

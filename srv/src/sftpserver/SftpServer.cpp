@@ -10,7 +10,6 @@
 
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
-HANDLE g_ServiceStopEvent{};
 #endif
 
 namespace AwsMock::Service {

@@ -15,7 +15,7 @@
 // TODO: Split into header code
 namespace AwsMock::Dto::Lambda {
 
-    struct EphemeralStorage {
+    struct EphemeralStorage final : Common::BaseCounter<EphemeralStorage> {
 
         /**
          * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB
@@ -55,25 +55,18 @@ namespace AwsMock::Dto::Lambda {
             }
         }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
+      private:
+
+        friend EphemeralStorage tag_invoke(boost::json::value_to_tag<EphemeralStorage>, boost::json::value const &v) {
+            EphemeralStorage r;
+            r.size = Core::Json::GetLongValue(v, "Size");
+            return r;
         }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &r) {
-            os << "EphemeralStorage=" << to_json(r.ToDocument());
-            return os;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EphemeralStorage const &obj) {
+            jv = {
+                    {"Size", obj.size},
+            };
         }
     };
 
