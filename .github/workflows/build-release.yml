@@ -125,7 +125,7 @@ jobs:
     name: Build & Package (macOS)
     runs-on: macos-latest
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-macos"
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
@@ -140,7 +140,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install doxygen pandoc libmagic libarchive libssh file icu4c autoconf
+          brew install doxygen pandoc file icu4c autoconf automake
 
       - name: Setup vcpkg
         id: vcpkg-installation
