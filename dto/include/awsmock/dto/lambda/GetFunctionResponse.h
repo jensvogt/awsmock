@@ -133,17 +133,7 @@ namespace AwsMock::Dto::Lambda {
      *}
      * @endcode
      */
-    struct GetFunctionResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * User
-         */
-        std::string user;
+    struct GetFunctionResponse final : Common::BaseCounter<GetFunctionResponse> {
 
         /**
          * Configuration
@@ -190,26 +180,44 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string lastUpdateStatus = "Successful";
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend GetFunctionResponse tag_invoke(boost::json::value_to_tag<GetFunctionResponse>, boost::json::value const &v) {
+            GetFunctionResponse r;
+            r.timeout = Core::Json::GetIntValue(v, "Timeout");
+            r.state = Core::Json::GetStringValue(v, "State");
+            r.stateReason = Core::Json::GetStringValue(v, "StateReason");
+            r.stateReasonCode = Core::Json::GetStringValue(v, "StateReasonCode");
+            r.lastUpdateStatus = Core::Json::GetStringValue(v, "LastUpdateStatus");
+            if (Core::Json::AttributeExists(v, "Function")) {
+                r.configuration = boost::json::value_to<Function>(v.at("Function"));
+            }
+            if (Core::Json::AttributeExists(v, "EphemeralStorage")) {
+                r.ephemeralStorage = boost::json::value_to<EphemeralStorage>(v.at("EphemeralStorage"));
+            }
+            if (Core::Json::AttributeExists(v, "Code")) {
+                r.code = boost::json::value_to<Code>(v.at("Code"));
+            }
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetFunctionResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetFunctionResponse const &obj) {
+            jv = {
+                    {"Timeout", obj.timeout},
+                    {"State", obj.state},
+                    {"StateReason", obj.stateReason},
+                    {"StateReasonCode", obj.stateReasonCode},
+                    {"LastUpdateStatus", obj.lastUpdateStatus},
+                    {"Tags", boost::json::value_from(obj.tags)},
+                    {"Function", boost::json::value_from(obj.configuration)},
+                    {"EphemeralStorage", boost::json::value_from(obj.ephemeralStorage)},
+                    {"Code", boost::json::value_from(obj.code)},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

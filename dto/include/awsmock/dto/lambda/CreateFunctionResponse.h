@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct CreateFunctionResponse final : Common::BaseDto<CreateFunctionResponse> {
+    struct CreateFunctionResponse final : Common::BaseCounter<CreateFunctionResponse> {
 
         /**
          * Name of the function
@@ -141,12 +141,51 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string dockerContainerId;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend CreateFunctionResponse tag_invoke(boost::json::value_to_tag<CreateFunctionResponse>, boost::json::value const &v) {
+            CreateFunctionResponse r;
+            r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
+            r.functionName = Core::Json::GetStringValue(v, "FunctionName");
+            r.runtime = Core::Json::GetStringValue(v, "Runtime");
+            r.role = Core::Json::GetStringValue(v, "Role");
+            r.handler = Core::Json::GetStringValue(v, "Handler");
+            r.memorySize = Core::Json::GetLongValue(v, "MemorySize");
+            r.codeSize = Core::Json::GetLongValue(v, "CodeSize");
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.timeout = Core::Json::GetIntValue(v, "Timeout");
+            r.codeSha256 = Core::Json::GetStringValue(v, "CodeSha256");
+            r.dockerImageId = Core::Json::GetStringValue(v, "DockerImageId");
+            r.dockerContainerId = Core::Json::GetStringValue(v, "DockerContainerId");
+            r.modified = Core::Json::GetDatetimeValue(v, "LastModified");
+            if (Core::Json::AttributeExists(v, "Environment")) {
+                r.environment = boost::json::value_to<EnvironmentVariables>(v.at("Environment"));
+            }
+            if (Core::Json::AttributeExists(v, "EphemeralStorage")) {
+                r.ephemeralStorage = boost::json::value_to<EphemeralStorage>(v.at("EphemeralStorage"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateFunctionResponse const &obj) {
+            jv = {
+                    {"FunctionArn", obj.functionArn},
+                    {"FunctionName", obj.functionName},
+                    {"Runtime", obj.runtime},
+                    {"Role", obj.role},
+                    {"Handler", obj.handler},
+                    {"MemorySize", obj.memorySize},
+                    {"CodeSize", obj.codeSize},
+                    {"Description", obj.description},
+                    {"Timeout", obj.timeout},
+                    {"CodeSha256", obj.codeSha256},
+                    {"DockerImageId", obj.dockerImageId},
+                    {"DockerContainerId", obj.dockerContainerId},
+                    {"LastModified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Environment", boost::json::value_from(obj.environment)},
+                    {"EphemeralStorage", boost::json::value_from(obj.ephemeralStorage)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

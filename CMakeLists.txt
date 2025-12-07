@@ -29,7 +29,7 @@ find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
 if (WIN32)
     find_package(utf8proc REQUIRED)
-    find_package(unofficial-libmagic CONFIG REQUIRED)
+    find_package(libmagic CONFIG REQUIRED)
     find_package(Boost REQUIRED COMPONENTS system)
 elseif (UNIX)
     pkg_check_modules(LIBMAGIC REQUIRED libmagic)
@@ -68,7 +68,7 @@ if (LINUX)
 elseif (WIN32)
     target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
             Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::system LibArchive::LibArchive
-            unofficial::libmagic::libmagic)
+            libmagic::libmagic)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -82,10 +82,9 @@ set(DTO_SOURCES dto/src/common/UserAgent.cpp dto/src/common/S3ClientCommand.cpp 
         dto/src/common/MonitoringClientCommand.cpp dto/src/common/CognitoClientCommand.cpp
         dto/src/common/ApiGatewayClientCommand.cpp dto/src/common/ApplicationClientCommand.cpp
         dto/src/common/ContainerClientCommand.cpp dto/src/sqs/mapper/Mapper.cpp dto/src/sns/mapper/Mapper.cpp
-        dto/src/s3/mapper/Mapper.cpp dto/src/lambda/CreateTagRequest.cpp dto/src/lambda/CreateFunctionRequest.cpp
-        dto/src/lambda/CreateFunctionResponse.cpp dto/src/lambda/GetFunctionResponse.cpp dto/src/lambda/mapper/Mapper.cpp
-        dto/src/lambda/ListEventSourceMappingsRequest.cpp dto/src/lambda/ListEventSourceMappingsResponse.cpp
-        dto/src/cognito/mapper/Mapper.cpp dto/src/transfer/ListUsersRequest.cpp dto/src/transfer/ListUsersResponse.cpp
+        dto/src/s3/mapper/Mapper.cpp dto/src/lambda/mapper/Mapper.cpp dto/src/lambda/ListEventSourceMappingsRequest.cpp
+        dto/src/lambda/ListEventSourceMappingsResponse.cpp dto/src/cognito/mapper/Mapper.cpp
+        dto/src/transfer/ListUsersRequest.cpp dto/src/transfer/ListUsersResponse.cpp
         dto/src/transfer/CreateUserRequest.cpp dto/src/transfer/CreateUserResponse.cpp
         dto/src/transfer/DeleteServerRequest.cpp dto/src/transfer/StartServerRequest.cpp
         dto/src/transfer/StopServerRequest.cpp dto/src/transfer/mapper/Mapper.cpp
@@ -106,7 +105,7 @@ target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenS
 target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 if (WIN32)
-    target_link_libraries(awsmockdto PUBLIC Boost::system unofficial::libmagic::libmagic)
+    target_link_libraries(awsmockdto PUBLIC Boost::system libmagic::libmagic)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -149,7 +148,7 @@ target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto 
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 if (WIN32)
-    target_link_libraries(awsmockdb PUBLIC Boost::system unofficial::libmagic::libmagic)
+    target_link_libraries(awsmockdb PUBLIC Boost::system libmagic::libmagic)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -192,7 +191,7 @@ target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 if (WIN32)
-    target_link_libraries(awsmocksrv PUBLIC Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib
+    target_link_libraries(awsmocksrv PUBLIC Boost::system libmagic::libmagic crypt32.lib Iphlpapi.lib
             pdh.lib ntdll.lib shlwapi.lib)
 endif ()
 
@@ -217,7 +216,7 @@ if (LINUX)
 elseif (WIN32)
     target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
             Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-            Boost::program_options Boost::chrono LibArchive::LibArchive Boost::system unofficial::libmagic::libmagic
+            Boost::program_options Boost::chrono LibArchive::LibArchive Boost::system libmagic::libmagic
             crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 endif ()
 
@@ -237,7 +236,7 @@ if (LINUX)
 elseif (WIN32)
     target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
             Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-            Boost::program_options Boost::chrono Boost::system unofficial::libmagic::libmagic LibArchive::LibArchive)
+            Boost::program_options Boost::chrono Boost::system libmagic::libmagic LibArchive::LibArchive)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -251,7 +250,7 @@ target_link_libraries(awslocal PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSS
         Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono
         LibArchive::LibArchive)
 if (WIN32)
-    target_link_libraries(awslocal PUBLIC Boost::system unofficial::libmagic::libmagic)
+    target_link_libraries(awslocal PUBLIC Boost::system libmagic::libmagic)
 endif ()
 
 # -------------------------------------------------------------------------
