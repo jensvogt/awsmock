@@ -43,7 +43,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package"
@@ -71,7 +71,7 @@ jobs:
       - name: Configure CMake
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$env:VCPKG_DEFAULT_TRIPLET" -DCMAKE_BUILD_TYPE=Release -Wno-dev -DVCPKG_OVERLAY_PORTS=${{ github.workspace }}/ports
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_TOOLCHAIN_FILE="${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}" -DVCPKG_OVERLAY_PORTS="${{ github.workspace }}/ports" -DCMAKE_BUILD_TYPE=Release -Wno-dev
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
