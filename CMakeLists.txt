@@ -23,7 +23,7 @@ endif ()
 find_package(LibArchive REQUIRED)
 find_package(bsoncxx CONFIG REQUIRED)
 find_package(mongocxx CONFIG REQUIRED)
-find_package(Boost REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup)
+find_package(Boost CONFIG REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup)
 find_package(jwt-cpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
@@ -58,15 +58,18 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp)
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
-add_library(awsmockcore SHARED ${CORE_SOURCES})
-target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${PICOJSON_INCLUDE_DIRS})
-target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-
 if (LINUX)
+    add_library(awsmockcore STATIC ${CORE_SOURCES})
+    target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
+    target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
     target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
             Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive magic)
 elseif (WIN32)
+    add_library(awsmockcore STATIC ${CORE_SOURCES})
+    target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
+    target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
     target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
             Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::system LibArchive::LibArchive
             unofficial::libmagic::libmagic)
@@ -98,15 +101,24 @@ set(DTO_SOURCES dto/src/common/UserAgent.cpp dto/src/common/S3ClientCommand.cpp 
         dto/src/module/CleanInfrastructureRequest.cpp dto/src/module/ListModuleNamesResponse.cpp
         dto/src/module/ImportInfrastructureRequest.cpp dto/src/monitoring/mapper/Mapper.cpp)
 
-add_library(awsmockdto SHARED ${DTO_SOURCES})
-target_include_directories(awsmockdto PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
-        ${CMAKE_SOURCE_DIR}/db/include)
-target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
-        Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json
-        LibArchive::LibArchive)
-target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-if (WIN32)
+if (LINUX)
+    add_library(awsmockdto STATIC ${DTO_SOURCES})
+    target_include_directories(awsmockdto PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
+            ${CMAKE_SOURCE_DIR}/db/include)
+    target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
+            Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json
+            LibArchive::LibArchive)
+    target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+else ()
+    add_library(awsmockdto STATIC ${DTO_SOURCES})
+    target_include_directories(awsmockdto PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
+            ${CMAKE_SOURCE_DIR}/db/include)
+    target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
+            Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json
+            LibArchive::LibArchive)
+    target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
     target_link_libraries(awsmockdto PUBLIC Boost::system unofficial::libmagic::libmagic)
 endif ()
 
@@ -142,14 +154,22 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp db/src/repository/Database.cpp
         db/src/utils/TestUtils.cpp)
 
-add_library(awsmockdb SHARED ${DB_SOURCES})
-target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
-        ${CMAKE_SOURCE_DIR}/db/include)
-target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
-        Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
-target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-if (WIN32)
+if (LINUX)
+    add_library(awsmockdb STATIC ${DB_SOURCES})
+    target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
+            ${CMAKE_SOURCE_DIR}/db/include)
+    target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
+            Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
+    target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+else ()
+    add_library(awsmockdb STATIC ${DB_SOURCES})
+    target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
+            ${CMAKE_SOURCE_DIR}/db/include)
+    target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
+            Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
+    target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
     target_link_libraries(awsmockdb PUBLIC Boost::system unofficial::libmagic::libmagic)
 endif ()
 
@@ -184,15 +204,24 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/monitoring/MonitoringService.cpp srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp
         srv/src/frontend/FrontendSession.cpp)
 
-add_library(awsmocksrv SHARED ${SRV_SOURCES})
-target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
-        ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
-target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
-        Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono
-        LibArchive::LibArchive ssh)
-target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-if (WIN32)
+if (LINUX)
+    add_library(awsmocksrv STATIC ${SRV_SOURCES})
+    target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
+            ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
+    target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono
+            LibArchive::LibArchive ssh)
+    target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+else ()
+    add_library(awsmocksrv STATIC ${SRV_SOURCES})
+    target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
+            ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
+    target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
+            Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono
+            LibArchive::LibArchive ssh)
+    target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
     target_link_libraries(awsmocksrv PUBLIC Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib
             pdh.lib ntdll.lib shlwapi.lib)
 endif ()
@@ -213,7 +242,8 @@ target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_st
 if (LINUX)
     target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
             Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-            Boost::program_options Boost::chrono LibArchive::LibArchive magic)
+            Boost::program_options Boost::chrono -Wl,--whole-archive Boost::json -Wl,--no-whole-archive
+            LibArchive::LibArchive magic)
 elseif (WIN32)
     target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
             Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url

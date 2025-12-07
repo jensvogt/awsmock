@@ -20,7 +20,8 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
     mkdir build && \
     cmake -S . -B build -DBUILD_DOCUMENTATION=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -Wno-dev && \
-    cmake --build build --parallel $(($(nproc)/2))
+    cmake --build build --parallel $(($(nproc)/2)) && \
+    find .
 
 FROM node:22-bookworm AS buildfrontend
 
@@ -69,10 +70,10 @@ RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
 # Install aws-mock
-COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/awsmock/bin
-COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/awsmock/bin
-COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/awsmock/bin
-COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
+COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/bin
+COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/bin
+COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/bin
+COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/etc/awsmock.json
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
@@ -93,4 +94,4 @@ EXPOSE 6000-6100 6000-6100
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-CMD ["/usr/local/awsmock/bin/awsmockmgr"]
+CMD ["/usr/local/bin/awsmockmgr", "--config", "/usr/local/etc/awsmock.json"]
