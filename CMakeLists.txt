@@ -63,7 +63,7 @@ target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
 target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
-        Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive magic)
+        Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive)
 if (WIN32)
     target_link_libraries(awsmockcore PUBLIC Boost::system unofficial::libmagic::libmagic)
 else ()
