@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "CpuStat.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -30,50 +33,33 @@ namespace AwsMock::Dto::Docker {
         std::string containerId;
 
         /**
-         * Error code
+         * Container name
          */
-        int errorCode{};
+        std::string name;
 
         /**
-         * PID
+         * OS type
          */
-        int pid{};
+        std::string osType;
 
         /**
-         * Running state
+         * Read timestamp
          */
-        bool running{};
+        system_clock::time_point readTime;
 
         /**
-         * Dead state
+         * CPU statistics
          */
-        bool dead{};
-
-        /**
-         * Paused state
-         */
-        bool paused{};
-
-        /**
-         * Restarting state
-         */
-        bool restarting{};
-
-        /**
-         * OOM killed state
-         */
-        bool oomKilled{};
-
-        /**
-         * Status
-         */
-        std::string status;
+        CpuStat cpuStats;
 
       private:
 
         friend Statistic tag_invoke(boost::json::value_to_tag<Statistic>, boost::json::value const &v) {
             Statistic r;
             r.containerId = Core::Json::GetStringValue(v, "containerId");
+            r.name = Core::Json::GetStringValue(v, "name");
+            r.osType = Core::Json::GetStringValue(v, "os_type");
+            r.readTime = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "read"));
             return r;
         }
 

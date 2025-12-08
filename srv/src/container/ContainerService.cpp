@@ -418,11 +418,15 @@ namespace AwsMock::Service {
     Dto::Docker::ListStatsResponse ContainerService::ListContainerStats(const Dto::Docker::ListStatsRequest &request) const {
         Dto::Docker::ListStatsResponse response;
         for (const auto &containerId: request.containerIds) {
-            auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/json", request.ToJson());
-            if (statusCode != http::status::created) {
+            auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
+            if (statusCode != http::status::ok) {
                 log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
                 return {};
             }
+            log_info << "containerId: " << body;
+            Dto::Docker::ContainerStat containerStat;
+            containerStat.FromJson(body);
+            response.containerStats.emplace_back(containerStat);
         }
         return response;
     }
@@ -828,4 +832,4 @@ namespace AwsMock::Service {
         ofs << "ENV " << "AWS_SECRET_ACCESS_KEY=\"none\"" << std::endl;
         ofs << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
