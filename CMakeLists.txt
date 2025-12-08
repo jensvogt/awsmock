@@ -219,7 +219,7 @@ target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmock
         Boost::program_options Boost::chrono LibArchive::LibArchive magic)
 if (WIN32)
     target_link_directories(awsmockctl PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockctl PUBLIC Boost::system unofficial::libmagic::libmagic)
+    target_link_libraries(awsmockctl PUBLIC Boost::system)
 endif ()
 
 # -------------------------------------------------------------------------
