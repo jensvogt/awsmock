@@ -188,12 +188,12 @@ target_include_directories(awsmockmgr PRIVATE ${CMAKE_SOURCE_DIR}/manager/includ
         ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
 target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono LibArchive::LibArchive magic)
+        Boost::program_options Boost::chrono LibArchive::LibArchive ssh magic)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 if (WIN32)
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockmgr PUBLIC Boost::system crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+    target_link_libraries(awsmockmgr PUBLIC Boost::system pcre2-posix pcre2-8 crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -210,7 +210,7 @@ target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmock
         Boost::program_options Boost::chrono LibArchive::LibArchive magic)
 if (WIN32)
     target_link_directories(awsmockctl PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockctl PUBLIC Boost::system)
+    target_link_libraries(awsmockctl PUBLIC Boost::system pcre2-posix pcre2-8 shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -225,6 +225,7 @@ target_link_libraries(awslocal PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSS
         LibArchive::LibArchive magic)
 if (WIN32)
     target_link_directories(awslocal PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awslocal PUBLIC shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
