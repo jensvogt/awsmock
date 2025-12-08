@@ -8,7 +8,6 @@
 #include <awsmock/service/container/ContainerHandler.h>
 
 namespace AwsMock::Service {
-
     http::response<http::dynamic_body> ContainerHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Container POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
@@ -16,10 +15,8 @@ namespace AwsMock::Service {
         clientCommand.FromRequest(request, region, user);
 
         try {
-
             switch (clientCommand.command) {
                 case Dto::Common::ContainerCommandType::LIST_CONTAINERS: {
-
                     Dto::Docker::ListContainerRequest containerRequest = Dto::Docker::ListContainerRequest::FromJson(clientCommand);
                     Dto::Docker::ListContainerResponse serviceResponse = _containerService.ListContainers();
                     log_info << "List containers, count: " << serviceResponse.containerList.size();
@@ -27,7 +24,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::ContainerCommandType::LIST_CONTAINER_STATS: {
-
                     Dto::Docker::ListStatsRequest containerRequest = Dto::Docker::ListStatsRequest::FromJson(clientCommand);
                     Dto::Docker::ListStatsResponse serviceResponse = _containerService.ListContainerStats(containerRequest);
                     log_info << "List container stats, count: " << serviceResponse.statistics.size();
@@ -37,7 +33,6 @@ namespace AwsMock::Service {
                 default:
                     return SendResponse(request, http::status::bad_request, "Unknown action");
             }
-
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
             return SendResponse(request, http::status::internal_server_error, exc.message());
@@ -52,5 +47,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.message());
         }
     }
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
