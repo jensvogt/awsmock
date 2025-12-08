@@ -10,9 +10,9 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -38,7 +38,9 @@ namespace AwsMock::Dto::Docker {
 
         friend ListContainerRequest tag_invoke(boost::json::value_to_tag<ListContainerRequest>, boost::json::value const &v) {
             ListContainerRequest r;
-            r.names = boost::json::value_to<std::vector<std::string>>(v);
+            if (v.is_array()) {
+                r.names = boost::json::value_to<std::vector<std::string>>(v);
+            }
             return r;
         }
 

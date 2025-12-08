@@ -26,7 +26,7 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
-                case Dto::Common::ContainerCommandType::LIST_STATS: {
+                case Dto::Common::ContainerCommandType::LIST_CONTAINER_STATS: {
 
                     Dto::Docker::ListStatsRequest containerRequest = Dto::Docker::ListStatsRequest::FromJson(clientCommand);
                     Dto::Docker::ListStatsResponse serviceResponse = _containerService.ListContainerStats(containerRequest);

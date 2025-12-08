@@ -92,7 +92,7 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListContainerResponse const &obj) {
             jv = {
-                    {boost::json::value_from(obj.containerList)},
+                    {"containers", boost::json::value_from(obj.containerList)},
             };
         }
     };
