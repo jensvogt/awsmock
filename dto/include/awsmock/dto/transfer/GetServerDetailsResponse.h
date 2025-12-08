@@ -21,33 +21,29 @@ namespace AwsMock::Dto::Transfer {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetServerDetailsResponse {
+    struct GetServerDetailsResponse final : Common::BaseCounter<GetServerDetailsResponse> {
 
         /**
          * Region
          */
         Server server;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend GetServerDetailsResponse tag_invoke(boost::json::value_to_tag<GetServerDetailsResponse>, boost::json::value const &v) {
+            GetServerDetailsResponse r;
+            r.server = boost::json::value_to<Server>(v.at("ServerId"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetServerDetailsResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetServerDetailsResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Server", boost::json::value_from(obj.server)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

@@ -127,3 +127,6 @@ src/service/btst/srv_sns_service
 src/service/btst/srv_sqs_cli
 src/service/btst/srv_sqs_java
 src/service/btst/srv_sqs_service
+
+# Vcpkg
+vcpkg_installed

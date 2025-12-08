@@ -9,17 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct CreateUserRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct CreateUserRequest final : Common::BaseCounter<CreateUserRequest> {
 
         /**
          * Server ID
@@ -41,33 +36,28 @@ namespace AwsMock::Dto::Transfer {
          */
         std::string homeDirectory;
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param body json input stream
-         */
-        void FromJson(const std::string &body);
+        friend CreateUserRequest tag_invoke(boost::json::value_to_tag<CreateUserRequest>, boost::json::value const &v) {
+            CreateUserRequest r;
+            r.serverId = Core::Json::GetStringValue(v, "ServerId");
+            r.userName = Core::Json::GetBoolValue(v, "UserName");
+            r.password = Core::Json::GetBoolValue(v, "Password");
+            r.homeDirectory = Core::Json::GetBoolValue(v, "HomeDirectory");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateUserRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateUserRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+                    {"UserName", obj.userName},
+                    {"Password", obj.password},
+                    {"HomeDirectory", obj.homeDirectory},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

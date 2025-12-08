@@ -65,7 +65,11 @@ namespace AwsMock::Service {
         if (transferEntity.HasUser(request.userName)) {
             log_warning << "Transfer manager has already a user with name '" + request.userName + "'";
             Database::Entity::Transfer::User user = transferEntity.GetUser(request.userName);
-            return {.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = user.userName};
+            Dto::Transfer::CreateUserResponse response;
+            response.region = transferEntity.region;
+            response.serverId = transferEntity.serverId;
+            response.userName = user.userName;
+            return response;
         }
 
         // Get home directory
@@ -96,7 +100,10 @@ namespace AwsMock::Service {
         // Create user in transfer server
 
         // Create response
-        Dto::Transfer::CreateUserResponse response{.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = request.userName};
+        Dto::Transfer::CreateUserResponse response;
+        response.region = transferEntity.region;
+        response.serverId = transferEntity.serverId;
+        response.userName = request.userName;
 
         return response;
     }

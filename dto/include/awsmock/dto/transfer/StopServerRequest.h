@@ -10,50 +10,33 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/transfer/model/Server.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct StopServerRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct StopServerRequest final : Common::BaseCounter<StopServerRequest> {
 
         /**
          * Maximal number of results
          */
         std::string serverId;
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString json input stream
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend StopServerRequest tag_invoke(boost::json::value_to_tag<StopServerRequest>, boost::json::value const &v) {
+            StopServerRequest r;
+            r.serverId = Core::Json::GetStringValue(v, "ServerId");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const StopServerRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, StopServerRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

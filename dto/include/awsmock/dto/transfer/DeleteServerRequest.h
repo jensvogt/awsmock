@@ -9,50 +9,33 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct DeleteServerRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct DeleteServerRequest final : Common::BaseCounter<DeleteServerRequest> {
 
         /**
          * Maximal number of results
          */
         std::string serverId;
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString json input stream
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend DeleteServerRequest tag_invoke(boost::json::value_to_tag<DeleteServerRequest>, boost::json::value const &v) {
+            DeleteServerRequest r;
+            r.serverId = Core::Json::GetStringValue(v, "ServerId");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteServerRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteServerRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer
