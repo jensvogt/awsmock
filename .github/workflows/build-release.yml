@@ -114,14 +114,14 @@ jobs:
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           overwrite: true
 
-    #
-    # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
-    # (e.g., /usr/local/bin/). Move the .plist file (de.jensvogt.awsmock.plist) to the appropriate location:
-    # Launch Agent (User Service): ~/Library/LaunchAgents/
-    # Launch Daemon (System Service): /Library/LaunchDaemons/
-    # Load the service using the launchctl command:
-    # launchctl load -w ~/Library/LaunchAgents/de.jensvogt.awsmock.plist.plist
-    #
+  #
+  # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
+  # (e.g., /usr/local/bin/). Move the .plist file (de.jensvogt.awsmock.plist) to the appropriate location:
+  # Launch Agent (User Service): ~/Library/LaunchAgents/
+  # Launch Daemon (System Service): /Library/LaunchDaemons/
+  # Load the service using the launchctl command:
+  # launchctl load -w ~/Library/LaunchAgents/de.jensvogt.awsmock.plist
+  #
   build-macos:
     name: Build & Package (macOS)
     runs-on: macos-latest
@@ -186,7 +186,7 @@ jobs:
           cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp dist/etc/awsmock_macos.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic_linux.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
@@ -293,7 +293,7 @@ jobs:
           cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic_linux.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
@@ -424,7 +424,7 @@ jobs:
           cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic_linux.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
