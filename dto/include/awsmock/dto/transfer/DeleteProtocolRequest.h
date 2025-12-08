@@ -10,17 +10,12 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/Protocol.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct DeleteProtocolRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct DeleteProtocolRequest final : Common::BaseCounter<DeleteProtocolRequest> {
 
         /**
          * Server ID
@@ -32,33 +27,24 @@ namespace AwsMock::Dto::Transfer {
          */
         ProtocolType protocol;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend DeleteProtocolRequest tag_invoke(boost::json::value_to_tag<DeleteProtocolRequest>, boost::json::value const &v) {
+            DeleteProtocolRequest r;
+            r.serverId = Core::Json::GetStringValue(v, "ServerId");
+            r.protocol = ProtocolTypeFromString(Core::Json::GetStringValue(v, "Protocol"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteProtocolRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteProtocolRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+                    {"Protocol", ProtocolTypeToString(obj.protocol)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

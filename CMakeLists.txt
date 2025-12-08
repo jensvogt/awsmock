@@ -83,17 +83,11 @@ set(DTO_SOURCES dto/src/common/UserAgent.cpp dto/src/common/S3ClientCommand.cpp 
         dto/src/common/ApiGatewayClientCommand.cpp dto/src/common/ApplicationClientCommand.cpp
         dto/src/common/ContainerClientCommand.cpp dto/src/sqs/mapper/Mapper.cpp dto/src/sns/mapper/Mapper.cpp
         dto/src/s3/mapper/Mapper.cpp dto/src/lambda/mapper/Mapper.cpp dto/src/cognito/mapper/Mapper.cpp
-        dto/src/transfer/ListUsersRequest.cpp dto/src/transfer/ListUsersResponse.cpp
-        dto/src/transfer/CreateUserRequest.cpp dto/src/transfer/CreateUserResponse.cpp
-        dto/src/transfer/DeleteServerRequest.cpp dto/src/transfer/StartServerRequest.cpp
-        dto/src/transfer/StopServerRequest.cpp dto/src/transfer/mapper/Mapper.cpp
-        dto/src/transfer/GetServerDetailsRequest.cpp dto/src/transfer/GetServerDetailsResponse.cpp
-        dto/src/transfer/DeleteUserRequest.cpp dto/src/transfer/DeleteProtocolRequest.cpp dto/src/dynamodb/mapper/Mapper.cpp
-        dto/src/secretsmanager/mapper/Mapper.cpp dto/src/ssm/mapper/Mapper.cpp dto/src/apps/mapper/Mapper.cpp
-        dto/src/apigateway/mapper/Mapper.cpp dto/src/module/model/Module.cpp
-        dto/src/module/mapper/Mapper.cpp dto/src/module/ExportInfrastructureResponse.cpp
-        dto/src/module/ListModuleNamesResponse.cpp
-        dto/src/module/ImportInfrastructureRequest.cpp dto/src/monitoring/mapper/Mapper.cpp)
+        dto/src/transfer/mapper/Mapper.cpp dto/src/dynamodb/mapper/Mapper.cpp dto/src/secretsmanager/mapper/Mapper.cpp
+        dto/src/ssm/mapper/Mapper.cpp dto/src/apps/mapper/Mapper.cpp dto/src/apigateway/mapper/Mapper.cpp
+        dto/src/module/model/Module.cpp dto/src/module/mapper/Mapper.cpp dto/src/module/ExportInfrastructureResponse.cpp
+        dto/src/module/ListModuleNamesResponse.cpp dto/src/module/ImportInfrastructureRequest.cpp
+        dto/src/monitoring/mapper/Mapper.cpp)
 
 add_library(awsmockdto STATIC ${DTO_SOURCES})
 target_include_directories(awsmockdto PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
@@ -148,15 +142,15 @@ target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_sta
 # Build AWSMock Service library
 # -------------------------------------------------------------------------
 
-set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer.cpp
-        srv/src/s3/S3Server.cpp srv/src/s3/S3Handler.cpp srv/src/s3/S3Service.cpp srv/src/s3/S3HashCreator.cpp
-        srv/src/sqs/SQSServer.cpp srv/src/sqs/SQSHandler.cpp srv/src/sqs/SQSService.cpp srv/src/sns/SNSServer.cpp
-        srv/src/sns/SNSHandler.cpp srv/src/sns/SNSService.cpp srv/src/lambda/LambdaServer.cpp
-        srv/src/lambda/LambdaHandler.cpp srv/src/lambda/LambdaService.cpp srv/src/lambda/LambdaCreator.cpp
-        srv/src/lambda/LambdaExecutor.cpp srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoHandler.cpp
-        srv/src/cognito/CognitoService.cpp srv/src/cognito/CognitoServer.cpp srv/src/transfer/TransferServer.cpp
-        srv/src/transfer/TransferHandler.cpp srv/src/transfer/TransferService.cpp srv/src/dynamodb/DynamoDbServer.cpp
-        srv/src/dynamodb/DynamoDbHandler.cpp srv/src/dynamodb/DynamoDbService.cpp srv/src/secretsmanager/SecretsManagerServer.cpp
+set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer.cpp srv/src/s3/S3Server.cpp
+        srv/src/s3/S3Handler.cpp srv/src/s3/S3Service.cpp srv/src/s3/S3HashCreator.cpp srv/src/sqs/SQSServer.cpp
+        srv/src/sqs/SQSHandler.cpp srv/src/sqs/SQSService.cpp srv/src/sns/SNSServer.cpp srv/src/sns/SNSHandler.cpp
+        srv/src/sns/SNSService.cpp srv/src/lambda/LambdaServer.cpp srv/src/lambda/LambdaHandler.cpp
+        srv/src/lambda/LambdaService.cpp srv/src/lambda/LambdaCreator.cpp srv/src/lambda/LambdaExecutor.cpp
+        srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoService.cpp
+        srv/src/cognito/CognitoServer.cpp srv/src/transfer/TransferServer.cpp srv/src/transfer/TransferHandler.cpp
+        srv/src/transfer/TransferService.cpp srv/src/dynamodb/DynamoDbServer.cpp srv/src/dynamodb/DynamoDbHandler.cpp
+        srv/src/dynamodb/DynamoDbService.cpp srv/src/secretsmanager/SecretsManagerServer.cpp
         srv/src/secretsmanager/SecretsManagerHandler.cpp srv/src/secretsmanager/SecretsManagerService.cpp
         srv/src/secretsmanager/SecretRotation.cpp srv/src/kms/KMSServer.cpp srv/src/kms/KMSHandler.cpp
         srv/src/kms/KMSService.cpp srv/src/kms/KMSCreator.cpp srv/src/ssm/SSMServer.cpp srv/src/ssm/SSMHandler.cpp
@@ -194,12 +188,9 @@ target_include_directories(awsmockmgr PRIVATE ${CMAKE_SOURCE_DIR}/manager/includ
         ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
 target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono LibArchive::LibArchive)
+        Boost::program_options Boost::chrono LibArchive::LibArchive magic)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
-        Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono Boost::json LibArchive::LibArchive magic)
 if (WIN32)
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockmgr PUBLIC Boost::system crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)

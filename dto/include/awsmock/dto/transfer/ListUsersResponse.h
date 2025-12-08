@@ -44,17 +44,7 @@ namespace AwsMock::Dto::Transfer {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * Next token ID
-         */
-        std::vector<User> users;
+    struct ListUsersResponse final : Common::BaseCounter<ListUsersResponse> {
 
         /**
          * Server ID
@@ -72,25 +62,32 @@ namespace AwsMock::Dto::Transfer {
         std::string password;
 
         /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
+         * Next token ID
          */
-        [[nodiscard]] std::string ToJson() const;
+        std::vector<User> users;
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListUsersResponse &r);
+        friend ListUsersResponse tag_invoke(boost::json::value_to_tag<ListUsersResponse>, boost::json::value const &v) {
+            ListUsersResponse r;
+            r.serverId = Core::Json::GetStringValue(v, "ServerId");
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            r.password = Core::Json::GetStringValue(v, "Password");
+            r.users = boost::json::value_to<std::vector<User>>(v.at("Users"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUsersResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+                    {"NextToken", obj.nextToken},
+                    {"Password", obj.password},
+                    {"Users", boost::json::value_from(obj.users)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

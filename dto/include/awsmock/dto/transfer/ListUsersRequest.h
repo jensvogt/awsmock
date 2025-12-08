@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -28,12 +28,7 @@ namespace AwsMock::Dto::Transfer {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListUsersRequest final : Common::BaseCounter<ListUsersRequest> {
 
         /**
          * Server ID
@@ -43,40 +38,33 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Maximal number of results
          */
-        int maxResults;
+        int maxResults{};
 
         /**
          * Token
          */
         std::string nextToken;
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString json input stream
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListUsersRequest tag_invoke(boost::json::value_to_tag<ListUsersRequest>, boost::json::value const &v) {
+            ListUsersRequest r;
+            r.serverId = Core::Json::GetStringValue(v, "ServerId");
+            r.maxResults = Core::Json::GetIntValue(v, "MaxResults");
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListUsersRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUsersRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+                    {"MaxResults", obj.maxResults},
+                    {"NextToken", obj.nextToken},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer
