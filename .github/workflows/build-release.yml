@@ -78,27 +78,27 @@ jobs:
       - name: Create package structure
         shell: cmd
         run: |
-          mkdir $env:PACKAGE_DIR\bin
-          mkdir $env:PACKAGE_DIR\etc
-          mkdir $env:PACKAGE_DIR\log
-          mkdir $env:PACKAGE_DIR\data
-          mkdir $env:PACKAGE_DIR\init
-          mkdir $env:PACKAGE_DIR\data\s3
-          mkdir $env:PACKAGE_DIR\data\sqs
-          mkdir $env:PACKAGE_DIR\data\sns
-          mkdir $env:PACKAGE_DIR\data\lambda
-          mkdir $env:PACKAGE_DIR\data\application
-          copy build\awsmockmgr $env:PACKAGE_DIR\bin
-          copy build\awsmockctl $env:PACKAGE_DIR\bin
-          copy build\awslocal $env:PACKAGE_DIR\bin
-          copy dist\etc\awsmock_windows.json $env:PACKAGE_DIR\etc\awsmock.json
-          copy vcpkg_installed\x64-windows-static\share\libmagic\misc\magic.mgc $env:PACKAGE_DIR\etc
+          mkdir ${{ env.PACKAGE_DIR }}\bin
+          mkdir ${{ env.PACKAGE_DIR }}\etc
+          mkdir ${{ env.PACKAGE_DIR }}\log
+          mkdir ${{ env.PACKAGE_DIR }}\data
+          mkdir ${{ env.PACKAGE_DIR }}\init
+          mkdir ${{ env.PACKAGE_DIR }}\data\s3
+          mkdir ${{ env.PACKAGE_DIR }}\data\sqs
+          mkdir ${{ env.PACKAGE_DIR }}\data\sns
+          mkdir ${{ env.PACKAGE_DIR }}\data\lambda
+          mkdir ${{ env.PACKAGE_DIR }}\data\application
+          copy build\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
+          copy build\awsmockctl ${{ env.PACKAGE_DIR }}\bin
+          copy build\awslocal ${{ env.PACKAGE_DIR }}\bin
+          copy dist\etc\awsmock_windows.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
+          copy dist\etc\magic.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
         run: |
-          $source = "$env:PACKAGE_DIR"
-          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
+          $source = "${{ env.PACKAGE_DIR }}"
+          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
 
           if (Test-Path $zip) {
             Remove-Item $zip -Force
@@ -107,13 +107,12 @@ jobs:
           Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
           [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
 
-          Write-Host "Created ZIP: $zip"
-
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: installer-windows
-          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          overwrite: true
 
     #
     # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
