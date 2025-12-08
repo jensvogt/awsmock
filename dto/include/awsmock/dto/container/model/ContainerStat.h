@@ -29,6 +29,26 @@ namespace AwsMock::Dto::Docker {
     struct ContainerStat final : Common::BaseCounter<ContainerStat> {
 
         /**
+         * ContainerId
+         */
+        std::string containerId;
+
+        /**
+         * Name
+         */
+        std::string name;
+
+        /**
+         * OS type
+         */
+        std::string osType;
+
+        /**
+         * Number of processes
+         */
+        int numProcs;
+
+        /**
          * Read timestamp
          */
         system_clock::time_point read;
@@ -57,6 +77,10 @@ namespace AwsMock::Dto::Docker {
 
         friend ContainerStat tag_invoke(boost::json::value_to_tag<ContainerStat>, boost::json::value const &v) {
             ContainerStat r;
+            r.containerId = Core::Json::GetStringValue(v, "id");
+            r.name = Core::Json::GetStringValue(v, "name");
+            r.osType = Core::Json::GetStringValue(v, "os_type");
+            r.numProcs = Core::Json::GetIntValue(v, "num_procs");
             r.memoryStats = boost::json::value_to<MemoryStat>(v.at("memory_stats"));
             r.cpuStats = boost::json::value_to<CpuStat>(v.at("cpu_stats"));
             r.preCpuStats = boost::json::value_to<CpuStat>(v.at("precpu_stats"));
@@ -67,6 +91,10 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ContainerStat const &obj) {
             jv = {
+                    {"id", boost::json::value_from(obj.containerId)},
+                    {"name", boost::json::value_from(obj.name)},
+                    {"os_type", boost::json::value_from(obj.osType)},
+                    {"num_procs", boost::json::value_from(obj.numProcs)},
                     {"memory_stats", boost::json::value_from(obj.memoryStats)},
                     {"cpu_stats", boost::json::value_from(obj.cpuStats)},
                     {"precpu_stats", boost::json::value_from(obj.preCpuStats)},

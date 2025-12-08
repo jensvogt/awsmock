@@ -10,6 +10,9 @@
 #include <vector>
 
 // AwsMock includes
+#include "model/ContainerStat.h"
+
+
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/dto/container/model/Statistic.h>
 
@@ -38,19 +41,19 @@ namespace AwsMock::Dto::Docker {
         /**
          * Container list
          */
-        std::vector<Statistic> statistics;
+        std::vector<ContainerStat> containerStats;
 
       private:
 
         friend ListStatsResponse tag_invoke(boost::json::value_to_tag<ListStatsResponse>, boost::json::value const &v) {
             ListStatsResponse r;
-            r.statistics = boost::json::value_to<std::vector<Statistic>>(v);
+            r.containerStats = boost::json::value_to<std::vector<ContainerStat>>(v);
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListStatsResponse const &obj) {
             jv = {
-                    {boost::json::value_from(obj.statistics)},
+                    {"containerStats", boost::json::value_from(obj.containerStats)},
             };
         }
     };

@@ -26,7 +26,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ContainerCommandType::LIST_CONTAINER_STATS: {
                     Dto::Docker::ListStatsRequest containerRequest = Dto::Docker::ListStatsRequest::FromJson(clientCommand);
                     Dto::Docker::ListStatsResponse serviceResponse = _containerService.ListContainerStats(containerRequest);
-                    log_info << "List container stats, count: " << serviceResponse.statistics.size();
+                    log_info << "List container stats, count: " << serviceResponse.containerStats.size();
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
@@ -47,4 +47,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.message());
         }
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
