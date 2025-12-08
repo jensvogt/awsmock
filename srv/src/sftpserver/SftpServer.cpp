@@ -80,7 +80,7 @@ static char *FtpFileNameToRealPath(const char *filename) {
     return realFilename;
 }
 
-#ifndef WIN32
+#ifdef WIN32
 extern void sftp_set_error(const sftp_session sftp, int errnum);
 #else
 void sftp_set_error(const sftp_session sftp, int errnum) {
@@ -190,7 +190,7 @@ static const char *get_s3_key(const char *name, const char *prefix) {
  * @param  error       The place to store the error.
  *
  */
-#ifndef WIN32
+#ifdef WIN32
 extern void _ssh_set_error_oom(void *error, const char *function);
 #else
 void _ssh_set_error_oom(void *error, const char *function) {
@@ -308,7 +308,7 @@ static void ssh_log_custom(ssh_logging_callback log_fn, int verbosity, const cha
     log_fn(verbosity, function, buf, ssh_get_log_userdata());
 }
 
-#ifndef WIN32
+#ifdef WIN32
 extern void ssh_log_function(const int verbosity, const char *function, const char *buffer);
 #else
 void ssh_log_function(const int verbosity, const char *function, const char *buffer) {
@@ -330,7 +330,7 @@ void ssh_log_function(const int verbosity, const char *function, const char *buf
  * @param  descr       The description, which can be a format string.
  * @param  ...         The arguments for the format string.
  */
-#ifndef WIN32
+#ifdef WIN32
 extern void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...);
 #else
 void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) {
@@ -746,7 +746,7 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
  * @returns             SSH_OK on success, SSH_ERROR on error
  * @warning             when using 'P' with a constant size (e.g. 8), do not forget to cast to (size_t).
  */
-#ifndef WIN32
+#ifdef WIN32
 extern int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 #else
 int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
@@ -1131,7 +1131,7 @@ error:
  * @param[in] nbytes      Number of bytes to read.
  * @returns               Number of bytes read on success, SSH_ERROR on error with errno set to indicate the error.
  */
-#ifndef WIN32
+#ifdef WIN32
 extern ssize_t ssh_readn(int fd, void *buf, size_t nbytes);
 #else
 ssize_t ssh_readn(int fd, void *buf, size_t nbytes) {
@@ -1232,7 +1232,7 @@ static int process_read(sftp_client_message client_msg) {
  * @param[in] nbytes      Number of bytes to write.
  * @returns               Number of bytes written on success,SSH_ERROR on error with errno set to indicate theerror.
  */
-#ifndef WIN32
+#ifdef WIN32
 extern ssize_t ssh_writen(int fd, const void *buf, size_t nbytes);
 #else
 ssize_t ssh_writen(int fd, const void *buf, size_t nbytes) {
@@ -1989,7 +1989,7 @@ extern int sftp_channel_default_subsystem_request(ssh_session session, ssh_chann
     return SSH_ERROR;
 }*/
 
-#ifndef WIN32
+#ifdef WIN32
 extern int sftp_reply_version(sftp_client_message client_msg);
 #else
 int sftp_reply_version(sftp_client_message client_msg) {
@@ -2898,7 +2898,7 @@ bignum ssh_make_string_bn(ssh_string string) {
  *                      SSH_ERROR on error
  * @see ssh_buffer_get_format() for format list values.
  */
-#ifndef WIN32
+#ifdef WIN32
 extern int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap);
 #else
 int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
@@ -3163,7 +3163,7 @@ cleanup:
  *                      SSH_ERROR on error
  * @warning             when using 'P' with a constant size (e.g. 8), do not forget to cast to (size_t).
  */
-#ifndef WIN32
+#ifdef WIN32
 extern int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 #else
 int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
