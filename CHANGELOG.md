@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.97](https://github.com/jensvogt/awsmock/compare/v1.9.96...v1.9.97) (2025-12-08)
+
+
+### Bug Fixes
+
+* add windows binaries ([0cd92fa](https://github.com/jensvogt/awsmock/commit/0cd92fa33c8fec550a519c07e34fe0f9516a544f))
+* add windows binaries ([354c184](https://github.com/jensvogt/awsmock/commit/354c18458bf6d81985c644d15418f1e887f7a2e6))
+
 ## [1.9.96](https://github.com/jensvogt/awsmock/compare/v1.9.95...v1.9.96) (2025-12-08)
 
 
