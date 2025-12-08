@@ -1,5 +1,123 @@
 # Changelog
 
+## [1.9.95](https://github.com/jensvogt/awsmock/compare/v1.9.94...v1.9.95) (2025-12-08)
+
+
+### Bug Fixes
+
+* add windows binaries ([87e07e3](https://github.com/jensvogt/awsmock/commit/87e07e3cf96defd3f40cbd0aa98911831ae1177c))
+
+## [1.9.94](https://github.com/jensvogt/awsmock/compare/v1.9.93...v1.9.94) (2025-12-08)
+
+
+### Bug Fixes
+
+* add windows binaries ([87144ae](https://github.com/jensvogt/awsmock/commit/87144ae9aa1687ee007f4e43b1b6bbd93519bb65))
+* add windows binaries ([320d6de](https://github.com/jensvogt/awsmock/commit/320d6dea3d69a66b77695cb84e554400dfa099a9))
+
+## [1.9.93](https://github.com/jensvogt/awsmock/compare/v1.9.92...v1.9.93) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([b648f8b](https://github.com/jensvogt/awsmock/commit/b648f8ba46346f287a7c221796a8c366c8b30e7a))
+* link statically ([71edfe3](https://github.com/jensvogt/awsmock/commit/71edfe305675785bef42e5ad2678f99f21303ff4))
+* link statically ([43225e5](https://github.com/jensvogt/awsmock/commit/43225e5750fab23495064c00bc5c62687f77dc55))
+* link statically ([c2b28bb](https://github.com/jensvogt/awsmock/commit/c2b28bbc7583daedef7639c8ad3725de203518d1))
+* link statically ([e733865](https://github.com/jensvogt/awsmock/commit/e7338650f1b87269a8131e15a2bdcbd929e5cc3a))
+* link statically ([3002eac](https://github.com/jensvogt/awsmock/commit/3002eacf34492b51db7292250dc50b64bbd095d1))
+* link statically ([19f4351](https://github.com/jensvogt/awsmock/commit/19f43516086950bedb92fdc8c300f9a4f215077e))
+
+## [1.9.92](https://github.com/jensvogt/awsmock/compare/v1.9.91...v1.9.92) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([ee93e34](https://github.com/jensvogt/awsmock/commit/ee93e348fa5466e1a420c698d50999f4fe833eff))
+* link statically ([eec6186](https://github.com/jensvogt/awsmock/commit/eec6186458a0c6f4d600c0fb389947768d444427))
+* link statically ([cb2511d](https://github.com/jensvogt/awsmock/commit/cb2511d87491d8dcdb7192c1986da1fac6b528c3))
+
+## [1.9.91](https://github.com/jensvogt/awsmock/compare/v1.9.90...v1.9.91) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([1cca3f6](https://github.com/jensvogt/awsmock/commit/1cca3f6a7faae3e3b33515f6435a9469dd18c11b))
+* link statically ([2f84016](https://github.com/jensvogt/awsmock/commit/2f840160bfe8db0763c98df08b6505280df2cc56))
+
+## [1.9.90](https://github.com/jensvogt/awsmock/compare/v1.9.89...v1.9.90) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([6cad047](https://github.com/jensvogt/awsmock/commit/6cad047b4a62d40f895d4d4d1ac9c4a620f9405c))
+* link statically ([b183b21](https://github.com/jensvogt/awsmock/commit/b183b210245abf3b4f5d4ed3219ecb25e7f29186))
+* link statically ([0e49a9e](https://github.com/jensvogt/awsmock/commit/0e49a9edfa4323d56497d5f774a2698c31000a54))
+* link statically ([aebd1c4](https://github.com/jensvogt/awsmock/commit/aebd1c4a260e7ff3a935fe4c5f505ea82e3e8bec))
+* link statically ([c4d4f74](https://github.com/jensvogt/awsmock/commit/c4d4f7487216412ee2d27058dde2ab9b30e9de74))
+
+## [1.9.89](https://github.com/jensvogt/awsmock/compare/v1.9.88...v1.9.89) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([c557be8](https://github.com/jensvogt/awsmock/commit/c557be82317d4ccffa2d52f1eecd32c3d67a38ee))
+* link statically ([c88cf39](https://github.com/jensvogt/awsmock/commit/c88cf3997b584dde875ca89a60e438357d7e0c76))
+* link statically ([57c9b7a](https://github.com/jensvogt/awsmock/commit/57c9b7a78d704419a18424ab946f00acb50a672a))
+
+## [1.9.88](https://github.com/jensvogt/awsmock/compare/v1.9.87...v1.9.88) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([7a3c9c6](https://github.com/jensvogt/awsmock/commit/7a3c9c6a4deb137749336296f31e9f63a2d311cb))
+
+## [1.9.87](https://github.com/jensvogt/awsmock/compare/v1.9.86...v1.9.87) (2025-12-07)
+
+
+### Bug Fixes
+
+* link statically ([9813f90](https://github.com/jensvogt/awsmock/commit/9813f90eac28c9b0aa74c8582afdf11ab8ba2b4d))
+
+## [1.9.86](https://github.com/jensvogt/awsmock/compare/v1.9.85...v1.9.86) (2025-12-06)
+
+
+### Bug Fixes
+
+* link statically ([5083e7c](https://github.com/jensvogt/awsmock/commit/5083e7c9ec1c56369d0ed7343ff2132fdf34769d))
+
+## [1.9.85](https://github.com/jensvogt/awsmock/compare/v1.9.84...v1.9.85) (2025-12-06)
+
+
+### Bug Fixes
+
+* link statically ([3253a98](https://github.com/jensvogt/awsmock/commit/3253a982f8a858fb4ce17c2663a14f999712104c))
+
+## [1.9.84](https://github.com/jensvogt/awsmock/compare/v1.9.83...v1.9.84) (2025-12-06)
+
+
+### Bug Fixes
+
+* link statically ([a7af5ea](https://github.com/jensvogt/awsmock/commit/a7af5ea1167517bb518949aea0ae6003346c3bfd))
+* link statically ([52c15f9](https://github.com/jensvogt/awsmock/commit/52c15f9fb8d3ed858acbe8310feaf4f0aeade706))
+
+## [1.9.83](https://github.com/jensvogt/awsmock/compare/v1.9.82...v1.9.83) (2025-12-06)
+
+
+### Bug Fixes
+
+* link statically ([a0260b0](https://github.com/jensvogt/awsmock/commit/a0260b05f96ad1803f6dba1909fce7076967d952))
+* link statically ([4164d3d](https://github.com/jensvogt/awsmock/commit/4164d3d20c2d1aee0d284535ec1d1cfe0fff1979))
+
+## [1.9.82](https://github.com/jensvogt/awsmock/compare/v1.9.81...v1.9.82) (2025-12-06)
+
+
+### Bug Fixes
+
+* link statically ([5154e8a](https://github.com/jensvogt/awsmock/commit/5154e8aea415ffcdd864afe9d98ff411a452eae3))
+* link statically ([9575aba](https://github.com/jensvogt/awsmock/commit/9575aba951354031b00e4b5cc8cce24768b714a1))
+* link statically ([da12908](https://github.com/jensvogt/awsmock/commit/da12908436a4dde611257fe2d442dee1faa8bf43))
+
 ## [1.9.81](https://github.com/jensvogt/awsmock/compare/v1.9.80...v1.9.81) (2025-12-06)
 
 

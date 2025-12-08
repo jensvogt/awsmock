@@ -28,8 +28,9 @@ find_package(jwt-cpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
 if (WIN32)
+    set(EXTERNAL_INC_DIR ${CMAKE_SOURCE_DIR}/extern/win32/include)
+    set(EXTERNAL_LIB_DIR ${CMAKE_SOURCE_DIR}/extern/win32/lib)
     find_package(utf8proc REQUIRED)
-    find_package(unofficial-libmagic CONFIG REQUIRED)
     find_package(Boost REQUIRED COMPONENTS system)
 elseif (UNIX)
     pkg_check_modules(LIBMAGIC REQUIRED libmagic)
@@ -63,11 +64,11 @@ target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
 target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
-        Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive)
+        Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive magic)
 if (WIN32)
-    target_link_libraries(awsmockcore PUBLIC Boost::system unofficial::libmagic::libmagic)
-else ()
-    target_link_libraries(awsmockcore PUBLIC magic)
+    target_include_directories(awsmockcore PRIVATE ${EXTERNAL_INC_DIR})
+    target_link_libraries(awsmockcore PUBLIC Boost::system)
+    target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR})
 endif ()
 
 # -------------------------------------------------------------------------
@@ -102,9 +103,6 @@ target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenS
         LibArchive::LibArchive)
 target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-if (WIN32)
-    target_link_libraries(awsmockdto PUBLIC Boost::system unofficial::libmagic::libmagic)
-endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Database library
@@ -145,9 +143,6 @@ target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto 
         Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-if (WIN32)
-    target_link_libraries(awsmockdb PUBLIC Boost::system unofficial::libmagic::libmagic)
-endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -188,10 +183,6 @@ target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL
         LibArchive::LibArchive ssh)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-if (WIN32)
-    target_link_libraries(awsmocksrv PUBLIC Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib
-            pdh.lib ntdll.lib shlwapi.lib)
-endif ()
 
 # -------------------------------------------------------------------------
 # AWSMock Manager (main program)
@@ -208,12 +199,10 @@ target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_sta
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono Boost::json LibArchive::LibArchive)
+        Boost::program_options Boost::chrono Boost::json LibArchive::LibArchive magic)
 if (WIN32)
-    target_link_libraries(awsmockmgr PUBLIC Boost::system unofficial::libmagic::libmagic crypt32.lib Iphlpapi.lib
-            pdh.lib ntdll.lib shlwapi.lib)
-else ()
-    target_link_libraries(awsmockmgr PUBLIC magic)
+    target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockmgr PUBLIC Boost::system crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -227,11 +216,10 @@ target_link_libraries(awsmockctl PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_sta
 target_link_libraries(awsmockctl PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono LibArchive::LibArchive)
+        Boost::program_options Boost::chrono LibArchive::LibArchive magic)
 if (WIN32)
-    target_link_libraries(awsmockctl PUBLIC Boost::system unofficial::libmagic::libmagic)
-else ()
-    target_link_libraries(awsmockctl PUBLIC magic)
+    target_link_directories(awsmockctl PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockctl PUBLIC Boost::system)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -243,11 +231,9 @@ target_include_directories(awslocal PRIVATE ${CMAKE_SOURCE_DIR}/awslocal/include
         ${CMAKE_SOURCE_DIR}/dto/include)
 target_link_libraries(awslocal PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
         Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono
-        LibArchive::LibArchive)
+        LibArchive::LibArchive magic)
 if (WIN32)
-    target_link_libraries(awslocal PUBLIC Boost::system unofficial::libmagic::libmagic)
-else ()
-    target_link_libraries(awslocal PUBLIC magic)
+    target_link_directories(awslocal PUBLIC ${EXTERNAL_LIB_DIR})
 endif ()
 
 # -------------------------------------------------------------------------

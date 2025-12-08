@@ -48,7 +48,7 @@ jobs:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
@@ -67,38 +67,38 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
           bootstrap-vcpkg.bat
-          vcpkg install --triplet ${{ env.VCPKG_DEFAULT_TRIPLET }} --overlay-ports "${{ github.workspace }}/vcpkg-ports"
+          vcpkg install --triplet ${{ env.VCPKG_DEFAULT_TRIPLET }} --overlay-ports "${{ github.workspace }}\vcpkg-ports" -Wno-dev
 
       - name: Configure CMake
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${{ env.VCPKG_DEFAULT_TRIPLET }}" -Wno-dev
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}"
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
         shell: cmd
         run: |
-          mkdir $env:PACKAGE_DIR\bin
-          mkdir $env:PACKAGE_DIR\etc
-          mkdir $env:PACKAGE_DIR\log
-          mkdir $env:PACKAGE_DIR\data
-          mkdir $env:PACKAGE_DIR\init
-          mkdir $env:PACKAGE_DIR\data\s3
-          mkdir $env:PACKAGE_DIR\data\sqs
-          mkdir $env:PACKAGE_DIR\data\sns
-          mkdir $env:PACKAGE_DIR\data\lambda
-          mkdir $env:PACKAGE_DIR\data\application
-          copy build\awsmockmgr $env:PACKAGE_DIR\bin
-          copy build\awsmockctl $env:PACKAGE_DIR\bin
-          copy build\awslocal $env:PACKAGE_DIR\bin
-          copy dist\etc\awsmock_windows.json $env:PACKAGE_DIR\etc\awsmock.json
-          copy vcpkg_installed\x64-windows-static\share\libmagic\misc\magic.mgc $env:PACKAGE_DIR\etc
+          mkdir ${{ env.PACKAGE_DIR }}\bin
+          mkdir ${{ env.PACKAGE_DIR }}\etc
+          mkdir ${{ env.PACKAGE_DIR }}\log
+          mkdir ${{ env.PACKAGE_DIR }}\data
+          mkdir ${{ env.PACKAGE_DIR }}\init
+          mkdir ${{ env.PACKAGE_DIR }}\data\s3
+          mkdir ${{ env.PACKAGE_DIR }}\data\sqs
+          mkdir ${{ env.PACKAGE_DIR }}\data\sns
+          mkdir ${{ env.PACKAGE_DIR }}\data\lambda
+          mkdir ${{ env.PACKAGE_DIR }}\data\application
+          copy build\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
+          copy build\awsmockctl ${{ env.PACKAGE_DIR }}\bin
+          copy build\awslocal ${{ env.PACKAGE_DIR }}\bin
+          copy dist\etc\awsmock_windows.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
+          copy dist\etc\magic.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
         run: |
-          $source = "$env:PACKAGE_DIR"
-          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
+          $source = "${{ env.PACKAGE_DIR }}"
+          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
 
           if (Test-Path $zip) {
             Remove-Item $zip -Force
@@ -107,22 +107,21 @@ jobs:
           Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
           [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
 
-          Write-Host "Created ZIP: $zip"
-
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: installer-windows
-          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          overwrite: true
 
-    #
-    # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
-    # (e.g., /usr/local/bin/). Move the .plist file (de.jensvogt.awsmock.plist) to the appropriate location:
-    # Launch Agent (User Service): ~/Library/LaunchAgents/
-    # Launch Daemon (System Service): /Library/LaunchDaemons/
-    # Load the service using the launchctl command:
-    # launchctl load -w ~/Library/LaunchAgents/de.jensvogt.awsmock.plist.plist
-    #
+  #
+  # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
+  # (e.g., /usr/local/bin/). Move the .plist file (de.jensvogt.awsmock.plist) to the appropriate location:
+  # Launch Agent (User Service): ~/Library/LaunchAgents/
+  # Launch Daemon (System Service): /Library/LaunchDaemons/
+  # Load the service using the launchctl command:
+  # launchctl load -w ~/Library/LaunchAgents/de.jensvogt.awsmock.plist
+  #
   build-macos:
     name: Build & Package (macOS)
     runs-on: macos-latest
@@ -159,6 +158,8 @@ jobs:
       - name: Build (Frontend)
         shell: bash
         run: |
+          mkdir -p ${{ github.workspace }}/frontend
+          cd ${{ github.workspace }}/frontend
           git clone https://github.com/jensvogt/awsmock-ui
           cd awsmock-ui
           npm install
@@ -166,30 +167,34 @@ jobs:
 
       - name: Prepare package structure
         run: |
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/bin
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/etc
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/log
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/frontend
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/s3
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/sqs
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/sns
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/lambda
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/application
-          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/log
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/s3
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sqs
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sns
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/lambda
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/application
+          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
+          mkdir -p ${{ env.PACKAGE_DIR }}/etc/systemd/system
+          mkdir -p ${{ env.PACKAGE_DIR }}/etc/ld.so.conf.d
+          mkdir -p ${{ env.PACKAGE_DIR }}/DEBIAN
 
           # Copy your app
-          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/awsmock/bin/
-          cp dist/etc/awsmock_macos.json ${{ env.PACKAGE_DIR }}/awsmock/etc/awsmock.json
-          cp dist/etc/magic_linux.mgc ${{ env.PACKAGE_DIR }}/awsmock/etc/magic.mgc
-          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/awsmock/etc/ssh_host_key
-          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
-          cp -R ${{ github.workspace }}/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/awsmock/frontend
+          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
+          cp dist/etc/awsmock_macos.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
+          cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
+          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
+          cp -R ${{ github.workspace }}/frontend/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
 
       - name: Create Launch Agent Plist
         run: |
-          cat > ${{ env.PACKAGE_DIR }}/awsmock/etc/awsmock.plist <<- EOF
+          cat > $PACKAGE_DIR/service/awsmock.plist <<- EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -200,7 +205,7 @@ jobs:
            <array>
                <string>${{ env.EXECUTABLE_NAME }}</string>
                <string>--config</string>
-               <string>$HOME/awsmock/etc/awsmock.json</string>
+               <string>/usr/local/awsmock/etc/awsmock.json</string>
            </array>
            <key>RunAtLoad</key>
            <true/>
@@ -288,7 +293,7 @@ jobs:
           cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic_linux.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
@@ -419,7 +424,7 @@ jobs:
           cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic_linux.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
