@@ -312,7 +312,7 @@ extern void ssh_log_function(const int verbosity, const char *function, const ch
     }
 
     ssh_log_stderr(verbosity, function, buffer);
-}
+}*/
 
 /**
  * @internal
