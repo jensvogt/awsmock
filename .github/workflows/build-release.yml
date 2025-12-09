@@ -45,8 +45,8 @@ jobs:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
-      BUILD_DIR: "${{ github.workspace }}/build-windows"
-      PACKAGE_DIR: "${{ github.workspace }}/package"
+      BUILD_DIR: "${{ github.workspace }}\\build-windows"
+      PACKAGE_DIR: "${{ github.workspace }}\\package-windows"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
       VCPKG_ROOT: ${{ github.workspace }}/vcpkg
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
@@ -67,12 +67,21 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git
           cd vcpkg
           bootstrap-vcpkg.bat
-          vcpkg install --triplet ${{ env.VCPKG_DEFAULT_TRIPLET }} --overlay-ports "${{ github.workspace }}\vcpkg-ports" -Wno-dev
 
-      - name: Configure CMake
+      - name: Build (Frontend)
+        shell: bash
+        run: |
+          mkdir -p "${{ github.workspace }}\\frontend"
+          cd "${{ github.workspace }}\\frontend"
+          git clone https://github.com/jensvogt/awsmock-ui
+          cd awsmock-ui
+          npm install
+          npm run build
+
+      - name: Build (Backend)
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}"
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}" -Wno-dev
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
@@ -88,11 +97,15 @@ jobs:
           mkdir ${{ env.PACKAGE_DIR }}\data\sns
           mkdir ${{ env.PACKAGE_DIR }}\data\lambda
           mkdir ${{ env.PACKAGE_DIR }}\data\application
+          mkdir ${{ env.PACKAGE_DIR }}\data\transfer
+          mkdir ${{ env.PACKAGE_DIR }}\data\backup
+          mkdir ${{ env.PACKAGE_DIR }}\data\tmp
           copy build\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
           copy build\awsmockctl ${{ env.PACKAGE_DIR }}\bin
           copy build\awslocal ${{ env.PACKAGE_DIR }}\bin
           copy dist\etc\awsmock_windows.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
           copy dist\etc\magic.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
+          robocopy /E /NFL /NDL /NS /NC frontend\awsmock-ui\dist\awsmock-ui\browser ${{ env.PACKAGE_DIR }}\frontend
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
@@ -167,34 +180,33 @@ jobs:
 
       - name: Prepare package structure
         run: |
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/log
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/s3
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sqs
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sns
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/lambda
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/application
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
-          mkdir -p ${{ env.PACKAGE_DIR }}/etc/systemd/system
-          mkdir -p ${{ env.PACKAGE_DIR }}/etc/ld.so.conf.d
-          mkdir -p ${{ env.PACKAGE_DIR }}/DEBIAN
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/bin
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/etc
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/log
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/frontend
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/s3
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/sqs
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/sns
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/lambda
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/application
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/transfer
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/backup
+          mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/data/tmp
+          mkdir -p ${{ env.PACKAGE_DIR }}/share/man/man1
 
           # Copy your app
-          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp dist/etc/awsmock_macos.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
-          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
-          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
-          cp -R ${{ github.workspace }}/frontend/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
+          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/awsmock/bin/
+          cp dist/etc/awsmock_macos.json ${{ env.PACKAGE_DIR }}/awsmock/etc/awsmock.json
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/awsmock/etc/magic.mgc
+          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/awsmock/etc/ssh_host_key
+          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/share/man/man1
+          cp -R ${{ github.workspace }}/frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/awsmock/frontend
 
       - name: Create Launch Agent Plist
         run: |
-          cat > $PACKAGE_DIR/service/awsmock.plist <<- EOF
+          cat > ${{ env.PACKAGE_DIR }}/etc/awsmock.plist <<- EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -205,7 +217,7 @@ jobs:
            <array>
                <string>${{ env.EXECUTABLE_NAME }}</string>
                <string>--config</string>
-               <string>/usr/local/awsmock/etc/awsmock.json</string>
+               <string>$HOME/awsmock/etc/awsmock.json</string>
            </array>
            <key>RunAtLoad</key>
            <true/>
