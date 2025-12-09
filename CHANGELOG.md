@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.105](https://github.com/jensvogt/awsmock/compare/v1.9.104...v1.9.105) (2025-12-09)
+
+
+### Bug Fixes
+
+* fix windows vcpkg errors ([e9e7632](https://github.com/jensvogt/awsmock/commit/e9e7632767f493f80e74fc1384977ef6cbd3f6eb))
+* fix windows vcpkg errors ([b2c2d1b](https://github.com/jensvogt/awsmock/commit/b2c2d1b9ea82d9838f6026c1dfd4846b532f1118))
+
 ## [1.9.104](https://github.com/jensvogt/awsmock/compare/v1.9.103...v1.9.104) (2025-12-09)
 
 
