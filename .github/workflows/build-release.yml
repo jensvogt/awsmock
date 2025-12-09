@@ -56,6 +56,16 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Debug
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}" -Recurse
+
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -66,7 +76,10 @@ jobs:
         run: |
           $vf = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg.json' 
           if (-not (Test-Path $vf)) { 
-            @" { "name":"awsmock","version-string":"0.0.0","dependencies":[] } "@ | Out-File -FilePath $vf -Encoding utf8 
+            # Corrected PowerShell Here-String Syntax
+            @" 
+            { "name": "awsmock","version-string": "0.0.0","dependencies": [ ] }
+            "@ | Out-File -FilePath $vf -Encoding utf8 
           }
 
       - name: Ensure vcpkg toolchain exists (Windows)
