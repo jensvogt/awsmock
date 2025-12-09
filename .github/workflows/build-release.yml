@@ -88,6 +88,7 @@ jobs:
           # Always set to true; Vcpkg handles finding the restored binaries internally
           runVcpkgInstall: true
           doNotCache: false
+          vcpkgGitCommitId: 'ab2977be50c702126336e5088f4836060733c899'
 
         # 4. ⬆️ Save Vcpkg Cache
         # Only save if the cache was missed (i.e., the install step had to run)
