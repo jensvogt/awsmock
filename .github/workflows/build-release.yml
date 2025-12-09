@@ -68,6 +68,7 @@ jobs:
           # Only run to generate outputs for caching
           runVcpkgInstall: false
           doNotCache: false
+          vcpkgGitCommitId: '26426cf80d4d8d3963bc380a3f47fc51432d7ed4'
 
       # 2. ⬇️ Restore Vcpkg Cache
       - name: Restore Vcpkg Cache
