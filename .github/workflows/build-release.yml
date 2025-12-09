@@ -60,14 +60,36 @@ jobs:
         with:
           arch: x64
 
-      - name: Setup vcpkg
-        id: vcpkg-installation
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-          doNotCache: false
+      - name: Ensure vcpkg.json exists (fallback)
+        shell: pwsh
+        run: |
+          $vf = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg.json'
+          if (-not (Test-Path $vf)) {
+            Write-Host "vcpkg.json not found; creating minimal fallback at $vf"
+            @"
+            {
+              "name": "awsmock",
+              "version-string": "0.0.0",
+              "dependencies": []
+            }
+            "@ | Out-File -FilePath $vf -Encoding utf8
+                    } else {
+                      Write-Host "vcpkg.json found at $vf"
+            }
+
+      - name: Ensure vcpkg toolchain exists (Windows)
+        id: ensure-vcpkg-windows
+        shell: pwsh
+        run: |
+          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
+          if (-not (Test-Path $v)) {
+            Write-Host "Cloning vcpkg into $v"
+            git clone https://github.com/microsoft/vcpkg.git $v
+            Write-Host "Bootstrapping vcpkg"
+            & "${v}\bootstrap-vcpkg.bat"
+          } else {
+            Write-Host "vcpkg already present at $v"
+          }
 
       - name: Build (Frontend)
         shell: cmd
