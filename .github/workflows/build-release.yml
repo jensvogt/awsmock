@@ -76,8 +76,8 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           # Use the path and key outputs provided by the lukka action
-          path: ${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}
-          key: ${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}
+          path: '${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}'
+          key: '${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}''
 
       # 3. 📦 Install Vcpkg Packages (Only runs full install on cache miss)
       - name: Install Vcpkg Packages
