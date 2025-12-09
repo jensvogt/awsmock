@@ -56,6 +56,16 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Debug
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}" -Recurse
+
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
