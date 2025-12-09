@@ -45,10 +45,10 @@ jobs:
     needs: release-please
     #if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
-      BUILD_DIR: ${{ github.workspace }}/build-windows
-      PACKAGE_DIR: ${{ github.workspace }}/package-windows
+      BUILD_DIR: "${{ github.workspace }}\\build-windows"
+      PACKAGE_DIR: "${{ github.workspace }}\\package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
-      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      VCPKG_ROOT: "${{ github.workspace }}\\vcpkg"
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
@@ -65,8 +65,8 @@ jobs:
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          vcpkgJsonGlob: '${{ github.workspace }}\\vcpkg.json'
+          vcpkgDirectory: '${{ github.workspace }}\\vcpkg'
           runVcpkgInstall: true
           doNotCache: false
 
