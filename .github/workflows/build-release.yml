@@ -54,6 +54,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -66,7 +67,13 @@ jobs:
           $vf = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg.json'
           if (-not (Test-Path $vf)) {
             Write-Host "vcpkg.json not found; creating minimal fallback at $vf"
-             @"{"name": "awsmock","version-string": "0.0.0","dependencies": []}"@ | Out-File -FilePath $vf -Encoding utf8
+            @"
+{
+  "name": "awsmock",
+  "version-string": "0.0.0",
+  "dependencies": []
+}
+"@ | Out-File -FilePath $vf -Encoding utf8
           } else {
             Write-Host "vcpkg.json found at $vf"
           }
@@ -85,6 +92,15 @@ jobs:
             Write-Host "vcpkg already present at $v"
           }
 
+      - name: Setup vcpkg (using lukka/run-vcpkg)
+        id: vcpkg-installation
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: ${{ github.workspace }}\vcpkg.json
+          vcpkgDirectory: ${{ github.workspace }}\vcpkg
+          runVcpkgInstall: true
+          doNotCache: false
+
       - name: Build (Frontend)
         shell: cmd
         run: |
@@ -99,7 +115,7 @@ jobs:
         shell: cmd
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}" -Wno-dev
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}"
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
@@ -146,14 +162,6 @@ jobs:
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           overwrite: true
 
-  #
-  # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
-  # (e.g., /usr/local/bin/). Move the .plist file (de.jensvogt.awsmock.plist) to the appropriate location:
-  # Launch Agent (User Service): ~/Library/LaunchAgents/
-  # Launch Daemon (System Service): /Library/LaunchDaemons/
-  # Load the service using the launchctl command:
-  # launchctl load -w ~/Library/LaunchAgents/de.jensvogt.awsmock.plist
-  #
   build-macos:
     name: Build & Package (macOS)
     runs-on: macos-latest
@@ -169,13 +177,44 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Install system dependencies
         shell: bash
         run: |
           brew install doxygen pandoc file icu4c autoconf autoconf-archive automake libtool
 
-      - name: Setup vcpkg
+      - name: Ensure vcpkg.json exists (fallback)
+        shell: bash
+        run: |
+          vf="${{ github.workspace }}/vcpkg.json"
+          if [ ! -f "$vf" ]; then
+            echo "vcpkg.json not found; creating minimal fallback at $vf"
+            cat > "$vf" <<'JSON'
+{
+  "name": "awsmock",
+  "version-string": "0.0.0",
+  "dependencies": []
+}
+JSON
+          else
+            echo "vcpkg.json found at $vf"
+          fi
+
+      - name: Ensure vcpkg toolchain exists (macOS)
+        shell: bash
+        run: |
+          v="${{ github.workspace }}/vcpkg"
+          if [ ! -d "$v" ]; then
+            echo "Cloning vcpkg into $v"
+            git clone https://github.com/microsoft/vcpkg.git "$v"
+            echo "Bootstrapping vcpkg"
+            "${v}/bootstrap-vcpkg.sh"
+          else
+            echo "vcpkg already present at $v"
+          fi
+
+      - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
@@ -274,6 +313,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Install system dependencies
         run: |
@@ -281,7 +321,37 @@ jobs:
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
 
-      - name: Setup vcpkg
+      - name: Ensure vcpkg.json exists (fallback)
+        shell: bash
+        run: |
+          vf="${{ github.workspace }}/vcpkg.json"
+          if [ ! -f "$vf" ]; then
+            echo "vcpkg.json not found; creating minimal fallback at $vf"
+            cat > "$vf" <<'JSON'
+{
+  "name": "awsmock",
+  "version-string": "0.0.0",
+  "dependencies": []
+}
+JSON
+          else
+            echo "vcpkg.json found at $vf"
+          fi
+
+      - name: Ensure vcpkg toolchain exists (Linux)
+        shell: bash
+        run: |
+          v="${{ github.workspace }}/vcpkg"
+          if [ ! -d "$v" ]; then
+            echo "Cloning vcpkg into $v"
+            git clone https://github.com/microsoft/vcpkg.git "$v"
+            echo "Bootstrapping vcpkg"
+            "${v}/bootstrap-vcpkg.sh"
+          else
+            echo "vcpkg already present at $v"
+          fi
+
+      - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
@@ -374,18 +444,10 @@ jobs:
 
           chmod 755 ${{ env.PACKAGE_DIR }}/DEBIAN/postinst $PACKAGE_DIR/DEBIAN/postrm
 
-      # Step 6: Build the .deb package
       - name: Build DEB with fpm
         run: |
-          fpm -s dir -t deb \
-            --name "${{ env.APP_NAME }}" \
-            --version "${{ env.SEMVER }}" \
-            --architecture amd64 \
-            --package "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb" \
-            -C "${{ env.PACKAGE_DIR }}" \
-            .=/
+          fpm -s dir -t deb \n            --name "${{ env.APP_NAME }}" \n            --version "${{ env.SEMVER }}" \n            --architecture amd64 \n            --package "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb" \n            -C "${{ env.PACKAGE_DIR }}" \n            .=/
 
-      # Step 7: Upload .deb artifact
       - name: Upload .deb
         uses: actions/upload-artifact@v4
         with:
@@ -407,6 +469,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Install system dependencies
         run: |
@@ -414,7 +477,37 @@ jobs:
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
 
-      - name: Setup vcpkg
+      - name: Ensure vcpkg.json exists (fallback)
+        shell: bash
+        run: |
+          vf="${{ github.workspace }}/vcpkg.json"
+          if [ ! -f "$vf" ]; then
+            echo "vcpkg.json not found; creating minimal fallback at $vf"
+            cat > "$vf" <<'JSON'
+{
+  "name": "awsmock",
+  "version-string": "0.0.0",
+  "dependencies": []
+}
+JSON
+          else
+            echo "vcpkg.json found at $vf"
+          fi
+
+      - name: Ensure vcpkg toolchain exists (Linux)
+        shell: bash
+        run: |
+          v="${{ github.workspace }}/vcpkg"
+          if [ ! -d "$v" ]; then
+            echo "Cloning vcpkg into $v"
+            git clone https://github.com/microsoft/vcpkg.git "$v"
+            echo "Bootstrapping vcpkg"
+            "${v}/bootstrap-vcpkg.sh"
+          else
+            echo "vcpkg already present at $v"
+          fi
+
+      - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
@@ -497,19 +590,8 @@ jobs:
 
       - name: Build RPM using FPM
         run: |
-          fpm -s dir -t rpm \
-            -n awsmock \
-            -v ${SEMVER} \
-            --description "AWSMock – Local AWS API mocking environment" \
-            --url "https://github.com/jensvogt/awsmock" \
-            --vendor "AWSMock Project" \
-            --license "Apache-2.0" \
-            --prefix / \
-            --after-install ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh \
-            --after-remove ${{ env.PACKAGE_DIR }}/scripts/postremove.sh \
-            ${{ env.PACKAGE_DIR }}/=/
+          fpm -s dir -t rpm \n            -n awsmock \n            -v ${SEMVER} \n            --description "AWSMock – Local AWS API mocking environment" \n            --url "https://github.com/jensvogt/awsmock" \n            --vendor "AWSMock Project" \n            --license "Apache-2.0" \n            --prefix / \n            --after-install ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh \n            --after-remove ${{ env.PACKAGE_DIR }}/scripts/postremove.sh \n            ${{ env.PACKAGE_DIR }}/=/
 
-      # Step 7: Upload .deb artifact
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
         with:
@@ -528,6 +610,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Build Docker
         run: |
@@ -558,6 +642,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - name: Download Windows installer
         uses: actions/download-artifact@v4
@@ -610,6 +695,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
