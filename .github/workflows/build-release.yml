@@ -61,12 +61,14 @@ jobs:
         with:
           arch: x64
 
-      - name: Install vcpkg
-        shell: cmd
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git
-          cd vcpkg
-          bootstrap-vcpkg.bat
+      - name: Setup vcpkg
+        id: vcpkg-installation
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          runVcpkgInstall: true
+          doNotCache: false
 
       - name: Build (Frontend)
         shell: bash
@@ -100,11 +102,12 @@ jobs:
           mkdir ${{ env.PACKAGE_DIR }}\data\transfer
           mkdir ${{ env.PACKAGE_DIR }}\data\backup
           mkdir ${{ env.PACKAGE_DIR }}\data\tmp
-          copy build\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
-          copy build\awsmockctl ${{ env.PACKAGE_DIR }}\bin
-          copy build\awslocal ${{ env.PACKAGE_DIR }}\bin
-          copy dist\etc\awsmock_windows.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
+          copy ${{ env.BUILD_DIR }}\Release\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
+          copy ${{ env.BUILD_DIR }}\Release\awsmockctl ${{ env.PACKAGE_DIR }}\bin
+          copy ${{ env.BUILD_DIR }}\Release\awslocal ${{ env.PACKAGE_DIR }}\bin
+          copy dist\etc\awsmock_win32.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
           copy dist\etc\magic.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
+          copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
           robocopy /E /NFL /NDL /NS /NC frontend\awsmock-ui\dist\awsmock-ui\browser ${{ env.PACKAGE_DIR }}\frontend
 
       - name: Create ZIP archive (PowerShell)
@@ -161,7 +164,9 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          runVcpkgInstall: false
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          runVcpkgInstall: true
+          doNotCache: false
 
       - name: Build (Backend)
         run: |
@@ -265,7 +270,9 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          runVcpkgInstall: false
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          runVcpkgInstall: true
+          doNotCache: false
 
       - name: Build (Backend)
         run: |
@@ -396,7 +403,9 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          runVcpkgInstall: false
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          runVcpkgInstall: true
+          doNotCache: false
 
       - name: Build (Backend)
         run: |
@@ -537,13 +546,13 @@ jobs:
       - name: Download Windows installer
         uses: actions/download-artifact@v4
         with:
-          name: installer-windows
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           path: artifacts/windows
 
       - name: Download macOS installer
         uses: actions/download-artifact@v4
         with:
-          name: installer-macos
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
           path: artifacts/macos
 
       - name: Download Linux Debian package
@@ -562,6 +571,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
+            artifacts/windows/*.zip
+            artifacts/macos/*.tgz
             artifacts/linux/*.deb
             artifacts/linux/*.rpm
           name: Release ${{ env.SEMVER }}
@@ -601,7 +612,7 @@ jobs:
           cd public
           echo '{ "downloads": [' > files.json
           first=true
-          for f in *.{exe,deb,rpm,dmg}; do
+          for f in *.{zip,deb,rpm,tgz}; do
             [ -f "$f" ] || continue
             if [ "$first" = true ]; then
               first=false
