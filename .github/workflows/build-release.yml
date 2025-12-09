@@ -211,7 +211,7 @@ jobs:
 
       - name: Create Launch Agent Plist
         run: |
-          cat > ${{ env.PACKAGE_DIR }}/etc/awsmock.plist <<- EOF
+          cat << EOF > ${{ env.PACKAGE_DIR }}/etc/awsmock.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -236,7 +236,7 @@ jobs:
 
       - name: Package Service Files
         run: |
-          tar -czf ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz -C $PACKAGE_DIR .
+          tar -czf ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz -C ${{ env.PACKAGE_DIR }} .
 
       - name: Upload macOS ZIP
         uses: actions/upload-artifact@v4
