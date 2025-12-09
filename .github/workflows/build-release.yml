@@ -64,11 +64,9 @@ jobs:
       - name: Ensure vcpkg.json exists (fallback)
         shell: pwsh
         run: |
-          $vf = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg.json'
-          if (-not (Test-Path $vf)) {
-            Write-Host "vcpkg.json not found; creating minimal fallback at $vf"
-          } else {
-            Write-Host "vcpkg.json found at $vf"
+          $vf = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg.json' 
+          if (-not (Test-Path $vf)) { 
+            @" { "name":"awsmock","version-string":"0.0.0","dependencies":[] } "@ | Out-File -FilePath $vf -Encoding utf8 
           }
 
       - name: Ensure vcpkg toolchain exists (Windows)
