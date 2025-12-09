@@ -83,6 +83,13 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
 
+      - name: Build (Backend)
+        shell: cmd
+        run: |
+          mkdir ${{ env.BUILD_DIR }}
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
+          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+
       - name: Build (Frontend)
         shell: cmd
         run: |
@@ -92,13 +99,6 @@ jobs:
           cd awsmock-ui
           npm install
           npm run build
-
-      - name: Build (Backend)
-        shell: cmd
-        run: |
-          mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
         shell: cmd
@@ -238,14 +238,14 @@ jobs:
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/awsmock/etc/ssh_host_key
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/share/man/man1
           cp -R ${{ github.workspace }}/frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/awsmock/frontend
-          
-          - name: Create Launch Agent Plist
-            run: |
-              cat << EOF > ${{ env.PACKAGE_DIR }}/etc/awsmock.plist
-              <?xml version="1.0" encoding="UTF-8"?>
-              <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-              <plist version="1.0">
-              <dict>
+
+      - name: Create Launch Agent Plist
+        run: |
+          cat << EOF > ${{ env.PACKAGE_DIR }}/etc/awsmock.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+            <dict>
                <key>Label</key>
                <string>${{ env.SERVICE_NAME }}</string>
                <key>ProgramArguments</key>
@@ -260,9 +260,9 @@ jobs:
                <false/>
                <key>StandardOutPath</key>
                <string>/tmp/${{ env.SERVICE_NAME }}.log</string>
-              </dict>
-              </plist>
-            EOF
+            </dict>
+          </plist>
+          EOF
 
       - name: Package Service Files
         run: |
@@ -414,7 +414,12 @@ jobs:
 
       - name: Build DEB with fpm
         run: |
-          fpm -s dir -t deb \n            --name "${{ env.APP_NAME }}" \n            --version "${{ env.SEMVER }}" \n            --architecture amd64 \n            --package "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb" \n            -C "${{ env.PACKAGE_DIR }}" \n            .=/
+          fpm -s dir -t deb --name "${{ env.APP_NAME }}" \
+          --version "${{ env.SEMVER }}" \
+          --architecture amd64 \
+          --package "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb" \
+          -C "${{ env.PACKAGE_DIR }}" \
+          .=/
 
       - name: Upload .deb
         uses: actions/upload-artifact@v4
@@ -551,7 +556,17 @@ jobs:
 
       - name: Build RPM using FPM
         run: |
-          fpm -s dir -t rpm \n            -n awsmock \n            -v ${SEMVER} \n            --description "AWSMock – Local AWS API mocking environment" \n            --url "https://github.com/jensvogt/awsmock" \n            --vendor "AWSMock Project" \n            --license "Apache-2.0" \n            --prefix / \n            --after-install ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh \n            --after-remove ${{ env.PACKAGE_DIR }}/scripts/postremove.sh \n            ${{ env.PACKAGE_DIR }}/=/
+          fpm -s dir -t rpm \
+          -n awsmock \
+          -v ${SEMVER} \
+          --description "AWSMock – Local AWS API mocking environment" \
+          --url "https://github.com/jensvogt/awsmock" \
+          --vendor "AWSMock Project" \
+          --license "Apache-2.0" \
+          --prefix / \
+          --after-install ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh \
+          --after-remove ${{ env.PACKAGE_DIR }}/scripts/postremove.sh \
+          .=/
 
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
