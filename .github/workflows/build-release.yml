@@ -52,11 +52,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
+
+      - name: Install vcpkg
+        shell: cmd
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          bootstrap-vcpkg.bat
 
       # 1. 🔑 Calculate Cache Key and Path
       - name: Calculate Vcpkg Cache Key and Path
