@@ -48,7 +48,6 @@ jobs:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
-      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
