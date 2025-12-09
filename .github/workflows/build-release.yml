@@ -66,91 +66,91 @@ jobs:
           $vf = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg.json'
           if (-not (Test-Path $vf)) {
             Write-Host "vcpkg.json not found; creating minimal fallback at $vf"
-            @"
-            {
-              "name": "awsmock",
-              "version-string": "0.0.0",
-              "dependencies": []
-            }
-            "@ | Out-File -FilePath $vf -Encoding utf8
-                    } else {
-                      Write-Host "vcpkg.json found at $vf"
-            }
-
-      - name: Ensure vcpkg toolchain exists (Windows)
-        id: ensure-vcpkg-windows
-        shell: pwsh
-        run: |
-          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
-          if (-not (Test-Path $v)) {
-            Write-Host "Cloning vcpkg into $v"
-            git clone https://github.com/microsoft/vcpkg.git $v
-            Write-Host "Bootstrapping vcpkg"
-            & "${v}\bootstrap-vcpkg.bat"
+             @"
+  {
+    "name": "awsmock",
+    "version-string": "0.0.0",
+    "dependencies": [ ]
+  }
+  "@ | Out-File -FilePath $vf -Encoding utf8
           } else {
-            Write-Host "vcpkg already present at $v"
-          }
+            Write-Host "vcpkg.json found at $vf"
+  }
 
-      - name: Build (Frontend)
-        shell: cmd
-        run: |
-          mkdir -p ${{ github.workspace }}\frontend
-          cd ${{ github.workspace }}\frontend
-          git clone https://github.com/jensvogt/awsmock-ui
-          cd awsmock-ui
-          npm install
-          npm run build
+  - name: Ensure vcpkg toolchain exists (Windows)
+    id: ensure-vcpkg-windows
+    shell: pwsh
+    run: |
+      $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
+      if (-not (Test-Path $v)) {
+        Write-Host "Cloning vcpkg into $v"
+        git clone https://github.com/microsoft/vcpkg.git $v
+        Write-Host "Bootstrapping vcpkg"
+        & "${v}\bootstrap-vcpkg.bat"
+      } else {
+        Write-Host "vcpkg already present at $v"
+      }
 
-      - name: Build (Backend)
-        shell: cmd
-        run: |
-          mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}" -Wno-dev
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+  - name: Build (Frontend)
+    shell: cmd
+    run: |
+      mkdir -p ${{ github.workspace }}\frontend
+      cd ${{ github.workspace }}\frontend
+      git clone https://github.com/jensvogt/awsmock-ui
+      cd awsmock-ui
+      npm install
+      npm run build
 
-      - name: Create package structure
-        shell: cmd
-        run: |
-          mkdir ${{ env.PACKAGE_DIR }}\bin
-          mkdir ${{ env.PACKAGE_DIR }}\etc
-          mkdir ${{ env.PACKAGE_DIR }}\log
-          mkdir ${{ env.PACKAGE_DIR }}\data
-          mkdir ${{ env.PACKAGE_DIR }}\init
-          mkdir ${{ env.PACKAGE_DIR }}\data\s3
-          mkdir ${{ env.PACKAGE_DIR }}\data\sqs
-          mkdir ${{ env.PACKAGE_DIR }}\data\sns
-          mkdir ${{ env.PACKAGE_DIR }}\data\lambda
-          mkdir ${{ env.PACKAGE_DIR }}\data\application
-          mkdir ${{ env.PACKAGE_DIR }}\data\transfer
-          mkdir ${{ env.PACKAGE_DIR }}\data\backup
-          mkdir ${{ env.PACKAGE_DIR }}\data\tmp
-          copy ${{ env.BUILD_DIR }}\Release\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
-          copy ${{ env.BUILD_DIR }}\Release\awsmockctl ${{ env.PACKAGE_DIR }}\bin
-          copy ${{ env.BUILD_DIR }}\Release\awslocal ${{ env.PACKAGE_DIR }}\bin
-          copy dist\etc\awsmock_win32.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
-          copy dist\etc\magic.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
-          copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
-          robocopy /E /NFL /NDL /NS /NC frontend\awsmock-ui\dist\awsmock-ui\browser ${{ env.PACKAGE_DIR }}\frontend
+  - name: Build (Backend)
+    shell: cmd
+    run: |
+      mkdir ${{ env.BUILD_DIR }}
+      cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}" -Wno-dev
+      cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
-      - name: Create ZIP archive (PowerShell)
-        shell: pwsh
-        run: |
-          $source = "${{ env.PACKAGE_DIR }}"
-          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
-          
-          if (Test-Path $zip) {
-            Remove-Item $zip -Force
-          }
-          
-          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
-          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+  - name: Create package structure
+    shell: cmd
+    run: |
+      mkdir ${{ env.PACKAGE_DIR }}\bin
+      mkdir ${{ env.PACKAGE_DIR }}\etc
+      mkdir ${{ env.PACKAGE_DIR }}\log
+      mkdir ${{ env.PACKAGE_DIR }}\data
+      mkdir ${{ env.PACKAGE_DIR }}\init
+      mkdir ${{ env.PACKAGE_DIR }}\data\s3
+      mkdir ${{ env.PACKAGE_DIR }}\data\sqs
+      mkdir ${{ env.PACKAGE_DIR }}\data\sns
+      mkdir ${{ env.PACKAGE_DIR }}\data\lambda
+      mkdir ${{ env.PACKAGE_DIR }}\data\application
+      mkdir ${{ env.PACKAGE_DIR }}\data\transfer
+      mkdir ${{ env.PACKAGE_DIR }}\data\backup
+      mkdir ${{ env.PACKAGE_DIR }}\data\tmp
+      copy ${{ env.BUILD_DIR }}\Release\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
+      copy ${{ env.BUILD_DIR }}\Release\awsmockctl ${{ env.PACKAGE_DIR }}\bin
+      copy ${{ env.BUILD_DIR }}\Release\awslocal ${{ env.PACKAGE_DIR }}\bin
+      copy dist\etc\awsmock_win32.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
+      copy dist\etc\magic.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
+      copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
+      robocopy /E /NFL /NDL /NS /NC frontend\awsmock-ui\dist\awsmock-ui\browser ${{ env.PACKAGE_DIR }}\frontend
 
-      - name: Upload Windows installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-          overwrite: true
+  - name: Create ZIP archive (PowerShell)
+    shell: pwsh
+    run: |
+      $source = "${{ env.PACKAGE_DIR }}"
+      $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
+      
+      if (Test-Path $zip) {
+        Remove-Item $zip -Force
+      }
+      
+      Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+      [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+
+  - name: Upload Windows installer
+    uses: actions/upload-artifact@v4
+    with:
+      name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+      path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+      overwrite: true
 
   #
   # Extract the package (awsmock-version.tgz).  Move the executable (my_macos_service) to a system path
