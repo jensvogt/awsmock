@@ -60,11 +60,6 @@ jobs:
         with:
           arch: x64
 
-      - name: Setup VCPKG environment
-        shell: cmd
-        run: |
-          mkdir vcpkg
-
       - name: Setup vcpkg
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
