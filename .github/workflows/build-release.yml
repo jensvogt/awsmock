@@ -71,17 +71,6 @@ jobs:
         with:
           arch: x64
 
-      - name: Ensure vcpkg.json exists (fallback)
-        shell: pwsh
-        run: |
-          $vf = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg.json' 
-          if (-not (Test-Path $vf)) { 
-            # Corrected PowerShell Here-String Syntax
-            @" 
-            { "name": "awsmock","version-string": "0.0.0","dependencies": [ ] }
-            "@ | Out-File -FilePath $vf -Encoding utf8 
-          }
-
       - name: Ensure vcpkg toolchain exists (Windows)
         id: ensure-vcpkg-windows
         shell: pwsh
@@ -97,11 +86,11 @@ jobs:
           }
 
       - name: Setup vcpkg (using lukka/run-vcpkg)
-        id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: ${{ github.workspace }}\vcpkg.json
-          vcpkgDirectory: ${{ github.workspace }}\vcpkg
+          vcpkgJsonGlob: 'vcpkg.json' # relative: look for vcpkg.json in repo
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg' # where vcpkg will live
+          workingDirectory: '${{ github.workspace }}' # force working dir to repo root
           runVcpkgInstall: true
           doNotCache: false
 
