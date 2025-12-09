@@ -64,8 +64,8 @@ jobs:
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: ${{ github.workspace }}\vcpkg.json
-          vcpkgDirectory: ${{ github.workspace }}
+          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           runVcpkgInstall: true
           doNotCache: false
 
