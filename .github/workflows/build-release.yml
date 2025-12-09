@@ -43,7 +43,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
@@ -78,8 +78,8 @@ jobs:
       - name: Setup vcpkg (using lukka/run-vcpkg)
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: 'vcpkg.json' # relative: look for vcpkg.json in repo
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg' # where vcpkg will live
+          vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           runVcpkgInstall: true
           doNotCache: false
 
@@ -97,7 +97,7 @@ jobs:
         shell: cmd
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
