@@ -56,16 +56,6 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Debug
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path "${{ github.workspace }}" -Recurse
-
-      - name: Setup MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -90,7 +80,6 @@ jobs:
         with:
           vcpkgJsonGlob: 'vcpkg.json' # relative: look for vcpkg.json in repo
           vcpkgDirectory: '${{ github.workspace }}/vcpkg' # where vcpkg will live
-          workingDirectory: '${{ github.workspace }}' # force working dir to repo root
           runVcpkgInstall: true
           doNotCache: false
 
@@ -108,7 +97,7 @@ jobs:
         shell: cmd
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="${env:VCPKG_DEFAULT_TRIPLET}"
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Create package structure
@@ -184,7 +173,7 @@ jobs:
           if [ ! -f "$vf" ]; then
             echo "vcpkg.json not found; creating minimal fallback at $vf"
           else
-              echo "vcpkg.json found at $vf"
+            echo "vcpkg.json found at $vf"
           fi
 
       - name: Ensure vcpkg toolchain exists (macOS)
@@ -274,16 +263,16 @@ jobs:
               </dict>
               </plist>
             EOF
-          
-          - name: Package Service Files
-            run: |
-              tar -czf ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz -C ${{ env.PACKAGE_DIR }} .
-          
-          - name: Upload macOS ZIP
-            uses: actions/upload-artifact@v4
-            with:
-              name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
-              path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+
+      - name: Package Service Files
+        run: |
+          tar -czf ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz -C ${{ env.PACKAGE_DIR }} .
+
+      - name: Upload macOS ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
 
   build-linux-deb:
     name: Build & Package (Linux DEB)
