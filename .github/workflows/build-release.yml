@@ -52,27 +52,51 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
 
-      - name: Setup VCPKG environment
-        shell: cmd
-        run: |
-          mkdir vcpkg
-
-      - name: Setup vcpkg
-        id: vcpkg-installation
+      # 1. 🔑 Calculate Cache Key and Path
+      - name: Calculate Vcpkg Cache Key and Path
+        id: vcpkg-key-path
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          # Only run to generate outputs for caching
+          runVcpkgInstall: false
+          doNotCache: false
+
+      # 2. ⬇️ Restore Vcpkg Cache
+      - name: Restore Vcpkg Cache
+        id: vcpkg-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          # Use the path and key outputs provided by the lukka action
+          path: ${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}
+          key: ${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}
+
+      # 3. 📦 Install Vcpkg Packages (Only runs full install on cache miss)
+      - name: Install Vcpkg Packages
+        id: vcpkg-installation
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+          vcpkgDirectory: '${{ steps.vcpkg-key-path.outputs.vcpkgDirectory }}' # Use the path output
+          # Always set to true; Vcpkg handles finding the restored binaries internally
           runVcpkgInstall: true
           doNotCache: false
+
+        # 4. ⬆️ Save Vcpkg Cache
+        # Only save if the cache was missed (i.e., the install step had to run)
+      - name: Save Vcpkg Cache
+        uses: actions/cache/save@v4
+        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
+        with:
+          path: ${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}
+          key: ${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}
 
       - name: Build (Frontend)
         shell: cmd
@@ -120,11 +144,11 @@ jobs:
         run: |
           $source = "${{ env.PACKAGE_DIR }}"
           $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
-
+          
           if (Test-Path $zip) {
             Remove-Item $zip -Force
           }
-
+          
           Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
           [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
 
