@@ -141,14 +141,6 @@ jobs:
           cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
-      - name: Build (Backend)
-        shell: powershell
-        run: |
-          New-Item -Path "${{ env.BUILD_DIR }}/Release" -ItemType Directory
-          New-Item -Path "${{ env.BUILD_DIR }}/Release/awsmockmgr" -ItemType File
-          New-Item -Path "${{ env.BUILD_DIR }}/Release/awsmockctl" -ItemType File
-          New-Item -Path "${{ env.BUILD_DIR }}/Release/awslocal" -ItemType File
-
       - name: Build (Frontend)
         shell: pwsh
         run: |
