@@ -101,15 +101,14 @@ jobs:
       - name: Build (Frontend)
         shell: cmd
         run: |
-          mkdir -p ${{ github.workspace }}\frontend
-          cd ${{ github.workspace }}\frontend
           git clone https://github.com/jensvogt/awsmock-ui
           cd awsmock-ui
           npm install
           npm run build
+          dir /S awsmock-ui
 
       - name: Create package structure
-        shell: powershell
+        shell: pwsh
         run: |
           New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
@@ -124,14 +123,15 @@ jobs:
           New-Item -Path "${{ env.PACKAGE_DIR }}/data/application" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}/data/backup" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}/data/tmp" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/frontend" -ItemType Directory
           
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
-          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
-          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
-          Copy-Item -Path 'frontend\awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
+          Copy-Item -Path '${{ env.BUILD_DIR }}/Release/awsmockmgr' -Destination '${{ env.PACKAGE_DIR }}/bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}/Release/awsmockctl' -Destination '${{ env.PACKAGE_DIR }}/bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}/Release/awslocal' -Destination '${{ env.PACKAGE_DIR }}/bin'
+          Copy-Item -Path 'dist/etc/awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}/etc/awsmock.json'
+          Copy-Item -Path 'dist/etc/magic.mgc' -Destination '${{ env.PACKAGE_DIR }}/etc'
+          Copy-Item -Path 'dist/etc/ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}/etc'
+          Copy-Item -Path 'awsmock-ui/dist/awsmock-ui/browser/*' -Destination '${{ env.PACKAGE_DIR }}/frontend' -Recurse
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
