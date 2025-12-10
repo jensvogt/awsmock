@@ -271,6 +271,7 @@ jobs:
 
       - name: Package Service Files
         run: |
+          echo "SEMVER: ${{ env.SEMVER }}"
           tar -czf ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz -C ${{ env.PACKAGE_DIR }} .
 
       - name: Upload macOS ZIP
