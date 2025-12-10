@@ -75,25 +75,32 @@ jobs:
             Write-Host "vcpkg already present at $v"
           }
 
-      # 1. 🔑 Calculate Cache Key and Path
-      - name: Calculate Vcpkg Cache Key and Path
-        id: vcpkg-key-path
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: 'vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          # Only run to generate outputs for caching
-          runVcpkgInstall: false
-          doNotCache: false
+      - name: Get vcpkg commit (Windows)
+        id: vcpkg-commit
+        shell: pwsh
+        run: |
+          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
+          if (Test-Path $v) {
+            $sha = (git -C $v rev-parse --short HEAD).Trim()
+            echo "VCPKG_COMMIT=$sha" >> $Env:GITHUB_ENV
+          } else {
+            echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
+          }
 
-      # 2. ⬇️ Restore Vcpkg Cache
-      - name: Restore Vcpkg Cache
+      - name: Restore Vcpkg Cache (tool only - Windows)
         id: vcpkg-cache-restore
         uses: actions/cache/restore@v4
         with:
-          # Use the path and key outputs provided by the lukka action
-          path: ${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}
-          key: ${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+          restore-keys: |
+            runnerOS=${{ runner.os }}-vcpkgGitCommit=
 
       - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
@@ -104,14 +111,20 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
 
-      # 4. ⬆️ Save Vcpkg Cache
-      # Only save if the cache was missed (i.e., the install step had to run)
-      - name: Save Vcpkg Cache
+      - name: Save Vcpkg Cache (tool only - Windows)
         uses: actions/cache/save@v4
         if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
         with:
-          path: ${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}
-          key: ${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+          restore-keys: |
+            runnerOS=${{ runner.os }}-vcpkgGitCommit=
 
       - name: Build (Backend)
         shell: cmd
