@@ -104,7 +104,7 @@ jobs:
           git clone https://github.com/jensvogt/awsmock-ui
           cd awsmock-ui
           npm install
-          npm run build
+          npm run build --prod
           dir /S awsmock-ui
 
       - name: Create package structure
