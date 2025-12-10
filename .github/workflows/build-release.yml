@@ -197,14 +197,14 @@ jobs:
       #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
       #          runVcpkgInstall: true
       #          doNotCache: false
+      #          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+      #          cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Build (Backend)
         run: |
-          #          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          #          cmake --build ${{ env.BUILD_DIR }} --config Release
-               echo "file1" >> build/awsmockmgr
-               echo "file2" >> build/awsmockctl
-               echo "file2" >> build/awslocal
+          echo "file1" >> ${{ env.BUILD_DIR }}/awsmockmgr
+          echo "file2" >> ${{ env.BUILD_DIR }}/awsmockctl
+          echo "file2" >> ${{ env.BUILD_DIR }}/awslocal
 
 
       - name: Build (Frontend)
