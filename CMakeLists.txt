@@ -205,9 +205,9 @@ target_include_directories(awsmockctl PRIVATE ${CMAKE_SOURCE_DIR}/controller/inc
         ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
 target_link_libraries(awsmockctl PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockctl PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
-        Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono LibArchive::LibArchive magic)
+target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto Boost::boost
+        Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::program_options
+        Boost::chrono LibArchive::LibArchive magic)
 if (WIN32)
     target_link_directories(awsmockctl PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockctl PUBLIC Boost::system pcre2-posix pcre2-8 shlwapi.lib)
