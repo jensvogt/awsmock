@@ -87,7 +87,7 @@ jobs:
             echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
           }
 
-      - name: Restore Vcpkg Cache (tool only - Windows)
+      - name: Restore Vcpkg Cache
         id: vcpkg-cache-restore
         uses: actions/cache/restore@v4
         with:
@@ -123,14 +123,12 @@ jobs:
             vcpkg/buildtrees
             vcpkg/downloads
           key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-          restore-keys: |
-            runnerOS=${{ runner.os }}-vcpkgGitCommit=
 
       - name: Build (Backend)
         shell: cmd
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Build (Backend)
@@ -243,6 +241,33 @@ jobs:
             echo "vcpkg already present at $v"
           fi
 
+      - name: Get vcpkg commit (Windows)
+        id: vcpkg-commit
+        shell: pwsh
+        run: |
+          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
+          if (Test-Path $v) {
+            $sha = (git -C $v rev-parse --short HEAD).Trim()
+            echo "VCPKG_COMMIT=$sha" >> $Env:GITHUB_ENV
+          } else {
+            echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
+          }
+
+      - name: Restore Vcpkg Cache
+        id: vcpkg-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+          restore-keys: |
+            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+
       - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
@@ -252,9 +277,22 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
 
+      - name: Save Vcpkg Cache (tool only - Windows)
+        uses: actions/cache/save@v4
+        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
+        with:
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+
       - name: Build (Backend)
         run: |
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Build (Frontend)
@@ -373,6 +411,33 @@ jobs:
             echo "vcpkg already present at $v"
           fi
 
+      - name: Get vcpkg commit (Linux - rpm)
+        id: vcpkg-commit-rpm
+        shell: bash
+        run: |
+          v="${{ github.workspace }}/vcpkg"
+          if [ -d "$v" ]; then
+            sha=$(git -C "$v" rev-parse --short HEAD)
+            echo "VCPKG_COMMIT=$sha" >> $GITHUB_ENV
+          else
+            echo "VCPKG_COMMIT=unknown" >> $GITHUB_ENV
+          fi
+
+      - name: Restore Vcpkg Cache (tool only - rpm)
+        id: vcpkg-cache-restore-rpm
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+          restore-keys: |
+            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+
       - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
@@ -382,10 +447,23 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
 
+      - name: Save Vcpkg Cache
+        uses: actions/cache/save@v4
+        if: ${{ steps.vcpkg-cache-restore-rpm.outputs.cache-hit != 'true' }}
+        with:
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+
       - name: Build (Backend)
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Build (Frontend)
@@ -526,6 +604,33 @@ jobs:
             echo "vcpkg already present at $v"
           fi
 
+      - name: Get vcpkg commit (Linux - rpm)
+        id: vcpkg-commit-rpm
+        shell: bash
+        run: |
+          v="${{ github.workspace }}/vcpkg"
+          if [ -d "$v" ]; then
+            sha=$(git -C "$v" rev-parse --short HEAD)
+            echo "VCPKG_COMMIT=$sha" >> $GITHUB_ENV
+          else
+            echo "VCPKG_COMMIT=unknown" >> $GITHUB_ENV
+          fi
+
+      - name: Restore Vcpkg Cache
+        id: vcpkg-cache-restore-rpm
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+          restore-keys: |
+            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+
       - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
@@ -535,10 +640,23 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
 
+      - name: Save Vcpkg Cache (tool only - rpm)
+        uses: actions/cache/save@v4
+        if: ${{ steps.vcpkg-cache-restore-rpm.outputs.cache-hit != 'true' }}
+        with:
+          path: |
+            vcpkg
+            vcpkg/installed
+            vcpkg/vcpkg_installed
+            vcpkg/packages
+            vcpkg/buildtrees
+            vcpkg/downloads
+          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+
       - name: Build (Backend)
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Build (Frontend)
