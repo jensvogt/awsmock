@@ -202,6 +202,7 @@ jobs:
 
       - name: Build (Backend)
         run: |
+          mkdir ${{ env.BUILD_DIR }}
           touch ${{ env.BUILD_DIR }}/awsmockmgr
           touch ${{ env.BUILD_DIR }}/awsmockctl
           touch ${{ env.BUILD_DIR }}/awslocal
