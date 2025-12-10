@@ -93,7 +93,7 @@ jobs:
       - name: Build (Backend)
         shell: cmd
         run: |
-          mkdir ${{ env.BUILD_DIR }}\Release
+          mkdir "${{ env.BUILD_DIR }}\\Release"
           echo "file1" > ${{ env.BUILD_DIR }}\Release\awsmockmgr 
           echo "file2" > ${{ env.BUILD_DIR }}\Release\awsmockctl 
           echo "file3" > ${{ env.BUILD_DIR }}\Release\awslocal 
