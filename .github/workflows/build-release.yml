@@ -102,7 +102,17 @@ jobs:
           restore-keys: |
             runnerOS=${{ runner.os }}-vcpkgGitCommit=
 
-      - name: Setup vcpkg (using lukka/run-vcpkg)
+      - name: Setup vcpkg tool only (lukka/run-vcpkg)
+        id: vcpkg-setup
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          runVcpkgInstall: false
+          doNotCache: false
+
+      - name: Run vcpkg install (only on cache miss)
+        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
         id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
