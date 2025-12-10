@@ -148,9 +148,7 @@ jobs:
           cd awsmock-ui
           npm install
           npm run build
-          
-          # Verify output
-          Get-ChildItem -Path "dist" -Recurse
+
 
       - name: Create package structure
         shell: pwsh
@@ -158,25 +156,25 @@ jobs:
           New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}/log" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/init" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/sql" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/s3" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/sns" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/lambda" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/transfer" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/application" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/backup" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/data/tmp" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/frontend" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\s3" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sns" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\lambda" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\transfer" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\application" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\backup" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
           
-          Copy-Item -Path '${{ env.BUILD_DIR }}/Release/awsmockmgr' -Destination '${{ env.PACKAGE_DIR }}/bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}/Release/awsmockctl' -Destination '${{ env.PACKAGE_DIR }}/bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}/Release/awslocal' -Destination '${{ env.PACKAGE_DIR }}/bin'
-          Copy-Item -Path 'dist/etc/awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}/etc/awsmock.json'
-          Copy-Item -Path 'dist/etc/magic.mgc' -Destination '${{ env.PACKAGE_DIR }}/etc'
-          Copy-Item -Path 'dist/etc/ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}/etc'
-          Copy-Item -Path 'awsmock-ui/dist/awsmock-ui/browser/*' -Destination '${{ env.PACKAGE_DIR }}/frontend' -Recurse
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
+          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
+          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
+          Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
