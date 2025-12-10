@@ -164,7 +164,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install doxygen pandoc file icu4c autoconf autoconf-archive automake libtool
+          brew install doxygen pandoc file autoconf autoconf-archive automake libtool
       #
       #      - name: Ensure vcpkg.json exists (fallback)
       #        shell: bash
@@ -235,13 +235,13 @@ jobs:
           mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
           
           # Copy your app
+          #          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
           cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/awsmock/bin/
           cp dist/etc/awsmock_macos.json ${{ env.PACKAGE_DIR }}/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/awsmock/etc/ssh_host_key
-          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
           cp -R ${{ github.workspace }}/frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/awsmock/frontend
 
       - name: Create Launch Agent Plist
