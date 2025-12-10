@@ -43,7 +43,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
@@ -75,13 +75,43 @@ jobs:
             Write-Host "vcpkg already present at $v"
           }
 
+      # 1. 🔑 Calculate Cache Key and Path
+      - name: Calculate Vcpkg Cache Key and Path
+        id: vcpkg-key-path
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          # Only run to generate outputs for caching
+          runVcpkgInstall: false
+          doNotCache: false
+
+      # 2. ⬇️ Restore Vcpkg Cache
+      - name: Restore Vcpkg Cache
+        id: vcpkg-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          # Use the path and key outputs provided by the lukka action
+          path: ${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}
+          key: ${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}
+
       - name: Setup vcpkg (using lukka/run-vcpkg)
+        id: vcpkg-installation
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           runVcpkgInstall: true
           doNotCache: false
+
+      # 4. ⬆️ Save Vcpkg Cache
+      # Only save if the cache was missed (i.e., the install step had to run)
+      - name: Save Vcpkg Cache
+        uses: actions/cache/save@v4
+        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
+        with:
+          path: ${{ steps.vcpkg-key-path.outputs.vcpkgCachePath }}
+          key: ${{ steps.vcpkg-key-path.outputs.vcpkgCacheKey }}
 
       - name: Build (Backend)
         shell: cmd
@@ -620,7 +650,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-linux-deb, build-linux-rpm ]
+    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
