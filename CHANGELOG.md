@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.9.107](https://github.com/jensvogt/awsmock/compare/v1.9.106...v1.9.107) (2025-12-10)
+
+
+### Bug Fixes
+
+* fix windows vcpkg errors ([e9a53ab](https://github.com/jensvogt/awsmock/commit/e9a53ab48c9be12e9f170d31d0061e2683d372fe))
+* fix windows vcpkg errors ([172dd87](https://github.com/jensvogt/awsmock/commit/172dd877e340171884e80665ec5f700e635c7f14))
+* fix windows vcpkg errors ([b6994bd](https://github.com/jensvogt/awsmock/commit/b6994bd690d4902a44b7fbe776db2bf4086fe0b4))
+* fix windows vcpkg errors ([09638d6](https://github.com/jensvogt/awsmock/commit/09638d67d8b131f11d1192c1373006ce6af860c8))
+* fix windows vcpkg errors ([121b572](https://github.com/jensvogt/awsmock/commit/121b57247cbb0143ef9a63fccfe412cf1b599be2))
+* fix windows vcpkg errors ([32ba751](https://github.com/jensvogt/awsmock/commit/32ba7510c5197de1d7740b5535aca422242de022))
+* fix windows vcpkg errors ([3da1583](https://github.com/jensvogt/awsmock/commit/3da1583c3d0b80c82e4e598589e0af65333a2b46))
+* fix windows vcpkg errors ([68f3efb](https://github.com/jensvogt/awsmock/commit/68f3efb89814bb17a042f58e0bb8ab5cd919396e))
+* fix windows vcpkg errors ([8294c14](https://github.com/jensvogt/awsmock/commit/8294c14eacf10424b7dd163e01a28727d37d0ea6))
+* fix windows vcpkg errors ([9da2dee](https://github.com/jensvogt/awsmock/commit/9da2deee234ace672e1cbb51e7e45870ea21e239))
+* fix windows vcpkg errors ([4e2c8e2](https://github.com/jensvogt/awsmock/commit/4e2c8e2f95d65e6c2a188ea18c548130b8930755))
+* fix windows vcpkg errors ([82cb196](https://github.com/jensvogt/awsmock/commit/82cb1967bfe9a9d1017e8a0be57864399ad64db3))
+* fix windows vcpkg errors ([3b12193](https://github.com/jensvogt/awsmock/commit/3b1219303aae9b9e0ed827b5ab180bbbb6609670))
+* fix windows vcpkg errors ([8eec1fa](https://github.com/jensvogt/awsmock/commit/8eec1fa6c63ce64ea47da1afbfae811ea1e1e72b))
+* fix windows vcpkg errors ([ee59fe4](https://github.com/jensvogt/awsmock/commit/ee59fe4891c2af25fe670e87400965fcb65e88f1))
+* fix windows vcpkg errors ([80bc0c4](https://github.com/jensvogt/awsmock/commit/80bc0c46eb6ca552afeacf489fb06389e92baa34))
+* fix windows vcpkg errors ([56a8c32](https://github.com/jensvogt/awsmock/commit/56a8c325207db988315b9d401492b7d67a30ecb6))
+* fix windows vcpkg errors ([a9c5823](https://github.com/jensvogt/awsmock/commit/a9c58234d97db205c9a4cd12a8634c2b97e632f9))
+
 ## [1.9.106](https://github.com/jensvogt/awsmock/compare/v1.9.105...v1.9.106) (2025-12-10)
 
 
