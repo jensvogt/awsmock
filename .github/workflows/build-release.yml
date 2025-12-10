@@ -91,12 +91,12 @@ jobs:
       #          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Build (Backend)
-        shell: cmd
+        shell: powershell
         run: |
-          mkdir "${{ env.BUILD_DIR }}\\Release"
-          echo "file1" > ${{ env.BUILD_DIR }}\Release\awsmockmgr 
-          echo "file2" > ${{ env.BUILD_DIR }}\Release\awsmockctl 
-          echo "file3" > ${{ env.BUILD_DIR }}\Release\awslocal 
+          New-Item -Path "${{ env.BUILD_DIR }}/Release" -ItemType Directory
+          New-Item -Path "${{ env.BUILD_DIR }}/Release/awsmockmgr" -ItemType File
+          New-Item -Path "${{ env.BUILD_DIR }}/Release/awsmockctl" -ItemType File
+          New-Item -Path "${{ env.BUILD_DIR }}/Release/awslocal" -ItemType File
 
       - name: Build (Frontend)
         shell: cmd
