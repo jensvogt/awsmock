@@ -80,12 +80,15 @@ static char *FtpFileNameToRealPath(const char *filename) {
     return realFilename;
 }
 
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern void sftp_set_error(const sftp_session sftp, int errnum);
-/*void sftp_set_error(const sftp_session sftp, int errnum) {
+#else
+void sftp_set_error(const sftp_session sftp, int errnum) {
     if (sftp != nullptr) {
         sftp->errnum = errnum;
     }
-}*/
+}
+#endif
 
 static const char *ssh_str_error(int u_errno) {
     switch (u_errno) {
@@ -132,7 +135,7 @@ static void clear_filexfer_attrib(struct sftp_attributes_struct *z_attr) {
 struct ssh_common_struct {
     error_struct error;
     ssh_callbacks callbacks; /* Callbacks to user functions */
-    int log_verbosity;       /* verbosity of the log functions */
+    int log_verbosity; /* verbosity of the log functions */
 };
 
 static int unix_errno_to_ssh_stat(int u_errno) {
@@ -187,23 +190,25 @@ static const char *get_s3_key(const char *name, const char *prefix) {
  * @param  error       The place to store the error.
  *
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern void _ssh_set_error_oom(void *error, const char *function);
-
-/*void _ssh_set_error_oom(void *error, const char *function) {
+#else
+void _ssh_set_error_oom(void *error, const char *function) {
     auto *err = static_cast<error_struct *>(error);
 
     snprintf(err->error_buffer, sizeof(err->error_buffer), "%s: Out of memory", function);
     err->error_code = SSH_FATAL;
-}*/
+}
+#endif
 
 /**
  * @internal
  *
  * @brief Add a 16 bits unsigned integer to the tail of a buffer.
  *
- * @param[in]  buffer   The buffer to add the integer.
- * @param[in]  data     The 16 bits integer to add.
- * @return              0 on success, -1 on error.
+ * @param [in] buffer   The buffer to add the integer.
+ * @param [in] data     The 16  bits integer to add.
+ * @return 0 on success,-1 on error.
  */
 int awsmock_ssh_buffer_add_u16(ssh_buffer_struct *buffer, uint16_t data) {
     if (const int rc = ssh_buffer_add_data(buffer, &data, sizeof(data)); rc < 0) {
@@ -303,16 +308,18 @@ static void ssh_log_custom(ssh_logging_callback log_fn, int verbosity, const cha
     log_fn(verbosity, function, buf, ssh_get_log_userdata());
 }
 
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern void ssh_log_function(const int verbosity, const char *function, const char *buffer);
-
-/*void ssh_log_function(const int verbosity, const char *function, const char *buffer) {
+#else
+void ssh_log_function(const int verbosity, const char *function, const char *buffer) {
     if (const ssh_logging_callback log_fn = ssh_get_log_callback()) {
         ssh_log_custom(log_fn, verbosity, function, buffer);
         return;
     }
 
     ssh_log_stderr(verbosity, function, buffer);
-}*/
+}
+#endif
 
 /**
  * @internal
@@ -324,9 +331,10 @@ extern void ssh_log_function(const int verbosity, const char *function, const ch
  * @param  descr       The description, which can be a format string.
  * @param  ...         The arguments for the format string.
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...);
-
-/*void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) {
+#else
+void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) {
     auto *err = static_cast<struct ssh_common_struct *>(error);
     va_list va;
 
@@ -338,7 +346,8 @@ extern void _ssh_set_error(void *error, int code, const char *function, const ch
     if (ssh_get_log_level() == SSH_LOG_TRACE) {
         ssh_log_function(SSH_LOG_TRACE, function, err->error.error_buffer);
     }
-}*/
+}
+#endif
 
 /**
  * @internal
@@ -738,9 +747,10 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
  * @returns             SSH_OK on success, SSH_ERROR on error
  * @warning             when using 'P' with a constant size (e.g. 8), do not forget to cast to (size_t).
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
-
-/*int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
+#else
+int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
     va_list ap;
 
     if (argc > 256) {
@@ -760,7 +770,8 @@ extern int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_
     va_end(ap);
 
     return rc;
-}*/
+}
+#endif
 
 /**
  * @brief Add data at the head of a buffer.
@@ -877,7 +888,7 @@ static int process_open(sftp_client_message client_msg) {
 
     if ((msg_flag & static_cast<uint32_t>(SSH_FXF_READ)) == SSH_FXF_READ &&
         (msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
-        file_flag = O_RDWR;// file must exist
+        file_flag = O_RDWR; // file must exist
         if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT) file_flag |= O_CREAT;
     } else if ((msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
         file_flag = O_WRONLY;
@@ -1121,9 +1132,10 @@ error:
  * @param[in] nbytes      Number of bytes to read.
  * @returns               Number of bytes read on success, SSH_ERROR on error with errno set to indicate the error.
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern ssize_t ssh_readn(int fd, void *buf, size_t nbytes);
-
-/*ssize_t ssh_readn(int fd, void *buf, size_t nbytes) {
+#else
+ssize_t ssh_readn(int fd, void *buf, size_t nbytes) {
     size_t total_bytes_read = 0;
 
     if (fd < 0 || buf == nullptr || nbytes == 0) {
@@ -1151,7 +1163,8 @@ extern ssize_t ssh_readn(int fd, void *buf, size_t nbytes);
     } while (total_bytes_read < nbytes);
 
     return total_bytes_read;
-}*/
+}
+#endif
 
 static int process_read(sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
@@ -1220,9 +1233,10 @@ static int process_read(sftp_client_message client_msg) {
  * @param[in] nbytes      Number of bytes to write.
  * @returns               Number of bytes written on success,SSH_ERROR on error with errno set to indicate theerror.
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern ssize_t ssh_writen(int fd, const void *buf, size_t nbytes);
-
-/*ssize_t ssh_writen(int fd, const void *buf, size_t nbytes) {
+#else
+ssize_t ssh_writen(int fd, const void *buf, size_t nbytes) {
     size_t total_bytes_written = 0;
 
     if (fd < 0 || buf == nullptr || nbytes == 0) {
@@ -1245,7 +1259,8 @@ extern ssize_t ssh_writen(int fd, const void *buf, size_t nbytes);
     } while (total_bytes_written < nbytes);
 
     return static_cast<int>(total_bytes_written);
-}*/
+}
+#endif
 
 static int process_write(sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
@@ -1959,9 +1974,10 @@ error:
  * @return SSH_OK when the SFTP server was successfully initialized, SSH_ERROR
  *         otherwise.
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel channel, const char *subsystem, void *userdata);
-
-/*int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel channel, const char *subsystem, void *userdata) {
+#else
+int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel channel, const char *subsystem, void *userdata) {
     if (strcmp(subsystem, "sftp") == 0) {
         auto *sftp = static_cast<sftp_session *>(userdata);
 
@@ -1974,11 +1990,13 @@ extern int sftp_channel_default_subsystem_request(ssh_session session, ssh_chann
         return SSH_OK;
     }
     return SSH_ERROR;
-}*/
+}
+#endif
 
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern int sftp_reply_version(sftp_client_message client_msg);
-
-/*int sftp_reply_version(sftp_client_message client_msg) {
+#else
+int sftp_reply_version(sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
     const ssh_session session = sftp->session;
 
@@ -2016,43 +2034,44 @@ extern int sftp_reply_version(sftp_client_message client_msg);
     }
 
     return SSH_OK;
-}*/
+}
+#endif
 
 /**
  * Functions to convert between host and network byte order.
  *
- * Please note that these functions normally take `unsigned long int' or
- * `unsigned short int' values as arguments and also return them.  But
- * this was a short-sighted decision since on different systems the types
+ * Please note that these functions normally take ` unsigned long int' or
+ * `unsigned short int' values as arguments and also return them.
+ * But this was a short-sighted decision since on different systems the types
  * may have different representations but the values are always the same.
  */
 const sftp_message_handler message_handlers[] = {
-        {"open", nullptr, SSH_FXP_OPEN, process_open},
-        {"close", nullptr, SSH_FXP_CLOSE, process_close},
-        {"read", nullptr, SSH_FXP_READ, process_read},
-        {"write", nullptr, SSH_FXP_WRITE, process_write},
-        {"lstat", nullptr, SSH_FXP_LSTAT, process_lstat},
-        {"fstat", nullptr, SSH_FXP_FSTAT, process_unsupported},
-        {"setstat", nullptr, SSH_FXP_SETSTAT, process_setstat},//7
-        {"fsetstat", nullptr, SSH_FXP_FSETSTAT, process_unsupported},
-        {"opendir", nullptr, SSH_FXP_OPENDIR, process_opendir},
-        {"readdir", nullptr, SSH_FXP_READDIR, process_readdir},
-        {"remove", nullptr, SSH_FXP_REMOVE, process_remove},
-        {"mkdir", nullptr, SSH_FXP_MKDIR, process_mkdir},
-        {"rmdir", nullptr, SSH_FXP_RMDIR, process_rmdir},
-        {"realpath", nullptr, SSH_FXP_REALPATH, process_realpath},//14
-        {"stat", nullptr, SSH_FXP_STAT, process_stat},
-        {"rename", nullptr, SSH_FXP_RENAME, process_unsupported},
-        {"readlink", nullptr, SSH_FXP_READLINK, process_readlink},
-        {"symlink", nullptr, SSH_FXP_SYMLINK, process_symlink},
-        {"init", nullptr, SSH_FXP_INIT, sftp_reply_version},
-        {nullptr, nullptr, 0, nullptr},
+    {"open", nullptr, SSH_FXP_OPEN, process_open},
+    {"close", nullptr, SSH_FXP_CLOSE, process_close},
+    {"read", nullptr, SSH_FXP_READ, process_read},
+    {"write", nullptr, SSH_FXP_WRITE, process_write},
+    {"lstat", nullptr, SSH_FXP_LSTAT, process_lstat},
+    {"fstat", nullptr, SSH_FXP_FSTAT, process_unsupported},
+    {"setstat", nullptr, SSH_FXP_SETSTAT, process_setstat}, //7
+    {"fsetstat", nullptr, SSH_FXP_FSETSTAT, process_unsupported},
+    {"opendir", nullptr, SSH_FXP_OPENDIR, process_opendir},
+    {"readdir", nullptr, SSH_FXP_READDIR, process_readdir},
+    {"remove", nullptr, SSH_FXP_REMOVE, process_remove},
+    {"mkdir", nullptr, SSH_FXP_MKDIR, process_mkdir},
+    {"rmdir", nullptr, SSH_FXP_RMDIR, process_rmdir},
+    {"realpath", nullptr, SSH_FXP_REALPATH, process_realpath}, //14
+    {"stat", nullptr, SSH_FXP_STAT, process_stat},
+    {"rename", nullptr, SSH_FXP_RENAME, process_unsupported},
+    {"readlink", nullptr, SSH_FXP_READLINK, process_readlink},
+    {"symlink", nullptr, SSH_FXP_SYMLINK, process_symlink},
+    {"init", nullptr, SSH_FXP_INIT, sftp_reply_version},
+    {nullptr, nullptr, 0, nullptr},
 };
 
 const sftp_message_handler extended_handlers[] = {
-        /* here are some extended type handlers */
-        {"statvfs", "statvfs@openssh.com", 0, process_extended_statvfs},
-        {nullptr, nullptr, 0, nullptr},
+    /* here are some extended type handlers */
+    {"statvfs", "statvfs@openssh.com", 0, process_extended_statvfs},
+    {nullptr, nullptr, 0, nullptr},
 };
 
 static int process_extended(sftp_client_message sftp_msg) {
@@ -2774,9 +2793,10 @@ static sftp_client_message sftp_get_client_message_from_packet(sftp_session sftp
  * SFTP packet buffer.
  * @returns number of decoded bytes.
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uint32_t len);
-
-/*int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uint32_t len) {
+#else
+int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uint32_t len) {
     const sftp_packet packet = sftp->read_packet;
 
     if (packet->sftp == nullptr) {
@@ -2809,7 +2829,8 @@ extern int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uin
 
     // We should return how many bytes we decoded, including packet length header and the payload length.
     return static_cast<int>(payload_len + sizeof(uint32_t));
-}*/
+}
+#endif
 
 /**
  * @brief Default data callback for sftp server
@@ -2823,9 +2844,10 @@ extern int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uin
  *
  * @return number of bytes processed, -1 when error occurs.
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern auto sftp_channel_default_data_callback([[maybe_unused]] ssh_session session, [[maybe_unused]] ssh_channel channel, void *data, const uint32_t len, [[maybe_unused]] int is_stderr, void *userdata) -> int;
-
-/*auto sftp_channel_default_data_callback([[maybe_unused]] ssh_session session, [[maybe_unused]] ssh_channel channel, void *data, const uint32_t len, [[maybe_unused]] int is_stderr, void *userdata) -> int {
+#else
+auto sftp_channel_default_data_callback([[maybe_unused]] ssh_session session, [[maybe_unused]] ssh_channel channel, void *data, const uint32_t len, [[maybe_unused]] int is_stderr, void *userdata) -> int {
     auto *sftpp = static_cast<sftp_session *>(userdata);
     sftp_session sftp = nullptr;
 
@@ -2845,7 +2867,9 @@ extern auto sftp_channel_default_data_callback([[maybe_unused]] ssh_session sess
         log_debug << "process sftp failed!";
 
     return decode_len;
-}*/
+}
+#endif
+
 
 /**
  * @brief Get a 8 bits unsigned int out of the buffer and adjust the read
@@ -2883,9 +2907,10 @@ bignum ssh_make_string_bn(ssh_string string) {
  *                      SSH_ERROR on error
  * @see ssh_buffer_get_format() for format list values.
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap);
-
-/*int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
+#else
+int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
     int rc = SSH_ERROR;
     const char *p = format;
     union {
@@ -3124,7 +3149,8 @@ cleanup:
     va_end(ap_copy);
 
     return rc;
-}*/
+}
+#endif
 
 /**
  * @brief Get multiple values from a buffer on a single function call
@@ -3146,16 +3172,18 @@ cleanup:
  *                      SSH_ERROR on error
  * @warning             when using 'P' with a constant size (e.g. 8), do not forget to cast to (size_t).
  */
+#if defined(WIN32) && defined(SSH_EXTERN)
 extern int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
-
-/*int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
+#else
+int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
     va_list ap;
 
     va_start(ap, argc);
     const int rc = ssh_buffer_unpack_va(buffer, format, argc, ap);
     va_end(ap);
     return rc;
-}*/
+}
+#endif
 
 // ======================================================================================================================
 
@@ -3338,7 +3366,7 @@ static void handle_session(const ssh_event &event, const ssh_session &session) {
         ssh_event_dopoll(event, 100);
     }
 }
-}// extern C
+} // extern C
 
 namespace AwsMock::Service {
     void SftpServer::AddUser(const std::string &userName, const std::string &password, const std::string &homeDirectory) {
@@ -3421,4 +3449,4 @@ namespace AwsMock::Service {
         ssh_bind_free(sshbind);
         ssh_finalize();
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
