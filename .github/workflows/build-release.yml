@@ -43,7 +43,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
@@ -55,40 +55,48 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      #
+      #      - name: Setup MSVC environment
+      #        uses: ilammy/msvc-dev-cmd@v1
+      #        with:
+      #          arch: x64
+      #
+      #      - name: Ensure vcpkg toolchain exists (Windows)
+      #        id: ensure-vcpkg-windows
+      #        shell: pwsh
+      #        run: |
+      #          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
+      #          if (-not (Test-Path $v)) {
+      #            Write-Host "Cloning vcpkg into $v"
+      #            git clone https://github.com/microsoft/vcpkg.git $v
+      #            Write-Host "Bootstrapping vcpkg"
+      #            & "${v}\bootstrap-vcpkg.bat"
+      #          } else {
+      #            Write-Host "vcpkg already present at $v"
+      #          }
+      #
+      #      - name: Setup vcpkg (using lukka/run-vcpkg)
+      #        uses: lukka/run-vcpkg@v11
+      #        with:
+      #          vcpkgJsonGlob: 'vcpkg.json'
+      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      #          runVcpkgInstall: true
+      #          doNotCache: false
 
-      - name: Setup MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-
-      - name: Ensure vcpkg toolchain exists (Windows)
-        id: ensure-vcpkg-windows
-        shell: pwsh
-        run: |
-          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
-          if (-not (Test-Path $v)) {
-            Write-Host "Cloning vcpkg into $v"
-            git clone https://github.com/microsoft/vcpkg.git $v
-            Write-Host "Bootstrapping vcpkg"
-            & "${v}\bootstrap-vcpkg.bat"
-          } else {
-            Write-Host "vcpkg already present at $v"
-          }
-
-      - name: Setup vcpkg (using lukka/run-vcpkg)
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: 'vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-          doNotCache: false
+      #      - name: Build (Backend)
+      #        shell: cmd
+      #        run: |
+      #          mkdir ${{ env.BUILD_DIR }}
+      #          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+      #          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Build (Backend)
         shell: cmd
         run: |
-          mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+          mkdir ${{ env.BUILD_DIR }}\Release
+          echo "file1" > ${{ env.BUILD_DIR }}\Release\awsmockmgr 
+          echo "file2" > ${{ env.BUILD_DIR }}\Release\awsmockctl 
+          echo "file3" > ${{ env.BUILD_DIR }}\Release\awslocal 
 
       - name: Build (Frontend)
         shell: cmd
@@ -148,7 +156,7 @@ jobs:
     name: Build & Package (macOS)
     runs-on: macos-latest
     needs: release-please
-    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-macos"
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
@@ -165,48 +173,43 @@ jobs:
         shell: bash
         run: |
           brew install doxygen pandoc file autoconf autoconf-archive automake libtool
-      #
-      #      - name: Ensure vcpkg.json exists (fallback)
-      #        shell: bash
-      #        run: |
-      #          vf="${{ github.workspace }}/vcpkg.json"
-      #          if [ ! -f "$vf" ]; then
-      #            echo "vcpkg.json not found; creating minimal fallback at $vf"
-      #          else
-      #            echo "vcpkg.json found at $vf"
-      #          fi
-      #
-      #      - name: Ensure vcpkg toolchain exists (macOS)
-      #        shell: bash
-      #        run: |
-      #          v="${{ github.workspace }}/vcpkg"
-      #          if [ ! -d "$v" ]; then
-      #            echo "Cloning vcpkg into $v"
-      #            git clone https://github.com/microsoft/vcpkg.git "$v"
-      #            echo "Bootstrapping vcpkg"
-      #            "${v}/bootstrap-vcpkg.sh"
-      #          else
-      #            echo "vcpkg already present at $v"
-      #          fi
-      #
-      #      - name: Setup vcpkg (using lukka/run-vcpkg)
-      #        id: vcpkg-installation
-      #        uses: lukka/run-vcpkg@v11
-      #        with:
-      #          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-      #          runVcpkgInstall: true
-      #          doNotCache: false
-      #          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-      #          cmake --build ${{ env.BUILD_DIR }} --config Release
+
+      - name: Ensure vcpkg.json exists (fallback)
+        shell: bash
+        run: |
+          vf="${{ github.workspace }}/vcpkg.json"
+          if [ ! -f "$vf" ]; then
+            echo "vcpkg.json not found; creating minimal fallback at $vf"
+          else
+            echo "vcpkg.json found at $vf"
+          fi
+
+      - name: Ensure vcpkg toolchain exists (macOS)
+        shell: bash
+        run: |
+          v="${{ github.workspace }}/vcpkg"
+          if [ ! -d "$v" ]; then
+            echo "Cloning vcpkg into $v"
+            git clone https://github.com/microsoft/vcpkg.git "$v"
+            echo "Bootstrapping vcpkg"
+            "${v}/bootstrap-vcpkg.sh"
+          else
+            echo "vcpkg already present at $v"
+          fi
+
+      - name: Setup vcpkg (using lukka/run-vcpkg)
+        id: vcpkg-installation
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          runVcpkgInstall: true
+          doNotCache: false
 
       - name: Build (Backend)
         run: |
-          mkdir ${{ env.BUILD_DIR }}
-          touch ${{ env.BUILD_DIR }}/awsmockmgr
-          touch ${{ env.BUILD_DIR }}/awsmockctl
-          touch ${{ env.BUILD_DIR }}/awslocal
-
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake --build ${{ env.BUILD_DIR }} --config Release
 
       - name: Build (Frontend)
         shell: bash
@@ -235,7 +238,7 @@ jobs:
           mkdir -p ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
           
           # Copy your app
-          #          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
+          # TODO: add documentation: cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/awsmock/share/man/man1
           cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/awsmock/bin/
           cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/awsmock/bin/
@@ -271,7 +274,6 @@ jobs:
 
       - name: Package Service Files
         run: |
-          echo "SEMVER: ${{ env.SEMVER }}"
           tar -czf ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz -C ${{ env.PACKAGE_DIR }} .
 
       - name: Upload macOS ZIP
