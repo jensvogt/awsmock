@@ -109,28 +109,29 @@ jobs:
           npm run build
 
       - name: Create package structure
-        shell: cmd
+        shell: powershell
         run: |
-          mkdir ${{ env.PACKAGE_DIR }}\bin
-          mkdir ${{ env.PACKAGE_DIR }}\etc
-          mkdir ${{ env.PACKAGE_DIR }}\log
-          mkdir ${{ env.PACKAGE_DIR }}\data
-          mkdir ${{ env.PACKAGE_DIR }}\init
-          mkdir ${{ env.PACKAGE_DIR }}\data\s3
-          mkdir ${{ env.PACKAGE_DIR }}\data\sqs
-          mkdir ${{ env.PACKAGE_DIR }}\data\sns
-          mkdir ${{ env.PACKAGE_DIR }}\data\lambda
-          mkdir ${{ env.PACKAGE_DIR }}\data\application
-          mkdir ${{ env.PACKAGE_DIR }}\data\transfer
-          mkdir ${{ env.PACKAGE_DIR }}\data\backup
-          mkdir ${{ env.PACKAGE_DIR }}\data\tmp
-          copy ${{ env.BUILD_DIR }}\Release\awsmockmgr ${{ env.PACKAGE_DIR }}\bin
-          copy ${{ env.BUILD_DIR }}\Release\awsmockctl ${{ env.PACKAGE_DIR }}\bin
-          copy ${{ env.BUILD_DIR }}\Release\awslocal ${{ env.PACKAGE_DIR }}\bin
-          copy dist\etc\awsmock_win32.json ${{ env.PACKAGE_DIR }}\etc\awsmock.json
-          copy dist\etc\magic.mgc ${{ env.PACKAGE_DIR }}\etc\magic.mgc
-          copy dist\etc\ssh_host_key ${{ env.PACKAGE_DIR }}\etc\ssh_host_key
-          robocopy /E /NFL /NDL /NS /NC frontend\awsmock-ui\dist\awsmock-ui\browser ${{ env.PACKAGE_DIR }}\frontend
+          New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/log" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/init" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/sql" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/s3" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/sns" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/lambda" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/transfer" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/application" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/backup" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/data/tmp" -ItemType Directory
+          
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
+          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
+          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
+          Copy-Item -Path 'frontend\awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
