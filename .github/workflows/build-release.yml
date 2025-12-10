@@ -152,7 +152,7 @@ jobs:
     env:
       BUILD_DIR: "${{ github.workspace }}/build-macos"
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
-      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+      SEMVER: ${{ needs.release-please.outputs.tag_name }}
       SERVICE_NAME: de.jensvogt.awsmock
     steps:
       - name: Checkout
