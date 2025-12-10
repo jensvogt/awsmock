@@ -87,7 +87,7 @@ jobs:
         shell: cmd
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Build (Frontend)
@@ -419,7 +419,7 @@ jobs:
           --architecture amd64 \
           --package "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb" \
           -C "${{ env.PACKAGE_DIR }}" \
-          .=/
+          ${{ env.PACKAGE_DIR }}/=/
 
       - name: Upload .deb
         uses: actions/upload-artifact@v4
@@ -566,7 +566,7 @@ jobs:
           --prefix / \
           --after-install ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh \
           --after-remove ${{ env.PACKAGE_DIR }}/scripts/postremove.sh \
-          .=/
+          ${{ env.PACKAGE_DIR }}/=/
 
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
