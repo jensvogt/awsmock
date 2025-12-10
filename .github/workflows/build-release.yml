@@ -99,13 +99,27 @@ jobs:
           New-Item -Path "${{ env.BUILD_DIR }}/Release/awslocal" -ItemType File
 
       - name: Build (Frontend)
-        shell: cmd
+        shell: pwsh
         run: |
           git clone https://github.com/jensvogt/awsmock-ui
           cd awsmock-ui
+          
+          # Run installation (Fail if dependencies aren't installed)
           npm install
-          npm run build --prod
-          dir /S awsmock-ui
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "npm install failed."
+            exit 1
+          }
+          
+          # Run the build command
+          npm run build -- --prod
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "npm run build failed."
+            exit 1
+          }
+          
+          # Verify output
+          Get-ChildItem -Path "dist" -Recurse
 
       - name: Create package structure
         shell: pwsh
