@@ -168,9 +168,9 @@ jobs:
           New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
           
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
           Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
           Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
