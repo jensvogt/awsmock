@@ -138,7 +138,7 @@ jobs:
         shell: cmd
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
+          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
 
       - name: Build (Frontend)
