@@ -43,7 +43,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
@@ -148,16 +148,14 @@ jobs:
           cd awsmock-ui
           npm install
           npm run build
-          
-          # Verify output
-          Get-ChildItem -Path "dist" -Recurse
+
 
       - name: Create package structure
         shell: pwsh
         run: |
-          New-Item -Path "${{ env.PACKAGE_DIR }}\bin" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\etc" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\log" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}/log" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
@@ -170,9 +168,9 @@ jobs:
           New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
           
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
           Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
           Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
