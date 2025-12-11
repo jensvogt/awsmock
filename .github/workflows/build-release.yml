@@ -39,163 +39,163 @@ jobs:
           CLEAN="${TAG#v}"   # remove leading 'v'
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
-  build-windows:
-    name: Build & Package (Windows)
-    runs-on: windows-latest
-    needs: release-please
-    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    env:
-      BUILD_DIR: "${{ github.workspace }}/build-windows"
-      PACKAGE_DIR: "${{ github.workspace }}/package-windows"
-      SEMVER: ${{ needs.release-please.outputs.tag_name }}
-      VCPKG_DEFAULT_TRIPLET: x64-windows
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Setup MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-
-      - name: Ensure vcpkg toolchain exists (Windows)
-        id: ensure-vcpkg-windows
-        shell: pwsh
-        run: |
-          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
-          if (-not (Test-Path $v)) {
-            Write-Host "Cloning vcpkg into $v"
-            git clone https://github.com/microsoft/vcpkg.git $v
-            Write-Host "Bootstrapping vcpkg"
-            & "${v}\bootstrap-vcpkg.bat"
-          } else {
-            Write-Host "vcpkg already present at $v"
-          }
-
-      - name: Get vcpkg commit (Windows)
-        id: vcpkg-commit
-        shell: pwsh
-        run: |
-          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
-          if (Test-Path $v) {
-            $sha = (git -C $v rev-parse --short HEAD).Trim()
-            echo "VCPKG_COMMIT=$sha" >> $Env:GITHUB_ENV
-          } else {
-            echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
-          }
-
-      - name: Restore Vcpkg Cache
-        id: vcpkg-cache-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-          restore-keys: |
-            runnerOS=${{ runner.os }}-vcpkgGitCommit=
-
-      - name: Setup vcpkg tool only (lukka/run-vcpkg)
-        id: vcpkg-setup
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: 'vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: false
-          doNotCache: false
-
-      - name: Run vcpkg install (only on cache miss)
-        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
-        id: vcpkg-installation
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: 'vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-          doNotCache: false
-
-      - name: Save Vcpkg Cache (tool only - Windows)
-        uses: actions/cache/save@v4
-        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-
-      - name: Build (Backend)
-        shell: cmd
-        run: |
-          mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
-
-      - name: Build (Frontend)
-        shell: pwsh
-        run: |
-          git clone https://github.com/jensvogt/awsmock-ui
-          cd awsmock-ui
-          npm install
-          npm run build
-
-
-      - name: Create package structure
-        shell: pwsh
-        run: |
-          New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/log" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\s3" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sns" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\lambda" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\transfer" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\application" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\backup" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
-          
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
-          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
-          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
-          Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
-          Copy-Item -Path 'vcpkg\installed\x64-windows\bin\*.dll' -Destination '${{ env.PACKAGE_DIR }}\bin'
-
-      - name: Create ZIP archive (PowerShell)
-        shell: pwsh
-        run: |
-          $source = "${{ env.PACKAGE_DIR }}"
-          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
-          
-          if (Test-Path $zip) {
-            Remove-Item $zip -Force
-          }
-          
-          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
-          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
-
-      - name: Upload Windows installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-          overwrite: true
+  #  build-windows:
+  #    name: Build & Package (Windows)
+  #    runs-on: windows-latest
+  #    needs: release-please
+  #    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
+  #    env:
+  #      BUILD_DIR: "${{ github.workspace }}/build-windows"
+  #      PACKAGE_DIR: "${{ github.workspace }}/package-windows"
+  #      SEMVER: ${{ needs.release-please.outputs.tag_name }}
+  #      VCPKG_DEFAULT_TRIPLET: x64-windows
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v4
+  #        with:
+  #          fetch-depth: 0
+  #          submodules: recursive
+  #
+  #      - name: Setup MSVC environment
+  #        uses: ilammy/msvc-dev-cmd@v1
+  #        with:
+  #          arch: x64
+  #
+  #      - name: Ensure vcpkg toolchain exists (Windows)
+  #        id: ensure-vcpkg-windows
+  #        shell: pwsh
+  #        run: |
+  #          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
+  #          if (-not (Test-Path $v)) {
+  #            Write-Host "Cloning vcpkg into $v"
+  #            git clone https://github.com/microsoft/vcpkg.git $v
+  #            Write-Host "Bootstrapping vcpkg"
+  #            & "${v}\bootstrap-vcpkg.bat"
+  #          } else {
+  #            Write-Host "vcpkg already present at $v"
+  #          }
+  #
+  #      - name: Get vcpkg commit (Windows)
+  #        id: vcpkg-commit
+  #        shell: pwsh
+  #        run: |
+  #          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
+  #          if (Test-Path $v) {
+  #            $sha = (git -C $v rev-parse --short HEAD).Trim()
+  #            echo "VCPKG_COMMIT=$sha" >> $Env:GITHUB_ENV
+  #          } else {
+  #            echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
+  #          }
+  #
+  #      - name: Restore Vcpkg Cache
+  #        id: vcpkg-cache-restore
+  #        uses: actions/cache/restore@v4
+  #        with:
+  #          path: |
+  #            vcpkg
+  #            vcpkg/installed
+  #            vcpkg/vcpkg_installed
+  #            vcpkg/packages
+  #            vcpkg/buildtrees
+  #            vcpkg/downloads
+  #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+  #          restore-keys: |
+  #            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+  #
+  #      - name: Setup vcpkg tool only (lukka/run-vcpkg)
+  #        id: vcpkg-setup
+  #        uses: lukka/run-vcpkg@v11
+  #        with:
+  #          vcpkgJsonGlob: 'vcpkg.json'
+  #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+  #          runVcpkgInstall: false
+  #          doNotCache: false
+  #
+  #      - name: Run vcpkg install (only on cache miss)
+  #        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
+  #        id: vcpkg-installation
+  #        uses: lukka/run-vcpkg@v11
+  #        with:
+  #          vcpkgJsonGlob: 'vcpkg.json'
+  #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+  #          runVcpkgInstall: true
+  #          doNotCache: false
+  #
+  #      - name: Save Vcpkg Cache (tool only - Windows)
+  #        uses: actions/cache/save@v4
+  #        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
+  #        with:
+  #          path: |
+  #            vcpkg
+  #            vcpkg/installed
+  #            vcpkg/vcpkg_installed
+  #            vcpkg/packages
+  #            vcpkg/buildtrees
+  #            vcpkg/downloads
+  #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+  #
+  #      - name: Build (Backend)
+  #        shell: cmd
+  #        run: |
+  #          mkdir ${{ env.BUILD_DIR }}
+  #          cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
+  #          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+  #
+  #      - name: Build (Frontend)
+  #        shell: pwsh
+  #        run: |
+  #          git clone https://github.com/jensvogt/awsmock-ui
+  #          cd awsmock-ui
+  #          npm install
+  #          npm run build
+  #
+  #
+  #      - name: Create package structure
+  #        shell: pwsh
+  #        run: |
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}/log" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\s3" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sns" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\lambda" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\transfer" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\application" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\backup" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
+  #
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
+  #          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
+  #          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
+  #          Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
+  #          Copy-Item -Path 'vcpkg\installed\x64-windows\bin\*.dll' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #
+  #      - name: Create ZIP archive (PowerShell)
+  #        shell: pwsh
+  #        run: |
+  #          $source = "${{ env.PACKAGE_DIR }}"
+  #          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
+  #
+  #          if (Test-Path $zip) {
+  #            Remove-Item $zip -Force
+  #          }
+  #
+  #          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+  #          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+  #
+  #      - name: Upload Windows installer
+  #        uses: actions/upload-artifact@v4
+  #        with:
+  #          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+  #          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+  #          overwrite: true
 
   build-macos:
     name: Build & Package (macOS)
@@ -242,7 +242,7 @@ jobs:
             echo "vcpkg already present at $v"
           fi
 
-      - name: Get vcpkg commit (Windows)
+      - name: Get vcpkg commit
         id: vcpkg-commit
         shell: pwsh
         run: |
@@ -278,7 +278,7 @@ jobs:
           runVcpkgInstall: true
           doNotCache: false
 
-      - name: Save Vcpkg Cache (tool only - Windows)
+      - name: Save Vcpkg Cache
         uses: actions/cache/save@v4
         if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
         with:
@@ -782,7 +782,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows ]
+    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
@@ -792,11 +792,11 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Download Windows installer
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-          path: artifacts/windows
+      #      - name: Download Windows installer
+      #        uses: actions/download-artifact@v4
+      #        with:
+      #          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+      #          path: artifacts/windows
 
       - name: Download macOS installer
         uses: actions/download-artifact@v4
@@ -820,10 +820,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/windows/*.zip
-            artifacts/macos/*.tgz
-            artifacts/linux/*.deb
-            artifacts/linux/*.rpm
+            #            artifacts/windows/*.zip
+                   artifacts/macos/*.tgz
+                   artifacts/linux/*.deb
+                   artifacts/linux/*.rpm
           name: Release ${{ env.SEMVER }}
           tag_name: ${{ env.SEMVER }}
           body: "Automated release for ${{ env.SEMVER }}"
