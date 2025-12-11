@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.111](https://github.com/jensvogt/awsmock/compare/v1.9.110...v1.9.111) (2025-12-11)
+
+
+### Bug Fixes
+
+* fix windows package errors ([e0fd3d1](https://github.com/jensvogt/awsmock/commit/e0fd3d18d41a551cbfc9584f2718b32e5ee97a6b))
+* fix windows package errors ([06eed96](https://github.com/jensvogt/awsmock/commit/06eed966118d81b4b3432b7ea961708ec2d43b6a))
+* fix windows package errors ([d2abfa9](https://github.com/jensvogt/awsmock/commit/d2abfa989c79023b36ddb7d90f948607eda86cbe))
+* fix windows package errors ([14d31fd](https://github.com/jensvogt/awsmock/commit/14d31fdd1b43c00721a49a268af52642a8c336d6))
+* fix windows vcpkg errors ([bc2cd01](https://github.com/jensvogt/awsmock/commit/bc2cd017df434fb08f8291e983dc2f0683fd12b1))
+
 ## [1.9.110](https://github.com/jensvogt/awsmock/compare/v1.9.109...v1.9.110) (2025-12-11)
 
 
