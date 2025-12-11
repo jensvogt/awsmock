@@ -418,14 +418,12 @@ namespace AwsMock::Service {
     Dto::Docker::ListStatsResponse ContainerService::ListContainerStats(const Dto::Docker::ListStatsRequest &request) const {
         Dto::Docker::ListStatsResponse response;
         for (const auto &containerId: request.containerIds) {
-            auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
+            auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false&one-shot=true");
             if (statusCode != http::status::ok) {
                 log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
                 return {};
             }
-            log_info << "containerId: " << body;
-            Dto::Docker::ContainerStat containerStat;
-            containerStat.FromJson(body);
+            Dto::Docker::ContainerStat containerStat = containerStat.FromJson(body);
             response.containerStats.emplace_back(containerStat);
         }
         return response;
@@ -504,12 +502,12 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void ContainerService::StartDockerContainer(const std::string &containerId, const std::string &containerName) const {
+    void ContainerService::StartContainer(const std::string &containerId) const {
         if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
-            log_warning << "Start container failed, name: " << containerName << ", id: " << containerId << ", statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
+            log_warning << "Start container failed, id: " << containerId << ", statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
-        log_debug << "Docker container started, name: " << containerName << ", id: " << containerId;
+        log_debug << "Docker container started, id: " << containerId;
     }
 
     bool ContainerService::IsContainerRunning(const std::string &containerId) const {

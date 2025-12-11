@@ -1,10 +1,4 @@
 
-#include "awsmock/core/exception/BadRequestException.h"
-#include "awsmock/core/exception/NotFoundException.h"
-#include "awsmock/dto/container/ListContainerRequest.h"
-#include "awsmock/dto/container/ListStatsRequest.h"
-
-
 #include <awsmock/service/container/ContainerHandler.h>
 
 namespace AwsMock::Service {
@@ -16,6 +10,28 @@ namespace AwsMock::Service {
 
         try {
             switch (clientCommand.command) {
+
+                case Dto::Common::ContainerCommandType::START_CONTAINER: {
+                    Dto::Docker::StartContainerRequest containerRequest = Dto::Docker::StartContainerRequest::FromJson(clientCommand);
+                    _containerService.StartContainer(containerRequest.containerId);
+                    log_info << "Start container, containerId: " << containerRequest.containerId;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ContainerCommandType::STOP_CONTAINER: {
+                    Dto::Docker::StopContainerRequest containerRequest = Dto::Docker::StopContainerRequest::FromJson(clientCommand);
+                    _containerService.StopContainer(containerRequest.containerId);
+                    log_info << "Stop container, containerId: " << containerRequest.containerId;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ContainerCommandType::KILL_CONTAINER: {
+                    Dto::Docker::KillContainerRequest containerRequest = Dto::Docker::KillContainerRequest::FromJson(clientCommand);
+                    _containerService.KillContainer(containerRequest.containerId);
+                    log_info << "Kill container, containerId: " << containerRequest.containerId;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::ContainerCommandType::LIST_CONTAINERS: {
                     Dto::Docker::ListContainerRequest containerRequest = Dto::Docker::ListContainerRequest::FromJson(clientCommand);
                     Dto::Docker::ListContainerResponse serviceResponse = _containerService.ListContainers();

@@ -47,7 +47,7 @@ namespace AwsMock::Service {
 
         // Start the docker container, in case it is not already running.
         if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
-            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.GetContainerName());
+            ContainerService::instance().StartContainer(inspectContainerResponse.id);
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             log_info << "Application docker container started, name: " << applicationEntity.name << ", containerId: " << Core::StringUtils::Continuation(inspectContainerResponse.id, 16);
         }
@@ -101,7 +101,7 @@ namespace AwsMock::Service {
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
-        log_info << "Finished creating docker image, name: " << applicationEntity.name <<":" << dockerTag << ", size: " << applicationEntity.imageSize;
+        log_info << "Finished creating docker image, name: " << applicationEntity.name << ":" << dockerTag << ", size: " << applicationEntity.imageSize;
     }
 
     void ApplicationCreator::CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, const std::string &dockerTag) {

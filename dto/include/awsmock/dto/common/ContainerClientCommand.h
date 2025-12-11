@@ -9,8 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -22,14 +22,20 @@ namespace AwsMock::Dto::Common {
      */
     enum class ContainerCommandType {
         LIST_CONTAINERS,
+        START_CONTAINER,
+        STOP_CONTAINER,
+        KILL_CONTAINER,
         LIST_CONTAINER_STATS,
         UNKNOWN
     };
 
     static std::map<ContainerCommandType, std::string> ContainerCommandTypeNames{
-        {ContainerCommandType::LIST_CONTAINERS, "list-containers"},
-        {ContainerCommandType::LIST_CONTAINER_STATS, "list-container-stats"},
-        {ContainerCommandType::UNKNOWN, "unknown"},
+            {ContainerCommandType::LIST_CONTAINERS, "list-containers"},
+            {ContainerCommandType::START_CONTAINER, "start-container"},
+            {ContainerCommandType::STOP_CONTAINER, "stop-container"},
+            {ContainerCommandType::KILL_CONTAINER, "kill-container"},
+            {ContainerCommandType::LIST_CONTAINER_STATS, "list-container-stats"},
+            {ContainerCommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string ContainerCommandTypeToString(const ContainerCommandType &commandType) {
@@ -89,6 +95,6 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const ContainerClientCommand &i);
     };
-} // namespace AwsMock::Dto::Common
+}// namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_CONTAINER_CLIENT_COMMAND_H

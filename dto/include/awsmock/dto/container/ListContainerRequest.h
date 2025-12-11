@@ -34,6 +34,11 @@ namespace AwsMock::Dto::Docker {
          */
         std::vector<std::string> names;
 
+        /**
+         * Prefix
+         */
+        std::string prefix;
+
       private:
 
         friend ListContainerRequest tag_invoke(boost::json::value_to_tag<ListContainerRequest>, boost::json::value const &v) {
