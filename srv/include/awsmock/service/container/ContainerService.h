@@ -34,12 +34,15 @@
 #include <awsmock/dto/container/CreateNetworkRequest.h>
 #include <awsmock/dto/container/CreateNetworkResponse.h>
 #include <awsmock/dto/container/InspectContainerResponse.h>
+#include <awsmock/dto/container/KillContainerRequest.h>
 #include <awsmock/dto/container/ListContainerResponse.h>
 #include <awsmock/dto/container/ListImageResponse.h>
 #include <awsmock/dto/container/ListNetworkResponse.h>
 #include <awsmock/dto/container/ListStatsRequest.h>
 #include <awsmock/dto/container/ListStatsResponse.h>
 #include <awsmock/dto/container/PruneContainerResponse.h>
+#include <awsmock/dto/container/StartContainerRequest.h>
+#include <awsmock/dto/container/StopContainerRequest.h>
 #include <awsmock/dto/container/VersionResponse.h>
 #include <awsmock/dto/container/model/ContainerStat.h>
 
@@ -377,9 +380,8 @@ namespace AwsMock::Service {
          * @brief Start the container
          *
          * @param containerId container ID
-         * @param containerName name of the container
          */
-        void StartDockerContainer(const std::string &containerId, const std::string &containerName) const;
+        void StartContainer(const std::string &containerId) const;
 
         /**
          * @brief Restart the container

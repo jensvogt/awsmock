@@ -91,10 +91,10 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ContainerStat const &obj) {
             jv = {
-                    {"id", boost::json::value_from(obj.containerId)},
-                    {"name", boost::json::value_from(obj.name)},
-                    {"os_type", boost::json::value_from(obj.osType)},
-                    {"num_procs", boost::json::value_from(obj.numProcs)},
+                    {"id", obj.containerId},
+                    {"name", obj.name},
+                    {"os_type", obj.osType},
+                    {"num_procs", obj.numProcs},
                     {"memory_stats", boost::json::value_from(obj.memoryStats)},
                     {"cpu_stats", boost::json::value_from(obj.cpuStats)},
                     {"precpu_stats", boost::json::value_from(obj.preCpuStats)},

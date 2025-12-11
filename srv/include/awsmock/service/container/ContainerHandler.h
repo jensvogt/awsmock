@@ -5,19 +5,17 @@
 #ifndef AWSMOCK_SERVICE_CONTAINER_HANDLER_H
 #define AWSMOCK_SERVICE_CONTAINER_HANDLER_H
 
-// Boost includes
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/exception/BadRequestException.h>
+#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/ContainerClientCommand.h>
+#include <awsmock/dto/container/ListContainerRequest.h>
+#include <awsmock/dto/container/ListStatsRequest.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
-
-    namespace http = boost::beast::http;
-    namespace ip = boost::asio::ip;
 
     /**
      * @brief Container HTTP handler
