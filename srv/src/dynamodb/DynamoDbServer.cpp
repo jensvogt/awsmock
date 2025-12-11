@@ -85,7 +85,7 @@ namespace AwsMock::Service {
 
         // Start the docker container, in case it is not already running.
         if (const Dto::Docker::Container container = _containerService.GetContainerByName(_containerName); !container.state.running) {
-            _containerService.StartDockerContainer(container.id, _containerName);
+            _containerService.StartContainer(container.id);
             _containerService.WaitForContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
