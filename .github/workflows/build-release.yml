@@ -175,7 +175,7 @@ jobs:
           Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
-          Copy-Item -Path 'vcpkg\installed\x64-windows\bin\*.dll' -Destination '${{ env.PACKAGE_DIR }}\bin'
+          Copy-Item -Path '${{ env.BUILD_DIR }}\vcpkg_installed\x64-windows\bin\*.dll' -Destination '${{ env.PACKAGE_DIR }}\bin'
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
