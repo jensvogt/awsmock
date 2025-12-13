@@ -290,7 +290,7 @@ namespace AwsMock::Service {
          * @return CreateContainerResponse
          */
         [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const;
-        Dto::Docker::ListStatsResponse ListContainerStats(const Dto::Docker::ListStatsRequest &request) const;
+        Dto::Docker::ListStatsResponse ListContainerStats() const;
 
         /**
          * @brief Returns a container by name/tags.

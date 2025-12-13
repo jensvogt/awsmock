@@ -119,6 +119,7 @@
         "monitoring-period": 300,
         "directories": [
           "incoming/mix",
+          "incoming/split",
           "feedback"
         ],
         "ftp": {
