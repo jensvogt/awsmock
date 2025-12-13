@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.112](https://github.com/jensvogt/awsmock/compare/1.9.111...v1.9.112) (2025-12-13)
+
+
+### Bug Fixes
+
+* add docker stats pages ([97bdb9c](https://github.com/jensvogt/awsmock/commit/97bdb9c005a12630f89ecc3149f1ba49ac1f30d6))
+* add docker stats pages ([bf83389](https://github.com/jensvogt/awsmock/commit/bf83389355ad666073c9864a36bc7910fcd9876b))
+* fix windows package errors ([fdf6975](https://github.com/jensvogt/awsmock/commit/fdf6975214b291eab8db874255124336ecff24dd))
+* fix windows package errors ([0a72c59](https://github.com/jensvogt/awsmock/commit/0a72c5951fa6554303680973ebd94654710c55e4))
+* fix windows package errors ([61bde07](https://github.com/jensvogt/awsmock/commit/61bde07e7ef1a8606059a8986351da884f270d53))
+
 ## [1.9.111](https://github.com/jensvogt/awsmock/compare/v1.9.110...v1.9.111) (2025-12-11)
 
 
