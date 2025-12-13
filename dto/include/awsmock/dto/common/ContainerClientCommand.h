@@ -25,6 +25,7 @@ namespace AwsMock::Dto::Common {
         START_CONTAINER,
         STOP_CONTAINER,
         KILL_CONTAINER,
+        RESTART_CONTAINER,
         LIST_CONTAINER_STATS,
         UNKNOWN
     };
@@ -34,6 +35,7 @@ namespace AwsMock::Dto::Common {
             {ContainerCommandType::START_CONTAINER, "start-container"},
             {ContainerCommandType::STOP_CONTAINER, "stop-container"},
             {ContainerCommandType::KILL_CONTAINER, "kill-container"},
+            {ContainerCommandType::RESTART_CONTAINER, "restart-container"},
             {ContainerCommandType::LIST_CONTAINER_STATS, "list-container-stats"},
             {ContainerCommandType::UNKNOWN, "unknown"},
     };

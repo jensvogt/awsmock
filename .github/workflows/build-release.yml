@@ -43,7 +43,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
@@ -194,7 +194,7 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          name: installer-windows
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           overwrite: true
 
@@ -365,7 +365,7 @@ jobs:
       - name: Upload macOS ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+          name: installer-macos
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
 
   build-linux-deb:
@@ -557,7 +557,7 @@ jobs:
       - name: Upload .deb
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
+          name: deb-package-linux
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
           overwrite: true
 
@@ -744,7 +744,7 @@ jobs:
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
+          name: rpm-package-linux
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           overwrite: true
 
@@ -793,38 +793,38 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      #      - name: Download Windows installer
-      #        uses: actions/download-artifact@v4
-      #        with:
-      #          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-      #          path: artifacts/windows
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4
+        with:
+          name: installer-windows
+          path: artifacts/windows
 
       - name: Download macOS installer
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+          name: installer-macos
           path: artifacts/macos
 
       - name: Download Linux Debian package
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
+          name: deb-package-linux
           path: artifacts/linux
 
       - name: Download Linux RPM package
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
+          name: rpm-package-linux
           path: artifacts/linux
 
       - name: Create GitHub Release (attach installers)
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            #            artifacts/windows/*.zip
-                   artifacts/macos/*.tgz
-                   artifacts/linux/*.deb
-                   artifacts/linux/*.rpm
+            artifacts/windows/*.zip
+            artifacts/macos/*.tgz
+            artifacts/linux/*.deb
+            artifacts/linux/*.rpm
           name: Release ${{ env.SEMVER }}
           tag_name: ${{ env.SEMVER }}
           body: "Automated release for ${{ env.SEMVER }}"
@@ -856,8 +856,10 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-          cp ./artifacts/awsmock-${{ env.SEMVER }}-amd64.deb/awsmock-${{ env.SEMVER }}-amd64.deb public/ || true
-          cp ./artifacts/awsmock-${{ env.SEMVER }}-1.x86_64.rpm/awsmock-${{ env.SEMVER }}-1.x86_64.rpm public/ || true
+          cp ./artifacts/installer-windows/*.zip public/ || true
+          cp ./artifacts/installer-macos/.tgz public/ || true
+          cp ./artifacts/deb-package-linux/.deb public/ || true
+          cp ./artifacts/rpm-package-linux/.rpm public/ || true
           cp .github/pages/index.html public/index.html
 
       - name: Generate files.json
