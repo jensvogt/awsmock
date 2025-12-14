@@ -120,6 +120,11 @@ namespace AwsMock::Database::Entity::S3 {
         std::vector<LambdaNotification> lambdaNotifications;
 
         /**
+         * Default metadata
+         */
+        std::map<std::string, std::string> defaultMetadata;
+
+        /**
          * Bucket versioning state
          */
         BucketVersionStatus versionStatus = DISABLED;
