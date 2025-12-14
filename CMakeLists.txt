@@ -12,6 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 if (WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    set(CMAKE_USE_WIN32_THREADS_INIT ON)
     add_definitions(-D_WIN32_WINNT=0x0A00)
     add_compile_options(/MP8 /FS "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MT>" "$<$<CONFIG:DEBUG>:/MTd>"
             /D "_WIN32" "$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)

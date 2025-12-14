@@ -24,20 +24,22 @@ namespace AwsMock::Dto::Common {
         LIST_CONTAINERS,
         START_CONTAINER,
         STOP_CONTAINER,
-        KILL_CONTAINER,
         RESTART_CONTAINER,
+        KILL_CONTAINER,
         LIST_CONTAINER_STATS,
+        DELETE_CONTAINER,
         UNKNOWN
     };
 
     static std::map<ContainerCommandType, std::string> ContainerCommandTypeNames{
-            {ContainerCommandType::LIST_CONTAINERS, "list-containers"},
-            {ContainerCommandType::START_CONTAINER, "start-container"},
-            {ContainerCommandType::STOP_CONTAINER, "stop-container"},
-            {ContainerCommandType::KILL_CONTAINER, "kill-container"},
-            {ContainerCommandType::RESTART_CONTAINER, "restart-container"},
-            {ContainerCommandType::LIST_CONTAINER_STATS, "list-container-stats"},
-            {ContainerCommandType::UNKNOWN, "unknown"},
+        {ContainerCommandType::LIST_CONTAINERS, "list-containers"},
+        {ContainerCommandType::START_CONTAINER, "start-container"},
+        {ContainerCommandType::STOP_CONTAINER, "stop-container"},
+        {ContainerCommandType::RESTART_CONTAINER, "restart-container"},
+        {ContainerCommandType::KILL_CONTAINER, "kill-container"},
+        {ContainerCommandType::LIST_CONTAINER_STATS, "list-container-stats"},
+        {ContainerCommandType::DELETE_CONTAINER, "delete-container"},
+        {ContainerCommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string ContainerCommandTypeToString(const ContainerCommandType &commandType) {
@@ -97,6 +99,6 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const ContainerClientCommand &i);
     };
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_CONTAINER_CLIENT_COMMAND_H

@@ -43,12 +43,12 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
-      VCPKG_DEFAULT_TRIPLET: x64-windows
+      VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -154,9 +154,9 @@ jobs:
       - name: Create package structure
         shell: pwsh
         run: |
-          New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/log" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\bin" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\etc" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\log" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
@@ -176,7 +176,6 @@ jobs:
           Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
-          Copy-Item -Path '${{ env.BUILD_DIR }}\vcpkg_installed\x64-windows\bin\*.dll' -Destination '${{ env.PACKAGE_DIR }}\bin'
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
@@ -194,7 +193,7 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: installer-windows
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           overwrite: true
 
@@ -365,7 +364,7 @@ jobs:
       - name: Upload macOS ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: installer-macos
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
 
   build-linux-deb:
@@ -557,7 +556,7 @@ jobs:
       - name: Upload .deb
         uses: actions/upload-artifact@v4
         with:
-          name: deb-package-linux
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
           overwrite: true
 
@@ -744,7 +743,7 @@ jobs:
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
         with:
-          name: rpm-package-linux
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           overwrite: true
 
@@ -783,7 +782,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos ]
+    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
@@ -796,25 +795,25 @@ jobs:
       - name: Download Windows installer
         uses: actions/download-artifact@v4
         with:
-          name: installer-windows
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           path: artifacts/windows
 
       - name: Download macOS installer
         uses: actions/download-artifact@v4
         with:
-          name: installer-macos
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
           path: artifacts/macos
 
       - name: Download Linux Debian package
         uses: actions/download-artifact@v4
         with:
-          name: deb-package-linux
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
           path: artifacts/linux
 
       - name: Download Linux RPM package
         uses: actions/download-artifact@v4
         with:
-          name: rpm-package-linux
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           path: artifacts/linux
 
       - name: Create GitHub Release (attach installers)
@@ -856,10 +855,8 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-          cp ./artifacts/installer-windows/*.zip public/ || true
-          cp ./artifacts/installer-macos/.tgz public/ || true
-          cp ./artifacts/deb-package-linux/.deb public/ || true
-          cp ./artifacts/rpm-package-linux/.rpm public/ || true
+          cp ./artifacts/awsmock-${{ env.SEMVER }}-amd64.deb/awsmock-${{ env.SEMVER }}-amd64.deb public/ || true
+          cp ./artifacts/awsmock-${{ env.SEMVER }}-1.x86_64.rpm/awsmock-${{ env.SEMVER }}-1.x86_64.rpm public/ || true
           cp .github/pages/index.html public/index.html
 
       - name: Generate files.json
