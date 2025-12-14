@@ -48,7 +48,7 @@ jobs:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
-      VCPKG_DEFAULT_TRIPLET: x64-windows
+      VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -154,9 +154,9 @@ jobs:
       - name: Create package structure
         shell: pwsh
         run: |
-          New-Item -Path "${{ env.PACKAGE_DIR }}/bin" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/etc" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}/log" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\bin" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\etc" -ItemType Directory
+          New-Item -Path "${{ env.PACKAGE_DIR }}\log" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
           New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
@@ -176,7 +176,6 @@ jobs:
           Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
           Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
-          Copy-Item -Path '${{ env.BUILD_DIR }}\vcpkg_installed\x64-windows\bin\*.dll' -Destination '${{ env.PACKAGE_DIR }}\bin'
 
       - name: Create ZIP archive (PowerShell)
         shell: pwsh
@@ -783,7 +782,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos ]
+    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
@@ -793,11 +792,11 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      #      - name: Download Windows installer
-      #        uses: actions/download-artifact@v4
-      #        with:
-      #          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-      #          path: artifacts/windows
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          path: artifacts/windows
 
       - name: Download macOS installer
         uses: actions/download-artifact@v4
@@ -821,10 +820,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            #            artifacts/windows/*.zip
-                   artifacts/macos/*.tgz
-                   artifacts/linux/*.deb
-                   artifacts/linux/*.rpm
+            artifacts/windows/*.zip
+            artifacts/macos/*.tgz
+            artifacts/linux/*.deb
+            artifacts/linux/*.rpm
           name: Release ${{ env.SEMVER }}
           tag_name: ${{ env.SEMVER }}
           body: "Automated release for ${{ env.SEMVER }}"
