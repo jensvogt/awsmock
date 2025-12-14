@@ -593,9 +593,9 @@ namespace AwsMock::Service {
                     Dto::S3::UpdateBucketRequest s3Request = Dto::S3::UpdateBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
 
                     // Get object versions
-                    //Dto::S3::UpdateBucketResponse s3Response = _s3Service.UpdateBucket(s3Request);
+                    _s3Service.UpdateBucket(s3Request);
 
-                    //log_info << "Update bucket, name: " << bucket.bucketName;
+                    log_info << "Update bucket, name: " << s3Request.bucket;
                     return SendResponse(request, http::status::ok, {});
                 }
 
@@ -653,10 +653,10 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::ADD_BUCKET_COUNTER: {
 
                     Dto::S3::CreateBucketRequest s3Request = Dto::S3::CreateBucketRequest::FromJson(clientCommand);
-                    Dto::S3::CreateBucketResponse s3Response=_s3Service.CreateBucket(s3Request);
+                    Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
                     log_trace << "Bucket added, bucketName: " << s3Request.name;
 
-                    return SendResponse(request, http::status::ok,s3Response.ToJson());
+                    return SendResponse(request, http::status::ok, s3Response.ToJson());
                 }
 
                 case Dto::Common::S3CommandType::DELETE_ALL_OBJECTS: {
@@ -679,7 +679,7 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
-                    case Dto::Common::S3CommandType::UNKNOWN: {
+                case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Unknown method";
                     return SendResponse(request, http::status::bad_request, "Unknown method");
                 }

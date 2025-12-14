@@ -32,6 +32,14 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::ContainerCommandType::RESTART_CONTAINER: {
+                    Dto::Docker::KillContainerRequest containerRequest = Dto::Docker::KillContainerRequest::FromJson(clientCommand);
+                    _containerService.KillContainer(containerRequest.containerId);
+                    _containerService.StartContainer(containerRequest.containerId);
+                    log_info << "Restart container, containerId: " << containerRequest.containerId;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::ContainerCommandType::LIST_CONTAINERS: {
                     Dto::Docker::ListContainerRequest containerRequest = Dto::Docker::ListContainerRequest::FromJson(clientCommand);
                     Dto::Docker::ListContainerResponse serviceResponse = _containerService.ListContainers();
@@ -40,8 +48,7 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::ContainerCommandType::LIST_CONTAINER_STATS: {
-                    Dto::Docker::ListStatsRequest containerRequest = Dto::Docker::ListStatsRequest::FromJson(clientCommand);
-                    Dto::Docker::ListStatsResponse serviceResponse = _containerService.ListContainerStats(containerRequest);
+                    Dto::Docker::ListStatsResponse serviceResponse = _containerService.ListContainerStats();
                     log_info << "List container stats, count: " << serviceResponse.containerStats.size();
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }

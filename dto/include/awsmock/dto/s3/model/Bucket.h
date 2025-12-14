@@ -74,6 +74,11 @@ namespace AwsMock::Dto::S3 {
         std::vector<LambdaConfiguration> lambdaConfigurations;
 
         /**
+         * Default metadata
+         */
+        std::map<std::string, std::string> defaultMetadata;
+
+        /**
          * Create timestamp
          */
         system_clock::time_point created;
@@ -93,8 +98,11 @@ namespace AwsMock::Dto::S3 {
             r.keys = Core::Json::GetLongValue(v, "Keys");
             r.size = Core::Json::GetLongValue(v, "Size");
             r.versionStatus = Core::Json::GetStringValue(v, "VersionStatus");
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
-            r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
+            r.created = Core::Json::GetDatetimeValue(v, "Created");
+            r.modified = Core::Json::GetDatetimeValue(v, "Modified");
+            if (Core::Json::AttributeExists(v, "defaultMetadata")) {
+                r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("defaultMetadata"));
+            }
             return r;
         }
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Bucket const &obj) {
@@ -109,6 +117,7 @@ namespace AwsMock::Dto::S3 {
                     {"queueConfigurations", boost::json::value_from(obj.queueConfigurations)},
                     {"topicConfigurations", boost::json::value_from(obj.topicConfigurations)},
                     {"lambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
+                    {"defaultMetadata", boost::json::value_from(obj.defaultMetadata)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

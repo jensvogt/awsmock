@@ -44,6 +44,11 @@ namespace AwsMock::Dto::Docker {
         std::string osType;
 
         /**
+         * The state of this container (e.g. Exited)
+         */
+        State state;
+
+        /**
          * Number of processes
          */
         int numProcs;
@@ -86,6 +91,9 @@ namespace AwsMock::Dto::Docker {
             r.preCpuStats = boost::json::value_to<CpuStat>(v.at("precpu_stats"));
             r.read = Core::Json::GetDatetimeValue(v, "read");
             r.preRead = Core::Json::GetDatetimeValue(v, "preread");
+            if (Core::Json::AttributeExists(v, "state")) {
+                r.state = boost::json::value_to<State>(v.at("state"));
+            }
             return r;
         }
 
@@ -100,6 +108,7 @@ namespace AwsMock::Dto::Docker {
                     {"precpu_stats", boost::json::value_from(obj.preCpuStats)},
                     {"read", Core::DateTimeUtils::ToISO8601(obj.read)},
                     {"preread", Core::DateTimeUtils::ToISO8601(obj.preRead)},
+                    {"state", boost::json::value_from(obj.state)},
             };
         }
     };

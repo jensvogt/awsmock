@@ -415,15 +415,18 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::Docker::ListStatsResponse ContainerService::ListContainerStats(const Dto::Docker::ListStatsRequest &request) const {
+    Dto::Docker::ListStatsResponse ContainerService::ListContainerStats() const {
         Dto::Docker::ListStatsResponse response;
-        for (const auto &containerId: request.containerIds) {
-            auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false&one-shot=true");
+        for (const Dto::Docker::ListContainerResponse listResponse = ListContainers(); const auto &container: listResponse.containerList) {
+            auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + container.id + "/stats?stream=false&one-shot=true");
             if (statusCode != http::status::ok) {
                 log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
                 return {};
             }
             Dto::Docker::ContainerStat containerStat = containerStat.FromJson(body);
+            containerStat.containerId = container.id;
+            containerStat.state = container.state;
+            containerStat.name = container.GetContainerName();
             response.containerStats.emplace_back(containerStat);
         }
         return response;

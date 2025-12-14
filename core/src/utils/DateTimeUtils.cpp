@@ -39,7 +39,7 @@ namespace AwsMock::Core {
         // z: ISO 8601 offset from UTC in timezone (1 minute=1, 1 hour=100). If timezone cannot be determined, no characters
         strptime(dateString.c_str(), "%FT%T", &t);
         t.tm_hour = t.tm_hour + 1;
-        return std::chrono::system_clock::from_time_t(mktime(&t));
+        return system_clock::from_time_t(mktime(&t));
     }
 
     system_clock::time_point DateTimeUtils::FromISO8601UTC(const std::string &dateString) {
