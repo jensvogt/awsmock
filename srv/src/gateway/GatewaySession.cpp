@@ -5,9 +5,7 @@
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
-
     GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
-
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
         _bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
@@ -24,7 +22,6 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoRead() {
-
         // Construct a new parser for each message
         _parser.emplace();
         _buffer.clear();
@@ -40,42 +37,41 @@ namespace AwsMock::Service {
         http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
-void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
-    boost::ignore_unused(bytes_transferred);
+    void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
+        boost::ignore_unused(bytes_transferred);
 
-    if (ec == http::error::end_of_stream) {
-        return DoShutdown();
+        if (ec == http::error::end_of_stream) {
+            return DoShutdown();
+        }
+        if (ec) {
+            log_error << "Read error: " << ec.message();
+            return;
+        }
+
+        boost::beast::error_code ev;
+
+        // Read request into _parser
+        boost::beast::http::read(_stream, _buffer, *_parser, ev);
+        if (ev) {
+            log_error << "Read failed: " << ev.message();
+            return;
+        }
+
+        // Handle 100-continue
+        if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
+            HandleContinueRequest(_stream, _parser->get());
+        }
+
+        // Handle the request
+        HandleRequest(_parser->release(), _queue);
+
+        // Pipeline next request if possible
+        if (!_queue.is_full()) DoRead();
+
+        log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
-    if (ec) {
-        log_error << "Read error: " << ec.message();
-        return;
-    }
-
-    boost::beast::error_code ev;
-
-    // Read request into _parser
-    boost::beast::http::read(_stream, _buffer, *_parser, ev);
-    if (ev) {
-        log_error << "Read failed: " << ev.message();
-        return;
-    }
-
-    // Handle 100-continue
-    if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
-        HandleContinueRequest(_stream, _parser->get());
-    }
-
-    // Handle the request
-    HandleRequest(_parser->release(), _queue);
-
-    // Pipeline next request if possible
-    if (!_queue.is_full()) DoRead();
-
-    log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
-}
 
     void GatewaySession::QueueWrite(http::message_generator response) {
-
         // Allocate and store the work
         _response_queue.push(std::move(response));
 
@@ -88,7 +84,6 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
     // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
     template<class Body, class Allocator, class Send>
     void GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request, Send &&send) {
-
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -122,7 +117,6 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
 
         std::shared_ptr<AbstractHandler> handler;
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
-
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
             handler = GatewayRouter::GetHandler(target, _ioc);
             if (!handler) {
@@ -131,9 +125,7 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
                 return;
             }
             log_trace << "Handler found, name: " << handler->name();
-
         } else {
-
             // Verify AWS signature
             if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
                 log_warning << "AWS signature could not be verified";
@@ -167,6 +159,7 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
                 }
                 case http::verb::post: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "POST"};
+                    Core::HttpUtils::DumpRequest(request);
                     send(std::move(handler->HandlePostRequest(request, _region, _user)));
                     break;
                 }
@@ -221,7 +214,6 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
     }
 
     void GatewaySession::DoShutdown() {
-
         // Send a TCP shutdown
         boost::beast::error_code ec;
         ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
@@ -229,7 +221,6 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
     }
 
     Core::AuthorizationHeaderKeys GatewaySession::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) {
-
         // Get signing version
         Core::AuthorizationHeaderKeys authKeys = {};
 
@@ -253,9 +244,7 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
             } catch (std::exception &e) {
                 log_error << e.what();
             }
-
         } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
-
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
                 authKeys.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
@@ -267,7 +256,6 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
     }
 
     http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
-
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
@@ -305,5 +293,4 @@ void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t byte
         boost::beast::error_code ec;
         write(_stream, response, ec);
     }
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
