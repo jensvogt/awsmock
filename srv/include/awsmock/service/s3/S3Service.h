@@ -70,6 +70,7 @@
 #include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
 #include <awsmock/dto/s3/internal/TouchObjectRequest.h>
 #include <awsmock/dto/s3/internal/UpdateObjectRequest.h>
+#include <awsmock/dto/s3/internal/UploadObjectCounterRequest.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -86,20 +87,18 @@
 #include <awsmock/service/transfer/TransferService.h>
 
 namespace AwsMock::Service {
-
     /**
      * @brief S3 service.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {};
+        explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {
+        };
 
         /**
          * @brief Checks whether a bucket exists
@@ -330,6 +329,15 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::S3::GetObjectCounterResponse GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const;
 
+        void UploadObjectCounter(const Dto::S3::UploadObjectCounterRequest &request);
+
+        /**
+         * @brief Uploads a S3 object
+         *
+         * @param request S3 upload object counter request
+         */
+        void UploadObjectCounter(const Dto::S3::UploadObjectCounterRequest &request) const;
+
         /**
          * @brief Delete object
          *
@@ -380,8 +388,7 @@ namespace AwsMock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
@@ -557,6 +564,6 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context _ioc;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H

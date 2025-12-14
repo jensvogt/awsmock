@@ -5,7 +5,6 @@
 #include <awsmock/dto/apps/mapper/Mapper.h>
 
 namespace AwsMock::Dto::Apps {
-
     Application Mapper::map(const Database::Entity::Apps::Application &applicationEntity) {
         Application applicationDto;
         applicationDto.region = applicationEntity.region;
@@ -17,6 +16,7 @@ namespace AwsMock::Dto::Apps {
         applicationDto.archive = applicationEntity.archive;
         applicationDto.version = applicationEntity.version;
         applicationDto.imageId = applicationEntity.imageId;
+        applicationDto.imageName = applicationEntity.imageName;
         applicationDto.containerId = applicationEntity.containerId;
         applicationDto.containerName = applicationEntity.containerName;
         applicationDto.status = AppsStatusTypeFromString(applicationEntity.status);
@@ -71,5 +71,4 @@ namespace AwsMock::Dto::Apps {
         }
         return applicationEntities;
     }
-
-}// namespace AwsMock::Dto::Apps
+} // namespace AwsMock::Dto::Apps
