@@ -51,6 +51,13 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ContainerCommandType::DELETE_CONTAINER: {
+                    Dto::Docker::DeleteContainerRequest containerRequest = Dto::Docker::DeleteContainerRequest::FromJson(clientCommand);
+                    _containerService.DeleteContainer(containerRequest.containerId);
+                    log_info << "Delete container, id: " << containerRequest.containerId;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 default:
                     return SendResponse(request, http::status::bad_request, "Unknown action");
             }

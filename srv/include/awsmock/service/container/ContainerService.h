@@ -33,6 +33,7 @@
 #include <awsmock/dto/container/CreateContainerResponse.h>
 #include <awsmock/dto/container/CreateNetworkRequest.h>
 #include <awsmock/dto/container/CreateNetworkResponse.h>
+#include <awsmock/dto/container/DeleteContainerRequest.h>
 #include <awsmock/dto/container/InspectContainerResponse.h>
 #include <awsmock/dto/container/KillContainerRequest.h>
 #include <awsmock/dto/container/ListContainerResponse.h>
@@ -55,7 +56,6 @@
 #define HOST_PORT_MAX 65536
 
 namespace AwsMock::Service {
-
     namespace http = boost::beast::http;
     using namespace std::chrono_literals;
 
@@ -96,9 +96,7 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
-
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -165,7 +163,8 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return file size in bytes
          */
-        [[nodiscard]] std::string BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, long privatePort, const std::map<std::string, std::string> &environment) const;
+        [[nodiscard]] std::string BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, long privatePort,
+                                                        const std::map<std::string, std::string> &environment) const;
 
         /**
          * @brief Build a docker image from a docker file
@@ -290,6 +289,7 @@ namespace AwsMock::Service {
          * @return CreateContainerResponse
          */
         [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const;
+
         Dto::Docker::ListStatsResponse ListContainerStats() const;
 
         /**
@@ -454,8 +454,7 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-      private:
-
+    private:
         /**
          * @brief Write the lambda docker file.
          *
@@ -553,7 +552,6 @@ namespace AwsMock::Service {
          */
         std::shared_ptr<Core::DomainSocket> _domainSocket;
     };
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_DOCKER_SERVICE_H

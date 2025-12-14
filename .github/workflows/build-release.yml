@@ -43,7 +43,7 @@ jobs:
     name: Build & Package (Windows)
     runs-on: windows-latest
     needs: release-please
-    #if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-windows"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
@@ -88,52 +88,52 @@ jobs:
             echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
           }
 
-      - name: Restore Vcpkg Cache
-        id: vcpkg-cache-restore
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-          restore-keys: |
-            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+      #      - name: Restore Vcpkg Cache
+      #        id: vcpkg-cache-restore
+      #        uses: actions/cache/restore@v4
+      #        with:
+      #          path: |
+      #            vcpkg
+      #            vcpkg/installed
+      #            vcpkg/vcpkg_installed
+      #            vcpkg/packages
+      #            vcpkg/buildtrees
+      #            vcpkg/downloads
+      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+      #          restore-keys: |
+      #            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+      #
+      #      - name: Setup vcpkg tool only (lukka/run-vcpkg)
+      #        id: vcpkg-setup
+      #        uses: lukka/run-vcpkg@v11
+      #        with:
+      #          vcpkgJsonGlob: 'vcpkg.json'
+      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      #          runVcpkgInstall: false
+      #          doNotCache: false
 
-      - name: Setup vcpkg tool only (lukka/run-vcpkg)
-        id: vcpkg-setup
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: 'vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: false
-          doNotCache: false
+      #      - name: Run vcpkg install
+      #        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
+      #        id: vcpkg-installation
+      #        uses: lukka/run-vcpkg@v11
+      #        with:
+      #          vcpkgJsonGlob: 'vcpkg.json'
+      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      #          runVcpkgInstall: false
+      #          doNotCache: false
 
-      - name: Run vcpkg install (only on cache miss)
-        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
-        id: vcpkg-installation
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: 'vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-          doNotCache: false
-
-      - name: Save Vcpkg Cache (tool only - Windows)
-        uses: actions/cache/save@v4
-        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+      #      - name: Save Vcpkg Cache
+      #        uses: actions/cache/save@v4
+      #        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
+      #        with:
+      #          path: |
+      #            vcpkg
+      #            vcpkg/installed
+      #            vcpkg/vcpkg_installed
+      #            vcpkg/packages
+      #            vcpkg/buildtrees
+      #            vcpkg/downloads
+      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
 
       - name: Build (Backend)
         shell: cmd

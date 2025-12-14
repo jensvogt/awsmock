@@ -159,7 +159,6 @@ namespace AwsMock::Service {
                 }
                 case http::verb::post: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "POST"};
-                    Core::HttpUtils::DumpRequest(request);
                     send(std::move(handler->HandlePostRequest(request, _region, _user)));
                     break;
                 }

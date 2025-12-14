@@ -18,7 +18,6 @@
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Apps {
-
     using std::chrono::system_clock;
 
     /**
@@ -27,7 +26,6 @@ namespace AwsMock::Dto::Apps {
      * @author jens.vogt\@opitz-consulting.com
      */
     struct Application final : Common::BaseCounter<Application> {
-
         /**
          * Application name
          */
@@ -69,8 +67,12 @@ namespace AwsMock::Dto::Apps {
         std::string imageId;
 
         /**
-         * Application docker container ID
+         * Application docker image name
          */
+        std::string imageName;
+        /**
+                * Application docker container ID
+                */
         std::string containerId;
 
         /**
@@ -128,8 +130,7 @@ namespace AwsMock::Dto::Apps {
          */
         system_clock::time_point modified = system_clock::now();
 
-      private:
-
+    private:
         friend Application tag_invoke(boost::json::value_to_tag<Application>, boost::json::value const &v) {
             Application r;
             r.name = Core::Json::GetStringValue(v, "name");
@@ -140,6 +141,7 @@ namespace AwsMock::Dto::Apps {
             r.archive = Core::Json::GetStringValue(v, "archive");
             r.version = Core::Json::GetStringValue(v, "version");
             r.imageId = Core::Json::GetStringValue(v, "imageId");
+            r.imageName = Core::Json::GetStringValue(v, "imageName");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.containerName = Core::Json::GetStringValue(v, "containerName");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
@@ -152,40 +154,40 @@ namespace AwsMock::Dto::Apps {
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             if (Core::Json::AttributeExists(v, "dependencies")) {
-                r.dependencies = boost::json::value_to<std::vector<std::string>>(v.at("dependencies"));
+                r.dependencies = boost::json::value_to<std::vector<std::string> >(v.at("dependencies"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Application const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"name", obj.name},
-                    {"runtime", AppsRuntimeTypeToString(obj.runtime)},
-                    {"runType", AppsRunTypeToString(obj.runType)},
-                    {"privatePort", obj.privatePort},
-                    {"publicPort", obj.publicPort},
-                    {"archive", obj.archive},
-                    {"version", obj.version},
-                    {"imageId", obj.imageId},
-                    {"containerId", obj.containerId},
-                    {"containerName", obj.containerName},
-                    {"status", AppsStatusTypeToString(obj.status)},
-                    {"enabled", obj.enabled},
-                    {"description", obj.description},
-                    {"dockerFile", obj.dockerFile},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-                    {"environment", boost::json::value_from(obj.environment)},
-                    {"dependencies", boost::json::value_from(obj.dependencies)},
-                    {"tags", boost::json::value_from(obj.tags)},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
+                {"name", obj.name},
+                {"runtime", AppsRuntimeTypeToString(obj.runtime)},
+                {"runType", AppsRunTypeToString(obj.runType)},
+                {"privatePort", obj.privatePort},
+                {"publicPort", obj.publicPort},
+                {"archive", obj.archive},
+                {"version", obj.version},
+                {"imageId", obj.imageId},
+                {"imageName", obj.imageName},
+                {"containerId", obj.containerId},
+                {"containerName", obj.containerName},
+                {"status", AppsStatusTypeToString(obj.status)},
+                {"enabled", obj.enabled},
+                {"description", obj.description},
+                {"dockerFile", obj.dockerFile},
+                {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
+                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                {"environment", boost::json::value_from(obj.environment)},
+                {"dependencies", boost::json::value_from(obj.dependencies)},
+                {"tags", boost::json::value_from(obj.tags)},
             };
         }
     };
-
-}// namespace AwsMock::Dto::Apps
+} // namespace AwsMock::Dto::Apps
 
 #endif// AWSMOCK_DTO_APPS_APPLICATION_H
