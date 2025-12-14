@@ -81,13 +81,13 @@ namespace AwsMock::Service {
         auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
 
         // Check existence
-        CheckBucketExistence(request.bucket.region, request.bucket.bucketName);
+        CheckBucketExistence(request.region, request.bucket.bucketName);
 
         try {
 
             // Mapp DTO to entity
-            Dto::S3::CreateBucketResponse createBucketResponse;
-            Database::Entity::S3::Bucket bucket = Dto::S3::Mapper::map(request.bucket);
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket.bucketName);
+            bucket.defaultMetadata = request.bucket.defaultMetadata;
 
             // Update database
             _database.UpdateBucket(bucket);
@@ -132,7 +132,7 @@ namespace AwsMock::Service {
         CheckBucketExistence(request.region, request.bucketName);
 
         try {
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
+            const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
             log_debug << "Bucket returned, bucket: " << request.bucketName;
 
             return Dto::S3::Mapper::map(request, bucket);
@@ -1154,7 +1154,7 @@ namespace AwsMock::Service {
 
             Dto::S3::GetObjectCounterResponse getObjectCounterResponse;
             auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-            std::string body = Core::FileUtils::ReadFile(dataS3Dir+Core::FileUtils::separator()+object.internalName);
+            std::string body = Core::FileUtils::ReadFile(dataS3Dir + Core::FileUtils::separator() + object.internalName);
 
             Dto::S3::ObjectCounter objectCounter;
             objectCounter.oid = object.oid;

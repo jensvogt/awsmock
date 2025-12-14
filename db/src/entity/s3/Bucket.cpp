@@ -136,6 +136,12 @@ namespace AwsMock::Database::Entity::S3 {
             lambdaNotificationsDoc.append(notification.ToDocument());
         }
 
+        // Lambda notifications
+        auto defaultMetadataDoc = document{};
+        for (const auto &[key, value]: defaultMetadata) {
+            defaultMetadataDoc.append(kvp(key, value));
+        }
+
         view_or_value<view, value> bucketDoc = make_document(
                 kvp("region", region),
                 kvp("name", name),
@@ -148,6 +154,7 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("topicNotifications", topicNotificationsDoc),
                 kvp("lambdaConfigurations", lambdaNotificationsDoc),
                 kvp("encryptionConfiguration", bucketEncryption.ToDocument()),
+                kvp("defaultMetadata", defaultMetadataDoc),
                 kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
@@ -192,6 +199,16 @@ namespace AwsMock::Database::Entity::S3 {
             for (bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 LambdaNotification notification;
                 lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
+            }
+        }
+
+        // Default metadata
+        if (mResult.value().find("defaultMetadata") != mResult.value().end()) {
+            defaultMetadata.clear();
+            for (const view metadataView = mResult.value()["defaultMetadata"].get_document().value; const bsoncxx::document::element &metadataElement: metadataView) {
+                std::string key = bsoncxx::string::to_string(metadataElement.key());
+                std::string value = bsoncxx::string::to_string(metadataView[key].get_string().value);
+                defaultMetadata.emplace(key, value);
             }
         }
     }
