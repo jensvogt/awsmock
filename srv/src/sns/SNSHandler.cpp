@@ -2,19 +2,15 @@
 #include <awsmock/service/sns/SNSHandler.h>
 
 namespace AwsMock::Service {
-
     http::response<http::dynamic_body> SNSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SNS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         try {
-
             Dto::Common::SNSClientCommand clientCommand;
             clientCommand.FromRequest(request, region, user);
 
             switch (clientCommand.command) {
-
                 case Dto::Common::SNSCommandType::CREATE_TOPIC: {
-
                     Dto::SNS::CreateTopicRequest snsRequest;
                     if (Core::StringUtils::Contains(clientCommand.contentType, "x-www-form-urlencoded")) {
                         snsRequest.region = region;
@@ -29,21 +25,18 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_TOPICS: {
-
                     Dto::SNS::ListTopicsResponse snsResponse = _snsService.ListTopics(clientCommand.region);
                     log_info << "List topics, count: " << snsResponse.topics.size();
                     return SendResponse(request, http::status::ok, snsResponse.ToXml());
                 }
 
                 case Dto::Common::SNSCommandType::LIST_TOPIC_ARNS: {
-
                     Dto::SNS::ListTopicArnsResponse snsResponse = _snsService.ListTopicArns(clientCommand.region);
                     log_info << "List topic ARNs";
                     return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
                 case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
-
                     std::string topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
 
                     Dto::SNS::GetTopicAttributesRequest snsRequest;
@@ -56,7 +49,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::GET_TOPIC_DETAILS: {
-
                     Dto::SNS::GetTopicDetailsRequest snsRequest = Dto::SNS::GetTopicDetailsRequest::FromJson(clientCommand);
                     Dto::SNS::GetTopicDetailsResponse snsResponse = _snsService.GetTopicDetails(snsRequest);
 
@@ -65,7 +57,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::PUBLISH: {
-
                     Dto::SNS::PublishRequest snsRequest;
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
@@ -87,7 +78,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::SUBSCRIBE: {
-
                     Dto::SNS::SubscribeRequest snsRequest;
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
@@ -102,7 +92,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::UPDATE_SUBSCRIPTION: {
-
                     Dto::SNS::UpdateSubscriptionRequest snsRequest = Dto::SNS::UpdateSubscriptionRequest::FromJson(clientCommand.payload);
                     Dto::SNS::UpdateSubscriptionResponse snsResponse = _snsService.UpdateSubscription(snsRequest);
 
@@ -111,7 +100,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::UNSUBSCRIBE: {
-
                     std::string subscriptionArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "SubscriptionArn");
                     Dto::SNS::UnsubscribeRequest snsRequest;
                     snsRequest.region = clientCommand.region;
@@ -139,7 +127,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::TAG_RESOURCE: {
-
                     std::string resourceArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "ResourceArn");
                     log_debug << "Resource ARN: " << resourceArn;
 
@@ -163,7 +150,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::UNTAG_RESOURCE: {
-
                     std::string resourceArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "ResourceArn");
                     log_debug << "Resource ARN: " << resourceArn;
 
@@ -186,7 +172,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
-
                     Dto::SNS::PurgeTopicRequest snsRequest = Dto::SNS::PurgeTopicRequest::FromJson(clientCommand.payload);
                     long deleted = _snsService.PurgeTopic(snsRequest);
 
@@ -195,7 +180,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
-
                     boost::asio::post(_ioc, [self = shared_from_this()] {
                         const long purged = self->_snsService.PurgeAllTopics();
                         log_info << "All topic purged, count: " << purged;
@@ -204,7 +188,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
-
                     Dto::SNS::DeleteTopicRequest snsRequest = Dto::SNS::DeleteTopicRequest::FromJson(clientCommand.payload);
                     Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(snsRequest);
                     log_info << "Topic deleted, topicArn: " << snsRequest.topicArn;
@@ -212,7 +195,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_MESSAGES: {
-
                     Dto::SNS::ListMessagesRequest snsRequest = Dto::SNS::ListMessagesRequest::FromJson(clientCommand);
                     Dto::SNS::ListMessagesResponse snsResponse = _snsService.ListMessages(snsRequest);
 
@@ -221,7 +203,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
-
                     Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
                     boost::asio::post(_ioc, [snsRequest, self = shared_from_this()] {
                         self->_snsService.DeleteMessage(snsRequest);
@@ -231,7 +212,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_TOPIC_COUNTERS: {
-
                     Dto::SNS::ListTopicCountersRequest snsRequest = Dto::SNS::ListTopicCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListTopicCountersResponse snsResponse = _snsService.ListTopicCounters(snsRequest);
                     log_trace << "List topic counters, json: " << snsResponse.ToJson();
@@ -239,7 +219,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_MESSAGE_COUNTERS: {
-
                     Dto::SNS::ListMessageCountersRequest snsRequest = Dto::SNS::ListMessageCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListMessageCountersResponse snsResponse = _snsService.ListMessageCounters(snsRequest);
                     log_trace << "List message counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messages.size();
@@ -247,7 +226,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_SUBSCRIPTION_COUNTERS: {
-
                     Dto::SNS::ListSubscriptionCountersRequest snsRequest = Dto::SNS::ListSubscriptionCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListSubscriptionCountersResponse snsResponse = _snsService.ListSubscriptionCounters(snsRequest);
                     log_trace << "List subscriptions counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.subscriptionCounters.size();
@@ -255,15 +233,20 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_ATTRIBUTE_COUNTERS: {
-
                     Dto::SNS::ListAttributeCountersRequest snsRequest = Dto::SNS::ListAttributeCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListAttributeCountersResponse snsResponse = _snsService.ListAttributeCounters(snsRequest);
                     log_trace << "List attributes counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.attributeCounters.size();
                     return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
-                case Dto::Common::SNSCommandType::LIST_TAG_COUNTERS: {
+                case Dto::Common::SNSCommandType::PUBLISH_COUNTER: {
+                    Dto::SNS::PublishRequest snsRequest = Dto::SNS::PublishRequest::FromJson(clientCommand);
+                    Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
+                    log_trace << "List tags counters, topicArn: " << snsRequest.topicArn << ", messageId: " << snsResponse.messageId;
+                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
+                }
 
+                case Dto::Common::SNSCommandType::LIST_TAG_COUNTERS: {
                     Dto::SNS::ListTagCountersRequest snsRequest = Dto::SNS::ListTagCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListTagCountersResponse snsResponse = _snsService.ListTagCounters(snsRequest);
                     log_trace << "List tags counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.tagCounters.size();
@@ -271,7 +254,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::GET_EVENT_SOURCE: {
-
                     Dto::SNS::GetEventSourceRequest snsRequest = Dto::SNS::GetEventSourceRequest::FromJson(clientCommand);
                     Dto::SNS::GetEventSourceResponse snsResponse = _snsService.GetEventSource(snsRequest);
                     log_info << "Get event source, arn: " << snsRequest.eventSourceArn;
@@ -279,7 +261,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::GET_MESSAGE_COUNTERS: {
-
                     Dto::SNS::GetMessageCountersRequest snsRequest = Dto::SNS::GetMessageCountersRequest::FromJson(clientCommand);
                     Dto::SNS::GetMessageCountersResponse snsResponse = _snsService.GetMessageCounters(snsRequest);
                     log_info << "Get message, messageId: " << snsRequest.messageId << ", content: " << snsResponse.ToJson();
@@ -292,7 +273,6 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::bad_request, "Unknown method");
                 }
             }
-
         } catch (std::exception &e) {
             log_error << "Exception, error: " << e.what();
             return SendResponse(request, http::status::internal_server_error, e.what());
@@ -303,13 +283,11 @@ namespace AwsMock::Service {
     }
 
     std::map<std::string, Dto::SNS::MessageAttribute> SNSHandler::GetMessageAttributes(const std::string &payload) {
-
         const int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttributes");
         log_debug << "Got message attribute count: " << attributeCount;
 
         std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes;
         for (int i = 1; i <= attributeCount / 2; i++) {
-
             const std::string attributeName = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Name");
 
             if (const std::string attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue"); !attributeName.empty() && !attributeValue.empty()) {
@@ -322,4 +300,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

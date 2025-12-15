@@ -21,7 +21,6 @@
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
-
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
@@ -56,35 +55,37 @@ namespace AwsMock::Dto::Common {
         UPDATE_SUBSCRIPTION,
         GET_EVENT_SOURCE,
         GET_MESSAGE_COUNTERS,
+        PUBLISH_COUNTER,
         UNKNOWN
     };
 
     static std::map<SNSCommandType, std::string> SNSCommandTypeNames{
-            {SNSCommandType::CREATE_TOPIC, "create-topic"},
-            {SNSCommandType::LIST_TOPICS, "list-topics"},
-            {SNSCommandType::GET_TOPIC_ATTRIBUTES, "get-topic-attributes"},
-            {SNSCommandType::GET_TOPIC_DETAILS, "get-topic-details"},
-            {SNSCommandType::PURGE_TOPIC, "purge-topic"},
-            {SNSCommandType::PURGE_ALL_TOPICS, "purge-all-topics"},
-            {SNSCommandType::PUBLISH, "publish"},
-            {SNSCommandType::SUBSCRIBE, "subscribe"},
-            {SNSCommandType::UNSUBSCRIBE, "unsubscribe"},
-            {SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC, "list-subscriptions-by-topic"},
-            {SNSCommandType::TAG_RESOURCE, "tag-resource"},
-            {SNSCommandType::UNTAG_RESOURCE, "untag-resource"},
-            {SNSCommandType::DELETE_TOPIC, "delete-topic"},
-            {SNSCommandType::LIST_MESSAGES, "list-messages"},
-            {SNSCommandType::DELETE_MESSAGE, "delete-message"},
-            // AwsMock
-            {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
-            {SNSCommandType::LIST_SUBSCRIPTION_COUNTERS, "list-subscription-counters"},
-            {SNSCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
-            {SNSCommandType::LIST_ATTRIBUTE_COUNTERS, "list-attribute-counters"},
-            {SNSCommandType::UPDATE_SUBSCRIPTION, "update-subscription"},
-            {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
-            {SNSCommandType::LIST_TOPIC_ARNS, "list-topic-arns"},
-            {SNSCommandType::GET_EVENT_SOURCE, "get-event-source"},
-            {SNSCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
+        {SNSCommandType::CREATE_TOPIC, "create-topic"},
+        {SNSCommandType::LIST_TOPICS, "list-topics"},
+        {SNSCommandType::GET_TOPIC_ATTRIBUTES, "get-topic-attributes"},
+        {SNSCommandType::GET_TOPIC_DETAILS, "get-topic-details"},
+        {SNSCommandType::PURGE_TOPIC, "purge-topic"},
+        {SNSCommandType::PURGE_ALL_TOPICS, "purge-all-topics"},
+        {SNSCommandType::PUBLISH, "publish"},
+        {SNSCommandType::SUBSCRIBE, "subscribe"},
+        {SNSCommandType::UNSUBSCRIBE, "unsubscribe"},
+        {SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC, "list-subscriptions-by-topic"},
+        {SNSCommandType::TAG_RESOURCE, "tag-resource"},
+        {SNSCommandType::UNTAG_RESOURCE, "untag-resource"},
+        {SNSCommandType::DELETE_TOPIC, "delete-topic"},
+        {SNSCommandType::LIST_MESSAGES, "list-messages"},
+        {SNSCommandType::DELETE_MESSAGE, "delete-message"},
+        // AwsMock
+        {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
+        {SNSCommandType::LIST_SUBSCRIPTION_COUNTERS, "list-subscription-counters"},
+        {SNSCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+        {SNSCommandType::LIST_ATTRIBUTE_COUNTERS, "list-attribute-counters"},
+        {SNSCommandType::UPDATE_SUBSCRIPTION, "update-subscription"},
+        {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
+        {SNSCommandType::LIST_TOPIC_ARNS, "list-topic-arns"},
+        {SNSCommandType::GET_EVENT_SOURCE, "get-event-source"},
+        {SNSCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
+        {SNSCommandType::PUBLISH_COUNTER, "publish-counter"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {
@@ -106,7 +107,6 @@ namespace AwsMock::Dto::Common {
      * @author jens.vogt\@opitz-consulting.com
      */
     struct SNSClientCommand : BaseClientCommand {
-
         /**
          * @brief Client command
          */
@@ -150,7 +150,6 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const SNSClientCommand &i);
     };
-
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_SNS_CLIENT_COMMAND_H
