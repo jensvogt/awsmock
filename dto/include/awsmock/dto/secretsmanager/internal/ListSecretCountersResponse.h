@@ -29,7 +29,7 @@ namespace AwsMock::Dto::SecretsManager {
         friend ListSecretCountersResponse tag_invoke(boost::json::value_to_tag<ListSecretCountersResponse>, boost::json::value const &v) {
             ListSecretCountersResponse r;
             r.total = Core::Json::GetLongValue(v, "total");
-            if (Core::Json::AttributeExists(v, "secretCounters")) {
+            if (Core::Json::AttributeExists(v, "c")) {
                 r.secretCounters = boost::json::value_to<std::vector<SecretCounter>>(v.at("secretCounters"));
             }
             return r;

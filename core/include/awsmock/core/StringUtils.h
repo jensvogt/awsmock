@@ -8,7 +8,7 @@
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #ifndef NOMINMAX
-# define NOMINMAX
+#define NOMINMAX
 #endif
 #include <windows.h>
 #endif
@@ -25,12 +25,12 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/beast/core/string.hpp>
 #include <boost/exception/info.hpp>
+#include <boost/token_functions.hpp>
+#include <boost/tokenizer.hpp>
 #include <boost/url/decode_view.hpp>
 #include <boost/url/encode.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include <boost/token_functions.hpp>
-#include <boost/tokenizer.hpp>
 
 namespace AwsMock::Core {
 
@@ -41,7 +41,7 @@ namespace AwsMock::Core {
      */
     class StringUtils {
 
-    public:
+      public:
 
         /**
          * @brief Generates a random string with the given length.
@@ -163,7 +163,7 @@ namespace AwsMock::Core {
          * @param s string to split
          * @return string having all line endings removed
          */
-        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char> > s);
+        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> s);
 
         /**
          * @brief Strip beginning of string
@@ -366,7 +366,15 @@ namespace AwsMock::Core {
          * @param input input byte array
          * @return hex encoded string
          */
-        static std::string SanitizeUtf8(std::string &input);
+        static std::string SanitizeUtf8(const std::string &input);
+
+        /**
+         * @brief Removes all unprintable characters from the string.
+         *
+         * @param s input string
+         * @return sanitized string
+         */
+        static std::string RemoveUnprintableAscii(std::string &s);
 
         /**
          * @brief Strip any chunk signatures from the input string
@@ -425,7 +433,6 @@ namespace AwsMock::Core {
          */
         static std::string ConvertToNarrowString(const std::wstring &input);
 #endif
-
     };
 
     inline std::string StringUtils::ToLower(const std::string &input) {

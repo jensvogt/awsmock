@@ -17,13 +17,18 @@ namespace AwsMock::Service {
 
         // Get lambda log messages
         log_info << "Getting lambda logs, containerId: " << instance.containerId;
-        const std::string logs = _containerService.GetContainerLogs(instance.containerId, start);
+        std::string logs = _containerService.GetContainerLogs(instance.containerId, start);
 
         // update lambda
         lambda.invocations++;
         lambda.averageRuntime = static_cast<long>(std::ceil((lambda.averageRuntime + runtime) / lambda.invocations));
         _lambdaDatabase.SetInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceIdle);
         _lambdaDatabase.SetLambdaValues(lambda, lambda.invocations, lambda.averageRuntime);
+
+        // Sanitize logs
+        logs = Core::StringUtils::RemoveColorCoding(logs);
+        logs = Core::StringUtils::SanitizeUtf8(logs);
+        logs = Core::StringUtils::RemoveUnprintableAscii(logs);
 
         // Prepare resultSend request to lambda docker container
         Database::Entity::Lambda::LambdaResult lambdaResult;
@@ -34,7 +39,7 @@ namespace AwsMock::Service {
         lambdaResult.lambdaStatus = response.statusCode == http::status::ok ? Database::Entity::Lambda::InstanceSuccess : Database::Entity::Lambda::InstanceFailed;
         lambdaResult.requestBody = payload;
         lambdaResult.responseBody = response.body;
-        lambdaResult.logMessages = Core::StringUtils::RemoveColorCoding(logs);
+        lambdaResult.logMessages = logs;
         lambdaResult.lambdaName = lambda.function;
         lambdaResult.lambdaArn = lambda.arn;
         lambdaResult.duration = runtime;
