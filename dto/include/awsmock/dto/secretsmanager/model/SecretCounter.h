@@ -147,9 +147,11 @@ namespace AwsMock::Dto::SecretsManager {
             r.nextRotatedDate = Core::Json::GetDatetimeValue(v, "nextRotatedDate");
             r.rotationEnabled = Core::Json::GetBoolValue(v, "rotationEnabled");
             r.rotationLambdaARN = Core::Json::GetStringValue(v, "rotationLambdaARN");
-            r.rotationRules = boost::json::value_to<RotationRules>(v.at("rotationRules"));
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
+            if (Core::Json::AttributeExists(v, "rotationRules")) {
+                r.rotationRules = boost::json::value_to<RotationRules>(v.at("rotationRules"));
+            }
             return r;
         }
 
