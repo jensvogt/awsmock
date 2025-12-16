@@ -10,6 +10,7 @@ namespace AwsMock::Dto::SecretsManager {
 
         // Convert to DTO
         GetSecretDetailsResponse response;
+        response.region = secret.region;
         response.secretId = secret.secretId;
         response.secretName = secret.name;
         response.secretArn = secret.arn;

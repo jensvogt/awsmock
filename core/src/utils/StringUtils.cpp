@@ -80,8 +80,8 @@ namespace AwsMock::Core {
 
     bool StringUtils::IsNumeric(const std::string &value) {
         return !value.empty() && std::ranges::find_if(value, [](unsigned char c) {
-            return !std::isdigit(c);
-        }) == value.end();
+                                     return !std::isdigit(c);
+                                 }) == value.end();
     }
 
     bool StringUtils::IsUuid(const std::string &value) {
@@ -187,11 +187,12 @@ namespace AwsMock::Core {
     std::string StringUtils::SubString(const std::string &string, const int beginIndex, const int endIndex) {
         const int size = static_cast<int>(string.size());
         if (beginIndex < 0 || beginIndex > size - 1) return "-1";// Index out of bounds
-        if (endIndex < 0 || endIndex > size - 1) return "-1";// Index out of bounds
-        if (beginIndex > endIndex) return "-1";// Begin index should not be bigger that end.
+        if (endIndex < 0 || endIndex > size - 1) return "-1";    // Index out of bounds
+        if (beginIndex > endIndex) return "-1";                  // Begin index should not be bigger that end.
 
         std::string substr;
-        for (int i = 0; i < size; i++) if (i >= beginIndex && i <= endIndex) substr += (char) string[i];
+        for (int i = 0; i < size; i++)
+            if (i >= beginIndex && i <= endIndex) substr += (char) string[i];
         return substr;
     }
 
@@ -293,6 +294,46 @@ namespace AwsMock::Core {
 
         // Return the result
         return result;
+    }
+
+    std::string StringUtils::SanitizeUtf8(const std::string &input) {
+        std::string output;
+        output.reserve(input.size());
+
+        const auto *s = reinterpret_cast<const unsigned char *>(input.data());
+        size_t i = 0;
+
+        while (i < input.size()) {
+
+            if (const unsigned char c = s[i]; c <= 0x7F) {
+                // ASCII
+                output.push_back(c);
+                i++;
+            } else if ((c & 0xE0) == 0xC0 && i + 1 < input.size() && (s[i + 1] & 0xC0) == 0x80) {
+                output.append(input, i, 2);
+                i += 2;
+            } else if ((c & 0xF0) == 0xE0 && i + 2 < input.size() && (s[i + 1] & 0xC0) == 0x80 && (s[i + 2] & 0xC0) == 0x80) {
+                output.append(input, i, 3);
+                i += 3;
+            } else if ((c & 0xF8) == 0xF0 && i + 3 < input.size() && (s[i + 1] & 0xC0) == 0x80 && (s[i + 2] & 0xC0) == 0x80 && (s[i + 3] & 0xC0) == 0x80) {
+                output.append(input, i, 4);
+                i += 4;
+            } else {
+                // Invalid UTF-8 byte → replace
+                output.append("\xEF\xBF\xBD");// Unicode replacement char �
+                i++;
+            }
+        }
+        return output;
+    }
+
+    std::string StringUtils::RemoveUnprintableAscii(std::string &s) {
+        s.erase(std::remove_if(s.begin(), s.end(),
+                               [](unsigned char c) {
+                                   return !std::isprint(c) && c != '\n' && c != '\t';
+                               }),
+                s.end());
+        return s;
     }
 
 #ifdef _WIN32
