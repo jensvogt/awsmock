@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.116](https://github.com/jensvogt/awsmock/compare/1.9.115...v1.9.116) (2025-12-16)
+
+
+### Bug Fixes
+
+* add secrets manager details dialog ([5ca5f3f](https://github.com/jensvogt/awsmock/commit/5ca5f3f785a1cab4fe0d2deb918770646775e6fa))
+
 ## [1.9.115](https://github.com/jensvogt/awsmock/compare/1.9.114...v1.9.115) (2025-12-16)
 
 
