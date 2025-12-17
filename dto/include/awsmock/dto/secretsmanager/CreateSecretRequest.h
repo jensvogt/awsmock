@@ -77,6 +77,7 @@ namespace AwsMock::Dto::SecretsManager {
             r.clientRequestToken = Core::Json::GetStringValue(v, "ClientRequestToken");
             r.secretString = Core::Json::GetStringValue(v, "SecretString");
             r.secretBinary = Core::Json::GetStringValue(v, "SecretBinary");
+            r.description = Core::Json::GetStringValue(v, "Description");
             r.forceOverwriteReplicaSecret = Core::Json::GetBoolValue(v, "ForceOverwriteReplicaSecret");
             r.kmsKeyId = Core::Json::GetStringValue(v, "KmsKeyId");
             if (Core::Json::AttributeExists(v, "Tags")) {
