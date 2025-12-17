@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.117](https://github.com/jensvogt/awsmock/compare/1.9.116...v1.9.117) (2025-12-17)
+
+
+### Bug Fixes
+
+* bug in dynamodb query processing, and putitem. Added listValues and mapValues. ([52e7871](https://github.com/jensvogt/awsmock/commit/52e7871200871b5a31232892cbebc89139199bf2))
+
 ## [1.9.116](https://github.com/jensvogt/awsmock/compare/1.9.115...v1.9.116) (2025-12-16)
 
 
