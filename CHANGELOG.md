@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.118](https://github.com/jensvogt/awsmock/compare/1.9.117...v1.9.118) (2025-12-18)
+
+
+### Bug Fixes
+
+* fix some minor issues dynamodb query processing ([5212c19](https://github.com/jensvogt/awsmock/commit/5212c19037f7342ca8c428d4156bfcd27fea40fc))
+
 ## [1.9.117](https://github.com/jensvogt/awsmock/compare/1.9.116...v1.9.117) (2025-12-17)
 
 
