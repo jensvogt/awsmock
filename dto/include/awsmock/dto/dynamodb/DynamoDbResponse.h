@@ -9,6 +9,8 @@
 #include <map>
 #include <string>
 
+#include <boost/beast/http.hpp>
+
 namespace AwsMock::Dto::DynamoDb {
 
     /**

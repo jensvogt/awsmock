@@ -34,7 +34,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::ListTableCountersRequest tableRequest = Dto::DynamoDb::ListTableCountersRequest::FromJson(clientCommand.payload);
                     Dto::DynamoDb::ListTableCountersResponse tableResponse = _dynamoDbService.ListTableCounters(tableRequest);
-                    log_debug << "List table counters listed, region: " << tableRequest.region << ", count: " << tableResponse.total;
+                    log_info << "List table counters listed, region: " << tableRequest.region << ", count: " << tableResponse.total;
                     return SendOkResponse(request, tableResponse.ToJson());
                 }
 
@@ -42,14 +42,14 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::GetTableDetailCountersRequest tableRequest = Dto::DynamoDb::GetTableDetailCountersRequest::FromJson(clientCommand.payload);
                     Dto::DynamoDb::GetTableDetailCountersResponse tableResponse = _dynamoDbService.GetTableDetailCounters(tableRequest);
-                    log_debug << "Get table details counters, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
+                    log_info << "Get table details counters, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
                     return SendOkResponse(request, tableResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::LIST_TABLE_ARNS: {
 
                     Dto::DynamoDb::ListTableArnsResponse tableResponse = _dynamoDbService.ListTableArns(region);
-                    log_debug << "List table arns, region: " << region;
+                    log_info << "List table arns, region: " << region;
                     return SendOkResponse(request, tableResponse.ToJson());
                 }
 
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::ListItemCountersRequest itemRequest = Dto::DynamoDb::ListItemCountersRequest::FromJson(clientCommand.payload);
                     Dto::DynamoDb::ListItemCountersResponse itemResponse = _dynamoDbService.ListItemCounters(itemRequest);
-                    log_debug << "Item counters listed, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", count: " << itemResponse.total;
+                    log_info << "Item counters listed, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", count: " << itemResponse.total;
                     return SendOkResponse(request, itemResponse.ToJson());
                 }
 
@@ -73,7 +73,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::DescribeTableRequest tableRequest = Dto::DynamoDb::DescribeTableRequest::FromJson(clientCommand);
                     Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
-                    log_debug << "Describe table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
+                    log_info << "Describe table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
                     return SendOkResponse(request, tableResponse.ToJson());
                 }
 
@@ -81,7 +81,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::DeleteTableRequest tableRequest = Dto::DynamoDb::DeleteTableRequest::FromJson(clientCommand);
                     Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
-                    log_debug << "Delete table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
+                    log_info << "Delete table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
                     return SendOkResponse(request, tableResponse.ToJson());
                 }
 
@@ -89,7 +89,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::GetItemRequest itemRequest = Dto::DynamoDb::GetItemRequest::FromJson(clientCommand);
                     Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
-                    log_debug << "Get item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName;
+                    log_info << "Get item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", feature: " << itemRequest.keys["featureName"].stringValue;
                     return SendOkResponse(request, itemResponse.ToJson());
                 }
 
@@ -97,7 +97,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::PutItemRequest itemRequest = Dto::DynamoDb::PutItemRequest::FromJson(clientCommand);
                     Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
-                    log_debug << "Put item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName;
+                    log_info << "Put item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName;
                     return SendOkResponse(request, itemResponse.ToJson());
                 }
 
@@ -105,7 +105,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::QueryRequest queryRequest = Dto::DynamoDb::QueryRequest::FromJson(clientCommand);
                     Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
-                    log_debug << "Query, region: " << queryRequest.region << ", tableName: " << queryRequest.tableName << ", response: " << queryResponse.ToJson();
+                    log_info << "Query, region: " << queryRequest.region << ", tableName: " << queryRequest.tableName;
                     return SendOkResponse(request, queryResponse.ToJson());
                 }
 
@@ -113,7 +113,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::ScanRequest scanRequest = Dto::DynamoDb::ScanRequest::FromJson(clientCommand);
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
-                    log_debug << "Scan, region: " << scanRequest.region << ", tableName: " << scanRequest.tableName << ", response: " << scanResponse.ToJson();
+                    log_info << "Scan, region: " << scanRequest.region << ", tableName: " << scanRequest.tableName;
                     return SendOkResponse(request, scanResponse.ToJson());
                 }
 
@@ -121,6 +121,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::DeleteItemRequest dynamoDbRequest = Dto::DynamoDb::DeleteItemRequest::FromJson(clientCommand);
                     Dto::DynamoDb::DeleteItemResponse dynamoDbResponse = _dynamoDbService.DeleteItem(dynamoDbRequest);
+                    log_info << "Delete item, region: " << dynamoDbRequest.region << ", tableName: " << dynamoDbRequest.tableName;
                     return SendOkResponse(request, dynamoDbResponse.ToJson());
                 }
 

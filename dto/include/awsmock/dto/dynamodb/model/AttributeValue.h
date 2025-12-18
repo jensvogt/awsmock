@@ -71,6 +71,7 @@ namespace AwsMock::Dto::DynamoDb {
          * Map value
          */
         std::map<std::string, AttributeValue> mapValue;
+
         /**
          * @brief Convert from JSON object.
          *
@@ -91,6 +92,18 @@ namespace AwsMock::Dto::DynamoDb {
                     } else if (ele.key() == "NS") {
                         for (bsoncxx::array::view jsonArray = jsonObject["NS"].get_array().value; const auto &value: jsonArray) {
                             numberSetValue.emplace_back(value.get_string().value);
+                        }
+                    } else if (ele.key() == "L") {
+                        for (bsoncxx::array::view jsonArray = jsonObject["L"].get_array().value; const auto &value: jsonArray) {
+                            AttributeValue a;
+                            a.FromDocument(value.get_document());
+                            listValue.emplace_back(a);
+                        }
+                    } else if (ele.key() == "M") {
+                        for (const auto &k: jsonObject["M"].get_document().value) {
+                            AttributeValue a;
+                            a.FromDocument(jsonObject["M"].get_document().view()[k.get_string()].get_document());
+                            mapValue[std::string(k.get_string().value)] = a;
                         }
                     } else if (ele.key() == "BOOL") {
                         boolValue = std::make_shared<bool>(jsonObject["BOOL"].get_bool().value);

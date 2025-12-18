@@ -149,6 +149,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeTableResponse const &obj) {
+            jv = {};
             boost::json::object tableObject = {
                     {"TableName", obj.tableName},
                     {"TableArn", obj.tableArn},
@@ -162,26 +163,12 @@ namespace AwsMock::Dto::DynamoDb {
                 tableObject["Tags"] = boost::json::value_from(obj.tags);
             }
             if (!obj.keySchemas.empty()) {
-                boost::json::array jvKeySchema;
-                for (const auto &k: obj.keySchemas) {
-                    boost::json::object jvKeySchemaItem;
-                    jvKeySchemaItem["AttributeName"] = k.at("AttributeName");
-                    jvKeySchemaItem["KeyType"] = k.at("KeyType");
-                    jvKeySchema.push_back(std::move(jvKeySchemaItem));
-                }
-                tableObject["KeySchema"] = jvKeySchema;
+                tableObject["KeySchema"] = boost::json::value_from(obj.keySchemas);
             }
             if (!obj.attributes.empty()) {
-                boost::json::array jvAttributeArray;
-                for (const auto &a: obj.attributes) {
-                    boost::json::object jvAttributeItem;
-                    jvAttributeItem["AttributeName"] = a.at("AttributeName");
-                    jvAttributeItem["AttributeType"] = a.at("AttributeType");
-                    jvAttributeArray.push_back(std::move(jvAttributeItem));
-                }
-                tableObject["AttributeDefinitions"] = jvAttributeArray;
+                tableObject["AttributeDefinitions"] = boost::json::value_from(obj.attributes);
             }
-            jv = {{"Table", tableObject}};
+            jv.as_object()["Table"] = tableObject;
         }
     };
 

@@ -46,27 +46,24 @@ namespace AwsMock::Dto::DynamoDb {
     struct GetItemResponse final : Common::BaseCounter<GetItemResponse> {
 
         /**
-         * Original HTTP response body
+         * Attributes
          */
-        Item item;
+        std::map<std::string, AttributeValue> attributes;
 
       private:
 
         friend GetItemResponse tag_invoke(boost::json::value_to_tag<GetItemResponse>, boost::json::value const &v) {
-            GetItemResponse r;
+            GetItemResponse r = {};
             if (Core::Json::AttributeExists(v, "Item")) {
-                r.item = boost::json::value_to<Item>(v.at("Item"));
+                r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("Item"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetItemResponse const &obj) {
-            if (!obj.item.attributes.empty()) {
-                boost::json::object itemJson;
-                for (const auto &[fst, snd]: obj.item.attributes) {
-                    itemJson[fst] = boost::json::value_from(snd);
-                }
-                jv = {{"Item", boost::json::value_from(obj.item.attributes)}};
+            jv = {};
+            if (!obj.attributes.empty()) {
+                jv = {"Item", boost::json::value_from(obj.attributes)};
             }
         }
     };
