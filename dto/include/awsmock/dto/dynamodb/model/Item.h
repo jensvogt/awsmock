@@ -74,20 +74,30 @@ namespace AwsMock::Dto::DynamoDb {
       private:
 
         friend Item tag_invoke(boost::json::value_to_tag<Item>, boost::json::value const &v) {
-            Item out = {};
-            const auto& obj = v.as_object();  // safer if you check type first
+            Item r;
+            r.oid = Core::Json::GetStringValue(v, "oid");
+            r.tableName = Core::Json::GetStringValue(v, "tableName");
+            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.modified = Core::Json::GetDatetimeValue(v, "modified");
 
-            if (const auto it = obj.if_contains("Item")) {
-                // Convert the nested attributes
-                out.attributes = boost::json::value_to<decltype(out.attributes)>(*it);
+            if (Core::Json::AttributeExists(v, "attributes")) {
+                r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "attributes");
             }
-
-            return out;
+            if (Core::Json::AttributeExists(v, "keys")) {
+                r.keys = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "keys");
+            }
+            return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Item const &obj) {
             jv = {
-                    {"Item", boost::json::value_from(obj.attributes)}};
+                    {"oid", obj.oid},
+                    {"tableName", obj.tableName},
+                    {"attributes", boost::json::value_from(obj.attributes)},
+                    {"keys", boost::json::value_from(obj.keys)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
         }
     };
 

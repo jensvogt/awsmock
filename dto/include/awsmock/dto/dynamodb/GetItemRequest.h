@@ -78,8 +78,8 @@ namespace AwsMock::Dto::DynamoDb {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetItemRequest const &obj) {
             jv = {
                     {"TableName", obj.tableName},
-                    {"ConsistentRead", obj.consistentRead},
-                    {"ReturnConsumedCapacity", ReturnConsumedCapacityTypeToString(obj.returnConsumedCapacity)},
+                    //                    {"ConsistentRead", obj.consistentRead},
+                    //                    {"ReturnConsumedCapacity", ReturnConsumedCapacityTypeToString(obj.returnConsumedCapacity)},
                     {"Key", boost::json::value_from(obj.keys)},
             };
             if (!obj.projectionExpression.empty()) {
