@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.120](https://github.com/jensvogt/awsmock/compare/1.9.119...v1.9.120) (2025-12-19)
+
+
+### Bug Fixes
+
+* add SNS add message dialog ([3738dbc](https://github.com/jensvogt/awsmock/commit/3738dbc9d9884305160bfa696af6e4da921cb749))
+* add SNS add message dialog ([3a40b44](https://github.com/jensvogt/awsmock/commit/3a40b44d4b62980f2d43c1ff0a25e0ab7cfc486f))
+
 ## [1.9.119](https://github.com/jensvogt/awsmock/compare/1.9.118...v1.9.119) (2025-12-19)
 
 
