@@ -252,7 +252,7 @@ namespace AwsMock::Service {
                     decryptRequest.keyId = p.kmsKeyArn.substr(p.kmsKeyArn.find_last_of('/') + 1);
                     decryptRequest.ciphertext = p.parameterValue;
                     const Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
-                    p.parameterValue = Core::Crypto::Base64Decode(kmsResponse.plaintext);
+                    p.parameterValue = Core::Crypto::Base64Encode(kmsResponse.plaintext);
                 }
             }
             log_trace << "SSM parameters found: " << parameterEntities.size();

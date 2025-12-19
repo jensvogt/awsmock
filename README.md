@@ -142,6 +142,93 @@ See [AwsMock SystemsManager supported commands](docs/man/awsmocksecretsmanager.1
 
 ## Getting started
 
+### Local Installation
+
+The simplest way to work with awsmock, is to use the docker daemon. Just start the docker image located as docker.io:
+
+```
+docker run jensvogt/awsmock:latest 
+```
+
+Additionally, there is the possitbility to start the awsmock manager locally, not using the docker environment. Docker 
+is still needed as the application and lambdas will be still started as socker container. Follow the instruction below
+to install awsmocj as a Windows, Linuc or MacOS service.
+
+#### Windows
+
+The Windows installation is a simple ZIP file. Unzip it to directory of your choice:
+
+```
+cd C:\Program Files
+mkdir awsmock
+cd awsmock
+unzip awsmock-<version>.zip
+```
+To install awsmock as a service start the ```awsmockmgr.exe``` with the ```--install``` options. It will install awsmock
+as automatically started Windows service. The logs will be written to ```C:\Program Files\awsmock\log\*```. The 
+configuration ```C:\Program Files\awsmock\etc\awsmock.json```
+
+The Angular frontend will be installed in ```C:\Program Files\awsmock\frontend``` and can started using the URL: 
+```http://localhost:4567```. Additionally a Qt based rich interface for Windows, macOS and Linux is available on 
+[https://github.com/jensvogt/awsmock-qt-ui](https://github.com/jensvogt/awsmock-qt-ui).
+
+#### Debian based Linux system
+
+For the Debian installation use the provided ```awsmock-<version>.deb```. Download the Debian package from 
+[http://jensvogt.github.io/awsmock](http://jensvogt.github.io/awsmock), using:
+
+```
+sudo apt install ./awsmock-<version>.deb
+```
+This will install all necessary files to ```/usr/local/awsmock```. Logs will be written to ```/usr/local/awsmock/logs```
+whereas the configuration is located in ```/usr/local/awsmock/etc/awsmock.json```.
+
+The Angular frontend will be installed in ```/usr/local/awsmock/frontend``` and can started using the URL:
+```http://localhost:4567```. Additionally a Qt based rich interface for Windows, macOS and Linux is available on
+[https://github.com/jensvogt/awsmock-qt-ui](https://github.com/jensvogt/awsmock-qt-ui).
+
+#### Redhat based Linux system
+
+For the RPM installation use the provided ```awsmock-<version>.rpm```. Download the RPM package from
+[http://jensvogt.github.io/awsmock](http://jensvogt.github.io/awsmock), using:
+
+```
+sudo apt install ./awsmock-<version>.rpm
+```
+This will install all necessary files to ```/usr/local/awsmock```. Logs will be written to ```/usr/local/awsmock/logs```
+whereas the configuration is located in ```/usr/local/awsmock/etc/awsmock.json```.
+
+The Angular frontend will be installed in ```/usr/local/awsmock/frontend``` and can started using the URL:
+```http://localhost:4567```. Additionally a Qt based rich interface for Windows, macOS and Linux is available on
+[https://github.com/jensvogt/awsmock-qt-ui](https://github.com/jensvogt/awsmock-qt-ui).
+
+#### MacOS
+
+For the MacOS installation use the provided ```awsmock-<version>.tgz``` file. Download the TAR file from
+[http://jensvogt.github.io/awsmock](http://jensvogt.github.io/awsmock), and unpack it in a directory of your choice:
+
+```
+cd $HOME
+tar -xzf awsmock-<version->.tgz
+cd awsmock
+```
+
+This will install all necessary files to ```$HOME/awsmock```. Logs will be written to ```$HOME/awsmock/logs```
+whereas the configuration is located in ```$HOME/awsmock/etc/awsmock.json```. To install the awsmock manager as a MacOS
+service use the provided ```plist``` file in ```$HOME/awsmock/etc/awsmock.plist```. The service can be then started 
+using the usual ```launchctl``` commands:
+
+```
+cd $HOME/awsmock
+cp etc/de.jensvogt.awsmock.plist ~/Library/LaunchAgents
+launchctl load ~/Library/LaunchAgents/de.jensvogt.awsmock.plist
+launchctl start de.jensvogt.awsmock.plist
+```
+
+The Angular frontend will be installed in ```$HOME/awsmock/frontend``` and can started using the URL:
+```http://localhost:4567```. Additionally a Qt based rich interface for Windows, macOS and Linux is available on
+[https://github.com/jensvogt/awsmock-qt-ui](https://github.com/jensvogt/awsmock-qt-ui).
+
 ### Building AwsMock
 
 Building of the AwsMock executables is CMake based. Supported platforms are Linux, MacOS and Windows
@@ -348,14 +435,15 @@ Start the manager as ```awsmockmgr```. The frontend is available at ```http://lo
 In order to compile AwsMock on macOS, install the prerequisites (if not already existing):
 
 ```
-brew install prometheus-cpp
 brew install jwt-cpp
 brew install mongo-cxx-driver
 brew install libarchive
 brew install libmagic
 brew install openssl (v3)
-brew install boost (v1.88)
-// Documentation (optional)
+brew install boost (v1.89)
+```
+To build the man pages use: 
+```
 brew install doxygen 
 brew install pandoc
 brew install graphviz
@@ -364,13 +452,11 @@ brew install graphviz
 Download the backend source code
 
 ```
-
 git clone https://github.com/jensvogt/awsmock
 cd awsmock
 cmake .
 cmake --build . -j 16
 sudo make install
-
 ```
 
 This will compile and install the backend executables into ```/usr/local/awsmock/bin``` and the libraries in
@@ -383,7 +469,6 @@ git clone https://github.com/jensvogt/awsmock-ui
 cd awsmock-ui
 npm install
 npm run build --prod
-
 ```
 
 ### Installing as a macOS services
