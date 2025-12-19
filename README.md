@@ -150,7 +150,7 @@ The simplest way to work with awsmock, is to use the docker daemon. Just start t
 docker run jensvogt/awsmock:latest 
 ```
 
-Additionally, there is the possitbility to start the awsmock manager locally, not using the docker environment. Docker 
+Additionally, there is the possitbility to start the awsmock manager locally, not using the docker environment. Docker
 is still needed as the application and lambdas will be still started as socker container. Follow the instruction below
 to install awsmocj as a Windows, Linuc or MacOS service.
 
@@ -164,22 +164,25 @@ mkdir awsmock
 cd awsmock
 unzip awsmock-<version>.zip
 ```
+
 To install awsmock as a service start the ```awsmockmgr.exe``` with the ```--install``` options. It will install awsmock
-as automatically started Windows service. The logs will be written to ```C:\Program Files\awsmock\log\*```. The 
+as automatically started Windows service. The logs will be written to ```C:\Program Files\awsmock\log\*```. The
 configuration ```C:\Program Files\awsmock\etc\awsmock.json```
 
-The Angular frontend will be installed in ```C:\Program Files\awsmock\frontend``` and can started using the URL: 
-```http://localhost:4567```. Additionally a Qt based rich interface for Windows, macOS and Linux is available on 
+The Angular frontend will be installed in ```C:\Program Files\awsmock\frontend``` and can started using the URL:
+```http://localhost:4567```. Additionally a Qt based rich interface for Windows, macOS and Linux is available on
 [https://github.com/jensvogt/awsmock-qt-ui](https://github.com/jensvogt/awsmock-qt-ui).
 
 #### Debian based Linux system
 
-For the Debian installation use the provided ```awsmock-<version>.deb```. Download the Debian package from 
+For the Debian installation use the provided ```awsmock-<version>.deb```. Download the Debian package from
 [http://jensvogt.github.io/awsmock](http://jensvogt.github.io/awsmock), using:
 
 ```
+wget https://jensvogt.github.io/awsmock/awsmock-<version>-amd64.deb
 sudo apt install ./awsmock-<version>.deb
 ```
+
 This will install all necessary files to ```/usr/local/awsmock```. Logs will be written to ```/usr/local/awsmock/logs```
 whereas the configuration is located in ```/usr/local/awsmock/etc/awsmock.json```.
 
@@ -193,8 +196,10 @@ For the RPM installation use the provided ```awsmock-<version>.rpm```. Download 
 [http://jensvogt.github.io/awsmock](http://jensvogt.github.io/awsmock), using:
 
 ```
+wget https://jensvogt.github.io/awsmock/awsmock-<version>.rpm
 sudo apt install ./awsmock-<version>.rpm
 ```
+
 This will install all necessary files to ```/usr/local/awsmock```. Logs will be written to ```/usr/local/awsmock/logs```
 whereas the configuration is located in ```/usr/local/awsmock/etc/awsmock.json```.
 
@@ -209,13 +214,14 @@ For the MacOS installation use the provided ```awsmock-<version>.tgz``` file. Do
 
 ```
 cd $HOME
+wget https://jensvogt.github.io/awsmock/awsmock-<version>-macos.tgz
 tar -xzf awsmock-<version->.tgz
 cd awsmock
 ```
 
 This will install all necessary files to ```$HOME/awsmock```. Logs will be written to ```$HOME/awsmock/logs```
 whereas the configuration is located in ```$HOME/awsmock/etc/awsmock.json```. To install the awsmock manager as a MacOS
-service use the provided ```plist``` file in ```$HOME/awsmock/etc/awsmock.plist```. The service can be then started 
+service use the provided ```plist``` file in ```$HOME/awsmock/etc/awsmock.plist```. The service can be then started
 using the usual ```launchctl``` commands:
 
 ```
@@ -289,13 +295,17 @@ Using the provided docker image is much simpler (assuming Docker is already inst
 To start the docker image:
 
 1. Pull the docker image:
+
 ```
 docker pull jensvogt/awsmock:latest
 ```
+
 2. Start the container
+
   ```  
   docker run -p 4566-4568:4566-4568 -p 2121:2121 -p 2222:2222 -p 6000-6100:6000:6100 -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
   ```
+
 Port ```4566``` (gateway) and ```4567``` (frontend) and ```4568``` (websocket) should be reachable.
 ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and
 ```-v /var/run/docker.sock:/var/run/docker.sock```
@@ -442,7 +452,9 @@ brew install libmagic
 brew install openssl (v3)
 brew install boost (v1.89)
 ```
-To build the man pages use: 
+
+To build the man pages use:
+
 ```
 brew install doxygen 
 brew install pandoc
@@ -473,7 +485,7 @@ npm run build --prod
 
 ### Installing as a macOS services
 
-AwsMock can run as a macOS service by using the supplied```.plist``` file. Copy the file from 
+AwsMock can run as a macOS service by using the supplied```.plist``` file. Copy the file from
 ```dist/macos/de.jensvogt.awsmock.plist```.
 
 ```
@@ -489,6 +501,7 @@ sudo launchctl list | grep de.jensvogt.awsmock
 ...
 72490	0	de.jensvogt.awsmock
 ```
+
 The service is running iwth PID 72490.
 
 ## Configuration
