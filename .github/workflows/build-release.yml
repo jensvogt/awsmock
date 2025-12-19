@@ -150,7 +150,6 @@ jobs:
           npm install
           npm run build
 
-
       - name: Create package structure
         shell: pwsh
         run: |
@@ -193,7 +192,7 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          name: installer-windows
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           overwrite: true
 
@@ -364,7 +363,7 @@ jobs:
       - name: Upload macOS ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+          name: installer-macos
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
 
   build-linux-deb:
@@ -556,7 +555,7 @@ jobs:
       - name: Upload .deb
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
+          name: deb-package-linux
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
           overwrite: true
 
@@ -743,7 +742,7 @@ jobs:
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
+          name: rpm-package-linux
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           overwrite: true
 
@@ -795,25 +794,25 @@ jobs:
       - name: Download Windows installer
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          name: installer-windows
           path: artifacts/windows
 
       - name: Download macOS installer
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
+          name: installer-macos
           path: artifacts/macos
 
       - name: Download Linux Debian package
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
+          name: deb-package-linux
           path: artifacts/linux
 
       - name: Download Linux RPM package
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
+          name: rpm-package-linux
           path: artifacts/linux
 
       - name: Create GitHub Release (attach installers)
@@ -843,9 +842,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -855,9 +851,12 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-          cp ./artifacts/awsmock-${{ env.SEMVER }}-amd64.deb/awsmock-${{ env.SEMVER }}-amd64.deb public/ || true
-          cp ./artifacts/awsmock-${{ env.SEMVER }}-1.x86_64.rpm/awsmock-${{ env.SEMVER }}-1.x86_64.rpm public/ || true
-          cp .github/pages/index.html public/index.html
+          cp ./artifacts/installer-windows/*.zip public/ || true
+          cp ./artifacts/installer-macos/*.tgz public/ || true
+          cp ./artifacts/deb-package-linux/*.deb public/ || true
+          cp ./artifacts/rpm-package-linux/*.rpm public/ || true
+          cp .github/pages/index.html public/index.html || true
+          find . -ls
 
       - name: Generate files.json
         run: |
