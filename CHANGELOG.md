@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.119](https://github.com/jensvogt/awsmock/compare/1.9.118...v1.9.119) (2025-12-19)
+
+
+### Bug Fixes
+
+* fix github pages processing ([777c5f1](https://github.com/jensvogt/awsmock/commit/777c5f1f85e4b7cf7df3f778d0b5b58314d69950))
+
 ## [1.9.118](https://github.com/jensvogt/awsmock/compare/1.9.117...v1.9.118) (2025-12-18)
 
 
