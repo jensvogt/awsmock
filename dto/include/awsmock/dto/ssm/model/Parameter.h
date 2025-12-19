@@ -93,6 +93,7 @@ namespace AwsMock::Dto::SSM {
                 Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
                 Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyArn", kmsKeyArn);
                 Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
+                Core::Bson::BsonUtils::SetStringValue(document, "Tier", tier);
                 Core::Bson::BsonUtils::SetDateValue(document, "created", created);
                 Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
                 return document.extract();
@@ -118,6 +119,7 @@ namespace AwsMock::Dto::SSM {
                 description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
                 kmsKeyArn = Core::Bson::BsonUtils::GetStringValue(document, "kmsKeyArn");
                 arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
+                tier = Core::Bson::BsonUtils::GetStringValue(document, "Tier");
                 created = Core::Bson::BsonUtils::GetDateValue(document, "created");
                 modified = Core::Bson::BsonUtils::GetDateValue(document, "created");
 
@@ -137,6 +139,7 @@ namespace AwsMock::Dto::SSM {
             r.type = ParameterTypeFromString(Core::Json::GetStringValue(v, "Type"));
             r.kmsKeyArn = Core::Json::GetStringValue(v, "KmsKeyArn");
             r.arn = Core::Json::GetStringValue(v, "ARN");
+            r.tier = Core::Json::GetStringValue(v, "Tier");
             r.created = Core::Json::GetDatetimeValue(v, "Created");
             r.modified = Core::Json::GetDatetimeValue(v, "Modified");
             return r;
@@ -153,6 +156,7 @@ namespace AwsMock::Dto::SSM {
                     {"Description", obj.description},
                     {"KmsKeyArn", obj.kmsKeyArn},
                     {"ARN", obj.arn},
+                    {"Tier", obj.tier},
                     {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

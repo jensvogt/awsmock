@@ -329,6 +329,7 @@ jobs:
           cp dist/etc/awsmock_macos.json ${{ env.PACKAGE_DIR }}/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/awsmock/etc/ssh_host_key
+          cp dist/macos/de.jensvogt.awsmock.plist ${{ env.PACKAGE_DIR }}/awsmock/etc/
           cp -R ${{ github.workspace }}/frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/awsmock/frontend
 
       - name: Create Launch Agent Plist
