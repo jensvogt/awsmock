@@ -1,10 +1,20 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(awsmock LANGUAGES CXX)
+# -------------------------------------------------------------------------
+# Read version.txt
+# -------------------------------------------------------------------------
+include(cmake/ReadVersion.cmake)
+
+project(awsmock VERSION ${VERSION_STRING} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# -------------------------------------------------------------------------
+# Current version
+# -------------------------------------------------------------------------
+configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/core/include/awsmock/core/Version.h)
 
 # -------------------------------------------------------------------------
 # Global link flags
