@@ -134,7 +134,7 @@ namespace AwsMock::Service {
             if (!request.kmsKeyArn.empty()) {
                 Dto::KMS::EncryptRequest encryptRequest;
                 encryptRequest.keyId = request.kmsKeyArn.substr(request.kmsKeyArn.find_last_of('/') + 1);
-                encryptRequest.plaintext = Core::Crypto::Base64Encode(request.value);
+                encryptRequest.plaintext = request.value;
                 Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
                 parameterEntity.parameterValue = kmsResponse.ciphertext;
             }
