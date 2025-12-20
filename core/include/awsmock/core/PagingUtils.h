@@ -14,23 +14,26 @@ namespace AwsMock::Core {
     std::map<S, P> PageMap(std::map<S, P> map, const long pageSize, const long pageIndex) {
         std::map<S, P> page;
         if (!map.empty()) {
-            int i = 0;
             for (const auto &[fst, snd]: map) {
                 if (pageSize >= 0) {
-                    if (i >= (pageIndex * pageSize) && i < (pageIndex + 1) * pageSize) {
+                    if (constexpr int i = 0; i >= (pageIndex * pageSize) && i < (pageIndex + 1) * pageSize) {
                         page[fst] = snd;
                     }
                 } else {
                     page[fst] = snd;
                 }
             }
+            return page;
         }
-        return page;
+        return map;
     }
 
 
     template<class T>
     std::vector<T> PageVector(std::vector<T> vec, const long pageSize, const long pageIndex) {
+        if (pageSize <= 0) {
+            return vec;
+        }
         typename std::vector<T>::iterator endArray;
         if (pageSize * (pageIndex + 1) > vec.size()) {
             endArray = vec.end();

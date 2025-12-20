@@ -19,9 +19,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-                    response.topicName = topic.topicName,
-                    response.owner = topic.owner,
-                    response.topicArn = topic.topicArn;
+            response.topicName = topic.topicName,
+            response.owner = topic.owner,
+            response.topicArn = topic.topicArn;
             return response;
         }
 
@@ -35,9 +35,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-                    response.topicName = topic.topicName,
-                    response.owner = topic.owner,
-                    response.topicArn = topic.topicArn;
+            response.topicName = topic.topicName,
+            response.owner = topic.owner,
+            response.topicArn = topic.topicArn;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -463,7 +463,7 @@ namespace AwsMock::Service {
 
     Dto::SNS::ListAttributeCountersResponse SNSService::ListAttributeCounters(const Dto::SNS::ListAttributeCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "list_attribute_counters");
-        log_trace << "List attribute counters request: " << request.ToString();
+        log_trace << "List topic attribute counters request: " << request.ToString();
 
         // Check existence
         if (!_snsDatabase.TopicExists(request.topicArn)) {
