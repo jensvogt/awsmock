@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/jensvogt/awsmock/compare/1.9.120...v1.10.0) (2025-12-21)
+
+
+### Features
+
+* add dynamodb add/delete/list tables ([004438f](https://github.com/jensvogt/awsmock/commit/004438fba824179ace20bec4fe67b4f70f1e8743))
+
 ## [1.9.120](https://github.com/jensvogt/awsmock/compare/1.9.119...v1.9.120) (2025-12-19)
 
 
