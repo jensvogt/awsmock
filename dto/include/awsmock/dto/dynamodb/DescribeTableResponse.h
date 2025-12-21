@@ -61,6 +61,11 @@ namespace AwsMock::Dto::DynamoDb {
     struct DescribeTableResponse final : Common::BaseCounter<DescribeTableResponse> {
 
         /**
+         * AWS region
+         */
+        std::string region;
+
+        /**
          * Table name
          */
         std::string tableName;
@@ -110,12 +115,18 @@ namespace AwsMock::Dto::DynamoDb {
          */
         system_clock::time_point createdDateTime = system_clock::now();
 
+        /**
+         * Deletion protection
+         */
+        bool deletionProtectionEnabled{};
+
       private:
 
         friend DescribeTableResponse tag_invoke(boost::json::value_to_tag<DescribeTableResponse>, boost::json::value const &v) {
             DescribeTableResponse r = {};
             if (Core::Json::AttributeExists(v, "Table")) {
                 const boost::json::object tableObject = v.at("Table").as_object();
+                r.region = Core::Json::GetStringValue(tableObject, "Region");
                 r.tableName = Core::Json::GetStringValue(tableObject, "TableName");
                 r.tableArn = Core::Json::GetStringValue(tableObject, "TableArn");
                 r.tableSize = Core::Json::GetLongValue(tableObject, "TableSizeBytes");
@@ -123,6 +134,7 @@ namespace AwsMock::Dto::DynamoDb {
                 r.provisionedThroughput = boost::json::value_to<ProvisionedThroughput>(tableObject, "ProvisionedThroughput");
                 r.tableStatus = TableStatusTypeFromString(Core::Json::GetStringValue(tableObject, "TableStatus"));
                 r.createdDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(tableObject, "CreatedDateTime"));
+                r.deletionProtectionEnabled = Core::Json::GetBoolValue(tableObject, "DeletionProtectionEnabled");
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
                     r.tags = boost::json::value_to<std::map<std::string, std::string>>(tableObject.at("Tags"));
                 }
@@ -151,6 +163,7 @@ namespace AwsMock::Dto::DynamoDb {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeTableResponse const &obj) {
             jv = {};
             boost::json::object tableObject = {
+                    {"Region", obj.region},
                     {"TableName", obj.tableName},
                     {"TableArn", obj.tableArn},
                     {"TableSizeBytes", obj.tableSize},
@@ -158,6 +171,7 @@ namespace AwsMock::Dto::DynamoDb {
                     {"ProvisionedThroughput", boost::json::value_from(obj.provisionedThroughput)},
                     {"TableStatus", TableStatusTypeToString(obj.tableStatus)},
                     {"CreatedDateTime", Core::DateTimeUtils::UnixTimestamp(obj.createdDateTime)},
+                    {"DeletionProtectionEnabled", obj.deletionProtectionEnabled},
             };
             if (!obj.tags.empty()) {
                 tableObject["Tags"] = boost::json::value_from(obj.tags);

@@ -111,7 +111,9 @@ namespace AwsMock::Service {
             tableResponse.total = _dynamoDbDatabase.CountTables(request.region, request.prefix);
             for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns)); const auto &table: tables) {
                 Dto::DynamoDb::TableCounter tableCounter;
+                tableCounter.region = table.region;
                 tableCounter.tableName = table.name;
+                tableCounter.tableArn = table.arn;
                 tableCounter.items = table.itemCount;
                 tableCounter.size = table.size;
                 tableCounter.created = table.created;
@@ -210,6 +212,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers = PrepareHeaders("DescribeTable");
             if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
                 Dto::DynamoDb::DescribeTableResponse describeTableResponse = Dto::DynamoDb::DescribeTableResponse::FromJson(body);
+                describeTableResponse.region = request.region;
                 log_debug << "DynamoDb describe table, name: " << request.tableName;
                 return describeTableResponse;
             }
@@ -223,7 +226,7 @@ namespace AwsMock::Service {
 
     Dto::DynamoDb::DeleteTableResponse DynamoDbService::DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "delete_table");
-        log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
+        log_debug << "Delete DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;

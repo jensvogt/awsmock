@@ -14,9 +14,19 @@ namespace AwsMock::Dto::DynamoDb {
     struct TableCounter final : Common::BaseCounter<TableCounter> {
 
         /**
+         * AWS region
+         */
+        std::string region;
+
+        /**
          * Table name
          */
         std::string tableName;
+
+        /**
+         * Table AWS ARN
+         */
+        std::string tableArn;
 
         /**
          * Table status
@@ -47,7 +57,9 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend TableCounter tag_invoke(boost::json::value_to_tag<TableCounter>, boost::json::value const &v) {
             TableCounter r;
+            r.region = Core::Json::GetStringValue(v, "region");
             r.tableName = Core::Json::GetStringValue(v, "tableName");
+            r.tableArn = Core::Json::GetStringValue(v, "tableArn");
             r.status = Core::Json::GetStringValue(v, "status");
             r.items = Core::Json::GetLongValue(v, "items");
             r.size = Core::Json::GetLongValue(v, "size");
@@ -63,6 +75,7 @@ namespace AwsMock::Dto::DynamoDb {
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"tableName", obj.tableName},
+                    {"tableArn", obj.tableArn},
                     {"status", obj.status},
                     {"items", obj.items},
                     {"size", obj.size},
