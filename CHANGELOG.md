@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/jensvogt/awsmock/compare/1.10.0...v1.10.1) (2025-12-22)
+
+
+### Bug Fixes
+
+* add dynamodb items add/delete/list ([c292eb7](https://github.com/jensvogt/awsmock/commit/c292eb72a0fa2215b680720ae0ee5d40b61650dd))
+
 ## [1.10.0](https://github.com/jensvogt/awsmock/compare/1.9.120...v1.10.0) (2025-12-21)
 
 
