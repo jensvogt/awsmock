@@ -16,6 +16,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
+#include <awsmock/dto/dynamodb/model/TableClassSummary.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -29,31 +30,35 @@ namespace AwsMock::Dto::DynamoDb {
      *       "AttributeName" : "Artist",
      *       "AttributeType" : "S"
      *     }, {
-     *     "AttributeName" : "SongTitle",
-     *     "AttributeType" : "S"
+     *       "AttributeName" : "SongTitle",
+     *       "AttributeType" : "S"
      *     } ],
-     * "TableName" : "MusicCollection",
-     * "KeySchema" : [ {
-     *   "AttributeName" : "Artist",
-     *   "KeyType" : "HASH"
-     *   }, {
-     *   "AttributeName" : "SongTitle",
-     *   "KeyType" : "RANGE"
-     * } ],
-     *   "TableStatus" : "ACTIVE",
-     *   "CreationDateTime" : 1.747564985299E9,
-     *   "ProvisionedThroughput" : {
-     *   "LastIncreaseDateTime" : 0.0,
-     *   "LastDecreaseDateTime" : 0.0,
-     *   "NumberOfDecreasesToday" : 0,
-     *   "ReadCapacityUnits" : 5,
-     *   "WriteCapacityUnits" : 5
-     *  },
-     *  "TableSizeBytes" : 0,
-     *  "ItemCount" : 0,
-     *  "TableArn" : "arn:aws:dynamodb:ddblocal:000000000000:table/MusicCollection",
-     *  "DeletionProtectionEnabled" : false
-     *  }
+     *     "TableClassSummary": {
+     *       "LastUpdateDateTime": number,
+     *       "TableClass": "string"
+     *      },
+     *     "TableName" : "MusicCollection",
+     *     "KeySchema" : [ {
+     *       "AttributeName" : "Artist",
+     *       "KeyType" : "HASH"
+     *       }, {
+     *       "AttributeName" : "SongTitle",
+     *       "KeyType" : "RANGE"
+     *       } ],
+     *     "TableStatus" : "ACTIVE",
+     *     "CreationDateTime" : 1.747564985299E9,
+     *       "ProvisionedThroughput" : {
+     *       "LastIncreaseDateTime" : 0.0,
+     *       "LastDecreaseDateTime" : 0.0,
+     *       "NumberOfDecreasesToday" : 0,
+     *       "ReadCapacityUnits" : 5,
+     *       "WriteCapacityUnits" : 5
+     *     },
+     *     "TableSizeBytes" : 0,
+     *     "ItemCount" : 0,
+     *     "TableArn" : "arn:aws:dynamodb:ddblocal:000000000000:table/MusicCollection",
+     *     "DeletionProtectionEnabled" : false
+     *   }
      * }
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
@@ -106,6 +111,11 @@ namespace AwsMock::Dto::DynamoDb {
         ProvisionedThroughput provisionedThroughput;
 
         /**
+         * Table class summary
+         */
+        TableClassSummary tableClassSummary;
+
+        /**
          * Table status
          */
         TableStatusType tableStatus = TableStatusType::UNKNOWN;
@@ -156,6 +166,9 @@ namespace AwsMock::Dto::DynamoDb {
                         r.keySchemas.emplace_back(keySchema);
                     }
                 }
+                if (Core::Json::AttributeExists(tableObject, "TableClassSummary")) {
+                    r.tableClassSummary = boost::json::value_to<TableClassSummary>(v.at("TableClassSummary"));
+                }
             }
             return r;
         }
@@ -172,6 +185,7 @@ namespace AwsMock::Dto::DynamoDb {
                     {"TableStatus", TableStatusTypeToString(obj.tableStatus)},
                     {"CreatedDateTime", Core::DateTimeUtils::UnixTimestamp(obj.createdDateTime)},
                     {"DeletionProtectionEnabled", obj.deletionProtectionEnabled},
+                    {"TableClassSummary", boost::json::value_from(obj.tableClassSummary)},
             };
             if (!obj.tags.empty()) {
                 tableObject["Tags"] = boost::json::value_from(obj.tags);

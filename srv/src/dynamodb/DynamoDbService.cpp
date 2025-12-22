@@ -31,23 +31,23 @@ namespace AwsMock::Service {
 
             // Send request to DynamoDB docker container
             std::map<std::string, std::string> headers = PrepareHeaders("CreateTable");
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
 
             // Update database
-            Database::Entity::DynamoDb::ProvisionedThroughput provisionedThroughput;
-            provisionedThroughput.readCapacityUnits = request.provisionedThroughput.readCapacityUnits;
-            provisionedThroughput.writeCapacityUnits = request.provisionedThroughput.writeCapacityUnits;
-            Database::Entity::DynamoDb::Table table;
-            table.region = request.region;
-            table.name = request.tableName;
-            table.arn = Core::AwsUtils::CreateDynamoDbTableArn(_accountId, request.tableName);
-            table.attributes = request.attributes;
-            table.keySchemas = request.keySchemas;
-            table.tags = request.tags;
-            table.provisionedThroughput = provisionedThroughput;
-            table = _dynamoDbDatabase.CreateTable(table);
-            log_debug << "DynamoDb table created, name: " << table.name;
-
+            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
+                Database::Entity::DynamoDb::ProvisionedThroughput provisionedThroughput;
+                provisionedThroughput.readCapacityUnits = request.provisionedThroughput.readCapacityUnits;
+                provisionedThroughput.writeCapacityUnits = request.provisionedThroughput.writeCapacityUnits;
+                Database::Entity::DynamoDb::Table table;
+                table.region = request.region;
+                table.name = request.tableName;
+                table.arn = Core::AwsUtils::CreateDynamoDbTableArn(_accountId, request.tableName);
+                table.attributes = request.attributes;
+                table.keySchemas = request.keySchemas;
+                table.tags = request.tags;
+                table.provisionedThroughput = provisionedThroughput;
+                table = _dynamoDbDatabase.CreateTable(table);
+                log_debug << "DynamoDb table created, name: " << table.name;
+            }
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd create table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd create table failed, error: " + exc.message());
@@ -376,15 +376,18 @@ namespace AwsMock::Service {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = PrepareHeaders("Scan");
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
-            Dto::DynamoDb::ScanResponse scanResponse = Dto::DynamoDb::ScanResponse::FromJson(body);
-            log_debug << "DynamoDb scan item, name: " << request.tableName;
-            return scanResponse;
+            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
+                Dto::DynamoDb::ScanResponse scanResponse = Dto::DynamoDb::ScanResponse::FromJson(body);
+                scanResponse.tableName = request.tableName;
+                log_debug << "DynamoDb scan item, name: " << request.tableName;
+                return scanResponse;
+            }
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb scan failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
+        return {};
     }
 
     Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const {
