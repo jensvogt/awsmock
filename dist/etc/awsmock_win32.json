@@ -50,7 +50,8 @@
         },
         "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\s3",
         "counter-period": 60,
-        "sync-period": 3600
+        "sync-period": 3600,
+        "archive-timeout": 300
       },
       "sqs": {
         "active": true,

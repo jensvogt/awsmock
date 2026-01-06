@@ -57,17 +57,23 @@ namespace AwsMock::Dto::S3 {
          */
         std::map<std::string, std::string> metadata;
 
+        /**
+         * S3 storage class, defaults to 'STANDARD'.
+         */
+        std::string storageClass = "STANDARD";
+
       private:
 
         friend PutObjectRequest tag_invoke(boost::json::value_to_tag<PutObjectRequest>, boost::json::value const &v) {
             PutObjectRequest r;
-            r.bucket = v.at("bucket").as_string();
-            r.key = v.at("key").as_string();
-            r.owner = v.at("owner").as_string();
-            r.md5Sum = v.at("md5Sum").as_string();
-            r.contentType = v.at("contentType").as_string();
-            r.contentLength = v.at("contentLength").as_int64();
-            r.checksumAlgorithm = v.at("checksumAlgorithm").as_string();
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.key = Core::Json::GetStringValue(v, "key");
+            r.owner = Core::Json::GetStringValue(v, "owner");
+            r.md5Sum = Core::Json::GetStringValue(v, "md5Sum");
+            r.contentType = Core::Json::GetStringValue(v, "contentType");
+            r.contentLength = Core::Json::GetLongValue(v, "contentLength");
+            r.checksumAlgorithm = Core::Json::GetStringValue(v, "checksumAlgorithm");
+            r.storageClass = Core::Json::GetStringValue(v, "storageClass");
             r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
             return r;
         }
@@ -84,6 +90,7 @@ namespace AwsMock::Dto::S3 {
                     {"contentType", obj.contentType},
                     {"contentLength", obj.contentLength},
                     {"checksumAlgorithm", obj.checksumAlgorithm},
+                    {"storageClass", obj.storageClass},
                     {"metadata", boost::json::value_from(obj.metadata)},
             };
         }

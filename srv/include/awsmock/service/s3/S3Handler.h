@@ -5,19 +5,9 @@
 #ifndef AWSMOCK_SERVICE_S3_HANDLER_H
 #define AWSMOCK_SERVICE_S3_HANDLER_H
 
-// C*+ includes
-#include <chrono>
-
-// Boost includes
-#include <boost/asio/detached.hpp>
-#include <boost/asio/spawn.hpp>
-
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
-#include <awsmock/dto/common/UserAgent.h>
-#include <awsmock/dto/s3/internal/DeleteObjectsRequest.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/s3/S3Service.h>

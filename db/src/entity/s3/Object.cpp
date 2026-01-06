@@ -28,6 +28,7 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("internalName", internalName),
                 kvp("localName", localName),
                 kvp("versionId", versionId),
+                kvp("storageClass", StorageClassToString(storageClass)),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -49,6 +50,7 @@ namespace AwsMock::Database::Entity::S3 {
         internalName = Core::Bson::BsonUtils::GetStringValue(mResult, "internalName");
         localName = Core::Bson::BsonUtils::GetStringValue(mResult, "localName");
         versionId = Core::Bson::BsonUtils::GetStringValue(mResult, "versionId");
+        storageClass = StorageClassFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "storageClass"));
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

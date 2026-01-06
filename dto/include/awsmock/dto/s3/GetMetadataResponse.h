@@ -10,14 +10,16 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/entity/s3/StorageClass.h"
+
+
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <boost/json/value_from.hpp>
 
 namespace AwsMock::Dto::S3 {
 
-    using std::chrono::system_clock;
+    //using std::chrono::system_clock;
 
     struct GetMetadataResponse final : Common::BaseCounter<GetMetadataResponse> {
 
@@ -40,6 +42,11 @@ namespace AwsMock::Dto::S3 {
          * Content type
          */
         std::string contentType;
+
+        /**
+         * S3 storage class
+         */
+        std::string storageClass = Database::Entity::S3::StorageClassToString(Database::Entity::S3::StorageClass::STANDARD);
 
         /**
          * Size
@@ -69,6 +76,7 @@ namespace AwsMock::Dto::S3 {
             r.key = Core::Json::GetStringValue(v, "key");
             r.md5Sum = Core::Json::GetStringValue(v, "md5Sum");
             r.contentType = Core::Json::GetStringValue(v, "contentType");
+            r.storageClass = Core::Json::GetStringValue(v, "storageClass");
             r.size = Core::Json::GetLongValue(v, "size");
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
@@ -87,6 +95,7 @@ namespace AwsMock::Dto::S3 {
                     {"key", obj.bucket},
                     {"md5Sum", obj.md5Sum},
                     {"contentType", obj.contentType},
+                    {"storageClass", obj.storageClass},
                     {"size", obj.size},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
