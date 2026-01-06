@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.11.0](https://github.com/jensvogt/awsmock/compare/1.10.1...v1.11.0) (2026-01-06)
+
+
+### Features
+
+* add s3 storage class ([212caa1](https://github.com/jensvogt/awsmock/commit/212caa1efa50c33c0929334e75fcf49f9b35bfe3))
+* add s3 storage class ([577398e](https://github.com/jensvogt/awsmock/commit/577398ee3efaff869ad507f742fc88d7936b87a4))
+
 ## [1.10.1](https://github.com/jensvogt/awsmock/compare/1.10.0...v1.10.1) (2025-12-22)
 
 
