@@ -1,8 +1,5 @@
 
-
 #include <awsmock/service/s3/S3Handler.h>
-
-#include "awsmock/dto/s3/internal/UploadObjectCounterRequest.h"
 
 namespace AwsMock::Service {
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
@@ -88,6 +85,13 @@ namespace AwsMock::Service {
                     headerMap["ETag"] = Core::StringUtils::Quoted(s3Response.md5sum);
                     headerMap["Content-Type"] = s3Response.contentType;
                     headerMap["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
+                    headerMap["x-amz-storage-class"] = s3Response.storageClass;
+
+                    if (s3Response.storageClass != Database::Entity::S3::StorageClassToString(Database::Entity::S3::StorageClass::STANDARD)) {
+                        headerMap["Content-Type"] = s3Response.contentType;
+                        std::string body = "<Error><Code>InvalidObjectState</Code><Message>The action is not valid for the object's storage class</Message></Error>";
+                        return SendResponse(request, http::status::forbidden, body, headerMap);
+                    }
 
                     // Set user headers
                     for (const auto &[fst, snd]: s3Response.metadata) {
@@ -271,6 +275,7 @@ namespace AwsMock::Service {
                     putObjectRequest.contentType = clientCommand.contentType;
                     putObjectRequest.checksumAlgorithm = checksumAlgorithm;
                     putObjectRequest.metadata = metadata;
+                    putObjectRequest.storageClass = clientCommand.storageClass;
 
                     boost::beast::net::streambuf sb;
                     putObjectRequest.contentLength = PrepareBody(request, sb);
@@ -751,6 +756,7 @@ namespace AwsMock::Service {
             headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
             headers["x-amz-bucket-region"] = s3Response.region;
             headers["x-amz-location-name"] = s3Response.region;
+            headers["x-amz-storage-class"] = s3Response.storageClass;
 
             // User supplied metadata
             if (!s3Response.metadata.empty()) {
@@ -759,6 +765,14 @@ namespace AwsMock::Service {
                 }
                 log_info << "Get metadata, count: " << s3Response.metadata.size();
             }
+
+            // Check storage class
+            if (s3Response.storageClass != Database::Entity::S3::StorageClassToString(Database::Entity::S3::StorageClass::STANDARD)) {
+                headers["Content-Type"] = "application/xml";
+                std::string body = "<Error><Code>InvalidObjectState</Code><Message>The action is not valid for the object's storage class</Message></Error>";
+                return SendResponse(request, http::status::forbidden, body, headers);
+            }
+
             return SendResponse(request, http::status::ok, {}, headers);
         } catch ([[maybe_unused]] Core::NotFoundException &exc) {
             return SendResponse(request, http::status::not_found);
@@ -833,4 +847,4 @@ namespace AwsMock::Service {
         key = Core::StringUtils::SubStringAfter(path, "/");
         log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

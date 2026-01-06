@@ -183,6 +183,7 @@ namespace AwsMock::Service {
             response.contentType = object.contentType;
             response.size = object.size;
             response.metadata = object.metadata;
+            response.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
             response.created = object.created;
             response.modified = object.modified;
 
@@ -240,9 +241,10 @@ namespace AwsMock::Service {
             response.md5sum = object.md5sum;
             response.created = object.created;
             response.modified = object.modified;
-            log_trace << "S3 get object response: " << response.ToString();
+            response.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
             log_debug << "Object returned, bucket: " << request.bucket << ", key: " << request.key << ", size: " << response.size;
             return response;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 get object failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -1322,6 +1324,7 @@ namespace AwsMock::Service {
         object.contentType = contentType;
         object.metadata = request.metadata;
         object.internalName = fileName;
+        object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
 
         // Meta data
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
@@ -1394,6 +1397,7 @@ namespace AwsMock::Service {
             object.metadata = request.metadata;
             object.internalName = fileName;
             object.versionId = versionId;
+            object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
 
             // Meta data
             object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
@@ -1580,4 +1584,4 @@ namespace AwsMock::Service {
         }
         return sContentType;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

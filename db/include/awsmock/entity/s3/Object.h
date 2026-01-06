@@ -4,6 +4,7 @@
 
 #ifndef AWSMOCK_DB_ENTITY_S3_OBJECT_H
 #define AWSMOCK_DB_ENTITY_S3_OBJECT_H
+#include "StorageClass.h"
 
 #ifdef _WIN32
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
@@ -105,6 +106,11 @@ namespace AwsMock::Database::Entity::S3 {
          * Object local name for import
          */
         std::string localName;
+
+        /**
+         * Storage class
+         */
+        StorageClass storageClass;
 
         /**
          * Creation date

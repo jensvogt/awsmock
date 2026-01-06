@@ -11,7 +11,7 @@ namespace AwsMock::Dto::Common {
         UserAgent userAgent;
         userAgent.FromRequest(request);
 
-        //Core::HttpUtils::DumpHeaders(request);
+        //Core::HttpUtils::DumpRequest(request);
 
         // Basic values
         this->region = awsRegion;
@@ -25,6 +25,7 @@ namespace AwsMock::Dto::Common {
         this->headers = Core::HttpUtils::GetHeaders(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);
         this->contentMd5 = Core::HttpUtils::GetHeaderValue(request, "Content-MD5");
+        this->storageClass = Core::HttpUtils::GetHeaderValue(request, "x-amz-storage-class");
 
         // Core values
         bucket = Core::AwsUtils::GetS3BucketName(request);
@@ -194,6 +195,7 @@ namespace AwsMock::Dto::Common {
             Core::Bson::BsonUtils::SetIntValue(document, "partNumber", partNumber);
             Core::Bson::BsonUtils::SetBoolValue(document, "copyRequest", copyRequest);
             Core::Bson::BsonUtils::SetStringValue(document, "uploadId", uploadId);
+            Core::Bson::BsonUtils::SetStringValue(document, "storageClass", storageClass);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {
