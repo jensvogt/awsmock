@@ -28,6 +28,11 @@ namespace AwsMock::Dto::S3 {
         std::string key;
 
         /**
+         * S3 storage class
+         */
+        std::string storageClass;
+
+        /**
          * Metadata
          */
         std::map<std::string, std::string> metadata;
@@ -39,6 +44,7 @@ namespace AwsMock::Dto::S3 {
             UpdateObjectRequest r;
             r.bucket = Core::Json::GetStringValue(v, "bucket");
             r.key = Core::Json::GetStringValue(v, "key");
+            r.storageClass = Core::Json::GetStringValue(v, "storageClass");
             if (Core::Json::AttributeExists(v, "metadata")) {
                 r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
             }
@@ -49,6 +55,7 @@ namespace AwsMock::Dto::S3 {
             jv = {
                     {"bucket", obj.bucket},
                     {"key", obj.key},
+                    {"storageClass", obj.storageClass},
                     {"metadata", boost::json::value_from(obj.metadata)},
             };
         }

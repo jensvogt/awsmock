@@ -92,7 +92,7 @@ namespace AwsMock::Dto::S3 {
 
         friend Bucket tag_invoke(boost::json::value_to_tag<Bucket>, boost::json::value const &v) {
             Bucket r;
-            r.bucketName = Core::Json::GetStringValue(v, "bucketName");
+            r.bucketName = Core::Json::GetStringValue(v, "BucketName");
             r.owner = Core::Json::GetStringValue(v, "Owner");
             r.arn = Core::Json::GetStringValue(v, "Arn");
             r.keys = Core::Json::GetLongValue(v, "Keys");
@@ -100,26 +100,26 @@ namespace AwsMock::Dto::S3 {
             r.versionStatus = Core::Json::GetStringValue(v, "VersionStatus");
             r.created = Core::Json::GetDatetimeValue(v, "Created");
             r.modified = Core::Json::GetDatetimeValue(v, "Modified");
-            if (Core::Json::AttributeExists(v, "defaultMetadata")) {
-                r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("defaultMetadata"));
+            if (Core::Json::AttributeExists(v, "DefaultMetadata")) {
+                r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("DefaultMetadata"));
             }
             return r;
         }
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Bucket const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"bucketName", obj.bucketName},
-                    {"owner", obj.owner},
-                    {"arn", obj.arn},
-                    {"keys", obj.keys},
-                    {"size", obj.size},
-                    {"versionStatus", obj.versionStatus},
-                    {"queueConfigurations", boost::json::value_from(obj.queueConfigurations)},
-                    {"topicConfigurations", boost::json::value_from(obj.topicConfigurations)},
-                    {"lambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
-                    {"defaultMetadata", boost::json::value_from(obj.defaultMetadata)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Region", obj.region},
+                    {"BucketName", obj.bucketName},
+                    {"Owner", obj.owner},
+                    {"Arn", obj.arn},
+                    {"Keys", obj.keys},
+                    {"Size", obj.size},
+                    {"VersionStatus", obj.versionStatus},
+                    {"QueueConfigurations", boost::json::value_from(obj.queueConfigurations)},
+                    {"TopicConfigurations", boost::json::value_from(obj.topicConfigurations)},
+                    {"LambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
+                    {"DefaultMetadata", boost::json::value_from(obj.defaultMetadata)},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };

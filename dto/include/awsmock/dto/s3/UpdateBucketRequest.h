@@ -27,16 +27,16 @@ namespace AwsMock::Dto::S3 {
 
         friend UpdateBucketRequest tag_invoke(boost::json::value_to_tag<UpdateBucketRequest>, boost::json::value const &v) {
             UpdateBucketRequest r;
-            r.bucket = boost::json::value_to<Bucket>(v.at("bucket"));
+            r.bucket = boost::json::value_to<Bucket>(v.at("Bucket"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateBucketRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"bucket", boost::json::value_from(obj.bucket)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Bucket", boost::json::value_from(obj.bucket)},
             };
         }
     };
