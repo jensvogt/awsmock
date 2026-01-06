@@ -70,23 +70,21 @@ namespace AwsMock::Service {
 
     void S3Service::UpdateBucket(const Dto::S3::UpdateBucketRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "update_bucket");
-        log_trace << "Update bucket request, s3Request: " << request.ToString();
-
-        // Get the region abd account ID
-        const std::string region = request.bucket.region;
-        auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        log_trace << "Update bucket request, body: " << request.ToString();
 
         // Check existence
         CheckBucketExistence(request.region, request.bucket.bucketName);
 
         try {
-            // Mapp DTO to entity
+            // Map DTO to entity
             Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket.bucketName);
             bucket.defaultMetadata = request.bucket.defaultMetadata;
+            bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(request.bucket.versionStatus);
 
             // Update database
             _database.UpdateBucket(bucket);
             log_debug << "Bucket updated, bucket: " << request.bucket.bucketName;
+
         } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
@@ -130,6 +128,7 @@ namespace AwsMock::Service {
             log_debug << "Bucket returned, bucket: " << request.bucketName;
 
             return Dto::S3::Mapper::map(request, bucket);
+
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get bucket failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -630,10 +629,14 @@ namespace AwsMock::Service {
             // Get the object
             Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-            // Change metadata
+            // Change attributes
             object.metadata = request.metadata;
+            object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
+
+            // Update database
             object = _database.UpdateObject(object);
             log_info << "Object updated, bucket: " << request.bucket << ", key: " << request.key;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 update object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
@@ -1136,6 +1139,7 @@ namespace AwsMock::Service {
             objectCounter.size = object.size;
             objectCounter.contentType = object.contentType;
             objectCounter.internalName = object.internalName;
+            objectCounter.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
             objectCounter.body = Core::Crypto::Base64Encode(body);
             objectCounter.created = object.created;
             objectCounter.modified = object.modified;
