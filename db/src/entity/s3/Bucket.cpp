@@ -103,7 +103,7 @@ namespace AwsMock::Database::Entity::S3 {
         if (it != lambdaNotifications.end()) {
             return *it;
         }
-        return {};
+        return LambdaNotification{};
     }
 
     bool Bucket::IsVersioned() const {
@@ -136,7 +136,13 @@ namespace AwsMock::Database::Entity::S3 {
             lambdaNotificationsDoc.append(notification.ToDocument());
         }
 
-        // Lambda notifications
+        // Lifecycle configurations notifications
+        auto lifecycleConfigurationDoc = array{};
+        for (const auto &lifecycleConfiguration: lifecycleConfigurations) {
+            lifecycleConfigurationDoc.append(lifecycleConfiguration.ToDocument());
+        }
+
+        // Default metadata
         auto defaultMetadataDoc = document{};
         for (const auto &[key, value]: defaultMetadata) {
             defaultMetadataDoc.append(kvp(key, value));
@@ -153,6 +159,7 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("queueNotifications", queueNotificationsDoc),
                 kvp("topicNotifications", topicNotificationsDoc),
                 kvp("lambdaConfigurations", lambdaNotificationsDoc),
+                kvp("lifecycleConfigurations", lifecycleConfigurationDoc),
                 kvp("encryptionConfiguration", bucketEncryption.ToDocument()),
                 kvp("defaultMetadata", defaultMetadataDoc),
                 kvp("versionStatus", BucketVersionStatusToString(versionStatus)),
@@ -197,8 +204,15 @@ namespace AwsMock::Database::Entity::S3 {
         if (mResult.value().find("lambdaConfigurations") != mResult.value().end()) {
             lambdaNotifications.clear();
             for (bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
-                LambdaNotification notification;
-                lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
+                lambdaNotifications.emplace_back(notificationElement.get_document().view());
+            }
+        }
+
+        // Lifecycle configurations
+        if (mResult.value().find("lifecycleConfigurations") != mResult.value().end()) {
+            lifecycleConfigurations.clear();
+            for (bsoncxx::array::view lifecycleView{mResult.value()["lifecycleConfigurations"].get_array().value}; const bsoncxx::array::element &lifecycleElement: lifecycleView) {
+                lifecycleConfigurations.emplace_back(lifecycleElement.get_document().view());
             }
         }
 

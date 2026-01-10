@@ -35,6 +35,7 @@ namespace AwsMock::Dto::Common {
         uploads = Core::HttpUtils::HasQueryParameter(request.target(), "uploads");
         uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
         partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        lifecycleRequest = Core::HttpUtils::HasQueryParameter(request.target(), "lifecycle");
         uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
         rangeRequest = Core::HttpUtils::HasHeader(request, "Range");
         multipartRequest = uploads || !uploadId.empty() || partNumber;
@@ -86,6 +87,8 @@ namespace AwsMock::Dto::Common {
                         command = S3CommandType::BUCKET_NOTIFICATION;
                     } else if (versionRequest) {
                         command = S3CommandType::PUT_BUCKET_VERSIONING;
+                    } else if (lifecycleRequest) {
+                        command = S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION;
                     } else if (!bucket.empty() && key.empty()) {
                         command = S3CommandType::CREATE_BUCKET;
                     } else if (!bucket.empty() && !key.empty()) {
@@ -171,6 +174,8 @@ namespace AwsMock::Dto::Common {
             command = S3CommandType::PUT_BUCKET_VERSIONING;
         } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "list-object-versions") {
             command = S3CommandType::LIST_OBJECT_VERSIONS;
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-lifecycle-configuration") {
+            command = S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION;
         }
     }
 

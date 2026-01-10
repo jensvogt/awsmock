@@ -15,7 +15,7 @@
 namespace AwsMock::Database::Entity::S3 {
 
     /**
-     * Filter rule for the S3 bucket notification to SQS queues
+     * @brief Filter rule for the S3 bucket notification to SQS queues
      *
      * @author jens.vogt\@opitz-consulting.com
      */

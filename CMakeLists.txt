@@ -67,7 +67,8 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp
-        dto/include/awsmock/dto/dynamodb/model/TableClassSummary.h)
+        dto/include/awsmock/dto/dynamodb/model/TableClassSummary.h
+        db/include/awsmock/entity/s3/LifecycleStatus.h)
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
@@ -119,8 +120,9 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/sns/Topic.cpp db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
         db/src/repository/SNSDatabase.cpp db/src/memorydb/SNSMemoryDb.cpp db/src/entity/s3/Bucket.cpp
         db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp db/src/repository/S3Database.cpp
-        db/src/memorydb/S3MemoryDb.cpp db/src/entity/s3/FilterRule.cpp db/src/entity/s3/QueueNotification.cpp
-        db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp db/src/entity/s3/BucketEncryption.cpp
+        db/src/memorydb/S3MemoryDb.cpp db/src/entity/s3/FilterRule.cpp db/src/entity/s3/LifecycleTransition.cpp
+        db/src/entity/s3/QueueNotification.cpp db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp
+        db/src/entity/s3/BucketEncryption.cpp db/src/entity/s3/LifecycleConfiguration.cpp
         db/src/entity/lambda/Tags.cpp db/src/entity/lambda/Environment.cpp db/src/entity/lambda/Lambda.cpp
         db/src/entity/lambda/Code.cpp db/src/entity/lambda/EphemeralStorage.cpp db/src/repository/LambdaDatabase.cpp
         db/src/memorydb/LambdaMemoryDb.cpp db/src/entity/lambda/Instance.cpp db/src/entity/lambda/EventSourceMapping.cpp
@@ -128,8 +130,8 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/transfer/Transfer.cpp db/src/memorydb/TransferMemoryDb.cpp db/src/entity/cognito/UserPool.cpp
         db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp db/src/entity/cognito/Group.cpp
         db/src/memorydb/CognitoMemoryDb.cpp db/src/repository/CognitoDatabase.cpp db/src/entity/dynamodb/Item.cpp
-        db/src/entity/dynamodb/Table.cpp db/src/entity/dynamodb/AttributeValue.cpp db/src/entity/dynamodb/ProvisionedThroughput.cpp
-        db/src/repository/DynamoDbDatabase.cpp db/src/memorydb/DynamoDbMemoryDb.cpp db/src/entity/secretsmanager/Secret.cpp
+        db/src/entity/dynamodb/Table.cpp db/src/entity/dynamodb/AttributeValue.cpp db/src/repository/DynamoDbDatabase.cpp
+        db/src/entity/dynamodb/ProvisionedThroughput.cpp db/src/memorydb/DynamoDbMemoryDb.cpp db/src/entity/secretsmanager/Secret.cpp
         db/src/entity/secretsmanager/SecretVersion.cpp db/src/entity/secretsmanager/RotationRules.cpp
         db/src/repository/SecretsManagerDatabase.cpp db/src/memorydb/SecretsManagerMemoryDb.cpp db/src/entity/kms/Key.cpp
         db/src/repository/KMSDatabase.cpp db/src/memorydb/KMSMemoryDb.cpp db/src/entity/ssm/Parameter.cpp

@@ -46,6 +46,10 @@ namespace AwsMock::Database::Entity::S3 {
          */
         std::vector<FilterRule> filterRules;
 
+        explicit LambdaNotification(const view &mResult);
+
+        explicit LambdaNotification() = default;
+
         /**
          * Check filter
          *
@@ -66,7 +70,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        LambdaNotification FromDocument(const std::optional<view> &mResult);
+        LambdaNotification FromDocument(const view &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::S3

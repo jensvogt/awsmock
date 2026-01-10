@@ -1,0 +1,55 @@
+{
+  "Rules": [
+    {
+      "Expiration": {
+        "Date": "2015-11-10T00:00:00",
+        "ExpiredObjectDeleteMarker": true
+      },
+      "Prefix": "",
+      "Filter": {
+        "Prefix": "string",
+        "Tag": {
+          "Key": "string",
+          "Value": "string"
+        },
+        "ObjectSizeGreaterThan": 0,
+        "ObjectSizeLessThan": 0,
+        "And": {
+          "Prefix": "string",
+          "Tags": [
+            {
+              "Key": "string",
+              "Value": "string"
+            }
+          ],
+          "ObjectSizeGreaterThan": 0,
+          "ObjectSizeLessThan": 0
+        }
+      },
+      "Status": "Enabled",
+      "Transitions": [
+        {
+          "Date": "2026-01-01T00:00:00",
+          "StorageClass": "GLACIER"
+        },
+        {
+          "Days": 365,
+          "StorageClass": "GLACIER"
+        }
+      ],
+      "NoncurrentVersionTransitions": [
+        {
+          "NoncurrentDays": 2,
+          "StorageClass": "GLACIER"
+        }
+      ],
+      "NoncurrentVersionExpiration": {
+        "NoncurrentDays": 0,
+        "NewerNoncurrentVersions": 0
+      },
+      "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 0
+      }
+    }
+  ]
+}

@@ -6,6 +6,10 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
+    LambdaNotification::LambdaNotification(const view &mResult) {
+        FromDocument(mResult);
+    }
+
     bool LambdaNotification::CheckFilter(const std::string &key) {
 
         if (filterRules.empty()) {
@@ -31,7 +35,7 @@ namespace AwsMock::Database::Entity::S3 {
         lambdaNotificationDoc.append(kvp("events", eventsDoc));
 
         // Filter rules
-        auto filterRulesDoc = bsoncxx::builder::basic::array{};
+        auto filterRulesDoc = array{};
         for (const auto &filterRule: filterRules) {
             filterRulesDoc.append(filterRule.ToDocument());
         }
@@ -40,23 +44,23 @@ namespace AwsMock::Database::Entity::S3 {
         return lambdaNotificationDoc.extract();
     }
 
-    LambdaNotification LambdaNotification::FromDocument(const std::optional<view> &mResult) {
+    LambdaNotification LambdaNotification::FromDocument(const view &mResult) {
 
         try {
 
-            id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
-            lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["lambdaArn"]);
+            id = Core::Bson::BsonUtils::GetStringValue(mResult["id"]);
+            lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult["lambdaArn"]);
 
             // Extract events
-            if (mResult.value().find("events") != mResult.value().end()) {
-                for (const view eventsView = mResult.value()["events"].get_array().value; bsoncxx::document::element event: eventsView) {
+            if (mResult.find("events") != mResult.end()) {
+                for (const view eventsView = mResult["events"].get_array().value; bsoncxx::document::element event: eventsView) {
                     events.emplace_back(event.get_string().value);
                 }
             }
 
             // Extract filter rules
-            if (mResult.value().find("filterRules") != mResult.value().end()) {
-                for (const view filterRulesView = mResult.value()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
+            if (mResult.find("filterRules") != mResult.end()) {
+                for (const view filterRulesView = mResult["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document().view());
                     filterRules.emplace_back(filterRule);
