@@ -37,7 +37,7 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM debian:stable-slim
 
-RUN apt update && apt upgrade && apt install -y curl unzip libssh-4 libarchive13 libmagic1
+RUN apt update && apt upgrade -y && apt install -y curl unzip libssh-4 libarchive13 libmagic1
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
