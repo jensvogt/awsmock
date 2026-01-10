@@ -49,6 +49,19 @@ namespace AwsMock::Dto::S3 {
             storageClass = StorageClassFromString(pt.get<std::string>("StorageClass", "STANDARD"));
         }
 
+        /**
+         * @brief Convert to an XML string
+         *
+         * @return boost a property tree
+         */
+        [[nodiscard]] boost::property_tree::ptree ToXml() const {
+            boost::property_tree::ptree pt;
+            pt.put("Date", Core::DateTimeUtils::ToISO8601(date));
+            pt.put("Days", days);
+            pt.put("StorageClass", StorageClassToString(storageClass));
+            return pt;
+        }
+
       private:
 
         friend LifecycleTransition tag_invoke(boost::json::value_to_tag<LifecycleTransition>, boost::json::value const &v) {

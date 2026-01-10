@@ -16,7 +16,8 @@ This directory container the following SQS examples:
 - ```get-object.sh```: gets an objects from a bucket ```test-bucket```
 - ```list-bucket.sh```: lists buckets
 - ```put-big-object.sh```: puts a big object (several GB) to bucket ```test-bucket```
-- ```put-lifecycle-configuration.sh```: puts a lifecycle to a bucket ```test-bucket```
+- ```put-lifecycle-configuration.sh```: puts a lifecycle to bucket ```test-bucket```
+- ```get-lifecycle-configuration.sh```: gets the lifecycle configuration for the bucket ```test-bucket```
 - ```put-object.sh```: puts a object to bucket ```test-bucket```
 - ```cleanup.sh```: deletes all created buckets and objects
 

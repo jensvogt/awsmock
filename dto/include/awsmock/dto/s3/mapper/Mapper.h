@@ -125,6 +125,30 @@ namespace AwsMock::Dto::S3 {
          */
         static std::vector<Database::Entity::S3::LifecycleConfiguration> map(const PutBucketLifecycleConfigurationRequest &request);
 
+        /**
+         * @brief Converts a transition entity to a DTO
+         *
+         * @param transition transition entity
+         * @return transition DTO
+         */
+        static LifecycleTransition map(const Database::Entity::S3::LifecycleTransition &transition);
+
+        /**
+         * @brief Converts a single lifecycle configuration to a lifecycle rule
+         *
+         * @param configuration lifecycle configuration
+         * @return configuration lifecycle rule
+         */
+        static LifecycleRule map(const Database::Entity::S3::LifecycleConfiguration &configuration);
+
+        /**
+         * @brief Maps a lifecycle configuration to a lifecycle rule.
+         *
+         * @param configurations
+         * @return
+         */
+        static std::vector<LifecycleRule> map(const std::vector<Database::Entity::S3::LifecycleConfiguration> &configurations);
+
       private:
 
         /**

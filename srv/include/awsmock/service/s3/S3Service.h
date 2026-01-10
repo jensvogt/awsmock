@@ -14,9 +14,6 @@
 #include <sys/uio.h>
 #endif
 
-// Boost includes
-#include <boost/thread/thread.hpp>
-
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MemoryMappedFile.h>
@@ -34,6 +31,8 @@
 #include <awsmock/dto/s3/CreateMultipartUploadResult.h>
 #include <awsmock/dto/s3/DeleteBucketRequest.h>
 #include <awsmock/dto/s3/DeleteObjectRequest.h>
+#include <awsmock/dto/s3/GetBucketLifecycleConfigurationRequest.h>
+#include <awsmock/dto/s3/GetBucketLifecycleConfigurationResponse.h>
 #include <awsmock/dto/s3/GetEventSourceRequest.h>
 #include <awsmock/dto/s3/GetEventSourceResponse.h>
 #include <awsmock/dto/s3/GetMetadataRequest.h>
@@ -209,6 +208,13 @@ namespace AwsMock::Service {
          * @param request S3 put lifecycle configuration request
          */
         void PutBucketLifecycleConfiguration(const Dto::S3::PutBucketLifecycleConfigurationRequest &request) const;
+
+        /**
+         * @brief Gets the bucket lifecycle configurations
+         *
+         * @param request get bucket lifecycle configuration request
+         */
+        Dto::S3::GetBucketLifecycleConfigurationResponse GetBucketLifecycleConfiguration(const Dto::S3::GetBucketLifecycleConfigurationRequest &request) const;
 
         /**
          * @brief Creates a new bucket
