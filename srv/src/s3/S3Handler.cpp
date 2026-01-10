@@ -210,10 +210,25 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, s3Response.ToXml());
                 }
 
+                // Delete a bucket (rb), bucket must be empty
+                case Dto::Common::S3CommandType::DELETE_BUCKET: {
+                    Dto::S3::DeleteBucketRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.user = clientCommand.user;
+                    s3Request.requestId = clientCommand.requestId;
+                    s3Request.bucket = clientCommand.bucket;
+                    _s3Service.DeleteBucket(s3Request);
+                    log_info << "Delete bucket, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::no_content);
+                }
+
                 default:
                     log_error << "Unknown method";
                     return SendResponse(request, http::status::bad_request, "Unknown method");
             }
+        } catch (Core::NotFoundException &exc) {
+            log_error << "Bucket or object not found, exception: " << exc.what();
+            return SendResponse(request, http::status::not_found, exc.what());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendResponse(request, http::status::internal_server_error, exc.what());
