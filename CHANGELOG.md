@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.2](https://github.com/jensvogt/awsmock/compare/v1.12.1...v1.12.2) (2026-01-10)
+
+
+### Bug Fixes
+
+* bug in S3 get lifecycle configuration ([642fb4b](https://github.com/jensvogt/awsmock/commit/642fb4bf3c22b8240cc57b6f0989e9f375e584fe))
+* bug in S3 get lifecycle configuration ([90328ec](https://github.com/jensvogt/awsmock/commit/90328ecb6de30e03120ff3ecf41156dbf9b13d27))
+
 ## [1.12.1](https://github.com/jensvogt/awsmock/compare/1.12.0...v1.12.1) (2026-01-10)
 
 
