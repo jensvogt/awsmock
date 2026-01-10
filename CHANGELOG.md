@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/jensvogt/awsmock/compare/1.12.0...v1.12.1) (2026-01-10)
+
+
+### Bug Fixes
+
+* bug in S3 delete bucket ([99f9b25](https://github.com/jensvogt/awsmock/commit/99f9b259bcc08f022d85a44cecbe7e9cae82e557))
+
 ## [1.12.0](https://github.com/jensvogt/awsmock/compare/1.11.0...v1.12.0) (2026-01-06)
 
 
