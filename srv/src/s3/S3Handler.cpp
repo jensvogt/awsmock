@@ -226,6 +226,8 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> S3Handler::HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "S3 PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
 
+        Core::HttpUtils::DumpRequest(request);
+
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
@@ -404,6 +406,20 @@ namespace AwsMock::Service {
                     s3Request.bucket = clientCommand.bucket;
 
                     _s3Service.PutBucketVersioning(s3Request);
+
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION: {
+                    log_debug << "Put bucket lifecycle configuration request, bucket: " << clientCommand.bucket;
+
+                    // S3 lifecycle configuration
+                    Dto::S3::PutBucketLifecycleConfigurationRequest s3Request;
+                    s3Request.FromXml(Core::HttpUtils::GetBodyAsString(request));
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+
+                    _s3Service.PutBucketLifecycleConfiguration(s3Request);
 
                     return SendResponse(request, http::status::ok);
                 }

@@ -58,6 +58,7 @@ namespace AwsMock::Dto::Common {
         PUT_BUCKET_NOTIFICATION_CONFIGURATION,
         PUT_BUCKET_ENCRYPTION,
         PUT_BUCKET_VERSIONING,
+        PUT_BUCKET_LIFECYCLE_CONFIGURATION,
         GET_OBJECT_COUNTER,
         UPLOAD_OBJECT_COUNTER,
         GET_EVENT_SOURCE,
@@ -98,6 +99,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION, "PutBucketNotificationConfiguration"},
             {S3CommandType::PUT_BUCKET_ENCRYPTION, "PurBucketEncryption"},
             {S3CommandType::PUT_BUCKET_VERSIONING, "PutBucketVersioning"},
+            {S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION, "PutBucketLifecycleConfiguration"},
             {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
             {S3CommandType::UPLOAD_OBJECT_COUNTER, "UploadObjectCounter"},
             {S3CommandType::GET_EVENT_SOURCE, "GetEventSource"},
@@ -215,6 +217,11 @@ namespace AwsMock::Dto::Common {
          * S3 storage class
          */
         std::string storageClass;
+
+        /**
+         * Lifecycle request
+         */
+        bool lifecycleRequest = false;
 
         /**
          * @brief Convert to a JSON string

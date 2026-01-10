@@ -50,6 +50,7 @@
 #include <awsmock/dto/s3/MoveObjectResponse.h>
 #include <awsmock/dto/s3/PurgeBucketRequest.h>
 #include <awsmock/dto/s3/PutBucketEncryptionRequest.h>
+#include <awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationResponse.h>
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
@@ -93,12 +94,13 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {
-        };
+                                                           };
 
         /**
          * @brief Checks whether a bucket exists
@@ -200,6 +202,13 @@ namespace AwsMock::Service {
          * @param request S3 put versioning request
          */
         void PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &request) const;
+
+        /**
+         * @brief Put bucket lifecycle configuration
+         *
+         * @param request S3 put lifecycle configuration request
+         */
+        void PutBucketLifecycleConfiguration(const Dto::S3::PutBucketLifecycleConfigurationRequest &request) const;
 
         /**
          * @brief Creates a new bucket
@@ -388,7 +397,8 @@ namespace AwsMock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
@@ -564,6 +574,6 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context _ioc;
     };
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H

@@ -6,6 +6,9 @@
 #define AWSMOCK_DTO_S3_MAPPER_H
 
 // AwsMock includes
+#include "awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h"
+
+
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/internal/GetBucketRequest.h>
@@ -97,6 +100,30 @@ namespace AwsMock::Dto::S3 {
          * @return
          */
         static EventNotification map(const std::string &notificationId, Bucket &bucket, Object &object, const std::string &event);
+
+        /**
+         * @brief Maps a lifecycle transition
+         *
+         * @param transition lifecycle transition
+         * @return lifecycle transition entity
+         */
+        static Database::Entity::S3::LifecycleTransition map(const LifecycleTransition &transition);
+
+        /**
+         * @brief Maps a single lifecycle rule
+         *
+         * @param rule lifecycle rule
+         * @return lifecycle rule entity
+         */
+        static Database::Entity::S3::LifecycleConfiguration map(const LifecycleRule &rule);
+
+        /**
+         * @brief Maps a S3 lifecycle put request to a list lifecycle rules
+         *
+         * @param request S3 lifecycle configuration request
+         * @return
+         */
+        static std::vector<Database::Entity::S3::LifecycleConfiguration> map(const PutBucketLifecycleConfigurationRequest &request);
 
       private:
 

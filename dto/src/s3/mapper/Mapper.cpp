@@ -4,6 +4,8 @@
 
 #include <awsmock/dto/s3/mapper/Mapper.h>
 
+#include "awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h"
+
 namespace AwsMock::Dto::S3 {
 
     ListObjectVersionsResponse Mapper::map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList) {
@@ -199,4 +201,31 @@ namespace AwsMock::Dto::S3 {
 
         return eventNotification;
     }
+
+    Database::Entity::S3::LifecycleTransition Mapper::map(const LifecycleTransition &transition) {
+        Database::Entity::S3::LifecycleTransition transitionEntity;
+        transitionEntity.days = transition.days;
+        transitionEntity.date = transition.date;
+        transitionEntity.storeClass = Database::Entity::S3::StorageClassFromString(StorageClassToString(transition.storageClass));
+        return transitionEntity;
+    }
+
+    Database::Entity::S3::LifecycleConfiguration Mapper::map(const LifecycleRule &rule) {
+        Database::Entity::S3::LifecycleConfiguration configuration;
+        configuration.id = rule.id;
+        configuration.status = Database::Entity::S3::LifeCycleStatusFromString(LifeCycleStatusToString(rule.status));
+        for (const auto &transition: rule.transitions) {
+            configuration.transitions.emplace_back(map(transition));
+        }
+        return configuration;
+    }
+
+    std::vector<Database::Entity::S3::LifecycleConfiguration> Mapper::map(const PutBucketLifecycleConfigurationRequest &request) {
+        std::vector<Database::Entity::S3::LifecycleConfiguration> lifecycleConfigurations;
+        for (const auto &rule: request.rules) {
+            lifecycleConfigurations.emplace_back(map(rule));
+        }
+        return lifecycleConfigurations;
+    }
+
 }// namespace AwsMock::Dto::S3

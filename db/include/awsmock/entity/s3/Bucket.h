@@ -4,6 +4,7 @@
 
 #ifndef AWSMOCK_DB_ENTITY_S3_BUCKET_H
 #define AWSMOCK_DB_ENTITY_S3_BUCKET_H
+#include "LifecycleConfiguration.h"
 
 #ifdef _WIN32
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
@@ -123,6 +124,11 @@ namespace AwsMock::Database::Entity::S3 {
          * Default metadata
          */
         std::map<std::string, std::string> defaultMetadata;
+
+        /**
+         * S3 lifecycle configurations
+         */
+        std::vector<LifecycleConfiguration> lifecycleConfigurations;
 
         /**
          * Bucket versioning state
