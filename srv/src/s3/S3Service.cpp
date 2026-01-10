@@ -381,6 +381,32 @@ namespace AwsMock::Service {
         log_debug << "Put bucket lifecycle configuration, bucket: " << request.bucket;
     }
 
+    Dto::S3::GetBucketLifecycleConfigurationResponse S3Service::GetBucketLifecycleConfiguration(const Dto::S3::GetBucketLifecycleConfigurationRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket_lifecycle");
+        log_trace << "Get bucket lifecycle configuration request: " << request.ToString();
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        // Update bucket
+        const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+
+        // Check rules length
+        if (bucket.lifecycleConfigurations.empty()) {
+            log_error << "Bucket odes not have a lifecycle configuration, bucket: " << request.bucket;
+            throw Core::NotFoundException("Bucket odes not have a lifecycle configuration");
+        }
+
+        // Convert to DTO
+        Dto::S3::GetBucketLifecycleConfigurationResponse response;
+        for (const auto &configuration: bucket.lifecycleConfigurations) {
+            response.rules.emplace_back(Dto::S3::Mapper::map(configuration));
+        }
+
+        log_debug << "Get bucket lifecycle configuration, bucket: " << request.bucket;
+        return response;
+    }
+
     Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "create_multipart_upload");
         log_trace << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;

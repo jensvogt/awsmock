@@ -206,7 +206,7 @@ namespace AwsMock::Dto::S3 {
         Database::Entity::S3::LifecycleTransition transitionEntity;
         transitionEntity.days = transition.days;
         transitionEntity.date = transition.date;
-        transitionEntity.storeClass = Database::Entity::S3::StorageClassFromString(StorageClassToString(transition.storageClass));
+        transitionEntity.storageClass = Database::Entity::S3::StorageClassFromString(StorageClassToString(transition.storageClass));
         return transitionEntity;
     }
 
@@ -226,6 +226,35 @@ namespace AwsMock::Dto::S3 {
             lifecycleConfigurations.emplace_back(map(rule));
         }
         return lifecycleConfigurations;
+    }
+
+    LifecycleTransition Mapper::map(const Database::Entity::S3::LifecycleTransition &transition) {
+        LifecycleTransition transitionDto;
+        transitionDto.days = transition.days;
+        transitionDto.date = transition.date;
+        transitionDto.storageClass = StorageClassFromString(Database::Entity::S3::StorageClassToString(transition.storageClass));
+        return transitionDto;
+    }
+
+    LifecycleRule Mapper::map(const Database::Entity::S3::LifecycleConfiguration &configuration) {
+        LifecycleRule rule;
+        rule.id = configuration.id;
+        rule.prefix = configuration.prefix;
+        rule.status = LifeCycleStatusFromString(LifeCycleStatusToString(configuration.status));
+        if (!configuration.transitions.empty()) {
+            for (const auto &transition: configuration.transitions) {
+                rule.transitions.emplace_back(map(transition));
+            }
+        }
+        return rule;
+    }
+
+    std::vector<LifecycleRule> Mapper::map(const std::vector<Database::Entity::S3::LifecycleConfiguration> &configurations) {
+        std::vector<LifecycleRule> rules;
+        for (const auto &configuration: configurations) {
+            rules.emplace_back(map(configuration));
+        }
+        return rules;
     }
 
 }// namespace AwsMock::Dto::S3

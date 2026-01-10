@@ -204,7 +204,8 @@ namespace AwsMock::Database::Entity::S3 {
         if (mResult.value().find("lambdaConfigurations") != mResult.value().end()) {
             lambdaNotifications.clear();
             for (bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
-                lambdaNotifications.emplace_back(notificationElement.get_document().view());
+                LambdaNotification notification;
+                lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
 
@@ -212,7 +213,9 @@ namespace AwsMock::Database::Entity::S3 {
         if (mResult.value().find("lifecycleConfigurations") != mResult.value().end()) {
             lifecycleConfigurations.clear();
             for (bsoncxx::array::view lifecycleView{mResult.value()["lifecycleConfigurations"].get_array().value}; const bsoncxx::array::element &lifecycleElement: lifecycleView) {
-                lifecycleConfigurations.emplace_back(lifecycleElement.get_document().view());
+                LifecycleConfiguration configuration;
+                configuration.FromDocument(lifecycleElement.get_document().view());
+                lifecycleConfigurations.emplace_back(configuration);
             }
         }
 

@@ -5,6 +5,8 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "S3 GET request, URI: " << request.target() << " region: " << region << " user: " + user;
 
+        //Core::HttpUtils::DumpRequest(request);
+
         // Get the command
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
@@ -222,10 +224,26 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::no_content);
                 }
 
+                case Dto::Common::S3CommandType::GET_BUCKET_LIFECYCLE_CONFIGURATION: {
+                    log_debug << "Get bucket lifecycle configuration request, bucket: " << clientCommand.bucket;
+
+                    // S3 lifecycle configuration
+                    Dto::S3::GetBucketLifecycleConfigurationRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.user = clientCommand.user;
+                    s3Request.requestId = clientCommand.requestId;
+                    s3Request.bucket = clientCommand.bucket;
+
+                    Dto::S3::GetBucketLifecycleConfigurationResponse s3Response = _s3Service.GetBucketLifecycleConfiguration(s3Request);
+
+                    return SendResponse(request, http::status::ok, s3Response.ToXml());
+                }
+
                 default:
                     log_error << "Unknown method";
                     return SendResponse(request, http::status::bad_request, "Unknown method");
             }
+
         } catch (Core::NotFoundException &exc) {
             log_error << "Bucket or object not found, exception: " << exc.what();
             return SendResponse(request, http::status::not_found, exc.what());

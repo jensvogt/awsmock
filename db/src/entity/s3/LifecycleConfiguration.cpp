@@ -37,7 +37,9 @@ namespace AwsMock::Database::Entity::S3 {
         if (mResult.find("transitions") != mResult.end()) {
             transitions.clear();
             for (const bsoncxx::array::view transitionView{mResult["transitions"].get_array().value}; const bsoncxx::array::element &transitionElement: transitionView) {
-                transitions.emplace_back(transitionElement.get_document().view());
+                LifecycleTransition transition;
+                transition.FromDocument(transitionElement.get_document().view());
+                transitions.emplace_back(transition);
             }
         }
     }

@@ -32,7 +32,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Storage class
          */
-        StorageClass storeClass;
+        StorageClass storageClass;
 
         /**
          * @brief Default constructor

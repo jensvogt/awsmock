@@ -176,6 +176,8 @@ namespace AwsMock::Dto::Common {
             command = S3CommandType::LIST_OBJECT_VERSIONS;
         } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "put-bucket-lifecycle-configuration") {
             command = S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION;
+        } else if (userAgent.clientModule == "s3api" && userAgent.clientCommand == "get-bucket-lifecycle-configuration") {
+            command = S3CommandType::GET_BUCKET_LIFECYCLE_CONFIGURATION;
         }
     }
 

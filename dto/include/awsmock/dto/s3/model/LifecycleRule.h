@@ -72,6 +72,28 @@ namespace AwsMock::Dto::S3 {
             }
         }
 
+        /**
+         * @brief Generate from an XML string
+         *
+         * @return pt boost a property tree
+         */
+        [[nodiscard]] boost::property_tree::ptree ToXml() const {
+
+            // General
+            boost::property_tree::ptree pt;
+            pt.put("ID", id);
+            pt.put("Prefix", prefix);
+            pt.put("Status", LifeCycleStatusToString(status));
+
+            // Transitions
+            if (!transitions.empty()) {
+                for (const auto &transition: transitions) {
+                    pt.add_child("Transition", transition.ToXml());
+                }
+            }
+            return pt;
+        }
+
       private:
 
         friend LifecycleRule tag_invoke(boost::json::value_to_tag<LifecycleRule>, boost::json::value const &v) {
