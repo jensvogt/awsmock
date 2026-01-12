@@ -114,7 +114,8 @@ namespace AwsMock::Dto::S3 {
                     {"RequestId", obj.requestId},
                     {"ID", obj.id},
                     {"Prefix", obj.prefix},
-                    {"Status", obj.status},
+                    {"Status", LifeCycleStatusToString(obj.status)},
+                    {"Transitions", boost::json::value_from(obj.transitions)},
             };
         }
     };

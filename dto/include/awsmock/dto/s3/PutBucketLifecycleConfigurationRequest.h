@@ -63,7 +63,7 @@ namespace AwsMock::Dto::S3 {
         friend PutBucketLifecycleConfigurationRequest tag_invoke(boost::json::value_to_tag<PutBucketLifecycleConfigurationRequest>, boost::json::value const &v) {
             PutBucketLifecycleConfigurationRequest r;
             r.bucket = Core::Json::GetStringValue(v, "bucket");
-            //            r.status = Core::Json::GetStringValue(v, "status");
+            r.rules = boost::json::value_to<std::vector<LifecycleRule>>(v.at("rules"));
             return r;
         }
 

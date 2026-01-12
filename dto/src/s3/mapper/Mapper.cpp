@@ -46,6 +46,7 @@ namespace AwsMock::Dto::S3 {
         response.queueConfigurations = map(bucket.queueNotifications);
         response.topicConfigurations = map(bucket.topicNotifications);
         response.defaultMetadata = bucket.defaultMetadata;
+        response.lifecycleRules = map(bucket.lifecycleConfigurations);
         response.created = bucket.created;
         response.modified = bucket.modified;
         return response;

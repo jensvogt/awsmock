@@ -593,7 +593,7 @@ namespace AwsMock::Service {
                     Dto::S3::GetBucketRequest s3Request = Dto::S3::GetBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
                     Dto::S3::GetBucketResponse s3Response = _s3Service.GetBucket(s3Request);
 
-                    log_info << "Get bucket, name: " << s3Request.bucketName;
+                    log_info << "Get bucket, name: " << s3Request.bucketName << ", body: " << s3Response.ToJson();
                     return SendResponse(request, http::status::ok, s3Response.ToJson());
                 }
 
@@ -727,6 +727,8 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> S3Handler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "S3 DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
 
+        Core::HttpUtils::DumpRequest(request);
+
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
@@ -759,10 +761,26 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::no_content);
                 }
 
+                case Dto::Common::S3CommandType::DELETE_BUCKET_LIFECYCLE: {
+                    log_debug << "Delete bucket lifecycle configuration request, bucket: " << clientCommand.bucket;
+
+                    // S3 lifecycle configuration
+                    Dto::S3::DeleteBucketLifecycleRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+
+                    _s3Service.DeleteBucketLifecycle(s3Request);
+
+                    return SendResponse(request, http::status::no_content);
+                }
+
                 default:
                     log_error << "Unknown method, command: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
                     return SendResponse(request, http::status::bad_request, "Unknown method");
             }
+        } catch (Core::NotFoundException &exc) {
+            log_error << "Bucket or object not found, exception: " << exc.what();
+            return SendResponse(request, http::status::not_found, exc.what());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendResponse(request, http::status::internal_server_error, exc.what());

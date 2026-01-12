@@ -78,6 +78,11 @@ namespace AwsMock::Dto::S3 {
         std::map<std::string, std::string> defaultMetadata;
 
         /**
+         * @brief Life cycle rules
+         */
+        std::vector<LifecycleRule> lifecycleRules;
+
+        /**
          * Created
          */
         system_clock::time_point created;
@@ -102,6 +107,7 @@ namespace AwsMock::Dto::S3 {
             r.queueConfigurations = boost::json::value_to<std::vector<QueueConfiguration>>(v.at("queueConfigurations"));
             r.topicConfigurations = boost::json::value_to<std::vector<TopicConfiguration>>(v.at("topicConfigurations"));
             r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("defaultMetadata"));
+            r.lifecycleRules = boost::json::value_to<std::vector<LifecycleRule>>(v.at("lifecycleRules"));
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
@@ -123,6 +129,7 @@ namespace AwsMock::Dto::S3 {
                     {"queueConfigurations", boost::json::value_from(obj.queueConfigurations)},
                     {"topicConfigurations", boost::json::value_from(obj.topicConfigurations)},
                     {"defaultMetadata", boost::json::value_from(obj.defaultMetadata)},
+                    {"lifecycleRules", boost::json::value_from(obj.lifecycleRules)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
