@@ -14,6 +14,9 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * @brief S3 storage class
      *
+     * @par
+     * If storage class does not exist in entity 'STANDARD' is assumed.
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
     enum class StorageClass {
@@ -25,8 +28,7 @@ namespace AwsMock::Database::Entity::S3 {
         GLACIER_IR,
         DEEP_ARCHIVE,
         INTELLIGENT_TIERING,
-        REDUCED_REDUNDANCY,
-        UNKNOWN,
+        REDUCED_REDUNDANCY
     };
 
     static std::map<StorageClass, std::string> StorageClassNames{
@@ -39,7 +41,6 @@ namespace AwsMock::Database::Entity::S3 {
             {StorageClass::DEEP_ARCHIVE, "DEEP_ARCHIVE"},
             {StorageClass::INTELLIGENT_TIERING, "INTELLIGENT_TIERING"},
             {StorageClass::REDUCED_REDUNDANCY, "REDUCED_REDUNDANCY"},
-            {StorageClass::UNKNOWN, "UNKNOWN"},
     };
 
     [[maybe_unused]] static std::string StorageClassToString(const StorageClass &storageClass) {
@@ -52,7 +53,7 @@ namespace AwsMock::Database::Entity::S3 {
                 return fst;
             }
         }
-        return StorageClass::UNKNOWN;
+        return StorageClass::STANDARD;
     }
 }// namespace AwsMock::Database::Entity::S3
 
