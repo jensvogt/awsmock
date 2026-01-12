@@ -29,6 +29,7 @@
 #include <awsmock/dto/s3/CreateBucketResponse.h>
 #include <awsmock/dto/s3/CreateMultipartUploadRequest.h>
 #include <awsmock/dto/s3/CreateMultipartUploadResult.h>
+#include <awsmock/dto/s3/DeleteBucketLifecycleRequest.h>
 #include <awsmock/dto/s3/DeleteBucketRequest.h>
 #include <awsmock/dto/s3/DeleteObjectRequest.h>
 #include <awsmock/dto/s3/GetBucketLifecycleConfigurationRequest.h>
@@ -215,6 +216,7 @@ namespace AwsMock::Service {
          * @param request get bucket lifecycle configuration request
          */
         Dto::S3::GetBucketLifecycleConfigurationResponse GetBucketLifecycleConfiguration(const Dto::S3::GetBucketLifecycleConfigurationRequest &request) const;
+        void DeleteBucketLifecycle(const Dto::S3::DeleteBucketLifecycleRequest &request) const;
 
         /**
          * @brief Creates a new bucket

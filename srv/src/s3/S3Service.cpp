@@ -407,6 +407,21 @@ namespace AwsMock::Service {
         return response;
     }
 
+    void S3Service::DeleteBucketLifecycle(const Dto::S3::DeleteBucketLifecycleRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_bucket_lifecycle");
+        log_trace << "Delete bucket lifecycle request: " << request.ToString();
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        // Update bucket
+        Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+        bucket.lifecycleConfigurations.clear();
+
+        _database.UpdateBucket(bucket);
+        log_debug << "Delete bucket lifecycle configuration, bucket: " << request.bucket;
+    }
+
     Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "create_multipart_upload");
         log_trace << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;
