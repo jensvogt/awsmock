@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.7](https://github.com/jensvogt/awsmock/compare/v1.12.6...v1.12.7) (2026-02-01)
+
+
+### Bug Fixes
+
+* set correct lambda version, when new code is uploaded ([018c69a](https://github.com/jensvogt/awsmock/commit/018c69a98c4cc656169394a067f0f2ac6f25030b))
+
 ## [1.12.6](https://github.com/jensvogt/awsmock/compare/1.12.5...v1.12.6) (2026-02-01)
 
 
