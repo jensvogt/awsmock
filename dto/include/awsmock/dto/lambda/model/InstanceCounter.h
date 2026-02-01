@@ -41,9 +41,14 @@ namespace AwsMock::Dto::Lambda {
         std::string hostname;
 
         /**
+         * Container private port
+         */
+        long privatePort{};
+
+        /**
          * Container public port
          */
-        long port{};
+        long publicPort{};
 
         /**
          * Last started
@@ -59,7 +64,8 @@ namespace AwsMock::Dto::Lambda {
             r.status = Core::Json::GetStringValue(v, "status");
             r.duration = Core::Json::GetLongValue(v, "duration");
             r.hostname = Core::Json::GetStringValue(v, "hostname");
-            r.port = Core::Json::GetLongValue(v, "port");
+            r.privatePort = Core::Json::GetLongValue(v, "privatePort");
+            r.publicPort = Core::Json::GetLongValue(v, "publicPort");
             r.lastInvocation = Core::Json::GetDatetimeValue(v, "lastInvocation");
             return r;
         }
@@ -71,7 +77,8 @@ namespace AwsMock::Dto::Lambda {
                     {"status", obj.status},
                     {"duration", obj.duration},
                     {"hostname", obj.hostname},
-                    {"port", obj.port},
+                    {"privatePort", obj.privatePort},
+                    {"publicPort", obj.publicPort},
                     {"lastInvocation", Core::DateTimeUtils::ToISO8601(obj.lastInvocation)},
             };
         }

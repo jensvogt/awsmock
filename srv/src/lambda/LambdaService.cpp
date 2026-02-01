@@ -462,7 +462,8 @@ namespace AwsMock::Service {
                 instanceCounter.containerId = instance.containerId;
                 instanceCounter.status = Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status);
                 instanceCounter.hostname = instance.hostName;
-                instanceCounter.port = instance.hostPort;
+                instanceCounter.publicPort = instance.publicPort;
+                instanceCounter.privatePort = instance.privatePort;
                 instanceCounter.lastInvocation = instance.lastInvocation;
                 response.instanceCounters.emplace_back(instanceCounter);
             }
@@ -679,7 +680,7 @@ namespace AwsMock::Service {
         // Find an idle instance
         Database::Entity::Lambda::Instance instance;
         FindIdleInstance(lambda, instance);
-        log_info << "Found idle instance, name: " << lambda.function << ", instanceId: " << instance.instanceId << ", containerId: " << instance.containerId << ", hostName: " << instance.hostName << ", port: " << instance.hostPort;
+        log_info << "Found idle instance, name: " << lambda.function << ", instanceId: " << instance.instanceId << ", containerId: " << instance.containerId << ", hostName: " << instance.hostName << ", port: " << instance.publicPort;
 
         // Execution depending on the invocation type
         Dto::Lambda::LambdaResult result{};

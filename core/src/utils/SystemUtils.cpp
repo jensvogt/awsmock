@@ -58,7 +58,7 @@ namespace AwsMock::Core {
     }
 
     int SystemUtils::GetNextFreePort() {
-        sockaddr_in sin;
+        sockaddr_in sin{};
         constexpr int port = 0;
 
         const int s = socket(AF_INET, SOCK_STREAM, 0);
@@ -70,13 +70,13 @@ namespace AwsMock::Core {
         sin.sin_addr.s_addr = INADDR_ANY;
         sin.sin_family = AF_INET;
 
-        if (bind(s, (sockaddr *) &sin, sizeof(sockaddr_in)) == -1) {
+        if (bind(s, reinterpret_cast<sockaddr *>(&sin), sizeof(sockaddr_in)) == -1) {
             if (errno == EADDRINUSE)
                 log_error << "Port in use";
             return -1;
         }
         socklen_t len = sizeof(sin);
-        if (getsockname(s, (sockaddr *) &sin, &len) != -1) {
+        if (getsockname(s, reinterpret_cast<sockaddr *>(&sin), &len) != -1) {
 #ifdef _WIN32
             closesocket(s);
 #else
