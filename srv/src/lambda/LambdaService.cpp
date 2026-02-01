@@ -77,6 +77,9 @@ namespace AwsMock::Service {
         lambda.state = Database::Entity::Lambda::LambdaState::Pending;
         lambda.invocations = 0;
         lambda.averageRuntime = 0;
+        lambda.dockerTag = request.version;
+        lambda.tags["version"] = request.version;
+        lambda.tags["dockerTag"] = request.version;
         lambda.stateReason = "Initializing";
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
