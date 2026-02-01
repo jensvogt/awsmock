@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.8](https://github.com/jensvogt/awsmock/compare/v1.12.7...v1.12.8) (2026-02-01)
+
+
+### Bug Fixes
+
+* controller having wrong ports ([99ba51c](https://github.com/jensvogt/awsmock/commit/99ba51c0781dfe62d8dbc98cab263ee36bec7b47))
+
 ## [1.12.7](https://github.com/jensvogt/awsmock/compare/v1.12.6...v1.12.7) (2026-02-01)
 
 
