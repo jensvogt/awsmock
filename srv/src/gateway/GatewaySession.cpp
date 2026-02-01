@@ -51,7 +51,7 @@ namespace AwsMock::Service {
         boost::beast::error_code ev;
 
         // Read request into _parser
-        boost::beast::http::read(_stream, _buffer, *_parser, ev);
+        http::read(_stream, _buffer, *_parser, ev);
         if (ev) {
             log_error << "Read failed: " << ev.message();
             return;
@@ -83,7 +83,7 @@ namespace AwsMock::Service {
     //
     // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
     template<class Body, class Allocator, class Send>
-    void GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request, Send &&send) {
+    void GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request, Send &&send) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -292,4 +292,4 @@ namespace AwsMock::Service {
         boost::beast::error_code ec;
         write(_stream, response, ec);
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

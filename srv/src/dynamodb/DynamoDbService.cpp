@@ -436,6 +436,35 @@ namespace AwsMock::Service {
         return {};
     }
 
+    void DynamoDbService::DeleteAllItems(const Dto::DynamoDb::DeleteAllItemsRequest &request) const {
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "delete_all_items");
+        log_debug << "Start deleting all items, region: " << request.region << " table: " << request.tableName;
+
+        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+            throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
+        }
+
+        try {
+
+            // Delete table
+            Dto::DynamoDb::DeleteTableRequest delRequest;
+            delRequest.tableName = request.tableName;
+            delRequest.region = request.region;
+            Dto::DynamoDb::DeleteTableResponse delResponse = DeleteTable(delRequest);
+
+            Dto::DynamoDb::CreateTableRequest createRequest;
+            createRequest.tableName = request.tableName;
+            createRequest.region = request.region;
+            Dto::DynamoDb::CreateTableResponse createResponse = CreateTable(createRequest);
+            log_debug << "DynamoDb item deleted, table: " << request.tableName;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd delete item failed, message: " << exc.message();
+            throw Core::ServiceException("DynamoDbd delete item failed, message: " + exc.message());
+        }
+    }
+
     std::map<std::string, std::string> DynamoDbService::PrepareHeaders(const std::string &command) {
         std::map<std::string, std::string> headers;
         headers["Region"] = "eu-central-1";

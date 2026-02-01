@@ -68,7 +68,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * System attributes
          */
-        std::map<std::string, MessageAttribute> messageSystemAttributes;
+        std::map<std::string, std::string> attributes;
 
         /**
          * Message attributes
@@ -144,14 +144,14 @@ namespace AwsMock::Dto::SQS {
                 }
 
                 // System attributes
-                if (!messageSystemAttributes.empty()) {
+                if (!attributes.empty()) {
                     array jsonAttributeArray;
-                    for (const auto &[fst, snd]: messageSystemAttributes) {
+                    for (const auto &[fst, snd]: attributes) {
                         document jsonAttribute;
-                        jsonAttribute.append(kvp(fst, snd.ToDocument()));
+                        jsonAttribute.append(kvp(fst, snd));
                         jsonAttributeArray.append(jsonAttribute);
                     }
-                    rootDocument.append(kvp("messageSystemAttributes", jsonAttributeArray));
+                    rootDocument.append(kvp("attributes", jsonAttributeArray));
                 }
                 return rootDocument.extract();
 
@@ -223,8 +223,8 @@ namespace AwsMock::Dto::SQS {
             r.size = Core::Json::GetLongValue(v, "Size");
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "Created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "Modified"));
-            if (Core::Json::AttributeExists(v, "MessageSystemAttributes")) {
-                r.messageSystemAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageSystemAttributes"));
+            if (Core::Json::AttributeExists(v, "Attributes")) {
+                r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("Attributes"));
             }
             if (Core::Json::AttributeExists(v, "MessageAttributes")) {
                 r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
@@ -245,7 +245,7 @@ namespace AwsMock::Dto::SQS {
                     {"Size", obj.size},
                     {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-                    {"MessageSystemAttributes", boost::json::value_from(obj.messageSystemAttributes)},
+                    {"Attributes", boost::json::value_from(obj.attributes)},
                     {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
             };
         }

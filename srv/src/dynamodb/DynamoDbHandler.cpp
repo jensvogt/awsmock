@@ -125,6 +125,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, dynamoDbResponse.ToJson());
                 }
 
+                case Dto::Common::DynamoDbCommandType::DELETE_ALL_ITEMS: {
+
+                    Dto::DynamoDb::DeleteAllItemsRequest dynamoDbRequest = Dto::DynamoDb::DeleteAllItemsRequest::FromJson(clientCommand);
+                    _dynamoDbService.DeleteAllItems(dynamoDbRequest);
+                    log_info << "Delete item, region: " << dynamoDbRequest.region << ", tableName: " << dynamoDbRequest.tableName;
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {
                     log_error << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
                     return SendBadRequestError(request, "Bad request, method: POST clientCommand: " + Dto::Common::DynamoDbCommandTypeToString(clientCommand.command));

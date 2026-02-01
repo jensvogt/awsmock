@@ -996,6 +996,7 @@ namespace AwsMock::Service {
             if (queue.attributes.delaySeconds > 0) {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.delaySeconds);
                 queue.attributes.approximateNumberOfMessagesDelayed++;
+                queue = _sqsDatabase.UpdateQueue(queue);
             } else {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
@@ -1011,11 +1012,13 @@ namespace AwsMock::Service {
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
             message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
-            message.md5MessageSystemAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageSystemAttributes);
+            //message.md5MessageSystemAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.attributes);
 
             // Update database
             message = _sqsDatabase.CreateMessage(message);
             log_debug << "Message send, queueName: " << queue.name;
+            // TODO: Remove
+            log_info << "SQS over SNS message: " << request.ToJson();
 
             // Find Lambdas with this as an event source
             CheckLambdaNotifications(queue.queueArn, message);
@@ -1048,7 +1051,7 @@ namespace AwsMock::Service {
                 Dto::SQS::SendMessageRequest entryRequest;
                 entryRequest.region = request.region;
                 entryRequest.queueUrl = queueUrl;
-                entryRequest.messageSystemAttributes = entry.messageSystemAttributes;
+                entryRequest.attributes = entry.attributes;
                 entryRequest.messageAttributes = entry.messageAttributes;
                 entryRequest.body = entry.body;
 

@@ -123,13 +123,6 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * These are the user-contributed message attributes.
          */
-        std::map<std::string, MessageAttribute> messageSystemAttributes;
-
-        /**
-         * List of message attributes.
-         *
-         * These are the user-contributed message attributes.
-         */
         std::map<std::string, MessageAttribute> messageAttributes;
 
         /**

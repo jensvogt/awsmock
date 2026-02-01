@@ -11,8 +11,6 @@ namespace AwsMock::Dto::Common {
         UserAgent userAgent;
         userAgent.FromRequest(request);
 
-        //Core::HttpUtils::DumpRequest(request);
-
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
