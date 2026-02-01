@@ -52,7 +52,7 @@ namespace AwsMock::Database::Entity::Lambda {
         for (auto &instance: instances) {
             if (instanceId == instance.instanceId) {
                 instance.hostName = host;
-                instance.hostPort = port;
+                instance.publicPort = port;
                 return;
             }
         }

@@ -14,7 +14,8 @@ namespace AwsMock::Database::Entity::Lambda {
             containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
             containerName = Core::Bson::BsonUtils::GetStringValue(mResult, "containerName");
             hostName = Core::Bson::BsonUtils::GetStringValue(mResult, "hostName");
-            hostPort = Core::Bson::BsonUtils::GetIntValue(mResult, "hostPort");
+            publicPort = Core::Bson::BsonUtils::GetIntValue(mResult, "publicPort");
+            privatePort = Core::Bson::BsonUtils::GetIntValue(mResult, "privatePort");
             status = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult, "lastInvocation");
@@ -34,7 +35,8 @@ namespace AwsMock::Database::Entity::Lambda {
             instanceDoc.append(kvp("containerId", containerId));
             instanceDoc.append(kvp("containerName", containerName));
             instanceDoc.append(kvp("hostName", hostName));
-            instanceDoc.append(kvp("hostPort", hostPort));
+            instanceDoc.append(kvp("publicPort", publicPort));
+            instanceDoc.append(kvp("privatePort", privatePort));
             instanceDoc.append(kvp("status", LambdaInstanceStatusToString(status)));
             instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));
             instanceDoc.append(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)));

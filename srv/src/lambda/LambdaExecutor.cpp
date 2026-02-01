@@ -8,11 +8,11 @@ namespace AwsMock::Service {
 
     Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const {
         Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
-        log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.hostPort;
+        log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.publicPort;
 
         // Send request to lambda docker container
         const system_clock::time_point start = system_clock::now();
-        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.hostPort, "/2015-03-31/functions/function/invocations", payload);
+        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/2015-03-31/functions/function/invocations", payload);
         const long runtime = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
 
         // Get lambda log messages

@@ -68,7 +68,8 @@ namespace AwsMock::Service {
         instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostName = _dockerized ? containerName : std::string("localhost");
-            instance.hostPort = _dockerized ? 8080 : hostPort;
+            instance.publicPort = _dockerized ? stoi(privatePort) : hostPort;
+            instance.privatePort = stoi(privatePort);
             instance.containerId = inspectContainerResponse.id;
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
         }
@@ -120,7 +121,8 @@ namespace AwsMock::Service {
         instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostName = dockerized ? containerName : "localhost";
-            instance.hostPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(privatePort);
+            instance.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(privatePort);
+            instance.privatePort = stoi(privatePort);
             instance.containerId = inspectContainerResponse.id;
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
         }

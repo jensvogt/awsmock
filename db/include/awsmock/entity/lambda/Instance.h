@@ -77,9 +77,14 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string containerName{};
 
         /**
-         * Host port
+         * Container public
          */
-        int hostPort{};
+        int publicPort{};
+
+        /**
+         * Container public
+         */
+        int privatePort = 8080;
 
         /**
          * Host name
