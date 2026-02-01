@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.5](https://github.com/jensvogt/awsmock/compare/v1.12.4...v1.12.5) (2026-02-01)
+
+
+### Bug Fixes
+
+* bug in S3 lifecylce, default strorage class is 'STANDARD' ([#1959](https://github.com/jensvogt/awsmock/issues/1959)) ([8fcf2cf](https://github.com/jensvogt/awsmock/commit/8fcf2cf3d0ef89fc7b578f816da9faaac68f597a))
+
 ## [1.12.4](https://github.com/jensvogt/awsmock/compare/v1.12.3...v1.12.4) (2026-01-12)
 
 
