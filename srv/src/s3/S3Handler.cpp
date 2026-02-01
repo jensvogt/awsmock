@@ -5,8 +5,6 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "S3 GET request, URI: " << request.target() << " region: " << region << " user: " + user;
 
-        //Core::HttpUtils::DumpRequest(request);
-
         // Get the command
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
@@ -258,8 +256,6 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> S3Handler::HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "S3 PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
-
-        Core::HttpUtils::DumpRequest(request);
 
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);

@@ -1017,8 +1017,6 @@ namespace AwsMock::Service {
             // Update database
             message = _sqsDatabase.CreateMessage(message);
             log_debug << "Message send, queueName: " << queue.name;
-            // TODO: Remove
-            log_info << "SQS over SNS message: " << request.ToJson();
 
             // Find Lambdas with this as an event source
             CheckLambdaNotifications(queue.queueArn, message);
