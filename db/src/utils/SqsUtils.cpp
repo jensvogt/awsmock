@@ -10,7 +10,7 @@ namespace AwsMock::Database {
         return Core::Crypto::GetMd5FromString(messageBody);
     }
 
-    std::string SqsUtils::CreateMd5OfMessageAttributes(const std::map<std::string, Entity::SQS::MessageAttribute> &attributes) {
+    std::string SqsUtils::CreateMd5OfMessageAttributes(const std::map<std::string, Entity::SQS::MessageAttribute> &messageAttributes) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();
@@ -19,7 +19,7 @@ namespace AwsMock::Database {
         auto *bytes = new unsigned char[1];
 
         EVP_DigestInit(context, md);
-        for (const auto &[fst, snd]: attributes) {
+        for (const auto &[fst, snd]: messageAttributes) {
 
             log_debug << "MD5sum, attribute: " << fst;
 

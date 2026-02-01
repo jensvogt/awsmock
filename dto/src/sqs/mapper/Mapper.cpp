@@ -85,12 +85,8 @@ namespace AwsMock::Dto::SQS {
             attribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
             messageEntity.messageAttributes[fst] = attribute;
         }
-        for (const auto &[fst, snd]: request.messageSystemAttributes) {
-            Database::Entity::SQS::MessageAttribute attribute;
-            attribute.stringValue = snd.stringValue;
-            attribute.stringListValues = snd.stringListValues;
-            attribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
-            messageEntity.messageSystemAttributes[fst] = attribute;
+        for (const auto &[fst, snd]: request.attributes) {
+            messageEntity.attributes[fst] = snd;
         }
         return messageEntity;
     }

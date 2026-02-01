@@ -68,8 +68,6 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-      private:
-
         friend GetMetadataResponse tag_invoke(boost::json::value_to_tag<GetMetadataResponse>, boost::json::value const &v) {
             GetMetadataResponse r;
             r.bucket = Core::Json::GetStringValue(v, "bucket");

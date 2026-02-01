@@ -27,6 +27,7 @@
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
+#include <awsmock/dto/dynamodb/DeleteAllItemsRequest.h>
 #include <awsmock/dto/dynamodb/DeleteItemRequest.h>
 #include <awsmock/dto/dynamodb/DeleteItemResponse.h>
 #include <awsmock/dto/dynamodb/DeleteTableRequest.h>
@@ -210,6 +211,16 @@ namespace AwsMock::Service {
          * @return DeleteItemResponse
          */
         [[nodiscard]] Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const;
+
+        /**
+         * @brief delete all items
+         *
+         * @par
+         * As DynamoDB does not have a truncate, or purge the table is deleted and recreated.
+         *
+         * @param request delete items request
+         */
+        void DeleteAllItems(const Dto::DynamoDb::DeleteAllItemsRequest &request) const;
 
       private:
 

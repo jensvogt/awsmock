@@ -89,7 +89,7 @@ namespace AwsMock::Service {
                     headerMap["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
                     headerMap["x-amz-storage-class"] = s3Response.storageClass;
 
-                    if (s3Response.storageClass != Database::Entity::S3::StorageClassToString(Database::Entity::S3::StorageClass::STANDARD)) {
+                    if (!s3Response.storageClass.empty() && s3Response.storageClass != Database::Entity::S3::StorageClassToString(Database::Entity::S3::StorageClass::STANDARD)) {
                         headerMap["Content-Type"] = s3Response.contentType;
                         std::string body = "<Error><Code>InvalidObjectState</Code><Message>The action is not valid for the object's storage class</Message></Error>";
                         return SendResponse(request, http::status::forbidden, body, headerMap);
@@ -830,7 +830,7 @@ namespace AwsMock::Service {
             }
 
             // Check storage class
-            if (s3Response.storageClass != Database::Entity::S3::StorageClassToString(Database::Entity::S3::StorageClass::STANDARD)) {
+            if (!s3Response.storageClass.empty() && s3Response.storageClass != Database::Entity::S3::StorageClassToString(Database::Entity::S3::StorageClass::STANDARD)) {
                 headers["Content-Type"] = "application/xml";
                 std::string body = "<Error><Code>InvalidObjectState</Code><Message>The action is not valid for the object's storage class</Message></Error>";
                 return SendResponse(request, http::status::forbidden, body, headers);

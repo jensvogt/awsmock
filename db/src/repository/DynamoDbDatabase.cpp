@@ -716,7 +716,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
                 const auto result = _itemCollection.delete_many({});
                 log_debug << "DynamoDB items deleted, count: " << result->deleted_count();
-                return static_cast<long>(result->deleted_count());
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

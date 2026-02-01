@@ -88,7 +88,7 @@ namespace AwsMock::Database::Entity::SQS {
             created = MongoUtils::GetDatetime(mResult, "created");
             modified = MongoUtils::GetDatetime(mResult, "modified");
 
-            // Attributes
+            // Message attributes
             if (mResult.value().find("messageAttributes") != mResult.value().end()) {
                 messageAttributes.clear();
                 for (const view messageAttributeObject = mResult.value()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
@@ -99,7 +99,7 @@ namespace AwsMock::Database::Entity::SQS {
                 }
             }
 
-            // Get attributes
+            // Attributes
             if (mResult.value().find("attributes") != mResult.value().end()) {
                 attributes.clear();
                 for (const view attributesView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
