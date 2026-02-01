@@ -1,5 +1,56 @@
 # Changelog
 
+## [1.12.5](https://github.com/jensvogt/awsmock/compare/v1.12.4...v1.12.5) (2026-02-01)
+
+
+### Bug Fixes
+
+* bug in S3 lifecylce, default strorage class is 'STANDARD' ([#1959](https://github.com/jensvogt/awsmock/issues/1959)) ([8fcf2cf](https://github.com/jensvogt/awsmock/commit/8fcf2cf3d0ef89fc7b578f816da9faaac68f597a))
+
+## [1.12.4](https://github.com/jensvogt/awsmock/compare/v1.12.3...v1.12.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* bug in S3 lifecylce, default strorage class is 'STANDARD' ([f380f70](https://github.com/jensvogt/awsmock/commit/f380f709291967ee5cbfe57c40f21bd21f0f2472))
+
+## [1.12.3](https://github.com/jensvogt/awsmock/compare/1.12.2...v1.12.3) (2026-01-12)
+
+
+### Bug Fixes
+
+* bug in S3 get lifecycle configuration ([f408c6b](https://github.com/jensvogt/awsmock/commit/f408c6b4d6e0e76871e42133f5d546d798ea6221))
+
+## [1.12.2](https://github.com/jensvogt/awsmock/compare/v1.12.1...v1.12.2) (2026-01-10)
+
+
+### Bug Fixes
+
+* bug in S3 get lifecycle configuration ([642fb4b](https://github.com/jensvogt/awsmock/commit/642fb4bf3c22b8240cc57b6f0989e9f375e584fe))
+* bug in S3 get lifecycle configuration ([90328ec](https://github.com/jensvogt/awsmock/commit/90328ecb6de30e03120ff3ecf41156dbf9b13d27))
+
+## [1.12.1](https://github.com/jensvogt/awsmock/compare/1.12.0...v1.12.1) (2026-01-10)
+
+
+### Bug Fixes
+
+* bug in S3 delete bucket ([99f9b25](https://github.com/jensvogt/awsmock/commit/99f9b259bcc08f022d85a44cecbe7e9cae82e557))
+
+## [1.12.0](https://github.com/jensvogt/awsmock/compare/1.11.0...v1.12.0) (2026-01-06)
+
+
+### Features
+
+* add s3 storage class ([54976ca](https://github.com/jensvogt/awsmock/commit/54976caa0a0091c9dd1aca617da552c814749b88))
+
+## [1.11.0](https://github.com/jensvogt/awsmock/compare/1.10.1...v1.11.0) (2026-01-06)
+
+
+### Features
+
+* add s3 storage class ([212caa1](https://github.com/jensvogt/awsmock/commit/212caa1efa50c33c0929334e75fcf49f9b35bfe3))
+* add s3 storage class ([577398e](https://github.com/jensvogt/awsmock/commit/577398ee3efaff869ad507f742fc88d7936b87a4))
+
 ## [1.10.1](https://github.com/jensvogt/awsmock/compare/1.10.0...v1.10.1) (2025-12-22)
 
 
