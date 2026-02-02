@@ -36,7 +36,7 @@ namespace AwsMock::Dto::SSM {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteParameterRequest const &obj) {
             jv = {
-                    {"rRegion", obj.region},
+                    {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"Name", obj.name},

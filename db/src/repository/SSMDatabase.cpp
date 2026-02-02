@@ -111,7 +111,9 @@ namespace AwsMock::Database {
 
             bsoncxx::builder::basic::document query = {};
             if (!prefix.empty()) {
-                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+                std::string escapedPrefix = prefix;
+                Core::StringUtils::Replace(escapedPrefix, "/", "\\/");
+                query.append(kvp("name", make_document(kvp("$regex", "^" + escapedPrefix))));
             }
             if (!region.empty()) {
                 query.append(kvp("region", region));

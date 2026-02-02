@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SSM {
         /**
          * KMS key ID
          */
-        std::string keyId;
+        std::string kmsKeyArn;
 
         /**
          * Parameter tier
@@ -66,9 +66,11 @@ namespace AwsMock::Dto::SSM {
             r.parameterValue = Core::Json::GetStringValue(v, "Value");
             r.description = Core::Json::GetStringValue(v, "Description");
             r.type = ParameterTypeFromString(Core::Json::GetStringValue(v, "Type"));
-            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.kmsKeyArn = Core::Json::GetStringValue(v, "KeyId");
             r.tier = Core::Json::GetStringValue(v, "Tier");
-            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tier"));
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
             return r;
         }
 
@@ -81,7 +83,7 @@ namespace AwsMock::Dto::SSM {
                     {"Value", obj.parameterValue},
                     {"Description", obj.description},
                     {"Type", ParameterTypeToString(obj.type)},
-                    {"KeyId", obj.keyId},
+                    {"KeyId", obj.kmsKeyArn},
                     {"Tier", obj.tier},
                     {"Tags", boost::json::value_from(obj.tags)},
             };

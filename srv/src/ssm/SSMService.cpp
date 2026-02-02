@@ -36,6 +36,7 @@ namespace AwsMock::Service {
                     .type = Dto::SSM::ParameterTypeToString(request.type),
                     .version = 1,
                     .arn = arn,
+                    .kmsKeyArn = request.kmsKeyArn,
                     .tags = request.tags,
                     .created = system_clock::now(),
                     .modified = system_clock::now(),
