@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.10](https://github.com/jensvogt/awsmock/compare/1.12.9...v1.12.10) (2026-02-03)
+
+
+### Bug Fixes
+
+* kms import/export ([a41d6da](https://github.com/jensvogt/awsmock/commit/a41d6daca812ee4192741a7ad3a9ecdb41f21d0a))
+
 ## [1.12.9](https://github.com/jensvogt/awsmock/compare/1.12.8...v1.12.9) (2026-02-01)
 
 
