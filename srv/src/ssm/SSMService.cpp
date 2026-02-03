@@ -16,8 +16,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::PutParameterResponse SSMService::PutParameter(const Dto::SSM::PutParameterRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "put_parameter");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "put_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "put_parameter");
         log_trace << "Put parameter request: " << request.ToString();
 
         if (_ssmDatabase.ParameterExists(request.name)) {
@@ -42,6 +41,15 @@ namespace AwsMock::Service {
                     .modified = system_clock::now(),
             };
 
+            // Encrypt if KMS key provided
+            if (!request.kmsKeyArn.empty()) {
+                Dto::KMS::EncryptRequest encryptRequest;
+                encryptRequest.keyId = request.kmsKeyArn.substr(request.kmsKeyArn.find_last_of('/') + 1);
+                encryptRequest.plaintext = Core::Crypto::Base64Encode(request.parameterValue);
+                Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
+                parameterEntity.parameterValue = kmsResponse.ciphertext;
+            }
+
             // Store in the database
             parameterEntity = _ssmDatabase.CreateParameter(parameterEntity);
             log_trace << "SSM parameter created: " << parameterEntity.ToString();
@@ -58,8 +66,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::ListParameterCountersResponse SSMService::CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "create_parameter");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "create_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "create_parameter");
         log_trace << "Create parameter request: " << request.ToString();
 
         if (_ssmDatabase.ParameterExists(request.name)) {
@@ -79,7 +86,7 @@ namespace AwsMock::Service {
                     .version = 1,
                     .arn = arn,
                     .kmsKeyArn = request.kmsKeyArn,
-                    //.tags = request.tags,
+                    .tags = request.tags,
                     .created = system_clock::now(),
                     .modified = system_clock::now(),
             };
@@ -103,17 +110,14 @@ namespace AwsMock::Service {
             listRequest.pageIndex = request.pageIndex;
             listRequest.sortColumns = request.sortColumns;
             return ListParameterCounters(listRequest);
-
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM put parameter failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
     }
 
-
     Dto::SSM::ListParameterCountersResponse SSMService::UpdateParameter(const Dto::SSM::UpdateParameterCounterRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "update_parameter");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "update_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "update_parameter");
         log_trace << "Create parameter request: " << request.ToString();
 
         if (!_ssmDatabase.ParameterExists(request.name)) {
@@ -126,6 +130,7 @@ namespace AwsMock::Service {
             Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
             parameterEntity.description = request.description;
             parameterEntity.type = Dto::SSM::ParameterTypeToString(request.type);
+            parameterEntity.tags = request.tags;
             parameterEntity.version++;
             parameterEntity.kmsKeyArn = request.kmsKeyArn;
             parameterEntity.parameterValue = request.value;
@@ -158,8 +163,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::GetParameterResponse SSMService::GetParameter(const Dto::SSM::GetParameterRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "get_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "get_parameter");
         log_trace << "Get parameter request, name: " << request.name;
 
         if (!_ssmDatabase.ParameterExists(request.name)) {
@@ -187,8 +191,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::GetParameterCounterResponse SSMService::GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "get_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "get_parameter");
         log_trace << "Get parameter counter request: " << request.ToString();
 
         if (!_ssmDatabase.ParameterExists(request.name)) {
@@ -218,8 +221,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::DescribeParametersResponse SSMService::DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "describe_parameters");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "describe_parameters");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "describe_parameters");
         log_trace << "Describe parameters request: " << request.ToString();
 
         try {
@@ -236,8 +238,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::ListParameterCountersResponse SSMService::ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "list_parameter_counters");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "list_parameter_counters");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "list_parameter_counters");
         log_trace << "List parameter counters region: " << request.region << ", prefix: " << request.prefix;
 
         try {
@@ -267,8 +268,7 @@ namespace AwsMock::Service {
     }
 
     void SSMService::DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "delete_parameter");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "delete_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 
         if (!_ssmDatabase.ParameterExists(request.name)) {
@@ -290,8 +290,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::ListParameterCountersResponse SSMService::DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const {
-        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "delete_parameter");
-        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "delete_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 
         if (!_ssmDatabase.ParameterExists(request.name)) {

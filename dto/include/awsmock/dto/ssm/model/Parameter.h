@@ -86,17 +86,25 @@ namespace AwsMock::Dto::SSM {
 
             try {
 
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
-                Core::Bson::BsonUtils::SetStringValue(document, "Value", parameterValue);
-                Core::Bson::BsonUtils::SetStringValue(document, "Type", ParameterTypeToString(type));
-                Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
-                Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyArn", kmsKeyArn);
-                Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
-                Core::Bson::BsonUtils::SetStringValue(document, "Tier", tier);
-                Core::Bson::BsonUtils::SetDateValue(document, "created", created);
-                Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
-                return document.extract();
+                document rootDocument;
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Name", name);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Value", parameterValue);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Type", ParameterTypeToString(type));
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Description", description);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "KmsKeyArn", kmsKeyArn);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "ARN", arn);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Tier", tier);
+                Core::Bson::BsonUtils::SetDateValue(rootDocument, "Created", created);
+                Core::Bson::BsonUtils::SetDateValue(rootDocument, "Modified", modified);
+
+                if (!tags.empty()) {
+                    auto tagsDoc = document{};
+                    for (const auto &[fst, snd]: tags) {
+                        tagsDoc.append(kvp(fst, snd));
+                    }
+                    rootDocument.append(kvp("Tags", tagsDoc));
+                }
+                return rootDocument.extract();
 
             } catch (bsoncxx::exception &exc) {
                 log_error << exc.what();
@@ -120,9 +128,18 @@ namespace AwsMock::Dto::SSM {
                 kmsKeyArn = Core::Bson::BsonUtils::GetStringValue(document, "kmsKeyArn");
                 arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
                 tier = Core::Bson::BsonUtils::GetStringValue(document, "Tier");
-                created = Core::Bson::BsonUtils::GetDateValue(document, "created");
-                modified = Core::Bson::BsonUtils::GetDateValue(document, "created");
+                created = Core::Bson::BsonUtils::GetDateValue(document, "Created");
+                modified = Core::Bson::BsonUtils::GetDateValue(document, "Modified");
 
+                // Get tags
+                if (document.view().find("Tags") != document.view().end()) {
+                    tags.clear();
+                    for (const view tagsView = document.view()["Tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+                        std::string key = bsoncxx::string::to_string(tagElement.key());
+                        std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                        tags.emplace(key, value);
+                    }
+                }
             } catch (bsoncxx::exception &exc) {
                 log_error << exc.what();
                 throw Core::JsonException(exc.what());

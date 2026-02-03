@@ -15,6 +15,7 @@ namespace AwsMock::Dto::SSM {
         responseDto.description = parameterEntity.description;
         responseDto.arn = parameterEntity.arn;
         responseDto.tier = parameterEntity.tier;
+        responseDto.tags = parameterEntity.tags;
         responseDto.type = ParameterTypeFromString(parameterEntity.type);
         responseDto.kmsKeyArn = parameterEntity.kmsKeyArn;
         responseDto.created = parameterEntity.created;
