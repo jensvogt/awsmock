@@ -121,6 +121,7 @@ namespace AwsMock::Dto::Module {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GatewayConfig const &obj) {
             jv = {
+                    {"region", obj.region},
                     {"endpoint", obj.endpoint},
                     {"protocol", obj.protocol},
                     {"host", obj.host},

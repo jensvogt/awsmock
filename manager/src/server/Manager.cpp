@@ -162,7 +162,6 @@ namespace AwsMock::Manager {
         // Autoload the init file before modules start
         AutoLoad();
 
-        Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
@@ -192,7 +191,7 @@ namespace AwsMock::Manager {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ioc));
             }
         }
-        log_info << "Module started, count: " << moduleMap.GetSize();
+        log_info << "Module started, count: " << Service::ModuleMap::instance().GetSize();
 
         // Start listener threads
         const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
@@ -208,7 +207,7 @@ namespace AwsMock::Manager {
             // eventually destroying the `io_context` and all the sockets in it.
             if (!ec) {
                 log_info << "Backend stopping on signal: " << signal;
-                StopModules(moduleMap);
+                StopModules(Service::ModuleMap::instance());
                 log_info << "Backend modules stopped";
                 _ioc.stop();
                 log_info << "Backend IO context stopped";
