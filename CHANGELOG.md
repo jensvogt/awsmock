@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.12](https://github.com/jensvogt/awsmock/compare/1.12.11...v1.12.12) (2026-02-03)
+
+
+### Bug Fixes
+
+* infrastructure dialog ([b243497](https://github.com/jensvogt/awsmock/commit/b243497dcd97f8ab99e3d33db91b1a98252af00c))
+
 ## [1.12.11](https://github.com/jensvogt/awsmock/compare/v1.12.10...v1.12.11) (2026-02-03)
 
 
