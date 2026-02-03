@@ -52,6 +52,18 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, modulesResponse.ToJson());
             }
 
+            if (action == "get-infrastructure") {
+
+                // Get request body
+                Dto::Module::ExportInfrastructureRequest moduleRequest = Dto::Module::ExportInfrastructureRequest::FromJson(payload);
+
+                // Get modules
+                const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
+                std::string json = moduleResponse.ToJson();
+                log_info << "Infrastructure exported, size: " << json.length();
+                return SendOkResponse(request, json);
+            }
+
             if (action == "ping") {
 
                 return SendOkResponse(request);
@@ -103,28 +115,7 @@ namespace AwsMock::Service {
                 log_info << "Infrastructure imported, size: " << payload.length();
                 return SendOkResponse(request);
             }
-            if (action == "set-log-level") {
 
-                Core::LogStream::SetSeverity(payload);
-                log_info << "Log level set to '" << payload << "'";
-
-                // Send response
-                return SendOkResponse(request);
-            }
-            if (action == "clean-objects") {
-
-                // Get request body
-                Dto::Module::CleanInfrastructureRequest moduleRequest;
-                moduleRequest.FromJson(payload);
-
-                // Get modules
-                if (moduleRequest.onlyObjects) {
-                    ModuleService::CleanObjects(moduleRequest);
-                } else {
-                    ModuleService::CleanInfrastructure(moduleRequest);
-                }
-                return SendOkResponse(request);
-            }
             if (action == "export") {
 
                 // Get request body
@@ -140,7 +131,32 @@ namespace AwsMock::Service {
                 log_info << "Infrastructure exported, size: " << json.length();
                 return SendOkResponse(request, json);
             }
+
+            if (action == "set-log-level") {
+
+                Core::LogStream::SetSeverity(payload);
+                log_info << "Log level set to '" << payload << "'";
+
+                // Send response
+                return SendOkResponse(request);
+            }
+
+            if (action == "clean-objects") {
+
+                // Get request body
+                Dto::Module::CleanInfrastructureRequest moduleRequest;
+                moduleRequest.FromJson(payload);
+
+                // Get modules
+                if (moduleRequest.onlyObjects) {
+                    ModuleService::CleanObjects(moduleRequest);
+                } else {
+                    ModuleService::CleanInfrastructure(moduleRequest);
+                }
+                return SendOkResponse(request);
+            }
             return SendBadRequestError(request, "Unknown action");
+
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());

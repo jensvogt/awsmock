@@ -22,6 +22,14 @@ namespace AwsMock::Service {
         return _moduleMap;
     }
 
+    std::vector<std::string> ModuleMap::GetModuleNames() {
+        std::vector<std::string> names;
+        for (const auto &key: _moduleMap | std::views::keys) {
+            names.push_back(key);
+        }
+        return names;
+    }
+
     int ModuleMap::GetSize() const {
         return static_cast<int>(_moduleMap.size());
     }

@@ -159,6 +159,11 @@ namespace AwsMock::Dto::SSM {
             r.tier = Core::Json::GetStringValue(v, "Tier");
             r.created = Core::Json::GetDatetimeValue(v, "Created");
             r.modified = Core::Json::GetDatetimeValue(v, "Modified");
+
+            // Tags
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
             return r;
         }
 
@@ -170,6 +175,7 @@ namespace AwsMock::Dto::SSM {
                     {"Name", obj.name},
                     {"Value", obj.parameterValue},
                     {"Type", ParameterTypeToString(obj.type)},
+                    {"Tags", boost::json::value_from(obj.tags)},
                     {"Description", obj.description},
                     {"KmsKeyArn", obj.kmsKeyArn},
                     {"ARN", obj.arn},

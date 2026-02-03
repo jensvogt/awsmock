@@ -167,29 +167,29 @@ namespace AwsMock::Manager {
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler, _ioc));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler, _ioc));
             } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler, _ioc));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler, _ioc));
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::DynamoDbServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::DynamoDbServer>(scheduler));
             } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::KMSServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::KMSServer>(scheduler));
             } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ioc));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ioc));
             }
         }
         log_info << "Module started, count: " << moduleMap.GetSize();
@@ -221,7 +221,7 @@ namespace AwsMock::Manager {
 
         // Start IO context
 #ifdef _WIN32
-        if (isService){
+        if (isService) {
 
             // Wait for Windows service signal
             while (true) {
@@ -243,7 +243,6 @@ namespace AwsMock::Manager {
 #else
         _ioc.run();
 #endif
-
     }
 
 }// namespace AwsMock::Manager

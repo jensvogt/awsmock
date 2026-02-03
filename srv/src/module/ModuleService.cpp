@@ -67,9 +67,16 @@ namespace AwsMock::Service {
 
     Dto::Module::ExportInfrastructureResponse ModuleService::ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request) {
 
+        // If modules list is empty take all
+        std::vector<std::string> modules = request.modules;
+        if (modules.empty()) {
+            modules = ModuleMap::instance().GetModuleNames();
+        }
+
+        // Create infrastructure object
         Dto::Module::Infrastructure infrastructure = {};
 
-        for (const auto &module: request.modules) {
+        for (const auto &module: modules) {
 
             if (module == "s3") {
 

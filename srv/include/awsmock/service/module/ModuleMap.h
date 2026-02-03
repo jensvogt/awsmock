@@ -61,6 +61,7 @@ namespace AwsMock::Service {
          * @return full module map
          */
         std::map<std::string, std::shared_ptr<AbstractServer>> GetModuleMap();
+        std::vector<std::string> GetModuleNames();
 
         /**
          * @brief Returns the module map size
