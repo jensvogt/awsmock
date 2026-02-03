@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.11](https://github.com/jensvogt/awsmock/compare/v1.12.10...v1.12.11) (2026-02-03)
+
+
+### Bug Fixes
+
+* add SSM tags ([bd76379](https://github.com/jensvogt/awsmock/commit/bd76379e4492225280bb464e3145a8ec72263c29))
+
 ## [1.12.10](https://github.com/jensvogt/awsmock/compare/1.12.9...v1.12.10) (2026-02-03)
 
 
