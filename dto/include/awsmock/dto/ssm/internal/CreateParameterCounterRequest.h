@@ -47,6 +47,11 @@ namespace AwsMock::Dto::SSM {
         std::string kmsKeyArn;
 
         /**
+         * KMS key ARN
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
          * Prefix
          */
         std::string prefix;
@@ -74,6 +79,9 @@ namespace AwsMock::Dto::SSM {
             r.value = Core::Json::GetStringValue(v, "value");
             r.description = Core::Json::GetStringValue(v, "description");
             r.type = ParameterTypeFromString(Core::Json::GetStringValue(v, "type"));
+            if (Core::Json::AttributeExists(v, "tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            }
             r.kmsKeyArn = Core::Json::GetStringValue(v, "kmsKeyArn");
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
@@ -93,6 +101,7 @@ namespace AwsMock::Dto::SSM {
                     {"value", obj.value},
                     {"description", obj.description},
                     {"type", ParameterTypeToString(obj.type)},
+                    {"tags", boost::json::value_from(obj.tags)},
                     {"kmsKeyArn", obj.kmsKeyArn},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
