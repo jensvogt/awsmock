@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.14](https://github.com/jensvogt/awsmock/compare/1.12.13...v1.12.14) (2026-02-04)
+
+
+### Bug Fixes
+
+* logging messages in module service ([9bea156](https://github.com/jensvogt/awsmock/commit/9bea1566a918035dece9fa2767f40191015f0e32))
+
 ## [1.12.13](https://github.com/jensvogt/awsmock/compare/1.12.12...v1.12.13) (2026-02-03)
 
 
