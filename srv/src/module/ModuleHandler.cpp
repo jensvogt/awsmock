@@ -60,7 +60,7 @@ namespace AwsMock::Service {
                 // Get modules
                 const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
                 std::string json = moduleResponse.ToJson();
-                log_info << "Infrastructure exported, size: " << json.length();
+                log_info << "Infrastructure send to client, size: " << json.length();
                 return SendOkResponse(request, json);
             }
 
