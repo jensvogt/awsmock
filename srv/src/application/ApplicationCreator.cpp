@@ -52,13 +52,13 @@ namespace AwsMock::Service {
             log_info << "Application docker container started, name: " << applicationEntity.name << ", containerId: " << Core::StringUtils::Continuation(inspectContainerResponse.id, 16);
         }
 
-        // Get the public port
+        // Get the public port and set some attributes
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         if (!inspectContainerResponse.id.empty()) {
             applicationEntity.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(applicationEntity.privatePort));
             applicationEntity.containerId = inspectContainerResponse.id;
             applicationEntity.containerName = inspectContainerResponse.GetContainerName();
-            applicationEntity.created = system_clock::now();
+            applicationEntity.lastStarted = system_clock::now();
         }
     }
 
