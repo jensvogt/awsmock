@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.0](https://github.com/jensvogt/awsmock/compare/v1.13.0...v1.14.0) (2026-02-06)
+
+
+### Features
+
+* add log messages to FE ([691c0b1](https://github.com/jensvogt/awsmock/commit/691c0b1609d9066891c3caa85de80262fa9b907d))
+* add log messages to FE ([15626e5](https://github.com/jensvogt/awsmock/commit/15626e533daa6e11467cff4072913ddca9712c78))
+
 ## [1.13.0](https://github.com/jensvogt/awsmock/compare/1.12.15...v1.13.0) (2026-02-06)
 
 
