@@ -284,6 +284,7 @@ namespace AwsMock::Core {
         DefineProperty<int>("awsmock.logging.file-count", "AWSMOCK_LOG_FILE_COUNT", 5);
         DefineProperty<bool>("awsmock.logging.file-active", "AWSMOCK_LOG_FILE_ACTIVE", false);
         DefineProperty<bool>("awsmock.logging.console-active", "AWSMOCK_LOG_CONSOLE_ACTIVE", true);
+        DefineProperty<bool>("awsmock.logging.websocket-active", "AWSMOCK_LOG_WEBSOCKET_ACTIVE", false);
     }
 
     std::string Configuration::GetFilename() const {

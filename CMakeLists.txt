@@ -67,8 +67,8 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp
-        dto/include/awsmock/dto/dynamodb/model/TableClassSummary.h
-        db/include/awsmock/entity/s3/LifecycleStatus.h)
+        srv/include/awsmock/service/logging/LoggingServer.h
+        srv/include/awsmock/service/logging/LoggingWebSocketSessionManager.h)
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})

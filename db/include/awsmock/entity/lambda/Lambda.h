@@ -11,11 +11,6 @@
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/lambda/Code.h>

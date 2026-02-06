@@ -298,6 +298,8 @@
     "logging": {
       "file-active": true,
       "console-active": false,
+      "websocket-active": true,
+      "websocket-port": 4569,
       "level": "info",
       "dir": "C:\\Program Files (x86)\\awsmock\\log",
       "prefix": "awsmock",

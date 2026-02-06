@@ -302,6 +302,8 @@
     "logging": {
       "file-active": false,
       "console-active": true,
+      "websocket-active": true,
+      "websocket-port": 4569,
       "level": "info",
       "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",
