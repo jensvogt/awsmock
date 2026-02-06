@@ -12,13 +12,22 @@ namespace AwsMock::Manager {
 
     void Manager::Initialize() const {
 
+        // Initialize websocket logging
+        InitializeWebsocketLogging();
+
+        // Start database
         InitializeDatabase();
-        std::string boostVersion = BOOST_LIB_VERSION;
-        Core::StringUtils::Replace(boostVersion, "_", ".");
-        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << ", pid: " << Core::SystemUtils::GetPid()
-                 << ", loglevel: " << Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level") << ", boost: " << boostVersion;
-        log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
-        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
+
+        // Write some infos
+        WriteInfoMessages();
+    }
+
+    void Manager::InitializeWebsocketLogging() const {
+
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.logging.websocket-active")) {
+            const unsigned int port = Core::Configuration::instance().GetValue<unsigned int>("awsmock.logging.websocket-port");
+            Core::LogStream::AddLoggingWebSocket(_ioc, port);
+        }
     }
 
     void Manager::InitializeDatabase() const {
@@ -36,6 +45,15 @@ namespace AwsMock::Manager {
         } else {
             log_info << "In-memory database initialized";
         }
+    }
+
+    void Manager::WriteInfoMessages() {
+        std::string boostVersion = BOOST_LIB_VERSION;
+        Core::StringUtils::Replace(boostVersion, "_", ".");
+        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << ", pid: " << Core::SystemUtils::GetPid()
+                 << ", loglevel: " << Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level") << ", boost: " << boostVersion;
+        log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
+        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
     }
 
     void Manager::AutoLoad() {

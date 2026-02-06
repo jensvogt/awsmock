@@ -34,8 +34,8 @@ namespace AwsMock::Database {
             mongocxx::collection _topicCollection = (*client)[_databaseName][_parameterCollectionName];
             const auto mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult->empty()) {
-                log_error << "ssm parameter not found, oid" << oid.to_string();
-                throw Core::DatabaseException("ssm parameter not found, oid" + oid.to_string());
+                log_error << "ssm parameter not found, oid: " << oid.to_string();
+                throw Core::DatabaseException("ssm parameter not found, oid: " + oid.to_string());
             }
 
             Entity::SSM::Parameter result;
@@ -125,7 +125,7 @@ namespace AwsMock::Database {
                 result.FromDocument(parameter);
                 parameterList.push_back(result);
             }
-            log_info << "Got parameter list, size:" << parameterList.size();
+            log_info << "Got parameter list, size: " << parameterList.size();
             return parameterList;
         }
         return _memoryDb.ListParameterCounters(region);

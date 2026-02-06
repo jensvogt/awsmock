@@ -1,6 +1,7 @@
 
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/logging/LoggingServer.h>
 
 namespace AwsMock::Core {
 
@@ -120,14 +121,38 @@ namespace AwsMock::Core {
 
     void LogStream::Initialize() {
 
+        namespace net = boost::asio;
+
+        boost::log::add_common_attributes();
         console_sink = boost::log::add_console_log(std::cout);
         console_sink->set_formatter(&LogColorFormatter);
         console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
         console_sink->locked_backend()->auto_flush(true);
+
         if (!Configuration::instance().GetValue<bool>("awsmock.logging.console-active")) {
             RemoveConsoleLogs();
         }
-        boost::log::add_common_attributes();
+
+        // if (!Configuration::instance().GetValue<bool>("awsmock.logging.websocket-active")) {
+        //     auto mgr = std::make_shared<Service::Logging::WebSocketSessionManager>();
+        //     net::io_context ioc;
+        //
+        //     // 1. Start WebSocket Server in a background thread
+        //     boost::thread([&ioc, mgr]() {
+        //         RunLoggingWebSocketServer(ioc, 9002, mgr);
+        //     }).detach();
+        //
+        //     // 2. Setup Boost.Log Sink
+        //     auto backend = boost::make_shared<Service::Logging::WebSocketSinkBackend>(mgr);
+        //     using sink_t = boost::log::sinks::synchronous_sink<Service::Logging::WebSocketSinkBackend>;
+        //     const auto sink = boost::make_shared<sink_t>(backend);
+        //
+        //     boost::log::core::get()->add_sink(sink);
+        //
+        //     boost::thread([&ioc]() {
+        //         ioc.run();
+        //     }).detach();
+        // }
     }
 
     void LogStream::SetSeverity(const std::string &lvl) {
@@ -164,13 +189,32 @@ namespace AwsMock::Core {
 
         log_info << "Start logging to file, dir: " << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
-    void LogStream::AddWebSocket(boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) {
+
+    void LogStream::AddWebSocket(websocket::stream<beast::tcp_stream> &ws) {
         const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
-        webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<boost::beast::websocket::stream<boost::beast::tcp_stream>>(std::move(ws)));
+        webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<websocket::stream<beast::tcp_stream>>(std::move(ws)));
         webSocketSink = boost::make_shared<webSocketSink_t>(webSocketBackend);
         webSocketSink->set_formatter(&LogFormatter);
         webSocketSink->set_filter(boost::log::trivial::severity >= _severity);
         core->add_sink(webSocketSink);
+    }
+
+    void LogStream::AddLoggingWebSocket(boost::asio::io_context &ioc, unsigned int port) {
+        auto mgr = std::make_shared<Service::Logging::WebSocketSessionManager>();
+
+        // 1. Start WebSocket Server in a background thread
+        boost::thread([mgr, &ioc, port]() {
+            RunLoggingWebSocketServer(ioc, port, mgr);
+        }).detach();
+
+        // 2. Setup Boost.Log Sink
+        auto backend = boost::make_shared<Service::Logging::WebSocketSinkBackend>(mgr);
+        using sink_t = boost::log::sinks::synchronous_sink<Service::Logging::WebSocketSinkBackend>;
+        const auto sink = boost::make_shared<sink_t>(backend);
+        sink->set_formatter(&LogFormatter);
+        sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+
+        boost::log::core::get()->add_sink(sink);
     }
 
     void LogStream::RemoveWebSocketSink() {

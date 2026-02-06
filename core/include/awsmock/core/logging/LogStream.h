@@ -106,6 +106,7 @@ namespace AwsMock::Core {
          * @param ws websocket
          */
         static void AddWebSocket(boost::beast::websocket::stream<boost::beast::tcp_stream> &ws);
+        static void AddLoggingWebSocket(boost::asio::io_context &ioc, unsigned int port);
 
         /**
          * @brief Remove web socket sink

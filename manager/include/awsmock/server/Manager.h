@@ -99,9 +99,19 @@ namespace AwsMock::Manager {
       private:
 
         /**
+         * @brief @STart websocket logging, when configures
+         */
+        void InitializeWebsocketLogging() const;
+
+        /**
          * @brief Initialize database
          */
         void InitializeDatabase() const;
+
+        /**
+         * @brief Writes some info message to the logging
+         */
+        static void WriteInfoMessages();
 
         /**
          * @brief Load the modules from the configuration file.
