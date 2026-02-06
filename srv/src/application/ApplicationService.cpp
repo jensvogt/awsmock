@@ -496,7 +496,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::vector<std::string> ApplicationService::ListApplicationNames() const {
+    Dto::Apps::ListApplicationNamesResponse ApplicationService::ListApplicationNames(const Dto::Apps::ListApplicationNamesRequest &request) const {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "list_application_names");
         log_debug << "List application names request";
 
@@ -505,10 +505,11 @@ namespace AwsMock::Service {
             const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications();
 
             // Prepare response
-            std::vector<std::string> response;
+            Dto::Apps::ListApplicationNamesResponse response;
             for (const auto &application: applications) {
-                response.push_back(application.name);
+                response.applicationNames.push_back(application.name);
             }
+            response.total = applications.size();
             return response;
 
         } catch (bsoncxx::exception &exc) {
