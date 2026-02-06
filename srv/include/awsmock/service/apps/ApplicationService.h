@@ -24,6 +24,8 @@
 #include <awsmock/dto/apps/internal/GetApplicationResponse.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
+#include <awsmock/dto/apps/internal/ListApplicationNamesRequest.h>
+#include <awsmock/dto/apps/internal/ListApplicationNamesResponse.h>
 #include <awsmock/dto/apps/internal/RebuildApplicationRequest.h>
 #include <awsmock/dto/apps/internal/RestartApplicationRequest.h>
 #include <awsmock/dto/apps/internal/StartAllApplicationsRequest.h>
@@ -114,7 +116,7 @@ namespace AwsMock::Service {
          *
          * @return list of strings
          */
-        [[nodiscard]] std::vector<std::string> ListApplicationNames() const;
+        [[nodiscard]] Dto::Apps::ListApplicationNamesResponse ListApplicationNames(const Dto::Apps::ListApplicationNamesRequest &request) const;
 
         /**
          * @brief Enable an application

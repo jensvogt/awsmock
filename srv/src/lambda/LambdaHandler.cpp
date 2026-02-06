@@ -150,15 +150,14 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
                 Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
-                log_trace << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
+                log_info << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
                 return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
                 Dto::Lambda::GetFunctionCountersRequest lambdaRequest = Dto::Lambda::GetFunctionCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::GetFunctionCountersResponse lambdaResponse = _lambdaService.GetFunctionCounters(lambdaRequest);
-                log_trace << "Lambda function counters list";
-
+                log_info << "Get lambda function counter, name: " << lambdaResponse.functionName;
                 return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
@@ -166,7 +165,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaEnvironmentCountersRequest lambdaRequest = Dto::Lambda::ListLambdaEnvironmentCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaEnvironmentCountersResponse lambdaResponse = _lambdaService.ListLambdaEnvironmentCounters(lambdaRequest);
                 log_trace << "Lambda environment counters list, count: " << lambdaResponse.environmentCounters.size();
-
                 return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
@@ -174,7 +172,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::AddEnvironmentRequest lambdaRequest = Dto::Lambda::AddEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.AddLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment added, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
-
                 return SendResponse(request, http::status::ok);
             }
 
@@ -182,7 +179,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::UpdateFunctionEnvironmentRequest lambdaRequest = Dto::Lambda::UpdateFunctionEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.UpdateLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment updated, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
-
                 return SendResponse(request, http::status::ok);
             }
 
@@ -190,7 +186,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::DeleteEnvironmentRequest lambdaRequest = Dto::Lambda::DeleteEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.DeleteLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment deleted, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
-
                 return SendResponse(request, http::status::ok);
             }
 
@@ -198,7 +193,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaTagCountersRequest lambdaRequest = Dto::Lambda::ListLambdaTagCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaTagCountersResponse lambdaResponse = _lambdaService.ListLambdaTagCounters(lambdaRequest);
                 log_trace << "Lambda tag counters list";
-
                 return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
@@ -467,4 +461,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

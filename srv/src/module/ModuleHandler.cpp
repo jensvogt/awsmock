@@ -65,7 +65,6 @@ namespace AwsMock::Service {
             }
 
             if (action == "ping") {
-
                 return SendOkResponse(request);
             }
             return SendBadRequestError(request, "Unknown action");

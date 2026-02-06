@@ -7,7 +7,7 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> ApplicationHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Application POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
-       Dto::Common::ApplicationClientCommand clientCommand;
+        Dto::Common::ApplicationClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
         try {
@@ -51,17 +51,17 @@ namespace AwsMock::Service {
 
                     Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.ListApplications(serviceRequest);
-                    log_info << "Applications listed, region: " << serviceRequest.region;
+                    log_info << "Applications counters list, count: " << serviceResponse.applications.size();
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
                 case Dto::Common::ApplicationCommandType::LIST_APPLICATION_NAMES: {
 
-                    Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
-                    std::vector<std::string> serviceResponse = _applicationService.ListApplicationNames();
+                    Dto::Apps::ListApplicationNamesRequest serviceRequest = Dto::Apps::ListApplicationNamesRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationNamesResponse serviceResponse = _applicationService.ListApplicationNames(serviceRequest);
                     log_info << "Application names listed, region: " << serviceRequest.region;
-		    // TODO: fix serialization
-                    return SendResponse(request, http::status::ok);
+                    // TODO: fix serialization
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
                 case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
