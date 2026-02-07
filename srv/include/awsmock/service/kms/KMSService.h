@@ -26,10 +26,13 @@
 #include <awsmock/dto/kms/DescribeKeyResponse.h>
 #include <awsmock/dto/kms/EncryptRequest.h>
 #include <awsmock/dto/kms/EncryptResponse.h>
+#include <awsmock/dto/kms/GetKeyCounterRequest.h>
+#include <awsmock/dto/kms/GetKeyCounterResponse.h>
 #include <awsmock/dto/kms/ListKeysRequest.h>
 #include <awsmock/dto/kms/ListKeysResponse.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
+#include <awsmock/dto/kms/UpdateKeyCounterRequest.h>
 #include <awsmock/dto/kms/internal/DeleteKeyRequest.h>
 #include <awsmock/dto/kms/internal/ListKeyArnsResponse.h>
 #include <awsmock/dto/kms/internal/ListKeyCountersRequest.h>
@@ -137,6 +140,26 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DescribeKeyResponse
          */
         [[nodiscard]] Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
+
+        /**
+         * @brief Get a key
+         *
+         * @param request get key counter request
+         * @return GetKeyCounterResponse
+         * @throws Core::DatabaseException
+         * @see Dto::KMS::GetKeyCounterRequest
+         * @see Dto::KMS::GetKeyCounterResponse
+         */
+        [[nodiscard]] Dto::KMS::GetKeyCounterResponse GetKeyCounter(const Dto::KMS::GetKeyCounterRequest &request) const;
+
+        /**
+         * @brief Update a key
+         *
+         * @param request update key counter request
+         * @throws Core::DatabaseException
+         * @see Dto::KMS::UpdateKeyCounterRequest
+         */
+        void UpdateKeyCounter(const Dto::KMS::UpdateKeyCounterRequest &request) const;
 
         /**
          * @brief Encrypt a plain text using a given algorithm

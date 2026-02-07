@@ -66,6 +66,24 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, kmsResponse.ToJson());
                 }
 
+                case Dto::Common::KMSCommandType::GET_KEY_COUNTER: {
+
+                    Dto::KMS::GetKeyCounterRequest kmsRequest = Dto::KMS::GetKeyCounterRequest::FromJson(clientCommand);
+                    Dto::KMS::GetKeyCounterResponse kmsResponse = _kmsService.GetKeyCounter(kmsRequest);
+                    log_info << "Get key received, id: " << kmsRequest.keyId;
+
+                    return SendOkResponse(request, kmsResponse.ToJson());
+                }
+
+                case Dto::Common::KMSCommandType::UPDATE_KEY_COUNTER: {
+
+                    Dto::KMS::UpdateKeyCounterRequest kmsRequest = Dto::KMS::UpdateKeyCounterRequest::FromJson(clientCommand);
+                    _kmsService.UpdateKeyCounter(kmsRequest);
+                    log_info << "Update key, id: " << kmsRequest.keyCounter.keyId;
+
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::KMSCommandType::ENCRYPT: {
 
                     Dto::KMS::EncryptRequest kmsRequest = Dto::KMS::EncryptRequest::FromJson(clientCommand);
@@ -76,19 +94,15 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::KMSCommandType::DECRYPT: {
-
                     Dto::KMS::DecryptRequest kmsRequest = Dto::KMS::DecryptRequest::FromJson(clientCommand);
                     Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(kmsRequest);
-
                     log_info << "Decrypt received, size: " << kmsResponse.plaintext.length();
                     return SendOkResponse(request, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::DELETE_KEY: {
-
                     Dto::KMS::DeleteKeyRequest kmsRequest = Dto::KMS::DeleteKeyRequest::FromJson(clientCommand);
                     _kmsService.DeleteKey(kmsRequest);
-
                     log_info << "Key deleted, size: " << kmsRequest.keyId;
                     return SendOkResponse(request);
                 }

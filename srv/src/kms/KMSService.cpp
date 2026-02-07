@@ -54,6 +54,7 @@ namespace AwsMock::Service {
 
             for (const auto &k: keyList) {
                 Dto::KMS::KeyCounter key;
+                key.region = request.region;
                 key.keyId = k.keyId;
                 key.arn = k.arn;
                 key.keyUsage = Dto::KMS::KeyUsageFromString(k.keyUsage);
@@ -228,6 +229,76 @@ namespace AwsMock::Service {
 
         } catch (Core::DatabaseException &exc) {
             log_error << "KMS describe key failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    Dto::KMS::GetKeyCounterResponse KMSService::GetKeyCounter(const Dto::KMS::GetKeyCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "get_key_counter");
+        log_trace << "Get key request: " << request;
+
+        if (!_kmsDatabase.KeyExists(request.keyId)) {
+            log_error << "Key not found, keyId: " << request.keyId;
+            throw Core::ServiceException("Key not found, keyId: " + request.keyId);
+        }
+
+        try {
+
+            Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            log_trace << "KMS key entity received: " << keyEntity.ToString();
+
+            // TODO: use mapper
+            Dto::KMS::KeyCounter key;
+            key.keyId = keyEntity.keyId;
+            key.arn = keyEntity.arn;
+            key.keySpec = Dto::KMS::KeySpecFromString(keyEntity.keySpec);
+            key.keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage);
+            key.keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState);
+            key.origin = Dto::KMS::OriginFromString(keyEntity.origin);
+            key.description = keyEntity.description;
+            key.scheduledDeletion = keyEntity.scheduledDeletion;
+            key.enabled = Core::StringUtils::Equals(keyEntity.keyState, Dto::KMS::KeyStateToString(Dto::KMS::KeyState::ENABLED));
+            key.created = keyEntity.created;
+            key.modified = keyEntity.modified;
+
+            // Create response
+            Dto::KMS::GetKeyCounterResponse response;
+            response.requestId = request.requestId;
+            response.region = request.region;
+            response.user = request.user;
+            response.key = key;
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "KMS get key failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    void KMSService::UpdateKeyCounter(const Dto::KMS::UpdateKeyCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "update_key_counter");
+        log_trace << "Update key request: " << request;
+
+        if (!_kmsDatabase.KeyExists(request.keyCounter.keyId)) {
+            log_error << "Key not found, keyId: " << request.keyCounter.keyId;
+            throw Core::ServiceException("Key not found, keyId: " + request.keyCounter.keyId);
+        }
+
+        try {
+
+            Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyCounter.keyId);
+            log_trace << "KMS key entity received, key: " << keyEntity;
+
+            keyEntity.keySpec = Dto::KMS::KeySpecToString(request.keyCounter.keySpec);
+            keyEntity.keyUsage = Dto::KMS::KeyUsageToString(request.keyCounter.keyUsage);
+            keyEntity.keyState = Dto::KMS::KeyStateToString(request.keyCounter.keyState);
+            keyEntity.origin = Dto::KMS::OriginToString(request.keyCounter.origin);
+            keyEntity.description = request.keyCounter.description;
+            _kmsDatabase.UpdateKey(keyEntity);
+            log_trace << "KMS key entity updated, key: " << keyEntity;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "KMS get key failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
     }
