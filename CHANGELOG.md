@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.1](https://github.com/jensvogt/awsmock/compare/1.14.0...v1.14.1) (2026-02-07)
+
+
+### Bug Fixes
+
+* some KMS issues ([64007eb](https://github.com/jensvogt/awsmock/commit/64007eb641c2fd43dfb17e47204cc6da2fe854e9))
+
 ## [1.14.0](https://github.com/jensvogt/awsmock/compare/v1.13.0...v1.14.0) (2026-02-06)
 
 
