@@ -122,10 +122,6 @@ namespace AwsMock::Service {
 
                 // Get modules
                 const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
-                // if (moduleResponse.ToJson().length() > 100000000) {
-                //     log_error << "Response > 10MB";
-                //     return SendBadRequestError(request, "Size > 100 MB.");
-                // }
                 std::string json = moduleResponse.ToJson();
                 log_info << "Infrastructure exported, size: " << json.length();
                 return SendOkResponse(request, json);

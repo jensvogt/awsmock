@@ -72,7 +72,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Bypass policy lockout safety check
          */
-        bool bypassPolicyLockoutSafetyCheck = false;
+        bool bypassPolicyLockoutSafetyCheck = true;
 
         /**
          * Origin

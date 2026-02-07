@@ -62,14 +62,29 @@ namespace AwsMock::Dto::KMS {
         KeyState keyState = KeyState::UNAVAILABLE;
 
         /**
+         * Key origin
+         */
+        Origin origin = Origin::AWS_KMS;
+
+        /**
          * Multi region
          */
         bool multiRegion = false;
 
         /**
+         * Enabled flag
+         */
+        bool enabled = false;
+
+        /**
          * Description
          */
         std::string description;
+
+        /**
+         * Scheduled deletion
+         */
+        system_clock::time_point scheduledDeletion;
 
         /**
          * Creation date
@@ -90,6 +105,10 @@ namespace AwsMock::Dto::KMS {
             r.keySpec = KeySpecFromString(Core::Json::GetStringValue(v, "keySpec"));
             r.keyUsage = KeyUsageFromString(Core::Json::GetStringValue(v, "keyUsage"));
             r.keyState = KeyStateFromString(Core::Json::GetStringValue(v, "keyState"));
+            r.origin = OriginFromString(Core::Json::GetStringValue(v, "origin"));
+            r.description = Core::Json::GetStringValue(v, "description");
+            r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.scheduledDeletion = Core::Json::GetDatetimeValue(v, "scheduledDeletion");
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             return r;
@@ -102,9 +121,13 @@ namespace AwsMock::Dto::KMS {
                     {"requestId", obj.requestId},
                     {"keyId", obj.keyId},
                     {"keyArn", obj.arn},
+                    {"description", obj.description},
                     {"keySpec", KeySpecToString(obj.keySpec)},
                     {"keyUsage", KeyUsageToString(obj.keyUsage)},
                     {"keyState", KeyStateToString(obj.keyState)},
+                    {"origin", OriginToString(obj.origin)},
+                    {"enabled", obj.enabled},
+                    {"scheduledDeletion", Core::DateTimeUtils::ToISO8601(obj.scheduledDeletion)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

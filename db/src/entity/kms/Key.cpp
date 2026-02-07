@@ -17,6 +17,7 @@ namespace AwsMock::Database::Entity::KMS {
                     kvp("keyUsage", keyUsage),
                     kvp("keySpec", keySpec),
                     kvp("keyState", keyState),
+                    kvp("origin", origin),
                     kvp("aes256Key", aes256Key),
                     kvp("aes256Iv", aes256Iv),
                     kvp("hmac224Key", hmac224Key),
@@ -26,6 +27,7 @@ namespace AwsMock::Database::Entity::KMS {
                     kvp("rsaPrivateKey", rsaPrivateKey),
                     kvp("rsaPublicKey", rsaPublicKey),
                     kvp("pendingWindowInDays", bsoncxx::types::b_int64(pendingWindowInDays)),
+                    kvp("description", description),
                     kvp("created", bsoncxx::types::b_date(created)),
                     kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -62,6 +64,7 @@ namespace AwsMock::Database::Entity::KMS {
             keyUsage = Core::Bson::BsonUtils::GetStringValue(mResult, "keyUsage");
             keySpec = Core::Bson::BsonUtils::GetStringValue(mResult, "keySpec");
             keyState = Core::Bson::BsonUtils::GetStringValue(mResult, "keyState");
+            origin = Core::Bson::BsonUtils::GetStringValue(mResult, "origin");
             aes256Key = Core::Bson::BsonUtils::GetStringValue(mResult, "aes256Key");
             aes256Iv = Core::Bson::BsonUtils::GetStringValue(mResult, "aes256Iv");
             hmac224Key = Core::Bson::BsonUtils::GetStringValue(mResult, "hmac224Key");
@@ -72,6 +75,7 @@ namespace AwsMock::Database::Entity::KMS {
             rsaPublicKey = Core::Bson::BsonUtils::GetStringValue(mResult, "rsaPublicKey");
             pendingWindowInDays = Core::Bson::BsonUtils::GetIntValue(mResult, "pendingWindowInDays");
             scheduledDeletion = Core::Bson::BsonUtils::GetDateValue(mResult, "scheduledDeletion");
+            description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

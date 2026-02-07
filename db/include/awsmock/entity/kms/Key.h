@@ -17,8 +17,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::KMS {
@@ -59,6 +59,11 @@ namespace AwsMock::Database::Entity::KMS {
          * Key state
          */
         std::string keyState;
+
+        /**
+         * Key state
+         */
+        std::string origin;
 
         /**
          * AWS ARN
