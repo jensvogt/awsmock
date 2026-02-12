@@ -61,9 +61,9 @@ namespace AwsMock::Dto::DynamoDb {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetItemResponse const &obj) {
-            jv = {};
+            jv = boost::json::object();
             if (!obj.attributes.empty()) {
-                jv = {"Item", boost::json::value_from(obj.attributes)};
+                jv.as_object().emplace("Item", boost::json::value_from(obj.attributes));
             }
         }
     };
