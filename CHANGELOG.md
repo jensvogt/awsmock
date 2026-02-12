@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.2](https://github.com/jensvogt/awsmock/compare/1.14.1...v1.14.2) (2026-02-12)
+
+
+### Bug Fixes
+
+* dynamodb getitem response ([06f9bfd](https://github.com/jensvogt/awsmock/commit/06f9bfd80ccc452da9d5ef34341efeb029902752))
+
 ## [1.14.1](https://github.com/jensvogt/awsmock/compare/1.14.0...v1.14.1) (2026-02-07)
 
 
