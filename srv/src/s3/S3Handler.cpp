@@ -288,7 +288,7 @@ namespace AwsMock::Service {
 
                         Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
 
-                        log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                        log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                         return SendResponse(request, http::status::ok, s3Response.ToXml());
                     }
 
