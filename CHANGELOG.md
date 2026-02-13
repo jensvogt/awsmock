@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.3](https://github.com/jensvogt/awsmock/compare/1.14.2...v1.14.3) (2026-02-13)
+
+
+### Bug Fixes
+
+* gate problem using 100-continue header ([e52d1fd](https://github.com/jensvogt/awsmock/commit/e52d1fde1da1b79dd2e3a4b343cc0d938a57d916))
+
 ## [1.14.2](https://github.com/jensvogt/awsmock/compare/1.14.1...v1.14.2) (2026-02-12)
 
 
