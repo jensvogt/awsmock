@@ -43,23 +43,19 @@ namespace AwsMock::Service {
         if (ec == http::error::end_of_stream) {
             return DoShutdown();
         }
-        if (ec) {
-            log_error << "Read error: " << ec.message();
-            return;
-        }
-
-        boost::beast::error_code ev;
-
-        // Read request into _parser
-        http::read(_stream, _buffer, *_parser, ev);
-        if (ev) {
-            log_error << "Read failed: " << ev.message();
-            return;
-        }
 
         // Handle 100-continue
         if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
             HandleContinueRequest(_stream, _parser->get());
+            return;
+        }
+
+        // Read request into _parser
+        boost::beast::error_code ev;
+        http::read(_stream, _buffer, *_parser, ev);
+        if (ev) {
+            log_error << "Read failed: " << ev.message();
+            return;
         }
 
         // Handle the request
