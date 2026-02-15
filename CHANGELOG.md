@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.4](https://github.com/jensvogt/awsmock/compare/1.14.3...v1.14.4) (2026-02-15)
+
+
+### Bug Fixes
+
+* fix several issues ([e1bca33](https://github.com/jensvogt/awsmock/commit/e1bca33ed0bca7eded44e9200b10129e1b2f4093))
+
 ## [1.14.3](https://github.com/jensvogt/awsmock/compare/1.14.2...v1.14.3) (2026-02-13)
 
 
