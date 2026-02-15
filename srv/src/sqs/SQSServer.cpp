@@ -21,7 +21,8 @@ namespace AwsMock::Service {
         log_info << "SQS server starting";
 
         // Start SQS monitoring update counters
-        scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _counterPeriod);
+        scheduler.AddTask("sqs-adjust-counter", [this] { this->AdjustCounter(); }, _counterPeriod);
+        scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, _monitoringPeriod);
 
         // Start reset messages task
@@ -38,6 +39,10 @@ namespace AwsMock::Service {
         SetRunning();
 
         log_debug << "SQS server initialized";
+    }
+
+    void SQSServer::AdjustCounter() const {
+        _sqsDatabase.AdjustMessageCounters();
     }
 
     void SQSServer::ResetMessages() const {

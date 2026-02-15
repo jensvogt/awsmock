@@ -64,7 +64,9 @@ namespace AwsMock::Manager {
         }
 
         // Load by directory has preference over a load by file
-        if (const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
+        const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir");
+        log_info << "Using autoload directory: " << autoLoadDir;
+        if (Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
             for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json", true)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
 

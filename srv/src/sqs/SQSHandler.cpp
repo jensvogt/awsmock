@@ -26,14 +26,14 @@ namespace AwsMock::Service {
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
                     const long purged = _sqsService.PurgeQueue(sqsRequest);
                     log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged;
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_ALL_QUEUES: {
 
                     const long purged = _sqsService.PurgeAllQueues();
                     log_info << "Purge all queues, count: " << purged;
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_ATTRIBUTES: {
@@ -51,7 +51,7 @@ namespace AwsMock::Service {
                         _sqsService.SetQueueAttributes(sqsRequest);
                         log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
                     });
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_URL: {
@@ -262,7 +262,7 @@ namespace AwsMock::Service {
                     Dto::SQS::RedriveMessagesRequest sqsRequest = Dto::SQS::RedriveMessagesRequest::FromJson(clientCommand);
                     const long count = _sqsService.RedriveMessages(sqsRequest);
                     log_info << "Delete message, queueUrl: " << sqsRequest.queueArn << " count: " << count;
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::UPDATE_MESSAGE: {
@@ -273,7 +273,7 @@ namespace AwsMock::Service {
                         log_info << "Update message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::RESEND_MESSAGE: {
@@ -284,7 +284,7 @@ namespace AwsMock::Service {
                         log_info << "Resend message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::GET_EVENT_SOURCE: {

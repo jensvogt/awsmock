@@ -58,12 +58,6 @@ namespace AwsMock::Service {
 
         // Process the request that was just finished by the async operation
         HandleRequest(_parser->release(), _queue);
-
-        // Continue the loop
-        if (!_queue.is_full()) {
-            DoRead();
-        }
-        log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
@@ -190,14 +184,8 @@ namespace AwsMock::Service {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream) {
+        if (ec == http::error::end_of_stream || !keep_alive) {
             log_warning << "End of stream, error: " << ec.message();
-            return DoShutdown();
-        }
-
-        if (!keep_alive) {
-            // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
-            log_debug << "Connection shutdown";
             return DoShutdown();
         }
 
@@ -210,7 +198,8 @@ namespace AwsMock::Service {
     void GatewaySession::DoShutdown() {
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        _stream.socket().close(ec);
         // At this point the connection is closed gracefully
     }
 
