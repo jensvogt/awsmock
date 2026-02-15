@@ -24,7 +24,7 @@
     "magic-file": "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc",
     "autoload": {
       "active": true,
-      "file": "C:\\Program Files (x86)\\awsmock\\init\\init.json",
+      "file": "C:\\Program Files (x86)\\awsmock\\init\\01_init.json",
       "dir": "C:\\Program Files (x86)\\awsmock\\init"
     },
     "gateway": {
@@ -34,8 +34,7 @@
         "address": "0.0.0.0",
         "port": 4566,
         "max-queue": 10,
-        "max-threads": 50,
-        "max-thread": 256,
+        "max-thread": 64,
         "max-body": 204857600,
         "timeout": 900
       }

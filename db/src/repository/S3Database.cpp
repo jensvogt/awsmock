@@ -26,9 +26,11 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-                const int64_t count = _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-                log_trace << "Bucket exists: " << std::boolalpha << count;
-                return count > 0;
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _bucketCollection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -48,9 +50,11 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-                const int64_t count = _bucketCollection.count_documents(make_document(kvp("arn", bucketArn)));
-                log_trace << "Bucket exists: " << std::boolalpha << count;
-                return count > 0;
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _bucketCollection.count_documents(make_document(kvp("arn", bucketArn)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -268,9 +272,11 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
-            const int64_t count = _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
-            log_trace << "Objects exists: " << std::boolalpha << count;
-            return count > 0;
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
+            return _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)), options);
         }
         return _memoryDb.HasObjects(bucket);
     }
@@ -560,9 +566,12 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            const int64_t count = _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)));
-            log_trace << "Object exists: " << std::boolalpha << count;
-            return count > 0;
+
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
+            return _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), options) > 0;
         }
         return _memoryDb.ObjectExists(object);
     }
@@ -574,9 +583,12 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            const int64_t count = _objectCollection.count_documents(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)));
-            log_trace << "Object exists: " << std::boolalpha << count;
-            return count > 0;
+
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
+            return _objectCollection.count_documents(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)), options) > 0;
         }
         return _memoryDb.ObjectExists(region, bucket, key);
     }
@@ -603,14 +615,16 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
             document query;
             if (!filename.empty()) {
                 query.append(kvp("internalName", filename));
             }
 
-            const int64_t count = _objectCollection.count_documents(query.extract());
-            log_trace << "Object exists: " << std::boolalpha << count;
-            return count > 0;
+            return _objectCollection.count_documents(query.extract(), options) > 0;
         }
         return _memoryDb.ObjectExistsInternalName(filename);
     }

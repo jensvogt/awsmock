@@ -72,6 +72,10 @@ namespace AwsMock::Service {
                 return items_.size() >= limit;
             }
 
+            long get_size() const {
+                return items_.size();
+            }
+
             // Called when a message finishes sending
             // Returns `true` if the caller should initiate a read
             bool on_write() {

@@ -36,11 +36,12 @@ namespace AwsMock::Service {
         response.keep_alive(request.keep_alive());
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
-        response.set(http::field::content_length, "0");
+        response.set(http::field::content_length, std::to_string(body.size()));
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Copy headers
         if (!headers.empty()) {
@@ -73,6 +74,7 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Body
         std::ifstream ifs(fileName);
@@ -99,10 +101,12 @@ namespace AwsMock::Service {
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, "0");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Copy headers
         if (!headers.empty()) {
@@ -124,10 +128,12 @@ namespace AwsMock::Service {
         response.result(http::status::internal_server_error);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, std::to_string(body.size()));
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Body
         if (!body.empty()) {
@@ -155,10 +161,12 @@ namespace AwsMock::Service {
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, std::to_string(body.size()));
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Body
         if (!body.empty()) {
@@ -186,11 +194,13 @@ namespace AwsMock::Service {
         response.result(http::status::not_found);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "text/html; charset=UTF-8");
+        response.set(http::field::content_length, std::to_string(body.size()));
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::last_modified, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Body
         if (!body.empty()) {
@@ -228,6 +238,7 @@ namespace AwsMock::Service {
             response.set(http::field::access_control_allow_origin, "*");
             response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
             response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
 
             // Body is part of file from min -> max
             auto buffer = new char[size];
@@ -266,10 +277,12 @@ namespace AwsMock::Service {
         response.result(http::status::continue_);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, "0");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Send the response to the client
         return response;
@@ -291,6 +304,7 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Copy headers
         if (!headers.empty()) {

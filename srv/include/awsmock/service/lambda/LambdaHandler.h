@@ -9,6 +9,9 @@
 #include <memory>
 
 // AwsMock includes
+#include "awsmock/service/module/ModuleService.h"
+
+
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
@@ -38,7 +41,11 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc), _lambdaService(ioc), _ioc(ioc) {}
+        explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc), _lambdaService(ioc), _ioc(ioc) {
+            _moduleService = std::make_shared<ModuleService>();
+            _lambdaService.sigLambdaCodeUpdated.connect(boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService)// This is the 'magic' that prevents crashes!
+            );
+        }
 
         /**
          * @brief HTTP GET request.
@@ -79,6 +86,8 @@ namespace AwsMock::Service {
          * Lambda module
          */
         LambdaService _lambdaService;
+
+        std::shared_ptr<ModuleService> _moduleService;
 
         /**
          * Boost IO context

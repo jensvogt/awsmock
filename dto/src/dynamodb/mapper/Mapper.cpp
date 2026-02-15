@@ -36,7 +36,7 @@ namespace AwsMock::Dto::DynamoDb {
         return item;
     }
 
-    Database::Entity::DynamoDb::Item Mapper::map(const PutItemRequest &request, const Database::Entity::DynamoDb::Table &table) {
+    Database::Entity::DynamoDb::Item Mapper::map(const PutItemRequest &request) {
 
         Database::Entity::DynamoDb::Item item;
         item.region = request.region;

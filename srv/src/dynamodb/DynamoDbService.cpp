@@ -319,11 +319,8 @@ namespace AwsMock::Service {
             if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
                 Dto::DynamoDb::PutItemResponse putItemResponse = Dto::DynamoDb::PutItemResponse::FromJson(body);
 
-                // Get the table
-                const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
-
                 // Convert to an entity and save to a database. If no exception is thrown by the HTTP call to the docker image, seems to be ok.
-                Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request, table);
+                Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request);
                 item.size = static_cast<long>(body.size());
                 item = _dynamoDbDatabase.CreateOrUpdateItem(item);
                 log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;

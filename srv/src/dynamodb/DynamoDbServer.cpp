@@ -170,7 +170,7 @@ namespace AwsMock::Service {
 
                     Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(_region, tableName);
 
-                    const long size = 0;
+                    long size = 0;
                     Dto::DynamoDb::ScanRequest scanRequest;
                     scanRequest.region = _region;
                     scanRequest.tableName = tableName;
@@ -179,10 +179,16 @@ namespace AwsMock::Service {
 
                     if (!scanResponse.items.empty()) {
                         for (auto &item: scanResponse.items) {
-                            /*Database::Entity::DynamoDb::Item itemEntity = Dto::DynamoDb::Mapper::map(item);
+                            Database::Entity::DynamoDb::Item itemEntity;
+                            itemEntity.region = _region;
+                            itemEntity.tableName = tableName;
+                            itemEntity.size = size;
+                            for (auto const &[key, value]: item) {
+                                itemEntity.attributes[key] = Dto::DynamoDb::Mapper::map(value);
+                            }
                             itemEntity = _dynamoDbDatabase.CreateOrUpdateItem(itemEntity);
                             log_trace << "Item synchronized, item: " << itemEntity.oid;
-                            size += item.size();*/
+                            size += item.size();
                         }
                     }
 

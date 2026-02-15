@@ -1412,27 +1412,19 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_message_batch");
         log_trace << "Delete message batch request, size: " << request.entries.size();
 
-        const std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
-
         try {
-
-            long deleted{};
 
             Dto::SQS::DeleteMessageBatchResponse deleteMessageBatchResponse;
             for (const auto &d: request.entries) {
-                if (!_sqsDatabase.MessageExists(d.receiptHandle)) {
 
-                    log_warning << "Message does not exist, receiptHandle: " << d.receiptHandle.substr(0, 40);
-                    deleteMessageBatchResponse.failed.emplace_back(d.id);
-
-                } else {
-
-                    // Delete from database
-                    deleted = _sqsDatabase.DeleteMessage(d.receiptHandle);
-
+                // Delete from database
+                const long deleted = _sqsDatabase.DeleteMessage(d.receiptHandle);
+                if (deleted > 0) {
                     deleteMessageBatchResponse.successfull.emplace_back(d.id);
-                    log_trace << "Message deleted, receiptHandle: " << d.receiptHandle.substr(0, 40) << " deleted: " << deleted;
+                } else {
+                    deleteMessageBatchResponse.failed.emplace_back(d.id);
                 }
+                log_trace << "Message deleted, receiptHandle: " << d.receiptHandle.substr(0, 40) << " deleted: " << deleted;
             }
             log_debug << "Message batch deleted, success: " << deleteMessageBatchResponse.successfull.size() << ", failure: " << deleteMessageBatchResponse.failed.size();
             return deleteMessageBatchResponse;

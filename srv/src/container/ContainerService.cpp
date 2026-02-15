@@ -259,7 +259,7 @@ namespace AwsMock::Service {
         std::vector<Dto::Docker::Container> containers;
         const std::string containerName = tag.empty() ? name : name + ":" + tag;
         for (const auto &container: response.containerList) {
-            if (Core::StringUtils::Contains(container.image, containerName)) {
+            if (Core::StringUtils::Contains(container.image, name)) {
                 containers.push_back(container);
             }
         }

@@ -19,9 +19,13 @@ namespace AwsMock::Database {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                const int64_t count = _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)));
-                log_trace << "Topic exists: " << std::boolalpha << count;
-                return count > 0;
+
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _topicCollection.count_documents(make_document(kvp("topicArn", topicArn)), options) > 0;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
@@ -37,9 +41,13 @@ namespace AwsMock::Database {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                const int64_t count = _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)));
-                log_trace << "Topic exists: " << std::boolalpha << count;
-                return count > 0;
+
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _topicCollection.count_documents(make_document(kvp("region", region), kvp("topicName", topicName)), options) > 0;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
@@ -558,9 +566,13 @@ namespace AwsMock::Database {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-                const int64_t count = _messageCollection.count_documents(make_document(kvp("messageId", messageId)));
-                log_trace << "Message exists: " << std::boolalpha << count;
-                return count > 0;
+
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _messageCollection.count_documents(make_document(kvp("messageId", messageId)), options) > 0;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
@@ -1002,19 +1014,19 @@ namespace AwsMock::Database {
 
                 // Initialize all topics with zero message counts
                 topicCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                          kvp("size", bsoncxx::types::b_int64()),
-                                                                          kvp("messages", bsoncxx::types::b_int64()),
-                                                                          kvp("messagesSend", bsoncxx::types::b_int64()),
-                                                                          kvp("messagesResend", bsoncxx::types::b_int64())))));
+                                                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                                                  kvp("messages", bsoncxx::types::b_int64()),
+                                                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
+                                                                                  kvp("messagesResend", bsoncxx::types::b_int64())))));
 
                 auto bulk = topicCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                     bulk.append(mongocxx::model::update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "topicArn"))),
                                                             make_document(kvp("$set", make_document(
-                                                                                      kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                                                      kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
-                                                                                      kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
-                                                                                      kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
+                                                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
+                                                                                              kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
+                                                                                              kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
                     log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "topicArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
                               << ", messages: " << Core::Bson::BsonUtils::GetLongValue(t, "total")

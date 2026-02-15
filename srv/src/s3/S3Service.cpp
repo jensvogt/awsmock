@@ -422,7 +422,7 @@ namespace AwsMock::Service {
         log_debug << "Delete bucket lifecycle configuration, bucket: " << request.bucket;
     }
 
-    Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const {
+    Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(Dto::S3::CreateMultipartUploadRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "create_multipart_upload");
         log_trace << "CreateMultipartUpload request, bucket: " + request.bucket << " key: " << request.key << " region: " << request.region << " user: " << request.user;
 
@@ -445,7 +445,14 @@ namespace AwsMock::Service {
         object.bucketArn = bucket.arn;
         object.key = request.key;
         object.owner = request.user;
-        object.metadata = request.metadata;
+
+        // Metadate
+        if (!bucket.defaultMetadata.empty()) {
+            object.metadata = bucket.defaultMetadata;
+        }
+        object.metadata.merge(request.metadata);
+
+        // Update database
         object = _database.CreateOrUpdateObject(object);
 
         log_debug << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
@@ -736,6 +743,11 @@ namespace AwsMock::Service {
             const std::string sourcePath = dataS3Dir + Core::FileUtils::separator() + sourceObject.internalName;
             const std::string targetPath = dataS3Dir + Core::FileUtils::separator() + targetFile;
             Core::FileUtils::CopyTo(sourcePath, targetPath);
+
+            // Add default metadata if existing. Can be overwritten by request metadata
+            if (targetBucket.defaultMetadata.empty()) {
+                targetObject.metadata = targetBucket.defaultMetadata;
+            }
 
             // Update database
             targetObject.region = request.region;
@@ -1196,10 +1208,16 @@ namespace AwsMock::Service {
             objectCounter.contentType = object.contentType;
             objectCounter.internalName = object.internalName;
             objectCounter.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
-            objectCounter.body = Core::Crypto::Base64Encode(body);
             objectCounter.created = object.created;
             objectCounter.modified = object.modified;
             objectCounter.metadata = object.metadata;
+
+            // Check body size > 200MB
+            if (body.size() > 1024 * 1024 * 200) {
+                objectCounter.body = Core::Crypto::Base64Encode("Body size > 200MB");
+            } else {
+                objectCounter.body = Core::Crypto::Base64Encode(body);
+            }
             getObjectCounterResponse.objectCounter = objectCounter;
             return getObjectCounterResponse;
         } catch (bsoncxx::exception &ex) {
@@ -1382,9 +1400,14 @@ namespace AwsMock::Service {
         object.owner = request.owner;
         object.size = size;
         object.contentType = contentType;
-        object.metadata = request.metadata;
         object.internalName = fileName;
         object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
+
+        // Metadata
+        if (bucket.defaultMetadata.empty()) {
+            object.metadata = bucket.defaultMetadata;
+        }
+        object.metadata.merge(request.metadata);
 
         // Meta data
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
@@ -1454,10 +1477,15 @@ namespace AwsMock::Service {
             object.owner = request.owner;
             object.size = count;
             object.contentType = request.contentType;
-            object.metadata = request.metadata;
             object.internalName = fileName;
             object.versionId = versionId;
             object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
+
+            // Metadata
+            if (bucket.defaultMetadata.empty()) {
+                object.metadata = bucket.defaultMetadata;
+            }
+            object.metadata.merge(request.metadata);
 
             // Meta data
             object.md5sum = Core::Crypto::GetMd5FromFile(filePath);

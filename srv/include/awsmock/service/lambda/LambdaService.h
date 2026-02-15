@@ -8,6 +8,9 @@
 // C++ standard includes
 #include <string>
 
+// Boost includes
+#include <boost/signals2/signal.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -520,6 +523,11 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::DeleteTagsRequest
          */
         void DeleteTags(const Dto::Lambda::DeleteTagsRequest &request) const;
+
+        /**
+         * @brief Signal for a lambda update code
+         */
+        boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
       private:
 

@@ -224,7 +224,7 @@ namespace AwsMock::Service {
          * @param request S3 multi part upload request
          * @return Dto::S3::CreateMultipartUploadResult
          */
-        [[nodiscard]] Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const;
+        [[nodiscard]] Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(Dto::S3::CreateMultipartUploadRequest &request) const;
 
         /**
          * @brief Upload a partial file
