@@ -30,6 +30,7 @@ namespace AwsMock::Service {
          * @brief Constructor
          */
         explicit SQSServer(Core::Scheduler &scheduler);
+        void AdjustCounter() const;
 
       private:
 

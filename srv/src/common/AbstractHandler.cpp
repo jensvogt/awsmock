@@ -33,7 +33,7 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::ok);
-        response.keep_alive(request.keep_alive());
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(body.size()));
@@ -41,7 +41,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
 
         // Copy headers
         if (!headers.empty()) {
@@ -64,9 +68,9 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
-        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::ok);
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(contentLength));
@@ -74,7 +78,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
 
         // Body
         std::ifstream ifs(fileName);
@@ -99,6 +107,7 @@ namespace AwsMock::Service {
         response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::no_content);
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, "0");
@@ -106,7 +115,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
 
         // Copy headers
         if (!headers.empty()) {
@@ -126,6 +139,7 @@ namespace AwsMock::Service {
         response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::internal_server_error);
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(body.size()));
@@ -133,7 +147,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
 
         // Body
         if (!body.empty()) {
@@ -156,9 +174,9 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
-        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::bad_request);
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(body.size()));
@@ -167,7 +185,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::keep_alive, "timeout=5, max=1000");
-
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
         // Body
         if (!body.empty()) {
             ostream(response.body()).write(body.c_str(), body.size());
@@ -189,9 +211,9 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
-        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::not_found);
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "text/html; charset=UTF-8");
         response.set(http::field::content_length, std::to_string(body.size()));
@@ -201,6 +223,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::keep_alive, "timeout=5, max=1000");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
 
         // Body
         if (!body.empty()) {
@@ -226,9 +253,9 @@ namespace AwsMock::Service {
 
             // Prepare the response message
             http::response<http::dynamic_body> response;
-            response.keep_alive(request.keep_alive());
             response.version(request.version());
             response.result(http::status::partial_content);
+            response.set(http::field::connection, "close");
             response.set(http::field::server, "awsmock");
             response.set(http::field::content_type, "application/octet-stream");
             response.set(http::field::accept_ranges, "bytes");
@@ -238,7 +265,11 @@ namespace AwsMock::Service {
             response.set(http::field::access_control_allow_origin, "*");
             response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
             response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-            response.set(http::field::keep_alive, "timeout=5, max=1000");
+            if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+                response.keep_alive(request.keep_alive());
+                response.set(http::field::connection, "keep-alive");
+                response.set(http::field::keep_alive, "timeout=5, max=1000");
+            }
 
             // Body is part of file from min -> max
             auto buffer = new char[size];
@@ -272,9 +303,9 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
-        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::continue_);
+        response.set(http::field::connection, "CLOSE");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, "0");
@@ -282,7 +313,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
 
         // Send the response to the client
         return response;
@@ -294,8 +329,7 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(status);
-        response.keep_alive(request.keep_alive());
-        response.set(http::field::connection, "Close");
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(body.length()));
@@ -304,7 +338,11 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive")) {
+            response.keep_alive(request.keep_alive());
+            response.set(http::field::connection, "keep-alive");
+            response.set(http::field::keep_alive, "timeout=5, max=1000");
+        }
 
         // Copy headers
         if (!headers.empty()) {
@@ -319,6 +357,7 @@ namespace AwsMock::Service {
             response.prepare_payload();
         }
 
+        //Core::HttpUtils::DumpResponse(response);
         // Send the response to the client
         return response;
     }

@@ -489,7 +489,7 @@ namespace AwsMock::Service {
                         Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
                         log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                        return SendOkResponse(request, result.ToXml());
+                        return SendResponse(request, http::status::ok, result.ToXml());
                     }
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     log_debug << "Finish multipart upload request, uploadId: " << uploadId;

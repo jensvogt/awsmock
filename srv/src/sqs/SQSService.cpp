@@ -148,7 +148,7 @@ namespace AwsMock::Service {
         try {
 
             // Adjust SQS queue counters
-            _sqsDatabase.AdjustMessageCounters();
+            //            _sqsDatabase.AdjustMessageCounters();
 
             // Get the queue list and the total number
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns), request.region);
