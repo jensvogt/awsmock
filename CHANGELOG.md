@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.5](https://github.com/jensvogt/awsmock/compare/1.14.4...v1.14.5) (2026-02-15)
+
+
+### Bug Fixes
+
+* SQS counters ([9439974](https://github.com/jensvogt/awsmock/commit/9439974bc529e17600123c9e152ecf403233f090))
+
 ## [1.14.4](https://github.com/jensvogt/awsmock/compare/1.14.3...v1.14.4) (2026-02-15)
 
 
