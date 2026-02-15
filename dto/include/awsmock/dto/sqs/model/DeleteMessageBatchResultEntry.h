@@ -11,9 +11,9 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
@@ -44,25 +44,6 @@ namespace AwsMock::Dto::SQS {
          * Id
          */
         std::string id;
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
 
       private:
 

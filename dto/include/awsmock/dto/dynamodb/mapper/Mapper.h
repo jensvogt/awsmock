@@ -50,12 +50,11 @@ namespace AwsMock::Dto::DynamoDb {
          * @brief Maps a DynamoDB PutItemRequest to an entity, which can be saved in the database.
          *
          * @param request request struct
-         * @param table table entity
          * @return Dynamodb entity to be deleted
          * @see Dto::DynamoDb::PutItemRequest
          * @see Database::Entity::DynamoDb::Item
          */
-        static Database::Entity::DynamoDb::Item map(const PutItemRequest &request, const Database::Entity::DynamoDb::Table &table);
+        static Database::Entity::DynamoDb::Item map(const PutItemRequest &request);
 
         /**
          * @brief Maps a DynamoDB PutItemRequest to an entity, which can be saved in the database.

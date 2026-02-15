@@ -11,8 +11,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -57,29 +57,6 @@ namespace AwsMock::Dto::SQS {
          * Error message
          */
         std::string message;
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
-                Core::Bson::BsonUtils::SetStringValue(document, "Code", code);
-                Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
-                Core::Bson::BsonUtils::SetBoolValue(document, "SenderFault", senderFault);
-
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
 
       private:
 

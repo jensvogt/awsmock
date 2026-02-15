@@ -436,7 +436,7 @@ namespace AwsMock::Core {
 
         // Load the default magic database (indicated by nullptr)
         if (magic_load(magic, magicFile.c_str()) != 0) {
-            log_error << "Could not load libmagic mime types, fileName: " << magicFile;
+            log_error << "Could not load libmagic mime types, fileName: " << magicFile << ", error: " << magic_error(magic);
             return DEFAULT_MIME_TYPE;
         }
 
@@ -626,8 +626,7 @@ namespace AwsMock::Core {
 
 
 #ifdef _WIN32
-    std::wstring FileUtils::NormalizePathForLongPaths(const std::wstring& path)
-    {
+    std::wstring FileUtils::NormalizePathForLongPaths(const std::wstring &path) {
         // The prefix must be applied only to absolute paths.
         // If the path already starts with the prefix, do nothing.
         if (path.rfind(L"\\\\?\\", 0) == 0) {

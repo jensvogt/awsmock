@@ -127,6 +127,10 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
 
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
                 document query;
                 if (!region.empty()) {
                     query.append(kvp("region", region));
@@ -135,9 +139,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", tableName));
                 }
 
-                const int64_t count = _tableCollection.count_documents(query.extract());
-                log_trace << "DynamoDb table exists: " << std::boolalpha << count;
-                return count > 0;
+                return _tableCollection.count_documents(query.extract(), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

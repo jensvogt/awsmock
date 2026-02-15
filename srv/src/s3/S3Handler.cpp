@@ -703,11 +703,13 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::S3CommandType::UNKNOWN: {
+                    Core::HttpUtils::DumpRequest(request);
                     log_error << "Unknown method";
                     return SendResponse(request, http::status::bad_request, "Unknown method");
                 }
 
                 default:
+                    Core::HttpUtils::DumpRequest(request);
                     log_error << "Unknown method";
                     return SendResponse(request, http::status::bad_request, "Unknown method");
             }

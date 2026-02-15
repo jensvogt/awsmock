@@ -212,7 +212,8 @@ namespace AwsMock::Manager {
         log_info << "Module started, count: " << Service::ModuleMap::instance().GetSize();
 
         // Start listener threads
-        const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
+        //const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
+        auto const maxThreads = std::thread::hardware_concurrency();
         for (auto i = 0; i < maxThreads; i++) {
             _threadGroup.create_thread([this] { return _ioc.run(); });
         }

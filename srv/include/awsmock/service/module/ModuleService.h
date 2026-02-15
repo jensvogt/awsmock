@@ -96,7 +96,7 @@ namespace AwsMock::Service {
          * @param request export infrastructure request
          * @return JSON string
          */
-        static Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request);
+        static Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request = {});
 
         /**
          * @brief Import the infrastructure
@@ -142,6 +142,13 @@ namespace AwsMock::Service {
          * @param module module name
          */
         static void BackupRetention(const std::string &module);
+
+        /**
+         * @brief Update lambda slot, signaled whenever a lambda function is updated
+         *
+         * @param name lambda name
+         */
+        void UpdateLambda(const std::string &name);
 
       private:
 

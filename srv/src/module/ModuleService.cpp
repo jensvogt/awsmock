@@ -2,9 +2,6 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include "awsmock/dto/s3/PutObjectRequest.h"
-
-
 #include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Service {
@@ -477,5 +474,15 @@ namespace AwsMock::Service {
         for (const auto &file: backupList) {
             Core::FileUtils::RemoveFile(file);
         }
+    }
+
+    // ReSharper disable once CppMemberFunctionMayBeStatic
+    void ModuleService::UpdateLambda(const std::string &name) {
+        const Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure();
+        const auto filename = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file");
+        std::ofstream ofs(filename, std::ios::trunc);
+        ofs << response.ToJson();
+        ofs.close();
+        log_info << "Infrastructure exported, file: " << filename;
     }
 }// namespace AwsMock::Service

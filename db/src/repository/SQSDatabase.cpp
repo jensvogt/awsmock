@@ -4,6 +4,8 @@
 
 #include <awsmock/repository/SQSDatabase.h>
 
+#include <bsoncxx/builder/stream/helpers.hpp>
+
 namespace AwsMock::Database {
 
     SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {}
@@ -16,9 +18,11 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
 
-            const int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-            log_trace << "Queue exists: " << std::boolalpha << count;
-            return count > 0;
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
+            return _queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
         }
         return _memoryDb.QueueExists(region, name);
     }
@@ -31,6 +35,10 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
 
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
             document query;
             if (!region.empty()) {
                 query.append(kvp("region", region));
@@ -39,9 +47,7 @@ namespace AwsMock::Database {
                 query.append(kvp("queueUrl", queueUrl));
             }
 
-            const int64_t count = _queueCollection.count_documents(query.extract());
-            log_trace << "Queue exists: " << std::boolalpha << (count > 0);
-            return count > 0;
+            return _queueCollection.count_documents(query.extract(), options) > 0;
         }
         return _memoryDb.QueueUrlExists(region, queueUrl);
     }
@@ -54,9 +60,11 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
 
-            const int64_t count = _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
-            log_trace << "Queue exists: " << std::boolalpha << count;
-            return count > 0;
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
+            return _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)), options) > 0;
         }
         return _memoryDb.QueueArnExists(queueArn);
     }
@@ -603,13 +611,15 @@ namespace AwsMock::Database {
             auto messageCollection = client->database(_databaseName)[_messageCollectionName];
 
             try {
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
 
                 document query;
                 query.append(kvp("receiptHandle", receiptHandle));
 
-                const auto result = messageCollection.find_one(query.extract());
-                log_trace << "Message exists: " << std::boolalpha << result->empty();
-                return result.has_value();
+                // 3. If count > 0, it exists
+                return messageCollection.count_documents(query.view(), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -628,9 +638,11 @@ namespace AwsMock::Database {
             auto messageCollection = client->database(_databaseName)[_messageCollectionName];
             try {
 
-                const auto result = messageCollection.find_one(make_document(kvp("messageId", messageId)));
-                log_trace << "Message exists: " << std::boolalpha << result.has_value();
-                return result.has_value();
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return messageCollection.count_documents(make_document(kvp("messageId", messageId)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -1354,12 +1366,8 @@ namespace AwsMock::Database {
 
             try {
 
-                if (const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle))); !findResult->empty()) {
-                    Entity::SQS::Message message;
-                    message.FromDocument(findResult->view());
-                    return DeleteMessage(message);
-                }
-                return 0;
+                auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

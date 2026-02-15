@@ -40,30 +40,29 @@ namespace AwsMock::Service {
     void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec == http::error::end_of_stream) {
-            return DoShutdown();
+        // Check for errors from the ASYNC read that triggered this
+        if (ec) {
+            if (ec == http::error::end_of_stream || ec == boost::asio::error::operation_aborted) {
+                return;// Normal close or timeout
+            }
+            log_error << "Read failed: " << ec.message();
+            return;
         }
 
-        // Handle 100-continue
+        // Data is already in _parser! No need for http::read(ev).
+        // Handle 100-continue (using the data already in the parser)
         if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
             HandleContinueRequest(_stream, _parser->get());
-            return;
+            DoRead();
         }
 
-        // Read request into _parser
-        boost::beast::error_code ev;
-        http::read(_stream, _buffer, *_parser, ev);
-        if (ev) {
-            log_error << "Read failed: " << ev.message();
-            return;
-        }
-
-        // Handle the request
+        // Process the request that was just finished by the async operation
         HandleRequest(_parser->release(), _queue);
 
-        // Pipeline next request if possible
-        if (!_queue.is_full()) DoRead();
-
+        // Continue the loop
+        if (!_queue.is_full()) {
+            DoRead();
+        }
         log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
@@ -264,8 +263,8 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::access_control_max_age, "86400");
         response.set(http::field::vary, "Accept-Encoding, Origin");
-        response.set(http::field::keep_alive, "timeout=10, max=100");
-        response.set(http::field::connection, "Keep-Alive");
+        //response.set(http::field::keep_alive, "timeout=10, max=100");
+        //response.set(http::field::connection, "Keep-Alive");
         response.prepare_payload();
 
         // Send the response to the client

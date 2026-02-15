@@ -94,6 +94,9 @@ namespace AwsMock::Service {
         // Update the lambda function
         const LambdaCreator lambdaCreator;
         lambdaCreator.CreateLambda(lambda, instanceId);
+
+        // Update init file
+        sigLambdaCodeUpdated(lambda.function);
         log_debug << "Lambda function code updated, function: " << lambda.function;
     }
 
