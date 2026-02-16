@@ -40,11 +40,11 @@ namespace AwsMock::Service {
     void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 
-        // Check for errors from the ASYNC read that triggered this
+        // This means they closed the connection
+        if (ec == http::error::end_of_stream)
+            return DoClose();
+
         if (ec) {
-            if (ec == http::error::end_of_stream || ec == boost::asio::error::operation_aborted) {
-                return;// Normal close or timeout
-            }
             log_error << "Read failed: " << ec.message();
             return;
         }
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
     //
     // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -246,8 +246,8 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::access_control_max_age, "86400");
         response.set(http::field::vary, "Accept-Encoding, Origin");
-        //response.set(http::field::keep_alive, "timeout=10, max=100");
-        //response.set(http::field::connection, "Keep-Alive");
+        response.set(http::field::keep_alive, "timeout=10, max=100");
+        response.set(http::field::connection, "Keep-Alive");
         response.prepare_payload();
 
         // Send the response to the client
@@ -267,7 +267,10 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_headers, "*");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::access_control_max_age, "86400");
+        response.set(http::field::keep_alive, "timeout=10, max=100");
+        response.set(http::field::connection, "Keep-Alive");
+
         boost::beast::error_code ec;
         write(_stream, response, ec);
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

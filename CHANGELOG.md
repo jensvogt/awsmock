@@ -1,5 +1,140 @@
 # Changelog
 
+## [1.14.7](https://github.com/jensvogt/awsmock/compare/1.14.6...v1.14.7) (2026-02-16)
+
+
+### Bug Fixes
+
+* add SNS add message dialog ([5624d6f](https://github.com/jensvogt/awsmock/commit/5624d6ff5d5a34dbbb4e4253363d8e1968c7f7cb))
+* add SNS add message dialog ([5cd1503](https://github.com/jensvogt/awsmock/commit/5cd15037e5c3cce3b23dc5f2f0f00520137e3f35))
+
+## [1.14.6](https://github.com/jensvogt/awsmock/compare/v1.14.5...v1.14.6) (2026-02-16)
+
+
+### Bug Fixes
+
+* keep alive settings ([fc8eeab](https://github.com/jensvogt/awsmock/commit/fc8eeab0e07182cc9ed47bd2eeb852f88eb8c3d9))
+
+## [1.14.5](https://github.com/jensvogt/awsmock/compare/1.14.4...v1.14.5) (2026-02-15)
+
+
+### Bug Fixes
+
+* SQS counters ([9439974](https://github.com/jensvogt/awsmock/commit/9439974bc529e17600123c9e152ecf403233f090))
+
+## [1.14.4](https://github.com/jensvogt/awsmock/compare/1.14.3...v1.14.4) (2026-02-15)
+
+
+### Bug Fixes
+
+* fix several issues ([e1bca33](https://github.com/jensvogt/awsmock/commit/e1bca33ed0bca7eded44e9200b10129e1b2f4093))
+
+## [1.14.3](https://github.com/jensvogt/awsmock/compare/1.14.2...v1.14.3) (2026-02-13)
+
+
+### Bug Fixes
+
+* gate problem using 100-continue header ([e52d1fd](https://github.com/jensvogt/awsmock/commit/e52d1fde1da1b79dd2e3a4b343cc0d938a57d916))
+
+## [1.14.2](https://github.com/jensvogt/awsmock/compare/1.14.1...v1.14.2) (2026-02-12)
+
+
+### Bug Fixes
+
+* dynamodb getitem response ([06f9bfd](https://github.com/jensvogt/awsmock/commit/06f9bfd80ccc452da9d5ef34341efeb029902752))
+
+## [1.14.1](https://github.com/jensvogt/awsmock/compare/1.14.0...v1.14.1) (2026-02-07)
+
+
+### Bug Fixes
+
+* some KMS issues ([64007eb](https://github.com/jensvogt/awsmock/commit/64007eb641c2fd43dfb17e47204cc6da2fe854e9))
+
+## [1.14.0](https://github.com/jensvogt/awsmock/compare/v1.13.0...v1.14.0) (2026-02-06)
+
+
+### Features
+
+* add log messages to FE ([691c0b1](https://github.com/jensvogt/awsmock/commit/691c0b1609d9066891c3caa85de80262fa9b907d))
+* add log messages to FE ([15626e5](https://github.com/jensvogt/awsmock/commit/15626e533daa6e11467cff4072913ddca9712c78))
+
+## [1.13.0](https://github.com/jensvogt/awsmock/compare/1.12.15...v1.13.0) (2026-02-06)
+
+
+### Features
+
+* add log messages to FE ([61a7833](https://github.com/jensvogt/awsmock/commit/61a783364e0945ecbfd3e77fdba59d8eeabca1ef))
+
+## [1.12.15](https://github.com/jensvogt/awsmock/compare/1.12.14...v1.12.15) (2026-02-05)
+
+
+### Bug Fixes
+
+* logging messages in module service ([a8f125c](https://github.com/jensvogt/awsmock/commit/a8f125c851925868d77023d53cf77f27db2e9753))
+
+## [1.12.14](https://github.com/jensvogt/awsmock/compare/1.12.13...v1.12.14) (2026-02-04)
+
+
+### Bug Fixes
+
+* logging messages in module service ([9bea156](https://github.com/jensvogt/awsmock/commit/9bea1566a918035dece9fa2767f40191015f0e32))
+
+## [1.12.13](https://github.com/jensvogt/awsmock/compare/1.12.12...v1.12.13) (2026-02-03)
+
+
+### Bug Fixes
+
+* infrastructure dialog ([0e4a75d](https://github.com/jensvogt/awsmock/commit/0e4a75d6eb7e6b5c7120580c675427cbb4c74c10))
+
+## [1.12.12](https://github.com/jensvogt/awsmock/compare/1.12.11...v1.12.12) (2026-02-03)
+
+
+### Bug Fixes
+
+* infrastructure dialog ([b243497](https://github.com/jensvogt/awsmock/commit/b243497dcd97f8ab99e3d33db91b1a98252af00c))
+
+## [1.12.11](https://github.com/jensvogt/awsmock/compare/v1.12.10...v1.12.11) (2026-02-03)
+
+
+### Bug Fixes
+
+* add SSM tags ([bd76379](https://github.com/jensvogt/awsmock/commit/bd76379e4492225280bb464e3145a8ec72263c29))
+
+## [1.12.10](https://github.com/jensvogt/awsmock/compare/1.12.9...v1.12.10) (2026-02-03)
+
+
+### Bug Fixes
+
+* kms import/export ([a41d6da](https://github.com/jensvogt/awsmock/commit/a41d6daca812ee4192741a7ad3a9ecdb41f21d0a))
+
+## [1.12.9](https://github.com/jensvogt/awsmock/compare/1.12.8...v1.12.9) (2026-02-01)
+
+
+### Bug Fixes
+
+* controller having wrong ports ([40672ef](https://github.com/jensvogt/awsmock/commit/40672effc2b10164d095a49885b368a395bac3a3))
+
+## [1.12.8](https://github.com/jensvogt/awsmock/compare/v1.12.7...v1.12.8) (2026-02-01)
+
+
+### Bug Fixes
+
+* controller having wrong ports ([99ba51c](https://github.com/jensvogt/awsmock/commit/99ba51c0781dfe62d8dbc98cab263ee36bec7b47))
+
+## [1.12.7](https://github.com/jensvogt/awsmock/compare/v1.12.6...v1.12.7) (2026-02-01)
+
+
+### Bug Fixes
+
+* set correct lambda version, when new code is uploaded ([018c69a](https://github.com/jensvogt/awsmock/commit/018c69a98c4cc656169394a067f0f2ac6f25030b))
+
+## [1.12.6](https://github.com/jensvogt/awsmock/compare/1.12.5...v1.12.6) (2026-02-01)
+
+
+### Bug Fixes
+
+* set correct lambda version, when new code is uploaded ([688a18a](https://github.com/jensvogt/awsmock/commit/688a18a342a5e8f6803fdeac7ddb109cdab94881))
+
 ## [1.12.5](https://github.com/jensvogt/awsmock/compare/v1.12.4...v1.12.5) (2026-02-01)
 
 
