@@ -147,11 +147,6 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context &_ioc;
 
-        /**
-         * Keep alive flagHandler name
-         */
-        bool keepAlive = Core::Configuration::instance().GetValue<bool>("awsmock.gateway.http.keep-alive");
-
       private:
 
         /**

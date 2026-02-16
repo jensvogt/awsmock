@@ -40,11 +40,11 @@ namespace AwsMock::Service {
     void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 
-        // Check for errors from the ASYNC read that triggered this
+        // This means they closed the connection
+        if (ec == http::error::end_of_stream)
+            return DoClose();
+
         if (ec) {
-            if (ec == http::error::end_of_stream || ec == boost::asio::error::operation_aborted) {
-                return;
-            }
             log_error << "Read failed: " << ec.message();
             return;
         }
