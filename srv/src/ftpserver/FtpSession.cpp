@@ -1,6 +1,8 @@
 
 #include <awsmock/ftpserver/FtpSession.h>
 
+#include "awsmock/core/EventBus.h"
+
 namespace AwsMock::FtpServer {
     FtpSession::FtpSession(boost::asio::io_context &awsIoc, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler)
         : _completion_handler(completion_handler), _user_database(user_database), _io_service(awsIoc),
@@ -1518,6 +1520,7 @@ namespace AwsMock::FtpServer {
 
         //_metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);
         //_metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(fileName)));
+        Core::EventBus::instance().sigFtpUpload(user, fileName, metadata);
         log_debug << "File uploaded, fileName: " << fileName;
     }
 

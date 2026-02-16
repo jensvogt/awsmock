@@ -60,6 +60,13 @@ namespace AwsMock::Core {
          */
         void Shutdown() const;
 
+        /**
+         * @brief Shutdown a specific task
+         *
+         * @param name name of the task
+         */
+        void Shutdown(const std::string &name);
+
       private:
 
         /**

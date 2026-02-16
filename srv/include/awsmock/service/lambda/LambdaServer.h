@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
@@ -169,6 +170,11 @@ namespace AwsMock::Service {
          * Monitoring collector
          */
         Core::MonitoringCollector &_monitoringCollector;
+
+        /**
+         * Asynchronous task scheduler
+         */
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

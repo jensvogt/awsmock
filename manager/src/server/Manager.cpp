@@ -4,6 +4,8 @@
 
 #include <awsmock/server/Manager.h>
 
+#include "awsmock/core/EventBus.h"
+
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
 #endif
@@ -228,7 +230,8 @@ namespace AwsMock::Manager {
             // eventually destroying the `io_context` and all the sockets in it.
             if (!ec) {
                 log_info << "Backend stopping on signal: " << signal;
-                StopModules(Service::ModuleMap::instance());
+                Core::EventBus::instance().sigShutdown();
+                //StopModules(Service::ModuleMap::instance());
                 log_info << "Backend modules stopped";
                 _ioc.stop();
                 log_info << "Backend IO context stopped";

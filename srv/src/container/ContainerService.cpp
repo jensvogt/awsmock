@@ -585,7 +585,11 @@ namespace AwsMock::Service {
 
     void ContainerService::KillContainer(const std::string &containerId, const std::string &signal) const {
         if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content) {
-            log_warning << "Kill container failed, statusCode: " << statusCode;
+            if (statusCode == http::status::conflict) {
+                log_debug << "Kill container failed, containerId: " << containerId << ", statusCode: " << statusCode;
+                return;
+            }
+            log_warning << "Kill container failed, containerId: " << containerId << ", statusCode: " << statusCode;
             return;
         }
         log_debug << "Docker container killed, id: " << containerId << ", signal: " << signal;

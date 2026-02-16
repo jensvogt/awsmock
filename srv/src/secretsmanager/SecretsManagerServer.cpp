@@ -2,14 +2,11 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "../../../core/include/awsmock/core/monitoring/MonitoringDefinition.h"
-
-
 #include <awsmock/service/secretsmanager/SecretsManagerServer.h>
 
 namespace AwsMock::Service {
 
-    SecretsManagerServer::SecretsManagerServer(Core::Scheduler &scheduler) : AbstractServer("secretsmanager") {
+    SecretsManagerServer::SecretsManagerServer(Core::Scheduler &scheduler) : AbstractServer("secretsmanager"), _scheduler(scheduler) {
 
         // Manager configuration
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.secretsmanager.monitoring.period");
@@ -17,23 +14,18 @@ namespace AwsMock::Service {
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.secretsmanager.backup.cron");
         log_debug << "SecretsManager rest module initialized";
 
-        // Check module active
-        if (!IsActive("secretsmanager")) {
-            log_info << "SecretsManager module inactive";
-            return;
-        }
-        log_info << "SecretsManager server starting";
-
         // Start secrets manager monitoring update counters
-        scheduler.AddTask("secretsmanager-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        _scheduler.AddTask("secretsmanager-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, _backupCron);
+            _scheduler.AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SecretsManagerServer::Shutdown, this));
+
+        log_debug << "Secrets manager server initialized";
     }
 
     void SecretsManagerServer::UpdateCounter() const {
@@ -46,4 +38,9 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("secretsmanager", true);
     }
 
+    void SecretsManagerServer::Shutdown() {
+        log_info << "Secrets manager server shutting down";
+        _scheduler.Shutdown("secretsmanager-monitoring");
+        _scheduler.Shutdown("secretsmanager-backup");
+    }
 }// namespace AwsMock::Service

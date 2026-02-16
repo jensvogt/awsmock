@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc),
-                                                                                           _monitoringCollector(Core::MonitoringCollector::instance()) {
+                                                                                           _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.GetValue<std::string>("awsmock.region");
@@ -35,30 +35,37 @@ namespace AwsMock::Service {
         CreateContainers();
 
         // Start lambda monitoring update counters
-        scheduler.AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
+        _scheduler.AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
         // Start the delete old lambda task
-        scheduler.AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _lifetime);
+        _scheduler.AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _lifetime);
         log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _lifetime;
 
         // Start the delete old lambda logs
-        scheduler.AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
+        _scheduler.AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
         log_debug << "Lambda task started, name remove-lambda-logs, period: " << _logRetentionPeriod;
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("lambda-backup", [] { BackupLambda(); }, _backupCron);
+            _scheduler.AddTask("lambda-backup", [] { BackupLambda(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&LambdaServer::Shutdown, this));
+
         log_debug << "Lambda server initialized";
     }
 
     void LambdaServer::Shutdown() {
         log_debug << "Lambda server shutdown, region: " << _region;
 
+        _scheduler.Shutdown("lambda-monitoring");
+        _scheduler.Shutdown("lambda-remove");
+        _scheduler.Shutdown("lambda-remove-logs");
+        _scheduler.Shutdown("lambda-backup");
+
+        // Stop all lambda docker containers
         for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
 
             // Cleanup instances
@@ -70,6 +77,7 @@ namespace AwsMock::Service {
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_info << "Lambda stopped, name: " << lambda.function;
         }
+        log_info << "Lambda server stopped";
     }
 
     void LambdaServer::CleanupDocker() const {

@@ -211,6 +211,7 @@ namespace AwsMock::Core {
     }
 
     void AwsUtils::AddAuthorizationHeader(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
+        // TODO: check again
         const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
         const std::string accessKeyId = Configuration::instance().GetValue<std::string>("awsmock.access.key-id");
         const std::string secretAccessKey = Configuration::instance().GetValue<std::string>("awsmock.access.secret-access-key");
@@ -262,7 +263,7 @@ namespace AwsMock::Core {
         return true;
     }
 
-    bool AwsUtils::VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &secretAccessKey) {
+    bool AwsUtils::VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
 
         const AuthorizationHeaderKeys authorizationHeaderKeys = GetAuthorizationKeys(request, secretAccessKey);
 
@@ -287,7 +288,7 @@ namespace AwsMock::Core {
         return canonicalRequest.str();
     }
 
-    std::string AwsUtils::GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+    std::string AwsUtils::GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalRequest;
         canonicalRequest << request.method() << '\n';
         canonicalRequest << StringUtils::UrlEncode(request.target()) << '\n';
@@ -347,7 +348,7 @@ namespace AwsMock::Core {
         return canonicalHeaders.str();
     }
 
-    std::string AwsUtils::GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+    std::string AwsUtils::GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalHeaders;
 
         // Get header
@@ -404,7 +405,7 @@ namespace AwsMock::Core {
         return {};
     }
 
-    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &secretAccessKey) {
+    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
         const std::string authorizationHeader = request["Authorization"];
 
         // Get signing version

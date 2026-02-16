@@ -5,10 +5,8 @@
 #ifndef AWSMOCK_SERVICE_SNS_SERVER_H
 #define AWSMOCK_SERVICE_SNS_SERVER_H
 
-// C++ standard includes
-#include <string>
-
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
@@ -49,6 +47,11 @@ namespace AwsMock::Service {
          * @brief Backup the SNS topics and messages
          */
         static void BackupSns();
+
+        /**
+         * @brief Shutdown server
+         */
+        void Shutdown() override;
 
         /**
          * @brief Database connection
@@ -100,6 +103,11 @@ namespace AwsMock::Service {
          * Monitoring collector
          */
         Core::MonitoringCollector &_monitoringCollector;
+
+        /**
+         * @brif Asynchronous tasks scheduler
+         */
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

@@ -13,24 +13,18 @@ namespace AwsMock::Service {
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.cognito.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.cognito.backup.cron");
 
-        // Check module active
-        if (!IsActive("cognito")) {
-            log_info << "Cognito module inactive";
-            return;
-        }
-        log_info << "Cognito module starting";
-
         // Start DynamoDB monitoring update counters
         _scheduler.AddTask("cognito-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("cognito-backup", [this] { BackupCognito(); }, _backupCron);
+            scheduler.AddTask("cognito-backup", [] { BackupCognito(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
-        log_debug << "Cognito server started";
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&CognitoServer::Shutdown, this));
+
+        log_info << "Cognito server started";
     }
 
     void CognitoServer::UpdateCounter() const {
@@ -59,4 +53,9 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("cognito", true);
     }
 
+    void CognitoServer::Shutdown() {
+        _scheduler.Shutdown("cognito-monitoring");
+        _scheduler.Shutdown("cognito-backup");
+        log_info << "Cognito server stopped";
+    }
 }// namespace AwsMock::Service

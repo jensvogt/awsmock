@@ -5,10 +5,8 @@
 #ifndef AWSMOCK_SERVICE_COGNITO_SERVER_H
 #define AWSMOCK_SERVICE_COGNITO_SERVER_H
 
-// C++ includes
-#include <string>
-
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
@@ -45,6 +43,11 @@ namespace AwsMock::Service {
          * @brief Backup the cognito objects
          */
         static void BackupCognito();
+
+        /**
+         * @brief Shutdown the cognito server
+         */
+        void Shutdown() override;
 
         /**
          * @brief Metric service

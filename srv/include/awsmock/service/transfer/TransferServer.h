@@ -5,16 +5,11 @@
 #ifndef AWSMOCK_SERVICE_TRANSFER_SERVER_H
 #define AWSMOCK_SERVICE_TRANSFER_SERVER_H
 
-// C++ standard includes
-#include <map>
-#include <memory>
-#include <string>
-
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/dto/s3/model/BucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -99,6 +94,11 @@ namespace AwsMock::Service {
          * @brief Backup the transfer server
          */
         static void BackupTransfer();
+
+        /**
+         * @brief Shutdown server
+         */
+        void Shutdown() override;
 
         /**
          * Transfer database
@@ -187,6 +187,11 @@ namespace AwsMock::Service {
          * Asynchronous task scheduler
          */
         boost::asio::io_context &_ioc;
+
+        /**
+         * @brif Asynchronous tasks scheduler
+         */
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

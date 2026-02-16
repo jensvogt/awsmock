@@ -6,8 +6,8 @@
 #define AWSMOCK_SERVICE_SQS_SERVER_H
 
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SQSDatabase.h>
@@ -78,6 +78,11 @@ namespace AwsMock::Service {
         static void BackupSqs();
 
         /**
+         * @ſbrief Server shutdown
+         */
+        void Shutdown() override;
+
+        /**
          * Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
@@ -124,6 +129,11 @@ namespace AwsMock::Service {
          * Monitoring collector
          */
         Core::MonitoringCollector &_monitoringCollector;
+
+        /**
+         * @brif Asynchronous tasks scheduler
+         */
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

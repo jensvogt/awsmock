@@ -9,7 +9,7 @@
 
 namespace AwsMock::Service {
 
-    KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()) {
+    KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()), _scheduler((scheduler)) {
 
         // HTTP manager configuration
         _removePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.kms.remove.period");
@@ -18,26 +18,19 @@ namespace AwsMock::Service {
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.kms.backup.cron");
         log_debug << "KMS server initialized";
 
-        // Check module active
-        if (!IsActive("sns")) {
-            log_info << "KMS module inactive";
-            return;
-        }
-        log_info << "KMS module starting";
-
         // Start lambda monitoring update counters
-        scheduler.AddTask("kms-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        _scheduler.AddTask("kms-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start the deleting old keys task
-        scheduler.AddTask("kms-delete-keys", [this] { this->DeleteKeys(); }, _removePeriod);
+        _scheduler.AddTask("kms-delete-keys", [this] { this->DeleteKeys(); }, _removePeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("kms-backup", [] { BackupKms(); }, _backupCron);
+            _scheduler.AddTask("kms-backup", [] { BackupKms(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&KMSServer::Shutdown, this));
 
         log_debug << "KMSServer initialized, workerPeriod: " << _removePeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
@@ -66,5 +59,13 @@ namespace AwsMock::Service {
 
     void KMSServer::BackupKms() {
         ModuleService::BackupModule("kms", true);
+    }
+
+    void KMSServer::Shutdown() {
+        log_debug << "KMS server shutdown";
+        _scheduler.Shutdown("kms-monitoring");
+        _scheduler.Shutdown("kms-delete-keys");
+        _scheduler.Shutdown("kms-backup");
+        log_info << "KMS server stopped";
     }
 }// namespace AwsMock::Service

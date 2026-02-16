@@ -6,8 +6,8 @@
 #define AWSMOCK_SERVICE_S3_SERVER_H
 
 // C++ includes
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 // Boost includes
 #define BOOST_NO_CXX11_SCOPED_ENUMS
@@ -16,6 +16,7 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
@@ -58,6 +59,8 @@ namespace AwsMock::Service {
          * @brief Backup the S3 buckets and object
          */
         static void BackupS3();
+
+        void Shutdown() override;
 
         /**
          * Metric service
@@ -122,6 +125,11 @@ namespace AwsMock::Service {
          * Monitoring collector
          */
         Core::MonitoringCollector &_monitoringCollector;
+
+        /**
+         * @brif Asynchronous tasks scheduler
+         */
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

@@ -16,13 +16,6 @@ namespace AwsMock::Service {
         _logServer = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.log-server");
         _logServerPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.log-server-port");
 
-        // Check module active
-        if (!IsActive("application")) {
-            log_info << "Application module inactive";
-            return;
-        }
-        log_info << "Application module starting";
-
         // Start application background threads
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
@@ -38,8 +31,9 @@ namespace AwsMock::Service {
             StartApplicationLogServer();
         }
 
-        // Set running
-        SetRunning();
+        // Connect shutdown signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&ApplicationServer::Shutdown, this));
+
         log_debug << "Application server started";
     }
 
@@ -199,12 +193,16 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::Shutdown() {
-        log_debug << "Application server shutdown";
+        log_info << "Application server shutdown";
+        _scheduler.Shutdown("application-monitoring");
+        _scheduler.Shutdown("application-restart");
+        _scheduler.Shutdown("application-watchdog");
+        _scheduler.Shutdown("application-backup");
 
         for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase.ListApplications(); auto &application: applications) {
-
             ContainerService::instance().KillContainer(application.containerId);
             log_info << "Application stopped, name: " << application.name;
         }
+        log_info << "Application server stopped";
     }
 }// namespace AwsMock::Service

@@ -526,6 +526,8 @@ namespace AwsMock::Service {
 
         /**
          * @brief Signal for a lambda update code
+         *
+         * @tparam name of the lambda
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 

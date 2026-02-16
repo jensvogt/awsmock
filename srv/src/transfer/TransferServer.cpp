@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()), _ioc(ioc) {
+    TransferServer::TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()), _ioc(ioc), _scheduler(scheduler) {
 
         // REST manager configuration
         _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
@@ -14,23 +14,14 @@ namespace AwsMock::Service {
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.transfer.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.backup.cron");
 
-        // Check module active
-        if (!IsActive("transfer")) {
-            log_info << "Transfer module inactive";
-            return;
-        }
         log_info << "Transfer server starting";
 
         // Start SNS monitoring update counters
-        scheduler.AddTask("transfer-monitoring", [this] {
-            UpdateCounter();
-        }, _monitoringPeriod);
+        _scheduler.AddTask("transfer-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("transfer-backup", [this] {
-                BackupTransfer();
-            }, _backupCron);
+            _scheduler.AddTask("transfer-backup", [] { BackupTransfer(); }, _backupCron);
         }
 
         // Create transfer bucket
@@ -39,8 +30,8 @@ namespace AwsMock::Service {
         // Start all transfer servers
         StartTransferServers();
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&TransferServer::Shutdown, this));
 
         log_info << "Transfer server initialized";
     }
@@ -173,6 +164,12 @@ namespace AwsMock::Service {
 
     void TransferServer::BackupTransfer() {
         ModuleService::BackupModule("transfer", true);
+    }
+
+    void TransferServer::Shutdown() {
+        log_info << "Transfer server shutting down";
+        _scheduler.Shutdown("ssm-monitoring");
+        _scheduler.Shutdown("ssm-backup");
     }
 
 }// namespace AwsMock::Service

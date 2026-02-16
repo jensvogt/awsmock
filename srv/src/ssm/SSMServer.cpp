@@ -4,9 +4,11 @@
 
 #include <awsmock/service/ssm/SSMServer.h>
 
+#include "awsmock/core/EventBus.h"
+
 namespace AwsMock::Service {
 
-    SSMServer::SSMServer(Core::Scheduler &scheduler) : AbstractServer("kms") {
+    SSMServer::SSMServer(Core::Scheduler &scheduler) : AbstractServer("ssm"), _scheduler(scheduler) {
 
         // HTTP manager configuration
         _workerPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.ssm.worker.period");
@@ -15,26 +17,18 @@ namespace AwsMock::Service {
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.backup.cron");
         log_debug << "SSM server initialized";
 
-        // Check module active
-        if (!IsActive("ssm")) {
-            log_info << "SSM module inactive";
-            return;
-        }
-        log_info << "SSM server starting";
-
-        // Monitoring
         // Start SNS monitoring update counters
-        scheduler.AddTask("ssm-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
+        _scheduler.AddTask("ssm-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("ssm-backup", [this] { BackupSsm(); }, _backupCron);
+            _scheduler.AddTask("ssm-backup", [this] { BackupSsm(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SSMServer::Shutdown, this));
 
-        log_debug << "SSM server started, workerPeriod: " << _workerPeriod << " monitoringPeriod: " << _monitoringPeriod;
+        log_debug << "SSM server started";
     }
 
     void SSMServer::UpdateCounter() const {
@@ -52,4 +46,9 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("ssm", true);
     }
 
+    void SSMServer::Shutdown() {
+        log_info << "SSM manager server shutting down";
+        _scheduler.Shutdown("ssm-monitoring");
+        _scheduler.Shutdown("ssm-backup");
+    }
 }// namespace AwsMock::Service

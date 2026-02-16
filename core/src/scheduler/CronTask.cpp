@@ -38,4 +38,10 @@ namespace AwsMock::Core {
         _timer.async_wait(boost::bind(&CronTask::Execute, this, boost::asio::placeholders::error));
     }
 
+    void CronTask::Stop() {
+        log_debug << "Stopping CronTask '" << _name << "'";
+        _timer.cancel();
+        log_info << "CronTask '" << _name << "' stopped";
+    }
+
 }// namespace AwsMock::Core
