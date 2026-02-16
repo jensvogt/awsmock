@@ -414,6 +414,29 @@ namespace AwsMock::Service {
         }
     }
 
+    void SQSService::RedriveMessage(const Dto::SQS::RedriveMessageRequest &request) const {
+        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "redrive_message");
+        log_trace << "Redrive message request, queueArn: " << request.queueArn;
+
+        // Check existence
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        try {
+            // Update message
+            const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
+            const Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            _sqsDatabase.RedriveMessage(originalQueue, dqlQueue, request.messageId);
+            log_debug << "SQS redrive message, queueArn: " << request.queueArn;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     long SQSService::RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "redrive_messages");
         log_trace << "Redrive messages request, queueArn: " << request.queueArn;

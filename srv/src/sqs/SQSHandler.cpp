@@ -257,14 +257,21 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, sqsResponse.ToJson());
                 }
 
+                case Dto::Common::SqsCommandType::REDRIVE_MESSAGE: {
+
+                    Dto::SQS::RedriveMessageRequest sqsRequest = Dto::SQS::RedriveMessageRequest::FromJson(clientCommand);
+                    _sqsService.RedriveMessage(sqsRequest);
+                    log_info << "Redrive message, queueUrl: " << sqsRequest.queueArn << ", messageId: " << sqsRequest.messageId;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::SqsCommandType::REDRIVE_MESSAGES: {
 
                     Dto::SQS::RedriveMessagesRequest sqsRequest = Dto::SQS::RedriveMessagesRequest::FromJson(clientCommand);
                     const long count = _sqsService.RedriveMessages(sqsRequest);
-                    log_info << "Delete message, queueUrl: " << sqsRequest.queueArn << " count: " << count;
+                    log_info << "Redrive messages, queueUrl: " << sqsRequest.queueArn << " count: " << count;
                     return SendResponse(request, http::status::ok);
                 }
-
                 case Dto::Common::SqsCommandType::UPDATE_MESSAGE: {
 
                     Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);

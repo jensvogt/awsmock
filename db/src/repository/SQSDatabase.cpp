@@ -1090,6 +1090,49 @@ namespace AwsMock::Database {
         return updated;
     }
 
+    void SQSDatabase::RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "redrive_message");
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto session = client->start_session();
+
+            const auto newReset = system_clock::now() + std::chrono::seconds{originalQueue.attributes.visibilityTimeout};
+            try {
+
+                document filterQuery;
+                filterQuery.append(kvp("queueArn", dlqQueue.queueArn));
+                filterQuery.append(kvp("messageId", messageId));
+
+                document setQuery;
+                setQuery.append(kvp("queueArn", originalQueue.queueArn));
+                setQuery.append(kvp("queueUrl", originalQueue.queueUrl));
+                setQuery.append(kvp("queueName", originalQueue.name));
+                setQuery.append(kvp("retries", 0));
+                setQuery.append(kvp("reset", bsoncxx::types::b_date(newReset)));
+                setQuery.append(kvp("receiptHandle", ""));
+                setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
+                session.start_transaction();
+                const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
+                session.commit_transaction();
+                log_trace << "Message redrive, arn: " << dlqQueue.queueArn << ", messageId: " << messageId << ", updated: " << result->modified_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        } else {
+            _memoryDb.RedriveMessage(originalQueue, dlqQueue, messageId);
+        }
+    }
+
     long SQSDatabase::RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "redrive_messages");
 
