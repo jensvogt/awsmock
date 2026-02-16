@@ -5,7 +5,7 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 namespace AwsMock::Service {
-    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _monitoringCollector(Core::MonitoringCollector::instance()) {
+    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
 
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring-period");
         _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset-period");
@@ -13,30 +13,25 @@ namespace AwsMock::Service {
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sqs.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sqs.backup.cron");
 
-        // Check module active
-        if (!IsActive("sqs")) {
-            log_info << "SQS module inactive";
-            return;
-        }
         log_info << "SQS server starting";
 
         // Start SQS monitoring update counters
-        scheduler.AddTask("sqs-adjust-counter", [this] { this->AdjustCounter(); }, _counterPeriod);
-        scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
-        scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, _monitoringPeriod);
+        _scheduler.AddTask("sqs-adjust-counter", [this] { this->AdjustCounter(); }, _counterPeriod);
+        _scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        _scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, _monitoringPeriod);
 
         // Start reset messages task
-        scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
-        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, -1);
-        scheduler.AddTask("sqs-seturl", [this] { this->SetUrl(); }, -1);
+        _scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
+        _scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, -1);
+        _scheduler.AddTask("sqs-seturl", [this] { this->SetUrl(); }, -1);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("sqs-backup", [] { BackupSqs(); }, _backupCron);
+            _scheduler.AddTask("sqs-backup", [] { BackupSqs(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SQSServer::Shutdown, this));
 
         log_debug << "SQS server initialized";
     }
@@ -164,4 +159,10 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("sqs", true);
     }
 
+    void SQSServer::Shutdown() {
+        log_info << "SQS manager server shutting down";
+        _scheduler.Shutdown("sns-monitoring");
+        _scheduler.Shutdown("sns-delete-messages");
+        _scheduler.Shutdown("sns-backup");
+    }
 }// namespace AwsMock::Service

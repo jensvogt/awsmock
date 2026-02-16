@@ -14,13 +14,24 @@ namespace AwsMock::Core {
     }
 
     void Scheduler::AddTask(std::string const &name, PeriodicTask::handler_fn const &task, const std::string &cronExpression) {
-        if (!_periodicTasks.contains(name)) {
+        if (!_cronTasks.contains(name)) {
             _cronTasks[name] = std::make_unique<CronTask>(std::ref(_ioc), name, cronExpression, task);
         }
     }
 
     void Scheduler::Shutdown() const {
-        _ioc.stop();
+        for (const auto &val: _periodicTasks | std::views::values) {
+            val->Stop();
+        }
+    }
+
+    void Scheduler::Shutdown(const std::string &name) {
+        if (_periodicTasks.contains(name)) {
+            _periodicTasks[name]->Stop();
+        }
+        if (_cronTasks.contains(name)) {
+            _cronTasks[name]->Stop();
+        }
     }
 
 }// namespace AwsMock::Core

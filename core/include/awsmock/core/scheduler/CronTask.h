@@ -60,6 +60,11 @@ namespace AwsMock::Core {
          */
         void Start();
 
+        /**
+         * @brief Stops the task
+         */
+        void Stop();
+
       private:
 
         /**

@@ -46,6 +46,11 @@ namespace AwsMock::Service {
         static void BackupSsm();
 
         /**
+         * @brief Shutdown server
+         */
+        void Shutdown() override;
+
+        /**
          * @brief Database connection
          */
         Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
@@ -81,6 +86,10 @@ namespace AwsMock::Service {
          * @brief SNS monitoring period
          */
         int _monitoringPeriod;
+        /**
+         * Asynchronous task scheduler
+         */
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

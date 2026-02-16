@@ -2,15 +2,11 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/service/apps/ApplicationService.h"
-#include "awsmock/service/container/ContainerService.h"
-
-
 #include <awsmock/service/monitoring/MonitoringServer.h>
 
 namespace AwsMock::Service {
 
-    MonitoringServer::MonitoringServer(Core::Scheduler &scheduler) : AbstractServer("monitoring") {
+    MonitoringServer::MonitoringServer(Core::Scheduler &scheduler) : AbstractServer("monitoring"), _scheduler(scheduler) {
 
         Monitoring::MetricService::instance().Initialize();
         const int systemPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.system-period");
@@ -18,21 +14,22 @@ namespace AwsMock::Service {
         const int retentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.retention");
 
         // Start monitoring system collector
-        scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
+        _scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
-        scheduler.AddTask("monitoring-docker-collector", [] { CollectDockerCounter(); }, systemPeriod);
+        _scheduler.AddTask("monitoring-docker-collector", [] { CollectDockerCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
-        scheduler.AddTask("monitoring-collector", [this] { this->Collector(); }, averagePeriod);
+        _scheduler.AddTask("monitoring-collector", [this] { this->Collector(); }, averagePeriod);
         log_debug << "System collector started";
 
         // Start the database cleanup worker thread every day
-        scheduler.AddTask("monitoring-cleanup-database", [this] { this->DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
+        _scheduler.AddTask("monitoring-cleanup-database", [this] { this->DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
         log_debug << "Cleanup started";
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&MonitoringServer::Shutdown, this));
+
         log_debug << "Monitoring module initialized";
     }
 
@@ -84,6 +81,15 @@ namespace AwsMock::Service {
 
     void MonitoringServer::Collector() const {
         _monitoringDatabase.UpdateMonitoringCounters();
+    }
+
+    void MonitoringServer::Shutdown() {
+        log_debug << "Monitoring server shutdown";
+        _scheduler.Shutdown("monitoring-system-collector");
+        _scheduler.Shutdown("monitoring-docker-collector");
+        _scheduler.Shutdown("monitoring-collector");
+        _scheduler.Shutdown("monitoring-cleanup-database");
+        log_info << "Monitoring server stopped";
     }
 
 }// namespace AwsMock::Service

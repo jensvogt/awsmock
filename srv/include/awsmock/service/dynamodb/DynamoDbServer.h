@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BackupUtils.h>
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
@@ -185,6 +186,11 @@ namespace AwsMock::Service {
          * Data directory
          */
         std::string _dataDir;
+
+        /**
+         * Asynchronous task scheduler
+         */
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _monitoringCollector(Core::MonitoringCollector::instance()) {
+    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
 
         // Configuration
         _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete-period");
@@ -15,26 +15,19 @@ namespace AwsMock::Service {
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sns.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sns.backup.cron");
 
-        // Check module active
-        if (!IsActive("sns")) {
-            log_info << "SNS module inactive";
-            return;
-        }
-        log_info << "SNS server starting";
-
         // Start SNS monitoring update counters
-        scheduler.AddTask("sns-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
+        _scheduler.AddTask("sns-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
 
         // Start the delete old messages task
-        scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _deletePeriod);
+        _scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _deletePeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("sns-backup", [] { BackupSns(); }, _backupCron);
+            _scheduler.AddTask("sns-backup", [] { BackupSns(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SNSServer::Shutdown, this));
 
         log_debug << "SNS server initialized, workerPeriod: " << _deletePeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
@@ -70,4 +63,10 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("sns", true);
     }
 
+    void SNSServer::Shutdown() {
+        log_info << "SNS manager server shutting down";
+        _scheduler.Shutdown("sns-monitoring");
+        _scheduler.Shutdown("sns-delete-messages");
+        _scheduler.Shutdown("sns-backup");
+    }
 }// namespace AwsMock::Service

@@ -48,6 +48,12 @@ namespace AwsMock::Core {
         }
     }
 
+    void PeriodicTask::Stop() {
+        log_debug << "Stopping PeriodicTask '" << _name << "'";
+        _timer.cancel();
+        log_info << "PeriodicTask '" << _name << "' stopped";
+    }
+
     void PeriodicTask::StartWait() {
         auto callback = [this](const boost::system::error_code &error) {
             Execute(error);

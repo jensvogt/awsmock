@@ -6,7 +6,8 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
+    DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()),
+                                                                 _metricService(Monitoring::MetricService::instance()), _scheduler(scheduler) {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
@@ -23,13 +24,6 @@ namespace AwsMock::Service {
         _dataDir = configuration.GetValue<std::string>("awsmock.modules.dynamodb.data-dir");
         log_debug << "DynamoDB docker endpoint: " << _containerHost << ":" << _containerPort;
 
-        // Check module active
-        if (!IsActive("dynamodb")) {
-            log_info << "DynamoDb module inactive";
-            return;
-        }
-        log_info << "DynamoDb server starting";
-
         // Create a local network if it is not existing yet
         CreateLocalNetwork();
 
@@ -37,19 +31,21 @@ namespace AwsMock::Service {
         StartLocalDynamoDb();
 
         // Start DynamoDB monitoring update counters
-        scheduler.AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        _scheduler.AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing
-        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, _workerPeriod);
-        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, _workerPeriod);
+        _scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, _workerPeriod);
+        _scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, _workerPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("dynamodb-backup", [this] { BackupDynamoDb(); }, _backupCron);
+            _scheduler.AddTask("dynamodb-backup", [this] { BackupDynamoDb(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect stop signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&DynamoDbServer::Shutdown, this));
+
+        log_info << "DynamoDB server started";
     }
 
     void DynamoDbServer::CreateLocalNetwork() const {
@@ -218,14 +214,14 @@ namespace AwsMock::Service {
         ss << "VOLUME /usr/local/awsmock/data/dynamodb /home/dynamodblocal/data" << std::endl;
         ss << "WORKDIR /home/dynamodblocal" << std::endl;
         ss << "EXPOSE 8000 8000" << std::endl;
-        ss << R"(ENTRYPOINT ["java", "-Djava.library.path=./DynamoDBLocal_lib", "-jar", "DynamoDBLocal.jar", "-sharedDb"])";
+        ss << R"(ENTRYPOINT ["java", "-Djava.library.path=./DynamoDBLocal_lib", "-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "./data"])";
         return ss.str();
     }
 
     void DynamoDbServer::UpdateCounter() const {
         log_trace << "Dynamodb monitoring starting";
 
-        std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables();
+        const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables();
         if (tables.empty()) {
             return;
         }
@@ -253,14 +249,11 @@ namespace AwsMock::Service {
 
     void DynamoDbServer::Shutdown() {
         log_debug << "DynamoDb server shutdown, region: " << _region;
-
-        // Stop detached instances
-        /*for (const auto &instance: ContainerService::instance().ListContainerByImageName(_imageName, _imageTag)) {
-            ContainerService::instance().StopContainer(instance.id);
-            ContainerService::instance().DeleteContainer(instance.id);
-            log_debug << "Detached dynamodb instances cleaned up, id: " << instance.id;
-        }*/
-        log_info << "All dynamodb instances stopped";
+        _scheduler.Shutdown("dynamodb-monitoring");
+        _scheduler.Shutdown("dynamodb-sync-tables");
+        _scheduler.Shutdown("dynamodb-sync-items");
+        _scheduler.Shutdown("dynamodb-backup");
+        log_info << "DynamoDB server stopped";
     }
 
 }// namespace AwsMock::Service

@@ -39,6 +39,11 @@ namespace AwsMock::Core {
          * @tparam metadata
          */
         boost::signals2::signal<void(std::string, std::string, std::map<std::string, std::string>)> sigFtpUpload;
+
+        /**
+         * @brief Signal for system shutdown
+         */
+        boost::signals2::signal<void()> sigShutdown;
     };
 };// namespace AwsMock::Core
 

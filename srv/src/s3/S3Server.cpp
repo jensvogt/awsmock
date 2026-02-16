@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _monitoringCollector(Core::MonitoringCollector::instance()) {
+    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
 
         // Get HTTP configuration values
         _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync-period");
@@ -14,25 +14,19 @@ namespace AwsMock::Service {
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.s3.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.backup.cron");
 
-        // Check module active
-        if (!IsActive("s3")) {
-            log_info << "S3 module inactive";
-            return;
-        }
-
         // Start S3 monitoring counters updates
-        scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
+        _scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
 
         // Start synchronization of objects
-        scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod, _syncPeriod);
+        _scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod, _syncPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("s3-backup", [] { BackupS3(); }, _backupCron);
+            _scheduler.AddTask("s3-backup", [] { BackupS3(); }, _backupCron);
         }
 
-        // Set running
-        SetRunning();
+        // Connect shutdown signal
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&S3Server::Shutdown, this));
 
         log_debug << "S3 server initialized";
     }
@@ -56,7 +50,7 @@ namespace AwsMock::Service {
             // Get objects and delete objects, where the file is not existing anymore, The files are identified by internal name.
             std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000);
             while (!objects.empty()) {
-                for ( const auto &object: objects) {
+                for (const auto &object: objects) {
                     if (!Core::FileUtils::FileExists(s3DataDir + Core::FileUtils::separator() + object.internalName)) {
                         _s3Database.DeleteObject(object);
                         log_debug << "Object deleted, internalName: " << object.internalName;
@@ -104,11 +98,16 @@ namespace AwsMock::Service {
         log_debug << "S3 monitoring finished";
     }
 
-    void S3Server::BackupS3()  {
+    void S3Server::BackupS3() {
 
         // Backup S3 buckets and objects
         ModuleService::BackupModule("s3", true);
-
     }
 
+    void S3Server::Shutdown() {
+        log_info << "S3 server shutting down";
+        _scheduler.Shutdown("s3-monitoring");
+        _scheduler.Shutdown("s3-sync-objects");
+        _scheduler.Shutdown("s3-backup");
+    }
 }// namespace AwsMock::Service
