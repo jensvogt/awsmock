@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.8](https://github.com/jensvogt/awsmock/compare/v1.14.7...v1.14.8) (2026-02-16)
+
+
+### Bug Fixes
+
+* add SNS add message dialog ([349b201](https://github.com/jensvogt/awsmock/commit/349b201582728a0d02da35b9a8867846d23c54bf))
+
 ## [1.14.7](https://github.com/jensvogt/awsmock/compare/1.14.6...v1.14.7) (2026-02-16)
 
 
