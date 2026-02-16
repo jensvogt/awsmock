@@ -141,7 +141,7 @@ namespace AwsMock::Service {
                         const ApplicationService service{_ioc};
                         service.RestartApplication(serviceRequest);
                         log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::RESTART_ALL_APPLICATIONS: {
@@ -150,7 +150,7 @@ namespace AwsMock::Service {
                         const ApplicationService service{_ioc};
                         const long count = service.RestartAllApplications();
                         log_info << "All applications restarted, count: " << count; });
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::STOP_APPLICATION: {
@@ -160,7 +160,7 @@ namespace AwsMock::Service {
                         const ApplicationService service{_ioc};
                         service.StopApplication(serviceRequest);
                         log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::STOP_ALL_APPLICATIONS: {
@@ -169,7 +169,7 @@ namespace AwsMock::Service {
                         const ApplicationService service{_ioc};
                         const long count = service.StopAllApplications();
                         log_info << "All applications stopped, count: " << count; });
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::DELETE_APPLICATION: {
@@ -177,7 +177,7 @@ namespace AwsMock::Service {
                     Dto::Apps::DeleteApplicationRequest serviceRequest = Dto::Apps::DeleteApplicationRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.DeleteApplication(serviceRequest);
                     log_info << "Application deleted, name: " << serviceRequest.name;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
                 default:

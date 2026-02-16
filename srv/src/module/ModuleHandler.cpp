@@ -38,18 +38,18 @@ namespace AwsMock::Service {
                 config.dataDir = configuration.GetValue<std::string>("awsmock.data-dir");
                 config.version = Core::Configuration::GetVersion();
                 config.databaseActive = configuration.GetValue<bool>("awsmock.mongodb.active");
-                return SendOkResponse(request, config.ToJson());
+                return SendResponse(request, http::status::ok, config.ToJson());
             }
             if (action == "list-modules") {
 
                 Database::Entity::Module::ModuleList modules = _moduleService.ListModules();
                 std::string body = Dto::Module::Module::ToJson(modules);
-                return SendOkResponse(request, body);
+                return SendResponse(request, http::status::ok, body);
             }
             if (action == "list-module-names") {
 
                 Dto::Module::ListModuleNamesResponse modulesResponse = _moduleService.ListModuleNames();
-                return SendOkResponse(request, modulesResponse.ToJson());
+                return SendResponse(request, http::status::ok, modulesResponse.ToJson());
             }
 
             if (action == "get-infrastructure") {
@@ -61,17 +61,17 @@ namespace AwsMock::Service {
                 const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
                 std::string json = moduleResponse.ToJson();
                 log_info << "Infrastructure send to client, size: " << json.length();
-                return SendOkResponse(request, json);
+                return SendResponse(request, http::status::ok, json);
             }
 
             if (action == "ping") {
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
-            return SendBadRequestError(request, "Unknown action");
+            return SendResponse(request, http::status::bad_request, "Unknown action");
 
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         }
     }
 
@@ -90,7 +90,7 @@ namespace AwsMock::Service {
 
                 Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
                 modules = _moduleService.StartModules(modules);
-                return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
+                return SendResponse(request, http::status::ok, Dto::Module::Module::ToJson(modules));
             }
 
             if (action == "restart-modules") {
@@ -98,13 +98,13 @@ namespace AwsMock::Service {
                 Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
                 modules = _moduleService.StopModules(modules);
                 modules = _moduleService.StartModules(modules);
-                return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
+                return SendResponse(request, http::status::ok, Dto::Module::Module::ToJson(modules));
             }
             if (action == "stop-modules") {
 
                 Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
                 modules = _moduleService.StopModules(modules);
-                return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
+                return SendResponse(request, http::status::ok, Dto::Module::Module::ToJson(modules));
             }
             if (action == "import") {
 
@@ -112,7 +112,7 @@ namespace AwsMock::Service {
                 infrastructureRequest.FromJson(payload);
                 ModuleService::ImportInfrastructure(infrastructureRequest);
                 log_info << "Infrastructure imported, size: " << payload.length();
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (action == "export") {
@@ -124,7 +124,7 @@ namespace AwsMock::Service {
                 const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
                 std::string json = moduleResponse.ToJson();
                 log_info << "Infrastructure exported, size: " << json.length();
-                return SendOkResponse(request, json);
+                return SendResponse(request, http::status::ok, json);
             }
 
             if (action == "set-log-level") {
@@ -133,7 +133,7 @@ namespace AwsMock::Service {
                 log_info << "Log level set to '" << payload << "'";
 
                 // Send response
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (action == "clean-objects") {
@@ -148,16 +148,16 @@ namespace AwsMock::Service {
                 } else {
                     ModuleService::CleanInfrastructure(moduleRequest);
                 }
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
-            return SendBadRequestError(request, "Unknown action");
+            return SendResponse(request, http::status::bad_request, "Unknown action");
 
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         }
     }
 

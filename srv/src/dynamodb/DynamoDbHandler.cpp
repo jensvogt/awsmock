@@ -135,30 +135,30 @@ namespace AwsMock::Service {
 
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {
                     log_error << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
-                    return SendBadRequestError(request, "Bad request, method: POST clientCommand: " + Dto::Common::DynamoDbCommandTypeToString(clientCommand.command));
+                    return SendResponse(request, http::status::bad_request, "Bad request, method: POST clientCommand: " + Dto::Common::DynamoDbCommandTypeToString(clientCommand.command));
                 }
 
                 default: {
                     log_error << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
-                    return SendBadRequestError(request);
+                    return SendResponse(request, http::status::bad_request);
                 }
             }
 
         } catch (Core::BadRequestException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (boost::exception &exc) {
             log_error << diagnostic_information(exc);
-            return SendInternalServerError(request, "Unknown exception");
+            return SendResponse(request, http::status::internal_server_error, "Unknown exception");
         }
     }
 

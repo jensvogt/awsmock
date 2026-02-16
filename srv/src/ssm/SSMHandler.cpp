@@ -22,7 +22,7 @@ namespace AwsMock::Service {
                     Dto::SSM::PutParameterRequest ssmRequest = Dto::SSM::PutParameterRequest::FromJson(clientCommand);
                     Dto::SSM::PutParameterResponse ssmResponse = _ssmService.PutParameter(ssmRequest);
                     log_info << "Parameter created, name: " << ssmRequest.name << " version: " << ssmResponse.version;
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 case Dto::Common::SSMCommandType::GET_PARAMETER: {
@@ -30,7 +30,7 @@ namespace AwsMock::Service {
                     Dto::SSM::GetParameterRequest ssmRequest = Dto::SSM::GetParameterRequest::FromJson(clientCommand);
                     Dto::SSM::GetParameterResponse ssmResponse = _ssmService.GetParameter(ssmRequest);
                     log_info << "Parameter found, name: " << ssmRequest.name;
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 case Dto::Common::SSMCommandType::GET_PARAMETER_COUNTER: {
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
                     Dto::SSM::GetParameterCounterRequest ssmRequest = Dto::SSM::GetParameterCounterRequest::FromJson(clientCommand);
                     Dto::SSM::GetParameterCounterResponse ssmResponse = _ssmService.GetParameterCounter(ssmRequest);
                     log_info << "Parameter found, name: " << ssmRequest.name << ", body: " << ssmResponse.ToJson();
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 case Dto::Common::SSMCommandType::DESCRIBE_PARAMETERS: {
@@ -46,7 +46,7 @@ namespace AwsMock::Service {
                     Dto::SSM::DescribeParametersRequest ssmRequest = Dto::SSM::DescribeParametersRequest::FromJson(clientCommand);
                     Dto::SSM::DescribeParametersResponse ssmResponse = _ssmService.DescribeParameters(ssmRequest);
                     log_info << "Describe parameters, region: " << ssmRequest.region;
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 case Dto::Common::SSMCommandType::LIST_PARAMETER_COUNTERS: {
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
                     Dto::SSM::ListParameterCountersRequest ssmRequest = Dto::SSM::ListParameterCountersRequest::FromJson(clientCommand);
                     Dto::SSM::ListParameterCountersResponse ssmResponse = _ssmService.ListParameterCounters(ssmRequest);
                     log_info << "List parameter counters, region: " << ssmRequest.region;
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 case Dto::Common::SSMCommandType::CREATE_PARAMETER_COUNTER: {
@@ -62,7 +62,7 @@ namespace AwsMock::Service {
                     Dto::SSM::CreateParameterCounterRequest ssmRequest = Dto::SSM::CreateParameterCounterRequest::FromJson(clientCommand);
                     Dto::SSM::ListParameterCountersResponse ssmResponse = _ssmService.CreateParameter(ssmRequest);
                     log_info << "Parameter created, name: " << ssmRequest.name;
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 case Dto::Common::SSMCommandType::UPDATE_PARAMETER_COUNTER: {
@@ -70,7 +70,7 @@ namespace AwsMock::Service {
                     Dto::SSM::UpdateParameterCounterRequest ssmRequest = Dto::SSM::UpdateParameterCounterRequest::FromJson(clientCommand);
                     Dto::SSM::ListParameterCountersResponse ssmResponse = _ssmService.UpdateParameter(ssmRequest);
                     log_info << "Parameter updated, name: " << ssmRequest.name;
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 case Dto::Common::SSMCommandType::DELETE_PARAMETER: {
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
                     Dto::SSM::DeleteParameterRequest ssmRequest = Dto::SSM::DeleteParameterRequest::FromJson(clientCommand);
                     _ssmService.DeleteParameter(ssmRequest);
                     log_info << "Parameter deleted, name: " << ssmRequest.name;
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SSMCommandType::DELETE_PARAMETER_COUNTER: {
@@ -86,7 +86,7 @@ namespace AwsMock::Service {
                     Dto::SSM::DeleteParameterCounterRequest ssmRequest = Dto::SSM::DeleteParameterCounterRequest::FromJson(clientCommand);
                     Dto::SSM::ListParameterCountersResponse ssmResponse = _ssmService.DeleteParameterCounter(ssmRequest);
                     log_info << "Parameter deleted, name: " << ssmRequest.name;
-                    return SendOkResponse(request, ssmResponse.ToJson());
+                    return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
                 default:
@@ -97,13 +97,13 @@ namespace AwsMock::Service {
             }
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
-            return SendInternalServerError(request, exc.what());
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
 }// namespace AwsMock::Service
