@@ -464,6 +464,23 @@ namespace AwsMock::Database {
         return count;
     }
 
+    void SQSMemoryDb::RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) {
+        boost::mutex::scoped_lock lock(_sqsMessageMutex);
+
+        for (auto [fst, snd]: _messages) {
+
+            if (snd.queueArn == dlqQueue.queueArn && snd.messageId == messageId) {
+
+                snd.retries = 0;
+                snd.queueArn = originalQueue.queueArn;
+                snd.queueName = originalQueue.name;
+                snd.status = Entity::SQS::MessageStatus::INITIAL;
+                _messages[fst] = snd;
+            }
+        }
+        log_trace << "Message redrive, arn: " << dlqQueue.queueArn << ", messageId: " << messageId;
+    }
+
     long SQSMemoryDb::MessageRetention(const std::string &queueArn, const long retentionPeriod) {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 

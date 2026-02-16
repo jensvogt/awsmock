@@ -42,6 +42,7 @@
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
+#include <awsmock/dto/sqs/RedriveMessageRequest.h>
 #include <awsmock/dto/sqs/RedriveMessagesRequest.h>
 #include <awsmock/dto/sqs/SendMessageBatchRequest.h>
 #include <awsmock/dto/sqs/SendMessageBatchResponse.h>
@@ -50,13 +51,12 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
-#include <awsmock/dto/sqs/internal/UpdateQueueRequest.h>
-#include <awsmock/dto/sqs/internal/GetMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/AddDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/DeleteDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/ExportMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
+#include <awsmock/dto/sqs/internal/GetMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/internal/ImportMessagesRequest.h>
@@ -70,10 +70,10 @@
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/ListMessagesResponse.h>
-#include <awsmock/dto/sqs/internal/ListQueueCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueArnsResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
@@ -84,6 +84,7 @@
 #include <awsmock/dto/sqs/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDqlRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateMessageRequest.h>
+#include <awsmock/dto/sqs/internal/UpdateQueueRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
@@ -104,7 +105,7 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-    public:
+      public:
 
         /**
          * @brief Constructor
@@ -185,6 +186,15 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         [[nodiscard]] long PurgeAllQueues() const;
+
+        /**
+         * @brief Redrive a single messages in queue
+         *
+         * @param request redrive messages request
+         * @return total number of redrive messages
+         * @throws ServiceException
+         */
+        void RedriveMessage(const Dto::SQS::RedriveMessageRequest &request) const;
 
         /**
          * @brief Redrive messages in queue
@@ -484,7 +494,7 @@ namespace AwsMock::Service {
          */
         void ReloadAllCounters() const;
 
-    private:
+      private:
 
         /**
          * @brief Send a lambda invocation request for a message.

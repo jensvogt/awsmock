@@ -17,6 +17,7 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Linq.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/sqs/Message.h>
@@ -24,7 +25,6 @@
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
-#include <awsmock/core/Linq.h>
 
 namespace AwsMock::Database {
 
@@ -42,7 +42,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit SQSMemoryDb()= default;
+        explicit SQSMemoryDb() = default;
 
         /**
          * @brief Singleton instance
@@ -322,7 +322,16 @@ namespace AwsMock::Database {
         long ResetDelayedMessages(const std::string &queueArn);
 
         /**
-         * @brief Redrive message
+         * @brief Redrive a single message
+         *
+         * @param originalQueue original queue
+         * @param dlqQueue DLQ queue
+         * @param messageId message ID
+         */
+        void RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId);
+
+        /**
+         * @brief Redrive messages
          *
          * @param originalQueue original queue
          * @param dlqQueue DLQ queue

@@ -2,11 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_REDRIVE_MESSAGES_REQUEST_H
-#define AWSMOCK_DTO_SQS_REDRIVE_MESSAGES_REQUEST_H
-
-// C++ standard includes
-#include <string>
+#ifndef AWSMOCK_DTO_SQS_REDRIVE_MESSAGE_REQUEST_H
+#define AWSMOCK_DTO_SQS_REDRIVE_MESSAGE_REQUEST_H
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -20,27 +17,34 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RedriveMessagesRequest final : Common::BaseCounter<RedriveMessagesRequest> {
+    struct RedriveMessageRequest final : Common::BaseCounter<RedriveMessageRequest> {
 
         /**
          * Queue ARN
          */
         std::string queueArn;
 
+        /**
+         * Message ID
+         */
+        std::string messageId;
+
       private:
 
-        friend RedriveMessagesRequest tag_invoke(boost::json::value_to_tag<RedriveMessagesRequest>, boost::json::value const &v) {
-            RedriveMessagesRequest r;
+        friend RedriveMessageRequest tag_invoke(boost::json::value_to_tag<RedriveMessageRequest>, boost::json::value const &v) {
+            RedriveMessageRequest r;
             r.queueArn = Core::Json::GetStringValue(v, "QueueArn");
+            r.messageId = Core::Json::GetStringValue(v, "MessageId");
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RedriveMessagesRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RedriveMessageRequest const &obj) {
             jv = {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"QueueArn", obj.queueArn},
+                    {"MessageId", obj.messageId},
             };
         }
     };

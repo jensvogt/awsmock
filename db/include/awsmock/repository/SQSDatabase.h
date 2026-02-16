@@ -417,6 +417,16 @@ namespace AwsMock::Database {
          *
          * @param originalQueue original queue
          * @param dlqQueue DLQ queue
+         * @param messageId message ID
+         * @return total number of redriven messages
+         */
+        void RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) const;
+
+        /**
+         * @brief Redrive messages
+         *
+         * @param originalQueue original queue
+         * @param dlqQueue DLQ queue
          * @return total number of redriven messages
          */
         [[nodiscard]] long RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const;
