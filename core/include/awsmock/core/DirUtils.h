@@ -2,8 +2,8 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWS_MOCK_CORE_DIRECTORY_UTILS_H
-#define AWS_MOCK_CORE_DIRECTORY_UTILS_H
+#ifndef AWSMOCK_CORE_DIRECTORY_UTILS_H
+#define AWSMOCK_CORE_DIRECTORY_UTILS_H
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -13,7 +13,6 @@
 #include <boost/asio.hpp>
 #include <windows.h>
 #endif
-
 
 // C++ standard includes
 #include <string>
@@ -63,7 +62,7 @@ namespace AwsMock::Core {
      */
     class DirUtils {
 
-    public:
+      public:
 
         /**
          * @brief Returns a thread safe temp directory name.
@@ -194,4 +193,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWS_MOCK_CORE_DIRECTORY_UTILS_H
+#endif// AWSMOCK_CORE_DIRECTORY_UTILS_H
