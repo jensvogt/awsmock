@@ -1330,35 +1330,6 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const {
-        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_message");
-        log_trace << "Delete message request, url: " << request.receiptHandle;
-
-        if (!_sqsDatabase.MessageExists(request.receiptHandle)) {
-            log_error << "Message does not exist, receiptHandle: " << request.receiptHandle;
-            throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
-        }
-
-        try {
-            const Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
-
-            // Delete from database
-            const long deleted = _sqsDatabase.DeleteMessage(message);
-            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << " deleted: " << deleted;
-
-            // Adjust queue counters
-            queue.attributes.approximateNumberOfMessagesNotVisible > 0 ? queue.attributes.approximateNumberOfMessagesNotVisible-- : queue.attributes.approximateNumberOfMessagesNotVisible;
-            queue.attributes.approximateNumberOfMessages > 0 ? queue.attributes.approximateNumberOfMessages-- : queue.attributes.approximateNumberOfMessages;
-            queue.size -= message.size;
-            queue = _sqsDatabase.UpdateQueue(queue);
-
-        } catch (Core::DatabaseException &ex) {
-            log_error << ex.message();
-            throw Core::ServiceException(ex.message());
-        }
-    }
-
     void SQSService::AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "add_message_attribute");
         log_trace << "Delete message attribute request, messageId: " << request.messageId << ", name: " << request.name;
@@ -1401,6 +1372,22 @@ namespace AwsMock::Service {
             message.messageAttributes.erase(request.name);
             message = _sqsDatabase.UpdateMessage(message);
             log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const {
+        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_message");
+        log_trace << "Delete message request, url: " << request.receiptHandle;
+
+        try {
+
+            // Delete from database
+            const long deleted = _sqsDatabase.DeleteMessage(request.receiptHandle);
+            log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << " deleted: " << deleted;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

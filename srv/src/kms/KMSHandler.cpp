@@ -18,7 +18,7 @@ namespace AwsMock::Service {
                     Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
                     log_info << "Key created, keyId: " << kmsResponse.key.keyId;
 
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::SCHEDULE_KEY_DELETION: {
@@ -27,7 +27,7 @@ namespace AwsMock::Service {
                     Dto::KMS::ScheduledKeyDeletionResponse kmsResponse = _kmsService.ScheduleKeyDeletion(kmsRequest);
                     log_info << "Key deletion scheduled, keyId: " << kmsResponse.keyId;
 
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::LIST_KEYS: {
@@ -36,7 +36,7 @@ namespace AwsMock::Service {
                     Dto::KMS::ListKeysResponse kmsResponse = _kmsService.ListKeys(kmsRequest);
                     log_info << "List keys received, count: " << kmsResponse.keys.size();
 
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::LIST_KEY_COUNTERS: {
@@ -45,7 +45,7 @@ namespace AwsMock::Service {
                     Dto::KMS::ListKeyCountersResponse kmsResponse = _kmsService.ListKeyCounters(kmsRequest);
                     log_info << "List key counters received, count: " << kmsResponse.keyCounters.size();
 
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::LIST_KEY_ARNS: {
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
                     Dto::KMS::ListKeyArnsResponse kmsResponse = _kmsService.ListKeyArns();
                     log_info << "List key ARNs received, count: " << kmsResponse.keyArns.size();
 
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::DESCRIBE_KEY: {
@@ -63,7 +63,7 @@ namespace AwsMock::Service {
                     log_info << "Describe key received, count: " << kmsResponse.key.keyId;
                     log_info << "Describe key received, count: " << kmsResponse.key;
 
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::GET_KEY_COUNTER: {
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
                     Dto::KMS::GetKeyCounterResponse kmsResponse = _kmsService.GetKeyCounter(kmsRequest);
                     log_info << "Get key received, id: " << kmsRequest.keyId;
 
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::UPDATE_KEY_COUNTER: {
@@ -81,7 +81,7 @@ namespace AwsMock::Service {
                     _kmsService.UpdateKeyCounter(kmsRequest);
                     log_info << "Update key, id: " << kmsRequest.keyCounter.keyId;
 
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::KMSCommandType::ENCRYPT: {
@@ -90,35 +90,35 @@ namespace AwsMock::Service {
                     Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(kmsRequest);
 
                     log_info << "Encrypt received, size: " << kmsResponse.ciphertext.length();
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::DECRYPT: {
                     Dto::KMS::DecryptRequest kmsRequest = Dto::KMS::DecryptRequest::FromJson(clientCommand);
                     Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(kmsRequest);
                     log_info << "Decrypt received, size: " << kmsResponse.plaintext.length();
-                    return SendOkResponse(request, kmsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
                 case Dto::Common::KMSCommandType::DELETE_KEY: {
                     Dto::KMS::DeleteKeyRequest kmsRequest = Dto::KMS::DeleteKeyRequest::FromJson(clientCommand);
                     _kmsService.DeleteKey(kmsRequest);
                     log_info << "Key deleted, size: " << kmsRequest.keyId;
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 default:
                 case Dto::Common::KMSCommandType::UNKNOWN: {
                     log_error << "Unknown method";
-                    return SendBadRequestError(request, "Unknown method");
+                    return SendResponse(request, http::status::bad_request, "Unknown method");
                 }
             }
         } catch (std::exception &exc) {
             log_error << exc.what();
-            return SendInternalServerError(request, exc.what());
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (...) {
             log_error << "Invalid request";
-            return SendInternalServerError(request, "Invalid request");
+            return SendResponse(request, http::status::internal_server_error, "Invalid request");
         }
     }
 }// namespace AwsMock::Service

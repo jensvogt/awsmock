@@ -15,7 +15,7 @@ namespace AwsMock::Service {
                 Dto::Transfer::CreateServerRequest transferRequest = Dto::Transfer::CreateServerRequest::FromJson(body);
                 transferRequest.region = region;
                 Dto::Transfer::CreateServerResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.CreateUser") {
@@ -24,7 +24,7 @@ namespace AwsMock::Service {
                 transferRequest.FromJson(body);
                 transferRequest.region = region;
                 Dto::Transfer::CreateUserResponse transferResponse = _transferService.CreateUser(transferRequest);
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.CreateProtocol") {
@@ -32,7 +32,7 @@ namespace AwsMock::Service {
                 Dto::Transfer::CreateProtocolRequest transferRequest = Dto::Transfer::CreateProtocolRequest::FromJson(body);
                 transferRequest.region = region;
                 _transferService.CreateProtocol(transferRequest);
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (target == "TransferService.ListServers") {
@@ -41,7 +41,7 @@ namespace AwsMock::Service {
                 transferRequest.region = region;
                 Dto::Transfer::ListServerResponse transferResponse = _transferService.ListServers(transferRequest);
                 log_info << "List servers, region: " << transferRequest.region << ", json: " << transferResponse.ToJson();
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.ListServerCounters") {
@@ -50,7 +50,7 @@ namespace AwsMock::Service {
                 transferRequest.region = region;
 
                 Dto::Transfer::ListServerCountersResponse transferResponse = _transferService.ListServerCounters(transferRequest);
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.ListUserCounters") {
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
                 transferRequest.region = region;
 
                 Dto::Transfer::ListUserCountersResponse transferResponse = _transferService.ListUserCounters(transferRequest);
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.ListProtocolCounters") {
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
                 transferRequest.region = region;
 
                 Dto::Transfer::ListProtocolCountersResponse transferResponse = _transferService.ListProtocolCounters(transferRequest);
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.ListTagCounters") {
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
 
                 Dto::Transfer::ListTagCountersResponse transferResponse = _transferService.ListTagCounters(transferRequest);
                 std::string tmp = transferResponse.ToJson();
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.ListUsers") {
@@ -89,7 +89,7 @@ namespace AwsMock::Service {
                 transferRequest.region = region;
 
                 Dto::Transfer::ListUsersResponse transferResponse = _transferService.ListUsers(transferRequest);
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.StartServer") {
@@ -98,7 +98,7 @@ namespace AwsMock::Service {
                 transferRequest.FromJson(body);
                 transferRequest.region = region;
                 _transferService.StartServer(transferRequest);
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (target == "TransferService.StopServer") {
@@ -108,7 +108,7 @@ namespace AwsMock::Service {
                 transferRequest.region = region;
 
                 _transferService.StopServer(transferRequest);
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (target == "TransferService.DeleteServer") {
@@ -118,7 +118,7 @@ namespace AwsMock::Service {
                 transferRequest.region = region;
 
                 _transferService.DeleteServer(transferRequest);
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (target == "TransferService.GetServerDetails") {
@@ -130,7 +130,7 @@ namespace AwsMock::Service {
                 Dto::Transfer::GetServerDetailsResponse transferResponse = _transferService.GetServerDetails(transferRequest);
                 log_debug << "Get transfer details, region: " << transferRequest.region << " serverId: " << transferRequest.serverId;
                 log_trace << transferResponse.ToJson();
-                return SendOkResponse(request, transferResponse.ToJson());
+                return SendResponse(request, http::status::ok, transferResponse.ToJson());
             }
 
             if (target == "TransferService.DeleteUser") {
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
                 _transferService.DeleteUser(transferRequest);
                 log_info << "Delete user, region: " << transferRequest.region << " serverId: " << transferRequest.serverId << " userName: " << transferRequest.userName;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (target == "TransferService.DeleteProtocol") {
@@ -154,14 +154,14 @@ namespace AwsMock::Service {
                 _transferService.DeleteProtocol(transferRequest);
                 log_info << "Delete protocol, region: " << transferRequest.region << " serverId: " << transferRequest.serverId << " protocol: " << Dto::Transfer::ProtocolTypeToString(transferRequest.protocol);
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             log_error << "Unknown method";
-            return SendBadRequestError(request, "Unknown method");
+            return SendResponse(request, http::status::bad_request, "Unknown method");
 
         } catch (std::exception &exc) {
-            return SendInternalServerError(request, exc.what());
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
 

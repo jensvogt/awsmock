@@ -98,64 +98,16 @@ namespace AwsMock::Service {
         virtual http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * @brief Send an OK response (HTTP state code 200).
-         *
-         * @param request HTTP request object
-         * @param body HTTP body payload
-         * @param headers HTTP header map values, added to the default headers
-         * @return HTTP response
-         */
-        static http::response<http::dynamic_body> SendOkResponse(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
-
-        /**
          * @brief Send a OK response (HTTP state code 200) for a multipart download/upload
          *
          * @param request HTTP request object
+         * @param status HTTP status
          * @param fileName file to send
          * @param contentLength content length of the stream in bytes
          * @param headers HTTP header map values, added to the default headers
          * @return HTTP response
          */
-        static http::response<http::dynamic_body> SendOkResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long contentLength, const std::map<std::string, std::string> &headers = {});
-
-        /**
-         * @brief Send a bad request response (HTTP state code 400).
-         *
-         * @param request HTTP request object
-         * @param headers HTTP header map values, added to the default headers
-         * @return response HTTP response
-         */
-        static http::response<http::dynamic_body> SendNoContentResponse(const http::request<http::dynamic_body> &request, const std::map<std::string, std::string> &headers = {});
-
-        /**
-         * @brief Send a internal server error response (HTTP state code 500).
-         *
-         * @param request HTTP request
-         * @param body HTTP body payload
-         * @param headers HTTP header map values, added to the default headers
-         * @return HTTP response
-         */
-        static http::response<http::dynamic_body> SendInternalServerError(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
-
-        /**
-         * @brief Send a bad request response (HTTP state code 400).
-         *
-         * @param request HTTP request
-         * @param body HTTP body payload
-         * @param headers HTTP header map values, added to the default headers
-         * @return response HTTP response
-         */
-        static http::response<http::dynamic_body> SendBadRequestError(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
-
-        /**
-         * @brief Send a not-found response (HTTP state code 404).
-         *
-         * @param request HTTP request
-         * @param body HTTP body payload
-         * @param headers HTTP header map values, added to the default headers
-         * @return response HTTP response
-         */
-        static http::response<http::dynamic_body> SendNotFoundError(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+        static http::response<http::dynamic_body> SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &fileName, long contentLength, const std::map<std::string, std::string> &headers = {});
 
         /**
          * @brief Send an OK response (HTTP state code 200) with an part of an output.
@@ -170,15 +122,7 @@ namespace AwsMock::Service {
          * @param headers HTTP header map values, added to the default headers
          * @return HTTP response
          */
-        static http::response<http::dynamic_body> SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers = {});
-
-        /**
-         * @brief Send continue response
-         *
-         * @param request HTTP request
-         * @return HTTP response
-         */
-        static http::response<http::dynamic_body> SendContinueResponse(const http::request<http::dynamic_body> &request);
+        static http::response<http::dynamic_body> SendResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers = {});
 
         /**
          * @brief General response

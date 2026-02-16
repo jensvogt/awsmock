@@ -264,7 +264,7 @@ namespace AwsMock::Service {
                     Dto::SNS::GetMessageCountersRequest snsRequest = Dto::SNS::GetMessageCountersRequest::FromJson(clientCommand);
                     Dto::SNS::GetMessageCountersResponse snsResponse = _snsService.GetMessageCounters(snsRequest);
                     log_info << "Get message, messageId: " << snsRequest.messageId << ", content: " << snsResponse.ToJson();
-                    return SendOkResponse(request, snsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
                 default:
@@ -300,4 +300,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -37,7 +37,7 @@
         "max-thread": 64,
         "max-body": 204857600,
         "timeout": 30,
-        "keep-alive": false
+        "keep-alive": true
       }
     },
     "modules": {

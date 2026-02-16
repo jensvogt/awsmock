@@ -62,7 +62,7 @@ namespace AwsMock::Service {
 
                     Dto::Lambda::GetFunctionResponse lambdaResponse = _lambdaService.GetFunction(region, functionName);
                     log_trace << "Lambda function region: " << region << " name: " << functionName;
-                    return SendOkResponse(request, lambdaResponse.ToJson());
+                    return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
                 }
                 Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                 log_trace << "Lambda function list: " << lambdaResponse.ToJson();
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
             if (action == "account-settings") {
                 Dto::Lambda::AccountSettingsResponse lambdaResponse = _lambdaService.GetAccountSettings();
                 log_trace << "Lambda account settings";
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
             return SendResponse(request, http::status::bad_request, "Unknown method");
         } catch (Core::ServiceException &exc) {

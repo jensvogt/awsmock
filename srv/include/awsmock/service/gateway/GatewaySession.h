@@ -163,8 +163,8 @@ namespace AwsMock::Service {
          * @param send send queue
          * @return
          */
-        template<class Body, class Allocator, class Send>
-        void HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request, Send &&send);
+        template<class Body, class Allocator>
+        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request);
 
         /**
          * @brief Called to start/continue the write-loop.
@@ -185,7 +185,7 @@ namespace AwsMock::Service {
         /**
          * @brief On class callback
          */
-        void DoShutdown();
+        void DoClose();
 
         /**
          * @brief Returns the authorization header

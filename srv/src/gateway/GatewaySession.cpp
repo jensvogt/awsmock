@@ -57,7 +57,11 @@ namespace AwsMock::Service {
         }
 
         // Process the request that was just finished by the async operation
-        HandleRequest(_parser->release(), _queue);
+        QueueWrite(HandleRequest(_parser->release()));
+
+        // If we aren't at the queue limit, try to pipeline another request
+        if (_response_queue.size() < _queueLimit)
+            DoRead();
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
@@ -71,15 +75,14 @@ namespace AwsMock::Service {
     // Return a response for the given request.
     //
     // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
-    template<class Body, class Allocator, class Send>
-    void GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request, Send &&send) {
+    template<class Body, class Allocator>
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
             request.method() != http::verb::head && request.method() != http::verb::connect &&
             request.method() != http::verb::options) {
-            send(std::move(Core::HttpUtils::BadRequest(request, "Unknown HTTP-method")));
-            return;
+            return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
         }
 
         // Ping request
@@ -87,21 +90,18 @@ namespace AwsMock::Service {
             log_debug << "Handle CONNECT request";
             Monitoring::MonitoringTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
             Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
-            send(std::move(Core::HttpUtils::Ok(request)));
-            return;
+            return Core::HttpUtils::Ok(request);
         }
 
         // Request path must be absolute and not contain "..".
         if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
-            send(std::move(Core::HttpUtils::BadRequest(request, "Invalid target path")));
-            return;
+            return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
         // Handle OPTIONS requests
         if (request.method() == http::verb::options) {
-            send(std::move(HandleOptionsRequest(request)));
-            return;
+            return HandleOptionsRequest(request);
         }
 
         std::shared_ptr<AbstractHandler> handler;
@@ -110,16 +110,14 @@ namespace AwsMock::Service {
             handler = GatewayRouter::GetHandler(target, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << target;
-                send(std::move(Core::HttpUtils::BadRequest(request, "Handler not found")));
-                return;
+                return Core::HttpUtils::BadRequest(request, "Handler not found");
             }
             log_trace << "Handler found, name: " << handler->name();
         } else {
             // Verify AWS signature
             if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
                 log_warning << "AWS signature could not be verified";
-                send(std::move(Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified")));
-                return;
+                return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
             }
 
             // Get the module from the authorization key, or the target header field.
@@ -129,7 +127,7 @@ namespace AwsMock::Service {
             handler = GatewayRouter::GetHandler(authKey.module, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << authKey.module;
-                return send(std::move(Core::HttpUtils::BadRequest(request, "Handler not found")));
+                return Core::HttpUtils::BadRequest(request, "Handler not found");
             }
             log_trace << "Handler found, name: " << handler->name();
         }
@@ -138,34 +136,29 @@ namespace AwsMock::Service {
             switch (request.method()) {
                 case http::verb::get: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "GET"};
-                    send(std::move(handler->HandleGetRequest(request, _region, _user)));
-                    break;
+                    return handler->HandleGetRequest(request, _region, _user);
                 }
                 case http::verb::put: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "PUT"};
-                    send(std::move(handler->HandlePutRequest(request, _region, _user)));
-                    break;
+                    return handler->HandlePutRequest(request, _region, _user);
                 }
                 case http::verb::post: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "POST"};
-                    send(std::move(handler->HandlePostRequest(request, _region, _user)));
-                    break;
+                    return handler->HandlePostRequest(request, _region, _user);
                 }
                 case http::verb::delete_: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "DELETE"};
-                    send(std::move(handler->HandleDeleteRequest(request, _region, _user)));
-                    break;
+                    return handler->HandleDeleteRequest(request, _region, _user);
                 }
                 case http::verb::head: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "HEAD"};
-                    send(std::move(handler->HandleHeadRequest(request, _region, _user)));
-                    break;
+                    handler->HandleHeadRequest(request, _region, _user);
                 }
                 default:
-                    send(std::move(Core::HttpUtils::NotImplemented(request, "Not yet implemented")));
-                    break;
+                    return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
             }
         }
+        return Core::HttpUtils::BadRequest(request, "Invalid target path");
     }
 
     // Called to start/continue the write-loop. Should not be called when write_loop is already active.
@@ -184,22 +177,23 @@ namespace AwsMock::Service {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream || !keep_alive) {
-            log_warning << "End of stream, error: " << ec.message();
-            return DoShutdown();
+        if (!keep_alive) {
+            return DoClose();
         }
 
-        if (_queue.on_write()) {
-            // Read another request
+        // Resume the read if it has been paused
+        if (_response_queue.size() == _queueLimit)
             DoRead();
-        }
+
+        _response_queue.pop();
+
+        DoWrite();
     }
 
-    void GatewaySession::DoShutdown() {
+    void GatewaySession::DoClose() {
         // Send a TCP shutdown
         boost::beast::error_code ec;
         _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
-        _stream.socket().close(ec);
         // At this point the connection is closed gracefully
     }
 

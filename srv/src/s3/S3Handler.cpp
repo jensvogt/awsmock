@@ -100,10 +100,10 @@ namespace AwsMock::Service {
 
                     if (Core::HttpUtils::HasHeader(request, "Range")) {
                         log_info << "Multi-part download progress: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
-                        return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
+                        return SendResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
                     }
                     log_info << "Get object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                    return SendOkResponse(request, s3Response.filename, s3Response.size, headerMap);
+                    return SendResponse(request, http::status::ok, s3Response.filename, s3Response.size, headerMap);
                 }
 
                 case Dto::Common::S3CommandType::GET_OBJECT_RANGE: {
@@ -133,7 +133,7 @@ namespace AwsMock::Service {
 
                     // Send range response
                     log_debug << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
-                    return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
+                    return SendResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
                 }
 
                 case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS: {
@@ -513,7 +513,7 @@ namespace AwsMock::Service {
 
                     const std::string &payload = Core::HttpUtils::GetBodyAsString(request);
                     if (payload.empty()) {
-                        return SendNoContentResponse(request);
+                        return SendResponse(request, http::status::no_content);
                     }
                     Dto::S3::DeleteObjectsRequest s3Request;
                     s3Request.FromXml(payload);
