@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.6](https://github.com/jensvogt/awsmock/compare/v1.14.5...v1.14.6) (2026-02-16)
+
+
+### Bug Fixes
+
+* keep alive settings ([fc8eeab](https://github.com/jensvogt/awsmock/commit/fc8eeab0e07182cc9ed47bd2eeb852f88eb8c3d9))
+
 ## [1.14.5](https://github.com/jensvogt/awsmock/compare/1.14.4...v1.14.5) (2026-02-15)
 
 
