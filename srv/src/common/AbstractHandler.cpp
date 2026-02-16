@@ -28,13 +28,11 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &fileName, long contentLength, const std::map<std::string, std::string> &headers) {
-
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(status);
         response.keep_alive(request.keep_alive());
-        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(contentLength));
@@ -42,8 +40,6 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::connection, "keep-alive");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Body
         std::ifstream ifs(fileName);
@@ -61,17 +57,16 @@ namespace AwsMock::Service {
         return response;
     }
 
-    http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status,
+                                                                     const std::map<std::string, std::string> &headers) {
         log_debug << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 
         try {
-
             // Prepare the response message
             http::response<http::dynamic_body> response;
             response.version(request.version());
             response.keep_alive(request.keep_alive());
             response.result(http::status::partial_content);
-            response.set(http::field::connection, "close");
             response.set(http::field::server, "awsmock");
             response.set(http::field::content_type, "application/octet-stream");
             response.set(http::field::accept_ranges, "bytes");
@@ -81,8 +76,6 @@ namespace AwsMock::Service {
             response.set(http::field::access_control_allow_origin, "*");
             response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
             response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-            response.set(http::field::connection, "keep-alive");
-            response.set(http::field::keep_alive, "timeout=5, max=1000");
 
             // Body is part of file from min -> max
             auto buffer = new char[size];
@@ -105,7 +98,6 @@ namespace AwsMock::Service {
             // Send the response to the client
             log_debug << "Range response finished, filename: " << fileName << " size: " << count << " status: " << status;
             return response;
-
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendResponse(request, http::status::internal_server_error, exc.what());
@@ -113,13 +105,11 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body, const std::map<std::string, std::string> &headers) {
-
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(status);
         response.keep_alive(request.keep_alive());
-        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(body.length()));
@@ -128,8 +118,6 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::connection, "keep-alive");
-        response.set(http::field::keep_alive, "timeout=5, max=1000");
 
         // Copy headers
         if (!headers.empty()) {
@@ -147,5 +135,4 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
