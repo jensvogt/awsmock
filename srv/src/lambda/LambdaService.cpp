@@ -1128,7 +1128,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_function");
         log_debug << "Delete function: " + request.ToString();
 
-        ContainerService &dockerService = ContainerService::instance();
+        const ContainerService &dockerService = ContainerService::instance();
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
             log_error << "Lambda function does not exist, function: " + request.functionName;
@@ -1140,7 +1140,7 @@ namespace AwsMock::Service {
         for (const auto &instance: lambda.instances) {
             if (dockerService.ContainerExists(instance.containerId)) {
                 Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
-                dockerService.StopContainer(container.id);
+                dockerService.KillContainer(container.id);
                 dockerService.DeleteContainer(container);
                 log_debug << "Docker container deleted, function: " + request.functionName;
             }
@@ -1148,7 +1148,7 @@ namespace AwsMock::Service {
 
         // Delete the image, if existing
         if (dockerService.ImageExists(request.functionName, lambda.dockerTag)) {
-            Dto::Docker::Image image = dockerService.GetImageByName(request.functionName, lambda.dockerTag);
+            const Dto::Docker::Image image = dockerService.GetImageByName(request.functionName, lambda.dockerTag);
             dockerService.DeleteImage(image.id);
             log_debug << "Docker image deleted, function: " + request.functionName;
         }
