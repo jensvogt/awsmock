@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.11](https://github.com/jensvogt/awsmock/compare/1.14.10...v1.14.11) (2026-02-17)
+
+
+### Bug Fixes
+
+* gateway debugging ([559ad13](https://github.com/jensvogt/awsmock/commit/559ad13905747e7b8e5ad2698eeaadedf048f37a))
+* gateway debugging ([25ef395](https://github.com/jensvogt/awsmock/commit/25ef395253b961adb336f032e901dd89e4bbd7c3))
+
 ## [1.14.10](https://github.com/jensvogt/awsmock/compare/v1.14.9...v1.14.10) (2026-02-16)
 
 
