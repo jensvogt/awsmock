@@ -589,7 +589,7 @@ namespace AwsMock::Service {
                     Dto::S3::GetBucketRequest s3Request = Dto::S3::GetBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
                     Dto::S3::GetBucketResponse s3Response = _s3Service.GetBucket(s3Request);
 
-                    log_info << "Get bucket, name: " << s3Request.bucketName << ", body: " << s3Response.ToJson();
+                    log_info << "Get bucket, name: " << s3Request.bucketName;
                     return SendResponse(request, http::status::ok, s3Response.ToJson());
                 }
 
@@ -810,13 +810,12 @@ namespace AwsMock::Service {
                 s3Response = _s3Service.GetObjectMetadata(s3Request);
             }
 
+            // Content size should be set to the size the GET would reply.
             std::map<std::string, std::string> headers;
-            headers["accept-ranges"] = "bytes";
-            headers["Handler"] = "awsmock";
-            headers["Content-Type"] = "application/json";
+            headers["Content-Type"] = "text/plain";
             headers["Content-Length"] = std::to_string(s3Response.size);
-            headers["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
             headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
+            headers["x-amz-request-id"] = Core::StringUtils::GenerateRandomHexString(16);
             headers["x-amz-bucket-region"] = s3Response.region;
             headers["x-amz-location-name"] = s3Response.region;
             headers["x-amz-storage-class"] = s3Response.storageClass;

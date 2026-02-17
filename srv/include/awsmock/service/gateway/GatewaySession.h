@@ -141,6 +141,7 @@ namespace AwsMock::Service {
          * @brief Read callback
          */
         void DoRead();
+        void OnReadHeader(boost::beast::error_code ec, std::size_t);
 
         /**
          * @brief On read callback
@@ -203,15 +204,7 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @return options response
          */
-        static http::response<http::dynamic_body> HandleOptionsRequest(const http::request<http::dynamic_body> &request);
-
-        /**
-         * @brief Handles continue request (HTTP status: 100)
-         *
-         * @param _stream HTTP socket stream
-         * @param request request
-         */
-        static void HandleContinueRequest(boost::beast::tcp_stream &_stream, const http::request<http::dynamic_body> &request);
+        void HandleOptionsRequest(const http::request<http::dynamic_body> &request);
 
         /**
          * Boost asio IO context

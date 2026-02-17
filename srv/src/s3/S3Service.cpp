@@ -161,7 +161,7 @@ namespace AwsMock::Service {
 
     Dto::S3::GetMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object_metadata");
-        log_trace << "Get metadata request, s3Request: " << request.ToString();
+        log_trace << "Get metadata request, s3Request: " << request.bucket << ", key: " << request.key;
 
         // Check existence
         CheckBucketExistence(request.region, request.bucket);
@@ -176,6 +176,7 @@ namespace AwsMock::Service {
             const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
             Dto::S3::GetMetadataResponse response;
+            response.region = request.region;
             response.bucket = object.bucket;
             response.key = object.key;
             response.md5Sum = object.md5sum;
