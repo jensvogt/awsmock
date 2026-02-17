@@ -28,6 +28,7 @@
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
+#include <awsmock/dto/lambda/RebuildLambdaRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
@@ -93,7 +94,6 @@
 #define MAX_OUTPUT_LENGTH (4 * 1024)
 
 namespace AwsMock::Service {
-
     /**
      * @brief Lambda service module. Handles all lambda related requests:
      *
@@ -120,15 +120,15 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
          * @param ioc boost asio IO context
          */
-        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {}
+        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()),
+                                                               _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {
+        }
 
         /**
          * @brief Create lambda function
@@ -495,6 +495,18 @@ namespace AwsMock::Service {
         void StopLambdaInstance(const Dto::Lambda::StopLambdaInstanceRequest &request) const;
 
         /**
+         * @brief Rebuild a lambda container
+         *
+         * @par
+         * This method will stop/kill the running docker container and will rebuild the lambda from scratch, which means
+         * create a new container from the image and restart the new container.
+         *
+         * @param request rebuild lambda request
+         * @throws Core::ServiceException
+         */
+        void RebuildLambda(const Dto::Lambda::RebuildLambdaRequest &request) const;
+
+        /**
          * @brief Delete lambda function
          *
          * This method will also delete the corresponding container and images.
@@ -531,8 +543,7 @@ namespace AwsMock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-      private:
-
+    private:
         /**
          * @brief Tries to find an idle lambda function instance
          *
@@ -631,9 +642,8 @@ namespace AwsMock::Service {
         /**
          * Function mutexes
          */
-        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
+        static std::map<std::string, std::shared_ptr<boost::mutex> > _instanceMutex;
     };
-
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

@@ -18,7 +18,6 @@
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
-
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
@@ -76,59 +75,61 @@ namespace AwsMock::Dto::Common {
         LIST_EVENT_SOURCE_COUNTERS,
         ADD_EVENT_SOURCE_COUNTER,
         DELETE_EVENT_SOURCE_COUNTER,
+        REBUILD_LAMBDA,
         UNKNOWN
     };
 
     static std::map<LambdaCommandType, std::string> LambdaCommandTypeNames{
-            {LambdaCommandType::CREATE_LAMBDA, "create-function"},
-            {LambdaCommandType::DELETE_LAMBDA, "delete-function"},
-            {LambdaCommandType::INVOKE_LAMBDA, "invoke-function"},
-            {LambdaCommandType::LIST_LAMBDAS, "list-functions"},
-            {LambdaCommandType::LIST_LAMBDA_COUNTERS, "list-function-counters"},
-            {LambdaCommandType::WAIT_LAMBDA, "wait"},
-            {LambdaCommandType::CREATE_EVENT_SOURCE_MAPPING, "create-event-source-mapping"},
-            {LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS, "list-event-source-mappings"},
-            {LambdaCommandType::TAG_LAMBDA, "function-tag"},
-            {LambdaCommandType::GET_FUNCTION_COUNTERS, "get-function-counters"},
-            {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"},
-            {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"},
-            {LambdaCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
-            {LambdaCommandType::LIST_ARNS, "list-arns"},
-            // Generell
-            {LambdaCommandType::UPDATE_LAMBDA, "update-lambda"},
-            // Tags
-            {LambdaCommandType::ADD_TAG, "add-function-tag"},
-            {LambdaCommandType::DELETE_TAG, "delete-function-tag"},
-            {LambdaCommandType::UPDATE_TAG, "update-function-tag"},
-            // Environment
-            {LambdaCommandType::LIST_ENVIRONMENT_COUNTERS, "list-environment-counters"},
-            {LambdaCommandType::ADD_ENVIRONMENT, "add-function-environment"},
-            {LambdaCommandType::DELETE_ENVIRONMENT, "delete-function-environment"},
-            {LambdaCommandType::UPDATE_ENVIRONMENT, "update-function-environment"},
-            // Function result
-            {LambdaCommandType::LIST_LAMBDA_RESULT_COUNTERS, "list-lambda-result-counters"},
-            {LambdaCommandType::GET_LAMBDA_RESULT_COUNTER, "get-lambda-result-counter"},
-            {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER, "delete-lambda-result-counter"},
-            {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS, "delete-lambda-result-counters"},
-            // Enable/disable
-            {LambdaCommandType::ENABLE_LAMBDA, "enable-lambda"},
-            {LambdaCommandType::ENABLE_ALL_LAMBDAS, "enable-all-lambdas"},
-            {LambdaCommandType::DISABLE_LAMBDA, "disable-lambda"},
-            {LambdaCommandType::DISABLE_ALL_LAMBDAS, "disable-all-lambdas"},
-            // Start/stop
-            {LambdaCommandType::START_LAMBDA, "start-lambda"},
-            {LambdaCommandType::START_ALL_LAMBDAS, "start-all-lambdas"},
-            {LambdaCommandType::RESTART_ALL_LAMBDAS, "restart-all-lambdas"},
-            {LambdaCommandType::STOP_LAMBDA, "stop-lambda"},
-            {LambdaCommandType::STOP_ALL_LAMBDAS, "stop-all-lambdas"},
-            // Instances
-            {LambdaCommandType::LIST_INSTANCE_COUNTERS, "list-instance-counters"},
-            {LambdaCommandType::STOP_LAMBDA_INSTANCE, "stop-instance"},
-            {LambdaCommandType::DELETE_IMAGE, "delete-image"},
-            // Event sources
-            {LambdaCommandType::LIST_EVENT_SOURCE_COUNTERS, "list-event-source-counters"},
-            {LambdaCommandType::ADD_EVENT_SOURCE_COUNTER, "add-event-source-counter"},
-            {LambdaCommandType::DELETE_EVENT_SOURCE_COUNTER, "delete-event-source-counter"},
+        {LambdaCommandType::CREATE_LAMBDA, "create-function"},
+        {LambdaCommandType::DELETE_LAMBDA, "delete-function"},
+        {LambdaCommandType::INVOKE_LAMBDA, "invoke-function"},
+        {LambdaCommandType::LIST_LAMBDAS, "list-functions"},
+        {LambdaCommandType::LIST_LAMBDA_COUNTERS, "list-function-counters"},
+        {LambdaCommandType::WAIT_LAMBDA, "wait"},
+        {LambdaCommandType::CREATE_EVENT_SOURCE_MAPPING, "create-event-source-mapping"},
+        {LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS, "list-event-source-mappings"},
+        {LambdaCommandType::TAG_LAMBDA, "function-tag"},
+        {LambdaCommandType::GET_FUNCTION_COUNTERS, "get-function-counters"},
+        {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"},
+        {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"},
+        {LambdaCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+        {LambdaCommandType::LIST_ARNS, "list-arns"},
+        // Generell
+        {LambdaCommandType::UPDATE_LAMBDA, "update-lambda"},
+        // Tags
+        {LambdaCommandType::ADD_TAG, "add-function-tag"},
+        {LambdaCommandType::DELETE_TAG, "delete-function-tag"},
+        {LambdaCommandType::UPDATE_TAG, "update-function-tag"},
+        // Environment
+        {LambdaCommandType::LIST_ENVIRONMENT_COUNTERS, "list-environment-counters"},
+        {LambdaCommandType::ADD_ENVIRONMENT, "add-function-environment"},
+        {LambdaCommandType::DELETE_ENVIRONMENT, "delete-function-environment"},
+        {LambdaCommandType::UPDATE_ENVIRONMENT, "update-function-environment"},
+        // Function result
+        {LambdaCommandType::LIST_LAMBDA_RESULT_COUNTERS, "list-lambda-result-counters"},
+        {LambdaCommandType::GET_LAMBDA_RESULT_COUNTER, "get-lambda-result-counter"},
+        {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER, "delete-lambda-result-counter"},
+        {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS, "delete-lambda-result-counters"},
+        // Enable/disable
+        {LambdaCommandType::ENABLE_LAMBDA, "enable-lambda"},
+        {LambdaCommandType::ENABLE_ALL_LAMBDAS, "enable-all-lambdas"},
+        {LambdaCommandType::DISABLE_LAMBDA, "disable-lambda"},
+        {LambdaCommandType::DISABLE_ALL_LAMBDAS, "disable-all-lambdas"},
+        // Start/stop
+        {LambdaCommandType::START_LAMBDA, "start-lambda"},
+        {LambdaCommandType::START_ALL_LAMBDAS, "start-all-lambdas"},
+        {LambdaCommandType::RESTART_ALL_LAMBDAS, "restart-all-lambdas"},
+        {LambdaCommandType::STOP_LAMBDA, "stop-lambda"},
+        {LambdaCommandType::STOP_ALL_LAMBDAS, "stop-all-lambdas"},
+        // Instances
+        {LambdaCommandType::LIST_INSTANCE_COUNTERS, "list-instance-counters"},
+        {LambdaCommandType::STOP_LAMBDA_INSTANCE, "stop-instance"},
+        {LambdaCommandType::DELETE_IMAGE, "delete-image"},
+        // Event sources
+        {LambdaCommandType::LIST_EVENT_SOURCE_COUNTERS, "list-event-source-counters"},
+        {LambdaCommandType::ADD_EVENT_SOURCE_COUNTER, "add-event-source-counter"},
+        {LambdaCommandType::DELETE_EVENT_SOURCE_COUNTER, "delete-event-source-counter"},
+        {LambdaCommandType::REBUILD_LAMBDA, "rebuild-lambda"},
     };
 
     [[maybe_unused]] static std::string LambdaCommandTypeToString(const LambdaCommandType &commandType) {
@@ -152,7 +153,6 @@ namespace AwsMock::Dto::Common {
      * @author jens.vogt\@opitz-consulting.com
      */
     struct LambdaClientCommand : BaseClientCommand {
-
         /**
          * @brief Client command
          */
@@ -196,7 +196,6 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const LambdaClientCommand &i);
     };
-
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_LAMBDA_CLIENT_COMMAND_H

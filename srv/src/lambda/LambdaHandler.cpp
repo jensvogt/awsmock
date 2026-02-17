@@ -388,6 +388,15 @@ namespace AwsMock::Service {
                 return SendResponse(request, http::status::ok);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::REBUILD_LAMBDA) {
+                Dto::Lambda::RebuildLambdaRequest lambdaRequest = Dto::Lambda::RebuildLambdaRequest::FromJson(clientCommand);
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    _lambdaService.RebuildLambda(lambdaRequest);
+                    log_trace << "Rebuild function, name: " << lambdaRequest.name << ":" << lambdaRequest.version;
+                });
+                return SendResponse(request, http::status::ok);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_IMAGE) {
                 Dto::Lambda::DeleteImageRequest lambdaRequest = Dto::Lambda::DeleteImageRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
@@ -461,4 +470,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
