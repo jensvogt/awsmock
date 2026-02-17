@@ -46,6 +46,13 @@ namespace AwsMock::Service {
 
         if (ec) {
             log_error << "Read failed: " << ec.message();
+            if (ec == boost::asio::error::operation_aborted || ec == boost::asio::error::timed_out) {
+                // The timeout timer called socket.cancel()
+                std::cout << "--- TIMEOUT BUFFER DUMP (" << bytes_transferred << " bytes) ---" << std::endl;
+                // Assuming 'data_' is your boost::array or std::vector buffer
+                std::cout << boost::beast::buffers_to_string(_buffer.data()) << std::endl;
+                std::cout << "\n------------------------------------------" << std::endl;
+            }
             return;
         }
 
@@ -62,14 +69,6 @@ namespace AwsMock::Service {
         // If we aren't at the queue limit, try to pipeline another request
         if (_response_queue.size() < _queueLimit)
             DoRead();
-    }
-
-    void GatewaySession::QueueWrite(http::message_generator response) {
-        // Allocate and store the work
-        _response_queue.push(std::move(response));
-
-        // If there was no previous work, start the write loop
-        if (_response_queue.size() == 1) DoWrite();
     }
 
     // Return a response for the given request.
@@ -159,6 +158,15 @@ namespace AwsMock::Service {
             }
         }
         return Core::HttpUtils::BadRequest(request, "Invalid target path");
+    }
+
+
+    void GatewaySession::QueueWrite(http::message_generator response) {
+        // Allocate and store the work
+        _response_queue.push(std::move(response));
+
+        // If there was no previous work, start the write loop
+        if (_response_queue.size() == 1) DoWrite();
     }
 
     // Called to start/continue the write-loop. Should not be called when write_loop is already active.
