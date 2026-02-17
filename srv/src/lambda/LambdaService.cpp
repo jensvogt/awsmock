@@ -5,8 +5,7 @@
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
-
-    std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_instanceMutex;
+    std::map<std::string, std::shared_ptr<boost::mutex> > LambdaService::_instanceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
@@ -124,7 +123,6 @@ namespace AwsMock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-
             const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             const long count = _lambdaDatabase.LambdaCount(request.region);
 
@@ -133,7 +131,6 @@ namespace AwsMock::Service {
 
             log_trace << "Lambda list function counters, result: " << response.ToString();
             return response;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -145,13 +142,12 @@ namespace AwsMock::Service {
         log_debug << "List lambda environment counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string>> environments;
+            std::vector<std::pair<std::string, std::string> > environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -185,7 +181,6 @@ namespace AwsMock::Service {
             }
             log_trace << "Lambda list environments counters, result: " << response.ToString();
             return response;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -197,7 +192,6 @@ namespace AwsMock::Service {
         log_debug << "List lambda event source counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaEventSourceCountersResponse response;
@@ -232,7 +226,6 @@ namespace AwsMock::Service {
 
             log_trace << "Lambda list event source counters, result: " << response.ToString();
             return response;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -248,12 +241,10 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             lambda.environment.variables[request.environmentKey] = request.environmentValue;
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda environments added, lambdaArn: " << lambda.arn;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -269,12 +260,10 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             lambda.environment.variables[request.environmentKey] = request.environmentValue;
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda environments updated, lambdaArn: " << lambda.arn;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -291,7 +280,6 @@ namespace AwsMock::Service {
         }
 
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             std::string environmentKey = request.environmentKey;
             const auto count = std::erase_if(lambda.environment.variables, [environmentKey](const auto &item) {
@@ -300,7 +288,6 @@ namespace AwsMock::Service {
             });
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda environments deleted, lambdaArn: " << lambda.arn << " count: " << count;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -317,7 +304,6 @@ namespace AwsMock::Service {
         }
 
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             lambda.enabled = request.enabled;
             lambda = _lambdaDatabase.UpdateLambda(lambda);
@@ -334,7 +320,6 @@ namespace AwsMock::Service {
                 startRequest.region = request.region;
                 StartLambda(startRequest);
             }
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -351,7 +336,6 @@ namespace AwsMock::Service {
         }
 
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             Database::Entity::Lambda::EventSourceMapping eventSourceMapping;
             eventSourceMapping.type = request.type;
@@ -367,7 +351,6 @@ namespace AwsMock::Service {
             lambda.eventSources.emplace_back(eventSourceMapping);
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda event sources added, lambdaArn: " << lambda.arn;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -384,7 +367,6 @@ namespace AwsMock::Service {
         }
 
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             std::string eventSourceArn = request.eventSourceArn;
             const auto count = std::erase_if(lambda.eventSources, [eventSourceArn](const auto &item) {
@@ -392,7 +374,6 @@ namespace AwsMock::Service {
             });
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda event sources deleted, lambdaArn: " << lambda.arn << " count: " << count;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -404,13 +385,12 @@ namespace AwsMock::Service {
         log_debug << "List lambda tag counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string>> tags;
+            std::vector<std::pair<std::string, std::string> > tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -441,7 +421,6 @@ namespace AwsMock::Service {
 
             log_trace << "Lambda list tags counters, result: " << response.ToString();
             return response;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -453,7 +432,6 @@ namespace AwsMock::Service {
         log_debug << "List lambda instance counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaInstanceCountersResponse response;
@@ -508,7 +486,6 @@ namespace AwsMock::Service {
 
             log_trace << "Lambda list instances counters, result: " << response.ToString();
             return response;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -520,12 +497,10 @@ namespace AwsMock::Service {
         log_debug << "List lambda tag counters request, functionArn: " << request.functionArn;
 
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             lambda.tags[request.tagKey] = request.tagValue;
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda tags added, lambdaArn: " << lambda.arn;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -542,12 +517,10 @@ namespace AwsMock::Service {
         }
 
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             lambda.tags[request.tagKey] = request.tagValue;
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda tags updated, lambdaArn: " << lambda.arn;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -559,7 +532,6 @@ namespace AwsMock::Service {
         log_debug << "Delete lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey;
 
         try {
-
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
             std::string tagKey = request.tagKey;
             const auto count = std::erase_if(lambda.tags, [tagKey](const auto &item) {
@@ -568,7 +540,6 @@ namespace AwsMock::Service {
             });
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda tags deleted, lambdaArn: " << lambda.arn << " count: " << count;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -584,12 +555,12 @@ namespace AwsMock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-            function.handler = lambda.handler,
-            function.runtime = lambda.runtime,
-            function.lastUpdateStatus = "Successful",
-            function.state = LambdaStateToString(lambda.state),
-            function.stateReason = lambda.stateReason,
-            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+                    function.handler = lambda.handler,
+                    function.runtime = lambda.runtime,
+                    function.lastUpdateStatus = "Successful",
+                    function.state = LambdaStateToString(lambda.state),
+                    function.stateReason = lambda.stateReason,
+                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -663,7 +634,6 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const {
-
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
@@ -854,7 +824,6 @@ namespace AwsMock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-
             const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase.ListLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             const long count = _lambdaDatabase.LambdaResultsCount(request.lambdaArn);
 
@@ -863,7 +832,6 @@ namespace AwsMock::Service {
 
             log_trace << "Lambda list function counters, result: " << response.ToString();
             return response;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -875,11 +843,9 @@ namespace AwsMock::Service {
         log_debug << "Delete lambda result counters request, region: " << request.region;
 
         try {
-
             const long count = _lambdaDatabase.DeleteResultsCounter(request.oid);
             log_trace << "Lambda result counter deleted, count: " << count;
             return count;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -892,11 +858,9 @@ namespace AwsMock::Service {
         log_debug << "Delete lambda result counters request, region: " << request.region;
 
         try {
-
             const long count = _lambdaDatabase.DeleteResultsCounters(request.lambdaArn);
             log_trace << "Lambda result counter deleted, arn: " << request.lambdaArn;
             return count;
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -1120,6 +1084,46 @@ namespace AwsMock::Service {
         log_info << "Lambda function stopped, functionArn: " + lambda.arn;
     }
 
+    void LambdaService::RebuildLambda(const Dto::Lambda::RebuildLambdaRequest &request) const {
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "rebuild_function");
+        log_debug << "Rebuild lambda function: " + request.name << ":" << request.version;
+
+        const ContainerService &dockerService = ContainerService::instance();
+
+        if (!_lambdaDatabase.LambdaExists(request.name)) {
+            log_error << "Lambda function does not exist, function: " + request.name;
+            throw Core::ServiceException("Lambda function does not exist");
+        }
+
+        // Delete the containers, if existing
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.name);
+        for (const auto &instance: lambda.instances) {
+            if (dockerService.ContainerExists(instance.containerId)) {
+                if (Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId); !container.id.empty()) {
+                    dockerService.KillContainer(container.id);
+                    dockerService.DeleteContainer(container);
+                    log_debug << "Docker container deleted, function: " + request.name;
+                }
+            }
+        }
+
+        // Delete the image, if existing
+        if (dockerService.ImageExists(request.name, lambda.dockerTag)) {
+            const Dto::Docker::Image image = dockerService.GetImageByName(request.name, lambda.dockerTag);
+            dockerService.DeleteImage(image.id);
+            log_debug << "Docker image deleted, function: " + request.name;
+        }
+
+        // Create instance
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+
+        // Update the lambda function
+        const LambdaCreator lambdaCreator;
+        lambdaCreator.CreateLambda(lambda, instanceId);
+
+        log_info << "Lambda function rebuild, function: " + request.name << ":" << request.version << ", newId: " << instanceId;
+    }
+
     void LambdaService::DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_function");
         log_debug << "Delete function: " + request.ToString();
@@ -1188,22 +1192,17 @@ namespace AwsMock::Service {
 
         // Check existing instances
         if (lambda.HasIdleInstance()) {
-
             instance = lambda.GetIdleInstance();
-
         } else if (lambda.instances.size() < lambda.concurrency) {
-
             // Create instance
             std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
             // Create lambda
-            LambdaCreator lambdaCreator;
+            const LambdaCreator lambdaCreator;
             lambda = lambdaCreator.CreateLambda(lambda, instanceId);
             log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
             instance = lambda.GetInstance(instanceId);
-
         } else {
-
             // Wait for an idle instance
             instance = WaitForIdleInstance(lambda);
         }
@@ -1235,7 +1234,6 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {
-
         // Delete docker containers
         for (const auto &container: ContainerService::instance().ListContainerByImageName(lambda.function)) {
             ContainerService::instance().KillContainer(container.id);
@@ -1253,9 +1251,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::CreateResourceNotification(const Dto::Lambda::AddEventSourceRequest &request) const {
-
         if (request.type == "S3") {
-
             if (!_s3Database.BucketExists(request.eventSourceArn)) {
                 log_error << "S3 bucket does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("S3 bucket does not exist: " + request.eventSourceArn);
@@ -1283,9 +1279,7 @@ namespace AwsMock::Service {
             // Send S3 put notification request
             bucket.lambdaNotifications.emplace_back(lambdaNotification);
             _s3Database.CreateOrUpdateBucket(bucket);
-
         } else if (request.type == "SQS") {
-
             if (!_sqsDatabase.QueueArnExists(request.eventSourceArn)) {
                 log_error << "SQS queue does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
@@ -1308,9 +1302,7 @@ namespace AwsMock::Service {
 
             // Send S3 put notification request
             _sqsDatabase.CreateOrUpdateQueue(queue);
-
         } else if (request.type == "SNS") {
-
             if (!_snsDatabase.TopicExists(request.eventSourceArn)) {
                 log_error << "SNS topic does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
@@ -1337,7 +1329,6 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::WriteBase64File(const std::string &base64File, const std::string &content) {
-
         auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
         std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
         log_debug << "Using Base64File: " << base64FullFile;
@@ -1347,4 +1338,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
