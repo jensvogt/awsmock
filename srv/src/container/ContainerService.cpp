@@ -184,18 +184,9 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
-        if (response.containerList.empty()) {
-            log_info << "Docker container not found, containerId: " << containerId;
-            return {};
-        }
-
-        if (response.containerList.size() > 1) {
-            log_warning << "More than one docker container found, containerId: " << containerId << " count: " << response.containerList.size();
-        }
-
+        Dto::Docker::Container response = Dto::Docker::Container::FromJson(body);
         log_debug << "Docker container found, containerId: " << containerId;
-        return response.containerList.front();
+        return response;
     }
 
     Dto::Docker::Container ContainerService::GetContainerByName(const std::string &name) const {

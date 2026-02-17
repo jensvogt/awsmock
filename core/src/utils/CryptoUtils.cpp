@@ -483,7 +483,9 @@ namespace AwsMock::Core {
         typedef transform_width<binary_from_base64<std::string::const_iterator>, 8, 6> ItBinaryT;
         try {
             /// Trailing whitespace makes remove_whitespace barf because the iterator never == end().
-            while (!input.empty() && std::isspace(input.back())) { input.pop_back(); }
+            while (!input.empty() && std::isspace(input.back())) {
+                input.pop_back();
+            }
             //inputString.swap(StripIt(inputString.begin()), StripIt(inputString.end()));
             /// If the input isn't a multiple of 4, pad with =
             input.append((4 - input.size() % 4) % 4, '=');

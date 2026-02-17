@@ -5,7 +5,7 @@
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
-    std::map<std::string, std::shared_ptr<boost::mutex> > LambdaService::_instanceMutex;
+    std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_instanceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string> > environments;
+            std::vector<std::pair<std::string, std::string>> environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -390,7 +390,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string> > tags;
+            std::vector<std::pair<std::string, std::string>> tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -555,12 +555,12 @@ namespace AwsMock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-                    function.handler = lambda.handler,
-                    function.runtime = lambda.runtime,
-                    function.lastUpdateStatus = "Successful",
-                    function.state = LambdaStateToString(lambda.state),
-                    function.stateReason = lambda.stateReason,
-                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+            function.handler = lambda.handler,
+            function.runtime = lambda.runtime,
+            function.lastUpdateStatus = "Successful",
+            function.state = LambdaStateToString(lambda.state),
+            function.stateReason = lambda.stateReason,
+            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -1102,16 +1102,20 @@ namespace AwsMock::Service {
                 if (Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId); !container.id.empty()) {
                     dockerService.KillContainer(container.id);
                     dockerService.DeleteContainer(container);
-                    log_debug << "Docker container deleted, function: " + request.name;
+                    log_debug << "Docker container deleted, function: " + request.name << ":" << request.version;
                 }
             }
         }
 
+        // Update instances
+        lambda.instances.clear();
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+
         // Delete the image, if existing
-        if (dockerService.ImageExists(request.name, lambda.dockerTag)) {
+        if (dockerService.ImageExists(request.name, request.version)) {
             const Dto::Docker::Image image = dockerService.GetImageByName(request.name, lambda.dockerTag);
             dockerService.DeleteImage(image.id);
-            log_debug << "Docker image deleted, function: " + request.name;
+            log_debug << "Docker image deleted, function: " + request.name << ":" << request.version;
         }
 
         // Create instance
@@ -1121,7 +1125,7 @@ namespace AwsMock::Service {
         const LambdaCreator lambdaCreator;
         lambdaCreator.CreateLambda(lambda, instanceId);
 
-        log_info << "Lambda function rebuild, function: " + request.name << ":" << request.version << ", newId: " << instanceId;
+        log_info << "Lambda function rebuild, name: " + request.name << ":" << request.version << ", newId: " << instanceId;
     }
 
     void LambdaService::DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) const {
@@ -1338,4 +1342,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

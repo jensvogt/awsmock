@@ -109,7 +109,8 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(status);
-        response.keep_alive(request.keep_alive());
+        //response.keep_alive(request.keep_alive());
+        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(body.length()));
@@ -135,4 +136,4 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
