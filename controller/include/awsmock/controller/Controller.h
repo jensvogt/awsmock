@@ -68,7 +68,8 @@ namespace AwsMock::Controller {
      */
     enum class CommandType {
         CONFIG,
-        LOG_LEVEL,
+        SET_LOG_LEVEL,
+        GET_LOG_LEVEL,
         LIST,
         STATUS,
         ENABLE,
@@ -86,21 +87,22 @@ namespace AwsMock::Controller {
     };
 
     static std::map<CommandType, std::string> CommandTypeNames{
-            {CommandType::CONFIG, "config"},
-            {CommandType::LOG_LEVEL, "log-level"},
-            {CommandType::LIST, "list"},
-            {CommandType::STATUS, "status"},
-            {CommandType::ENABLE, "enable"},
-            {CommandType::DISABLE, "disable"},
-            {CommandType::START, "start"},
-            {CommandType::RESTART, "restart"},
-            {CommandType::STOP, "stop"},
-            {CommandType::IMPORT, "import"},
-            {CommandType::EXPORT, "export"},
-            {CommandType::CLEAN, "clean"},
-            {CommandType::CLEAN_OBJECTS, "clean-objects"},
-            {CommandType::PING, "ping"},
-            {CommandType::UNKNOWN, "unknown"},
+        {CommandType::CONFIG, "config"},
+        {CommandType::SET_LOG_LEVEL, "set-loglevel"},
+        {CommandType::GET_LOG_LEVEL, "get-loglevel"},
+        {CommandType::LIST, "list"},
+        {CommandType::STATUS, "status"},
+        {CommandType::ENABLE, "enable"},
+        {CommandType::DISABLE, "disable"},
+        {CommandType::START, "start"},
+        {CommandType::RESTART, "restart"},
+        {CommandType::STOP, "stop"},
+        {CommandType::IMPORT, "import"},
+        {CommandType::EXPORT, "export"},
+        {CommandType::CLEAN, "clean"},
+        {CommandType::CLEAN_OBJECTS, "clean-objects"},
+        {CommandType::PING, "ping"},
+        {CommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string CommandTypeToString(const CommandType &commandType) {
@@ -126,8 +128,7 @@ namespace AwsMock::Controller {
      */
     class AwsMockCtl {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -282,6 +283,11 @@ namespace AwsMock::Controller {
         void SetLogLevel(const std::string &level) const;
 
         /**
+         * @brief Prints out the current log level
+         */
+        void GetLogLevel() const;
+
+        /**
          * @brief Returns the current AwsMock configuration
          */
         void GetConfig() const;
@@ -319,8 +325,7 @@ namespace AwsMock::Controller {
          */
         void PingManager() const;
 
-      private:
-
+    private:
         /**
          * @brief Add an authorization header.
          *
@@ -434,6 +439,6 @@ namespace AwsMock::Controller {
         std::vector<Dto::Lambda::Function> _lambdas;
     };
 
-}// namespace AwsMock::Controller
+} // namespace AwsMock::Controller
 
 #endif// AWSMOCK_CONTROLLER_CONTROLLER_H
