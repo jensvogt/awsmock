@@ -33,43 +33,8 @@ namespace AwsMock::Service {
         // Set the timeout.
         _stream.expires_after(std::chrono::seconds(_timeout));
 
-        // Read only the metadata first
-        http::async_read_header(_stream, _buffer, *_parser,
-                                boost::beast::bind_front_handler(&GatewaySession::OnReadHeader, shared_from_this()));
-    }
-
-    void GatewaySession::OnReadHeader(boost::beast::error_code ec, std::size_t) {
-        if (ec) return DoClose();
-
-        // Handle OPTIONS immediately
-        if (_parser->get().method() == http::verb::options) {
-            HandleOptionsRequest(_parser->get());
-            // Since OPTIONS hasn't a body, we don't call async_read.
-            // We wait for the next request or close.
-            return DoRead();
-        }
-
-        // Check for "Expect: 100-continue"
-        if (_parser->get()[http::field::expect] == "100-continue") {
-
-            // Check body size
-            const boost::optional<std::uint64_t> contentLength;
-            _parser->get().content_length(contentLength);
-            if (contentLength.value_or(0) > _bodyLimit) {
-                log_error << "Body too big ";
-                return;
-            }
-
-            // Send the "100 Continue" status immediately
-            http::response<http::empty_body> res;
-            res.version(11);
-            res.result(http::status::continue_);
-            http::write(_stream, res);
-        }
-
-        // Now proceed to read the actual body
-        http::async_read(_stream, _buffer, *_parser,
-                         boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
+        // Read a request using the parser-oriented interface
+        http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
     void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
@@ -80,14 +45,19 @@ namespace AwsMock::Service {
             return DoClose();
 
         if (ec) {
-            // Log the specific error
-            if (ec == boost::beast::error::timeout) {
-                log_error << "GatewaySession: Operation timed out. Closing connection.";
-            } else {
-                log_error << "Read failed: " << ec.message();
-            }
-            log_error << "Read failed: closed";
-            return DoClose();
+            log_error << "Read failed: " << ec.message();
+            _buffer.commit(90000000);
+            std::cout << "--- ERROR BUFFER DUMP (" << _buffer.size() << " bytes) ---" << std::endl;
+            std::cout << boost::beast::buffers_to_string(_buffer.cdata()) << std::endl;
+            std::cout << "\n------------------------------------------" << std::endl;
+            return;
+        }
+
+        // Data is already in _parser! No need for http::read(ev).
+        // Handle 100-continue (using the data already in the parser)
+        if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
+            HandleContinueRequest(_stream, _parser->get());
+            DoRead();
         }
 
         // Process the request that was just finished by the async operation
@@ -98,25 +68,26 @@ namespace AwsMock::Service {
             DoRead();
     }
 
-    // Return a response for the given request.
-    //
-    // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
+    // Return a response for the given request. The concrete type of the response message (which depends on the request)
+    // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
-            request.method() != http::verb::head && request.method() != http::verb::options &&
-            request.method() != http::verb::connect) {
+            request.method() != http::verb::head) {
             return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
         }
 
-        // Ping request
-        if (request.method() == http::verb::connect) {
-            log_debug << "Handle CONNECT request";
-            Monitoring::MonitoringTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
-            Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
-            return Core::HttpUtils::Ok(request);
+        // Request path must be absolute and not contain "..".
+        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
+            log_error << "Illegal request-target";
+            return Core::HttpUtils::BadRequest(request, "Invalid target path");
+        }
+
+        // Handle OPTIONS requests
+        if (request.method() == http::verb::options) {
+            return HandleOptionsRequest(request);
         }
 
         std::shared_ptr<AbstractHandler> handler;
@@ -167,7 +138,7 @@ namespace AwsMock::Service {
                 }
                 case http::verb::head: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "HEAD"};
-                    return handler->HandleHeadRequest(request, _region, _user);
+                    handler->HandleHeadRequest(request, _region, _user);
                 }
                 default:
                     return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
@@ -256,20 +227,45 @@ namespace AwsMock::Service {
         return {};
     }
 
-    void GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
-
-        http::response<http::empty_body> response{http::status::no_content, request.version()};
-
-        // Standard CORS headers
+    http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(http::status::ok);
+        response.keep_alive(request.keep_alive());
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::allow, "*/*");
-        response.set(http::field::access_control_allow_origin, "*");// Or your specific domain
+        response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "*");
-        response.set(http::field::access_control_allow_methods, "GET, POST, PUT, DELETE, OPTIONS");
-        response.set(http::field::access_control_allow_headers, "Content-Type, Authorization, X-Requested-With");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
         response.set(http::field::access_control_max_age, "86400");
+        response.set(http::field::vary, "Accept-Encoding, Origin");
+        response.set(http::field::keep_alive, "timeout=10, max=100");
+        response.set(http::field::connection, "Keep-Alive");
         response.prepare_payload();
 
-        // Use your existing write logic to send it
-        QueueWrite(std::move(response));
+        // Send the response to the client
+        return response;
     }
-}// namespace AwsMock::Service
+
+    void GatewaySession::HandleContinueRequest(boost::beast::tcp_stream &_stream, const http::request<http::dynamic_body> &request) {
+        http::response<http::empty_body> response;
+        response.version(11);
+        response.keep_alive(request.keep_alive());
+        response.result(http::status::continue_);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::allow, "*/*");
+        response.set(http::field::content_length, "0");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "*");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::access_control_max_age, "86400");
+        response.set(http::field::keep_alive, "timeout=10, max=100");
+        response.set(http::field::connection, "Keep-Alive");
+
+        boost::beast::error_code ec;
+        write(_stream, response, ec);
+    }
+} // namespace AwsMock::Service

@@ -206,12 +206,9 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "monitoring": {
-          "period": 300
-        },
-        "remove": {
-          "period": 300
-        }
+        "monitoring-period": 300,
+        "worker-period": 300,
+        "remove-period": 300
       },
       "application": {
         "active": true,
