@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.14.13](https://github.com/jensvogt/awsmock/compare/1.14.12...v1.14.13) (2026-02-18)
+
+
+### Bug Fixes
+
+* get log level ([5615924](https://github.com/jensvogt/awsmock/commit/5615924f6bd33aa2f7e1a5b4ee0d2085f3bd24e6))
+* get log level ([37c218c](https://github.com/jensvogt/awsmock/commit/37c218c0bc2bc9e4191866397956f91cb8585079))
+
+## [1.14.12](https://github.com/jensvogt/awsmock/compare/v1.14.11...v1.14.12) (2026-02-17)
+
+
+### Bug Fixes
+
+* keep alive settings ([a738b73](https://github.com/jensvogt/awsmock/commit/a738b73cb8bb20d14290bfa1ad69d6edf31731de))
+* keep alive settings ([dd822b9](https://github.com/jensvogt/awsmock/commit/dd822b97459866d92c79f7fb5f4e60fc20483937))
+* rebuild lambda ([5a040c0](https://github.com/jensvogt/awsmock/commit/5a040c0a49d5e1165e4bee9de42765235d03cc50))
+* rebuild lambda ([8ccd4ad](https://github.com/jensvogt/awsmock/commit/8ccd4ad06a1f1644e702193e8a356c7129f17f3a))
+
+## [1.14.11](https://github.com/jensvogt/awsmock/compare/1.14.10...v1.14.11) (2026-02-17)
+
+
+### Bug Fixes
+
+* gateway debugging ([559ad13](https://github.com/jensvogt/awsmock/commit/559ad13905747e7b8e5ad2698eeaadedf048f37a))
+* gateway debugging ([25ef395](https://github.com/jensvogt/awsmock/commit/25ef395253b961adb336f032e901dd89e4bbd7c3))
+
 ## [1.14.10](https://github.com/jensvogt/awsmock/compare/v1.14.9...v1.14.10) (2026-02-16)
 
 
