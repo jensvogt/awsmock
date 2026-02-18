@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.13](https://github.com/jensvogt/awsmock/compare/1.14.12...v1.14.13) (2026-02-18)
+
+
+### Bug Fixes
+
+* get log level ([5615924](https://github.com/jensvogt/awsmock/commit/5615924f6bd33aa2f7e1a5b4ee0d2085f3bd24e6))
+* get log level ([37c218c](https://github.com/jensvogt/awsmock/commit/37c218c0bc2bc9e4191866397956f91cb8585079))
+
 ## [1.14.12](https://github.com/jensvogt/awsmock/compare/v1.14.11...v1.14.12) (2026-02-17)
 
 
