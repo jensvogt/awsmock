@@ -64,6 +64,15 @@ namespace AwsMock::Service {
                 return SendResponse(request, http::status::ok, json);
             }
 
+            if (action == "get-log-level") {
+
+                std::string currentLogLevel = Core::LogStream::GetSeverity();
+                log_info << "Current log level: '" << currentLogLevel << "'";
+
+                // Send response
+                return SendResponse(request, http::status::ok, currentLogLevel);
+            }
+
             if (action == "ping") {
                 return SendResponse(request, http::status::ok);
             }
@@ -161,4 +170,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

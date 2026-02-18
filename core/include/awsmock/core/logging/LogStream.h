@@ -68,8 +68,7 @@ namespace AwsMock::Core {
      */
     class LogStream {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -81,11 +80,18 @@ namespace AwsMock::Core {
         static void Initialize();
 
         /**
+         * @brief Returns the current log level
+         *
+         * @return current log level
+         */
+        static std::string GetSeverity();
+
+        /**
          * @brief Set the maximum severity
          *
-         * @param severity PLog severity string
+         * @param lvl PLog severity string
          */
-        static void SetSeverity(const std::string &severity);
+        static void SetSeverity(const std::string &lvl);
 
         /**
          * @brief Add a file logging sink
@@ -106,6 +112,7 @@ namespace AwsMock::Core {
          * @param ws websocket
          */
         static void AddWebSocket(boost::beast::websocket::stream<boost::beast::tcp_stream> &ws);
+
         static void AddLoggingWebSocket(boost::asio::io_context &ioc, unsigned int port);
 
         /**
@@ -118,8 +125,7 @@ namespace AwsMock::Core {
          */
         static void RemoveConsoleLogs();
 
-      private:
-
+    private:
         /**
          * Log size
          */
@@ -133,12 +139,17 @@ namespace AwsMock::Core {
         /**
          * Log directory
          */
-        static std::string logDir;
+        static std::string _logDir;
 
         /**
          * Log filename prefix
          */
-        static std::string logPrefix;
+        static std::string _logPrefix;
+
+        /**
+         * Current log level
+         */
+        static std::string _currentLevel;
 
         /**
          * Severity
@@ -148,17 +159,17 @@ namespace AwsMock::Core {
         /**
          * Console appender
          */
-        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> console_sink;
+        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> > console_sink;
 
         /**
          * File appender
          */
-        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> file_sink;
+        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> > file_sink;
 
         /**
          * Web socket
          */
-        static boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> _ws;
+        static boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream> > _ws;
 
         /**
          * Web socket backend
@@ -171,7 +182,7 @@ namespace AwsMock::Core {
         static boost::shared_ptr<webSocketSink_t> webSocketSink;
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
 #define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)

@@ -31,22 +31,27 @@ namespace AwsMock::Controller {
                 return GetConfig();
             }
 
-            case CommandType::LOG_LEVEL: {
+            case CommandType::SET_LOG_LEVEL: {
                 SetLogLevel(*_commands.begin());
+                break;
+            }
+
+            case CommandType::GET_LOG_LEVEL: {
+                GetLogLevel();
                 break;
             }
 
             case CommandType::STATUS: {
                 std::cout << "Applications: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                          << std::setw(10) << std::left << "Enabled"
-                          << std::setw(10) << std::left << "Status"
-                          << std::setw(12) << std::left << "Ports"
-                          << std::endl;
+                        << std::setw(10) << std::left << "Enabled"
+                        << std::setw(10) << std::left << "Status"
+                        << std::setw(12) << std::left << "Ports"
+                        << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
+                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
                     if (application.enabled) {
                         std::cout << std::setw(12) << std::left << (std::to_string(application.privatePort) + "->" + std::to_string(application.publicPort));
                     }
@@ -54,14 +59,14 @@ namespace AwsMock::Controller {
                 }
                 std::cout << "Lambdas: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                          << std::setw(10) << std::left << "Enabled"
-                          << std::setw(10) << std::left << "Status"
-                          << std::setw(12) << std::left << "Ports"
-                          << std::endl;
+                        << std::setw(10) << std::left << "Enabled"
+                        << std::setw(10) << std::left << "Status"
+                        << std::setw(12) << std::left << "Ports"
+                        << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
+                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
                     if (lambda.enabled) {
                         std::vector<Dto::Lambda::InstanceCounter> instances = GetLambdaInstances(lambda);
                         std::string portStr = "8080->";
@@ -81,16 +86,16 @@ namespace AwsMock::Controller {
                     std::cout << "Applications: " << std::endl;
                     for (const auto &application: _applications) {
                         std::cout << "  " << std::setw(32) << std::left << application.name
-                                  << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                                  << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                                << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                                << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
                     }
                 }
                 if (_commands.empty() || _commands[0] == "lambdas") {
                     std::cout << "Lambdas: " << std::endl;
                     for (const auto &lambda: _lambdas) {
                         std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                                  << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                                  << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                                << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                                << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
                     }
                 }
                 break;
@@ -597,6 +602,17 @@ namespace AwsMock::Controller {
     }
 #endif
 
+    void AwsMockCtl::GetLogLevel() const {
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "module", "get-log-level");
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
+        if (response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Could not get log level, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
+            return;
+        }
+        std::cout << "Log level is: " << response.body << std::endl;
+    }
+
     void AwsMockCtl::SetLogLevel(const std::string &level) const {
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "set-log-level");
@@ -856,4 +872,4 @@ namespace AwsMock::Controller {
         }
         return modules;
     }
-}// namespace AwsMock::Controller
+} // namespace AwsMock::Controller
