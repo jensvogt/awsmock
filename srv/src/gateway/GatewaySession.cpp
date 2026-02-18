@@ -46,13 +46,10 @@ namespace AwsMock::Service {
 
         if (ec) {
             log_error << "Read failed: " << ec.message();
-            if (ec == boost::asio::error::operation_aborted || ec == boost::asio::error::timed_out) {
-                // The timeout timer called socket.cancel()
-                std::cout << "--- TIMEOUT BUFFER DUMP (" << bytes_transferred << " bytes) ---" << std::endl;
-                // Assuming 'data_' is your boost::array or std::vector buffer
-                std::cout << boost::beast::buffers_to_string(_buffer.data()) << std::endl;
-                std::cout << "\n------------------------------------------" << std::endl;
-            }
+            _buffer.commit(90000000);
+            std::cout << "--- ERROR BUFFER DUMP (" << _buffer.size() << " bytes) ---" << std::endl;
+            std::cout << boost::beast::buffers_to_string(_buffer.cdata()) << std::endl;
+            std::cout << "\n------------------------------------------" << std::endl;
             return;
         }
 
@@ -71,25 +68,15 @@ namespace AwsMock::Service {
             DoRead();
     }
 
-    // Return a response for the given request.
-    //
-    // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
+    // Return a response for the given request. The concrete type of the response message (which depends on the request)
+    // is type-erased in message_generator.
     template<class Body, class Allocator>
     http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
-            request.method() != http::verb::head && request.method() != http::verb::connect &&
-            request.method() != http::verb::options) {
+            request.method() != http::verb::head) {
             return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
-        }
-
-        // Ping request
-        if (request.method() == http::verb::connect) {
-            log_debug << "Handle CONNECT request";
-            Monitoring::MonitoringTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
-            Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
-            return Core::HttpUtils::Ok(request);
         }
 
         // Request path must be absolute and not contain "..".
