@@ -5,7 +5,7 @@
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
-    GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
+ GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
         _bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
@@ -22,6 +22,7 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoRead() {
+
         // Construct a new parser for each message
         _parser.emplace();
         _buffer.clear();
@@ -39,6 +40,7 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::OnReadHeader(boost::beast::error_code ec, std::size_t) {
+
         if (ec) return DoClose();
 
         // Handle OPTIONS immediately

@@ -37,8 +37,7 @@ namespace AwsMock::Database {
      */
     class SQSMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -181,6 +180,14 @@ namespace AwsMock::Database {
          * @return updated queue
          */
         Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue);
+
+        /**
+         * @brief Increases the number of invisible messages
+         *
+         * @param queueArn queue ARN
+         * @param messageNumber number of invisible messages
+         */
+        void UpdateQueueInvisibleNumber(const std::string &queueArn, long messageNumber);
 
         /**
          * @brief Updates the counters of a queue
@@ -428,8 +435,7 @@ namespace AwsMock::Database {
          */
         long DeleteAllMessages();
 
-      private:
-
+    private:
         /**
          * SQS queue vector, when running without database
          */
@@ -451,6 +457,6 @@ namespace AwsMock::Database {
         static boost::mutex _sqsMessageMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SQS_MEMORYDB_H
