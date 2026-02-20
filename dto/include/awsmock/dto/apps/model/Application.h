@@ -70,9 +70,10 @@ namespace AwsMock::Dto::Apps {
          * Application docker image name
          */
         std::string imageName;
+
         /**
-                * Application docker container ID
-                */
+         * Application docker container ID
+         */
         std::string containerId;
 
         /**

@@ -28,17 +28,17 @@ namespace AwsMock::Service {
             // Update database
             const std::string arn = Core::AwsUtils::CreateSSMParameterArn(request.region, _accountId, request.name);
             Database::Entity::SSM::Parameter parameterEntity = {
-                    .region = request.region,
-                    .parameterName = request.name,
-                    .parameterValue = request.parameterValue,
-                    .description = request.description,
-                    .type = Dto::SSM::ParameterTypeToString(request.type),
-                    .version = 1,
-                    .arn = arn,
-                    .kmsKeyArn = request.kmsKeyArn,
-                    .tags = request.tags,
-                    .created = system_clock::now(),
-                    .modified = system_clock::now(),
+                .region = request.region,
+                .parameterName = request.name,
+                .parameterValue = request.parameterValue,
+                .description = request.description,
+                .type = Dto::SSM::ParameterTypeToString(request.type),
+                .version = 1,
+                .arn = arn,
+                .kmsKeyArn = request.kmsKeyArn,
+                .tags = request.tags,
+                .created = system_clock::now(),
+                .modified = system_clock::now(),
             };
 
             // Encrypt if KMS key provided
@@ -78,17 +78,17 @@ namespace AwsMock::Service {
             // Update database
             const std::string arn = Core::AwsUtils::CreateSSMParameterArn(request.region, _accountId, request.name);
             Database::Entity::SSM::Parameter parameterEntity = {
-                    .region = request.region,
-                    .parameterName = request.name,
-                    .parameterValue = request.value,
-                    .description = request.description,
-                    .type = Dto::SSM::ParameterTypeToString(request.type),
-                    .version = 1,
-                    .arn = arn,
-                    .kmsKeyArn = request.kmsKeyArn,
-                    .tags = request.tags,
-                    .created = system_clock::now(),
-                    .modified = system_clock::now(),
+                .region = request.region,
+                .parameterName = request.name,
+                .parameterValue = request.value,
+                .description = request.description,
+                .type = Dto::SSM::ParameterTypeToString(request.type),
+                .version = 1,
+                .arn = arn,
+                .kmsKeyArn = request.kmsKeyArn,
+                .tags = request.tags,
+                .created = system_clock::now(),
+                .modified = system_clock::now(),
             };
 
             // Encrypt if KMS key provided
@@ -245,8 +245,8 @@ namespace AwsMock::Service {
             Dto::SSM::ListParameterCountersResponse response;
 
             // Get from the database
-            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             response.total = _ssmDatabase.CountParameters(request.region, request.prefix);
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             response.parameterCounters = Dto::SSM::Mapper::map(parameterEntities);
             for (auto &p: response.parameterCounters) {
                 if (p.type == Dto::SSM::ParameterType::secureString) {
@@ -322,4 +322,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

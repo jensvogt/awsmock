@@ -7,9 +7,10 @@
 
 namespace AwsMock::Database {
 
-    typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean>> Accumulator;
+    typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean> > Accumulator;
 
-    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {}
+    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {
+    }
 
     std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit) const {
         log_trace << "Get distinct label values, labelName: " << labelName;
@@ -38,7 +39,7 @@ namespace AwsMock::Database {
                 } else {
 
                     for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {
-                        for (const view eventsView = doc["values"].get_array().value; const bsoncxx::document::element& element: eventsView) {
+                        for (const view eventsView = doc["values"].get_array().value; const bsoncxx::document::element &element: eventsView) {
                             labels.emplace_back(element.get_string().value);
                         }
                     }
@@ -133,7 +134,8 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const long step, const std::string &labelName, const std::string &labelValue, const long limit) const {
+    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const long step, const std::string &labelName,
+                                                                                     const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
 
         using namespace std::literals;
@@ -190,7 +192,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    void MonitoringDatabase::UpdateMonitoringCounters() const {
+    void MonitoringDatabase::UpdateMonitoringCounters() {
 
         if (HasDatabase()) {
 
@@ -198,7 +200,7 @@ namespace AwsMock::Database {
             Core::ShmMap *counterMap = Core::MonitoringCollector::instance().GetCounterMap();
 
             const auto client = ConnectionPool::instance().GetConnection();
-            const auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
+            auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
             auto session = client->start_session();
 
             try {
@@ -228,14 +230,13 @@ namespace AwsMock::Database {
                 }
 
                 // Execute bulk update
-                auto collection = mongocxx::collection{monitoringCollection};
+                long count{};
                 if (!documents.empty()) {
                     session.start_transaction();
-                    const auto result = collection.insert_many(documents);
+                    count += monitoringCollection.insert_many(documents)->inserted_count();
                     session.commit_transaction();
-                    log_debug << "Imported monitoring values: " << result->inserted_count();
                 }
-                log_debug << Core::MonitoringCollector::instance().ToString();
+                log_debug << "Imported monitoring values: " << count;
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
@@ -272,4 +273,4 @@ namespace AwsMock::Database {
         return 0;
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
