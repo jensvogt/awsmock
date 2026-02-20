@@ -410,7 +410,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    void SQSDatabase::UpdateQueueInvisibleNumber(const std::string &queueArn, long messageNumber) const {
+    void SQSDatabase::UpdateQueueReceiveNumbers(const std::string &queueArn, const long messageNumber) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "update_queue");
 
         if (HasDatabase()) {
@@ -423,9 +423,10 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queueArn)),
-                                                                          make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(messageNumber))))));
+                                                                          make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(messageNumber)))),
+                                                                                        kvp("$dec", make_document(kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(messageNumber))))));
                 session.commit_transaction();
-                log_trace << "Invisible number updated, queueArn: " << queueArn;
+                log_trace << "Message counters updated, queueArn: " << queueArn;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

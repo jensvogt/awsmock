@@ -220,7 +220,7 @@ namespace AwsMock::Database {
          * @param queueArn queue ARN
          * @param messageNumber number of invisible messages
          */
-        void UpdateQueueInvisibleNumber(const std::string &queueArn, long messageNumber) const;
+        void UpdateQueueReceiveNumbers(const std::string &queueArn, long messageNumber) const;
 
         /**
          * @brief Create a new queue or updates an existing queue

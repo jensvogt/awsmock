@@ -191,7 +191,8 @@ namespace AwsMock::Database {
                                              });
         if (it != _queues.end()) {
             it->second.modified = system_clock::now();
-            it->second.attributes.approximateNumberOfMessages = messageNumber;
+            it->second.attributes.approximateNumberOfMessages -= messageNumber;
+            it->second.attributes.approximateNumberOfMessagesNotVisible += messageNumber;
         }
     }
 

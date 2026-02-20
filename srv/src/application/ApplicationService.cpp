@@ -91,6 +91,8 @@ namespace AwsMock::Service {
         }
 
         try {
+
+            // Update database
             Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
             application = _database.UpdateApplication(application);
 
@@ -597,4 +599,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

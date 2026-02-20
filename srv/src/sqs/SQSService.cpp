@@ -1156,7 +1156,7 @@ namespace AwsMock::Service {
             if (!messageList.empty()) {
 
                 // Adjust queue attributes
-                _sqsDatabase.UpdateQueueInvisibleNumber(queueArn, messageList.size());
+                _sqsDatabase.UpdateQueueReceiveNumbers(queueArn, messageList.size());
 
                 response.messageList = Dto::SQS::Mapper::map(messageList);
             }
