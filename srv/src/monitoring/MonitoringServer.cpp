@@ -55,25 +55,28 @@ namespace AwsMock::Service {
                 if (Core::StringUtils::Contains(containerName, ":")) {
                     containerName = containerName.substr(0, containerName.find(':'));
                 }
+                if (Core::StringUtils::StartsWith(containerName, "/")) {
+                    containerName = containerName.substr(1);
+                }
 
                 // Get statistics
                 const Dto::Docker::ContainerStat stats = ContainerService::instance().GetContainerStats(container.id);
 
                 // CPU
-                const double timeDiff = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(stats.read - stats.preRead).count());
+                if (const double timeDiff = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(stats.read - stats.preRead).count()); timeDiff > 0) {
+                    const auto numCpus = static_cast<double>(stats.cpuStats.onlineCpus);
+                    const auto cpuDelta = static_cast<double>(stats.cpuStats.cpuUsage.total - stats.preCpuStats.cpuUsage.total);
+                    if (numCpus > 0) {
+                        const auto cpuPercent = cpuDelta / timeDiff / numCpus * 100.0;
+                        Core::MonitoringCollector::instance().SetGauge(DOCKER_CPU_TOTAL, "container", containerName, cpuPercent);
+                    }
 
-                const auto numCpus = static_cast<double>(stats.cpuStats.onlineCpus);
-                const auto cpuDelta = static_cast<double>(stats.cpuStats.cpuUsage.total - stats.preCpuStats.cpuUsage.total);
-                if (timeDiff > 0 && numCpus > 0) {
-                    const auto cpuPercent = cpuDelta / timeDiff / numCpus * 100.0;
-                    Core::MonitoringCollector::instance().SetGauge(DOCKER_CPU_TOTAL, "container", containerName, cpuPercent);
+                    // Memory
+                    const auto availableMem = static_cast<double>(stats.memoryStats.limit);
+                    const auto usedMem = static_cast<double>(stats.memoryStats.usage - stats.memoryStats.stats.cache);
+                    const auto memPercent = usedMem / availableMem * 100.0;
+                    Core::MonitoringCollector::instance().SetGauge(DOCKER_MEMORY_TOTAL, "container", containerName, memPercent);
                 }
-
-                // Memory
-                const auto availableMem = static_cast<double>(stats.memoryStats.limit);
-                const auto usedMem = static_cast<double>(stats.memoryStats.usage - stats.memoryStats.stats.cache);
-                const auto memPercent = usedMem / availableMem * 100.0;
-                Core::MonitoringCollector::instance().SetGauge(DOCKER_MEMORY_TOTAL, "container", containerName, memPercent);
             }
             Core::MonitoringCollector::instance().SetGauge(DOCKER_CONTAINER_COUNT, static_cast<long>(containers.size()));
         }

@@ -556,7 +556,7 @@ namespace AwsMock::Service {
          * @param bucket bucket entity.
          * @param lambdaConfigurations lambda notification configurations vector.
          */
-        static void PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
+        void PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) const;
 
         /**
          * @brief Adds the lambda notification configuration to the provided bucket.

@@ -498,7 +498,7 @@ namespace AwsMock::Service {
 
     void ContainerService::StartContainer(const std::string &containerId) const {
         if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
-            log_warning << "Start container failed, id: " << containerId << ", statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
+            log_warning << "Start container failed, id: " << containerId << ", statusCode: " << statusCode;
             return;
         }
         log_debug << "Docker container started, id: " << containerId;

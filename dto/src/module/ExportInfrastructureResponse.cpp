@@ -8,6 +8,7 @@ namespace AwsMock::Dto::Module {
 
     std::string ExportInfrastructureResponse::ToJson() const {
 
+        // TODO: write in boost::json
         try {
 
             document document;

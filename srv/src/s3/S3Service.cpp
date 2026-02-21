@@ -1591,12 +1591,15 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
+    void S3Service::PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) const {
         for (const auto &lambdaConfiguration: lambdaConfigurations) {
-            // Check existence
+
+            // Check existence, if existing do an update
             if (!lambdaConfiguration.id.empty() && bucket.HasLambdaNotificationId(lambdaConfiguration.id)) {
                 log_debug << "Lambda notification configuration exists already, id: " << lambdaConfiguration.id;
-                break;
+                bucket.lambdaNotifications.emplace_back(Dto::S3::Mapper::map(lambdaConfiguration));
+                bucket = _database.UpdateBucket(bucket);
+                continue;
             }
 
             // General attributes
