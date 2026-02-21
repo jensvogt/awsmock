@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.17](https://github.com/jensvogt/awsmock/compare/1.14.16...v1.14.17) (2026-02-21)
+
+
+### Bug Fixes
+
+* keep alive settings ([7c3154d](https://github.com/jensvogt/awsmock/commit/7c3154ddf9eabe92cbb6d132cb6d18750a315341))
+* SQS queue default attributes ([f04deef](https://github.com/jensvogt/awsmock/commit/f04deefb732bf83cb235ec3cce02b95c6a271025))
+
 ## [1.14.16](https://github.com/jensvogt/awsmock/compare/1.14.15...v1.14.16) (2026-02-19)
 
 
