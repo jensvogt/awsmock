@@ -149,6 +149,24 @@ namespace AwsMock::Dto::S3 {
          */
         static std::vector<LifecycleRule> map(const std::vector<Database::Entity::S3::LifecycleConfiguration> &configurations);
 
+        /**
+         * @brief Maps a S3 queue configuration DTO list to a queue configuration entity
+         *
+         * @param lambdaConfigurationDtos list of lambda configuration
+         * @return list of LambdaConfiguration
+         * @see LambdaConfiguration
+         */
+        static std::vector<Database::Entity::S3::LambdaNotification> map(const std::vector<LambdaConfiguration> &lambdaConfigurationDtos);
+
+        /**
+         * @brief Maps a S3 lambda configuration DTO to a lambda configuration entity
+         *
+         * @param lambdaConfigurationDto lambda configuration
+         * @return lambdaNotification entity
+         * @see LambdaConfiguration
+         */
+        static Database::Entity::S3::LambdaNotification map(const LambdaConfiguration &lambdaConfigurationDto);
+
       private:
 
         /**
@@ -209,15 +227,6 @@ namespace AwsMock::Dto::S3 {
          * @return filter rules DTOs
          */
         static std::vector<FilterRule> map(const std::vector<Database::Entity::S3::FilterRule> &filterRulesEntities);
-
-        /**
-         * @brief Maps a S3 queue configuration DTO list to a queue configuration entity
-         *
-         * @param lambdaConfigurationDtos list of lambda configuration
-         * @return list of LambdaConfiguration
-         * @see LambdaConfiguration
-         */
-        static std::vector<Database::Entity::S3::LambdaNotification> map(const std::vector<LambdaConfiguration> &lambdaConfigurationDtos);
     };
 
 }// namespace AwsMock::Dto::S3

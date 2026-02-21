@@ -253,19 +253,22 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
-
         http::response<http::empty_body> response{http::status::no_content, request.version()};
 
-        // Standard CORS headers
-        response.set(http::field::allow, "*/*");
-        response.set(http::field::access_control_allow_origin, "*"); // Or your specific domain
-        response.set(http::field::access_control_allow_headers, "*");
+        response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_methods, "GET, POST, PUT, DELETE, OPTIONS");
-        response.set(http::field::access_control_allow_headers, "Content-Type, Authorization, X-Requested-With");
+
+        // Combine all allowed headers into ONE string.
+        response.set(http::field::access_control_allow_headers, "Content-Type, Authorization, X-Requested-With, x-awsmock-action, x-awsmock-target");
         response.set(http::field::access_control_max_age, "86400");
+
+        // Add request headers
+        if (const auto requested_headers = request[http::field::access_control_request_headers]; !requested_headers.empty()) {
+            response.set(http::field::access_control_allow_headers, requested_headers);
+        }
+        // Options requests with no_content shouldn't have a payload, but this ensures headers are finalized.
         response.prepare_payload();
 
-        // Use your existing write logic to send it
         QueueWrite(std::move(response));
     }
 } // namespace AwsMock::Service

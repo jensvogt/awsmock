@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         /**
          * Update the counter
          */
-        void UpdateCounter();
+        void UpdateCounter() const;
 
       private:
 

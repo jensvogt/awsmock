@@ -88,7 +88,7 @@ namespace AwsMock::Core {
     std::map<std::string, std::string> HttpUtils::GetQueryParameters(const std::string &uri) {
 
         if (uri == "/") {
-            return  {};
+            return {};
         }
 
         std::map<std::string, std::string> queryParameters;
@@ -199,7 +199,7 @@ namespace AwsMock::Core {
         return request.base().find(name) != request.end();
     }
 
-    bool HttpUtils::HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &name) {
+    bool HttpUtils::HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name) {
         return request.base().find(name) != request.end();
     }
 
@@ -207,31 +207,31 @@ namespace AwsMock::Core {
         return HasHeader(request, name) && GetHeaderValue(request, name) == value;
     }
 
-    std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &defaultValue) {
-        if (request.base().find(name) == request.end()) {
+    std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue) {
+        if (request.base().find(key) == request.end()) {
             if (!defaultValue.empty()) {
                 return defaultValue;
             }
         }
-        return request.base()[name];
+        return request.base()[key];
     }
 
-    std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &name, const std::string &defaultValue) {
-        if (!HasHeader(request, name)) {
+    std::string HttpUtils::GetHeaderValue(const http::request<http::string_body> &request, const std::string &key, const std::string &defaultValue) {
+        if (!HasHeader(request, key)) {
             if (!defaultValue.empty()) {
                 return defaultValue;
             }
         }
-        return request.base()[name];
+        return request.base()[key];
     }
 
-    std::string HttpUtils::GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &name, const std::string &defaultValue) {
-        if (request.base().find(name) == request.end()) {
+    std::string HttpUtils::GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &key, const std::string &defaultValue) {
+        if (request.base().find(key) == request.end()) {
             if (!defaultValue.empty()) {
                 return defaultValue;
             }
         }
-        return request.base()[name];
+        return request.base()[key];
     }
 
     std::map<std::string, std::string> HttpUtils::GetHeaders(const http::request<http::dynamic_body> &request) {
@@ -358,7 +358,7 @@ namespace AwsMock::Core {
         return request.body();
     }
 
-    std::string HttpUtils::GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t> > &request) {
+    std::string HttpUtils::GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
 
         return request.body();
     }
@@ -436,7 +436,7 @@ namespace AwsMock::Core {
         return response;
     }
 
-    http::response<http::dynamic_body> HttpUtils::BadRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &reason) {
+    http::response<http::dynamic_body> HttpUtils::BadRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &reason) {
 
         http::response<http::dynamic_body> response{http::status::bad_request, request.version()};
         response.set(http::field::server, BOOST_BEAST_VERSION_STRING);

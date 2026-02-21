@@ -82,14 +82,19 @@ namespace AwsMock::Dto::S3 {
         return bucket;
     }
 
+    Database::Entity::S3::LambdaNotification Mapper::map(const LambdaConfiguration &lambdaConfigurationDto) {
+        Database::Entity::S3::LambdaNotification lambdaNotificationEntity;
+        lambdaNotificationEntity.id = lambdaConfigurationDto.id;
+        lambdaNotificationEntity.lambdaArn = lambdaConfigurationDto.lambdaArn;
+        lambdaNotificationEntity.events = map(lambdaConfigurationDto.events);
+        lambdaNotificationEntity.filterRules = map(lambdaConfigurationDto.filterRules);
+        return lambdaNotificationEntity;
+    }
+
     std::vector<Database::Entity::S3::LambdaNotification> Mapper::map(const std::vector<LambdaConfiguration> &lambdaConfigurationDtos) {
         std::vector<Database::Entity::S3::LambdaNotification> lambdaNotificationEntities;
         for (const auto &lambdaConfigurationDto: lambdaConfigurationDtos) {
-            Database::Entity::S3::LambdaNotification lambdaNotification;
-            lambdaNotification.id = lambdaConfigurationDto.id;
-            lambdaNotification.lambdaArn = lambdaConfigurationDto.lambdaArn;
-            lambdaNotification.events = map(lambdaConfigurationDto.events);
-            lambdaNotification.filterRules = map(lambdaConfigurationDto.filterRules);
+            Database::Entity::S3::LambdaNotification lambdaNotification = map(lambdaConfigurationDto);
             lambdaNotificationEntities.emplace_back(lambdaNotification);
         }
         return lambdaNotificationEntities;
