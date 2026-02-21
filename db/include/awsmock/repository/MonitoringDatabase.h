@@ -90,6 +90,8 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit = 10) const;
 
+        void UpdateMonitoringCounters();
+
         /**
          * @brief Returns list of label values by label name
          *

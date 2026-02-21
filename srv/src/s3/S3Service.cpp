@@ -571,6 +571,7 @@ namespace AwsMock::Service {
             // Check notifications
             CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
             log_debug << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
+
             Dto::S3::CompleteMultipartUploadResult response;
             response.location = request.region;
             response.bucket = request.bucket;
@@ -1334,7 +1335,7 @@ namespace AwsMock::Service {
         // Get queue URL
         const std::string queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queueNotification.queueArn);
 
-        SQSService _sqsService(_ioc);
+        const SQSService _sqsService(_ioc);
         Dto::SQS::SendMessageRequest request;
         request.region = region;
         request.queueUrl = queueUrl;
@@ -1676,4 +1677,4 @@ namespace AwsMock::Service {
         }
         return sContentType;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

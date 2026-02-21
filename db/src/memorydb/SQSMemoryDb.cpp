@@ -28,8 +28,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                   return queue.second.queueArn == queueArn;
-               }) != _queues.end();
+            return queue.second.queueArn == queueArn;
+        }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -180,6 +180,20 @@ namespace AwsMock::Database {
                                              });
         _queues[it->first] = queue;
         return _queues[it->first];
+    }
+
+    void SQSMemoryDb::UpdateQueueInvisibleNumber(const std::string &queueArn, long messageNumber) {
+        boost::mutex::scoped_lock lock(_sqsQueueMutex);
+
+        const auto it = std::ranges::find_if(_queues,
+                                             [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                                                 return queue.second.queueArn == queueArn;
+                                             });
+        if (it != _queues.end()) {
+            it->second.modified = system_clock::now();
+            it->second.attributes.approximateNumberOfMessages -= messageNumber;
+            it->second.attributes.approximateNumberOfMessagesNotVisible += messageNumber;
+        }
     }
 
     void SQSMemoryDb::UpdateQueueCounter(const std::string &queueArn, const long keys, const long size, long initial, const long invisible, const long delayed) {
@@ -606,4 +620,4 @@ namespace AwsMock::Database {
         log_debug << "All resources deleted, count: " << count;
         return count;
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

@@ -58,10 +58,19 @@ namespace AwsMock::Service {
                 Dto::Module::ExportInfrastructureRequest moduleRequest = Dto::Module::ExportInfrastructureRequest::FromJson(payload);
 
                 // Get modules
-                const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
+                const Dto::Module::ExportInfrastructureResponse moduleResponse = _moduleService.ExportInfrastructure(moduleRequest);
                 std::string json = moduleResponse.ToJson();
                 log_info << "Infrastructure send to client, size: " << json.length();
                 return SendResponse(request, http::status::ok, json);
+            }
+
+            if (action == "get-log-level") {
+
+                std::string currentLogLevel = Core::LogStream::GetSeverity();
+                log_info << "Current log level: '" << currentLogLevel << "'";
+
+                // Send response
+                return SendResponse(request, http::status::ok, currentLogLevel);
             }
 
             if (action == "ping") {
@@ -161,4 +170,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

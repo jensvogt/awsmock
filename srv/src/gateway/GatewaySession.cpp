@@ -5,7 +5,7 @@
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
-    GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
+ GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
         _bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
@@ -22,6 +22,7 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::DoRead() {
+
         // Construct a new parser for each message
         _parser.emplace();
         _buffer.clear();
@@ -39,6 +40,7 @@ namespace AwsMock::Service {
     }
 
     void GatewaySession::OnReadHeader(boost::beast::error_code ec, std::size_t) {
+
         if (ec) return DoClose();
 
         // Handle OPTIONS immediately
@@ -80,14 +82,12 @@ namespace AwsMock::Service {
             return DoClose();
 
         if (ec) {
-            // Log the specific error
-            if (ec == boost::beast::error::timeout) {
-                log_error << "GatewaySession: Operation timed out. Closing connection.";
-            } else {
-                log_error << "Read failed: " << ec.message();
-            }
-            log_error << "Read failed: closed";
-            return DoClose();
+            log_error << "Read failed: " << ec.message();
+            _buffer.commit(90000000);
+            std::cout << "--- ERROR BUFFER DUMP (" << _buffer.size() << " bytes) ---" << std::endl;
+            std::cout << boost::beast::buffers_to_string(_buffer.cdata()) << std::endl;
+            std::cout << "\n------------------------------------------" << std::endl;
+            return;
         }
 
         // Process the request that was just finished by the async operation
@@ -98,25 +98,21 @@ namespace AwsMock::Service {
             DoRead();
     }
 
-    // Return a response for the given request.
-    //
-    // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
+    // Return a response for the given request. The concrete type of the response message (which depends on the request)
+    // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
-            request.method() != http::verb::head && request.method() != http::verb::options &&
-            request.method() != http::verb::connect) {
+            request.method() != http::verb::head) {
             return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
         }
 
-        // Ping request
-        if (request.method() == http::verb::connect) {
-            log_debug << "Handle CONNECT request";
-            Monitoring::MonitoringTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
-            Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
-            return Core::HttpUtils::Ok(request);
+        // Request path must be absolute and not contain "..".
+        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
+            log_error << "Illegal request-target";
+            return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
         std::shared_ptr<AbstractHandler> handler;
@@ -275,4 +271,4 @@ namespace AwsMock::Service {
 
         QueueWrite(std::move(response));
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.14.16](https://github.com/jensvogt/awsmock/compare/1.14.15...v1.14.16) (2026-02-19)
+
+
+### Bug Fixes
+
+* SQS queue default attributes ([fbf9bce](https://github.com/jensvogt/awsmock/commit/fbf9bceec6888615cf512d8cadd87222dddfc551))
+
+## [1.14.15](https://github.com/jensvogt/awsmock/compare/v1.14.14...v1.14.15) (2026-02-19)
+
+
+### Bug Fixes
+
+* gateway issues ([c67358b](https://github.com/jensvogt/awsmock/commit/c67358b598d24eb6d63111dd1d358352c68eef11))
+* gateway issues ([a315aad](https://github.com/jensvogt/awsmock/commit/a315aad69a7a2fb84e4c7a10a7d92929762d2f67))
+
+## [1.14.14](https://github.com/jensvogt/awsmock/compare/1.14.13...v1.14.14) (2026-02-18)
+
+
+### Bug Fixes
+
+* get log level ([eb46f8d](https://github.com/jensvogt/awsmock/commit/eb46f8d35aee4bcbc127fcdb87466b9a09735adf))
+
+## [1.14.13](https://github.com/jensvogt/awsmock/compare/1.14.12...v1.14.13) (2026-02-18)
+
+
+### Bug Fixes
+
+* get log level ([5615924](https://github.com/jensvogt/awsmock/commit/5615924f6bd33aa2f7e1a5b4ee0d2085f3bd24e6))
+* get log level ([37c218c](https://github.com/jensvogt/awsmock/commit/37c218c0bc2bc9e4191866397956f91cb8585079))
+
+## [1.14.12](https://github.com/jensvogt/awsmock/compare/v1.14.11...v1.14.12) (2026-02-17)
+
+
+### Bug Fixes
+
+* keep alive settings ([a738b73](https://github.com/jensvogt/awsmock/commit/a738b73cb8bb20d14290bfa1ad69d6edf31731de))
+* keep alive settings ([dd822b9](https://github.com/jensvogt/awsmock/commit/dd822b97459866d92c79f7fb5f4e60fc20483937))
+* rebuild lambda ([5a040c0](https://github.com/jensvogt/awsmock/commit/5a040c0a49d5e1165e4bee9de42765235d03cc50))
+* rebuild lambda ([8ccd4ad](https://github.com/jensvogt/awsmock/commit/8ccd4ad06a1f1644e702193e8a356c7129f17f3a))
+
 ## [1.14.11](https://github.com/jensvogt/awsmock/compare/1.14.10...v1.14.11) (2026-02-17)
 
 

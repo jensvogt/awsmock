@@ -223,7 +223,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueueAttributeCountersResponse SQSService::ListQueueAttributeCounters(
-            const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
+        const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_queue_attribute_counters");
         log_trace << "List queue attribute counters request: " << request.ToString();
 
@@ -250,7 +250,7 @@ namespace AwsMock::Service {
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "approximateNumberOfMessagesNotVisible",
-            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
+                    attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "deadLetterTargetArn";
@@ -294,8 +294,8 @@ namespace AwsMock::Service {
                     endArray = response.attributeCounters.end();
                 }
                 response.attributeCounters = std::vector(
-                        response.attributeCounters.begin() + request.pageSize * request.pageIndex,
-                        endArray);
+                    response.attributeCounters.begin() + request.pageSize * request.pageIndex,
+                    endArray);
             }
             return response;
         } catch (Core::DatabaseException &ex) {
@@ -576,7 +576,7 @@ namespace AwsMock::Service {
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -958,7 +958,7 @@ namespace AwsMock::Service {
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -1150,14 +1150,14 @@ namespace AwsMock::Service {
                 }
             }
 
-            // Adjust queue attributes
-            queue.attributes.approximateNumberOfMessagesNotVisible += static_cast<long>(messageList.size());
-            queue = _sqsDatabase.UpdateQueue(queue);
-
             // Prepare response
             Dto::SQS::ReceiveMessageResponse response;
             response.requestId = request.requestId;
             if (!messageList.empty()) {
+
+                // Adjust queue attributes
+                _sqsDatabase.UpdateQueueReceiveNumbers(queueArn, messageList.size());
+
                 response.messageList = Dto::SQS::Mapper::map(messageList);
             }
             log_debug << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
@@ -1447,8 +1447,8 @@ namespace AwsMock::Service {
 
     bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
         return std::ranges::find_if(attributes, [&value](const std::string &attribute) {
-                   return Core::StringUtils::EqualsIgnoreCase(attribute, value);
-               }) != attributes.end();
+            return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+        }) != attributes.end();
     }
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
@@ -1486,4 +1486,4 @@ namespace AwsMock::Service {
         Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", sourceArn: " << eventSourceArn << ", result: " << result;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

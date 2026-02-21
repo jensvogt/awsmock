@@ -47,8 +47,7 @@ namespace AwsMock::Database {
      */
     class SQSDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -214,6 +213,14 @@ namespace AwsMock::Database {
          * @return updated queue
          */
         Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue) const;
+
+        /**
+         * @brief Increases the number of invisible messages
+         *
+         * @param queueArn queue ARN
+         * @param messageNumber number of invisible messages
+         */
+        void UpdateQueueReceiveNumbers(const std::string &queueArn, long messageNumber) const;
 
         /**
          * @brief Create a new queue or updates an existing queue
@@ -525,8 +532,7 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters() const;
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -548,6 +554,6 @@ namespace AwsMock::Database {
         SQSMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SQS_DATABASE_H

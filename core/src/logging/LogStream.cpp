@@ -7,12 +7,13 @@ namespace AwsMock::Core {
 
     long LogStream::logSize = DEFAULT_LOG_SIZE;
     int LogStream::logCount = DEFAULT_LOG_COUNT;
-    std::string LogStream::logDir;
-    std::string LogStream::logPrefix;
+    std::string LogStream::_logDir;
+    std::string LogStream::_logPrefix;
+    std::string LogStream::_currentLevel = "info";
     boost::log::trivial::severity_level LogStream::_severity;
-    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> LogStream::console_sink;
-    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> LogStream::file_sink;
-    boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> LogStream::_ws;
+    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> > LogStream::console_sink;
+    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> > LogStream::file_sink;
+    boost::shared_ptr<websocket::stream<beast::tcp_stream> > LogStream::_ws;
     boost::shared_ptr<LogWebsocketSink> LogStream::webSocketBackend(new LogWebsocketSink(_ws));
     boost::shared_ptr<webSocketSink_t> LogStream::webSocketSink(new webSocketSink_t(webSocketBackend));
 
@@ -28,7 +29,7 @@ namespace AwsMock::Core {
             return {func};
         }
 
-        for (const char *i = funcEnd - 1; i >= funcBegin; --i)// search backwards for the first space char
+        for (const char *i = funcEnd - 1; i >= funcBegin; --i) // search backwards for the first space char
         {
             if (*i == '>') {
                 foundTemplate++;
@@ -155,7 +156,12 @@ namespace AwsMock::Core {
         // }
     }
 
+    std::string LogStream::GetSeverity() {
+        return _currentLevel;
+    }
+
     void LogStream::SetSeverity(const std::string &lvl) {
+        _currentLevel = lvl;
         from_string(lvl.c_str(), lvl.length(), _severity);
         if (console_sink) {
             console_sink->set_filter(boost::log::trivial::severity >= _severity);
@@ -168,22 +174,22 @@ namespace AwsMock::Core {
     void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {
 #ifdef _WIN32
         file_sink = add_file_log(
-                boost::log::keywords::file_name = dir + "\\" + prefix + ".log ", boost::log::keywords::rotation_size = size,
-                boost::log::keywords::target_file_name = dir + "\\" + prefix + "_ % N.log ", boost::log::keywords::format = &LogFormatter);
+            boost::log::keywords::file_name = dir + "\\" + prefix + ".log ", boost::log::keywords::rotation_size = size,
+            boost::log::keywords::target_file_name = dir + "\\" + prefix + "_ % N.log ", boost::log::keywords::format = &LogFormatter);
 #else
         file_sink = add_file_log(
-                boost::log::keywords::file_name = dir + "/" + prefix + ".log",
-                boost::log::keywords::rotation_size = size,
-                boost::log::keywords::target_file_name = dir + "/" + prefix + "_%N.log",
-                boost::log::keywords::format = &LogColorFormatter);
+            boost::log::keywords::file_name = dir + "/" + prefix + ".log",
+            boost::log::keywords::rotation_size = size,
+            boost::log::keywords::target_file_name = dir + "/" + prefix + "_%N.log",
+            boost::log::keywords::format = &LogColorFormatter);
 #endif
 
         // Set level
         file_sink->set_filter(boost::log::trivial::severity >= _severity);
 
         file_sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
-                boost::log::keywords::target = dir,
-                boost::log::keywords::max_files = count));
+            boost::log::keywords::target = dir,
+            boost::log::keywords::max_files = count));
 
         file_sink->locked_backend()->scan_for_files();
 
@@ -192,7 +198,7 @@ namespace AwsMock::Core {
 
     void LogStream::AddWebSocket(websocket::stream<beast::tcp_stream> &ws) {
         const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
-        webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<websocket::stream<beast::tcp_stream>>(std::move(ws)));
+        webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<websocket::stream<beast::tcp_stream> >(std::move(ws)));
         webSocketSink = boost::make_shared<webSocketSink_t>(webSocketBackend);
         webSocketSink->set_formatter(&LogFormatter);
         webSocketSink->set_filter(boost::log::trivial::severity >= _severity);
@@ -225,4 +231,4 @@ namespace AwsMock::Core {
     void LogStream::RemoveConsoleLogs() {
         boost::log::core::get()->remove_sink(console_sink);
     }
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
