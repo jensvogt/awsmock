@@ -9,8 +9,6 @@ namespace AwsMock::Service {
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
-        log_debug << "S3 GET request, URI: " << request.target() << " region: " << clientCommand.region << " user: " + clientCommand.user;
-
         try {
             switch (clientCommand.command) {
                 case Dto::Common::S3CommandType::LIST_BUCKETS: {
@@ -259,6 +257,8 @@ namespace AwsMock::Service {
 
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
+
+        Core::HttpUtils::DumpRequest(request);
 
         try {
             switch (clientCommand.command) {

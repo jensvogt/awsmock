@@ -244,7 +244,7 @@ namespace AwsMock::Service {
     }
 
     void DynamoDbServer::BackupDynamoDb() {
-        ModuleService::BackupModule("dynamodb", true);
+        ModuleService::BackupModule("dynamodb", false);
     }
 
     void DynamoDbServer::Shutdown() {
