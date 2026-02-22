@@ -424,7 +424,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queueArn)),
                                                                           make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(messageNumber)))),
-                                                                                        kvp("$dec", make_document(kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(messageNumber))))));
+                                                                                        kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(-messageNumber))))));
                 session.commit_transaction();
                 log_trace << "Message counters updated, queueArn: " << queueArn;
 
@@ -1501,15 +1501,15 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.group(make_document(
-                    kvp("_id", "$queueArn"),
-                    kvp("size", make_document(kvp("$sum", "$size"))),
-                    kvp("total", make_document(kvp("$sum", 1))),
-                    kvp("initial", make_document(kvp("$sum",
-                                                     make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))), 1, 0)))))),
-                    kvp("invisible", make_document(kvp("$sum",
-                                                       make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)))), 1, 0)))))),
-                    kvp("delayed", make_document(kvp("$sum",
-                                                     make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)))), 1, 0))))))));
+                        kvp("_id", "$queueArn"),
+                        kvp("size", make_document(kvp("$sum", "$size"))),
+                        kvp("total", make_document(kvp("$sum", 1))),
+                        kvp("initial", make_document(kvp("$sum",
+                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))), 1, 0)))))),
+                        kvp("invisible", make_document(kvp("$sum",
+                                                           make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)))), 1, 0)))))),
+                        kvp("delayed", make_document(kvp("$sum",
+                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)))), 1, 0))))))));
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
@@ -1525,21 +1525,21 @@ namespace AwsMock::Database {
 
                 // Initialize all queues with zero message counts
                 queueCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                      kvp("size", bsoncxx::types::b_int64()),
-                                                                      kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
-                                                                      kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
-                                                                      kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64())))));
+                                                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                                                  kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
+                                                                                  kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
+                                                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64())))));
 
                 // Create a bulk write operation for queues with messages
                 auto bulk = queueCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                     bulk.append(mongocxx::model::update_one(
-                        make_document(kvp("queueArn", Core::Bson::BsonUtils::GetStringValue(t, "queueArn"))),
-                        make_document(kvp("$set", make_document(
-                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                              kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
-                                              kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
-                                              kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
+                            make_document(kvp("queueArn", Core::Bson::BsonUtils::GetStringValue(t, "queueArn"))),
+                            make_document(kvp("$set", make_document(
+                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                              kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                              kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
+                                                              kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
 
                     log_debug << "Queue: " << Core::Bson::BsonUtils::GetStringValue(t, "queueArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
@@ -1567,4 +1567,4 @@ namespace AwsMock::Database {
         }
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

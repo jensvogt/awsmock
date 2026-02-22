@@ -5,7 +5,7 @@
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
- GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
+    GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
         _bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
@@ -101,7 +101,7 @@ namespace AwsMock::Service {
     // Return a response for the given request. The concrete type of the response message (which depends on the request)
     // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -271,4 +271,4 @@ namespace AwsMock::Service {
 
         QueueWrite(std::move(response));
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
