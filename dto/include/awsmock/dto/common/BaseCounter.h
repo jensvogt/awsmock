@@ -5,15 +5,9 @@
 #ifndef AWSMOCK_DTO_COMMON_BASE_COUNTER_H
 #define AWSMOCK_DTO_COMMON_BASE_COUNTER_H
 
-// C++ standard includes
-#include <string>
-
 // Boost includes
 #include <boost/describe.hpp>
 #include <boost/json.hpp>
-#include <boost/mp11.hpp>
-#include <boost/proto/traits.hpp>
-#include <boost/version.hpp>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -21,6 +15,7 @@
 #include <awsmock/dto/common/BaseClientCommand.h>
 
 namespace AwsMock::Dto::Common {
+
     class BaseClientCommand;
 
     /**
@@ -33,11 +28,6 @@ namespace AwsMock::Dto::Common {
      */
     template<typename T>
     struct BaseCounter {
-
-        /**
-         * Destructor
-         */
-        virtual ~BaseCounter() = default;
 
         /**
          * Request ID
@@ -74,6 +64,7 @@ namespace AwsMock::Dto::Common {
          * @brief Convert from JSON representation
          *
          * @param jsonString JSON string
+         * @return object of class <T>
          */
         static T FromJson(const std::string &jsonString) {
             if (jsonString.empty()) {
@@ -109,14 +100,10 @@ namespace AwsMock::Dto::Common {
          * @brief Convert from JSON representation base inside client command
          *
          * @param clientCommand base client command
+         * @return object of class <T>
          */
         static T FromJson(const BaseClientCommand &clientCommand) {
-            T t = boost::json::value_to<T>(boost::json::parse(clientCommand.payload));
-            t.region = clientCommand.region;
-            t.user = clientCommand.user;
-            t.requestId = clientCommand.requestId;
-            t.contentType = clientCommand.contentType;
-            return t;
+            return FromJson(clientCommand.payload);
         }
 
 #ifndef _WIN32
@@ -160,8 +147,7 @@ namespace AwsMock::Dto::Common {
             return os;
         }
 
-      private:
-
+    private:
         /**
          * brief Deserialization
          *
@@ -184,13 +170,13 @@ namespace AwsMock::Dto::Common {
          */
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, BaseCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
             };
         }
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_BASE_COUNTER_H

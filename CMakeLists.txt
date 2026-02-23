@@ -57,7 +57,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/utils/DateTimeUtils.cpp core/src/utils/CryptoUtils.cpp core/src/utils/AwsUtils.cpp
         core/src/utils/SystemUtils.cpp core/src/utils/TarUtils.cpp core/src/utils/RandomUtils.cpp
         core/src/utils/TestUtils.cpp core/src/utils/HttpUtils.cpp core/src/utils/NumberUtils.cpp
-        core/src/utils/MemoryMappedFile.cpp core/src/utils/XmlUtils.cpp core/src/utils/UnixSocket.cpp
+        core/src/utils/XmlUtils.cpp core/src/utils/UnixSocket.cpp
         core/src/utils/HttpSocket.cpp core/src/utils/JwtUtils.cpp core/src/scheduler/PeriodicTask.cpp
         core/src/scheduler/Scheduler.cpp core/src/utils/BackupUtils.cpp core/src/config/Configuration.cpp
         core/src/utils/SrpUtils.cpp core/src/utils/DomainSocket.cpp core/src/scheduler/CronTask.cpp
