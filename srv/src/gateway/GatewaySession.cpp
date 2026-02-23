@@ -101,7 +101,7 @@ namespace AwsMock::Service {
     // Return a response for the given request. The concrete type of the response message (which depends on the request)
     // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -214,9 +214,6 @@ namespace AwsMock::Service {
         // Send a TCP shutdown
         boost::beast::error_code ec;
         ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
-        if (ec) {
-            log_error << "Error closing connection: " << ec.message();
-        }
         // At this point the connection is closed gracefully
     }
 
@@ -275,4 +272,4 @@ namespace AwsMock::Service {
         QueueWrite(std::move(response));
         log_debug << "Options request answered";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

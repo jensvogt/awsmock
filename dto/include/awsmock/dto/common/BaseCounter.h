@@ -28,6 +28,7 @@ namespace AwsMock::Dto::Common {
      */
     template<typename T>
     struct BaseCounter {
+        virtual ~BaseCounter() = default;
 
         /**
          * Request ID
@@ -75,24 +76,30 @@ namespace AwsMock::Dto::Common {
             if (jv.is_array()) {
                 return t;
             }
-            if (Core::Json::AttributeExists(jv, "region")) {
-                t.region = Core::Json::GetStringValue(jv, "region");
+            return t;
+        }
+
+        /**
+         * @brief Convert from JSON representation
+         *
+         * @param jsonString JSON string
+         * @param region
+         * @param user
+         * @param requestId
+         * @return object of class <T>
+         */
+        static T FromJson(const std::string &jsonString, const std::string &region, const std::string &user, const std::string &requestId) {
+            if (jsonString.empty()) {
+                return {};
             }
-            if (Core::Json::AttributeExists(jv, "Region")) {
-                t.region = Core::Json::GetStringValue(jv, "Region");
+            const boost::json::value jv = boost::json::parse(jsonString);
+            T t = boost::json::value_to<T>(jv);
+            if (jv.is_array()) {
+                return t;
             }
-            if (Core::Json::AttributeExists(jv, "user")) {
-                t.user = Core::Json::GetStringValue(jv, "user");
-            }
-            if (Core::Json::AttributeExists(jv, "User")) {
-                t.user = Core::Json::GetStringValue(jv, "User");
-            }
-            if (Core::Json::AttributeExists(jv, "requestId")) {
-                t.requestId = Core::Json::GetStringValue(jv, "requestId");
-            }
-            if (Core::Json::AttributeExists(jv, "RequestId")) {
-                t.requestId = Core::Json::GetStringValue(jv, "RequestId");
-            }
+            t.region = region;
+            t.user = user;
+            t.requestId = requestId;
             return t;
         }
 
@@ -103,7 +110,7 @@ namespace AwsMock::Dto::Common {
          * @return object of class <T>
          */
         static T FromJson(const BaseClientCommand &clientCommand) {
-            return FromJson(clientCommand.payload);
+            return FromJson(clientCommand.payload, clientCommand.region, clientCommand.user, clientCommand.requestId);
         }
 
 #ifndef _WIN32
@@ -147,7 +154,8 @@ namespace AwsMock::Dto::Common {
             return os;
         }
 
-    private:
+      private:
+
         /**
          * brief Deserialization
          *
@@ -170,13 +178,13 @@ namespace AwsMock::Dto::Common {
          */
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, BaseCounter const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
             };
         }
     };
 
-} // namespace AwsMock::Dto::Common
+}// namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_BASE_COUNTER_H
