@@ -18,6 +18,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Apps {
+
     using std::chrono::system_clock;
 
     /**
@@ -26,6 +27,7 @@ namespace AwsMock::Dto::Apps {
      * @author jens.vogt\@opitz-consulting.com
      */
     struct Application final : Common::BaseCounter<Application> {
+
         /**
          * Application name
          */

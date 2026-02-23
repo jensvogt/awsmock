@@ -101,7 +101,7 @@ namespace AwsMock::Service {
     // Return a response for the given request. The concrete type of the response message (which depends on the request)
     // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -213,7 +213,10 @@ namespace AwsMock::Service {
     void GatewaySession::DoClose() {
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        if (ec) {
+            log_error << "Error closing connection: " << ec.message();
+        }
         // At this point the connection is closed gracefully
     }
 
@@ -259,7 +262,7 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_methods, "GET, POST, PUT, DELETE, OPTIONS");
 
         // Combine all allowed headers into ONE string.
-        response.set(http::field::access_control_allow_headers, "Content-Type, Authorization, X-Requested-With, x-awsmock-action, x-awsmock-target");
+        response.set(http::field::access_control_allow_headers, "*");
         response.set(http::field::access_control_max_age, "86400");
 
         // Add request headers
@@ -270,5 +273,6 @@ namespace AwsMock::Service {
         response.prepare_payload();
 
         QueueWrite(std::move(response));
+        log_debug << "Options request answered";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

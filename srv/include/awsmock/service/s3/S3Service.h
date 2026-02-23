@@ -16,7 +16,6 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -94,13 +93,12 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {
-                                                           };
+        };
 
         /**
          * @brief Checks whether a bucket exists
@@ -216,6 +214,7 @@ namespace AwsMock::Service {
          * @param request get bucket lifecycle configuration request
          */
         Dto::S3::GetBucketLifecycleConfigurationResponse GetBucketLifecycleConfiguration(const Dto::S3::GetBucketLifecycleConfigurationRequest &request) const;
+
         void DeleteBucketLifecycle(const Dto::S3::DeleteBucketLifecycleRequest &request) const;
 
         /**
@@ -405,8 +404,7 @@ namespace AwsMock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
@@ -582,6 +580,6 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context _ioc;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H
