@@ -104,7 +104,7 @@ namespace AwsMock::Dto::Common {
         }
 
         /**
-         * @brief Convert from JSON representation base inside client command
+         * @brief Convert payload from client command in JSON format
          *
          * @param clientCommand base client command
          * @return object of class <T>
