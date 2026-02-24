@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.18](https://github.com/jensvogt/awsmock/compare/1.14.17...v1.14.18) (2026-02-23)
+
+
+### Bug Fixes
+
+* SQS queue default attributes ([42eecf3](https://github.com/jensvogt/awsmock/commit/42eecf3ab6beeeaff8cc82b0e6a3de32072d4eb6))
+* SQS queue default attributes ([aff3b65](https://github.com/jensvogt/awsmock/commit/aff3b658cb3bedf9580e294e20e62ab00558b550))
+
 ## [1.14.17](https://github.com/jensvogt/awsmock/compare/1.14.16...v1.14.17) (2026-02-22)
 
 
