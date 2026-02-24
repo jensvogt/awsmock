@@ -99,15 +99,15 @@ namespace AwsMock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ReceiveMessageRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"queueUrl", obj.queueUrl},
-                    {"maxMessages", obj.maxMessages},
-                    {"visibilityTimeout", obj.visibilityTimeout},
-                    {"waitTimeSeconds", obj.waitTimeSeconds},
-                    {"attributeNames", boost::json::value_from(obj.attributeNames)},
-                    {"messageAttributeNames", boost::json::value_from(obj.messageAttributeNames)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueUrl", obj.queueUrl},
+                    {"MaxMessages", obj.maxMessages},
+                    {"VisibilityTimeout", obj.visibilityTimeout},
+                    {"WaitTimeSeconds", obj.waitTimeSeconds},
+                    {"AttributeNames", boost::json::value_from(obj.attributeNames)},
+                    {"MessageAttributeNames", boost::json::value_from(obj.messageAttributeNames)},
             };
         }
     };
