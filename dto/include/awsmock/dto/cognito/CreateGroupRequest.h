@@ -63,24 +63,24 @@ namespace AwsMock::Dto::Cognito {
 
         friend CreateGroupRequest tag_invoke(boost::json::value_to_tag<CreateGroupRequest>, boost::json::value const &v) {
             CreateGroupRequest r;
-            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
-            r.groupName = Core::Json::GetStringValue(v, "groupName");
-            r.description = Core::Json::GetStringValue(v, "description");
-            r.precedence = Core::Json::GetLongValue(v, "precedence");
-            r.roleArn = Core::Json::GetStringValue(v, "roleArn");
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.groupName = Core::Json::GetStringValue(v, "GroupName");
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.precedence = Core::Json::GetLongValue(v, "Precedence");
+            r.roleArn = Core::Json::GetStringValue(v, "RoleArn");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateGroupRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"userPoolId", obj.userPoolId},
-                    {"groupName", obj.groupName},
-                    {"description", obj.description},
-                    {"precedence", obj.precedence},
-                    {"roleArn", obj.roleArn},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+                    {"GroupName", obj.groupName},
+                    {"Description", obj.description},
+                    {"Precedence", obj.precedence},
+                    {"RoleArn", obj.roleArn},
             };
         }
     };

@@ -21,11 +21,12 @@ namespace AwsMock::Service {
     }
 
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
-        if (const auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/images/" + name + ":" + tag + "/json", {}, {}); statusCode == http::status::ok) {
+        const Core::DomainSocketResult result = _domainSocket->SendJson(http::verb::get, "/images/" + name + ":" + tag + "/json", {}, {});
+        if (result.statusCode == http::status::ok) {
             log_debug << "Docker image found, name: " << name << ":" << tag;
             return true;
         }
-        log_warning << "Image does not exists, name: " << name << ":" << tag;
+        log_warning << "Image does not exists, name: " << name << ":" << tag << ", httpStatus: " << result.statusCode;
         return false;
     }
 

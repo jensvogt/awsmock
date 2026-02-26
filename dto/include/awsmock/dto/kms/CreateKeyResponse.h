@@ -70,13 +70,13 @@ namespace AwsMock::Dto::KMS {
         /**
          * Key metadata
          */
-        Key key;
+        Key keyMetadata;
 
       private:
 
         friend CreateKeyResponse tag_invoke(boost::json::value_to_tag<CreateKeyResponse>, boost::json::value const &v) {
             CreateKeyResponse r;
-            r.key = boost::json::value_to<Key>(v.at("Key"));
+            r.keyMetadata = boost::json::value_to<Key>(v.at("KeyMetadata"));
             return r;
         }
 
@@ -85,7 +85,7 @@ namespace AwsMock::Dto::KMS {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Key", boost::json::value_from(obj.key)},
+                    {"KeyMetadata", boost::json::value_from(obj.keyMetadata)},
             };
         }
     };

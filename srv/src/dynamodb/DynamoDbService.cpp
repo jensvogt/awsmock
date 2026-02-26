@@ -305,11 +305,11 @@ namespace AwsMock::Service {
 
     Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "put_item");
-        log_debug << "Start put item, region: " << request.region << " name: " << request.tableName;
+        log_info << "Start put item, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
+            throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         }
 
         try {

@@ -99,6 +99,7 @@ namespace AwsMock::Dto::Cognito {
         userPoolDto.user = userPoolEntity.userPoolId;
         userPoolDto.region = userPoolEntity.region;
         userPoolDto.name = userPoolEntity.name;
+        userPoolDto.userPoolId = userPoolEntity.userPoolId;
         userPoolDto.created = userPoolEntity.created;
         userPoolDto.modified = userPoolEntity.modified;
         return userPoolDto;
@@ -144,10 +145,31 @@ namespace AwsMock::Dto::Cognito {
         return userDto;
     }
 
-    std::vector<UserCounter> Mapper::map(const std::vector<Database::Entity::Cognito::User> &userEntities) {
+    std::vector<UserCounter> Mapper::mapCounter(const std::vector<Database::Entity::Cognito::User> &userEntities) {
         std::vector<UserCounter> userDtos;
         for (const auto &userEntity: userEntities) {
             UserCounter userDto;
+            userDto.region = userEntity.region;
+            userDto.userPoolId = userEntity.userPoolId;
+            userDto.userName = userEntity.userName;
+            userDto.enabled = userEntity.enabled;
+            userDto.userStatus = userEntity.userStatus;
+            userDto.password = userEntity.password;
+            userDto.created = userEntity.created;
+            userDto.modified = userEntity.modified;
+
+            for (const auto &group: userEntity.groups) {
+                userDto.groups.emplace_back(map(group));
+            }
+            userDtos.emplace_back(userDto);
+        }
+        return userDtos;
+    }
+
+    std::vector<User> Mapper::map(const std::vector<Database::Entity::Cognito::User> &userEntities) {
+        std::vector<User> userDtos;
+        for (const auto &userEntity: userEntities) {
+            User userDto;
             userDto.region = userEntity.region;
             userDto.userPoolId = userEntity.userPoolId;
             userDto.userName = userEntity.userName;

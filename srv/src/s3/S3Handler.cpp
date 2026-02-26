@@ -258,7 +258,7 @@ namespace AwsMock::Service {
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
-        Core::HttpUtils::DumpRequest(request);
+        //Core::HttpUtils::DumpRequest(request);
 
         try {
             switch (clientCommand.command) {
@@ -347,7 +347,9 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
                     std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-                    long contentLength = std::stol(request.base()[http::field::content_length]);
+                    // TODO: remove
+                    Core::HttpUtils::DumpHeaders(request);
+                    long contentLength = std::stol(request.base()["x-amz-decoded-content-length"]);
                     log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
                     // If chunked, we take the content length from the decoded content length header field.

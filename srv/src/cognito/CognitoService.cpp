@@ -315,7 +315,7 @@ namespace AwsMock::Service {
             std::string clientId = request.clientId;
             const auto it = std::ranges::find_if(userPool.userPoolClients,
                                                  [clientId](
-                                                 const Database::Entity::Cognito::UserPoolClient &userPoolClient) {
+                                                         const Database::Entity::Cognito::UserPoolClient &userPoolClient) {
                                                      return userPoolClient.clientId == clientId;
                                                  });
 
@@ -406,8 +406,7 @@ namespace AwsMock::Service {
 
             Dto::Cognito::AdminCreateUserResponse response;
             response.region = user.region;
-            response.userName = user.userName;
-            response.enabled = user.enabled;
+            response.user = Dto::Cognito::Mapper::map(user);
             log_trace << "Create user response: " + response.ToJson();
             return response;
 
@@ -570,7 +569,7 @@ namespace AwsMock::Service {
             const std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             log_trace << "Got user list counters, count: " << users.size();
             Dto::Cognito::ListUserCountersResponse response;
-            response.users = Dto::Cognito::Mapper::map(users);
+            response.users = Dto::Cognito::Mapper::mapCounter(users);
             response.total = total;
             return response;
         } catch (bsoncxx::exception &exc) {
