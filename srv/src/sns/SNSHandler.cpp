@@ -189,7 +189,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
                     Dto::SNS::DeleteTopicRequest snsRequest;
-                    if (clientCommand.contentType.starts_with("application/x-www-form-urlencoded")) {
+                    if (format == FORMAT_XML) {
                         snsRequest.region = clientCommand.region;
                         snsRequest.user = clientCommand.user;
                         snsRequest.requestId = clientCommand.requestId;
