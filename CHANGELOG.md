@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.20](https://github.com/jensvogt/awsmock/compare/1.14.19...v1.14.20) (2026-02-26)
+
+
+### Bug Fixes
+
+* keep alive settings ([6e17825](https://github.com/jensvogt/awsmock/commit/6e17825f9b846d0b8cc1e25a472ff252ae331920))
+
 ## [1.14.19](https://github.com/jensvogt/awsmock/compare/v1.14.18...v1.14.19) (2026-02-24)
 
 
