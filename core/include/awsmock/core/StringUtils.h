@@ -29,6 +29,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/url/decode_view.hpp>
 #include <boost/url/encode.hpp>
+#include <boost/url/rfc/pchars.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 

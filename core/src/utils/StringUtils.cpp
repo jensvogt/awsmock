@@ -211,6 +211,11 @@ namespace AwsMock::Core {
     }
 
     std::string StringUtils::UrlEncode(const std::string &input) {
+        boost::urls::encoding_opts opt;
+        opt.space_as_plus = true;
+        return boost::urls::encode(input, boost::urls::pchars, opt);
+        // TODO: remove if testet
+        /*
         std::ostringstream escaped;
         escaped.fill('0');
         escaped << std::hex;
@@ -218,7 +223,7 @@ namespace AwsMock::Core {
         for (const char c: input) {
             if (c == '"' || c == '\'' || c == '!' || c == '*' || c == '(' || c == ')' || c == ';' || c == ':' || c == '@' || c == '&' || c == '=' ||
                 c == '+' || c == '$' || c == ',' || c == '?' || c == '#' || c == '[' || c == ']' || c == ' ' || c == '\n' || c == '{' || c == '}' ||
-                c == '|' || c == '*') {
+                c == '|') {
                 // Any other characters are percent-encoded
                 escaped << std::uppercase;
                 escaped << '%' << std::setw(2) << static_cast<int>(static_cast<unsigned char>(c));
@@ -227,7 +232,13 @@ namespace AwsMock::Core {
                 escaped << c;
             }
         }
-        return escaped.str();
+        return escaped.str();*/
+    }
+
+    std::string StringUtils::UrlDecode(const std::string &input) {
+        boost::urls::encoding_opts opt;
+        opt.space_as_plus = true;
+        return boost::to_string(boost::urls::decode_view(input, opt));
     }
 
     void StringUtils::Replace(std::string &target, const std::string &pattern, const std::string &replacement) {
@@ -236,10 +247,6 @@ namespace AwsMock::Core {
 
     std::string StringUtils::Continuation(const std::string &input, const int length) {
         return input.substr(0, length) + "...";
-    }
-
-    std::string StringUtils::UrlDecode(const std::string &input) {
-        return boost::to_string(boost::urls::decode_view(input));
     }
 
     std::string StringUtils::Quoted(const std::string &input) {
