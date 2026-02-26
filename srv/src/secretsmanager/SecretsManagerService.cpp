@@ -678,8 +678,8 @@ namespace AwsMock::Service {
         kmsRequest.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
         kmsRequest.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
         const Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
-        _kmsService.WaitForAesKey(kmsResponse.key.keyId, 5);
-        secret.kmsKeyId = kmsResponse.key.keyId;
+        _kmsService.WaitForAesKey(kmsResponse.keyMetadata.keyId, 5);
+        secret.kmsKeyId = kmsResponse.keyMetadata.keyId;
     }
 
     void SecretsManagerService::EncryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const {

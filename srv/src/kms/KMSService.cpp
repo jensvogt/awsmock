@@ -129,7 +129,7 @@ namespace AwsMock::Service {
             key.keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState);
             key.description = keyEntity.description;
             Dto::KMS::CreateKeyResponse response;
-            response.key = key;
+            response.keyMetadata = key;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -224,7 +224,7 @@ namespace AwsMock::Service {
             response.requestId = request.requestId;
             response.region = request.region;
             response.user = request.user;
-            response.key = key;
+            response.keyMetadata = key;
             return response;
 
         } catch (Core::DatabaseException &exc) {

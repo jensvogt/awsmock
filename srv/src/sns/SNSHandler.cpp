@@ -8,11 +8,12 @@ namespace AwsMock::Service {
         try {
             Dto::Common::SNSClientCommand clientCommand;
             clientCommand.FromRequest(request, region, user);
+            int format = Core::StringUtils::Contains(clientCommand.contentType, "application/x-www-form-urlencoded") ? FORMAT_XML : FORMAT_JSON;
 
             switch (clientCommand.command) {
                 case Dto::Common::SNSCommandType::CREATE_TOPIC: {
                     Dto::SNS::CreateTopicRequest snsRequest;
-                    if (Core::StringUtils::Contains(clientCommand.contentType, "x-www-form-urlencoded")) {
+                    if (format == FORMAT_XML) {
                         snsRequest.region = region;
                         snsRequest.owner = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Owner");
                         snsRequest.topicName = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Name");
@@ -38,14 +39,13 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
                     std::string topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
-
                     Dto::SNS::GetTopicAttributesRequest snsRequest;
                     snsRequest.region = clientCommand.region;
                     snsRequest.topicArn = topicArn;
                     Dto::SNS::GetTopicAttributesResponse snsResponse = _snsService.GetTopicAttributes(snsRequest);
 
                     log_info << "Get topic attributes, topicArn" << topicArn;
-                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
+                    return SendResponse(request, http::status::ok, format == FORMAT_XML ? snsResponse.ToXml() : snsResponse.ToJson());
                 }
 
                 case Dto::Common::SNSCommandType::GET_TOPIC_DETAILS: {
@@ -188,7 +188,15 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
-                    Dto::SNS::DeleteTopicRequest snsRequest = Dto::SNS::DeleteTopicRequest::FromJson(clientCommand.payload);
+                    Dto::SNS::DeleteTopicRequest snsRequest;
+                    if (clientCommand.contentType.starts_with("application/x-www-form-urlencoded")) {
+                        snsRequest.region = clientCommand.region;
+                        snsRequest.user = clientCommand.user;
+                        snsRequest.requestId = clientCommand.requestId;
+                        snsRequest.topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
+                    } else {
+                        snsRequest = Dto::SNS::DeleteTopicRequest::FromJson(clientCommand.payload);
+                    }
                     Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(snsRequest);
                     log_info << "Topic deleted, topicArn: " << snsRequest.topicArn;
                     return SendResponse(request, http::status::ok, snsResponse.ToXml());

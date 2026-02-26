@@ -51,10 +51,10 @@ namespace AwsMock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateGroupResponse const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"userPoolId", boost::json::value_from(obj.group)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Group", boost::json::value_from(obj.group)},
             };
         }
     };
