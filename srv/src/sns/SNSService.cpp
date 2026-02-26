@@ -742,8 +742,11 @@ namespace AwsMock::Service {
     void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
+        // Convert from URL to ARN, as the URL has the port in it, which does not work when we use a random port (i.e. awsmock-container)
+        std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, subscription.endpoint);
+
         // Get queue by ARN
-        const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByUrl(request.region, subscription.endpoint);
+        const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByArn(queueArn);
         log_debug << "Found queue, queueUrl: " << sqsQueue.name;
 
         // Create a SQS notification request
