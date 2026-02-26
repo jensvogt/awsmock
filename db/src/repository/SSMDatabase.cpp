@@ -154,12 +154,8 @@ namespace AwsMock::Database {
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Parameter count failed, error: " << e.what();
             }
-
-        } else {
-
-            return _memoryDb.CountParameters();
         }
-        return -1;
+        return _memoryDb.CountParameters();
     }
 
     Entity::SSM::Parameter SSMDatabase::CreateParameter(Entity::SSM::Parameter &parameter) const {
