@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.14.24](https://github.com/jensvogt/awsmock/compare/v1.14.23...v1.14.24) (2026-02-27)
+
+
+### Bug Fixes
+
+* synchronous hash algorithm ([4e29cb7](https://github.com/jensvogt/awsmock/commit/4e29cb7eaebe5364bfa8fb872dd7122f345f0fa7))
+
+## [1.14.23](https://github.com/jensvogt/awsmock/compare/1.14.22...v1.14.23) (2026-02-27)
+
+
+### Bug Fixes
+
+* add magic.mgc to docker image ([1041dd4](https://github.com/jensvogt/awsmock/commit/1041dd4cd5726f6f01e22ef3acc647483a4c042c))
+
+## [1.14.22](https://github.com/jensvogt/awsmock/compare/v1.14.21...v1.14.22) (2026-02-26)
+
+
+### Bug Fixes
+
+* keep alive settings ([2524bc4](https://github.com/jensvogt/awsmock/commit/2524bc4ee7c8356cd1d2837d05f0db8ba095c302))
+
+## [1.14.21](https://github.com/jensvogt/awsmock/compare/1.14.20...v1.14.21) (2026-02-26)
+
+
+### Bug Fixes
+
+* keep alive settings ([8aac559](https://github.com/jensvogt/awsmock/commit/8aac559a7f48a17df53c04043e9da7420e79e1d5))
+
+## [1.14.20](https://github.com/jensvogt/awsmock/compare/1.14.19...v1.14.20) (2026-02-26)
+
+
+### Bug Fixes
+
+* keep alive settings ([6e17825](https://github.com/jensvogt/awsmock/commit/6e17825f9b846d0b8cc1e25a472ff252ae331920))
+
+## [1.14.19](https://github.com/jensvogt/awsmock/compare/v1.14.18...v1.14.19) (2026-02-24)
+
+
+### Bug Fixes
+
+* keep alive settings ([8e8ef51](https://github.com/jensvogt/awsmock/commit/8e8ef51ad0f8e49d3e825e1a2f53f90f580701d6))
+
 ## [1.14.18](https://github.com/jensvogt/awsmock/compare/1.14.17...v1.14.18) (2026-02-23)
 
 
