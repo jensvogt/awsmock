@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.23](https://github.com/jensvogt/awsmock/compare/1.14.22...v1.14.23) (2026-02-27)
+
+
+### Bug Fixes
+
+* add magic.mgc to docker image ([1041dd4](https://github.com/jensvogt/awsmock/commit/1041dd4cd5726f6f01e22ef3acc647483a4c042c))
+
 ## [1.14.22](https://github.com/jensvogt/awsmock/compare/v1.14.21...v1.14.22) (2026-02-26)
 
 
