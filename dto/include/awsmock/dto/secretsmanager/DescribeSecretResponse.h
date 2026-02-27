@@ -12,7 +12,6 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/ReplicationStatus.h>
-#include <awsmock/dto/secretsmanager/model/SecretTags.h>
 #include <awsmock/dto/secretsmanager/model/Tag.h>
 #include <awsmock/dto/secretsmanager/model/VersionIdsToStages.h>
 
