@@ -425,44 +425,32 @@ namespace AwsMock::Service {
 
             case Dto::KMS::KeySpec::HMAC_224: {
 
-                // Preparation
-                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-
                 // Encryption
-                std::string ciphertext = Core::Crypto::GetHmacSha224FromString(key.hmac224Key, rawPlaintext);
+                const std::string ciphertext = Core::Crypto::GetHmacSha224FromString(key.hmac224Key, Core::Crypto::Base64Decode(plainText));
                 log_debug << "Encrypted plaintext, hashedTextLength: " << ciphertext.size();
-                return Core::Crypto::Base64Encode({ciphertext, ciphertext.size()});
+                return Core::Crypto::Base64Encode({ciphertext.c_str(), ciphertext.size()});
             }
 
             case Dto::KMS::KeySpec::HMAC_256: {
 
-                // Preparation
-                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-
                 // Encryption
-                std::string ciphertext = Core::Crypto::GetHmacSha256FromString(key.hmac256Key, rawPlaintext);
+                const std::string ciphertext = Core::Crypto::GetHmacSha256FromString(key.hmac256Key, Core::Crypto::Base64Decode(plainText));
                 log_debug << "Encrypted plaintext, hashedTextLength: " << ciphertext.size();
-                return Core::Crypto::Base64Encode({ciphertext, ciphertext.size()});
+                return Core::Crypto::Base64Encode({ciphertext.c_str(), ciphertext.size()});
             }
 
             case Dto::KMS::KeySpec::HMAC_384: {
 
-                // Preparation
-                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-
                 // Encryption
-                std::string ciphertext = Core::Crypto::GetHmacSha384FromString(key.hmac384Key, rawPlaintext);
+                const std::string ciphertext = Core::Crypto::GetHmacSha384FromString(key.hmac384Key, Core::Crypto::Base64Decode(plainText));
                 log_debug << "Encrypted plaintext, hashedTextLength: " << ciphertext.size();
                 return Core::Crypto::Base64Encode({ciphertext.c_str(), ciphertext.size()});
             }
 
             case Dto::KMS::KeySpec::HMAC_512: {
 
-                // Preparation
-                const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-
                 // Encryption
-                const std::string ciphertext = Core::Crypto::GetHmacSha512FromString(key.hmac512Key, rawPlaintext);
+                const std::string ciphertext = Core::Crypto::GetHmacSha512FromString(key.hmac512Key, Core::Crypto::Base64Decode(plainText));
                 log_debug << "Encrypted plaintext, hashedTextLength: " << ciphertext.size();
                 return Core::Crypto::Base64Encode({ciphertext.c_str(), ciphertext.size()});
             }

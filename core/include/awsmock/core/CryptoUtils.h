@@ -92,14 +92,6 @@ namespace AwsMock::Core {
         static std::string GetMd5FromString(const std::string &content);
 
         /**
-         * @brief Returns the MD5 hash of a string.
-         *
-         * @param content string to hash
-         * @return MD5 hash of the given string
-         */
-        static std::string GetMd5FromString(const unsigned char *content);
-
-        /**
          * @brief Returns the MD5 hash of a file.
          *
          * @param fileName file name to hash

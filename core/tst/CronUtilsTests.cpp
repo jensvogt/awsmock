@@ -2,11 +2,11 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_CRON_UTILS_TEST_H
-#define AWMOCK_CORE_CRON_UTILS_TEST_H
-
 // C++ includes
 #include <chrono>
+
+// Boost include
+#include <boost/test/unit_test.hpp>
 
 // AwsMock includes
 #include <awsmock/core/CronUtils.h>
@@ -21,7 +21,7 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const system_clock::time_point datetime = CronUtils::GetNextExecutionTime("0 0 0 * * ?") + std::chrono::hours(2);
+        const system_clock::time_point datetime = CronUtils::GetNextExecutionTime("0 0 0 * * ?") + std::chrono::hours(1);
         const system_clock::time_point midnight = std::chrono::ceil<std::chrono::days>(system_clock::now());
 
         // assert
@@ -33,7 +33,7 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const long datetimeSeconds = CronUtils::GetNextExecutionTimeSeconds("0 0 0 * * ?") + 7200;
+        const long datetimeSeconds = CronUtils::GetNextExecutionTimeSeconds("0 0 0 * * ?") + 3600;
         const system_clock::time_point midnight = std::chrono::ceil<std::chrono::days>(system_clock::now());
         const long seconds = std::chrono::duration_cast<std::chrono::seconds>(midnight - system_clock::now()).count();
 
@@ -42,5 +42,3 @@ namespace AwsMock::Core {
     }
 
 }// namespace AwsMock::Core
-
-#endif// AWMOCK_CORE_CRON_UTILS_TEST_H
