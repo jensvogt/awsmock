@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.26](https://github.com/jensvogt/awsmock/compare/1.14.25...v1.14.26) (2026-02-27)
+
+
+### Bug Fixes
+
+* change sha1/sha256 algorithms ([32a8cc4](https://github.com/jensvogt/awsmock/commit/32a8cc49039051a10eb0bc48437e5cb05d4df7fb))
+
 ## [1.14.25](https://github.com/jensvogt/awsmock/compare/v1.14.24...v1.14.25) (2026-02-27)
 
 
