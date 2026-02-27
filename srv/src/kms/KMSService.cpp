@@ -455,7 +455,7 @@ namespace AwsMock::Service {
                 unsigned int hashLen = 0;
 
                 // Encryption
-                ciphertext = Core::Crypto::GetHmacSha384FromString(key.hmac384Key, rawPlaintext, &hashLen);
+                ciphertext = Core::Crypto::GetHmacSha384FromString(key.hmac384Key, rawPlaintext);
                 log_debug << "Encrypted plaintext, length: " << hashLen;
                 return Core::Crypto::Base64Encode({ciphertext.c_str(), static_cast<size_t>(hashLen)});
             }
@@ -467,7 +467,7 @@ namespace AwsMock::Service {
                 unsigned int hashLen = 0;
 
                 // Encryption
-                const std::string ciphertext = Core::Crypto::GetHmacSha512FromString(key.hmac512Key, rawPlaintext, &hashLen);
+                const std::string ciphertext = Core::Crypto::GetHmacSha512FromString(key.hmac512Key, rawPlaintext);
                 log_debug << "HMAC hashed plaintext, length: " << hashLen;
                 std::string tmp = ciphertext.substr(0, hashLen * 2);
                 return Core::Crypto::Base64Encode(ciphertext.substr(0, hashLen * 2));
