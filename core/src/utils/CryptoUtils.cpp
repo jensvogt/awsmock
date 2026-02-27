@@ -82,7 +82,33 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::GetSha1FromFile(const std::string &fileName) {
+        std::ifstream file(fileName, std::ios::binary);
+        if (!file) {
+            log_error << "Could not open file: " << fileName;
+            return "Error: Could not open file";
+        }
 
+        boost::uuids::detail::sha1 sha1;
+        std::vector<char> buffer(AWSMOCK_BUFFER_SIZE);
+
+        while (file.read(buffer.data(), buffer.size()) || file.gcount() > 0) {
+            sha1.process_bytes(buffer.data(), file.gcount());
+        }
+
+        // Modern Boost uses 20 bytes (unsigned char) for the digest
+        boost::uuids::detail::sha1::digest_type digest;
+        sha1.get_digest(digest);
+
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+
+        for (unsigned char i: digest) {
+            result << std::setw(2) << static_cast<int>(i);
+        }
+
+        return result.str();
+
+        /*
         const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
@@ -106,7 +132,7 @@ namespace AwsMock::Core {
         EVP_MD_CTX_free(context);
         delete[] buffer;
 
-        return HexEncode(md_value, static_cast<int>(md_len));
+        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetSha256FromString(const std::string &content) {
@@ -188,6 +214,33 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetSha256FromFile(const std::string &fileName) {
 
+        std::ifstream file(fileName, std::ios::binary);
+        if (!file) {
+            log_error << "Could not open file: " << fileName;
+            return "Error: Could not open file";
+        }
+
+        // 1. Initialize the SHA-256 hasher
+        boost::hash2::sha2_256 hasher;
+        std::vector<char> buffer(AWSMOCK_BIG_BUFFER_SIZE);
+
+        // 2. Stream the file content
+        while (file.read(buffer.data(), buffer.size()) || file.gcount() > 0) {
+            hasher.update(buffer.data(), file.gcount());
+        }
+
+        // 3. Obtain the final 32-byte digest
+        auto digest = hasher.result();
+
+        // 4. Convert to hex string
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (auto b: digest) {
+            result << std::setw(2) << static_cast<int>(b);
+        }
+
+        return result.str();
+        /*
         const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
@@ -211,7 +264,7 @@ namespace AwsMock::Core {
         EVP_MD_CTX_free(context);
         delete[] buffer;
 
-        return HexEncode(md_value, static_cast<int>(md_len));
+        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, CRYPTO_HMAC256_BLOCK_SIZE> &key, const std::string &msg) {
