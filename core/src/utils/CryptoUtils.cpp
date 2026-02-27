@@ -26,19 +26,6 @@ namespace AwsMock::Core {
             result << std::setw(2) << static_cast<int>(char_ptr[i]);
         }
         return result.str();
-
-        /*
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_md5();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-        EVP_DigestUpdate(context, content.data(), content.length());
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-
-        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetMd5FromFile(const std::string &fileName) {
@@ -66,31 +53,6 @@ namespace AwsMock::Core {
         }
         file.close();
         return result.str();
-
-        /*
-        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
-
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_md5();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-
-        std::ifstream ifs(fileName, std::ios::binary);
-        while (ifs.good()) {
-            ifs.read(buffer, AWSMOCK_BUFFER_SIZE);
-            EVP_DigestUpdate(context, buffer, ifs.gcount());
-        }
-        ifs.close();
-
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-        delete[] buffer;
-
-        return HexEncode(md_value, static_cast<int>(md_len));
-        */
     }
 
     std::string Crypto::GetSha1FromString(const std::string &content) {
@@ -110,19 +72,6 @@ namespace AwsMock::Core {
             result << std::setw(2) << static_cast<int>(i);
         }
         return result.str();
-
-        /*EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_sha1();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-        EVP_DigestUpdate(context, content.c_str(), content.length());
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-
-        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetSha1FromFile(const std::string &fileName) {
@@ -154,32 +103,6 @@ namespace AwsMock::Core {
         file.close();
 
         return result.str();
-
-        /*
-        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
-
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_sha1();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-
-        std::ifstream is;
-        is.open(fileName.c_str(), std::ios::binary);
-        while (is.good()) {
-            is.read(buffer, AWSMOCK_BUFFER_SIZE);
-            EVP_DigestUpdate(context, buffer, is.gcount());
-        }
-        is.close();
-
-        // Finalize
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-        delete[] buffer;
-
-        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetSha256FromString(const std::string &content) {
@@ -196,18 +119,6 @@ namespace AwsMock::Core {
             result << std::setw(2) << static_cast<int>(b);
         }
         return result.str();
-        /*
-        EVP_MD_CTX *context = EVP_MD_CTX_create();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
-
-        EVP_DigestInit_ex(context, EVP_sha256(), nullptr);
-        EVP_DigestUpdate(context, content.c_str(), content.size());
-        EVP_DigestFinal(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-
-        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetSha256FromFile(const std::string &fileName) {
@@ -238,31 +149,6 @@ namespace AwsMock::Core {
         }
 
         return result.str();
-        /*
-        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
-
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_sha256();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-
-        std::ifstream is;
-        is.open(fileName.c_str(), std::ios::binary);
-        while (is.good()) {
-            is.read(buffer, AWSMOCK_BUFFER_SIZE);
-            EVP_DigestUpdate(context, buffer, is.gcount());
-        }
-        is.close();
-
-        // Finalize
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-        delete[] buffer;
-
-        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetHmacSha224FromString(const std::string &key, const std::string &content) {
@@ -284,19 +170,6 @@ namespace AwsMock::Core {
         }
 
         return result.str();
-
-        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
-        unsigned int hashLen;
-
-        HMAC(EVP_sha224(),
-             content.data(),
-             static_cast<int>(content.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
-             static_cast<int>(key.size()),
-             hash.data(),
-             &hashLen);
-
-        return HexEncode(hash.data(), static_cast<int>(hashLen));
     }
 
     std::string Crypto::GetHmacSha384FromString(const std::string &key, const std::string &content) {
@@ -318,17 +191,6 @@ namespace AwsMock::Core {
         }
 
         return result.str();
-        /* std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
-
-        HMAC(EVP_sha384(),
-             content.data(),
-             static_cast<int>(content.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
-             static_cast<int>(key.size()),
-             hash.data(),
-             hashLen);
-
-        return HexEncode(hash.data(), static_cast<int>(*hashLen));*/
     }
 
     std::string Crypto::GetHmacSha512FromString(const std::string &key, const std::string &content) {
@@ -350,19 +212,6 @@ namespace AwsMock::Core {
         }
 
         return result.str();
-
-        /*
-        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
-
-        HMAC(EVP_sha512(),
-             content.data(),
-             static_cast<int>(content.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
-             static_cast<int>(key.size()),
-             hash.data(),
-             hashLen);
-
-        return HexEncode(hash.data(), static_cast<int>(*hashLen));*/
     }
 
     std::string Crypto::GetHmacSha256FromString(const std::string &key, const std::string &msg) {
