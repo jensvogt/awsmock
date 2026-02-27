@@ -248,7 +248,7 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (...) {
             log_error << "Invalid request";
-            return SendResponse(request, http::status::internal_server_error, "Invalid request");
+            return SendResponse(request, http::status::bad_request, "Invalid request");
         }
     }
 
@@ -521,7 +521,7 @@ namespace AwsMock::Service {
                     s3Request.bucket = clientCommand.bucket;
 
                     Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
-                    log_info << "Object deleted, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    log_info << "Object deleted, bucket: " << clientCommand.bucket << ", count: " << s3Response.keys.size();
                     return SendResponse(request, http::status::ok, s3Response.ToXml());
                 }
 
