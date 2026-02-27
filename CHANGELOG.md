@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.24](https://github.com/jensvogt/awsmock/compare/v1.14.23...v1.14.24) (2026-02-27)
+
+
+### Bug Fixes
+
+* synchronous hash algorithm ([4e29cb7](https://github.com/jensvogt/awsmock/commit/4e29cb7eaebe5364bfa8fb872dd7122f345f0fa7))
+
 ## [1.14.23](https://github.com/jensvogt/awsmock/compare/1.14.22...v1.14.23) (2026-02-27)
 
 
