@@ -1414,7 +1414,7 @@ namespace AwsMock::Service {
         // Meta data
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
         log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", md5: " << object.md5sum;
-        /*if (!request.checksumAlgorithm.empty()) {
+        if (!request.checksumAlgorithm.empty()) {
             const std::string filename = dataS3Dir + "/" + object.internalName;
             if (request.checksumAlgorithm == "SHA1") {
                 object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
@@ -1423,7 +1423,7 @@ namespace AwsMock::Service {
                 object.sha256sum = Core::Crypto::GetSha256FromFile(filename);
                 log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", sha256: " << object.sha256sum;
             }
-        }*/
+        }
 
         // Update database
         object = _database.CreateOrUpdateObject(object);

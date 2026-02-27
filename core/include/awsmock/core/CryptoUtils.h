@@ -40,6 +40,8 @@
 #include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/beast/core/detail/base64.hpp>
+#include <boost/hash2/sha2.hpp>
+#include <boost/uuid/detail/sha1.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Base64Utils.h>
@@ -49,7 +51,8 @@
 #include <awsmock/core/logging/LogStream.h>
 
 // 64 kB buffer
-#define AWSMOCK_BUFFER_SIZE 4096
+#define AWSMOCK_BUFFER_SIZE 8192
+#define AWSMOCK_BIG_BUFFER_SIZE 65536
 
 #define CRYPTO_RSA_KEY_LEN_4096 4096
 #define CRYPTO_RSA_KEY_LEN_2048 2048
