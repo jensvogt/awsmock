@@ -214,25 +214,6 @@ namespace AwsMock::Core {
         boost::urls::encoding_opts opt;
         opt.space_as_plus = true;
         return boost::urls::encode(input, boost::urls::pchars, opt);
-        // TODO: remove if testet
-        /*
-        std::ostringstream escaped;
-        escaped.fill('0');
-        escaped << std::hex;
-
-        for (const char c: input) {
-            if (c == '"' || c == '\'' || c == '!' || c == '*' || c == '(' || c == ')' || c == ';' || c == ':' || c == '@' || c == '&' || c == '=' ||
-                c == '+' || c == '$' || c == ',' || c == '?' || c == '#' || c == '[' || c == ']' || c == ' ' || c == '\n' || c == '{' || c == '}' ||
-                c == '|') {
-                // Any other characters are percent-encoded
-                escaped << std::uppercase;
-                escaped << '%' << std::setw(2) << static_cast<int>(static_cast<unsigned char>(c));
-                escaped << std::nouppercase;
-            } else {
-                escaped << c;
-            }
-        }
-        return escaped.str();*/
     }
 
     std::string StringUtils::UrlDecode(const std::string &input) {
