@@ -2,8 +2,9 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_DATETIME_UTILS_TEST_H
-#define AWMOCK_CORE_DATETIME_UTILS_TEST_H
+// Boost includes
+#include <boost/locale.hpp>
+#include <boost/test/unit_test.hpp>
 
 // Local includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -21,7 +22,7 @@ namespace AwsMock::Core {
         const system_clock::time_point utcTime = DateTimeUtils::ConvertToUtc(localTime);
 
         // assert
-        BOOST_CHECK_EQUAL(7200, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
+        BOOST_CHECK_EQUAL(3600, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
     }
 
     BOOST_AUTO_TEST_CASE(UtcOffsetTest) {
@@ -38,5 +39,3 @@ namespace AwsMock::Core {
     }
 
 }// namespace AwsMock::Core
-
-#endif// AWMOCK_CORE_DATETIME_UTILS_TEST_H

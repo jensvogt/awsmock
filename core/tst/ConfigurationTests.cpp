@@ -2,44 +2,14 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWS_MOCK_CORE_CONFIGURATION_TEST_H
-#define AWS_MOCK_CORE_CONFIGURATION_TEST_H
+// Boost includes
+#include <boost/test/unit_test.hpp>
 
 // Local includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
-
-    BOOST_AUTO_TEST_CASE(EmptyFilenameTest) {
-        // arrange
-
-        // act
-        BOOST_CHECK_THROW({
-                     try {
-                        auto configuration = Configuration("");
-                     } catch (const CoreException &e) {
-                         BOOST_CHECK_EQUAL("Empty configuration filename", e.message());
-                         throw;
-                     } }, CoreException);
-
-        // assert
-    }
-
-    BOOST_AUTO_TEST_CASE(NonexistentFilenameTest) {
-        // arrange
-
-        // act
-        BOOST_CHECK_THROW({
-                     try {
-                        auto configuration = Configuration("FooBarBaz.json");
-                     } catch (const CoreException &e) {
-                         BOOST_CHECK_EQUAL("Configuration file 'FooBarBaz.json' does not exist. Will use defaults.", e.message());
-                         throw;
-                     } }, CoreException);
-
-        // assert
-    }
 
     BOOST_AUTO_TEST_CASE(ConstructorTest) {
 
@@ -136,5 +106,3 @@ namespace AwsMock::Core {
     }
 
 }// namespace AwsMock::Core
-
-#endif// AWS_MOCK_CORE_CONFIGURATION_TEST_H

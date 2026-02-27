@@ -2,14 +2,9 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_CRYPTO_UTILS_TEST_H
-#define AWSMOCK_CORE_CRYPTO_UTILS_TEST_H
-
 // Boost includes
-#include <boost/locale/config.hpp>
-#include <boost/test/tools/old/interface.hpp>
-#include <boost/test/unit_test_log.hpp>
-#include <boost/test/unit_test_suite.hpp>
+#include <boost/locale.hpp>
+#include <boost/test/unit_test.hpp>
 
 // Local includes
 #include <awsmock/core/CryptoUtils.h>
@@ -20,7 +15,7 @@
 #define BASE64_TEST_STRING "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw=="
 #define TEST_STRING1 "{\"id\":\"DLI393_9783836272926\",\"artikelTyp\":\"physisch\",\"ursprungsDatei\":\"DLI393/20231113_RheinwerkVerlag_10329_13112023131739313.xml\",\"ursprungsFormat\":\"Onix2.1\",\"standDatum\":\"2023-11-13T00:00:00\",\"lieferantenId\":\"DLI393\"}"
 #define MD5_SUM "d41d8cd98f00b204e9800998ecf8427e"
-#define MD5_SUM1 "5e39cce4e34eb60f350d1cf2f1098166"
+#define MD5_SUM1 "3bbc1acccf87660b55d29e92524b1f32"
 #define MD5_SUM2 "9e107d9d372bb6826bd81d3542a419d6"
 #define MD5_SUM3 "9e107d9d372bb6826bd81d3542a419d6"
 #define SHA1_SUM "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"
@@ -47,11 +42,12 @@ namespace AwsMock::Core {
         memcpy(input, TEST_STRING1, sizeof(TEST_STRING1));
 
         // act
-        std::string utf8_string = boost::locale::conv::to_utf<char>(TEST_STRING1, "Latin1");
-        const std::string result = Crypto::GetMd5FromString(input);
+        const std::string utf8_string = boost::locale::conv::to_utf<char>(TEST_STRING1, "Latin1");
+        const std::string result = Crypto::GetMd5FromString(utf8_string);
 
         // assert
         BOOST_CHECK_EQUAL(result, MD5_SUM1);
+        delete input;
     }
 
     BOOST_AUTO_TEST_CASE(Md5FileTest) {
@@ -251,7 +247,7 @@ namespace AwsMock::Core {
     BOOST_AUTO_TEST_CASE(GetRsaKeyTest) {
 
         // arrange
-        EVP_PKEY *keyPair = Crypto::GenerateRsaKeys(4096);
+        const EVP_PKEY *keyPair = Crypto::GenerateRsaKeys(4096);
 
         // Generate key pair and initialize
         const std::string publicKey = Crypto::GetRsaPublicKey(keyPair);
@@ -265,7 +261,6 @@ namespace AwsMock::Core {
     }
 
     BOOST_AUTO_TEST_CASE(HexEncodeDecodeTest) {
-
         // arrange
         std::string testString = "This is a test string";
 
@@ -279,5 +274,3 @@ namespace AwsMock::Core {
         //BOOST_CHECK_EQUAL(testString, std::string{(const char *) decoded});
     }
 }// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_CRYPTO_UTILS_TEST_H
