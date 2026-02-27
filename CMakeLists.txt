@@ -10,6 +10,9 @@ project(awsmock VERSION ${VERSION_STRING} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY ON)
+set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
+set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
 
 # -------------------------------------------------------------------------
 # Current version
@@ -68,7 +71,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp
         core/include/awsmock/core/crypto/CRC32Processor.h)
-set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
+set(CORE_SOURCES_TST core/tst/CryptoUtilsTest.cpp)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -80,6 +83,14 @@ if (WIN32)
     target_include_directories(awsmockcore PRIVATE ${EXTERNAL_INC_DIR})
     target_link_libraries(awsmockcore PUBLIC Boost::system)
     target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR})
+else ()
+    # Tests
+    #    add_executable(core_crypto core/tst/CryptoUtilsTest.cpp core/tst/TestBase.cpp)
+    #    target_include_directories(core_crypto PUBLIC ${CMAKE_SOURCE_DIR}/core/include)
+    #    target_link_libraries(core_crypto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+    #    target_link_libraries(core_crypto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+    #    target_link_libraries(core_crypto PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
+    #            Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive magic)
 endif ()
 
 # -------------------------------------------------------------------------

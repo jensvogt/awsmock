@@ -11,77 +11,72 @@ namespace AwsMock::Core {
 
     std::string Crypto::GetMd5FromString(const std::string &content) {
 
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_md5();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
+        // Initialize the hasher
+        boost::uuids::detail::md5 hasher;
+        hasher.process_bytes(content.data(), content.size());
 
-        EVP_DigestInit_ex(context, md, nullptr);
-        EVP_DigestUpdate(context, content.data(), content.length());
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
+        boost::uuids::detail::md5::digest_type digest;
+        hasher.get_digest(digest);
 
-        return HexEncode(md_value, static_cast<int>(md_len));
-    }
-
-    std::string Crypto::GetMd5FromString(const unsigned char *content) {
-
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_md5();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-        EVP_DigestUpdate(context, content, sizeof(content));
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-
-        return HexEncode(md_value, static_cast<int>(md_len));
+        // MD5 produces 16 bytes (128 bits), stored as 4 ints
+        const auto char_ptr = reinterpret_cast<const unsigned char *>(digest);
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (int i = 0; i < 16; ++i) {
+            result << std::setw(2) << static_cast<int>(char_ptr[i]);
+        }
+        return result.str();
     }
 
     std::string Crypto::GetMd5FromFile(const std::string &fileName) {
 
-        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
+        // Open file
+        std::ifstream file(fileName, std::ios::binary);
+        if (!file) return "";
 
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_md5();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
+        boost::uuids::detail::md5 md5_hasher;
+        std::vector<char> buffer(8192);
 
-        EVP_DigestInit_ex(context, md, nullptr);
-
-        std::ifstream ifs(fileName, std::ios::binary);
-        while (ifs.good()) {
-            ifs.read(buffer, AWSMOCK_BUFFER_SIZE);
-            EVP_DigestUpdate(context, buffer, ifs.gcount());
+        while (file.read(buffer.data(), buffer.size()) || file.gcount() > 0) {
+            md5_hasher.process_bytes(buffer.data(), file.gcount());
         }
-        ifs.close();
 
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-        delete[] buffer;
+        boost::uuids::detail::md5::digest_type digest;
+        md5_hasher.get_digest(digest);
 
-        return HexEncode(md_value, static_cast<int>(md_len));
+        // Convert to hex string (same logic as string example)
+        const auto char_ptr = reinterpret_cast<const unsigned char *>(digest);
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (int i = 0; i < 16; ++i) {
+            result << std::setw(2) << static_cast<int>(char_ptr[i]);
+        }
+        file.close();
+        return result.str();
     }
 
     std::string Crypto::GetSha1FromString(const std::string &content) {
+        boost::uuids::detail::sha1 sha1;
+        std::vector<char> buffer(AWSMOCK_BUFFER_SIZE);
 
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_sha1();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
+        sha1.process_bytes(content.data(), content.size());
 
-        EVP_DigestInit_ex(context, md, nullptr);
-        EVP_DigestUpdate(context, content.c_str(), content.length());
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
+        // Modern Boost uses 20 bytes (unsigned char) for the digest
+        boost::uuids::detail::sha1::digest_type digest;
+        sha1.get_digest(digest);
 
-        return HexEncode(md_value, static_cast<int>(md_len));
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+
+        for (const unsigned char i: digest) {
+            result << std::setw(2) << static_cast<int>(i);
+        }
+        return result.str();
     }
 
     std::string Crypto::GetSha1FromFile(const std::string &fileName) {
+
+        // Open file
         std::ifstream file(fileName, std::ios::binary);
         if (!file) {
             log_error << "Could not open file: " << fileName;
@@ -105,95 +100,118 @@ namespace AwsMock::Core {
         for (unsigned char i: digest) {
             result << std::setw(2) << static_cast<int>(i);
         }
+        file.close();
 
         return result.str();
-
-        /*
-        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
-
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_sha1();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-
-        std::ifstream is;
-        is.open(fileName.c_str(), std::ios::binary);
-        while (is.good()) {
-            is.read(buffer, AWSMOCK_BUFFER_SIZE);
-            EVP_DigestUpdate(context, buffer, is.gcount());
-        }
-        is.close();
-
-        // Finalize
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-        delete[] buffer;
-
-        return HexEncode(md_value, static_cast<int>(md_len));*/
     }
 
     std::string Crypto::GetSha256FromString(const std::string &content) {
+        boost::hash2::sha2_256 hasher;
 
-        EVP_MD_CTX *context = EVP_MD_CTX_create();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
+        // Update takes a pointer to the start and the length
+        hasher.update(content.data(), content.size());
 
-        EVP_DigestInit_ex(context, EVP_sha256(), nullptr);
-        EVP_DigestUpdate(context, content.c_str(), content.size());
-        EVP_DigestFinal(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
+        auto digest = hasher.result();
 
-        return HexEncode(md_value, static_cast<int>(md_len));
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (const auto b: digest) {
+            result << std::setw(2) << static_cast<int>(b);
+        }
+        return result.str();
     }
 
-    std::string Crypto::GetHmacSha224FromString(const std::string &key, const std::string &msg) {
+    std::string Crypto::GetSha256FromFile(const std::string &fileName) {
 
-        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
-        unsigned int hashLen;
+        std::ifstream file(fileName, std::ios::binary);
+        if (!file) {
+            log_error << "Could not open file: " << fileName;
+            return "Error: Could not open file";
+        }
 
-        HMAC(EVP_sha224(),
-             msg.data(),
-             static_cast<int>(msg.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
-             static_cast<int>(key.size()),
-             hash.data(),
-             &hashLen);
+        // Initialize the SHA-256 hasher
+        boost::hash2::sha2_256 hasher;
+        std::vector<char> buffer(AWSMOCK_BIG_BUFFER_SIZE);
 
-        return HexEncode(hash.data(), static_cast<int>(hashLen));
+        // Stream the file content
+        while (file.read(buffer.data(), buffer.size()) || file.gcount() > 0) {
+            hasher.update(buffer.data(), file.gcount());
+        }
+
+        // Obtain the final 32-byte digest
+        auto digest = hasher.result();
+
+        // Convert to hex string
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (auto b: digest) {
+            result << std::setw(2) << static_cast<int>(b);
+        }
+
+        return result.str();
     }
 
-    std::string Crypto::GetHmacSha384FromString(const std::string &key, const std::string &msg, unsigned int *hashLen) {
+    std::string Crypto::GetHmacSha224FromString(const std::string &key, const std::string &content) {
 
-        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
+        // Initialize HMAC with SHA2-224 and the secret key. The key is passed directly to the constructor
+        boost::hash2::hmac<boost::hash2::sha2_224> hmac_hasher(key.data(), key.size());
 
-        HMAC(EVP_sha384(),
-             msg.data(),
-             static_cast<int>(msg.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
-             static_cast<int>(key.size()),
-             hash.data(),
-             hashLen);
+        // Update with the message data
+        hmac_hasher.update(content.data(), content.size());
 
-        return HexEncode(hash.data(), static_cast<int>(*hashLen));
+        // Obtain the 224-bit (28-byte) result
+        auto digest = hmac_hasher.result();
+
+        // Convert to hex string
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (const auto b: digest) {
+            result << std::setw(2) << static_cast<int>(b);
+        }
+
+        return result.str();
     }
 
-    std::string Crypto::GetHmacSha512FromString(const std::string &key, const std::string &msg, unsigned int *hashLen) {
+    std::string Crypto::GetHmacSha384FromString(const std::string &key, const std::string &content) {
 
-        std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
+        // Initialize HMAC with SHA2-384 and the secret key. The key is passed directly to the constructor
+        boost::hash2::hmac<boost::hash2::sha2_384> hmac_hasher(key.data(), key.size());
 
-        HMAC(EVP_sha512(),
-             msg.data(),
-             static_cast<int>(msg.size()),
-             reinterpret_cast<unsigned char const *>(key.data()),
-             static_cast<int>(key.size()),
-             hash.data(),
-             hashLen);
+        // Update with the message data
+        hmac_hasher.update(content.data(), content.size());
 
-        return HexEncode(hash.data(), static_cast<int>(*hashLen));
+        // Obtain the 384-bit (48-byte) result
+        auto digest = hmac_hasher.result();
+
+        // Convert to hex string
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (const auto b: digest) {
+            result << std::setw(2) << static_cast<int>(b);
+        }
+
+        return result.str();
+    }
+
+    std::string Crypto::GetHmacSha512FromString(const std::string &key, const std::string &content) {
+
+        // Initialize HMAC with SHA2-512 and the secret key. The key is passed directly to the constructor
+        boost::hash2::hmac<boost::hash2::hmac_sha2_512> hmac_hasher(key.data(), key.size());
+
+        // Update with the message data
+        hmac_hasher.update(content.data(), content.size());
+
+        // Obtain the 512-bit (64-byte) result
+        auto digest = hmac_hasher.result();
+
+        // Convert to hex string
+        std::ostringstream result;
+        result << std::hex << std::setfill('0');
+        for (const auto b: digest) {
+            result << std::setw(2) << static_cast<int>(b);
+        }
+
+        return result.str();
     }
 
     std::string Crypto::GetHmacSha256FromString(const std::string &key, const std::string &msg) {
@@ -211,62 +229,6 @@ namespace AwsMock::Core {
 
         return HexEncode(hash.data(), static_cast<int>(hashLen));
     }
-
-    std::string Crypto::GetSha256FromFile(const std::string &fileName) {
-
-        std::ifstream file(fileName, std::ios::binary);
-        if (!file) {
-            log_error << "Could not open file: " << fileName;
-            return "Error: Could not open file";
-        }
-
-        // 1. Initialize the SHA-256 hasher
-        boost::hash2::sha2_256 hasher;
-        std::vector<char> buffer(AWSMOCK_BIG_BUFFER_SIZE);
-
-        // 2. Stream the file content
-        while (file.read(buffer.data(), buffer.size()) || file.gcount() > 0) {
-            hasher.update(buffer.data(), file.gcount());
-        }
-
-        // 3. Obtain the final 32-byte digest
-        auto digest = hasher.result();
-
-        // 4. Convert to hex string
-        std::ostringstream result;
-        result << std::hex << std::setfill('0');
-        for (auto b: digest) {
-            result << std::setw(2) << static_cast<int>(b);
-        }
-
-        return result.str();
-        /*
-        const auto buffer = new char[AWSMOCK_BUFFER_SIZE];
-
-        EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_sha256();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        std::string output;
-
-        EVP_DigestInit_ex(context, md, nullptr);
-
-        std::ifstream is;
-        is.open(fileName.c_str(), std::ios::binary);
-        while (is.good()) {
-            is.read(buffer, AWSMOCK_BUFFER_SIZE);
-            EVP_DigestUpdate(context, buffer, is.gcount());
-        }
-        is.close();
-
-        // Finalize
-        EVP_DigestFinal_ex(context, md_value, &md_len);
-        EVP_MD_CTX_free(context);
-        delete[] buffer;
-
-        return HexEncode(md_value, static_cast<int>(md_len));*/
-    }
-
     std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, CRYPTO_HMAC256_BLOCK_SIZE> &key, const std::string &msg) {
 
         std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};

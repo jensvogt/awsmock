@@ -41,6 +41,7 @@
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/beast/core/detail/base64.hpp>
 #include <boost/hash2/sha2.hpp>
+#include <boost/uuid/detail/md5.hpp>
 #include <boost/uuid/detail/sha1.hpp>
 
 // AwsMock includes
@@ -152,20 +153,18 @@ namespace AwsMock::Core {
          *
          * @param key string for hashing
          * @param content string to hash
-         * @param hashLen length of the hashed string
          * @return hey-encoded HMAC SHA284 hash of the given string
          */
-        static std::string GetHmacSha384FromString(const std::string &key, const std::string &content, unsigned int *hashLen);
+        static std::string GetHmacSha384FromString(const std::string &key, const std::string &content);
 
         /**
          * @brief Returns the hex encoded HMAC SHA512 hash of a string.
          *
          * @param key string for hashing
          * @param content string to hash
-         * @param hashLen length of the resulting hash
          * @return hey-encoded HMAC SHA512 hash of the given string
          */
-        static std::string GetHmacSha512FromString(const std::string &key, const std::string &content, unsigned int *hashLen);
+        static std::string GetHmacSha512FromString(const std::string &key, const std::string &content);
 
         /**
          * @brief Returns the hex encoded HMAC SHA256 hash of a string.
