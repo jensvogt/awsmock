@@ -41,7 +41,7 @@ namespace AwsMock::Service {
         log_trace << "Application Monitoring starting";
 
         // Total count
-        _metricService.SetGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase.CountApplications());
+        // _metricService.SetGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase.CountApplications());
 
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {
