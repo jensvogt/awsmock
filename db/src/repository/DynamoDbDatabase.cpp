@@ -139,7 +139,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", tableName));
                 }
 
-                return _tableCollection.count_documents(query.extract(), options) > 0;
+                return _tableCollection.count_documents(query.view(), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -218,7 +218,7 @@ namespace AwsMock::Database {
                 if (!prefix.empty()) {
                     query.append(kvp("name", bsoncxx::types::b_regex{"^" + prefix + ".*"}));
                 }
-                return _tableCollection.count_documents(query.extract());
+                return _tableCollection.count_documents(query.view());
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -434,7 +434,7 @@ namespace AwsMock::Database {
                         }
                     }
                 }
-                const int64_t count = _itemCollection.count_documents(query.extract());
+                const int64_t count = _itemCollection.count_documents(query.view());
 
                 log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
@@ -639,7 +639,7 @@ namespace AwsMock::Database {
                 if (!prefix.empty()) {
                     query.append(kvp("prefix", prefix));
                 }
-                return _itemCollection.count_documents(query.extract());
+                return _itemCollection.count_documents(query.view());
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

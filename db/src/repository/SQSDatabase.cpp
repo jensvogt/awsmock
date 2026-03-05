@@ -48,7 +48,7 @@ namespace AwsMock::Database {
                 query.append(kvp("queueUrl", queueUrl));
             }
 
-            return _queueCollection.count_documents(query.extract(), options) > 0;
+            return _queueCollection.count_documents(query.view(), options) > 0;
         }
         return _memoryDb.QueueUrlExists(region, queueUrl);
     }
@@ -508,7 +508,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
 
-            count = _queueCollection.count_documents(query.extract());
+            count = _queueCollection.count_documents(query.view());
 
         } else {
 
@@ -1262,7 +1262,7 @@ namespace AwsMock::Database {
                 query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
             }
 
-            count = messageCollection.count_documents(query.extract());
+            count = messageCollection.count_documents(query.view());
             log_trace << "Count messages, queueArn: " << queueArn << " result: " << count;
 
             return count;

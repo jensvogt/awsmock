@@ -16,13 +16,13 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+                mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
 
                 // Set limit to 1 (Very important for performance!)
                 mongocxx::options::count options;
                 options.limit(1);
 
-                return _applicationCollection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
+                return applicationCollection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -38,13 +38,13 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+            mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto result = _applicationCollection.insert_one(application.ToDocument());
+                const auto result = applicationCollection.insert_one(application.ToDocument());
                 session.commit_transaction();
                 log_trace << "Application created, oid: " << result->inserted_id().get_oid().value.to_string();
                 application.oid = result->inserted_id().get_oid().value.to_string();
@@ -78,8 +78,8 @@ namespace AwsMock::Database {
             try {
 
                 if (const auto client = ConnectionPool::instance().GetConnection()) {
-                    mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-                    const auto result = _applicationCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                    mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+                    const auto result = applicationCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                     log_trace << "Application retrieved, region: " << region << ", name: " << name;
                     if (result) {
                         Entity::Apps::Application application;
@@ -104,7 +104,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+                mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
 
                 document query;
                 if (!region.empty()) {
@@ -127,7 +127,7 @@ namespace AwsMock::Database {
                     opts.limit(pageSize);
                 }
 
-                for (auto applicationCursor = _applicationCollection.find(query.extract(), opts); auto application: applicationCursor) {
+                for (auto applicationCursor = applicationCollection.find(query.extract(), opts); auto application: applicationCursor) {
                     Entity::Apps::Application result;
                     result.FromDocument(application);
                     applications.push_back(result);
@@ -154,7 +154,7 @@ namespace AwsMock::Database {
 
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _topicCollection = client->database(_databaseName)[_applicationCollectionName];
+                mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
 
                 document query = {};
 
@@ -165,7 +165,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                const long count = _topicCollection.count_documents(query.extract());
+                const long count = applicationCollection.count_documents(query.view());
                 log_trace << "Count applications, result: " << count;
                 return count;
 
@@ -187,13 +187,13 @@ namespace AwsMock::Database {
             opts.return_document(mongocxx::options::return_document::k_after);
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+            mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto mResult = _applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts);
+                const auto mResult = applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts);
                 session.commit_transaction();
 
                 if (mResult) {
@@ -223,8 +223,8 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-                const auto result = _applicationCollection.delete_many(make_document(kvp("region", region), kvp("name", name)));
+                mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+                const auto result = applicationCollection.delete_many(make_document(kvp("region", region), kvp("name", name)));
                 session.commit_transaction();
                 log_trace << "Application deleted: " << result.value().deleted_count();
                 return result.value().deleted_count();

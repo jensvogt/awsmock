@@ -214,14 +214,14 @@ namespace AwsMock::Core {
         return result.str();
     }
 
-    std::string Crypto::GetHmacSha256FromString(const std::string &key, const std::string &msg) {
+    std::string Crypto::GetHmacSha256FromString(const std::string &key, const std::string &content) {
 
         std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
         unsigned int hashLen;
 
         HMAC(EVP_sha256(),
-             msg.data(),
-             static_cast<int>(msg.size()),
+             content.data(),
+             static_cast<int>(content.size()),
              reinterpret_cast<unsigned char const *>(key.data()),
              static_cast<int>(key.size()),
              hash.data(),
@@ -229,14 +229,14 @@ namespace AwsMock::Core {
 
         return HexEncode(hash.data(), static_cast<int>(hashLen));
     }
-    std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, CRYPTO_HMAC256_BLOCK_SIZE> &key, const std::string &msg) {
+    std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, CRYPTO_HMAC256_BLOCK_SIZE> &key, const std::string &content) {
 
         std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
         unsigned int hashLen;
 
         HMAC(EVP_sha256(),
-             msg.data(),
-             static_cast<int>(msg.size()),
+             content.data(),
+             static_cast<int>(content.size()),
              key.data(),
              key.size(),
              hash.data(),

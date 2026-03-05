@@ -319,7 +319,7 @@ namespace AwsMock::Database {
                 if (!region.empty()) {
                     query.append(kvp("region", region));
                 }
-                count = _userPoolCollection.count_documents(query.extract());
+                count = _userPoolCollection.count_documents(query.view());
                 log_trace << "User pool count: " << count;
                 return count;
 
@@ -532,7 +532,7 @@ namespace AwsMock::Database {
                     query.append(kvp("groups.groupName", groupName));
                 }
 
-                count = _userCollection.count_documents(query.extract());
+                count = _userCollection.count_documents(query.view());
 
                 log_trace << "User count: " << count;
                 return count;
