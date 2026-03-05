@@ -488,7 +488,7 @@ namespace AwsMock::Database {
                     query.append(kvp("arn", lambdaArn));
                 }
 
-                const int64_t count = _lambdaResultCollection.count_documents(query.extract());
+                const int64_t count = _lambdaResultCollection.count_documents(query.view());
                 log_trace << "Got lambda result count, size:" << count;
                 return count;
             } catch (const mongocxx::exception &exc) {

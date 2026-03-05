@@ -330,7 +330,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
 
-            const long count = _serverCollection.count_documents(query.extract());
+            const long count = _serverCollection.count_documents(query.view());
             log_trace << "Count servers, result: " << count;
             return count;
         }

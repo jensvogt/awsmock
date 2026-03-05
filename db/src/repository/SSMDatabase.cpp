@@ -147,7 +147,7 @@ namespace AwsMock::Database {
                     query.append(kvp("region", region));
                 }
 
-                const long count = _parameterCollection.count_documents(query.extract());
+                const long count = _parameterCollection.count_documents(query.view());
                 log_trace << "Parameter count: " << count;
                 return count;
 
