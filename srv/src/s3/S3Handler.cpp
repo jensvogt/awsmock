@@ -248,7 +248,7 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (...) {
             log_error << "Invalid request";
-            return SendResponse(request, http::status::internal_server_error, "Invalid request");
+            return SendResponse(request, http::status::bad_request, "Invalid request");
         }
     }
 
@@ -258,7 +258,7 @@ namespace AwsMock::Service {
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
-        Core::HttpUtils::DumpRequest(request);
+        //Core::HttpUtils::DumpRequest(request);
 
         try {
             switch (clientCommand.command) {
@@ -347,7 +347,7 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
                     std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-                    long contentLength = std::stol(request.base()[http::field::content_length]);
+                    long contentLength = std::stol(request.base()["x-amz-decoded-content-length"]);
                     log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
                     // If chunked, we take the content length from the decoded content length header field.
@@ -521,7 +521,7 @@ namespace AwsMock::Service {
                     s3Request.bucket = clientCommand.bucket;
 
                     Dto::S3::DeleteObjectsResponse s3Response = _s3Service.DeleteObjects(s3Request);
-                    log_info << "Object deleted, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    log_info << "Object deleted, bucket: " << clientCommand.bucket << ", count: " << s3Response.keys.size();
                     return SendResponse(request, http::status::ok, s3Response.ToXml());
                 }
 

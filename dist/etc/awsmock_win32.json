@@ -156,12 +156,8 @@
           "count": 5
         },
         "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\dynamodb",
-        "monitoring": {
-          "period": 300
-        },
-        "worker": {
-          "period": 300
-        },
+        "monitoring-period": 300,
+        "worker-period": 300,
         "container": {
           "host": "localhost",
           "port": 8000,

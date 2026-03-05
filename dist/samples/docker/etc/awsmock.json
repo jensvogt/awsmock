@@ -157,12 +157,8 @@
           "count": 5
         },
         "data-dir": "/usr/local/awsmock/data/dynamodb",
-        "monitoring": {
-          "period": 300
-        },
-        "worker": {
-          "period": 300
-        },
+        "monitoring-period": 300,
+        "worker-period": 300,
         "container": {
           "host": "dynamodb",
           "port": "8000",

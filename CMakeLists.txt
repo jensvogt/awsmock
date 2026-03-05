@@ -10,7 +10,9 @@ project(awsmock VERSION ${VERSION_STRING} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(Boost_NO_SYSTEM_PATHS ON)
+set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY ON)
+set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
+set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
 
 # -------------------------------------------------------------------------
 # Current version
@@ -35,7 +37,7 @@ endif ()
 find_package(LibArchive REQUIRED)
 find_package(bsoncxx CONFIG REQUIRED)
 find_package(mongocxx CONFIG REQUIRED)
-find_package(Boost CONFIG REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup)
+find_package(Boost CONFIG REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup unit_test_framework locale)
 find_package(jwt-cpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
@@ -69,7 +71,6 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp
         core/include/awsmock/core/crypto/CRC32Processor.h)
-set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -81,6 +82,8 @@ if (WIN32)
     target_include_directories(awsmockcore PRIVATE ${EXTERNAL_INC_DIR})
     target_link_libraries(awsmockcore PUBLIC Boost::system)
     target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR})
+else ()
+    add_subdirectory(core/tst)
 endif ()
 
 # -------------------------------------------------------------------------

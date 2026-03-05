@@ -124,14 +124,14 @@ namespace AwsMock::Dto::Cognito {
 
         friend User tag_invoke(boost::json::value_to_tag<User>, boost::json::value const &v) {
             User r;
-            r.oid = Core::Json::GetStringValue(v, "oid");
-            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
-            r.userName = Core::Json::GetStringValue(v, "userName");
-            r.enabled = Core::Json::GetBoolValue(v, "enabled");
-            r.userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Json::GetStringValue(v, "userStatus"));
-            r.password = Core::Json::GetStringValue(v, "password");
-            if (Core::Json::AttributeExists(v, "groups")) {
-                r.groups = boost::json::value_to<std::vector<Group>>(v.at("groups"));
+            r.oid = Core::Json::GetStringValue(v, "Oid");
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.userName = Core::Json::GetStringValue(v, "Username");
+            r.enabled = Core::Json::GetBoolValue(v, "Enabled");
+            r.userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Json::GetStringValue(v, "UserStatus"));
+            r.password = Core::Json::GetStringValue(v, "Password");
+            if (Core::Json::AttributeExists(v, "Groups")) {
+                r.groups = boost::json::value_to<std::vector<Group>>(v.at("Groups"));
             }
             r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
@@ -140,18 +140,18 @@ namespace AwsMock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, User const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"oid", obj.oid},
-                    {"userPoolId", obj.userPoolId},
-                    {"userName", obj.userName},
-                    {"enabled", obj.enabled},
-                    {"userStatus", Database::Entity::Cognito::UserStatusToString(obj.userStatus)},
-                    {"password", boost::json::value_from(obj.password)},
-                    {"groups", boost::json::value_from("groups")},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Oid", obj.oid},
+                    {"UserPoolId", obj.userPoolId},
+                    {"Username", obj.userName},
+                    {"Enabled", obj.enabled},
+                    {"UserStatus", Database::Entity::Cognito::UserStatusToString(obj.userStatus)},
+                    {"Password", boost::json::value_from(obj.password)},
+                    {"Groups", boost::json::value_from("groups")},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };

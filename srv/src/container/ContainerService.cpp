@@ -21,11 +21,12 @@ namespace AwsMock::Service {
     }
 
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
-        if (const auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/images/" + name + ":" + tag + "/json", {}, {}); statusCode == http::status::ok) {
+        const Core::DomainSocketResult result = _domainSocket->SendJson(http::verb::get, "/images/" + name + ":" + tag + "/json", {}, {});
+        if (result.statusCode == http::status::ok) {
             log_debug << "Docker image found, name: " << name << ":" << tag;
             return true;
         }
-        log_warning << "Image does not exists, name: " << name << ":" << tag;
+        log_warning << "Image does not exists, name: " << name << ":" << tag << ", httpStatus: " << result.statusCode;
         return false;
     }
 
@@ -81,10 +82,10 @@ namespace AwsMock::Service {
         std::string dockerFile = WriteApplicationDockerFile(codeDir, name, archive, privatePort, runtime, environment);
         const std::string imageFile = BuildImageFile(codeDir, name);
         if (auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
-            log_error << "Build image failed, statusCode: " << statusCode << ", body: " << body;
+            log_error << "Build image failed, image: " << name << ":" << tag << ", statusCode: " << statusCode << ", body: " << body;
             return dockerFile;
         }
-        log_info << "Build image successful, name: " << name << ": " << tag;
+        log_info << "Build image successful, name: " << name << ":" << tag;
         return dockerFile;
     }
 

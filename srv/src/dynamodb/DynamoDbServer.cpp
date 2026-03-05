@@ -13,8 +13,8 @@ namespace AwsMock::Service {
         const Core::Configuration &configuration = Core::Configuration::instance();
         _backupActive = configuration.GetValue<bool>("awsmock.modules.dynamodb.backup.active");
         _backupCron = configuration.GetValue<std::string>("awsmock.modules.dynamodb.backup.cron");
-        _workerPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.worker.period");
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.monitoring.period");
+        _workerPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.worker-period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.monitoring-period");
         _containerName = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.name");
         _containerHost = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.host");
         _containerPort = configuration.GetValue<int>("awsmock.modules.dynamodb.container.port");

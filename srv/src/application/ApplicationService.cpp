@@ -278,13 +278,18 @@ namespace AwsMock::Service {
             return;
         }
 
-        // Update status
-        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
-        application = _database.UpdateApplication(application);
-
         // Get code base64 file name
         auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
         std::string fullBase64File = Core::FileUtils::appendPath(dataDir, "/", application.name, "-", application.version, ".b64");
+        if (!Core::FileUtils::FileExists(fullBase64File)) {
+            application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+            log_error << "Application Base64 image does not exist, name: " << application.name;
+            return;
+        }
+
+        // Update status
+        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
+        application = _database.UpdateApplication(application);
 
         // Get container id, if already running
         if (application.containerName.empty()) {
@@ -599,4 +604,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

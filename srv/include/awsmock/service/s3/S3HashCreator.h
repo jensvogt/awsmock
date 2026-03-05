@@ -47,7 +47,7 @@ namespace AwsMock::Service {
          * @param algorithms vector of algorithm names
          * @param object S3 object to hash
          */
-        void operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const;
+        void operator()(const std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const;
     };
 
 }// namespace AwsMock::Service

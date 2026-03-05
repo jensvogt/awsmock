@@ -1,5 +1,90 @@
 # Changelog
 
+## [1.14.31](https://github.com/jensvogt/awsmock/compare/v1.14.30...v1.14.31) (2026-03-05)
+
+
+### Bug Fixes
+
+* secrets manager tags ([f4a9d1a](https://github.com/jensvogt/awsmock/commit/f4a9d1a647ffa7d4fca7a0290633c4b4964ae1c0))
+
+## [1.14.30](https://github.com/jensvogt/awsmock/compare/v1.14.29...v1.14.30) (2026-03-05)
+
+
+### Bug Fixes
+
+* secrets manager tags ([5c8a88e](https://github.com/jensvogt/awsmock/commit/5c8a88e69068734c7385fc93bbdf9e0e4dc6bc83))
+
+## [1.14.29](https://github.com/jensvogt/awsmock/compare/1.14.28...v1.14.29) (2026-03-05)
+
+
+### Bug Fixes
+
+* secrets manager tags ([6ed5dc7](https://github.com/jensvogt/awsmock/commit/6ed5dc73e9c9abab9d4571a4ba46ec56fd95f6e4))
+
+## [1.14.28](https://github.com/jensvogt/awsmock/compare/v1.14.27...v1.14.28) (2026-02-27)
+
+
+### Bug Fixes
+
+* secrets manager tags ([16fb882](https://github.com/jensvogt/awsmock/commit/16fb8829705aa27730e1aab4453d01a23825b229))
+* secrets manager tags ([0076c6e](https://github.com/jensvogt/awsmock/commit/0076c6e34070403e84d0753bb1c04f429f346f85))
+
+## [1.14.27](https://github.com/jensvogt/awsmock/compare/v1.14.26...v1.14.27) (2026-02-27)
+
+
+### Bug Fixes
+
+* change sha1/sha256 algorithms ([5019f4c](https://github.com/jensvogt/awsmock/commit/5019f4c4cdf1b8cd8c460783efa8df2f8d620950))
+
+## [1.14.26](https://github.com/jensvogt/awsmock/compare/1.14.25...v1.14.26) (2026-02-27)
+
+
+### Bug Fixes
+
+* change sha1/sha256 algorithms ([32a8cc4](https://github.com/jensvogt/awsmock/commit/32a8cc49039051a10eb0bc48437e5cb05d4df7fb))
+
+## [1.14.25](https://github.com/jensvogt/awsmock/compare/v1.14.24...v1.14.25) (2026-02-27)
+
+
+### Bug Fixes
+
+* change sha1/sha256 algorithms ([5aa160f](https://github.com/jensvogt/awsmock/commit/5aa160f7b0e4c1f93cbb4070541df8a02cb6bcd9))
+
+## [1.14.24](https://github.com/jensvogt/awsmock/compare/v1.14.23...v1.14.24) (2026-02-27)
+
+
+### Bug Fixes
+
+* synchronous hash algorithm ([4e29cb7](https://github.com/jensvogt/awsmock/commit/4e29cb7eaebe5364bfa8fb872dd7122f345f0fa7))
+
+## [1.14.23](https://github.com/jensvogt/awsmock/compare/1.14.22...v1.14.23) (2026-02-27)
+
+
+### Bug Fixes
+
+* add magic.mgc to docker image ([1041dd4](https://github.com/jensvogt/awsmock/commit/1041dd4cd5726f6f01e22ef3acc647483a4c042c))
+
+## [1.14.22](https://github.com/jensvogt/awsmock/compare/v1.14.21...v1.14.22) (2026-02-26)
+
+
+### Bug Fixes
+
+* keep alive settings ([2524bc4](https://github.com/jensvogt/awsmock/commit/2524bc4ee7c8356cd1d2837d05f0db8ba095c302))
+
+## [1.14.21](https://github.com/jensvogt/awsmock/compare/1.14.20...v1.14.21) (2026-02-26)
+
+
+### Bug Fixes
+
+* keep alive settings ([8aac559](https://github.com/jensvogt/awsmock/commit/8aac559a7f48a17df53c04043e9da7420e79e1d5))
+
+## [1.14.20](https://github.com/jensvogt/awsmock/compare/1.14.19...v1.14.20) (2026-02-26)
+
+
+### Bug Fixes
+
+* keep alive settings ([6e17825](https://github.com/jensvogt/awsmock/commit/6e17825f9b846d0b8cc1e25a472ff252ae331920))
+
 ## [1.14.19](https://github.com/jensvogt/awsmock/compare/v1.14.18...v1.14.19) (2026-02-24)
 
 

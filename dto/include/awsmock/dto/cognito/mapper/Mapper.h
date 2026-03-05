@@ -73,12 +73,20 @@ namespace AwsMock::Dto::Cognito {
         static User map(const Database::Entity::Cognito::User &userEntity);
 
         /**
+         * @brief Maps a user entity to a user DTO
+         *
+         * @param userEntities user entities
+         * @return User DTO
+         */
+        static std::vector<UserCounter> mapCounter(const std::vector<Database::Entity::Cognito::User> &userEntities);
+
+        /**
          * @brief Map a list of entities to DTOs
          *
          * @param userEntities user entities
          * @return user DTOs
          */
-        static std::vector<UserCounter> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
+        static std::vector<User> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
 
         /**
          * @brief Maps a group entity to a group DTO

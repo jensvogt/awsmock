@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * User entities
          */
-        std::vector<UserCounter> users;
+        std::vector<User> users;
 
         /**
          * User entities
@@ -35,8 +35,7 @@ namespace AwsMock::Dto::Cognito {
 
         friend ListUsersResponse tag_invoke(boost::json::value_to_tag<ListUsersResponse>, boost::json::value const &v) {
             ListUsersResponse r;
-            r.users = boost::json::value_to<std::vector<UserCounter>>(v.at("Users"));
-            r.total = Core::Json::GetLongValue(v, "Users");
+            r.users = boost::json::value_to<std::vector<User>>(v.at("Users"));
             return r;
         }
 

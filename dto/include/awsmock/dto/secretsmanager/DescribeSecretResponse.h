@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/ReplicationStatus.h>
-#include <awsmock/dto/secretsmanager/model/SecretTags.h>
+#include <awsmock/dto/secretsmanager/model/Tag.h>
 #include <awsmock/dto/secretsmanager/model/VersionIdsToStages.h>
 
 namespace AwsMock::Dto::SecretsManager {
@@ -109,7 +109,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Map of Tags
          */
-        std::map<std::string, std::string> tags;
+        std::vector<Tag> tags;
 
       private:
 
@@ -134,7 +134,7 @@ namespace AwsMock::Dto::SecretsManager {
                 r.versionIdsToStages = boost::json::value_to<VersionIdsToStages>(v.at("VersionIdsToStages"));
             }
             if (Core::Json::AttributeExists(v, "Tags")) {
-                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+                r.tags = boost::json::value_to<std::vector<Tag>>(v.at("Tags"));
             }
             return r;
         }

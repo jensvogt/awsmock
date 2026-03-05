@@ -16,7 +16,7 @@ namespace AwsMock::Service {
 
                     Dto::KMS::CreateKeyRequest kmsRequest = Dto::KMS::CreateKeyRequest::FromJson(clientCommand);
                     Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
-                    log_info << "Key created, keyId: " << kmsResponse.key.keyId;
+                    log_info << "Key created, keyId: " << kmsResponse.keyMetadata.keyId;
 
                     return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
@@ -60,8 +60,8 @@ namespace AwsMock::Service {
 
                     Dto::KMS::DescribeKeyRequest kmsRequest = Dto::KMS::DescribeKeyRequest::FromJson(clientCommand);
                     Dto::KMS::DescribeKeyResponse kmsResponse = _kmsService.DescribeKey(kmsRequest);
-                    log_info << "Describe key received, count: " << kmsResponse.key.keyId;
-                    log_info << "Describe key received, count: " << kmsResponse.key;
+                    log_info << "Describe key received, count: " << kmsResponse.keyMetadata.keyId;
+                    log_info << "Describe key received, count: " << kmsResponse.keyMetadata;
 
                     return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }

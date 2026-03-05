@@ -115,7 +115,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                const long count = _bucketCollection.count_documents(query.extract());
+                const long count = _bucketCollection.count_documents(query.view());
                 log_trace << "Bucket count: " << count;
                 return count;
 
@@ -624,7 +624,7 @@ namespace AwsMock::Database {
                 query.append(kvp("internalName", filename));
             }
 
-            return _objectCollection.count_documents(query.extract(), options) > 0;
+            return _objectCollection.count_documents(query.view(), options) > 0;
         }
         return _memoryDb.ObjectExistsInternalName(filename);
     }
@@ -872,7 +872,7 @@ namespace AwsMock::Database {
                     query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                count = _objectCollection.count_documents(query.extract());
+                count = _objectCollection.count_documents(query.view());
                 log_trace << "Object count: " << count;
 
                 return count;

@@ -147,19 +147,15 @@ namespace AwsMock::Database {
                     query.append(kvp("region", region));
                 }
 
-                const long count = _parameterCollection.count_documents(query.extract());
+                const long count = _parameterCollection.count_documents(query.view());
                 log_trace << "Parameter count: " << count;
                 return count;
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Parameter count failed, error: " << e.what();
             }
-
-        } else {
-
-            return _memoryDb.CountParameters();
         }
-        return -1;
+        return _memoryDb.CountParameters();
     }
 
     Entity::SSM::Parameter SSMDatabase::CreateParameter(Entity::SSM::Parameter &parameter) const {

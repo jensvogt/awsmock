@@ -21,9 +21,11 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-                const int64_t count = _secretCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-                log_trace << "Secret exists: " << std::boolalpha << count;
-                return count > 0;
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _secretCollection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -42,9 +44,11 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-                const int64_t count = _secretCollection.count_documents(make_document(kvp("arn", arn)));
-                log_trace << "Secret exists: " << std::boolalpha << count;
-                return count > 0;
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _secretCollection.count_documents(make_document(kvp("arn", arn)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -67,9 +71,11 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
 
-                const int64_t count = _secretCollection.count_documents(make_document(kvp("secretId", secretId)));
-                log_trace << "Secret exists: " << std::boolalpha << count;
-                return count > 0;
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _secretCollection.count_documents(make_document(kvp("secretId", secretId)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

@@ -71,6 +71,7 @@ COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/loca
 COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/bin
 COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/bin
 COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/bin
+COPY --from=build /usr/src/awsmock/dist/etc/magic.mgc /usr/local/awsmock/etc
 COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
 
 # Set library search path

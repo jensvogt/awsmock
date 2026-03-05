@@ -434,7 +434,7 @@ namespace AwsMock::Database {
                     query.append(kvp("topicName", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                const long count = _topicCollection.count_documents(query.extract());
+                const long count = _topicCollection.count_documents(query.view());
                 log_trace << "Count topics, result: " << count;
                 return count;
 
@@ -665,7 +665,7 @@ namespace AwsMock::Database {
                     query.append(kvp("topicArn", topicArn));
                 }
 
-                const long count = _messageCollection.count_documents(query.extract());
+                const long count = _messageCollection.count_documents(query.view());
                 log_trace << "Count messages, arn: " << topicArn << " result: " << count;
                 return count;
             } catch (const mongocxx::exception &exc) {

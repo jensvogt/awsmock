@@ -87,11 +87,11 @@ namespace AwsMock::Dto::Cognito {
 
         friend Group tag_invoke(boost::json::value_to_tag<Group>, boost::json::value const &v) {
             Group r;
-            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
-            r.groupName = Core::Json::GetStringValue(v, "groupName");
-            r.description = Core::Json::GetStringValue(v, "description");
-            r.roleArn = Core::Json::GetStringValue(v, "roleArn");
-            r.precedence = Core::Json::GetLongValue(v, "precedence");
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.groupName = Core::Json::GetStringValue(v, "GroupName");
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.roleArn = Core::Json::GetStringValue(v, "RoleArn");
+            r.precedence = Core::Json::GetLongValue(v, "Precedence");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
             return r;
@@ -99,17 +99,17 @@ namespace AwsMock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Group const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"userPoolId", boost::json::value_from(obj.userPoolId)},
-                    {"groupName", boost::json::value_from(obj.groupName)},
-                    {"description", boost::json::value_from(obj.description)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", boost::json::value_from(obj.userPoolId)},
+                    {"GroupName", boost::json::value_from(obj.groupName)},
+                    {"Description", boost::json::value_from(obj.description)},
+                    {"RoleArn", boost::json::value_from(obj.roleArn)},
                     {"roleArn", boost::json::value_from(obj.roleArn)},
-                    {"roleArn", boost::json::value_from(obj.roleArn)},
-                    {"precedence", boost::json::value_from(obj.precedence)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Precedence", boost::json::value_from(obj.precedence)},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
