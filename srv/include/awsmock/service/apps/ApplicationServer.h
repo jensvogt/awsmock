@@ -29,8 +29,7 @@ namespace AwsMock::Service {
      */
     class ApplicationServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -41,8 +40,7 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-      private:
-
+    private:
         /**
          * @brief Update counters
          */
@@ -159,13 +157,8 @@ namespace AwsMock::Service {
          * Shared memory segment
          */
         boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Counter map in a shared memory segment
-         */
-        // Database::ApplicationCounterMapType *_applicationCounterMap{};
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_APPLICATION_SERVER_H

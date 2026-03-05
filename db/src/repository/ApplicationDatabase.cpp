@@ -6,10 +6,11 @@
 
 namespace AwsMock::Database {
 
-    ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {}
+    ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {
+    }
 
     bool ApplicationDatabase::ApplicationExists(const std::string &region, const std::string &name) const {
-       Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "application_exists");
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "application_exists");
 
         if (HasDatabase()) {
 
@@ -151,7 +152,7 @@ namespace AwsMock::Database {
 
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _topicCollection = client->database(_databaseName)[_applicationCollectionName];
+                mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
 
                 document query = {};
 
@@ -162,7 +163,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
                 }
 
-                const long count = _topicCollection.count_documents(query.extract());
+                const long count = _applicationCollection.count_documents(query.extract());
                 log_trace << "Count applications, result: " << count;
                 return count;
 
@@ -261,4 +262,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllApplications();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
