@@ -37,7 +37,7 @@ namespace AwsMock::Service {
 
                     Dto::SSM::GetParameterCounterRequest ssmRequest = Dto::SSM::GetParameterCounterRequest::FromJson(clientCommand);
                     Dto::SSM::GetParameterCounterResponse ssmResponse = _ssmService.GetParameterCounter(ssmRequest);
-                    log_info << "Parameter found, name: " << ssmRequest.name << ", body: " << ssmResponse.ToJson();
+                    log_info << "Parameter found, name: " << ssmRequest.name;
                     return SendResponse(request, http::status::ok, ssmResponse.ToJson());
                 }
 
