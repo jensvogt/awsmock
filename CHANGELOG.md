@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.31](https://github.com/jensvogt/awsmock/compare/v1.14.30...v1.14.31) (2026-03-05)
+
+
+### Bug Fixes
+
+* secrets manager tags ([f4a9d1a](https://github.com/jensvogt/awsmock/commit/f4a9d1a647ffa7d4fca7a0290633c4b4964ae1c0))
+
 ## [1.14.30](https://github.com/jensvogt/awsmock/compare/v1.14.29...v1.14.30) (2026-03-05)
 
 
