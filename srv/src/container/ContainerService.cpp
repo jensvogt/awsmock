@@ -82,10 +82,10 @@ namespace AwsMock::Service {
         std::string dockerFile = WriteApplicationDockerFile(codeDir, name, archive, privatePort, runtime, environment);
         const std::string imageFile = BuildImageFile(codeDir, name);
         if (auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
-            log_error << "Build image failed, statusCode: " << statusCode << ", body: " << body;
+            log_error << "Build image failed, image: " << name << ":" << tag << ", statusCode: " << statusCode << ", body: " << body;
             return dockerFile;
         }
-        log_info << "Build image successful, name: " << name << ": " << tag;
+        log_info << "Build image successful, name: " << name << ":" << tag;
         return dockerFile;
     }
 
