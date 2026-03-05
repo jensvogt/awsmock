@@ -9,7 +9,7 @@ namespace AwsMock::Database {
     ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {}
 
     bool ApplicationDatabase::ApplicationExists(const std::string &region, const std::string &name) const {
-       Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "application_exists");
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "application_exists");
 
         if (HasDatabase()) {
 
@@ -17,9 +17,12 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-                const int64_t count = _applicationCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
-                log_trace << "Application exists: " << std::boolalpha << count;
-                return count > 0;
+
+                // Set limit to 1 (Very important for performance!)
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _applicationCollection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
