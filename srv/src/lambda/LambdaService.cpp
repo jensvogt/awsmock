@@ -360,12 +360,14 @@ namespace AwsMock::Service {
             // Create mutex
             _instanceMutex[request.functionName] = std::make_shared<boost::mutex>();
 
+            // Start lambda
             Dto::Lambda::StartLambdaRequest startRequest;
             startRequest.functionArn = functionArn;
             startRequest.region = request.region;
             StartLambda(startRequest);
             log_debug << "Lambda started, containerName: " << request.functionName + "-" + instanceId;
 
+            // Create response object
             Dto::Lambda::UpdateFunctionCodeResponse response{};
             response.region = lambda.region;
             response.functionName = lambda.function;
