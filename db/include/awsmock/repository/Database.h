@@ -109,7 +109,7 @@ namespace AwsMock::Database {
         /**
          * Database name
          */
-        std::string _name;
+        std::string _name{};
 
         /**
          * Database client
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
         /**
          * Database flag
          */
-        bool _useDatabase;
+        bool _useDatabase = true;
 
         /**
          * @brief Index definitions

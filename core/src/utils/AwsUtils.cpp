@@ -68,6 +68,10 @@ namespace AwsMock::Core {
         return queueUrl.substr(queueUrl.find_last_of("/") + 1);
     }
 
+    std::string AwsUtils::ConvertLambdaNameToArn(const std::string &region, const std::string &accountId, const std::string &functionName) {
+        return CreateArn("lambda", region, accountId, "function:" + functionName);
+    }
+
     std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -461,5 +465,9 @@ namespace AwsMock::Core {
         std::ostringstream oss;
         oss << std::put_time(&tm, "%FT%TZ");
         return oss.str();
+    }
+
+    std::string AwsUtils::GetDefaultAccountId() {
+        return SQS_DEFAULT_ACCOUNT_ID;
     }
 }// namespace AwsMock::Core

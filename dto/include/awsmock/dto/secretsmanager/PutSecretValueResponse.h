@@ -58,7 +58,9 @@ namespace AwsMock::Dto::SecretsManager {
             r.name = Core::Json::GetStringValue(v, "Name");
             r.arn = Core::Json::GetStringValue(v, "ARN");
             r.versionId = Core::Json::GetStringValue(v, "VersionId");
-            r.versionStages = boost::json::value_to<std::vector<std::string>>(v.at("VersionId"));
+            if (Core::Json::AttributeExists(v, "VersionStages")) {
+                r.versionStages = boost::json::value_to<std::vector<std::string>>(v.at("VersionStages"));
+            }
             return r;
         }
 

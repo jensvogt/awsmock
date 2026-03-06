@@ -47,7 +47,9 @@ namespace AwsMock::Dto::Docker {
 
         friend ListStatsResponse tag_invoke(boost::json::value_to_tag<ListStatsResponse>, boost::json::value const &v) {
             ListStatsResponse r;
-            r.containerStats = boost::json::value_to<std::vector<ContainerStat>>(v);
+            if (v.is_array() && v.as_array().size() > 0) {
+                r.containerStats = boost::json::value_to<std::vector<ContainerStat>>(v);
+            }
             return r;
         }
 
