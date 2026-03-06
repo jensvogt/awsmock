@@ -350,18 +350,21 @@ namespace AwsMock::Service {
 
             // Find idle instance
             Database::Entity::Lambda::Instance instance;
-
-            // Create instance
             std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            log_debug << "Created lambda instance, instanceId: " << instanceId;
 
             // Create lambda
             LambdaCreator lambdaCreator;
             lambda = lambdaCreator.CreateLambda(lambda, instanceId);
 
+            // Create mutex
+            _instanceMutex[request.functionName] = std::make_shared<boost::mutex>();
+
             Dto::Lambda::StartLambdaRequest startRequest;
             startRequest.functionArn = functionArn;
             startRequest.region = request.region;
             StartLambda(startRequest);
+            log_debug << "Lambda started, containerName: " << request.functionName + "-" + instanceId;
 
             Dto::Lambda::UpdateFunctionCodeResponse response{};
             response.region = lambda.region;
