@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.33](https://github.com/jensvogt/awsmock/compare/v1.14.32...v1.14.33) (2026-03-06)
+
+
+### Bug Fixes
+
+* lambda update code call ([f55681f](https://github.com/jensvogt/awsmock/commit/f55681f480e3be68a640e96e7ea6f39d8f08eee0))
+* lambda update code call ([1c04f87](https://github.com/jensvogt/awsmock/commit/1c04f870fccc5eeba30a3f723869f9d9ca0cecf1))
+
 ## [1.14.32](https://github.com/jensvogt/awsmock/compare/v1.14.31...v1.14.32) (2026-03-06)
 
 
