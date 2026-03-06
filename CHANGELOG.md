@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.32](https://github.com/jensvogt/awsmock/compare/v1.14.31...v1.14.32) (2026-03-06)
+
+
+### Bug Fixes
+
+* SEGFAULT in application module ([9102d1d](https://github.com/jensvogt/awsmock/commit/9102d1d663784b266e0d447711fa0af3c080259c))
+* SEGFAULT in application module ([cc41020](https://github.com/jensvogt/awsmock/commit/cc4102034ae2818db2e8a5bdae680f3b002e1a91))
+
 ## [1.14.31](https://github.com/jensvogt/awsmock/compare/v1.14.30...v1.14.31) (2026-03-05)
 
 
