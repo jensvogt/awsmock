@@ -16,11 +16,11 @@
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/core/monitoring/MonitoringTimer.h>
 
 namespace AwsMock::Database {
 
@@ -146,12 +146,12 @@ namespace AwsMock::Database {
         /**
          * Database name
          */
-        std::string _databaseName;
+        std::string _databaseName{};
 
         /**
          * Application collection name
          */
-        std::string _applicationCollectionName;
+        std::string _applicationCollectionName{};
 
         /**
          * Application in-memory database

@@ -70,6 +70,17 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
+         * @brief HTTP PUT request.
+         *
+         * @param request HTTP request
+         * @param region AWS region name
+         * @param user AWS user
+         * @return HTTP response
+         * @see AbstractResource::HandleGetRequest
+         */
+        http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+
+        /**
          * @brief HTTP DELETE request.
          *
          * @param request HTTP request

@@ -201,6 +201,16 @@ namespace AwsMock::Core {
         static std::string ConvertSQSQueueUrlToName(const std::string &queueUrl);
 
         /**
+         * @brief Converts a lambda fiunction nae to a lambda function ARN
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param functionName name of the function
+         * @return lambda function ARN
+         */
+        static std::string ConvertLambdaNameToArn(const std::string &region, const std::string &accountId, const std::string &functionName);
+
+        /**
          * @brief Creates a queue ARN
          *
          * @return SQS sender ID
@@ -508,6 +518,13 @@ namespace AwsMock::Core {
         static std::string GetBucketNameFromArn(const std::string &arn) {
             return arn.substr(arn.find_last_of(":") + 1);
         }
+
+        /**
+         * @brief Returns the default account ID
+         *
+         * @return default account ID
+         */
+        static std::string GetDefaultAccountId();
 
       private:
 

@@ -34,10 +34,8 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            ApplicationCreator applicationCreator;
-            boost::asio::post(_ioc, [applicationCreator, fullBase64File, application, instanceId] {
-                applicationCreator(fullBase64File, application.region, application.name, instanceId);
-            });
+            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+            t.detach();
 
             Dto::Apps::ListApplicationCountersRequest listRequest{};
             listRequest.requestId = request.requestId;
@@ -162,10 +160,8 @@ namespace AwsMock::Service {
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        ApplicationCreator applicationCreator;
-        boost::asio::post(_ioc, [applicationCreator, fullBase64File, application, instanceId] {
-            applicationCreator(fullBase64File, application.region, application.name, instanceId);
-        });
+        boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+        t.detach();
         log_debug << "Application code updated, name: " << request.applicationName << ", version: " << request.version;
     }
 
@@ -196,10 +192,8 @@ namespace AwsMock::Service {
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        ApplicationCreator applicationCreator;
-        boost::asio::post(_ioc, [applicationCreator, base64FullFile, application, instanceId] {
-            applicationCreator(base64FullFile, application.region, application.name, instanceId);
-        });
+        boost::thread t(boost::ref(applicationCreator), base64FullFile, application.region, application.name, instanceId);
+        t.detach();
     }
 
     void ApplicationService::EnableApplication(const Dto::Apps::EnableApplicationRequest &request) const {
@@ -232,8 +226,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::DisableApplication(const Dto::Apps::DisableApplicationRequest &request) const {
-        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, "action", "disable_application");
-        //Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_application");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "disable_application");
         log_debug << "Diable application request, name: " << request.application.name;
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
@@ -306,11 +299,9 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            ApplicationCreator applicationCreator;
-            boost::asio::post(_ioc, [applicationCreator, fullBase64File, application, instanceId] {
-                applicationCreator(fullBase64File, application.region, application.name, instanceId);
-            });
-            log_debug << "Application start initiated, name: " << request.application.name;
+            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+            t.detach();
+            log_debug << "Application start initiated, name: " << application.name;
 
         } else {
             Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerId);
@@ -388,7 +379,6 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            ApplicationCreator applicationCreator;
             boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
             t.detach();
             log_debug << "Application start initiated, name: " << request.application.name;

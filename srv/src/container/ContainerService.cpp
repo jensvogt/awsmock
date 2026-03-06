@@ -412,7 +412,7 @@ namespace AwsMock::Service {
         for (const Dto::Docker::ListContainerResponse listResponse = ListContainers(); const auto &container: listResponse.containerList) {
             auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + container.id + "/stats?stream=false&one-shot=true");
             if (statusCode != http::status::ok) {
-                log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
+                log_warning << "List container stats failed, statusCode: " << statusCode << " body " << body;
                 return {};
             }
             Dto::Docker::ContainerStat containerStat = containerStat.FromJson(body);

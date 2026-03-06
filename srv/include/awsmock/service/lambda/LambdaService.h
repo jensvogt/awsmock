@@ -28,7 +28,6 @@
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
-#include <awsmock/dto/lambda/RebuildLambdaRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/CreateTagRequest.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
@@ -38,6 +37,9 @@
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
+#include <awsmock/dto/lambda/RebuildLambdaRequest.h>
+#include <awsmock/dto/lambda/UpdateFunctionCodeRequest.h>
+#include <awsmock/dto/lambda/UpdateFunctionCodeResponse.h>
 #include <awsmock/dto/lambda/internal/AddEnvironmentRequest.h>
 #include <awsmock/dto/lambda/internal/AddEventSourceRequest.h>
 #include <awsmock/dto/lambda/internal/AddTagRequest.h>
@@ -120,7 +122,8 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -203,6 +206,16 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::UpdateLambdaRequest
          */
         void UpdateLambda(const Dto::Lambda::UpdateLambdaRequest &request) const;
+
+        /**
+         * @brief Update a lambda function code
+         *
+         * @param request update lambda function code request
+         * @return update lambda function code response
+         * @see Dto::Lambda::UpdateFunctionCodeRequest
+         * @see Dto::Lambda::UpdateFunctionCodeResponse
+         */
+        Dto::Lambda::UpdateFunctionCodeResponse UpdateFunctionCode(const Dto::Lambda::UpdateFunctionCodeRequest &request) const;
 
         /**
          * @brief Add a lambda environment variable
@@ -543,7 +556,8 @@ namespace AwsMock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-    private:
+      private:
+
         /**
          * @brief Tries to find an idle lambda function instance
          *
@@ -642,8 +656,8 @@ namespace AwsMock::Service {
         /**
          * Function mutexes
          */
-        static std::map<std::string, std::shared_ptr<boost::mutex> > _instanceMutex;
+        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

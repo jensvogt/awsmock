@@ -149,7 +149,7 @@ namespace AwsMock::Manager {
 
         if (!Database::ModuleDatabase::instance().ModuleExists(key)) {
             Database::Entity::Module::Module m = {.name = key, .state = ModuleState::STOPPED, .status = ModuleStatus::ACTIVE};
-            Database::ModuleDatabase::instance().CreateModule(m);
+            Database::ModuleDatabase::instance().CreateOrUpdateModule(m);
         }
     }
 
