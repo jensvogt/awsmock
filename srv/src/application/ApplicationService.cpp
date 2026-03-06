@@ -34,8 +34,9 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-            t.detach();
+            boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+                applicationCreator(fullBase64File, application.region, application.name, instanceId);
+            });
 
             Dto::Apps::ListApplicationCountersRequest listRequest{};
             listRequest.requestId = request.requestId;
@@ -160,8 +161,9 @@ namespace AwsMock::Service {
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-        t.detach();
+        boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+            applicationCreator(fullBase64File, application.region, application.name, instanceId);
+        });
         log_debug << "Application code updated, name: " << request.applicationName << ", version: " << request.version;
     }
 
@@ -187,13 +189,14 @@ namespace AwsMock::Service {
         // Get the base64 encoded application code
         const auto applicationDataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
         const std::string base64File = application.name + "-" + application.version + ".b64";
-        std::string base64FullFile = applicationDataDir + Core::FileUtils::separator() + base64File;
-        log_debug << "Using Base64File: " << base64FullFile;
+        std::string fullBase64File = applicationDataDir + Core::FileUtils::separator() + base64File;
+        log_debug << "Using Base64File: " << fullBase64File;
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        boost::thread t(boost::ref(applicationCreator), base64FullFile, application.region, application.name, instanceId);
-        t.detach();
+        boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+            applicationCreator(fullBase64File, application.region, application.name, instanceId);
+        });
     }
 
     void ApplicationService::EnableApplication(const Dto::Apps::EnableApplicationRequest &request) const {
@@ -299,8 +302,9 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-            t.detach();
+            boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+                applicationCreator(fullBase64File, application.region, application.name, instanceId);
+            });
             log_debug << "Application start initiated, name: " << application.name;
 
         } else {
@@ -379,8 +383,9 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-            t.detach();
+            boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+                applicationCreator(fullBase64File, application.region, application.name, instanceId);
+            });
             log_debug << "Application start initiated, name: " << request.application.name;
 
         } else {
