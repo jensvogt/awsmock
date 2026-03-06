@@ -326,6 +326,56 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Lambda::UpdateFunctionCodeResponse LambdaService::UpdateFunctionCode(const Dto::Lambda::UpdateFunctionCodeRequest &request) const {
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda");
+        log_debug << "Update lambda function code request, functionName: " << request.functionName;
+
+        std::string functionArn = Core::AwsUtils::ConvertLambdaNameToArn(request.region, Core::AwsUtils::GetDefaultAccountId(), request.functionName);
+
+        if (!_lambdaDatabase.LambdaExistsByArn(functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + functionArn);
+        }
+
+        try {
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(functionArn);
+            lambda.enabled = true;
+            lambda.modified = system_clock::now();
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda updated, lambdaArn: " << lambda.arn;
+
+            // Write the base64 file
+            lambda.code.zipFile = request.functionName + "-" + request.revisionId + ".b64";
+            WriteBase64File(lambda.code.zipFile, request.zipFile);
+
+            // Find idle instance
+            Database::Entity::Lambda::Instance instance;
+
+            // Create instance
+            std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+
+            // Create lambda
+            LambdaCreator lambdaCreator;
+            lambda = lambdaCreator.CreateLambda(lambda, instanceId);
+
+            Dto::Lambda::StartLambdaRequest startRequest;
+            startRequest.functionArn = functionArn;
+            startRequest.region = request.region;
+            StartLambda(startRequest);
+
+            Dto::Lambda::UpdateFunctionCodeResponse response{};
+            response.region = lambda.region;
+            response.functionName = lambda.function;
+            response.functionArn = lambda.arn;
+            response.handler = lambda.handler;
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     void LambdaService::AddEventSource(const Dto::Lambda::AddEventSourceRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "add_event_source");
         log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;

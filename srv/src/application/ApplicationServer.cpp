@@ -17,9 +17,9 @@ namespace AwsMock::Service {
         _logServerPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.log-server-port");
 
         // Start application background threads
-        _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
-        _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
+        _scheduler.AddTask("application-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
+        _scheduler.AddTask("application-restart", [this] { RestartApplications(); }, -1);
+        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
@@ -41,7 +41,7 @@ namespace AwsMock::Service {
         log_trace << "Application Monitoring starting";
 
         // Total count
-        // _metricService.SetGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase.CountApplications());
+        //        _metricService.SetGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationDatabase.CountApplications()));
 
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {

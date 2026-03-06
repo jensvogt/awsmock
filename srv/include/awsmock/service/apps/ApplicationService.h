@@ -39,6 +39,7 @@
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/apps/ApplicationCreator.h>
+#include <boost/asio/strand.hpp>
 
 
 namespace AwsMock::Service {
@@ -256,6 +257,11 @@ namespace AwsMock::Service {
          * Boost asio IO context
          */
         boost::asio::io_context &_ioc;
+
+        /**
+         * Application creator
+         */
+        ApplicationCreator applicationCreator;
     };
 
 }// namespace AwsMock::Service

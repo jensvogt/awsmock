@@ -410,9 +410,42 @@ namespace AwsMock::Service {
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = Dto::Lambda::DeleteFunctionRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
                     _lambdaService.DeleteFunction(lambdaRequest);
-                    log_trace << "Delete function, functionName: " << lambdaRequest.functionName;
+                    log_info << "Function deleted, functionName: " << lambdaRequest.functionName;
                 });
                 return SendResponse(request, http::status::ok);
+            }
+
+            log_error << "Unknown method";
+            return SendResponse(request, http::status::bad_request, "Unknown method");
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+            return SendResponse(request, http::status::internal_server_error, exc.message());
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendResponse(request, http::status::internal_server_error, exc.what());
+        }
+    }
+
+    http::response<http::dynamic_body> LambdaHandler::HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        log_trace << "Lambda PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
+
+        try {
+            std::string version, action;
+            Core::HttpUtils::GetVersionAction(request.target(), version, action);
+
+            if (const std::string method = Core::HttpUtils::GetPathParameter(request.target(), 3); action == "functions" && method == "code") {
+                Dto::Lambda::UpdateFunctionCodeRequest lambdaRequest;
+                lambdaRequest.region = region;
+                lambdaRequest.user = user;
+                lambdaRequest.functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
+
+                std::string tmp = Core::HttpUtils::GetBodyAsString(request);
+
+                const Dto::Lambda::Code code = code.FromJson(Core::HttpUtils::GetBodyAsString(request));
+                lambdaRequest.zipFile = code.zipFile;
+                const Dto::Lambda::UpdateFunctionCodeResponse lambdaResponse = _lambdaService.UpdateFunctionCode(lambdaRequest);
+                log_info << "Update function code, functionName: " << lambdaRequest.functionName;
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             log_error << "Unknown method";
@@ -433,12 +466,15 @@ namespace AwsMock::Service {
         clientCommand.FromRequest(request, region, user);
 
         try {
-            std::string version, action;
+            std::string version{}, action{};
             Core::HttpUtils::GetVersionAction(request.target(), version, action);
 
             if (action == "functions") {
+                std::string qualifier{};
                 std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
-                std::string qualifier = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                if (Core::HttpUtils::GetPathParameters(request.target()).size() > 3) {
+                    qualifier = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                }
                 log_debug << "Found lambda name, name: " << functionName << " qualifier: " << qualifier;
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest;
@@ -470,4 +506,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
