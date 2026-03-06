@@ -207,4 +207,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
