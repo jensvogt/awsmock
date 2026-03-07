@@ -254,6 +254,23 @@ namespace AwsMock::Database {
         return it->second;
     }
 
+    Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const {
+
+        const auto it =
+                std::ranges::find_if(_items, [region, tableName, keys](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                    const bool result = std::ranges::all_of(item.second.keys, [keys](std::pair<std::string, Entity::DynamoDb::AttributeValue> v) {
+                        return v.second.stringValue == keys.at(v.first).stringValue;
+                    });
+                    return item.second.region == region && item.second.tableName == tableName && result;
+                });
+
+        if (it == _items.end()) {
+            log_error << "Get item by keys failed, region: " << region << ", tableName: " << tableName;
+            throw Core::DatabaseException("Get item by keys failed, region: " + region + ", tableName: " + tableName);
+        }
+        return it->second;
+    }
+
     Entity::DynamoDb::Item DynamoDbMemoryDb::CreateItem(const Entity::DynamoDb::Item &item) {
         boost::mutex::scoped_lock lock(_itemMutex);
 

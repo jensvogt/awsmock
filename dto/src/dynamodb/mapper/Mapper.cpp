@@ -4,8 +4,6 @@
 
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 
-#include <ranges>
-
 namespace AwsMock::Dto::DynamoDb {
 
     Database::Entity::DynamoDb::Table Mapper::map(const DescribeTableResponse &response) {
