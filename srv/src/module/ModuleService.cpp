@@ -288,6 +288,18 @@ namespace AwsMock::Service {
                     }
                     log_info << "DynamoDB item imported, count: " << infrastructure.cognitoUserPools.size();
                 }
+
+                // Fix item count and item size
+                for (auto &table: infrastructure.dynamoDbTables) {
+                    table.itemCount = _dynamoDatabase.CountItems(table.region, table.name);
+                    long size = 0;
+                    for (const auto &item: _dynamoDatabase.ListItems(table.region, table.name)) {
+                        size += item.size;
+                    }
+                    table.size = size;
+                    _dynamoDatabase.UpdateTable(table);
+                    log_info << "DynamoDB table counter fixed, name: " << table.name << ", count: " << table.itemCount << ", size: " << table.size;
+                }
             }
 
             // Applications
