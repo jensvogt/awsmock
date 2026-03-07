@@ -412,8 +412,8 @@ namespace AwsMock::Database {
                 }
 
                 // Add primary keys
-                for (const auto &k: table.keySchemas) {
-                    std::string keyName = k.at("AttributeName");
+                for (const auto &v: table.keySchema) {
+                    std::string keyName = v.attributeName;
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
                     auto it = std::ranges::find_if(att,
                                                    [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
@@ -571,25 +571,24 @@ namespace AwsMock::Database {
                 }
 
                 // Add primary keys
-                for (const auto &key: table.keySchemas) {
-                    const std::string &keyName = key.at("AttributeName");
+                for (const auto &k: table.keySchema) {
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
                     auto it = std::ranges::find_if(att,
-                                                   [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
-                                                       return attribute.first == keyName;
+                                                   [k](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
+                                                       return attribute.first == k.attributeName;
                                                    });
                     if (it != att.end()) {
                         if (!it->second.stringValue.empty()) {
-                            query.append(kvp("attributes." + keyName + ".S", it->second.stringValue));
+                            query.append(kvp("attributes." + k.attributeName + ".S", it->second.stringValue));
                         }
                         if (!it->second.numberValue.empty()) {
-                            query.append(kvp("attributes." + keyName + ".N", it->second.numberValue));
+                            query.append(kvp("attributes." + k.attributeName + ".N", it->second.numberValue));
                         }
                         if (it->second.boolValue) {
-                            query.append(kvp("attributes." + keyName + ".BOOL", *it->second.boolValue));
+                            query.append(kvp("attributes." + k.attributeName + ".BOOL", *it->second.boolValue));
                         }
                         if (it->second.nullValue && it->second.nullValue) {
-                            query.append(kvp("attributes." + keyName + ".nullptr", *it->second.nullValue));
+                            query.append(kvp("attributes." + k.attributeName + ".nullptr", *it->second.nullValue));
                         }
                     }
                 }
@@ -686,7 +685,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void DynamoDbDatabase::DeleteItems(const std::string &region, const std::string &tableName) const {
+    long DynamoDbDatabase::DeleteItems(const std::string &region, const std::string &tableName) const {
 
         if (HasDatabase()) {
 
@@ -694,18 +693,18 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+
                 const auto result = _itemCollection.delete_many(make_document(kvp("tableName", tableName)));
+
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteItems(region, tableName);
         }
+        return _memoryDb.DeleteItems(region, tableName);
     }
 
     long DynamoDbDatabase::DeleteAllItems() const {

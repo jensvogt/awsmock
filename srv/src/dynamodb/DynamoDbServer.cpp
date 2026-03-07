@@ -34,12 +34,12 @@ namespace AwsMock::Service {
         _scheduler.AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing
-        _scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, _workerPeriod);
-        _scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, _workerPeriod);
+        //_scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, _workerPeriod);
+        //_scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, _workerPeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("dynamodb-backup", [this] { BackupDynamoDb(); }, _backupCron);
+            _scheduler.AddTask("dynamodb-backup", [] { BackupDynamoDb(); }, _backupCron);
         }
 
         // Connect stop signal

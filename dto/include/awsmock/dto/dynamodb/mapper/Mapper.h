@@ -113,6 +113,28 @@ namespace AwsMock::Dto::DynamoDb {
         static std::vector<Item> map(const std::vector<Database::Entity::DynamoDb::Item> &itemEntities);
 
         /**
+         * @brief Maps a table key schema DTO to a key schema entity
+         *
+         * @param keySchemaDto DynamoDb table key schema DTO
+         * @return Dynamodb table key schema entity
+         * @see Dto::DynamoDb::KeySchema
+         * @see Database::Entity::DynamoDb::KeySchema
+         */
+        static Database::Entity::DynamoDb::KeySchema map(const KeySchema &keySchemaDto);
+        static KeySchema map(const Database::Entity::DynamoDb::KeySchema &keySchemaEntity);
+
+        /**
+         * @brief Maps a table attribute DTO to an attribute entity
+         *
+         * @param attributeDefinitionDto DynamoDb table attribute
+         * @return Dynamodb table attribute entity
+         * @see Dto::DynamoDb::KeySchema
+         * @see Database::Entity::DynamoDb::KeySchema
+         */
+        static Database::Entity::DynamoDb::AttributeDefinition map(const AttributeDefinition &attributeDefinitionDto);
+        static AttributeDefinition map(const Database::Entity::DynamoDb::AttributeDefinition &attributeDefinitionEntity);
+
+        /**
          * @brief Maps a DynamoDB item entity to an item counter DTO.
          *
          * @param itemEntity DynamoDb item entity

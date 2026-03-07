@@ -186,7 +186,7 @@ namespace AwsMock::Service {
          * @param request put item request DTO
          * @return GetItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::PutItemResponse PutItem(Dto::DynamoDb::PutItemRequest &request) const;
 
         /**
          * @brief Query the database

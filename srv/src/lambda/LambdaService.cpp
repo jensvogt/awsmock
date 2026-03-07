@@ -332,6 +332,8 @@ namespace AwsMock::Service {
 
         std::string functionArn = Core::AwsUtils::ConvertLambdaNameToArn(request.region, Core::AwsUtils::GetDefaultAccountId(), request.functionName);
 
+        std::vector<Database::Entity::Lambda::Lambda> lambads = _lambdaDatabase.ListLambdas();
+
         if (!_lambdaDatabase.LambdaExistsByArn(functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + functionArn);
