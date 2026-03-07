@@ -132,6 +132,12 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::KeySchema
          */
         static Database::Entity::DynamoDb::AttributeDefinition map(const AttributeDefinition &attributeDefinitionDto);
+
+        /**
+         *
+         * @param attributeDefinitionEntity
+         * @return
+         */
         static AttributeDefinition map(const Database::Entity::DynamoDb::AttributeDefinition &attributeDefinitionEntity);
         static std::map<std::string, Database::Entity::DynamoDb::AttributeValue> map(const std::map<std::string, AttributeValue> &keyDtos);
 

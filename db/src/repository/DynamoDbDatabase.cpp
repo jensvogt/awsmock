@@ -61,25 +61,29 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Table DynamoDbDatabase::GetTableById(bsoncxx::oid oid) const {
 
-        try {
+        if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            const auto mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
-            if (!mResult) {
-                log_error << "Database exception: Table not found ";
-                throw Core::DatabaseException("Database exception, Table not found ");
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                const auto mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
+                if (!mResult) {
+                    log_error << "Database exception: Table not found ";
+                    throw Core::DatabaseException("Database exception, Table not found ");
+                }
+
+                Entity::DynamoDb::Table result;
+                result.FromDocument(mResult->view());
+                log_debug << "Got table by ID, table: " << result.ToString();
+                return result;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-            Entity::DynamoDb::Table result;
-            result.FromDocument(mResult->view());
-            log_debug << "Got table by ID, table: " << result.ToString();
-            return result;
-
-        } catch (const mongocxx::exception &exc) {
-            log_error << "Database exception " << exc.what();
-            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
+        return {};
     }
 
     Entity::DynamoDb::Table DynamoDbDatabase::GetTableByRegionName(const std::string &region, const std::string &name) const {
@@ -353,17 +357,15 @@ namespace AwsMock::Database {
                 auto result = _tableCollection.delete_many(make_document(kvp("region", region), kvp("name", tableName)));
                 session.commit_transaction();
                 log_debug << "DynamoDB table deleted, tableName: " << tableName << " region: " << region;
+                return;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteTable(tableName);
         }
+        _memoryDb.DeleteTable(tableName);
     }
 
     long DynamoDbDatabase::DeleteAllTables() const {
@@ -449,12 +451,12 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) const {
 
-        Entity::DynamoDb::ItemList items;
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
             try {
+                Entity::DynamoDb::ItemList items;
 
                 document query;
                 if (!region.empty()) {
@@ -470,19 +472,15 @@ namespace AwsMock::Database {
                     result.FromDocument(item);
                     items.push_back(result);
                 }
+                log_trace << "Got DynamoDb item list, size:" << items.size();
+                return items;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            items = _memoryDb.ListItems(region, tableName);
         }
-
-        log_trace << "Got DynamoDb item list, size:" << items.size();
-        return items;
+        return _memoryDb.ListItems(region, tableName);
     }
 
     Entity::DynamoDb::Item DynamoDbDatabase::GetItemById(bsoncxx::oid oid) const {
@@ -545,6 +543,7 @@ namespace AwsMock::Database {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
+        return _memoryDb.GetItemByKeys(region, tableName, keys);
     }
 
     Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(Entity::DynamoDb::Item &item) const {

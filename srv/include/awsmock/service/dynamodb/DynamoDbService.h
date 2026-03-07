@@ -9,9 +9,6 @@
 #include <sstream>
 #include <string>
 
-// Boost include
-#include <boost/lexical_cast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -78,7 +75,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbService();
+        explicit DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _accountId(Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id")) {}
 
         /**
          * @brief Creates a new table
@@ -266,16 +263,6 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::DynamoDbDatabase &_dynamoDbDatabase;
-
-        /**
-         * DynamoDb container host
-         */
-        std::string _containerHost;
-
-        /**
-         * DynamoDb container port
-         */
-        int _containerPort;
 
         /**
          * AWS account ID
