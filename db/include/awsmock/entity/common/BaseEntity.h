@@ -5,17 +5,8 @@
 #ifndef AWSMOCK_DB_ENTITY_COMMON_BASE_ENTITY_H
 #define AWSMOCK_DB_ENTITY_COMMON_BASE_ENTITY_H
 
-// C++ standard includes
-#include <string>
-
-// Boost includes
-#include <boost/describe.hpp>
-#include <boost/json.hpp>
-#include <boost/mp11.hpp>
-#include <boost/proto/traits.hpp>
-#include <boost/version.hpp>
-
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Database::Entity::Common {

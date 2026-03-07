@@ -12,43 +12,55 @@ namespace AwsMock::Dto::Module {
         // S3
         Core::Bson::ToBsonArray(document, "s3-buckets", s3Buckets);
         Core::Bson::ToBsonArray(document, "s3-objects", s3Objects);
+        log_info << "S3: " << bsoncxx::to_json(document);
 
         // SQS
         Core::Bson::ToBsonArray(document, "sqs-queues", sqsQueues);
         Core::Bson::ToBsonArray(document, "sqs-messages", sqsMessages);
+        log_info << "SQS: " << bsoncxx::to_json(document);
 
         // SNS
         Core::Bson::ToBsonArray(document, "sns-topics", snsTopics);
         Core::Bson::ToBsonArray(document, "sns-messages", snsMessages);
+        log_info << "SNS: " << bsoncxx::to_json(document);
 
         // Lambdas
         Core::Bson::ToBsonArray(document, "lambda-functions", lambdas);
+        log_info << "lambda: " << bsoncxx::to_json(document);
 
         // Transfer servers
         Core::Bson::ToBsonArray(document, "transfer-servers", transferServers);
+        log_info << "transfer: " << bsoncxx::to_json(document);
 
         // Cognito
         Core::Bson::ToBsonArray(document, "cognito-user-pools", cognitoUserPools);
         Core::Bson::ToBsonArray(document, "cognito-users", cognitoUsers);
+        log_info << "cognito: " << bsoncxx::to_json(document);
 
         // DynamoDb
         Core::Bson::ToBsonArray(document, "dynamodb-tables", dynamoDbTables);
         Core::Bson::ToBsonArray(document, "dynamodb-items", dynamoDbItems);
+        log_info << "dynamodb: " << bsoncxx::to_json(document);
 
         // Secrets manager
-        Core::Bson::ToBsonArray(document, "secretsmanager-secrets", secrets);
+        //Core::Bson::ToBsonArray(document, "secretsmanager-secrets", secrets);
+        //log_info << "secretsmanager: " << bsoncxx::to_json(document);
 
         // KMS
         Core::Bson::ToBsonArray(document, "kms-keys", kmsKeys);
+        log_info << "kms: " << bsoncxx::to_json(document);
 
         // SSM
         Core::Bson::ToBsonArray(document, "ssm-parameters", ssmParameters);
+        log_info << "ssm: " << bsoncxx::to_json(document);
 
         // Applications
         Core::Bson::ToBsonArray(document, "applications", applications);
+        log_info << "applications: " << bsoncxx::to_json(document);
 
         // API gateway keys
         Core::Bson::ToBsonArray(document, "api-gateway-keys", apiKeys);
+        log_info << "api: " << bsoncxx::to_json(document);
 
         return document;
     }

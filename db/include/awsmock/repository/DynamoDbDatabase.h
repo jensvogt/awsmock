@@ -16,6 +16,9 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
+#include "awsmock/dto/dynamodb/model/AttributeValue.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -199,13 +202,24 @@ namespace AwsMock::Database {
 
 
         /**
-         * @brief Returns a item entity by primary key
+         * @brief Returns an item entity by primary key
          *
          * @param oid item primary key
          * @return item entity
          * @throws DatabaseException
          */
         [[nodiscard]] Entity::DynamoDb::Item GetItemById(bsoncxx::oid oid) const;
+
+        /**
+         * @brief Returns an item entity by primary key
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @param keys map of primary keys
+         * @return item entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const;
 
         /**
          * @brief Creates a new item
@@ -259,9 +273,10 @@ namespace AwsMock::Database {
          *
          * @param region AWS region.
          * @param tableName name of the table
+         * @return number of items deleted
          * @throws DatabaseException
          */
-        void DeleteItems(const std::string &region, const std::string &tableName) const;
+        long DeleteItems(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Deletes all items

@@ -4,6 +4,8 @@
 
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 
+#include <ranges>
+
 namespace AwsMock::Dto::DynamoDb {
 
     Database::Entity::DynamoDb::Table Mapper::map(const DescribeTableResponse &response) {
@@ -12,11 +14,21 @@ namespace AwsMock::Dto::DynamoDb {
         tableEntity.name = response.tableName,
         tableEntity.arn = response.tableArn,
         tableEntity.status = TableStatusTypeToString(response.tableStatus),
-        tableEntity.attributes = response.attributes,
-        tableEntity.keySchemas = response.keySchemas;
         tableEntity.itemCount = response.itemCount;
         tableEntity.size = response.tableSize;
         tableEntity.provisionedThroughput.FromDocument(response.provisionedThroughput.ToDocument());
+
+        if (!response.attributeDefinitions.empty()) {
+            for (const auto &attributeDefinition: response.attributeDefinitions) {
+                tableEntity.attributeDefinitions.emplace_back(map(attributeDefinition));
+            }
+        }
+
+        if (!response.keySchema.empty()) {
+            for (const auto &keySchemas: response.keySchema) {
+                tableEntity.keySchema.emplace_back(map(keySchemas));
+            }
+        }
         return tableEntity;
     }
 
@@ -30,6 +42,8 @@ namespace AwsMock::Dto::DynamoDb {
             Database::Entity::DynamoDb::AttributeValue attributeValue;
             attributeValue.stringValue = snd.stringValue;
             attributeValue.numberValue = snd.numberValue;
+            std::map<std::string, std::string> attributeMap;
+            attributeMap[fst] = snd.stringValue;
             item.keys[fst] = attributeValue;
         }
 
@@ -41,20 +55,11 @@ namespace AwsMock::Dto::DynamoDb {
         Database::Entity::DynamoDb::Item item;
         item.region = request.region;
         item.tableName = request.tableName;
-
         for (const auto &[fst, snd]: request.attributes) {
-            Database::Entity::DynamoDb::AttributeValue attribute;
-            attribute.stringValue = snd.stringValue;
-            attribute.stringSetValue = snd.stringSetValue;
-            attribute.numberValue = snd.numberValue;
-            attribute.numberSetValue = snd.numberSetValue;
-            attribute.boolValue = snd.boolValue;
-            attribute.nullValue = snd.nullValue;
-            item.attributes[fst] = attribute;
-
-            /*            if (table.keySchemas.contains(fst)) {
-                item.keys[fst] = attribute;
-            }*/
+            item.attributes[fst] = map(snd);
+        }
+        for (const auto &[fst, snd]: request.keys) {
+            item.keys[fst] = map(snd);
         }
         return item;
     }
@@ -132,8 +137,11 @@ namespace AwsMock::Dto::DynamoDb {
         itemDto.tableName = itemEntity.tableName;
         itemDto.created = itemEntity.created;
         itemDto.modified = itemEntity.modified;
-        for (const auto &[fst, snd]: itemEntity.attributes) {
-            itemDto.attributes[fst] = map(snd);
+        for (const auto &[k, v]: itemEntity.attributes) {
+            itemDto.attributes[k] = map(v);
+        }
+        for (const auto &[k, v]: itemEntity.keys) {
+            itemDto.keys[k] = map(v);
         }
         return itemDto;
     }
@@ -158,6 +166,54 @@ namespace AwsMock::Dto::DynamoDb {
             items.emplace_back(map(i));
         }
         return items;
+    }
+
+    // Key schema DTO -> entity
+    Database::Entity::DynamoDb::KeySchema Mapper::map(const KeySchema &keySchemaDto) {
+        Database::Entity::DynamoDb::KeySchema keySchemaEntity;
+        keySchemaEntity.attributeName = keySchemaDto.attributeName;
+        keySchemaEntity.keyType = keySchemaDto.keyType;
+        return keySchemaEntity;
+    }
+
+    // Key schema entity -> DTO
+    KeySchema Mapper::map(const Database::Entity::DynamoDb::KeySchema &keySchemaEntity) {
+        KeySchema keySchemaDto;
+        keySchemaDto.attributeName = keySchemaEntity.attributeName;
+        keySchemaDto.keyType = keySchemaEntity.keyType;
+        return keySchemaDto;
+    }
+
+    // Attribute definition entity -> DTO
+    Database::Entity::DynamoDb::AttributeDefinition Mapper::map(const AttributeDefinition &attributeDefinitionDto) {
+        Database::Entity::DynamoDb::AttributeDefinition attributeDefinitionEntity;
+        attributeDefinitionEntity.attributeName = attributeDefinitionDto.attributeName;
+        attributeDefinitionEntity.attributeType = attributeDefinitionDto.attributeType;
+        return attributeDefinitionEntity;
+    }
+
+    // Attribute definition DTO -> entity
+    AttributeDefinition Mapper::map(const Database::Entity::DynamoDb::AttributeDefinition &attributeDefinitionEntity) {
+        AttributeDefinition attributeDefinitionDto;
+        attributeDefinitionDto.attributeName = attributeDefinitionEntity.attributeName;
+        attributeDefinitionDto.attributeType = attributeDefinitionEntity.attributeType;
+        return attributeDefinitionDto;
+    }
+
+    // Attribute value DTO -> entity
+    std::map<std::string, Database::Entity::DynamoDb::AttributeValue> Mapper::map(const std::map<std::string, AttributeValue> &keyDtos) {
+        std::map<std::string, Database::Entity::DynamoDb::AttributeValue> attributeValueEntities;
+        for (const auto &[k, v]: keyDtos) {
+            Database::Entity::DynamoDb::AttributeValue attributeValue;
+            attributeValue.boolValue = v.boolValue;
+            attributeValue.stringValue = v.stringValue;
+            attributeValue.stringSetValue = v.stringSetValue;
+            attributeValue.numberValue = v.numberValue;
+            attributeValue.numberSetValue = v.numberSetValue;
+            attributeValue.nullValue = v.nullValue;
+            attributeValueEntities[k] = attributeValue;
+        }
+        return attributeValueEntities;
     }
 
     // Attribute Value item -> DTO

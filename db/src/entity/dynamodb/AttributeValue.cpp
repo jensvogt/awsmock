@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/entity/dynamodb/AttributeValue.h>
-#include <jwt-cpp/jwt.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 

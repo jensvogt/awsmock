@@ -2,12 +2,11 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
-#define AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
+#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_TAG_H
+#define AWSMOCK_DB_ENTITY_DYNAMODB_TAG_H
 
 // C++ includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -33,47 +32,17 @@ namespace AwsMock::Database::Entity::DynamoDb {
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Item final : Common::BaseEntity<Item> {
+    struct Tag final : Common::BaseEntity<Tag> {
 
         /**
-         * ID
+         * Key
          */
-        std::string oid;
+        std::string tagKey;
 
         /**
-         * AWS region name
+         * Value
          */
-        std::string region;
-
-        /**
-         * Table name
-         */
-        std::string tableName;
-
-        /**
-         * Item size in bytes
-         */
-        long size{};
-
-        /**
-         * Attributes
-         */
-        std::map<std::string, AttributeValue> attributes;
-
-        /**
-         * Key schemas
-         */
-        std::map<std::string, AttributeValue> keys;
-
-        /**
-         * Creation date
-         */
-        system_clock::time_point created = system_clock::now();
-
-        /**
-         * Last modification date
-         */
-        system_clock::time_point modified = system_clock::now();
+        std::string tagValue;
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -87,11 +56,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @param mResult query result.
          */
-        Item FromDocument(const view_or_value<view, value> &mResult);
+        Tag FromDocument(const view_or_value<view, value> &mResult);
     };
-
-    typedef std::vector<Item> ItemList;
 
 }// namespace AwsMock::Database::Entity::DynamoDb
 
-#endif// AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
+#endif// AWSMOCK_DB_ENTITY_DYNAMODB_TAG_H
