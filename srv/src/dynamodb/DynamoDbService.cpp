@@ -36,18 +36,32 @@ namespace AwsMock::Service {
             table.region = request.region;
             table.name = request.tableName;
             table.arn = Core::AwsUtils::CreateDynamoDbTableArn(_accountId, request.tableName);
-            table.tags = request.tags;
             table.provisionedThroughput = provisionedThroughput;
+
+            // Attributes
             if (!request.attributes.empty()) {
                 for (const auto &a: request.attributes) {
                     table.attributeDefinitions.emplace_back(Dto::DynamoDb::Mapper::map(a));
                 }
             }
+
+            // Key schema
             if (!request.keySchema.empty()) {
                 for (const auto &k: request.keySchema) {
                     table.keySchema.emplace_back(Dto::DynamoDb::Mapper::map(k));
                 }
             }
+
+            // Tags
+            if (!request.tags.empty()) {
+                for (const auto &k: request.tags) {
+                    Database::Entity::DynamoDb::Tag tag;
+                    tag.tagKey = k.tagKey;
+                    tag.tagValue = k.tagValue;
+                    table.tags.emplace_back(tag);
+                }
+            }
+
             table = _dynamoDbDatabase.CreateTable(table);
             log_debug << "DynamoDb table created, name: " << table.name;
 
@@ -206,15 +220,28 @@ namespace AwsMock::Service {
             response.tableName = request.tableName;
             response.itemCount = table.itemCount;
             response.tableArn = table.arn;
-            response.tags = table.tags;
+
+            // Attribute definitions
             if (!table.attributeDefinitions.empty()) {
                 for (const auto &a: table.attributeDefinitions) {
                     response.attributeDefinitions.emplace_back(Dto::DynamoDb::Mapper::map(a));
                 }
             }
+
+            // Key Schema
             if (!table.keySchema.empty()) {
                 for (const auto &k: table.keySchema) {
                     response.keySchema.emplace_back(Dto::DynamoDb::Mapper::map(k));
+                }
+            }
+
+            // Tags
+            if (!table.tags.empty()) {
+                for (const auto &t: table.tags) {
+                    Dto::DynamoDb::Tag tag;
+                    tag.tagKey = t.tagKey;
+                    tag.tagValue = t.tagValue;
+                    response.tags.emplace_back(tag);
                 }
             }
 
@@ -301,19 +328,13 @@ namespace AwsMock::Service {
         }
 
         try {
-            //Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKey();
+            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, Dto::DynamoDb::Mapper::map(request.keys));
 
             Dto::DynamoDb::GetItemResponse getItemResponse;
             getItemResponse.region = request.region;
-            getItemResponse.region = request.region;
-
-            /*            // Send request to docker container
-            std::map<std::string, std::string> headers = PrepareHeaders("GetItem");
-            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
-                Dto::DynamoDb::GetItemResponse getItemResponse = Dto::DynamoDb::GetItemResponse::FromJson(body);
-                log_debug << "DynamoDb get item, name: " << request.tableName << ", body: " << body << ", status: " << status;
-                return getItemResponse;
-            }*/
+            getItemResponse.user = request.user;
+            getItemResponse.requestId = request.requestId;
+            getItemResponse.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
             return getItemResponse;
 
         } catch (Core::JsonException &exc) {
@@ -338,12 +359,25 @@ namespace AwsMock::Service {
             item.size = sizeof(item) + sizeof(long);
 
             // Key schema
-            for (const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName); auto &k: table.keySchema) {
-                //item.keys.[k] = Dto::DynamoDb::Mapper::map(request.keys[k]);
+            Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            for (auto &k: table.keySchema) {
+                Database::Entity::DynamoDb::AttributeValue attributeValue;
+                attributeValue.numberValue = request.attributes[k.attributeName].numberValue;
+                attributeValue.numberSetValue = request.attributes[k.attributeName].numberSetValue;
+                attributeValue.stringValue = request.attributes[k.attributeName].stringValue;
+                attributeValue.numberSetValue = request.attributes[k.attributeName].numberSetValue;
+                attributeValue.boolValue = request.attributes[k.attributeName].boolValue;
+                attributeValue.nullValue = request.attributes[k.attributeName].nullValue;
+                item.keys[k.attributeName] = attributeValue;
             }
 
             item = _dynamoDbDatabase.CreateOrUpdateItem(item);
             log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
+
+            table.size += item.size;
+            table.itemCount++;
+            table = _dynamoDbDatabase.UpdateTable(table);
+            log_debug << "Database updated, region: " << table.region << " tableName: " << table.name;
 
             Dto::DynamoDb::PutItemResponse response;
             response.consumedCapacity.tableName = item.tableName;
@@ -396,15 +430,20 @@ namespace AwsMock::Service {
         }
 
         try {
+            const std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase.ListItems(request.region, request.tableName);
+            const long count = _dynamoDbDatabase.CountItems(request.region, request.tableName);
 
-            // Send request to docker container
-            std::map<std::string, std::string> headers = PrepareHeaders("Scan");
-            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
-                Dto::DynamoDb::ScanResponse scanResponse = Dto::DynamoDb::ScanResponse::FromJson(body);
-                scanResponse.tableName = request.tableName;
-                log_debug << "DynamoDb scan item, name: " << request.tableName;
-                return scanResponse;
+            Dto::DynamoDb::ScanResponse scanResponse;
+            scanResponse.region = request.region;
+            scanResponse.user = request.user;
+            scanResponse.requestId = request.requestId;
+            scanResponse.tableName = request.tableName;
+            scanResponse.count = count;
+            scanResponse.scannedCount = items.size();
+            for (const auto &item: items) {
+                scanResponse.items.emplace_back(Dto::DynamoDb::Mapper::map(item.attributes));
             }
+            return scanResponse;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb scan failed, message: " << exc.message();

@@ -2,9 +2,6 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include "awsmock/entity/cognito/UserPool.h"
-
-
 #include <awsmock/entity/dynamodb/Table.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
@@ -26,11 +23,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             // Tags
             if (!tags.empty()) {
-                auto tagsDoc = document{};
+                auto tagsArray = array{};
                 for (const auto &t: tags) {
-                    tagsDoc.append(kvp(t.at("key"), t.at("value")));
+                    tagsArray.append(t.ToDocument());
                 }
-                tableDoc.append(kvp("tags", tagsDoc));
+                tableDoc.append(kvp("tags", tagsArray));
             }
 
             // Attributes
@@ -81,10 +78,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
             tags.clear();
-            for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
-                std::map<std::string, std::string> tag;
-                tag["Key"] = bsoncxx::string::to_string(tagElement.key());
-                tag["Value"] = bsoncxx::string::to_string(tagElement.get_string().value);
+            for (const view tagsView = mResult.value()["tags"].get_array().value; const bsoncxx::document::element &tagElement: tagsView) {
+                Tag tag;
+                tag.FromDocument(tagElement.get_document().value);
                 tags.emplace_back(tag);
             }
         }

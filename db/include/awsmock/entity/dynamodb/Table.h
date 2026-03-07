@@ -11,6 +11,7 @@
 #include <awsmock/entity/dynamodb/KeySchema.h>
 #include <awsmock/entity/dynamodb/ProvisionedThroughput.h>
 #include <awsmock/entity/dynamodb/StreamSpecification.h>
+#include <awsmock/entity/dynamodb/Tag.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -61,7 +62,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Tags
          */
-        std::vector<std::map<std::string, std::string>> tags;
+        std::vector<Tag> tags;
 
         /**
          * Item count

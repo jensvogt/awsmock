@@ -4,6 +4,8 @@
 
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 
+#include <ranges>
+
 namespace AwsMock::Dto::DynamoDb {
 
     Database::Entity::DynamoDb::Table Mapper::map(const DescribeTableResponse &response) {
@@ -196,6 +198,22 @@ namespace AwsMock::Dto::DynamoDb {
         attributeDefinitionDto.attributeName = attributeDefinitionEntity.attributeName;
         attributeDefinitionDto.attributeType = attributeDefinitionEntity.attributeType;
         return attributeDefinitionDto;
+    }
+
+    // Attribute value DTO -> entity
+    std::map<std::string, Database::Entity::DynamoDb::AttributeValue> Mapper::map(const std::map<std::string, AttributeValue> &keyDtos) {
+        std::map<std::string, Database::Entity::DynamoDb::AttributeValue> attributeValueEntities;
+        for (const auto &[k, v]: keyDtos) {
+            Database::Entity::DynamoDb::AttributeValue attributeValue;
+            attributeValue.boolValue = v.boolValue;
+            attributeValue.stringValue = v.stringValue;
+            attributeValue.stringSetValue = v.stringSetValue;
+            attributeValue.numberValue = v.numberValue;
+            attributeValue.numberSetValue = v.numberSetValue;
+            attributeValue.nullValue = v.nullValue;
+            attributeValueEntities[k] = attributeValue;
+        }
+        return attributeValueEntities;
     }
 
     // Attribute Value item -> DTO

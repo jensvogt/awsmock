@@ -5,10 +5,6 @@
 #ifndef AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
 #define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H
 
-// C++ standard includes
-#include <map>
-#include <string>
-
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -17,6 +13,7 @@
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/dto/dynamodb/model/KeySchema.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
+#include <awsmock/dto/dynamodb/model/Tag.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -55,12 +52,14 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Tags
          */
-        std::vector<std::map<std::string, std::string>> tags;
+        std::vector<Tag> tags;
 
         /**
          * Streams
          */
         StreamSpecification streamSpecification;
+
+      private:
 
         friend CreateTableRequest tag_invoke(boost::json::value_to_tag<CreateTableRequest>, boost::json::value const &v) {
             CreateTableRequest r;
@@ -73,13 +72,7 @@ namespace AwsMock::Dto::DynamoDb {
                 r.streamSpecification = boost::json::value_to<StreamSpecification>(v.at("StreamSpecification"));
             }
             if (Core::Json::AttributeExists(v, "Tags")) {
-                for (boost::json::array tagsArray = v.at("Tags").as_array(); const auto &a: tagsArray) {
-                    boost::json::object tagObject = a.as_object();
-                    std::map<std::string, std::string> tag;
-                    tag["Key"] = a.at("Key").as_string();
-                    tag["Value"] = a.at("Value").as_string();
-                    r.tags.push_back(std::move(tag));
-                }
+                r.tags = boost::json::value_to<std::vector<Tag>>(v.at("Tags"));
             }
             if (Core::Json::AttributeExists(v, "AttributeDefinitions")) {
                 r.attributes = boost::json::value_to<std::vector<AttributeDefinition>>(v.at("AttributeDefinitions"));

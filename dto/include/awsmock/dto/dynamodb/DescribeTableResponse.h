@@ -18,6 +18,7 @@
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/TableClassSummary.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
+#include <awsmock/dto/dynamodb/model/Tag.h>
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -104,7 +105,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Tags
          */
-        std::vector<std::map<std::string, std::string>> tags;
+        std::vector<Tag> tags;
 
         /**
          * Provisioned throughput
@@ -147,7 +148,7 @@ namespace AwsMock::Dto::DynamoDb {
                 r.createdDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(tableObject, "CreatedDateTime"));
                 r.deletionProtectionEnabled = Core::Json::GetBoolValue(tableObject, "DeletionProtectionEnabled");
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
-                    r.tags = boost::json::value_to<std::vector<std::map<std::string, std::string>>>(tableObject.at("Tags"));
+                    r.tags = boost::json::value_to<std::vector<Tag>>(tableObject.at("Tags"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "AttributeDefinitions")) {
                     r.attributeDefinitions = boost::json::value_to<std::vector<AttributeDefinition>>(tableObject.at("AttributeDefinitions"));

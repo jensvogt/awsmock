@@ -144,7 +144,8 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/repository/ApiGatewayDatabase.cpp
         db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp
         db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp db/src/repository/Database.cpp
-        db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp db/src/entity/dynamodb/KeySchema.cpp)
+        db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp db/src/entity/dynamodb/KeySchema.cpp
+        db/src/entity/dynamodb/Tag.cpp)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include

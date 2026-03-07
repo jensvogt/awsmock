@@ -133,6 +133,7 @@ namespace AwsMock::Dto::DynamoDb {
          */
         static Database::Entity::DynamoDb::AttributeDefinition map(const AttributeDefinition &attributeDefinitionDto);
         static AttributeDefinition map(const Database::Entity::DynamoDb::AttributeDefinition &attributeDefinitionEntity);
+        static std::map<std::string, Database::Entity::DynamoDb::AttributeValue> map(const std::map<std::string, AttributeValue> &keyDtos);
 
         /**
          * @brief Maps a DynamoDB item entity to an item counter DTO.
