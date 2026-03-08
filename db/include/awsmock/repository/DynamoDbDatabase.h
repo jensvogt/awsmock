@@ -20,23 +20,15 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
+#include <awsmock/dto/dynamodb/model/Item.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/repository/DynamoDbToMongoTranslator.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
-
-    struct DynamoDbMonitoringCounter {
-        long items{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
-
-    using DynamoDbShmAllocator = boost::interprocess::allocator<std::pair<const std::string, DynamoDbMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using DynamoDbCounterMapType = boost::container::map<std::string, DynamoDbMonitoringCounter, std::less<std::string>, DynamoDbShmAllocator>;
-
-    static constexpr auto DYNAMODB_COUNTER_MAP_NAME = "DynamoDbCounter";
 
     /**
      * @brief DynamoDB MongoDB database.
@@ -50,7 +42,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbDatabase();
+        explicit DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {}
 
         /**
          * @brief Singleton instance
@@ -264,6 +256,7 @@ namespace AwsMock::Database {
          * @param limit query limit
          */
         [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
+        void AdjustItemCounters() const;
 
         /**
          * @brief Deletes an item by its primary key
@@ -319,16 +312,6 @@ namespace AwsMock::Database {
          * @brief DynamoDB in-memory database
          */
         DynamoDbMemoryDb &_memoryDb;
-
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Map of monitoring counters
-         */
-        DynamoDbCounterMapType *_dynamoDbCounterMap;
     };
 
 }// namespace AwsMock::Database

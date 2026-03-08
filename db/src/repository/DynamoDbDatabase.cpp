@@ -4,32 +4,7 @@
 
 #include <awsmock/repository/DynamoDbDatabase.h>
 
-#include "awsmock/dto/dynamodb/model/Item.h"
-
 namespace AwsMock::Database {
-
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
-    DynamoDbDatabase::DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {
-
-        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _dynamoDbCounterMap = _segment.find<DynamoDbCounterMapType>(DYNAMODB_COUNTER_MAP_NAME).first;
-        if (!_dynamoDbCounterMap) {
-            _dynamoDbCounterMap = _segment.construct<DynamoDbCounterMapType>(DYNAMODB_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
-        }
-
-        // Initialize the counters
-        for (const auto &table: ListTables()) {
-            DynamoDbMonitoringCounter counter;
-            counter.items = CountItems(table.region, table.name);
-            counter.size = GetTableSize(table.region, table.name);
-            _dynamoDbCounterMap->insert_or_assign(table.arn, counter);
-        }
-        log_debug << "DynamoDb counters initialized" << _dynamoDbCounterMap->size();
-    }
 
     Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(Entity::DynamoDb::Table &table) const {
 
@@ -569,13 +544,6 @@ namespace AwsMock::Database {
         } else {
             item = _memoryDb.CreateItem(item);
         }
-
-        Core::AwsUtils::CreateDynamoDbTableArn(_accountId, item.tableName);
-
-        // Update counter
-        //(*_dynamoDbCounterMap)[item.tableName].items++;
-        //(*_dynamoDbCounterMap)[item.tableName].size += item.size;
-
         return item;
     }
 
@@ -786,4 +754,66 @@ namespace AwsMock::Database {
         return items;
     }
 
+    void DynamoDbDatabase::AdjustItemCounters() const {
+        Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "adjust_item_counter");
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto itemCollection = (*client)[_databaseName][_itemCollectionName];
+            auto tableCollection = (*client)[_databaseName][_tableCollectionName];
+            auto session = client->start_session();
+
+            try {
+                mongocxx::pipeline p{};
+                p.group(make_document(
+                        kvp("_id", "$tableName"),
+                        kvp("size", make_document(kvp("$sum", "$size"))),
+                        kvp("itemCount", make_document(kvp("$sum", 1)))));
+
+                document projectDocument;
+                projectDocument.append(kvp("_id", 0),
+                                       kvp("tableName", "$_id"),
+                                       kvp("size", 1),
+                                       kvp("itemCount", 1));
+                p.project(projectDocument.extract());
+
+                session.start_transaction();
+
+                // Initialize all topics with zero message counts
+                tableCollection.update_many({}, make_document(kvp("$set", make_document(
+                                                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                                                  kvp("itemCount", bsoncxx::types::b_int64())))));
+
+                auto bulk = tableCollection.create_bulk_write();
+                for (auto cursor = itemCollection.aggregate(p); const auto t: cursor) {
+                    bulk.append(mongocxx::model::update_one(
+                            make_document(kvp("name", Core::Bson::BsonUtils::GetStringValue(t, "tableName"))),
+                            make_document(kvp("$set", make_document(
+                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                              kvp("itemCount", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "itemCount"))))))));
+                    log_info << "Table: " << Core::Bson::BsonUtils::GetStringValue(t, "tableName")
+                             << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
+                             << ", itemCount: " << Core::Bson::BsonUtils::GetLongValue(t, "itemCount");
+                }
+
+                // Bulk updates
+                if (!bulk.empty()) {
+                    try {
+                        auto result = bulk.execute();
+                        log_debug << "Bulk write result: " << result->modified_count();
+                    } catch (const mongocxx::exception &exc) {
+                        log_error << "Bulk write failed: " << exc.what();
+                        throw Core::DatabaseException(exc.what());
+                    }
+                }
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+    }
 }// namespace AwsMock::Database

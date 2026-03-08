@@ -2,10 +2,6 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include "../../../dto/include/awsmock/dto/sns/model/MessageStatus.h"
-#include "awsmock/core/monitoring/MonitoringTimer.h"
-
-
 #include <awsmock/repository/SNSDatabase.h>
 
 namespace AwsMock::Database {
