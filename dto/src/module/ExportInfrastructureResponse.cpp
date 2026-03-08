@@ -12,7 +12,7 @@ namespace AwsMock::Dto::Module {
         try {
 
             document document;
-            document.append(kvp("onlyObjects", includeObjects));
+            document.append(kvp("exportType", ExportTypeToString(exportType)));
             document.append(kvp("prettyPrint", prettyPrint));
             document.append(kvp("infrastructure", infrastructure.ToDocument()));
             return bsoncxx::to_json(document);

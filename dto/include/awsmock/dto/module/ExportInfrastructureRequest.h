@@ -8,6 +8,7 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/module/model/ExportType.h>
 
 namespace AwsMock::Dto::Module {
 
@@ -28,11 +29,6 @@ namespace AwsMock::Dto::Module {
     struct ExportInfrastructureRequest final : Common::BaseCounter<ExportInfrastructureRequest> {
 
         /**
-         * Include objects, default: false
-         */
-        bool includeObjects = false;
-
-        /**
          * Pretty print, default: true
          */
         bool prettyPrint = true;
@@ -47,14 +43,27 @@ namespace AwsMock::Dto::Module {
          */
         std::vector<std::string> modules;
 
+        /**
+         * Export type
+         */
+        ExportType exportType = BOTH;
+
+        bool IsInfrastructure() const {
+            return exportType == INFRA_STRUCTURE || exportType == BOTH;
+        }
+
+        bool IsObjects() const {
+            return exportType == OBJECTS || exportType == BOTH;
+        }
+
       private:
 
         friend ExportInfrastructureRequest tag_invoke(boost::json::value_to_tag<ExportInfrastructureRequest>, boost::json::value const &v) {
-            ExportInfrastructureRequest r;
-            r.includeObjects = Core::Json::GetBoolValue(v, "includeObjects");
+            ExportInfrastructureRequest r{};
             r.prettyPrint = Core::Json::GetBoolValue(v, "prettyPrint");
             r.cleanFirst = Core::Json::GetBoolValue(v, "cleanFirst");
-            if (Core::Json::AttributeExists(v,"modules")) {
+            r.exportType = ExportTypeFromString(Core::Json::GetStringValue(v, "exportType"));
+            if (Core::Json::AttributeExists(v, "modules")) {
                 r.modules = boost::json::value_to<std::vector<std::string>>(v.at("modules"));
             }
             return r;
@@ -65,9 +74,9 @@ namespace AwsMock::Dto::Module {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"includeObjects", obj.includeObjects},
                     {"prettyPrint", obj.prettyPrint},
                     {"cleanFirst", obj.cleanFirst},
+                    {"exportType", ExportTypeToString(obj.exportType)},
                     {"modules", boost::json::value_from(obj.modules)},
             };
         }
@@ -75,4 +84,4 @@ namespace AwsMock::Dto::Module {
 
 }// namespace AwsMock::Dto::Module
 
-#endif//AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
+#endif// AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H

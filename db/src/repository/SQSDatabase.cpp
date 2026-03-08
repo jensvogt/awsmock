@@ -907,8 +907,8 @@ namespace AwsMock::Database {
                 std::string dlqQueueUrl;
                 std::string dlqQueueName;
                 if (!dlQueueArn.empty()) {
-                    Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
-                    Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
+                    dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
+                    dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
                 }
 
                 auto queueBulk = messageCollection.create_bulk_write();

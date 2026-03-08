@@ -58,7 +58,7 @@ namespace AwsMock::Service {
     }
 
     void KMSServer::BackupKms() {
-        ModuleService::BackupModule("kms", true);
+        ModuleService::BackupModule("kms", Dto::Module::ExportType::BOTH);
     }
 
     void KMSServer::Shutdown() {

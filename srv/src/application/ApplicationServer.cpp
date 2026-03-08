@@ -121,7 +121,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::BackupApplication() {
-        ModuleService::BackupModule("application", true);
+        ModuleService::BackupModule("application", Dto::Module::ExportType::BOTH);
     }
 
     void ApplicationServer::RestartApplications() const {

@@ -16,15 +16,13 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include "awsmock/dto/dynamodb/model/AttributeValue.h"
-
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DynamoDbToMongoTranslator.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
@@ -259,6 +257,15 @@ namespace AwsMock::Database {
         [[nodiscard]] long CountItems(const std::string &region = {}, const std::string &tableName = {}, const std::string &prefix = {}) const;
 
         /**
+         * @brief Execute query
+         *
+         * @param req request
+         * @param scanIndexForward scan forward
+         * @param limit query limit
+         */
+        [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
+
+        /**
          * @brief Deletes an item by its primary key
          *
          * @param region AWS region.
@@ -276,7 +283,7 @@ namespace AwsMock::Database {
          * @return number of items deleted
          * @throws DatabaseException
          */
-        long DeleteItems(const std::string &region, const std::string &tableName) const;
+        [[nodiscard]] long DeleteItems(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Deletes all items

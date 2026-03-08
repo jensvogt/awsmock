@@ -87,22 +87,22 @@ namespace AwsMock::Controller {
     };
 
     static std::map<CommandType, std::string> CommandTypeNames{
-        {CommandType::CONFIG, "config"},
-        {CommandType::SET_LOG_LEVEL, "set-loglevel"},
-        {CommandType::GET_LOG_LEVEL, "get-loglevel"},
-        {CommandType::LIST, "list"},
-        {CommandType::STATUS, "status"},
-        {CommandType::ENABLE, "enable"},
-        {CommandType::DISABLE, "disable"},
-        {CommandType::START, "start"},
-        {CommandType::RESTART, "restart"},
-        {CommandType::STOP, "stop"},
-        {CommandType::IMPORT, "import"},
-        {CommandType::EXPORT, "export"},
-        {CommandType::CLEAN, "clean"},
-        {CommandType::CLEAN_OBJECTS, "clean-objects"},
-        {CommandType::PING, "ping"},
-        {CommandType::UNKNOWN, "unknown"},
+            {CommandType::CONFIG, "config"},
+            {CommandType::SET_LOG_LEVEL, "set-loglevel"},
+            {CommandType::GET_LOG_LEVEL, "get-loglevel"},
+            {CommandType::LIST, "list"},
+            {CommandType::STATUS, "status"},
+            {CommandType::ENABLE, "enable"},
+            {CommandType::DISABLE, "disable"},
+            {CommandType::START, "start"},
+            {CommandType::RESTART, "restart"},
+            {CommandType::STOP, "stop"},
+            {CommandType::IMPORT, "import"},
+            {CommandType::EXPORT, "export"},
+            {CommandType::CLEAN, "clean"},
+            {CommandType::CLEAN_OBJECTS, "clean-objects"},
+            {CommandType::PING, "ping"},
+            {CommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string CommandTypeToString(const CommandType &commandType) {
@@ -128,7 +128,8 @@ namespace AwsMock::Controller {
      */
     class AwsMockCtl {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -297,9 +298,9 @@ namespace AwsMock::Controller {
          *
          * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
-         * @param includeObjects include also objects
+         * @param exportType export type: INFRA_STRUCTURE, OBJECTS, or BOTH
          */
-        void ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, bool pretty = true, bool includeObjects = false) const;
+        void ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, bool pretty, const Dto::Module::ExportType &exportType) const;
 
         /**
          * @brief Imports the current infrastructure from stdin
@@ -325,7 +326,8 @@ namespace AwsMock::Controller {
          */
         void PingManager() const;
 
-    private:
+      private:
+
         /**
          * @brief Add an authorization header.
          *
@@ -439,6 +441,6 @@ namespace AwsMock::Controller {
         std::vector<Dto::Lambda::Function> _lambdas;
     };
 
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller
 
 #endif// AWSMOCK_CONTROLLER_CONTROLLER_H
