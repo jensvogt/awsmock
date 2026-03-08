@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.36](https://github.com/jensvogt/awsmock/compare/v1.14.35...v1.14.36) (2026-03-08)
+
+
+### Bug Fixes
+
+* remove dynamodb java app ([7628c12](https://github.com/jensvogt/awsmock/commit/7628c12deb89583cd2b39570ed57dc287a6075f9))
+
 ## [1.14.35](https://github.com/jensvogt/awsmock/compare/v1.14.34...v1.14.35) (2026-03-08)
 
 
