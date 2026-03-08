@@ -221,7 +221,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
             for (auto &[fst, snd]: versions) {
                 if (fst != versionId) {
                     snd.stages.clear();
-                    snd.stages.push_back("AWSPREVIOUS");
+                    snd.stages.emplace_back("AWSPREVIOUS");
                 }
             }
         }

@@ -377,7 +377,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) const {
+    Dto::DynamoDb::QueryResponse DynamoDbService::Query(Dto::DynamoDb::QueryRequest &request) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "query");
         log_debug << "Start query, region: " << request.region << " name: " << request.tableName;
 
@@ -388,11 +388,16 @@ namespace AwsMock::Service {
 
         try {
 
-            // Send request to docker container
-            // std::map<std::string, std::string> headers = PrepareHeaders("Query");
-            // auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
-            // Dto::DynamoDb::QueryResponse queryResponse = Dto::DynamoDb::QueryResponse::FromJson(body);
-            // log_debug << "DynamoDb query item, name: " << request.tableName;
+            Database::DynamoToMongoTranslator::DynamoRequest dynamoRequest;
+            dynamoRequest.attrNames = request.expressionAttributeNames;
+            for (auto &[fst, snd]: request.expressionAttributeValues) {
+                if (fst == "S") {
+                    dynamoRequest.attrValues[fst] = snd.expressionAttributeValues[fst];
+                }
+            }
+
+            std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase.ExecuteQuery(dynamoRequest, true, 100);
+
             Dto::DynamoDb::QueryResponse queryResponse;
             return queryResponse;
 

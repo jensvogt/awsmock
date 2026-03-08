@@ -4,6 +4,8 @@
 
 #include <awsmock/service/sqs/SQSServer.h>
 
+#include "awsmock/dto/sqs/internal/ExportMessagesRequest.h"
+
 namespace AwsMock::Service {
     SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
 
@@ -156,7 +158,7 @@ namespace AwsMock::Service {
     }
 
     void SQSServer::BackupSqs() {
-        ModuleService::BackupModule("sqs", true);
+        ModuleService::BackupModule("sqs", Dto::Module::ExportType::BOTH);
     }
 
     void SQSServer::Shutdown() {

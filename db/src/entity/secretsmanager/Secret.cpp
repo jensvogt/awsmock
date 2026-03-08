@@ -37,7 +37,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
             secretDoc.append(kvp("versions", versionsDoc));
         }
 
-        return secretDoc.view();
+        return secretDoc.extract();
     }
 
     void Secret::FromDocument(const std::optional<view> &mResult) {

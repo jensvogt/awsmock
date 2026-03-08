@@ -163,7 +163,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::BackupTransfer() {
-        ModuleService::BackupModule("transfer", true);
+        ModuleService::BackupModule("transfer", Dto::Module::ExportType::BOTH);
     }
 
     void TransferServer::Shutdown() {

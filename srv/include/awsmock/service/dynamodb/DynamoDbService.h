@@ -10,6 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/repository/DynamoDbToMongoTranslator.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
@@ -191,7 +194,7 @@ namespace AwsMock::Service {
          * @param request query item request DTO
          * @return QueryResponse
          */
-        [[nodiscard]] Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::QueryResponse Query(Dto::DynamoDb::QueryRequest &request) const;
 
         /**
          * @brief Scan the database

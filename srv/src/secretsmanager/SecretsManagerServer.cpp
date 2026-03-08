@@ -35,7 +35,7 @@ namespace AwsMock::Service {
     }
 
     void SecretsManagerServer::BackupSecretsManger() {
-        ModuleService::BackupModule("secretsmanager", true);
+        ModuleService::BackupModule("secretsmanager", Dto::Module::ExportType::BOTH);
     }
 
     void SecretsManagerServer::Shutdown() {

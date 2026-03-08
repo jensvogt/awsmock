@@ -29,8 +29,8 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 using bsoncxx::view_or_value;
 using bsoncxx::builder::basic::array;
@@ -52,7 +52,7 @@ namespace AwsMock::Core::Bson {
         if (!a.empty()) {
             array jsonArray;
             for (const auto &e: a) {
-                jsonArray.append(bsoncxx::types::b_document(e.ToDocument()));
+                jsonArray.append(e.ToDocument());
             }
             d.append(kvp(name, jsonArray));
         }

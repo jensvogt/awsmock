@@ -60,7 +60,7 @@ namespace AwsMock::Service {
     }
 
     void SNSServer::BackupSns() {
-        ModuleService::BackupModule("sns", true);
+        ModuleService::BackupModule("sns", Dto::Module::ExportType::BOTH);
     }
 
     void SNSServer::Shutdown() {
