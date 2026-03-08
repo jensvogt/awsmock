@@ -83,7 +83,7 @@ namespace AwsMock::Database {
         const std::vector<Entity::DynamoDb::Table> tables = dynamoDbDatabase.ListTables();
 
         // assert
-        BOOST_CHECK_EQUAL(true, tables.size() > 0);
+        BOOST_CHECK_EQUAL(false, tables.empty());
     }
 
     BOOST_AUTO_TEST_CASE(DeleteAllTablesTest) {

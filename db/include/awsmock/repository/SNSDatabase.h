@@ -9,12 +9,6 @@
 #include <string>
 #include <vector>
 
-// Boost includes
-#include <boost/container/map.hpp>
-#include <boost/container/string.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
-
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -25,6 +19,8 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
+#include <awsmock/dto/sns/model/MessageStatus.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
@@ -35,20 +31,6 @@ namespace AwsMock::Database {
 
     using std::chrono::system_clock;
 
-    struct TopicMonitoringCounter {
-        long initial{};
-        long send{};
-        long resend{};
-        long messages{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
-
-    using SnsShmAllocator = boost::interprocess::allocator<std::pair<const std::string, TopicMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using SnsCounterMapType = boost::container::map<std::string, TopicMonitoringCounter, std::less<std::string>, SnsShmAllocator>;
-
-    static constexpr auto SNS_COUNTER_MAP_NAME = "SnsBucketCounter";
-
     /**
      * @brief SNS MongoDB database.
      *
@@ -56,7 +38,7 @@ namespace AwsMock::Database {
      */
     class SNSDatabase : public DatabaseBase {
 
-    public:
+      public:
 
         /**
          * @brief Constructor
@@ -298,7 +280,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid) const;
+        [[nodiscard]] Entity::SNS::Message GetMessageById(const std::string &oid) const;
 
         /**
          * @brief Returns a message by message ID.
@@ -307,7 +289,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        [[maybe_unused]] Entity::SNS::Message GetMessageByMessageId(const std::string &messageId) const;
+        [[nodiscard]] Entity::SNS::Message GetMessageByMessageId(const std::string &messageId) const;
 
         /**
          * @brief Count the number of messages by ARN
@@ -315,7 +297,7 @@ namespace AwsMock::Database {
          * @param topicArn URL of the topic
          * @return number of available messages
          */
-        long CountMessages(const std::string &topicArn = {}) const;
+        [[nodiscard]] long CountMessages(const std::string &topicArn = {}) const;
 
         /**
          * @brief  Count the number of message by state
@@ -323,7 +305,7 @@ namespace AwsMock::Database {
          * @param topicArn ARN of the queue
          * @return total message size
          */
-        long CountMessagesSize(const std::string &topicArn = {}) const;
+        [[nodiscard]] long CountMessagesSize(const std::string &topicArn = {}) const;
 
         /**
          * @brief Count the number of messages by state
@@ -419,7 +401,7 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters() const;
 
-    private:
+      private:
 
         /**
          * Database name

@@ -74,6 +74,8 @@
 #define DYNAMODB_SIZE_BY_TABLE "dynamodb_size_by_table_counter"
 #define DYNAMODB_SERVICE_TIMER "dynamodb_service_timer"
 #define DYNAMODB_SERVICE_COUNTER "dynamodb_service_counter"
+#define DYNAMODB_DATABASE_TIMER "dynamodb_database_timer"
+#define DYNAMODB_DATABASE_COUNTER "dynamodb_database_counter"
 
 // Secrets manager
 #define SECRETSMANAGER_SECRETS_COUNT "secretsmanager_secret_counter"
