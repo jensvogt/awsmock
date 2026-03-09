@@ -5,16 +5,6 @@
 #ifndef AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
 #define AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
 
-// C++ standard includes
-#include <string>
-#include <vector>
-
-// Boost includes
-#include <boost/container/map.hpp>
-#include <boost/container/string.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
@@ -22,7 +12,6 @@
 #include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/dto/dynamodb/model/Item.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/repository/DynamoDbToMongoTranslator.h>

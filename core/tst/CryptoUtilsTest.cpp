@@ -38,16 +38,13 @@ namespace AwsMock::Core {
     BOOST_AUTO_TEST_CASE(Md5UtfStringTest) {
 
         // arrange
-        auto *input = static_cast<unsigned char *>(malloc(sizeof(TEST_STRING1)));
-        memcpy(input, TEST_STRING1, sizeof(TEST_STRING1));
+        const std::string utf8_string = boost::locale::conv::to_utf<char>(TEST_STRING1, "Latin1");
 
         // act
-        const std::string utf8_string = boost::locale::conv::to_utf<char>(TEST_STRING1, "Latin1");
         const std::string result = Crypto::GetMd5FromString(utf8_string);
 
         // assert
         BOOST_CHECK_EQUAL(result, MD5_SUM1);
-        delete input;
     }
 
     BOOST_AUTO_TEST_CASE(Md5FileTest) {
@@ -270,7 +267,7 @@ namespace AwsMock::Core {
         Crypto::HexDecode(encoded, decoded);
 
         // assert
-        BOOST_CHECK_EQUAL_COLLECTIONS(testString.c_str(), testString.c_str() + strlen(testString.c_str()), decoded, decoded + strlen((const char *) decoded));
-        //BOOST_CHECK_EQUAL(testString, std::string{(const char *) decoded});
+        BOOST_CHECK_EQUAL_COLLECTIONS(testString.c_str(), testString.c_str() + strlen(testString.c_str()), decoded, decoded + strlen(reinterpret_cast<const char *>(decoded)));
+        delete[] decoded;
     }
 }// namespace AwsMock::Core
