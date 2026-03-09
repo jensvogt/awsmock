@@ -54,6 +54,19 @@ namespace AwsMock::Database {
         return table;
     }
 
+    struct DynamoDbFixture {
+        DynamoDbFixture() {
+        }
+        ~DynamoDbFixture() {
+            const long deletedItems = DynamoDbDatabase::instance().DeleteAllItems();
+            log_debug << "Items deleted, count: " << deletedItems;
+            const long deletedTables = DynamoDbDatabase::instance().DeleteAllTables();
+            log_debug << "Tables deleted, count: " << deletedTables;
+        }
+    };
+
+    BOOST_FIXTURE_TEST_SUITE(CognitoMemoryDbTests, DynamoDbFixture)
+
     BOOST_AUTO_TEST_CASE(CreateTableTest) {
 
         // arrange
@@ -169,5 +182,7 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, items.empty());
     }
+
+    BOOST_AUTO_TEST_SUITE_END()
 
 }// namespace AwsMock::Database

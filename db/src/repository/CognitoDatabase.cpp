@@ -331,7 +331,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountUserPools(region);
     }
 
-    void CognitoDatabase::DeleteUserPool(const std::string &id) const {
+    void CognitoDatabase::DeleteUserPool(const std::string &userPoolId) const {
 
         if (HasDatabase()) {
 
@@ -342,9 +342,9 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto result = _userPoolCollection.delete_many(make_document(kvp("userPoolId", id)));
+                const auto result = _userPoolCollection.delete_many(make_document(kvp("userPoolId", userPoolId)));
                 session.commit_transaction();
-                log_debug << "User pool deleted, userPoolId: " << id << " count: " << result->deleted_count();
+                log_debug << "User pool deleted, userPoolId: " << userPoolId << " count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -354,7 +354,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteUserPool(id);
+            _memoryDb.DeleteUserPool(userPoolId);
         }
     }
 
@@ -704,7 +704,7 @@ namespace AwsMock::Database {
         return CreateUser(user);
     }
 
-    void CognitoDatabase::DeleteUser(const Entity::Cognito::User &user) const {
+    long CognitoDatabase::DeleteUser(const Entity::Cognito::User &user) const {
 
         if (HasDatabase()) {
 
@@ -718,17 +718,15 @@ namespace AwsMock::Database {
                 const auto result = _userCollection.delete_many(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)));
                 session.commit_transaction();
                 log_debug << "User deleted, userName: " << user.userName << " count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteUser(user);
         }
+        return _memoryDb.DeleteUser(user);
     }
 
     void CognitoDatabase::DeleteAllUsers() const {

@@ -344,13 +344,14 @@ namespace AwsMock::Database {
         return _users[it->first];
     }
 
-    void CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
+    long CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
         boost::mutex::scoped_lock lock(_userMutex);
 
         const auto count = std::erase_if(_users, [user](const std::pair<std::string, Entity::Cognito::User> &u) {
             return u.second.region == user.region && u.second.userPoolId == user.userPoolId && u.second.userName == user.userName;
         });
         log_debug << "Cognito user deleted, count: " << count;
+        return count;
     }
 
     void CognitoMemoryDb::DeleteAllUsers() {
