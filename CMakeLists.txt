@@ -21,9 +21,8 @@ enable_testing()
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/core/include/awsmock/core/Version.h)
 
 # -------------------------------------------------------------------------
-# Global link flags
+# Global link flags (Windows)
 # -------------------------------------------------------------------------
-
 if (WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     set(CMAKE_USE_WIN32_THREADS_INIT ON)

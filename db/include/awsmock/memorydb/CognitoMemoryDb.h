@@ -296,7 +296,7 @@ namespace AwsMock::Database {
          * @param group cognito group entity to create
          * @return created cognito group entity.
          */
-        Entity::Cognito::Group CreateGroup(const Entity::Cognito::Group &group);
+        Entity::Cognito::Group CreateGroup(Entity::Cognito::Group &group);
 
         /**
          * @brief Returns a list of cognito groups.
@@ -321,9 +321,10 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @param userPoolId cognito user pool ID
          * @param groupName name of the group
+         * @return number of groups deleted
          * @throws DatabaseException
          */
-        void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName);
+        long DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName);
 
         /**
          * @brief Deletes all existing cognito user groups.

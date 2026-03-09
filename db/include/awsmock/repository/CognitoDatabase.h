@@ -361,9 +361,10 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @param userPoolId cognito user pool ID
          * @param groupName name of the group
+         * @return number of groups deleted
          * @throws DatabaseException
          */
-        void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
+        long DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
 
         /**
          * @brief Deletes all existing cognito user groups.
