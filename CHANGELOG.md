@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.14.38](https://github.com/jensvogt/awsmock/compare/1.14.37...v1.14.38) (2026-03-09)
+
+
+### Bug Fixes
+
+* add cognito database tests ([4536a24](https://github.com/jensvogt/awsmock/commit/4536a24c01b2d584de435ddd61cc82a0803e82cd))
+* add cognito database tests ([ffbc945](https://github.com/jensvogt/awsmock/commit/ffbc945c835e1b4c0c42345564f27be2ca976e83))
+* add cognito database tests ([d54adff](https://github.com/jensvogt/awsmock/commit/d54adff2004cd7ed87bb78ca177c5b02049f1ce7))
+* macOS port and new tests for memory DB ([6b8fad8](https://github.com/jensvogt/awsmock/commit/6b8fad8c3338863b2c731c54831c40cfe4d422f6))
+
 ## [1.14.37](https://github.com/jensvogt/awsmock/compare/v1.14.36...v1.14.37) (2026-03-09)
 
 
