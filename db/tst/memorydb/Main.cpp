@@ -30,28 +30,6 @@ struct GlobalTestFixture {
         shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, MONITORING_SEGMENT_NAME, 65000, nullptr, unrestricted_permissions);
     }
 
-    /**
-    * Initialize database
-    */
-    static void InitializeDatabase() {
-
-        // Get database variables
-        const auto name = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.name");
-        const auto host = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.host");
-        const auto user = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.user");
-        const auto password = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.password");
-        const int port = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.mongodb.port");
-        const int poolSize = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.mongodb.pool-size");
-        AwsMock::Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", true);
-
-        // MongoDB URL
-        mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
-
-        // Options
-        AwsMock::Database::ConnectionPool &_pool = AwsMock::Database::ConnectionPool::instance();
-        _pool.Configure();
-    }
-
     GlobalTestFixture() {
 
         // Initialize logging
@@ -63,9 +41,6 @@ struct GlobalTestFixture {
 
         // Initialize shared memory
         InitializeShm();
-
-        // Initialize database
-        InitializeDatabase();
     }
 
     ~GlobalTestFixture() {

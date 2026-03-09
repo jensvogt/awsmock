@@ -160,7 +160,8 @@ target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_stat
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 
 if (NOT WIN32)
-    add_subdirectory(db/tst)
+    add_subdirectory(db/tst/mongodb)
+    add_subdirectory(db/tst/memorydb)
 endif ()
 
 # -------------------------------------------------------------------------

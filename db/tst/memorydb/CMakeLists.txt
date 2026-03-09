@@ -1,8 +1,8 @@
-set(BINARY db_tst)
+set(BINARY db_mopngo_tst)
 set(STATIC_LIB awsmockdb)
 set(CMAKE_BUILD_TYPE "Debug")
 
-set(SOURCES Main.cpp DynamoDbTest.cpp)
+set(SOURCES Main.cpp DynamoDbTest.cpp CognitoDbTest.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PUBLIC ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/db/include)
@@ -13,4 +13,4 @@ target_link_libraries(${BINARY} PRIVATE OpenSSL::SSL OpenSSL::Crypto Boost::boos
         Boost::thread Boost::process Boost::date_time Boost::url Boost::unit_test_framework Boost::chrono Boost::locale
         LibArchive::LibArchive magic)
 
-add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ..)

@@ -232,10 +232,8 @@ namespace AwsMock::Database {
             }
             return count;
 
-        } else {
-
-            return static_cast<long>(_tables.size());
         }
+        return static_cast<long>(_tables.size());
     }
 
     Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemById(const std::string &oid) {

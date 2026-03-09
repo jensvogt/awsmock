@@ -468,41 +468,42 @@ namespace AwsMock::Database {
     }
 
     Entity::DynamoDb::Item DynamoDbDatabase::GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const {
+        if (HasDatabase()) {
+            try {
 
-        try {
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-
-            document query;
-            if (!region.empty()) {
-                query.append(kvp("region", region));
-            }
-            if (!tableName.empty()) {
-                query.append(kvp("tableName", tableName));
-            }
-
-            // Primary keys
-            if (!keys.empty()) {
-                document keyObject;
-                for (const auto &[k, v]: keys) {
-                    keyObject.append(kvp(k, v.ToDocument()));
+                document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
                 }
-                query.append(kvp("keys", keyObject));
-            }
+                if (!tableName.empty()) {
+                    query.append(kvp("tableName", tableName));
+                }
 
-            if (const auto mResult = _itemCollection.find_one(query.view())) {
-                Entity::DynamoDb::Item result;
-                result.FromDocument(mResult->view());
-                log_debug << "Got item by ID, item: " << result.ToString();
-                return result;
-            }
-            log_error << "Database exception: item not found, query: " << bsoncxx::to_json(query);
-            throw Core::DatabaseException("Database exception, item not found, region: " + region + ", tableName: " + tableName);
+                // Primary keys
+                if (!keys.empty()) {
+                    document keyObject;
+                    for (const auto &[k, v]: keys) {
+                        keyObject.append(kvp(k, v.ToDocument()));
+                    }
+                    query.append(kvp("keys", keyObject));
+                }
 
-        } catch (const mongocxx::exception &exc) {
-            log_error << "Database exception " << exc.what();
-            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+                if (const auto mResult = _itemCollection.find_one(query.view())) {
+                    Entity::DynamoDb::Item result;
+                    result.FromDocument(mResult->view());
+                    log_debug << "Got item by ID, item: " << result.ToString();
+                    return result;
+                }
+                log_error << "Database exception: item not found, query: " << bsoncxx::to_json(query);
+                throw Core::DatabaseException("Database exception, item not found, region: " + region + ", tableName: " + tableName);
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
         }
         return _memoryDb.GetItemByKeys(region, tableName, keys);
     }
