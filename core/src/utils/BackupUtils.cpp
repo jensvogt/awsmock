@@ -2,12 +2,12 @@
 // Created by vogje01 on 6/10/25.
 //
 
-
 #include <awsmock/core/BackupUtils.h>
 
 namespace AwsMock::Core {
     std::string BackupUtils::GetBackupFilename(const std::string &module) {
         const auto backupDir = Configuration::instance().GetValue<std::string>("awsmock.backup-dir");
+        DirUtils::EnsureDirectory(backupDir);
         return backupDir + "/" + module + "-" + GetTimestamp() + ".json";
     }
 
