@@ -248,7 +248,7 @@ namespace AwsMock::Service {
     }
 
     template<typename Out>
-    Out load_file(std::string const &filename, Out out) {
+    Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
         ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
@@ -274,7 +274,7 @@ namespace AwsMock::Service {
 
             // Load file
             std::vector<char> input;
-            load_file(s3CodeFile, back_inserter(input));
+            loadFile(s3CodeFile, back_inserter(input));
 
             // Allocate "enough" space, using an upperbound prediction:
             std::string encoded(boost::beast::detail::base64::encoded_size(input.size()), '\0');

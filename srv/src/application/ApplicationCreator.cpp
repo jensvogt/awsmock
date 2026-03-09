@@ -112,6 +112,8 @@ namespace AwsMock::Service {
             const std::vector<std::string> environment = GetEnvironment(applicationEntity);
             const long publicPort = applicationEntity.publicPort < 0 ? Core::SystemUtils::GetNextFreePort() : applicationEntity.publicPort;
             const long privatePort = applicationEntity.privatePort;
+
+            // Create the container
             const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(applicationEntity.name, containerName, dockerTag, environment, publicPort, privatePort);
             log_debug << "Application container created, publicPort: " << publicPort << " containerId: " << containerCreateResponse.id;
 
@@ -171,7 +173,7 @@ namespace AwsMock::Service {
     }
 
     template<typename Out>
-    Out load_file(std::string const &filename, Out out) {
+    Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
         ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
