@@ -231,7 +231,6 @@ namespace AwsMock::Database {
                 }
             }
             return count;
-
         }
         return static_cast<long>(_tables.size());
     }
@@ -256,7 +255,7 @@ namespace AwsMock::Database {
 
         const auto it =
                 std::ranges::find_if(_items, [region, tableName, keys](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-                    const bool result = std::ranges::all_of(item.second.keys, [keys](std::pair<std::string, Entity::DynamoDb::AttributeValue> v) {
+                    const bool result = std::ranges::all_of(item.second.keys, [keys](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &v) {
                         return v.second.stringValue == keys.at(v.first).stringValue;
                     });
                     return item.second.region == region && item.second.tableName == tableName && result;
