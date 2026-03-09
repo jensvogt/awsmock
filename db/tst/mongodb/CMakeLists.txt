@@ -1,4 +1,4 @@
-set(BINARY db_memory_tst)
+set(BINARY db_mongo_tst)
 set(STATIC_LIB awsmockdb)
 set(CMAKE_BUILD_TYPE "Debug")
 

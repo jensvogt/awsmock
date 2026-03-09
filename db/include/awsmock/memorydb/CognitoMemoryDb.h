@@ -13,8 +13,8 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
@@ -257,9 +257,10 @@ namespace AwsMock::Database {
          * @brief Deletes an existing cognito users
          *
          * @param user cognito user to delete
+         * @return number of users deleted
          * @throws DatabaseException
          */
-        void DeleteUser(const Entity::Cognito::User &user);
+        long DeleteUser(const Entity::Cognito::User &user);
 
         /**
          * @brief Deletes all existing cognito users
