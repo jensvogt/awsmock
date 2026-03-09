@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     SecretsManagerServer::SecretsManagerServer(Core::Scheduler &scheduler) : AbstractServer("secretsmanager"), _scheduler(scheduler) {
 
         // Manager configuration
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.secretsmanager.monitoring.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.secretsmanager.monitoring-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.secretsmanager.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.secretsmanager.backup.cron");
         log_debug << "SecretsManager rest module initialized";
