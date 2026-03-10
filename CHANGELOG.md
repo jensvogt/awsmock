@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.39](https://github.com/jensvogt/awsmock/compare/1.14.38...v1.14.39) (2026-03-10)
+
+
+### Bug Fixes
+
+* queue name as arn/url ([12ce444](https://github.com/jensvogt/awsmock/commit/12ce4449b74bc3f30a2b371201e7b1a1c5bec42d))
+
 ## [1.14.38](https://github.com/jensvogt/awsmock/compare/1.14.37...v1.14.38) (2026-03-09)
 
 
