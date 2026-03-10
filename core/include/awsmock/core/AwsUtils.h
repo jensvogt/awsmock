@@ -170,27 +170,27 @@ namespace AwsMock::Core {
         /**
          * @brief Converts a queue ARN to a queue URL
          *
-         * @param queueArn ARN of the queue
+         * @param input ARN of the queue
          * @return URL of the queue
          */
-        static std::string ConvertSQSQueueArnToUrl(const std::string &queueArn);
+        static std::string ConvertSQSQueueArnToUrl(const std::string &input);
 
         /**
          * @brief Converts a queue ARN to a queue name
          *
-         * @param queueArn ARN of the queue
+         * @param input ARN of the queue
          * @return name of the queue
          */
-        static std::string ConvertSQSQueueArnToName(const std::string &queueArn);
+        static std::string ConvertSQSQueueArnToName(const std::string &input);
 
         /**
          * @brief Converts a queue ARN to a queue URL
          *
          * @param region AWS region
-         * @param queueUrl URL of the queue
+         * @param input URL of the queue
          * @return URL of the queue
          */
-        static std::string ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl);
+        static std::string ConvertSQSQueueUrlToArn(const std::string &region, const std::string &input);
 
         /**
          * @brief Converts a queue URL to a queue name
@@ -525,6 +525,22 @@ namespace AwsMock::Core {
          * @return default account ID
          */
         static std::string GetDefaultAccountId();
+
+        /**
+         * @brief Checks whether a value is a valid AWS ARN.
+         *
+         * @param value value to check
+         * @return true if value is a valid AWS ARN
+         */
+        static bool IsArn(const std::string &value);
+
+        /**
+         * @brief Checks whether a value is a valid URL
+         *
+         * @param value value to check
+         * @return true if value is a valid URL
+         */
+        static bool IsUrl(const std::string &value);
 
       private:
 
