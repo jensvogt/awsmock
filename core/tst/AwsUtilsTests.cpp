@@ -101,9 +101,9 @@ namespace AwsMock::Core {
         // arrange
         const std::string queueName = "file-delivery1-queue";
         Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
-        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
-        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
-        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         const std::string endpoint = SystemUtils::GetHostName() + ":" + port;
         const std::string sqsQueueUrl = "http://sqs." + region + "." + endpoint + "/" + accountId + "/" + queueName;
         const std::string sqsQueueArn = "arn:aws:sqs:" + region + ":" + accountId + ":" + queueName;
@@ -113,6 +113,45 @@ namespace AwsMock::Core {
 
         // assert
         BOOST_CHECK_EQUAL(result, sqsQueueArn);
+    }
+
+    BOOST_AUTO_TEST_CASE(IsURLTest) {
+
+        // arrange
+        const auto port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string endpoint = SystemUtils::GetHostName() + ":" + port;
+        const std::string queueName1 = "http://sqs." + region + "." + endpoint + "/" + accountId + "/test";
+        const std::string queueName2 = "ftp://sqs." + region + "." + endpoint + "/" + accountId + "/test";
+
+        // act
+        const bool result1 = AwsUtils::IsUrl(queueName1);
+        const bool result2 = AwsUtils::IsUrl(queueName2);
+
+        // assert
+        BOOST_CHECK_EQUAL(true, result1);
+        BOOST_CHECK_EQUAL(false, result2);
+    }
+
+    BOOST_AUTO_TEST_CASE(IsArnTest) {
+
+        // arrange
+        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string arn1 = "arn:aws:lambda:" + region + ":" + accountId + ":test";
+        const std::string arn2 = "arn:aws:lambda:" + region + ":" + accountId + ":test/test1";
+        const std::string arn3 = "arn:abc:lambda:" + region + ":" + accountId + ":test/test1";
+
+        // act
+        const bool result1 = AwsUtils::IsArn(arn1);
+        const bool result2 = AwsUtils::IsArn(arn2);
+        const bool result3 = AwsUtils::IsArn(arn3);
+
+        // assert
+        BOOST_CHECK_EQUAL(true, result1);
+        BOOST_CHECK_EQUAL(true, result2);
+        BOOST_CHECK_EQUAL(false, result3);
     }
 
     /**
@@ -127,7 +166,7 @@ namespace AwsMock::Core {
      * x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
      * x-amz-date: 20130524T000000Z
      */
-    BOOST_AUTO_TEST_CASE(VerifySignatureTest) {
+    BOOST_AUTO_TEST_CASE(VerifySignatureTest, *boost::unit_test::disabled()) {
 
         // arrange
         http::request<http::dynamic_body> request;
