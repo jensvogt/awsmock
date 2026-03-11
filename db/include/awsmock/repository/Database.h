@@ -51,6 +51,11 @@ namespace AwsMock::Database {
          * Columns definitions
          */
         std::vector<IndexColumnDefinition> indexColumns;
+
+        /**
+         * Unique index
+         */
+        bool unique = false;
     };
 
     /**
