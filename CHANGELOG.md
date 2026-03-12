@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.40](https://github.com/jensvogt/awsmock/compare/1.14.39...v1.14.40) (2026-03-12)
+
+
+### Bug Fixes
+
+* delete dynamodb memory database ([937d168](https://github.com/jensvogt/awsmock/commit/937d1685c3c650ff0406bdc7432ae3707dca6d29))
+* duplicate application in database ([ae5a379](https://github.com/jensvogt/awsmock/commit/ae5a379a0bbd45e722b13489b30ef3ffee2eadcb))
+
 ## [1.14.39](https://github.com/jensvogt/awsmock/compare/1.14.38...v1.14.39) (2026-03-10)
 
 
