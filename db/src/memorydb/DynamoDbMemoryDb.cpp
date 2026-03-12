@@ -13,7 +13,7 @@ namespace AwsMock::Database {
     template<typename Map, typename Key>
     bool KeyCompare(Map const &lhs, Map const &rhs, Key const &keys) {
 
-        auto pred = [](auto a, auto b) { return a.first == b.first; };
+        auto pred = [](const auto &a, const auto &b) { return a.first == b.first; };
 
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin(), pred);
     }
@@ -132,31 +132,16 @@ namespace AwsMock::Database {
     long DynamoDbMemoryDb::DeleteAllTables() {
         boost::mutex::scoped_lock lock(_tableMutex);
 
-        const long count = _tables.size();
+        const long count = static_cast<long>(_tables.size());
         log_debug << "All DynamoDb tables deleted, count: " << count;
         _tables.clear();
         return count;
     }
 
     bool DynamoDbMemoryDb::ItemExists(const Entity::DynamoDb::Item &item) {
-
-        const std::string region = item.region;
-        std::string tableName = item.tableName;
-
-        // Get table
-        Entity::DynamoDb::Table table = GetTableByRegionName(region, tableName);
-
-        if (!region.empty()) {
-            return std::ranges::find_if(_items,
-                                        [table, item](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
-                                            bool result = i.second.region == table.region && i.second.tableName == table.name;
-                                            result &= KeyCompare(item.attributes, i.second.attributes, table.keySchema);
-                                            return result;
-                                        }) != _items.end();
-        }
         return std::ranges::find_if(_items,
-                                    [tableName](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
-                                        return i.second.tableName == tableName;
+                                    [item](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
+                                        return i.second.region == item.region && i.second.tableName == item.tableName && i.second.keys == item.keys;
                                     }) != _items.end();
     }
 
@@ -255,10 +240,7 @@ namespace AwsMock::Database {
 
         const auto it =
                 std::ranges::find_if(_items, [region, tableName, keys](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-                    const bool result = std::ranges::all_of(item.second.keys, [keys](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &v) {
-                        return v.second.stringValue == keys.at(v.first).stringValue;
-                    });
-                    return item.second.region == region && item.second.tableName == tableName && result;
+                    return item.second.region == region && item.second.tableName == tableName && item.second.keys == keys;
                 });
 
         if (it == _items.end()) {

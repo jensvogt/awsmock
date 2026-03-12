@@ -55,8 +55,7 @@ namespace AwsMock::Database {
     }
 
     struct DynamoDbFixture {
-        DynamoDbFixture() {
-        }
+        DynamoDbFixture() = default;
         ~DynamoDbFixture() {
             const long deletedItems = DynamoDbDatabase::instance().DeleteAllItems();
             log_debug << "Items deleted, count: " << deletedItems;
@@ -134,6 +133,24 @@ namespace AwsMock::Database {
         BOOST_CHECK_EQUAL(table.name, item.tableName);
     }
 
+    BOOST_AUTO_TEST_CASE(ExistsItemTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+        table = dynamoDbDatabase.CreateTable(table);
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+        Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
+        item = dynamoDbDatabase.CreateItem(item);
+
+        // act
+        const bool result = dynamoDbDatabase.ItemExists(item);
+
+        // assert
+        BOOST_CHECK_EQUAL(true, result);
+    }
+
     BOOST_AUTO_TEST_CASE(GetItemTest) {
 
         // arrange
@@ -181,6 +198,26 @@ namespace AwsMock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(false, items.empty());
+    }
+
+    BOOST_AUTO_TEST_CASE(DeleteItemTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+        table = dynamoDbDatabase.CreateTable(table);
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+        Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
+        item = dynamoDbDatabase.CreateItem(item);
+        BOOST_CHECK_EQUAL(false, item.oid.empty());
+
+        // act
+        dynamoDbDatabase.DeleteItem(TEST_TABLE_REGION, TEST_TABLE_NAME, item.keys);
+        const long count = dynamoDbDatabase.CountItems(TEST_TABLE_REGION, TEST_TABLE_NAME);
+
+        // assert
+        BOOST_CHECK_EQUAL(0, count);
     }
 
     BOOST_AUTO_TEST_SUITE_END()

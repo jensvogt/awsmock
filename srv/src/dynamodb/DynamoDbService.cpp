@@ -29,6 +29,7 @@ namespace AwsMock::Service {
             table.name = request.tableName;
             table.arn = Core::AwsUtils::CreateDynamoDbTableArn(_accountId, request.tableName);
             table.provisionedThroughput = provisionedThroughput;
+            table.status = Dto::DynamoDb::TableStatusTypeToString(Dto::DynamoDb::TableStatusType::ACTIVE);
 
             // Attributes
             if (!request.attributes.empty()) {
@@ -212,6 +213,7 @@ namespace AwsMock::Service {
             response.tableName = request.tableName;
             response.itemCount = table.itemCount;
             response.tableArn = table.arn;
+            response.tableStatus = Dto::DynamoDb::TableStatusTypeFromString(table.status);
 
             // Attribute definitions
             if (!table.attributeDefinitions.empty()) {
@@ -444,7 +446,8 @@ namespace AwsMock::Service {
 
         if (const Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request); !_dynamoDbDatabase.ItemExists(item)) {
             log_warning << "DynamoDb item does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::BadRequestException("DynamoDb item does not exist, region: " + request.region + " name: " + request.tableName);
+            return {};
+            //throw Core::BadRequestException("DynamoDb item does not exist, region: " + request.region + " name: " + request.tableName);
         }
 
         try {

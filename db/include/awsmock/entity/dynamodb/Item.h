@@ -88,6 +88,13 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * @param mResult query result.
          */
         Item FromDocument(const view_or_value<view, value> &mResult);
+
+        /**
+         * @brief Equality operator
+         */
+        bool operator==(const Item &other) const {
+            return keys == other.keys;
+        }
     };
 
     typedef std::vector<Item> ItemList;
