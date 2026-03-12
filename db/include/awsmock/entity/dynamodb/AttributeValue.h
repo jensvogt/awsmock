@@ -66,6 +66,13 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * @param mResult query result.
          */
         void FromDocument(view_or_value<view, value> mResult);
+
+        /**
+         * @brief Equality operator
+         */
+        bool operator==(const AttributeValue &other) const {
+            return stringValue == other.stringValue && boolValue == other.boolValue && numberValue == other.numberValue && stringSetValue == other.stringSetValue && numberSetValue == other.numberSetValue && boolValue == other.boolValue;
+        }
     };
 }// namespace AwsMock::Database::Entity::DynamoDb
 
