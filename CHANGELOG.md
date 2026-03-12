@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.41](https://github.com/jensvogt/awsmock/compare/v1.14.40...v1.14.41) (2026-03-12)
+
+
+### Bug Fixes
+
+* duplicate application in database ([a0f2caa](https://github.com/jensvogt/awsmock/commit/a0f2caa894883d99df4fc43a020dac4a98204f79))
+
 ## [1.14.40](https://github.com/jensvogt/awsmock/compare/1.14.39...v1.14.40) (2026-03-12)
 
 
