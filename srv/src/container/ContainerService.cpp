@@ -675,8 +675,8 @@ namespace AwsMock::Service {
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
-            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "RUN pip install -r requirements.txt" << std::endl;
+            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}/" << std::endl;
+            ofs << "RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt" << std::endl;
             ofs << "RUN mkdir -p /root/.aws" << std::endl;
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;

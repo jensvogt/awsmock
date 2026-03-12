@@ -1193,7 +1193,8 @@ namespace AwsMock::Service {
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
             log_error << "Lambda function does not exist, function: " + request.functionName;
-            throw Core::ServiceException("Lambda function does not exist");
+            //throw Core::ServiceException("Lambda function does not exist");
+            return;
         }
 
         // Delete the containers, if existing
