@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.42](https://github.com/jensvogt/awsmock/compare/1.14.41...v1.14.42) (2026-03-13)
+
+
+### Bug Fixes
+
+* mongodb index sqs-message. create SNS topic ([2db9010](https://github.com/jensvogt/awsmock/commit/2db9010ee1b41825ff240a8fb3f917b224791624))
+
 ## [1.14.41](https://github.com/jensvogt/awsmock/compare/v1.14.40...v1.14.41) (2026-03-12)
 
 
