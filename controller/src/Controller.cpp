@@ -44,14 +44,14 @@ namespace AwsMock::Controller {
             case CommandType::STATUS: {
                 std::cout << "Applications: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                        << std::setw(10) << std::left << "Enabled"
-                        << std::setw(10) << std::left << "Status"
-                        << std::setw(12) << std::left << "Ports"
-                        << std::endl;
+                          << std::setw(10) << std::left << "Enabled"
+                          << std::setw(10) << std::left << "Status"
+                          << std::setw(12) << std::left << "Ports"
+                          << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
+                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
                     if (application.enabled) {
                         std::cout << std::setw(12) << std::left << (std::to_string(application.privatePort) + "->" + std::to_string(application.publicPort));
                     }
@@ -59,14 +59,14 @@ namespace AwsMock::Controller {
                 }
                 std::cout << "Lambdas: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                        << std::setw(10) << std::left << "Enabled"
-                        << std::setw(10) << std::left << "Status"
-                        << std::setw(12) << std::left << "Ports"
-                        << std::endl;
+                          << std::setw(10) << std::left << "Enabled"
+                          << std::setw(10) << std::left << "Status"
+                          << std::setw(12) << std::left << "Ports"
+                          << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
+                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
                     if (lambda.enabled) {
                         std::vector<Dto::Lambda::InstanceCounter> instances = GetLambdaInstances(lambda);
                         std::string portStr = "8080->";
@@ -86,16 +86,16 @@ namespace AwsMock::Controller {
                     std::cout << "Applications: " << std::endl;
                     for (const auto &application: _applications) {
                         std::cout << "  " << std::setw(32) << std::left << application.name
-                                << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                                << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                                  << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                                  << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
                     }
                 }
                 if (_commands.empty() || _commands[0] == "lambdas") {
                     std::cout << "Lambdas: " << std::endl;
                     for (const auto &lambda: _lambdas) {
                         std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                                << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                                << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                                  << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                                  << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
                     }
                 }
                 break;
@@ -220,7 +220,7 @@ namespace AwsMock::Controller {
                 const bool pretty = _vm.find("pretty") != _vm.end();
                 const bool includeObjects = _vm.find("include-objects") != _vm.end();
 
-                ExportInfrastructure(modules, pretty, includeObjects);
+                ExportInfrastructure(modules, pretty, includeObjects ? Dto::Module::ExportType::BOTH : Dto::Module::ExportType::INFRA_STRUCTURE);
                 break;
             }
 
@@ -664,7 +664,7 @@ namespace AwsMock::Controller {
         }
     }
 
-    void AwsMockCtl::ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, const bool pretty, const bool includeObjects) const {
+    void AwsMockCtl::ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, const bool pretty, const Dto::Module::ExportType &exportType) const {
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "module", "export");
 
@@ -672,7 +672,7 @@ namespace AwsMock::Controller {
         for (const auto &module: modules) {
             moduleRequest.modules.emplace_back(module.name);
         }
-        moduleRequest.includeObjects = includeObjects;
+        moduleRequest.exportType = exportType;
         moduleRequest.prettyPrint = pretty;
 
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", moduleRequest.ToJson(), headers);
@@ -872,4 +872,4 @@ namespace AwsMock::Controller {
         }
         return modules;
     }
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller

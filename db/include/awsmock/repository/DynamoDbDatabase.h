@@ -5,37 +5,19 @@
 #ifndef AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
 #define AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
 
-// C++ standard includes
-#include <string>
-#include <vector>
-
-// Boost includes
-#include <boost/container/map.hpp>
-#include <boost/container/string.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DynamoDbToMongoTranslator.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
-
-    struct DynamoDbMonitoringCounter {
-        long items{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
-
-    using DynamoDbShmAllocator = boost::interprocess::allocator<std::pair<const std::string, DynamoDbMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using DynamoDbCounterMapType = boost::container::map<std::string, DynamoDbMonitoringCounter, std::less<std::string>, DynamoDbShmAllocator>;
-
-    static constexpr auto DYNAMODB_COUNTER_MAP_NAME = "DynamoDbCounter";
 
     /**
      * @brief DynamoDB MongoDB database.
@@ -49,7 +31,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbDatabase();
+        explicit DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {}
 
         /**
          * @brief Singleton instance
@@ -199,13 +181,24 @@ namespace AwsMock::Database {
 
 
         /**
-         * @brief Returns a item entity by primary key
+         * @brief Returns an item entity by primary key
          *
          * @param oid item primary key
          * @return item entity
          * @throws DatabaseException
          */
         [[nodiscard]] Entity::DynamoDb::Item GetItemById(bsoncxx::oid oid) const;
+
+        /**
+         * @brief Returns an item entity by primary key
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @param keys map of primary keys
+         * @return item entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const;
 
         /**
          * @brief Creates a new item
@@ -245,6 +238,16 @@ namespace AwsMock::Database {
         [[nodiscard]] long CountItems(const std::string &region = {}, const std::string &tableName = {}, const std::string &prefix = {}) const;
 
         /**
+         * @brief Execute query
+         *
+         * @param req request
+         * @param scanIndexForward scan forward
+         * @param limit query limit
+         */
+        [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
+        void AdjustItemCounters() const;
+
+        /**
          * @brief Deletes an item by its primary key
          *
          * @param region AWS region.
@@ -259,9 +262,10 @@ namespace AwsMock::Database {
          *
          * @param region AWS region.
          * @param tableName name of the table
+         * @return number of items deleted
          * @throws DatabaseException
          */
-        void DeleteItems(const std::string &region, const std::string &tableName) const;
+        [[nodiscard]] long DeleteItems(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Deletes all items
@@ -297,16 +301,6 @@ namespace AwsMock::Database {
          * @brief DynamoDB in-memory database
          */
         DynamoDbMemoryDb &_memoryDb;
-
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Map of monitoring counters
-         */
-        DynamoDbCounterMapType *_dynamoDbCounterMap;
     };
 
 }// namespace AwsMock::Database

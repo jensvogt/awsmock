@@ -2,9 +2,6 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include "awsmock/entity/cognito/UserPool.h"
-
-
 #include <awsmock/entity/dynamodb/Table.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
@@ -26,29 +23,29 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             // Tags
             if (!tags.empty()) {
-                auto tagsDoc = document{};
+                auto tagsArray = array{};
                 for (const auto &t: tags) {
-                    tagsDoc.append(kvp(t.at("Key"), t.at("Value")));
+                    tagsArray.append(t.ToDocument());
                 }
-                tableDoc.append(kvp("tags", tagsDoc));
+                tableDoc.append(kvp("tags", tagsArray));
             }
 
             // Attributes
-            if (!attributes.empty()) {
-                auto attributesDoc = document{};
-                for (const auto &k: attributes) {
-                    attributesDoc.append(kvp(k.at("AttributeName"), k.at("AttributeType")));
+            if (!attributeDefinitions.empty()) {
+                auto attributesArray = array{};
+                for (const auto &attributeDefinition: attributeDefinitions) {
+                    attributesArray.append(attributeDefinition.ToDocument());
                 }
-                tableDoc.append(kvp("attributes", attributesDoc));
+                tableDoc.append(kvp("attributeDefinitions", attributesArray));
             }
 
             // Key schemas
-            if (!keySchemas.empty()) {
-                auto keySchemaDoc = document{};
-                for (const auto &k: keySchemas) {
-                    keySchemaDoc.append(kvp(k.at("AttributeName"), k.at("KeyType")));
+            if (!keySchema.empty()) {
+                auto keySchemaArray = array{};
+                for (const auto &attribute: keySchema) {
+                    keySchemaArray.append(attribute.ToDocument());
                 }
-                tableDoc.append(kvp("keySchemas", keySchemaDoc));
+                tableDoc.append(kvp("keySchema", keySchemaArray));
             }
 
             // Provisioned throughput
@@ -81,33 +78,30 @@ namespace AwsMock::Database::Entity::DynamoDb {
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
             tags.clear();
-            for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
-                std::map<std::string, std::string> tag;
-                tag["Key"] = bsoncxx::string::to_string(tagElement.key());
-                tag["Value"] = bsoncxx::string::to_string(tagElement.get_string().value);
+            for (const view tagsView = mResult.value()["tags"].get_array().value; const bsoncxx::document::element &tagElement: tagsView) {
+                Tag tag;
+                tag.FromDocument(tagElement.get_document().value);
                 tags.emplace_back(tag);
             }
         }
 
         // Get attributes
-        if (mResult.value().find("attributes") != mResult.value().end()) {
-            attributes.clear();
-            for (const view tagsView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
-                std::map<std::string, std::string> attribute;
-                attribute["AttributeName"] = bsoncxx::string::to_string(tagElement.key());
-                attribute["AttributeType"] = bsoncxx::string::to_string(tagElement.get_string().value);
-                attributes.emplace_back(attribute);
+        if (mResult.value().find("attributeDefinitions") != mResult.value().end()) {
+            attributeDefinitions.clear();
+            for (const view attributesView = mResult.value()["attributeDefinitions"].get_array().value; const bsoncxx::document::element &attributeElement: attributesView) {
+                AttributeDefinition attributeDefinition;
+                attributeDefinition.FromDocument(attributeElement.get_document().value);
+                attributeDefinitions.emplace_back(attributeDefinition);
             }
         }
 
         // Key schemas
-        if (mResult.value().find("keySchemas") != mResult.value().end()) {
-            keySchemas.clear();
-            for (const view keySchemaView = mResult.value()["keySchemas"].get_document().value; const bsoncxx::document::element &keySchemaElement: keySchemaView) {
-                std::map<std::string, std::string> key;
-                key["AttributeName"] = bsoncxx::string::to_string(keySchemaElement.key());
-                key["KeyType"] = bsoncxx::string::to_string(keySchemaElement.get_string().value);
-                keySchemas.emplace_back(key);
+        if (mResult.value().find("keySchema") != mResult.value().end()) {
+            keySchema.clear();
+            for (const view keySchemaView = mResult.value()["keySchema"].get_array().value; const bsoncxx::document::element &keyElement: keySchemaView) {
+                KeySchema keySchemas;
+                keySchemas.FromDocument(keyElement.get_document().value);
+                keySchema.emplace_back(keySchemas);
             }
         }
 

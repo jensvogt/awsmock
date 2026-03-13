@@ -9,8 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/module/model/ExportType.h>
 #include <awsmock/dto/module/model/Infrastructure.h>
 
 namespace AwsMock::Dto::Module {
@@ -39,7 +39,7 @@ namespace AwsMock::Dto::Module {
         /**
          * Include objects
          */
-        bool includeObjects = false;
+        ExportType exportType;
 
         /**
          * Pretty print

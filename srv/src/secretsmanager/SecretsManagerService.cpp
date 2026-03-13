@@ -185,8 +185,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::PutSecretValueResponse SecretsManagerService::PutSecretValue(const Dto::SecretsManager::PutSecretValueRequest &request) const {
-        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "put_secret_value");
-        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "put_secret_value");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, SECRETSMANAGER_SERVICE_TIMER "action", "put_secret_value");
         log_trace << "Put secret value request: " << request.ToString();
 
         // Check whether we have a name of ARN
@@ -214,7 +213,7 @@ namespace AwsMock::Service {
             if (!secret.kmsKeyId.empty()) {
                 Dto::KMS::EncryptRequest encryptRequest;
                 encryptRequest.keyId = secret.kmsKeyId;
-                encryptRequest.plaintext = request.secretString;
+                encryptRequest.plaintext = Core::Crypto::Base64Encode(request.secretString);
                 Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
                 newVersion.secretString = Core::Crypto::Base64Decode(kmsResponse.ciphertext);
             } else if (!request.secretBinary.empty()) {

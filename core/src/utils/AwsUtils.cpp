@@ -29,43 +29,65 @@ namespace AwsMock::Core {
         return StringUtils::GenerateRandomString(42);
     }
 
-    std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &queueArn) {
-        std::string endpoint = GetEndpoint();
-        std::vector<std::string> parts = StringUtils::Split(queueArn, ":");
-        if (parts.size() < 6) {
-            log_error << "Could not convert SQS arn to url, arn: " << queueArn;
-            return {};
+    std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &input) {
+        if (IsUrl(input)) {
+            return input;
         }
+        if (IsArn(input)) {
+            std::string endpoint = GetEndpoint();
+            std::vector<std::string> parts = StringUtils::Split(input, ":");
+            if (parts.size() < 6) {
+                log_error << "Could not convert SQS arn to url, arn: " << input;
+                return {};
+            }
 
-        const std::string accountId = parts[4];
-        const std::string queueName = parts[5];
-        parts.clear();
+            const std::string accountId = parts[4];
+            const std::string queueName = parts[5];
+            parts.clear();
 
-        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
-        const auto port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
-        const auto hostname = SystemUtils::GetHostName();
+            const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+            const auto port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+            const auto hostname = SystemUtils::GetHostName();
 
-        return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
+            return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
+        }
+        log_error << "Neither Url nor ARN";
+        return {};
     }
 
-    std::string AwsUtils::ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl) {
-        const auto queueName = queueUrl.substr(queueUrl.rfind('/') + 1);
-        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        log_trace << "Region: " << region << " accountId: " << accountId;
-        return CreateArn("sqs", region, accountId, queueName);
+    std::string AwsUtils::ConvertSQSQueueUrlToArn(const std::string &region, const std::string &input) {
+        if (IsUrl(input)) {
+            const auto queueName = input.substr(input.rfind('/') + 1);
+            const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            log_trace << "Region: " << region << " accountId: " << accountId;
+            return CreateArn("sqs", region, accountId, queueName);
+        }
+        if (IsArn(input)) {
+            return input;
+        }
+        log_error << "Neither Url nor ARN";
+        return input;
     }
 
-    std::string AwsUtils::ConvertSQSQueueArnToName(const std::string &queueArn) {
-        std::vector<std::string> parts = StringUtils::Split(queueArn, ":");
-        if (parts.size() < 6) {
-            log_error << "Could not convert SQS arn to name, arn: " << queueArn;
-            return {};
+    std::string AwsUtils::ConvertSQSQueueArnToName(const std::string &input) {
+        if (IsArn(input)) {
+            std::vector<std::string> parts = StringUtils::Split(input, ":");
+            if (parts.size() < 6) {
+                log_error << "Could not convert SQS arn to name, arn: " << input;
+                return {};
+            }
+            return parts[5];
         }
-        return parts[5];
+        log_error << "Not an ARN, input: " << input;
+        return {};
     }
 
     std::string AwsUtils::ConvertSQSQueueUrlToName(const std::string &queueUrl) {
         return queueUrl.substr(queueUrl.find_last_of("/") + 1);
+    }
+
+    std::string AwsUtils::ConvertLambdaNameToArn(const std::string &region, const std::string &accountId, const std::string &functionName) {
+        return CreateArn("lambda", region, accountId, "function:" + functionName);
     }
 
     std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
@@ -461,5 +483,19 @@ namespace AwsMock::Core {
         std::ostringstream oss;
         oss << std::put_time(&tm, "%FT%TZ");
         return oss.str();
+    }
+
+    std::string AwsUtils::GetDefaultAccountId() {
+        return SQS_DEFAULT_ACCOUNT_ID;
+    }
+
+    bool AwsUtils::IsArn(const std::string &value) {
+        static const std::regex arnPattern(R"(^arn:(aws|aws-cn|aws-us-gov):[a-z0-9-]+:[a-z0-9-]*:(\d{12})?:.+$)", std::regex::optimize);
+        return std::regex_match(value, arnPattern);
+    }
+
+    bool AwsUtils::IsUrl(const std::string &value) {
+        static const std::regex urlPattern(R"(^https?:\/\/.*$)", std::regex::optimize);
+        return std::regex_match(value, urlPattern);
     }
 }// namespace AwsMock::Core

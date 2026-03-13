@@ -9,15 +9,17 @@
 #include <map>
 #include <string>
 
-// Boost include<
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/dynamodb/model/AttributeDefinition.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
+#include <awsmock/dto/dynamodb/model/KeySchema.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/TableClassSummary.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
+#include <awsmock/dto/dynamodb/model/Tag.h>
+#include <awsmock/entity/dynamodb/AttributeDefinition.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -93,17 +95,17 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Key schema
          */
-        std::vector<std::map<std::string, std::string>> keySchemas;
+        std::vector<KeySchema> keySchema;
 
         /**
          * Attribute definitions
          */
-        std::vector<std::map<std::string, std::string>> attributes;
+        std::vector<AttributeDefinition> attributeDefinitions;
 
         /**
          * Tags
          */
-        std::map<std::string, std::string> tags;
+        std::vector<Tag> tags;
 
         /**
          * Provisioned throughput
@@ -146,25 +148,13 @@ namespace AwsMock::Dto::DynamoDb {
                 r.createdDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(tableObject, "CreatedDateTime"));
                 r.deletionProtectionEnabled = Core::Json::GetBoolValue(tableObject, "DeletionProtectionEnabled");
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
-                    r.tags = boost::json::value_to<std::map<std::string, std::string>>(tableObject.at("Tags"));
+                    r.tags = boost::json::value_to<std::vector<Tag>>(tableObject.at("Tags"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "AttributeDefinitions")) {
-                    for (boost::json::array attributeDefinitionsArray = tableObject.at("AttributeDefinitions").as_array(); const auto &a: attributeDefinitionsArray) {
-                        boost::json::object attributeDefinitionObject = a.as_object();
-                        std::map<std::string, std::string> attributeDefinition;
-                        attributeDefinition["AttributeName"] = a.at("AttributeName").as_string();
-                        attributeDefinition["AttributeType"] = a.at("AttributeType").as_string();
-                        r.attributes.push_back(std::move(attributeDefinition));
-                    }
+                    r.attributeDefinitions = boost::json::value_to<std::vector<AttributeDefinition>>(tableObject.at("AttributeDefinitions"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "KeySchema")) {
-                    for (boost::json::array attributeDefinitionsArray = tableObject.at("KeySchema").as_array(); const auto &a: attributeDefinitionsArray) {
-                        boost::json::object attributeDefinitionObject = a.as_object();
-                        std::map<std::string, std::string> keySchema;
-                        keySchema["AttributeName"] = a.at("AttributeName").as_string();
-                        keySchema["KeyType"] = a.at("KeyType").as_string();
-                        r.keySchemas.emplace_back(keySchema);
-                    }
+                    r.keySchema = boost::json::value_to<std::vector<KeySchema>>(tableObject.at("KeySchema"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "TableClassSummary")) {
                     r.tableClassSummary = boost::json::value_to<TableClassSummary>(v.at("TableClassSummary"));
@@ -190,11 +180,11 @@ namespace AwsMock::Dto::DynamoDb {
             if (!obj.tags.empty()) {
                 tableObject["Tags"] = boost::json::value_from(obj.tags);
             }
-            if (!obj.keySchemas.empty()) {
-                tableObject["KeySchema"] = boost::json::value_from(obj.keySchemas);
+            if (!obj.keySchema.empty()) {
+                tableObject["KeySchema"] = boost::json::value_from(obj.keySchema);
             }
-            if (!obj.attributes.empty()) {
-                tableObject["AttributeDefinitions"] = boost::json::value_from(obj.attributes);
+            if (!obj.attributeDefinitions.empty()) {
+                tableObject["AttributeDefinitions"] = boost::json::value_from(obj.attributeDefinitions);
             }
             jv.as_object()["Table"] = tableObject;
         }

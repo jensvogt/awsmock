@@ -54,7 +54,6 @@ namespace AwsMock::Dto::Module {
     }
 
     void Infrastructure::FromJson(const std::string &jsonString) {
-
         if (const value documentValue = bsoncxx::from_json(jsonString); documentValue.find("infrastructure") != documentValue.end()) {
             FromDocument(documentValue["infrastructure"].get_document().view());
         }

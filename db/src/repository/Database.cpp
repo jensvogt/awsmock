@@ -8,34 +8,41 @@ namespace AwsMock::Database {
 
     const std::map<std::string, IndexDefinition> DatabaseBase::indexDefinitions = {
             // SQS messages
-            {"sqs_message_idx1", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"reset", 1}}}},
-            {"sqs_message_idx2", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"retries", 1}}}},
-            {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}}},
-            {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}}}},
-            {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}}},
+            {"sqs_message_idx1", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"reset", 1}}, false}},
+            {"sqs_message_idx2", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"retries", 1}}, false}},
+            {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}, false}},
+            {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}}, false}},
+            {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}, false}},
             // SQS queues
-            {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}}},
-            {"sqs_queue_idx2", {"sqs_queue", {{"region", 1}, {"queueUrl", 1}}}},
+            {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}, false}},
+            {"sqs_queue_idx2", {"sqs_queue", {{"region", 1}, {"queueUrl", 1}}, false}},
+            {"sqs_queue_idx3", {"sqs_queue", {
+                                                     {"queueArn", 1},
+                                             },
+                                true}},
             // SNS messages
-            {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}}},
+            {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}, false}},
             // SNS topics
-            {"sns_topic_idx1", {"sns_topic", {{"region", 1}, {"topicName", 1}}}},
+            {"sns_topic_idx1", {"sns_topic", {{"region", 1}, {"topicName", 1}}, false}},
+            {"sns_topic_idx2", {"sns_topic", {{"topicArn", 1}}, true}},
             // S3 buckets
-            {"s3_bucket_idx1", {"s3_bucket", {{"region", 1}, {"name", 1}}}},
+            {"s3_bucket_idx1", {"s3_bucket", {{"region", 1}, {"name", 1}}, false}},
+            {"s3_bucket_idx2", {"s3_bucket", {{"arn", 1}}, true}},
             // S3 objects
-            {"s3_object_idx1", {"s3_object", {{"region", 1}, {"bucket", 1}, {"key", 1}}}},
-            {"s3_object_idx2", {"s3_object", {{"internalName", 1}}}},
+            {"s3_object_idx1", {"s3_object", {{"region", 1}, {"bucket", 1}, {"key", 1}}, false}},
+            {"s3_object_idx2", {"s3_object", {{"internalName", 1}}, false}},
             // Modules
-            {"module_idx1", {"module", {{"name", 1}, {"state", 1}}}},
+            {"module_idx1", {"module", {{"name", 1}, {"state", 1}}, false}},
+            {"module_idx2", {"module", {{"name", 1}}, true}},
             // KMS
-            {"kms_idx1", {"kms", {{"region", 1}, {"keyId", 1}}}},
+            {"kms_idx1", {"kms", {{"region", 1}, {"keyId", 1}}, false}},
             // Applications
-            {"application_idx1", {"apps_application", {{"region", 1}, {"name", 1}}}},
-            {"application_idx2", {"apps_application", {{"region", 1}, {"name", 1}, {"status", 1}}}},
+            {"application_idx1", {"apps_application", {{"region", 1}, {"name", 1}}, false}},
+            {"application_idx2", {"apps_application", {{"region", 1}, {"name", 1}, {"status", 1}}, false}},
             // Monitoring
-            {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}}},
-            {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}}},
-            {"monitoring_idx3", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}}}},
+            {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}, false}},
+            {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}, false}},
+            {"monitoring_idx3", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}}, false}},
     };
 
     DatabaseBase::DatabaseBase() : _useDatabase(false) {
@@ -75,18 +82,23 @@ namespace AwsMock::Database {
     }
 
     void DatabaseBase::CreateIndex(const mongocxx::database &database, const std::string &indexName) {
-
         log_trace << "Start creating index, name: " << indexName;
-        auto [collectionName, indexColumns] = indexDefinitions.at(indexName);
+        auto [collectionName, indexColumns, unique] = indexDefinitions.at(indexName);
 
         document queryDoc;
         for (const auto &[columns, direction]: indexColumns) {
             queryDoc.append(kvp(columns, direction));
         }
-        document nameDoc;
-        nameDoc.append(kvp("name", indexName));
 
-        database[collectionName].create_index(queryDoc.extract(), nameDoc.extract());
+        // Set the index name
+        mongocxx::options::index options{};
+        options.name(indexName);
+
+        // Configure the index as unique
+        if (unique) {
+            options.unique(true);
+        }
+        database[collectionName].create_index(queryDoc.extract(), options);
         log_trace << "Database index created, name: " << indexName;
     }
 

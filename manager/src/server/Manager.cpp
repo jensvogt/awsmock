@@ -149,7 +149,7 @@ namespace AwsMock::Manager {
 
         if (!Database::ModuleDatabase::instance().ModuleExists(key)) {
             Database::Entity::Module::Module m = {.name = key, .state = ModuleState::STOPPED, .status = ModuleStatus::ACTIVE};
-            Database::ModuleDatabase::instance().CreateModule(m);
+            Database::ModuleDatabase::instance().CreateOrUpdateModule(m);
         }
     }
 
@@ -216,7 +216,6 @@ namespace AwsMock::Manager {
         log_info << "Module started, count: " << Service::ModuleMap::instance().GetSize();
 
         // Start listener threads
-        //const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
         auto const maxThreads = std::thread::hardware_concurrency();
         for (auto i = 0; i < maxThreads; i++) {
             _threadGroup.create_thread([this] { return _ioc.run(); });

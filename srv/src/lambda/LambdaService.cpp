@@ -326,6 +326,63 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Lambda::UpdateFunctionCodeResponse LambdaService::UpdateFunctionCode(const Dto::Lambda::UpdateFunctionCodeRequest &request) const {
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda");
+        log_debug << "Update lambda function code request, functionName: " << request.functionName;
+
+        std::string functionArn = Core::AwsUtils::ConvertLambdaNameToArn(request.region, Core::AwsUtils::GetDefaultAccountId(), request.functionName);
+
+        std::vector<Database::Entity::Lambda::Lambda> lambads = _lambdaDatabase.ListLambdas();
+
+        if (!_lambdaDatabase.LambdaExistsByArn(functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + functionArn);
+        }
+
+        try {
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(functionArn);
+            lambda.enabled = true;
+            lambda.modified = system_clock::now();
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda updated, lambdaArn: " << lambda.arn;
+
+            // Write the base64 file
+            lambda.code.zipFile = request.functionName + "-" + request.revisionId + ".b64";
+            WriteBase64File(lambda.code.zipFile, request.zipFile);
+
+            // Find idle instance
+            Database::Entity::Lambda::Instance instance;
+            std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            log_debug << "Created lambda instance, instanceId: " << instanceId;
+
+            // Create lambda
+            LambdaCreator lambdaCreator;
+            lambda = lambdaCreator.CreateLambda(lambda, instanceId);
+
+            // Create mutex
+            _instanceMutex[request.functionName] = std::make_shared<boost::mutex>();
+
+            // Start lambda
+            Dto::Lambda::StartLambdaRequest startRequest;
+            startRequest.functionArn = functionArn;
+            startRequest.region = request.region;
+            StartLambda(startRequest);
+            log_debug << "Lambda started, containerName: " << request.functionName + "-" + instanceId;
+
+            // Create response object
+            Dto::Lambda::UpdateFunctionCodeResponse response{};
+            response.region = lambda.region;
+            response.functionName = lambda.function;
+            response.functionArn = lambda.arn;
+            response.handler = lambda.handler;
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     void LambdaService::AddEventSource(const Dto::Lambda::AddEventSourceRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "add_event_source");
         log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;
@@ -1136,7 +1193,8 @@ namespace AwsMock::Service {
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
             log_error << "Lambda function does not exist, function: " + request.functionName;
-            throw Core::ServiceException("Lambda function does not exist");
+            //throw Core::ServiceException("Lambda function does not exist");
+            return;
         }
 
         // Delete the containers, if existing

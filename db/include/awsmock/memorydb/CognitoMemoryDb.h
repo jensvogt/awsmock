@@ -13,8 +13,8 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
@@ -257,9 +257,10 @@ namespace AwsMock::Database {
          * @brief Deletes an existing cognito users
          *
          * @param user cognito user to delete
+         * @return number of users deleted
          * @throws DatabaseException
          */
-        void DeleteUser(const Entity::Cognito::User &user);
+        long DeleteUser(const Entity::Cognito::User &user);
 
         /**
          * @brief Deletes all existing cognito users
@@ -295,7 +296,7 @@ namespace AwsMock::Database {
          * @param group cognito group entity to create
          * @return created cognito group entity.
          */
-        Entity::Cognito::Group CreateGroup(const Entity::Cognito::Group &group);
+        Entity::Cognito::Group CreateGroup(Entity::Cognito::Group &group);
 
         /**
          * @brief Returns a list of cognito groups.
@@ -320,9 +321,10 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @param userPoolId cognito user pool ID
          * @param groupName name of the group
+         * @return number of groups deleted
          * @throws DatabaseException
          */
-        void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName);
+        long DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName);
 
         /**
          * @brief Deletes all existing cognito user groups.

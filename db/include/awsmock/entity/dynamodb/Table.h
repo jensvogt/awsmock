@@ -5,16 +5,13 @@
 #ifndef AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
 #define AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
 
-// C++ includes
-#include <map>
-#include <string>
-#include <vector>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
+#include <awsmock/entity/dynamodb/AttributeDefinition.h>
+#include <awsmock/entity/dynamodb/KeySchema.h>
 #include <awsmock/entity/dynamodb/ProvisionedThroughput.h>
 #include <awsmock/entity/dynamodb/StreamSpecification.h>
+#include <awsmock/entity/dynamodb/Tag.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -55,17 +52,17 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Attributes
          */
-        std::vector<std::map<std::string, std::string>> attributes;
+        std::vector<AttributeDefinition> attributeDefinitions;
 
         /**
          * Key schemas
          */
-        std::vector<std::map<std::string, std::string>> keySchemas;
+        std::vector<KeySchema> keySchema;
 
         /**
          * Tags
          */
-        std::vector<std::map<std::string, std::string>> tags;
+        std::vector<Tag> tags;
 
         /**
          * Item count

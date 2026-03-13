@@ -90,14 +90,15 @@
         "log-retention-period": 1,
         "private-port": 8080,
         "runtime": {
-          "java11": "public.ecr.aws/lambda/java:11",
-          "java17": "public.ecr.aws/lambda/java:17",
-          "java21": "public.ecr.aws/lambda/java:21",
-          "python3-9": "public.ecr.aws/lambda/python:3.9",
-          "python3-10": "public.ecr.aws/lambda/python:3.10",
-          "python3-11": "public.ecr.aws/lambda/python:3.11",
-          "python3-12": "public.ecr.aws/lambda/python:3.12",
-          "python3-13": "public.ecr.aws/lambda/python:3.13",
+          "java11": "alpine/java:11.0.22-jdk",
+          "java17": "openjdk:17-jdk-alpine",
+          "java21": "alpine/java:21-jdk",
+          "python3-9": "python3.9",
+          "python3-10": "python3.10",
+          "python3-11": "python3.11",
+          "python3-12": "python3.12",
+          "python3-13": "python3.13",
+          "python3-14": "python3.14",
           "nodejs18-x": "public.ecr.aws/lambda/nodejs:18",
           "nodejs20-x": "public.ecr.aws/lambda/nodejs:20",
           "nodejs22-x": "public.ecr.aws/lambda/nodejs:22",
@@ -157,14 +158,7 @@
         },
         "data-dir": "/usr/local/awsmock/data/dynamodb",
         "monitoring-period": 300,
-        "worker-period": 300,
-        "container": {
-          "host": "localhost",
-          "port": "8000",
-          "name": "dynamodb",
-          "image-name": "amazon/dynamodb-local",
-          "image-tag": "latest"
-        }
+        "worker-period": 300
       },
       "secretsmanager": {
         "active": true,
@@ -173,12 +167,8 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "monitoring": {
-          "period": 300
-        },
-        "worker": {
-          "period": 300
-        }
+        "monitoring-period": 300,
+        "worker-period": 300
       },
       "kms": {
         "active": true,
@@ -187,12 +177,8 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "monitoring": {
-          "period": 300
-        },
-        "remove": {
-          "period": 300
-        }
+        "monitoring-period": 300,
+        "remove-period": 300
       },
       "ssm": {
         "active": true,

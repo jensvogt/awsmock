@@ -57,52 +57,14 @@ namespace AwsMock::Service {
         void CreateLocalNetwork() const;
 
         /**
-         * @brief Start the local DynamoDB container.
-         *
-         * @par
-         * If the AWS DynamoDb docker image does not already exist, it will be downloaded. Otherwise, the local docker
-         * image will be started as a container.
-         */
-        void StartLocalDynamoDb() const;
-
-        /**
-         * @brief Stop the local DynamoDB container.
-         *
-         * @par
-         * The AWS DynamoDb docker container will be stopped.
-         */
-        void StopLocalDynamoDb() const;
-
-        /**
          * @brief Update counters
          */
         void UpdateCounter() const;
 
         /**
-         * @brief Synchronize tables.
-         *
-         * @par
-         * Loops over all DynamoDB tables and updates the MongoDB backend.
-         */
-        void SynchronizeTables() const;
-
-        /**
-         * @brief Synchronize items.
-         *
-         * @par
-         * Loops over all DynamoDB table items and updates the MongoDB backend.
-         */
-        void SynchronizeItems() const;
-
-        /**
          * @brief Backup the dynamoDb tables and items
          */
         static void BackupDynamoDb();
-
-        /**
-         * @brief Writes the docker file
-         */
-        static std::string WriteDockerFile();
 
         /**
          * Container module (either docker or podman)
@@ -151,31 +113,6 @@ namespace AwsMock::Service {
          * Worker period
          */
         int _workerPeriod;
-
-        /**
-         * Dynamo DB docker name
-         */
-        std::string _containerName;
-
-        /**
-         * Dynamo DB docker host
-         */
-        std::string _containerHost;
-
-        /**
-         * Dynamo DB docker host
-         */
-        int _containerPort;
-
-        /**
-         * Dynamo DB image name
-         */
-        std::string _imageName;
-
-        /**
-         * Dynamo DB image tag
-         */
-        std::string _imageTag;
 
         /**
          * AWS region

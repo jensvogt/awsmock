@@ -412,7 +412,7 @@ namespace AwsMock::Service {
         for (const Dto::Docker::ListContainerResponse listResponse = ListContainers(); const auto &container: listResponse.containerList) {
             auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + container.id + "/stats?stream=false&one-shot=true");
             if (statusCode != http::status::ok) {
-                log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
+                log_warning << "List container stats failed, statusCode: " << statusCode << " body " << body;
                 return {};
             }
             Dto::Docker::ContainerStat containerStat = containerStat.FromJson(body);
@@ -675,8 +675,8 @@ namespace AwsMock::Service {
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
-            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "RUN pip install -r requirements.txt" << std::endl;
+            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}/" << std::endl;
+            ofs << "RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt" << std::endl;
             ofs << "RUN mkdir -p /root/.aws" << std::endl;
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;

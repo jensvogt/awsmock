@@ -49,7 +49,7 @@ namespace AwsMock::Service {
 
                     Dto::SecretsManager::PutSecretValueRequest secretsManagerRequest = Dto::SecretsManager::PutSecretValueRequest::FromJson(clientCommand);
                     Dto::SecretsManager::PutSecretValueResponse secretsManagerResponse = _secretsManagerService.PutSecretValue(secretsManagerRequest);
-                    log_info << "Secret put value, name: " << secretsManagerResponse.name;
+                    log_info << "Secret put value, name: " << secretsManagerResponse.name << ", body: " << secretsManagerResponse.ToJson();
                     return SendResponse(request, http::status::ok, secretsManagerResponse.ToJson());
                 }
 

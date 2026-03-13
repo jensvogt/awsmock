@@ -331,7 +331,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountUserPools(region);
     }
 
-    void CognitoDatabase::DeleteUserPool(const std::string &id) const {
+    void CognitoDatabase::DeleteUserPool(const std::string &userPoolId) const {
 
         if (HasDatabase()) {
 
@@ -342,9 +342,9 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto result = _userPoolCollection.delete_many(make_document(kvp("userPoolId", id)));
+                const auto result = _userPoolCollection.delete_many(make_document(kvp("userPoolId", userPoolId)));
                 session.commit_transaction();
-                log_debug << "User pool deleted, userPoolId: " << id << " count: " << result->deleted_count();
+                log_debug << "User pool deleted, userPoolId: " << userPoolId << " count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -354,7 +354,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteUserPool(id);
+            _memoryDb.DeleteUserPool(userPoolId);
         }
     }
 
@@ -704,7 +704,7 @@ namespace AwsMock::Database {
         return CreateUser(user);
     }
 
-    void CognitoDatabase::DeleteUser(const Entity::Cognito::User &user) const {
+    long CognitoDatabase::DeleteUser(const Entity::Cognito::User &user) const {
 
         if (HasDatabase()) {
 
@@ -718,17 +718,15 @@ namespace AwsMock::Database {
                 const auto result = _userCollection.delete_many(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)));
                 session.commit_transaction();
                 log_debug << "User deleted, userName: " << user.userName << " count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteUser(user);
         }
+        return _memoryDb.DeleteUser(user);
     }
 
     void CognitoDatabase::DeleteAllUsers() const {
@@ -766,9 +764,12 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
-                const int64_t count = _groupCollection.count_documents(make_document(kvp("region", region), kvp("groupName", groupName)));
-                log_trace << "Cognito group exists: " << std::boolalpha << count;
-                return count > 0;
+
+                // Set limit to 1
+                mongocxx::options::count options;
+                options.limit(1);
+
+                return _groupCollection.count_documents(make_document(kvp("region", region), kvp("groupName", groupName)), options) > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -826,7 +827,6 @@ namespace AwsMock::Database {
         return _memoryDb.GetGroupByGroupName(region, userPoolId, groupName);
     }
 
-    // TODO: write tests
     Entity::Cognito::Group CognitoDatabase::CreateGroup(Entity::Cognito::Group &group) const {
 
         if (HasDatabase()) {
@@ -904,8 +904,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -927,7 +927,7 @@ namespace AwsMock::Database {
         return _memoryDb.ExportGroups(sortColumns);
     }
 
-    void CognitoDatabase::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {
+    long CognitoDatabase::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {
 
         if (HasDatabase()) {
 
@@ -941,17 +941,15 @@ namespace AwsMock::Database {
                 const auto result = _groupCollection.delete_many(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
                 session.commit_transaction();
                 log_debug << "Group deleted, groupName: " << groupName << " count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteGroup(region, userPoolId, groupName);
         }
+        return _memoryDb.DeleteGroup(region, userPoolId, groupName);
     }
 
     void CognitoDatabase::DeleteAllGroups(const std::string &region) const {

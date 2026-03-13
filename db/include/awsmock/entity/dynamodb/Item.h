@@ -61,7 +61,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         std::map<std::string, AttributeValue> attributes;
 
         /**
-         * Keys
+         * Key schemas
          */
         std::map<std::string, AttributeValue> keys;
 
@@ -90,11 +90,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
         Item FromDocument(const view_or_value<view, value> &mResult);
 
         /**
-         * @brief Converts the DynamoDB document to a MongoDb entity
-         *
-         * @param mResult query result.
+         * @brief Equality operator
          */
-        Item FromDynamodb(const view_or_value<view, value> &mResult);
+        bool operator==(const Item &other) const {
+            return keys == other.keys;
+        }
     };
 
     typedef std::vector<Item> ItemList;

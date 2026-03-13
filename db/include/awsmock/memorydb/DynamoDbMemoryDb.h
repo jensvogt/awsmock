@@ -157,7 +157,7 @@ namespace AwsMock::Database {
          * @param tableName table name
          * @return list of DynamoDB tables
          */
-        Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}) const;
+        [[nodiscard]] Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}) const;
 
         /**
          * @brief Returns a item entity by primary key
@@ -166,7 +166,18 @@ namespace AwsMock::Database {
          * @return item entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item GetItemById(const std::string &oid);
+        [[nodiscard]] Entity::DynamoDb::Item GetItemById(const std::string &oid);
+
+        /**
+         * @brief Returns an item entity by primary key
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @param keys map of primary keys
+         * @return item entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const;
 
         /**
          * @brief Creates a new item
@@ -208,9 +219,10 @@ namespace AwsMock::Database {
          *
          * @param region AWS region.
          * @param tableName name of the table
+         * @return number of items deleted
          * @throws DatabaseException
          */
-        void DeleteItems(const std::string &region, const std::string &tableName);
+        long DeleteItems(const std::string &region, const std::string &tableName);
 
         /**
          * @brief Deletes all items

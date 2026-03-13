@@ -78,79 +78,103 @@ namespace AwsMock::Service {
             if (module == "s3") {
 
                 Database::S3Database &_s3Database = Database::S3Database::instance();
-                infrastructure.s3Buckets = _s3Database.ExportBuckets({{.column = "name", .sortDirection = 1}});
-                if (request.includeObjects) {
+                if (request.IsInfrastructure()) {
+                    infrastructure.s3Buckets = _s3Database.ExportBuckets({{.column = "name", .sortDirection = 1}});
+                }
+                if (request.IsObjects()) {
                     infrastructure.s3Objects = _s3Database.ListObjects();
                 }
 
             } else if (module == "sqs") {
 
                 Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-                infrastructure.sqsQueues = _sqsDatabase.ExportQueues({{.column = "name", .sortDirection = 1}});
-                if (request.includeObjects) {
+                if (request.IsInfrastructure()) {
+                    infrastructure.sqsQueues = _sqsDatabase.ExportQueues({{.column = "name", .sortDirection = 1}});
+                }
+                if (request.IsObjects()) {
                     infrastructure.sqsMessages = _sqsDatabase.ListMessages();
                 }
 
             } else if (module == "sns") {
 
                 Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-                infrastructure.snsTopics = _snsDatabase.ExportTopics({{.column = "name", .sortDirection = 1}});
-                if (request.includeObjects) {
+                if (request.IsInfrastructure()) {
+                    infrastructure.snsTopics = _snsDatabase.ExportTopics({{.column = "name", .sortDirection = 1}});
+                }
+                if (request.IsObjects()) {
                     infrastructure.snsMessages = _snsDatabase.ListMessages();
                 }
 
             } else if (module == "lambda") {
 
                 Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-                infrastructure.lambdas = _lambdaDatabase.ExportLambdas({{.column = "name", .sortDirection = 1}});
+                if (request.IsInfrastructure()) {
+                    infrastructure.lambdas = _lambdaDatabase.ExportLambdas({{.column = "name", .sortDirection = 1}});
+                }
 
             } else if (module == "cognito") {
 
                 Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-                infrastructure.cognitoUserPools = _cognitoDatabase.ExportUserPools({{.column = "name", .sortDirection = 1}});
-                infrastructure.cognitoUserGroups = _cognitoDatabase.ExportGroups({{.column = "name", .sortDirection = 1}});
-                infrastructure.cognitoUsers = _cognitoDatabase.ExportUsers({{.column = "name", .sortDirection = 1}});
+                if (request.IsInfrastructure()) {
+                    infrastructure.cognitoUserPools = _cognitoDatabase.ExportUserPools({{.column = "name", .sortDirection = 1}});
+                    infrastructure.cognitoUserGroups = _cognitoDatabase.ExportGroups({{.column = "name", .sortDirection = 1}});
+                    infrastructure.cognitoUsers = _cognitoDatabase.ExportUsers({{.column = "name", .sortDirection = 1}});
+                }
 
             } else if (module == "dynamodb") {
 
                 Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
-                infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
-                if (request.includeObjects) {
+                if (request.IsInfrastructure()) {
+                    infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
+                }
+                if (request.IsObjects()) {
                     infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
                 }
 
             } else if (module == "secretsmanager") {
 
-                Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-                infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
+                if (request.IsInfrastructure()) {
+                    Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+                    infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
+                }
 
             } else if (module == "transfer") {
 
-                Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
-                infrastructure.transferServers = _transferDatabase.ListServers();
+                if (request.IsInfrastructure()) {
+                    Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+                    infrastructure.transferServers = _transferDatabase.ListServers();
+                }
 
             } else if (module == "kms") {
 
-                Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
-                infrastructure.kmsKeys = _kmsDatabase.ListKeys();
+                if (request.IsInfrastructure()) {
+                    Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+                    infrastructure.kmsKeys = _kmsDatabase.ListKeys();
+                }
 
             } else if (module == "ssm") {
 
-                Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
-                infrastructure.ssmParameters = _ssmDatabase.ListParameters();
+                if (request.IsInfrastructure()) {
+                    Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+                    infrastructure.ssmParameters = _ssmDatabase.ListParameters();
+                }
 
             } else if (module == "application") {
 
-                Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
-                infrastructure.applications = _applicationDatabase.ListApplications();
+                if (request.IsInfrastructure()) {
+                    Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+                    infrastructure.applications = _applicationDatabase.ListApplications();
+                }
 
             } else if (module == "apigateway") {
 
-                Database::ApiGatewayDatabase &_apiGatewayDatabase = Database::ApiGatewayDatabase::instance();
-                infrastructure.apiKeys = _apiGatewayDatabase.GetApiKeys();
+                if (request.IsInfrastructure()) {
+                    Database::ApiGatewayDatabase &_apiGatewayDatabase = Database::ApiGatewayDatabase::instance();
+                    infrastructure.apiKeys = _apiGatewayDatabase.GetApiKeys();
+                }
             }
         }
-        return {.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
+        return {.infrastructure = infrastructure, .exportType = request.exportType, .prettyPrint = request.prettyPrint};
     }
 
     void ModuleService::ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) {
@@ -272,46 +296,25 @@ namespace AwsMock::Service {
         try {
             // DynamoDB
             if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
-                DynamoDbService _dynamoDbService;
                 const Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
                 if (!infrastructure.dynamoDbTables.empty()) {
                     for (auto &table: infrastructure.dynamoDbTables) {
-                        if (!_dynamoDbService.ExistTable(table.region, table.name)) {
-                            Dto::DynamoDb::ProvisionedThroughput provisionedThroughput;
-                            provisionedThroughput.readCapacityUnits = 1;
-                            provisionedThroughput.writeCapacityUnits = 1;
-                            Dto::DynamoDb::CreateTableRequest dynamoDbRequest;
-                            dynamoDbRequest.region = table.region;
-                            dynamoDbRequest.tableName = table.name;
-                            dynamoDbRequest.provisionedThroughput = provisionedThroughput;
-                            dynamoDbRequest.attributes = table.attributes;
-                            dynamoDbRequest.keySchemas = table.keySchemas;
-                            dynamoDbRequest.tags = table.tags;
-                            dynamoDbRequest.streamSpecification.enabled = table.streamSpecification.enabled;
-                            dynamoDbRequest.streamSpecification.streamViewType = Dto::DynamoDb::StreamViewTypeFromString(Database::Entity::DynamoDb::StreamViewTypeToString(table.streamSpecification.streamViewType));
-                            Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
-                        } else {
-                            _dynamoDatabase.CreateOrUpdateTable(table);
-                        }
-                        log_debug << "DynamoDB table created: " << table.name;
+                        table.modified = system_clock::now();
+                        _dynamoDatabase.CreateOrUpdateTable(table);
                     }
-                    log_info << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size();
+                    log_info << "DynamoDB table imported, count: " << infrastructure.cognitoUserPools.size();
                 }
+
                 if (!infrastructure.dynamoDbItems.empty()) {
                     for (auto &item: infrastructure.dynamoDbItems) {
-                        if (_dynamoDbService.ExistTable(item.region, item.tableName)) {
-                            Dto::DynamoDb::PutItemRequest putItemRequest;
-                            putItemRequest.region = item.region;
-                            putItemRequest.tableName = item.tableName;
-                            putItemRequest.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
-                            putItemRequest.keys = Dto::DynamoDb::Mapper::map(item.keys);
-                            putItemRequest.body = putItemRequest.ToJson();
-                            Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(putItemRequest);
-                            log_debug << "DynamoDB item created, tableName: " << response.tableName;
-                        }
+                        item.modified = system_clock::now();
+                        item.size = sizeof(item) + sizeof(long);
+                        _dynamoDatabase.CreateOrUpdateItem(item);
                     }
-                    log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
+                    log_info << "DynamoDB item imported, count: " << infrastructure.cognitoUserPools.size();
                 }
+
+                _dynamoDatabase.AdjustItemCounters();
             }
 
             // Applications
@@ -383,8 +386,7 @@ namespace AwsMock::Service {
             } else if (m == "sns") {
                 count += Database::SNSDatabase::instance().DeleteAllTopics();
             } else if (m == "dynamodb") {
-                DynamoDbService _dynamoDbService;
-                count += _dynamoDbService.DeleteAllTables();
+                count += Database::DynamoDbDatabase::instance().DeleteAllTables();
             } else if (m == "transfer") {
                 count += Database::TransferDatabase::instance().DeleteAllTransfers();
             } else if (m == "application") {
@@ -438,7 +440,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void ModuleService::BackupModule(const std::string &module, bool includeObjects) {
+    void ModuleService::BackupModule(const std::string &module, const Dto::Module::ExportType &exportType) {
 
         // Backup file name
         std::string backupFilename = Core::BackupUtils::GetBackupFilename(module);
@@ -446,8 +448,8 @@ namespace AwsMock::Service {
 
         // Create export request
         Dto::Module::ExportInfrastructureRequest request;
-        request.includeObjects = includeObjects;
         request.prettyPrint = true;
+        request.exportType = exportType;
         request.modules.emplace_back(module);
 
         // Do the actual export

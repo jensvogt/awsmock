@@ -1,5 +1,92 @@
 # Changelog
 
+## [1.14.42](https://github.com/jensvogt/awsmock/compare/1.14.41...v1.14.42) (2026-03-13)
+
+
+### Bug Fixes
+
+* mongodb index sqs-message. create SNS topic ([2db9010](https://github.com/jensvogt/awsmock/commit/2db9010ee1b41825ff240a8fb3f917b224791624))
+
+## [1.14.41](https://github.com/jensvogt/awsmock/compare/v1.14.40...v1.14.41) (2026-03-12)
+
+
+### Bug Fixes
+
+* duplicate application in database ([a0f2caa](https://github.com/jensvogt/awsmock/commit/a0f2caa894883d99df4fc43a020dac4a98204f79))
+
+## [1.14.40](https://github.com/jensvogt/awsmock/compare/1.14.39...v1.14.40) (2026-03-12)
+
+
+### Bug Fixes
+
+* delete dynamodb memory database ([937d168](https://github.com/jensvogt/awsmock/commit/937d1685c3c650ff0406bdc7432ae3707dca6d29))
+* duplicate application in database ([ae5a379](https://github.com/jensvogt/awsmock/commit/ae5a379a0bbd45e722b13489b30ef3ffee2eadcb))
+
+## [1.14.39](https://github.com/jensvogt/awsmock/compare/1.14.38...v1.14.39) (2026-03-10)
+
+
+### Bug Fixes
+
+* queue name as arn/url ([12ce444](https://github.com/jensvogt/awsmock/commit/12ce4449b74bc3f30a2b371201e7b1a1c5bec42d))
+
+## [1.14.38](https://github.com/jensvogt/awsmock/compare/1.14.37...v1.14.38) (2026-03-09)
+
+
+### Bug Fixes
+
+* add cognito database tests ([4536a24](https://github.com/jensvogt/awsmock/commit/4536a24c01b2d584de435ddd61cc82a0803e82cd))
+* add cognito database tests ([ffbc945](https://github.com/jensvogt/awsmock/commit/ffbc945c835e1b4c0c42345564f27be2ca976e83))
+* add cognito database tests ([d54adff](https://github.com/jensvogt/awsmock/commit/d54adff2004cd7ed87bb78ca177c5b02049f1ce7))
+* macOS port and new tests for memory DB ([6b8fad8](https://github.com/jensvogt/awsmock/commit/6b8fad8c3338863b2c731c54831c40cfe4d422f6))
+
+## [1.14.37](https://github.com/jensvogt/awsmock/compare/v1.14.36...v1.14.37) (2026-03-09)
+
+
+### Bug Fixes
+
+* remove dynamodb java app ([20fae51](https://github.com/jensvogt/awsmock/commit/20fae51878df6641c28811bf55cb4066aefe32f3))
+* remove dynamodb java app ([2d3865d](https://github.com/jensvogt/awsmock/commit/2d3865d171a2addc20e5220fecbbeb96f313232a))
+
+## [1.14.36](https://github.com/jensvogt/awsmock/compare/v1.14.35...v1.14.36) (2026-03-08)
+
+
+### Bug Fixes
+
+* remove dynamodb java app ([7628c12](https://github.com/jensvogt/awsmock/commit/7628c12deb89583cd2b39570ed57dc287a6075f9))
+
+## [1.14.35](https://github.com/jensvogt/awsmock/compare/v1.14.34...v1.14.35) (2026-03-08)
+
+
+### Bug Fixes
+
+* remove dynamodb java app ([da453d9](https://github.com/jensvogt/awsmock/commit/da453d98aad14d85ac2997aa23a37936d28d01d1))
+
+## [1.14.34](https://github.com/jensvogt/awsmock/compare/1.14.33...v1.14.34) (2026-03-07)
+
+
+### Bug Fixes
+
+* remove dynamodb java app ([d32cde7](https://github.com/jensvogt/awsmock/commit/d32cde751c7c1bf16223792b713cb6287814635c))
+* remove dynamodb java app ([85e881c](https://github.com/jensvogt/awsmock/commit/85e881cbff9f91801920c93d2e36129dc57124c9))
+* remove dynamodb java app ([a57d6dc](https://github.com/jensvogt/awsmock/commit/a57d6dcbaf4193ce940275b3879975957e0332c8))
+* remove dynamodb java app ([ce0f388](https://github.com/jensvogt/awsmock/commit/ce0f388af2ffbf39f36d52ad828b77ceeca2b8bc))
+
+## [1.14.33](https://github.com/jensvogt/awsmock/compare/v1.14.32...v1.14.33) (2026-03-06)
+
+
+### Bug Fixes
+
+* lambda update code call ([f55681f](https://github.com/jensvogt/awsmock/commit/f55681f480e3be68a640e96e7ea6f39d8f08eee0))
+* lambda update code call ([1c04f87](https://github.com/jensvogt/awsmock/commit/1c04f870fccc5eeba30a3f723869f9d9ca0cecf1))
+
+## [1.14.32](https://github.com/jensvogt/awsmock/compare/v1.14.31...v1.14.32) (2026-03-06)
+
+
+### Bug Fixes
+
+* SEGFAULT in application module ([9102d1d](https://github.com/jensvogt/awsmock/commit/9102d1d663784b266e0d447711fa0af3c080259c))
+* SEGFAULT in application module ([cc41020](https://github.com/jensvogt/awsmock/commit/cc4102034ae2818db2e8a5bdae680f3b002e1a91))
+
 ## [1.14.31](https://github.com/jensvogt/awsmock/compare/v1.14.30...v1.14.31) (2026-03-05)
 
 

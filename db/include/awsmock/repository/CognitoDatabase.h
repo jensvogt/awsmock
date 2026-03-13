@@ -10,8 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
@@ -29,7 +29,7 @@ namespace AwsMock::Database {
      */
     class CognitoDatabase : public DatabaseBase {
 
-    public:
+      public:
 
         /**
          * @brief Constructor
@@ -156,10 +156,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes an existing cognito user pool
          *
-         * @param id cognito user pool ID
+         * @param userPoolId cognito user pool ID
          * @throws DatabaseException
          */
-        void DeleteUserPool(const std::string &id) const;
+        void DeleteUserPool(const std::string &userPoolId) const;
 
         /**
          * @brief Deletes all existing cognito user pools
@@ -288,9 +288,10 @@ namespace AwsMock::Database {
          * @brief Deletes an existing cognito users
          *
          * @param user cognito user to delete
+         * @return number of users deleted
          * @throws DatabaseException
          */
-        void DeleteUser(const Entity::Cognito::User &user) const;
+        long DeleteUser(const Entity::Cognito::User &user) const;
 
         /**
          * @brief Deletes all existing cognito users
@@ -360,9 +361,10 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @param userPoolId cognito user pool ID
          * @param groupName name of the group
+         * @return number of groups deleted
          * @throws DatabaseException
          */
-        void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
+        long DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
 
         /**
          * @brief Deletes all existing cognito user groups.
@@ -382,7 +384,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] bool ClientIdExists(const std::string &region, const std::string &clientId) const;
 
-    private:
+      private:
 
         /**
          * Database name

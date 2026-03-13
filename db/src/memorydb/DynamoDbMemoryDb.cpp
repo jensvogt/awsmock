@@ -13,7 +13,7 @@ namespace AwsMock::Database {
     template<typename Map, typename Key>
     bool KeyCompare(Map const &lhs, Map const &rhs, Key const &keys) {
 
-        auto pred = [](auto a, auto b) { return a.first == b.first; };
+        auto pred = [](const auto &a, const auto &b) { return a.first == b.first; };
 
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin(), pred);
     }
@@ -132,31 +132,16 @@ namespace AwsMock::Database {
     long DynamoDbMemoryDb::DeleteAllTables() {
         boost::mutex::scoped_lock lock(_tableMutex);
 
-        const long count = _tables.size();
+        const long count = static_cast<long>(_tables.size());
         log_debug << "All DynamoDb tables deleted, count: " << count;
         _tables.clear();
         return count;
     }
 
     bool DynamoDbMemoryDb::ItemExists(const Entity::DynamoDb::Item &item) {
-
-        const std::string region = item.region;
-        std::string tableName = item.tableName;
-
-        // Get table
-        Entity::DynamoDb::Table table = GetTableByRegionName(region, tableName);
-
-        if (!region.empty()) {
-            return std::ranges::find_if(_items,
-                                        [table, item](const std::pair<std::string, Entity::DynamoDb::Item> &item1) {
-                                            bool result = item1.second.region == table.region && item1.second.tableName == table.name;
-                                            result &= KeyCompare(item.attributes, item1.second.attributes, table.keySchemas);
-                                            return result;
-                                        }) != _items.end();
-        }
         return std::ranges::find_if(_items,
-                                    [tableName](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-                                        return item.second.tableName == tableName;
+                                    [item](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
+                                        return i.second.region == item.region && i.second.tableName == item.tableName && i.second.keys == item.keys;
                                     }) != _items.end();
     }
 
@@ -231,11 +216,8 @@ namespace AwsMock::Database {
                 }
             }
             return count;
-
-        } else {
-
-            return static_cast<long>(_tables.size());
         }
+        return static_cast<long>(_tables.size());
     }
 
     Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemById(const std::string &oid) {
@@ -251,6 +233,20 @@ namespace AwsMock::Database {
         }
 
         it->second.oid = oid;
+        return it->second;
+    }
+
+    Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const {
+
+        const auto it =
+                std::ranges::find_if(_items, [region, tableName, keys](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                    return item.second.region == region && item.second.tableName == tableName && item.second.keys == keys;
+                });
+
+        if (it == _items.end()) {
+            log_error << "Get item by keys failed, region: " << region << ", tableName: " << tableName;
+            throw Core::DatabaseException("Get item by keys failed, region: " + region + ", tableName: " + tableName);
+        }
         return it->second;
     }
 
@@ -300,7 +296,7 @@ namespace AwsMock::Database {
         log_debug << "DynamoDB items deleted, count: " << count;
     }
 
-    void DynamoDbMemoryDb::DeleteItems(const std::string &region, const std::string &tableName) {
+    long DynamoDbMemoryDb::DeleteItems(const std::string &region, const std::string &tableName) {
         boost::mutex::scoped_lock lock(_itemMutex);
 
         const auto count = std::erase_if(_items, [region, tableName](const auto &item) {
@@ -308,12 +304,13 @@ namespace AwsMock::Database {
             return v.region == region && v.tableName == tableName;
         });
         log_debug << "DynamoDB items deleted, tableName: " << tableName << " count: " << count;
+        return count;
     }
 
     long DynamoDbMemoryDb::DeleteAllItems() {
         boost::mutex::scoped_lock lock(_itemMutex);
 
-        long count = _items.size();
+        const long count = static_cast<long>(_items.size());
         log_debug << "DynamoDB items deleted, count: " << _items.size();
         _items.clear();
         return count;

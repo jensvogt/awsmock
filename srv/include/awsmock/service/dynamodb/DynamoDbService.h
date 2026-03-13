@@ -9,10 +9,10 @@
 #include <sstream>
 #include <string>
 
-// Boost include
-#include <boost/lexical_cast.hpp>
-
 // AwsMock includes
+#include "awsmock/repository/DynamoDbToMongoTranslator.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbService();
+        explicit DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _accountId(Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id")) {}
 
         /**
          * @brief Creates a new table
@@ -186,7 +186,7 @@ namespace AwsMock::Service {
          * @param request put item request DTO
          * @return GetItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::PutItemResponse PutItem(Dto::DynamoDb::PutItemRequest &request) const;
 
         /**
          * @brief Query the database
@@ -194,7 +194,7 @@ namespace AwsMock::Service {
          * @param request query item request DTO
          * @return QueryResponse
          */
-        [[nodiscard]] Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::QueryResponse Query(Dto::DynamoDb::QueryRequest &request) const;
 
         /**
          * @brief Scan the database
@@ -266,16 +266,6 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::DynamoDbDatabase &_dynamoDbDatabase;
-
-        /**
-         * DynamoDb container host
-         */
-        std::string _containerHost;
-
-        /**
-         * DynamoDb container port
-         */
-        int _containerPort;
 
         /**
          * AWS account ID

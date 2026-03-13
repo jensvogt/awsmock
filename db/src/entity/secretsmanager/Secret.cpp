@@ -8,23 +8,12 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
     view_or_value<view, value> Secret::ToDocument() const {
 
-        document rotationRulesDoc;
-        rotationRulesDoc.append(kvp("automaticallyAfterDays", static_cast<bsoncxx::types::b_int64>(rotationRules.automaticallyAfterDays)));
-        rotationRulesDoc.append(kvp("duration", rotationRules.duration));
-        rotationRulesDoc.append(kvp("scheduleExpression", rotationRules.scheduleExpression));
-
-        document versionsDoc;
-        for (const auto &[fst, snd]: versions) {
-            versionsDoc.append(kvp(fst, snd.ToDocument()));
-        }
-
         document secretDoc;
         secretDoc.append(kvp("region", region));
         secretDoc.append(kvp("name", name));
         secretDoc.append(kvp("arn", arn));
         secretDoc.append(kvp("secretId", secretId));
         secretDoc.append(kvp("kmsKeyId", kmsKeyId));
-        secretDoc.append(kvp("versions", versionsDoc.extract()));
         secretDoc.append(kvp("description", description));
         secretDoc.append(kvp("owningService", owningService));
         secretDoc.append(kvp("primaryRegion", primaryRegion));
@@ -36,9 +25,17 @@ namespace AwsMock::Database::Entity::SecretsManager {
         secretDoc.append(kvp("nextRotatedDate", bsoncxx::types::b_date(nextRotatedDate)));
         secretDoc.append(kvp("rotationEnabled", rotationEnabled));
         secretDoc.append(kvp("rotationLambdaARN", rotationLambdaARN));
-        secretDoc.append(kvp("rotationRules", rotationRulesDoc.extract()));
+        secretDoc.append(kvp("rotationRules", rotationRules.ToDocument()));
         secretDoc.append(kvp("created", bsoncxx::types::b_date(created)));
         secretDoc.append(kvp("modified", bsoncxx::types::b_date(modified)));
+
+        if (!versions.empty()) {
+            document versionsDoc;
+            for (const auto &[fst, snd]: versions) {
+                versionsDoc.append(kvp(fst, snd.ToDocument()));
+            }
+            secretDoc.append(kvp("versions", versionsDoc));
+        }
 
         return secretDoc.extract();
     }

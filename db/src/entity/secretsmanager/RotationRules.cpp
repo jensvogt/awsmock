@@ -9,7 +9,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
     view_or_value<view, value> RotationRules::ToDocument() const {
 
         auto rotationRulesDoc = document{};
-        rotationRulesDoc.append(kvp("automaticallyAfterDays", static_cast<bsoncxx::types::b_int64>(automaticallyAfterDays)));
+        rotationRulesDoc.append(kvp("automaticallyAfterDays", bsoncxx::types::b_int64(automaticallyAfterDays)));
         rotationRulesDoc.append(kvp("duration", duration));
         rotationRulesDoc.append(kvp("scheduleExpression", scheduleExpression));
 

@@ -1,0 +1,173 @@
+//
+// Created by vogje01 on 02/06/2023.
+//
+// Boost includes
+#include <boost/locale.hpp>
+#include <boost/test/unit_test.hpp>
+
+// AwsMock includes
+#include <awsmock/entity/dynamodb/AttributeDefinition.h>
+#include <awsmock/repository/DynamoDbDatabase.h>
+
+#define TEST_ACCOUNT_ID "000000000000"
+#define TEST_TABLE_NAME "test-table"
+#define TEST_TABLE_REGION "eu-cental-1"
+
+namespace AwsMock::Database {
+
+    Entity::DynamoDb::Item CreateDefaultItem(const std::string &region, const std::string &tableName) {
+        Entity::DynamoDb::Item item;
+        item.tableName = tableName;
+        item.region = region;
+
+        Entity::DynamoDb::AttributeValue key1Value;
+        key1Value.stringValue = "key-value-1";
+        item.keys["test-attribute-1"] = key1Value;
+
+        Entity::DynamoDb::AttributeValue attr1Value;
+        attr1Value.stringValue = "attr-value-1";
+        item.attributes["test-attribute-1"] = attr1Value;
+        return item;
+    }
+
+    Entity::DynamoDb::Table CreateDefaultTable() {
+        Entity::DynamoDb::Table table;
+        table.region = TEST_TABLE_REGION;
+        table.name = TEST_TABLE_NAME;
+        table.arn = Core::AwsUtils::CreateDynamoDbTableArn(TEST_ACCOUNT_ID, TEST_TABLE_NAME);
+
+        // arrange attributes
+        Entity::DynamoDb::AttributeDefinition attributeDefinition1;
+        attributeDefinition1.attributeName = "test-attribute-1";
+        attributeDefinition1.attributeType = "S";
+        table.attributeDefinitions.push_back(attributeDefinition1);
+        Entity::DynamoDb::AttributeDefinition attributeDefinition2;
+        attributeDefinition2.attributeName = "test-attribute-2";
+        attributeDefinition2.attributeType = "N";
+        table.attributeDefinitions.push_back(attributeDefinition2);
+
+        // arrange key schema
+        Entity::DynamoDb::KeySchema keySchema1;
+        keySchema1.attributeName = "test-attribute-1";
+        keySchema1.keyType = "HASH";
+        table.keySchema.emplace_back(keySchema1);
+        return table;
+    }
+
+    BOOST_AUTO_TEST_CASE(CreateTableTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+
+        // act
+        table = dynamoDbDatabase.CreateTable(table);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+        BOOST_CHECK_EQUAL(false, table.keySchema.empty());
+        BOOST_CHECK_EQUAL(false, table.attributeDefinitions.empty());
+    }
+
+    BOOST_AUTO_TEST_CASE(ListTableTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+        table = dynamoDbDatabase.CreateTable(table);
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+
+        // act
+        const std::vector<Entity::DynamoDb::Table> tables = dynamoDbDatabase.ListTables();
+
+        // assert
+        BOOST_CHECK_EQUAL(false, tables.empty());
+    }
+
+    BOOST_AUTO_TEST_CASE(DeleteAllTablesTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+        table = dynamoDbDatabase.CreateTable(table);
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+
+        // act
+        const long result = dynamoDbDatabase.DeleteAllTables();
+
+        // assert
+        BOOST_CHECK_EQUAL(true, result > 0);
+    }
+
+    BOOST_AUTO_TEST_CASE(CreateItemTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+        table = dynamoDbDatabase.CreateTable(table);
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+        Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
+
+        // act
+        item = dynamoDbDatabase.CreateItem(item);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, item.keys.empty());
+        BOOST_CHECK_EQUAL(false, item.attributes.empty());
+        BOOST_CHECK_EQUAL(table.name, item.tableName);
+    }
+
+    BOOST_AUTO_TEST_CASE(GetItemTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+        table = dynamoDbDatabase.CreateTable(table);
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+        Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
+        item = dynamoDbDatabase.CreateItem(item);
+        BOOST_CHECK_EQUAL(false, item.oid.empty());
+
+        // arrange key
+        Entity::DynamoDb::AttributeValue key1Value;
+        key1Value.stringValue = "key-value-1";
+        std::map<std::string, Entity::DynamoDb::AttributeValue> keys;
+        keys["test-attribute-1"] = key1Value;
+
+        // act
+        std::vector<Entity::DynamoDb::Item> items = dynamoDbDatabase.ListItems();
+
+        item = dynamoDbDatabase.GetItemByKeys(table.region, table.name, keys);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, item.keys.empty());
+        BOOST_CHECK_EQUAL(false, item.attributes.empty());
+        BOOST_CHECK_EQUAL(item.attributes["test-attribute-1"].stringValue, "attr-value-1");
+        BOOST_CHECK_EQUAL(item.keys["test-attribute-1"].stringValue, "key-value-1");
+    }
+
+    BOOST_AUTO_TEST_CASE(ListItemTest) {
+
+        // arrange
+        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        Entity::DynamoDb::Table table = CreateDefaultTable();
+        table = dynamoDbDatabase.CreateTable(table);
+        BOOST_CHECK_EQUAL(false, table.arn.empty());
+        BOOST_CHECK_EQUAL(false, table.oid.empty());
+        Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
+        item = dynamoDbDatabase.CreateItem(item);
+        BOOST_CHECK_EQUAL(false, item.oid.empty());
+
+        // act
+        const std::vector<Entity::DynamoDb::Item> items = dynamoDbDatabase.ListItems(table.region, table.name);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, items.empty());
+    }
+
+}// namespace AwsMock::Database

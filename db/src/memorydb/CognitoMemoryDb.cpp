@@ -53,8 +53,24 @@ namespace AwsMock::Database {
         }
 
         log_trace << "Got user pool list, size: " << userPoolList.size();
-        std::ranges::sort(userPoolList, [](const Entity::Cognito::UserPool &a, const Entity::Cognito::UserPool &b) {
-            return a.name < b.name;
+        auto compare = [](const auto &valA, const auto &valB, const int &dir) {
+            if (valA == valB) return 0;
+            if (dir == 1) return valA < valB ? 1 : -1;
+            return valA > valB ? 1 : -1;
+        };
+
+        std::ranges::sort(userPoolList, [&sortColumns, compare](const auto &a, const auto &b) {
+            for (const auto &[column, dir]: sortColumns) {
+                int res = 0;
+                if (column == "userPoolId") res = compare(a.userPoolId, b.userPoolId, dir);
+                else if (column == "name")
+                    res = compare(a.name, b.name, dir);
+                else if (column == "oid")
+                    res = compare(a.oid, b.oid, dir);
+
+                if (res != 0) return res == 1;
+            }
+            return false;
         });
         return userPoolList;
     }
@@ -256,7 +272,7 @@ namespace AwsMock::Database {
                                           if (!region.empty() && obj.second.region == region && !userPoolId.empty() && obj.second.userPoolId == userPoolId) {
                                               return true;
                                           }
-                                          return false;
+                                          return true;
                                       });
 
         log_trace << "Count user pools, size: " << count;
@@ -344,13 +360,14 @@ namespace AwsMock::Database {
         return _users[it->first];
     }
 
-    void CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
+    long CognitoMemoryDb::DeleteUser(const Entity::Cognito::User &user) {
         boost::mutex::scoped_lock lock(_userMutex);
 
         const auto count = std::erase_if(_users, [user](const std::pair<std::string, Entity::Cognito::User> &u) {
             return u.second.region == user.region && u.second.userPoolId == user.userPoolId && u.second.userName == user.userName;
         });
         log_debug << "Cognito user deleted, count: " << count;
+        return count;
     }
 
     void CognitoMemoryDb::DeleteAllUsers() {
@@ -384,12 +401,13 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    Entity::Cognito::Group CognitoMemoryDb::CreateGroup(const Entity::Cognito::Group &group) {
+    Entity::Cognito::Group CognitoMemoryDb::CreateGroup(Entity::Cognito::Group &group) {
         boost::mutex::scoped_lock lock(_groupMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
+        group.oid = oid;
         _groups[oid] = group;
-        log_trace << "Cognito user pool created, oid: " << oid;
+        log_trace << "Cognito user group created, oid: " << oid;
         return _groups[oid];
     }
 
@@ -437,13 +455,14 @@ namespace AwsMock::Database {
         return groupList;
     }
 
-    void CognitoMemoryDb::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
+    long CognitoMemoryDb::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
         boost::mutex::scoped_lock lock(_groupMutex);
 
         const auto count = std::erase_if(_groups, [region, userPoolId, groupName](const std::pair<std::string, Entity::Cognito::Group> &g) {
             return g.second.region == region && g.second.userPoolId == userPoolId && g.second.groupName == groupName;
         });
         log_debug << "Cognito group deleted, groupName: " << groupName << " count: " << count;
+        return count;
     }
 
     void CognitoMemoryDb::DeleteAllGroups(const std::string &region) {

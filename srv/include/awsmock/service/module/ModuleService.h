@@ -132,9 +132,9 @@ namespace AwsMock::Service {
          * @brief Backup infrastructure
          *
          * @param module module name
-         * @param includeObjects include all objects
+         * @param exportType
          */
-        static void BackupModule(const std::string &module, bool includeObjects = false);
+        static void BackupModule(const std::string &module, const Dto::Module::ExportType &exportType);
 
         /**
          * @brief Cleanup backups, keep only the number of backups which are defined in the module retention property

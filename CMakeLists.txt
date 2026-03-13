@@ -13,6 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
+enable_testing()
 
 # -------------------------------------------------------------------------
 # Current version
@@ -20,9 +21,8 @@ set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/core/include/awsmock/core/Version.h)
 
 # -------------------------------------------------------------------------
-# Global link flags
+# Global link flags (Windows)
 # -------------------------------------------------------------------------
-
 if (WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
     set(CMAKE_USE_WIN32_THREADS_INIT ON)
@@ -70,7 +70,10 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp
-        core/include/awsmock/core/crypto/CRC32Processor.h)
+        core/include/awsmock/core/crypto/CRC32Processor.h
+        dto/include/awsmock/dto/module/model/ExportType.h
+        db/include/awsmock/repository/DynamoDbToMongoTranslator.h
+        db/include/awsmock/repository/DynamoDbUnmarshaller.h)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -144,7 +147,8 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/repository/ApiGatewayDatabase.cpp
         db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp
         db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp db/src/repository/Database.cpp
-        db/src/utils/TestUtils.cpp)
+        db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp db/src/entity/dynamodb/KeySchema.cpp
+        db/src/entity/dynamodb/Tag.cpp)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
@@ -153,6 +157,11 @@ target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto 
         Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+
+if (NOT WIN32)
+    add_subdirectory(db/tst/mongodb)
+    add_subdirectory(db/tst/memorydb)
+endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
