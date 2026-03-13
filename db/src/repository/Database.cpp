@@ -10,7 +10,7 @@ namespace AwsMock::Database {
             // SQS messages
             {"sqs_message_idx1", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"reset", 1}}, false}},
             {"sqs_message_idx2", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"retries", 1}}, false}},
-            {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}, true}},
+            {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}, false}},
             {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}}, false}},
             {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}, false}},
             // SQS queues
@@ -24,10 +24,10 @@ namespace AwsMock::Database {
             {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}, false}},
             // SNS topics
             {"sns_topic_idx1", {"sns_topic", {{"region", 1}, {"topicName", 1}}, false}},
-            {"sns_topic_idx1", {"sns_topic", {{"topicArn", 1}}, true}},
+            {"sns_topic_idx2", {"sns_topic", {{"topicArn", 1}}, true}},
             // S3 buckets
             {"s3_bucket_idx1", {"s3_bucket", {{"region", 1}, {"name", 1}}, false}},
-            {"s3_bucket_idx1", {"s3_bucket", {{"arn", 1}}, true}},
+            {"s3_bucket_idx2", {"s3_bucket", {{"arn", 1}}, true}},
             // S3 objects
             {"s3_object_idx1", {"s3_object", {{"region", 1}, {"bucket", 1}, {"key", 1}}, false}},
             {"s3_object_idx2", {"s3_object", {{"internalName", 1}}, false}},

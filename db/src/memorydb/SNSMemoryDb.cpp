@@ -230,7 +230,7 @@ namespace AwsMock::Database {
     long SNSMemoryDb::DeleteAllTopics() {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
-        const long count = _topics.size();
+        const long count = static_cast<long>(_topics.size());
         log_debug << "All topics deleted, count: " << _topics.size();
         _topics.clear();
         return count;
