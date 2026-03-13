@@ -18,7 +18,9 @@ namespace AwsMock::Service {
                         snsRequest.owner = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Owner");
                         snsRequest.topicName = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Name");
                     } else {
-                        snsRequest = Dto::SNS::CreateTopicRequest::FromJson(clientCommand.payload);
+                        snsRequest = Dto::SNS::CreateTopicRequest::FromJson(clientCommand);
+                        snsRequest.owner = clientCommand.user;
+                        snsRequest.region = clientCommand.region;
                     }
                     Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
                     log_info << "Topic created, name: " << snsRequest.topicName;
