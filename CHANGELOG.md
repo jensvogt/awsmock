@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.45](https://github.com/jensvogt/awsmock/compare/v1.14.44...v1.14.45) (2026-03-14)
+
+
+### Bug Fixes
+
+* SQS message counter using memory db ([22a7a99](https://github.com/jensvogt/awsmock/commit/22a7a99d3ae708a2006ae4ce0024307375c30f5d))
+
 ## [1.14.44](https://github.com/jensvogt/awsmock/compare/1.14.43...v1.14.44) (2026-03-14)
 
 
