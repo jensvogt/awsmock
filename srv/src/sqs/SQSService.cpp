@@ -505,6 +505,9 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Queue does not exist, arn: " + arn);
         }
 
+        // Adjust message counters
+        _sqsDatabase.AdjustMessageCounters();
+
         try {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(arn);
             log_debug << "Got queue: " << queue.queueUrl;
@@ -1021,6 +1024,7 @@ namespace AwsMock::Service {
             // Set delay
             if (queue.attributes.delaySeconds > 0) {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.delaySeconds);
+                message.status = Database::Entity::SQS::MessageStatus::DELAYED;
                 queue.attributes.approximateNumberOfMessagesDelayed++;
                 queue = _sqsDatabase.UpdateQueue(queue);
             } else {
