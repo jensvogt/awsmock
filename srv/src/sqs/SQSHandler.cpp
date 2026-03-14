@@ -149,7 +149,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::UpdateDqlRequest sqsRequest = Dto::SQS::UpdateDqlRequest::FromJson(clientCommand);
                     _sqsService.UpdateDql(sqsRequest);
-                    log_info << "Queue DQL subscription updated, queueArn: " << sqsRequest.queueArn;
+                    log_info << "Queue SQL subscription updated, queueArn: " << sqsRequest.queueArn;
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::UpdateQueueRequest sqsRequest = Dto::SQS::UpdateQueueRequest::FromJson(clientCommand);
                     _sqsService.UpdateQueue(sqsRequest);
-                    log_info << "Update queue, queueArn: " << Core::AwsUtils::ConvertSQSQueueArnToName(sqsRequest.queueArn);
+                    log_info << "Update queue, queue: " << Core::AwsUtils::ConvertSQSQueueArnToName(sqsRequest.queueArn);
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::DeleteQueueRequest sqsRequest = Dto::SQS::DeleteQueueRequest::FromJson(clientCommand);
                     Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
-                    log_info << "Delete queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
+                    log_info << "Delete queue, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -173,7 +173,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::SendMessageRequest sqsRequest = Dto::SQS::SendMessageRequest::FromJson(clientCommand);
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
-                    log_info << "Send message, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
+                    log_info << "Send message, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
                     return SendResponse(request, http::status::ok, sqsResponse.ToJson());
                 }
 

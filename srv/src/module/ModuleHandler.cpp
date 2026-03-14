@@ -147,12 +147,8 @@ namespace AwsMock::Service {
 
             if (action == "clean-objects") {
 
-                // Get request body
-                Dto::Module::CleanInfrastructureRequest moduleRequest;
-                moduleRequest.FromJson(payload);
-
                 // Get modules
-                if (moduleRequest.onlyObjects) {
+                if (Dto::Module::CleanInfrastructureRequest moduleRequest = Dto::Module::CleanInfrastructureRequest::FromJson(payload); moduleRequest.onlyObjects) {
                     ModuleService::CleanObjects(moduleRequest);
                 } else {
                     ModuleService::CleanInfrastructure(moduleRequest);
@@ -170,4 +166,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

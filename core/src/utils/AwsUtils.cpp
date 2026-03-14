@@ -55,18 +55,20 @@ namespace AwsMock::Core {
         return {};
     }
 
-    std::string AwsUtils::ConvertSQSQueueUrlToArn(const std::string &region, const std::string &input) {
+    std::string AwsUtils::ConvertToArn(const std::string &region, const std::string &input) {
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        log_trace << "Region: " << region << " accountId: " << accountId;
+        // If URL convert top ARN
         if (IsUrl(input)) {
             const auto queueName = input.substr(input.rfind('/') + 1);
-            const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-            log_trace << "Region: " << region << " accountId: " << accountId;
             return CreateArn("sqs", region, accountId, queueName);
         }
+        // If ARN simply return it
         if (IsArn(input)) {
             return input;
         }
-        log_error << "Neither Url nor ARN";
-        return input;
+        // Simple name, convert to ARN
+        return CreateSQSQueueArn(region, accountId, input);
     }
 
     std::string AwsUtils::ConvertSQSQueueArnToName(const std::string &input) {

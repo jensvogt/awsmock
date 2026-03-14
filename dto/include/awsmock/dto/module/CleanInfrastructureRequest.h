@@ -38,12 +38,12 @@ namespace AwsMock::Dto::Module {
         /**
          * Only objects
          */
-        bool onlyObjects{};
+        bool onlyObjects = false;
 
         /**
          * Pretty print
          */
-        bool prettyPrint{};
+        bool prettyPrint = false;
 
       private:
 

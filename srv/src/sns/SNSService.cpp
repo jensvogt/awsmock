@@ -743,7 +743,7 @@ namespace AwsMock::Service {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
         // Convert from URL to ARN, as the URL has the port in it, which does not work when we use a random port (i.e. awsmock-container)
-        std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, subscription.endpoint);
+        std::string queueArn = Core::AwsUtils::ConvertToArn(request.region, subscription.endpoint);
 
         // Get queue by ARN
         const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByArn(queueArn);
