@@ -37,7 +37,8 @@ namespace AwsMock::Database {
      */
     class SQSMemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -435,7 +436,13 @@ namespace AwsMock::Database {
          */
         long DeleteAllMessages();
 
-    private:
+        /**
+         * @brief Adjust all queue counters
+         */
+        void AdjustMessageCounters();
+
+      private:
+
         /**
          * SQS queue vector, when running without database
          */
@@ -457,6 +464,6 @@ namespace AwsMock::Database {
         static boost::mutex _sqsMessageMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SQS_MEMORYDB_H

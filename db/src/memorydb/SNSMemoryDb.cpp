@@ -402,4 +402,15 @@ namespace AwsMock::Database {
         _messages.clear();
         return deleted;
     }
+
+    void SNSMemoryDb::AdjustMessageCounters() const {
+        boost::mutex::scoped_lock lock(_snsMessageMutex);
+
+        for (auto topic: _topics | std::views::values) {
+            topic.messages = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::INITIAL);
+            topic.messagesSend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
+            topic.messagesResend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::RESEND);
+        }
+        log_debug << "Topic counters updated, count: " << _topics.size();
+    }
 }// namespace AwsMock::Database

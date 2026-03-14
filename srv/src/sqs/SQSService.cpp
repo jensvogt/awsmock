@@ -1020,16 +1020,17 @@ namespace AwsMock::Service {
             if (!queue.defaultMessageAttributes.empty()) {
                 message.messageAttributes.insert(queue.defaultMessageAttributes.begin(), queue.defaultMessageAttributes.end());
             }
+            queue.attributes.approximateNumberOfMessages++;
 
             // Set delay
             if (queue.attributes.delaySeconds > 0) {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.delaySeconds);
                 message.status = Database::Entity::SQS::MessageStatus::DELAYED;
                 queue.attributes.approximateNumberOfMessagesDelayed++;
-                queue = _sqsDatabase.UpdateQueue(queue);
             } else {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
+            queue = _sqsDatabase.UpdateQueue(queue);
 
             // Set parameters
             message.queueArn = queue.queueArn;
@@ -1042,7 +1043,6 @@ namespace AwsMock::Service {
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
             message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
-            //message.md5MessageSystemAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.attributes);
 
             // Update database
             message = _sqsDatabase.CreateMessage(message);
