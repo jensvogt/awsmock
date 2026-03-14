@@ -307,6 +307,11 @@ namespace AwsMock::Database {
          */
         long DeleteAllMessages();
 
+        /**
+         * @brief Adjust all topic counters
+         */
+        void AdjustMessageCounters() const;
+
       private:
 
         /**

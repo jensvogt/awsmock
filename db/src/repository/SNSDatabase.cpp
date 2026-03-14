@@ -1041,7 +1041,7 @@ namespace AwsMock::Database {
                     }
                 }
                 session.commit_transaction();
-
+                return;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -1049,5 +1049,6 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException(exc.what());
             }
         }
+        _memoryDb.AdjustMessageCounters();
     }
 }// namespace AwsMock::Database

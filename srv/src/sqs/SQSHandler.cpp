@@ -375,9 +375,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::RELOAD_ALL_COUNTERS: {
 
                     Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
-                    boost::asio::post(_ioc, [this] {
-                        _sqsService.ReloadAllCounters();
-                    });
+                    _sqsService.ReloadAllCounters();
                     return SendResponse(request, http::status::ok);
                 }
 
