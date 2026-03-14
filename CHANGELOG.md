@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.43](https://github.com/jensvogt/awsmock/compare/1.14.42...v1.14.43) (2026-03-14)
+
+
+### Bug Fixes
+
+* get SQS sttributes ([102ed86](https://github.com/jensvogt/awsmock/commit/102ed86c7a59b9c565cbdc1d8ae398d5b9c4e1a8))
+
 ## [1.14.42](https://github.com/jensvogt/awsmock/compare/1.14.41...v1.14.42) (2026-03-13)
 
 
