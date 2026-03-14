@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.44](https://github.com/jensvogt/awsmock/compare/1.14.43...v1.14.44) (2026-03-14)
+
+
+### Bug Fixes
+
+* get SQS attributes, delay status ([b09e53c](https://github.com/jensvogt/awsmock/commit/b09e53ce80eef5268a5209a3c9cc265584aa4d4b))
+
 ## [1.14.43](https://github.com/jensvogt/awsmock/compare/1.14.42...v1.14.43) (2026-03-14)
 
 
