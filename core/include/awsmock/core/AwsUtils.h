@@ -190,7 +190,7 @@ namespace AwsMock::Core {
          * @param input URL of the queue
          * @return URL of the queue
          */
-        static std::string ConvertSQSQueueUrlToArn(const std::string &region, const std::string &input);
+        static std::string ConvertToArn(const std::string &region, const std::string &input);
 
         /**
          * @brief Converts a queue URL to a queue name
