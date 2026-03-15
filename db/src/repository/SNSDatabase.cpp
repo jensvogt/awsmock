@@ -844,21 +844,16 @@ namespace AwsMock::Database {
         }
     }
 
-    void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) const {
+    long SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) const {
 
         if (HasDatabase()) {
 
-            DeleteMessage(message.messageId);
-
-        } else {
-            _memoryDb.DeleteMessage(message.messageId);
+            return DeleteMessage(message.messageId);
         }
-
-        // Update monitoring counters
-        AdjustMessageCounters();
+        return _memoryDb.DeleteMessage(message.messageId);
     }
 
-    void SNSDatabase::DeleteMessage(const std::string &messageId) const {
+    long SNSDatabase::DeleteMessage(const std::string &messageId) const {
         Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_messages");
 
         if (HasDatabase()) {
@@ -871,20 +866,18 @@ namespace AwsMock::Database {
                 const auto result = _messageCollection.delete_one(make_document(kvp("messageId", messageId)));
                 log_debug << "Messages deleted, messageId: " << messageId << " count: " << result->deleted_count();
                 session.commit_transaction();
+                return result->deleted_count();
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else {
-            _memoryDb.DeleteMessage(messageId);
         }
-
-        // Update monitoring counters
-        AdjustMessageCounters();
+        return _memoryDb.DeleteMessage(messageId);
     }
 
-    void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const {
+    long SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const {
         Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_messages");
 
         if (HasDatabase()) {
@@ -903,18 +896,15 @@ namespace AwsMock::Database {
                 const auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
                 log_debug << "Messages deleted, count: " << result->result().deleted_count();
                 session.commit_transaction();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else {
-            _memoryDb.DeleteMessages(region, topicArn, messageIds);
         }
-
-        // Update monitoring counters
-        AdjustMessageCounters();
+        return _memoryDb.DeleteMessages(region, topicArn, messageIds);
     }
 
     void SNSDatabase::DeleteOldMessages(const long timeout) const {

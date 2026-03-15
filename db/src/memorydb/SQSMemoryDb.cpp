@@ -117,7 +117,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) {
 
-        const Entity::SQS::QueueList queueList;
+        constexpr Entity::SQS::QueueList queueList;
 
         std::vector<Entity::SQS::Queue> result;
 
@@ -164,7 +164,7 @@ namespace AwsMock::Database {
             return value.queueArn == queueArn;
         });
         log_debug << "Purged queue, queueArn: " << queueArn << " count: " << count;
-        return count;
+        return static_cast<long>(count);
     }
 
     Entity::SQS::Queue SQSMemoryDb::UpdateQueue(Entity::SQS::Queue &queue) {
@@ -378,12 +378,21 @@ namespace AwsMock::Database {
             if (snd.queueArn == queueArn && snd.status == Entity::SQS::MessageStatus::INITIAL) {
 
                 snd.retries++;
-                snd.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
-                messageList.push_back(snd);
+                if (!dlQueueArn.empty() && maxRetries > 0 && snd.retries >= maxRetries) {
 
-                // Update values
-                snd.status = Entity::SQS::MessageStatus::INVISIBLE;
-                snd.reset = reset;
+                    snd.queueArn = dlQueueArn;
+                    snd.queueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
+                    snd.receiptHandle = "";
+                    snd.status = Entity::SQS::MessageStatus::INITIAL;
+                    log_debug << "Message send to DQL, id: " << snd.oid << " queueArn: " << dlQueueArn;
+
+                } else {
+
+                    snd.reset = reset;
+                    snd.status = Entity::SQS::MessageStatus::INVISIBLE;
+                    snd.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+                }
+                messageList.push_back(snd);
 
                 // Update store
                 _messages[fst] = snd;
@@ -512,34 +521,18 @@ namespace AwsMock::Database {
     }
 
     long SQSMemoryDb::CountMessages(const std::string &queueArn) {
-
-        long count = 0;
         if (queueArn.empty()) {
-
-            count = static_cast<long>(_messages.size());
-
-        } else {
-
-            for (auto it = _messages.begin(); it != _messages.end(); ++it) {
-                if (it->second.queueArn == queueArn) {
-                    count++;
-                }
-            }
+            return static_cast<long>(_messages.size());
         }
-        log_trace << "Count resources, result: " << count;
-        return count;
+        return std::ranges::count_if(_messages, [queueArn](const auto &pair) {
+            return pair.second.queueArn == queueArn;
+        });
     }
 
     long SQSMemoryDb::CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) {
-
-        long count = 0;
-        for (auto &val: _messages | std::views::values) {
-            if (val.queueArn == queueArn && val.status == status) {
-                count++;
-            }
-        }
-        log_trace << "Count resources by status, result: " << count;
-        return count;
+        return std::ranges::count_if(_messages, [queueArn, status](const auto &pair) {
+            return pair.second.queueArn == queueArn && pair.second.status == status;
+        });
     }
 
     Entity::SQS::MessageWaitTime SQSMemoryDb::GetAverageMessageWaitingTime() {
@@ -586,30 +579,21 @@ namespace AwsMock::Database {
         });
 
         log_debug << "Messages deleted, queueArn: " << queueArn << " count: " << count;
-        return count;
+        return static_cast<long>(count);
     }
 
     long SQSMemoryDb::DeleteMessage(const Entity::SQS::Message &message) {
-        boost::mutex::scoped_lock lock(_sqsMessageMutex);
-
-        std::string receiptHandle = message.receiptHandle;
-        const auto count = std::erase_if(_messages, [receiptHandle](const auto &item) {
-            auto const &[key, value] = item;
-            return value.receiptHandle == receiptHandle;
-        });
-        log_debug << "Messages deleted, receiptHandle: " << message.receiptHandle << " count: " << count;
-        return count;
+        return DeleteMessage(message.receiptHandle);
     }
 
     long SQSMemoryDb::DeleteMessage(const std::string &receiptHandle) {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        const auto count = std::erase_if(_messages, [receiptHandle](const auto &item) {
-            auto const &[key, value] = item;
-            return value.receiptHandle == receiptHandle;
+        const auto count = std::erase_if(_messages, [receiptHandle](const std::pair<std::string, Entity::SQS::Message> &item) {
+            return item.second.receiptHandle == receiptHandle;
         });
         log_debug << "Messages deleted, receiptHandle: " << receiptHandle << " count: " << count;
-        return count;
+        return static_cast<long>(count);
     }
 
     long SQSMemoryDb::DeleteAllMessages() {
@@ -617,17 +601,17 @@ namespace AwsMock::Database {
 
         const long count = static_cast<long>(_messages.size());
         _messages.clear();
-        log_debug << "All resources deleted, count: " << count;
+        log_debug << "All messages deleted, count: " << count;
         return count;
     }
 
     void SQSMemoryDb::AdjustMessageCounters() {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        for (auto queue: _queues | std::views::values) {
-            queue.attributes.approximateNumberOfMessages = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
-            queue.attributes.approximateNumberOfMessagesNotVisible = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INVISIBLE);
-            queue.attributes.approximateNumberOfMessagesDelayed = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED);
+        for (const auto &queue: _queues | std::views::values) {
+            _queues[queue.oid].attributes.approximateNumberOfMessages = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+            _queues[queue.oid].attributes.approximateNumberOfMessagesNotVisible = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INVISIBLE);
+            _queues[queue.oid].attributes.approximateNumberOfMessagesDelayed = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED);
         }
         log_debug << "All message counters updated, count: " << _queues.size();
     }
