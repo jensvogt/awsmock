@@ -271,25 +271,15 @@ namespace AwsMock::Database {
         if (topicArn.empty()) {
             return static_cast<long>(_messages.size());
         }
-
-        long count = 0;
-        for (const auto &val: _messages | std::views::values) {
-            if (!topicArn.empty() && val.topicArn == topicArn) {
-                count++;
-            }
-        }
-        return count;
+        return std::ranges::count_if(_messages, [topicArn](const auto &pair) {
+            return pair.second.topicArn == topicArn;
+        });
     }
 
     long SNSMemoryDb::CountMessagesByStatus(const std::string &topicArn, const Entity::SNS::MessageStatus status) const {
-
-        long count = 0;
-        for (const auto &val: _messages | std::views::values) {
-            if (!topicArn.empty() && val.topicArn == topicArn && val.status == status) {
-                count++;
-            }
-        }
-        return count;
+        return std::ranges::count_if(_messages, [topicArn, status](const auto &pair) {
+            return pair.second.topicArn == topicArn && pair.second.status == status;
+        });
     }
 
     Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) const {
@@ -334,11 +324,14 @@ namespace AwsMock::Database {
 
         std::string oid = message.oid;
         const auto it =
-                std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SNS::Message> &message) {
-                    return message.second.oid == oid;
+                std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SNS::Message> &m) {
+                    return m.first == oid;
                 });
-        _messages[it->first] = message;
-        return _messages[it->first];
+        if (it != _messages.end()) {
+            _messages[it->first] = message;
+            return _messages[it->first];
+        }
+        return {};
     }
 
     void SNSMemoryDb::SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) {
@@ -346,28 +339,29 @@ namespace AwsMock::Database {
 
         std::string oid = message.oid;
         const auto it =
-                std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SNS::Message> &message) {
-                    return message.second.oid == oid;
+                std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SNS::Message> &m) {
+                    return m.first == oid;
                 });
-        _messages[it->first].status = status;
-        _messages[it->first].modified = system_clock::now();
+        if (it != _messages.end()) {
+            _messages[it->first].status = status;
+            _messages[it->first].modified = system_clock::now();
+        }
     }
 
     void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {
         DeleteMessage(message.messageId);
     }
 
-    void SNSMemoryDb::DeleteMessage(const std::string &messageId) {
+    long SNSMemoryDb::DeleteMessage(const std::string &messageId) {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
-        const auto count = std::erase_if(_messages, [messageId](const auto &item) {
+        return static_cast<long>(std::erase_if(_messages, [messageId](const auto &item) {
             auto const &[key, value] = item;
             return value.messageId == messageId;
-        });
-        log_debug << "Message deleted, messageId: " << messageId << " count: " << count;
+        }));
     }
 
-    void SNSMemoryDb::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) {
+    long SNSMemoryDb::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
         long count = 0;
@@ -378,6 +372,7 @@ namespace AwsMock::Database {
             }));
         }
         log_debug << "Messages deleted, count: " << count;
+        return count;
     }
 
     void SNSMemoryDb::DeleteOldMessages(const long timeout) {
@@ -398,18 +393,18 @@ namespace AwsMock::Database {
     long SNSMemoryDb::DeleteAllMessages() {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
         const long deleted = static_cast<long>(_messages.size());
-        log_debug << "All resources deleted, count: " << _messages.size();
         _messages.clear();
+        log_debug << "All messages deleted, count: " << deleted;
         return deleted;
     }
 
-    void SNSMemoryDb::AdjustMessageCounters() const {
+    void SNSMemoryDb::AdjustMessageCounters() {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
-        for (auto topic: _topics | std::views::values) {
-            topic.messages = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::INITIAL);
-            topic.messagesSend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
-            topic.messagesResend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::RESEND);
+        for (const auto &topic: _topics | std::views::values) {
+            _topics[topic.oid].messages = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::INITIAL);
+            _topics[topic.oid].messagesSend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
+            _topics[topic.oid].messagesResend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::RESEND);
         }
         log_debug << "Topic counters updated, count: " << _topics.size();
     }
