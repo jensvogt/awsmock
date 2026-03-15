@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.46](https://github.com/jensvogt/awsmock/compare/1.14.45...v1.14.46) (2026-03-15)
+
+
+### Bug Fixes
+
+* SQS/SNS memory DB delete methods ([b6f6e88](https://github.com/jensvogt/awsmock/commit/b6f6e88838d9268c145949610e5f16ee450835ca))
+
 ## [1.14.45](https://github.com/jensvogt/awsmock/compare/v1.14.44...v1.14.45) (2026-03-14)
 
 
