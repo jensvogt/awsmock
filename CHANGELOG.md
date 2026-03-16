@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.48](https://github.com/jensvogt/awsmock/compare/v1.14.47...v1.14.48) (2026-03-16)
+
+
+### Bug Fixes
+
+* SQS/SNS load database when redrivePolicy is missing ([60f47d9](https://github.com/jensvogt/awsmock/commit/60f47d97dd90f2511b60e0f12503b2df36892cbd))
+
 ## [1.14.47](https://github.com/jensvogt/awsmock/compare/1.14.46...v1.14.47) (2026-03-16)
 
 
