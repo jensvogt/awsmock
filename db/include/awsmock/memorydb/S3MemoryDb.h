@@ -362,7 +362,7 @@ namespace AwsMock::Database {
          * @retrun number of objects deleted.
          */
         long DeleteAllObjects();
-        void AdjustMessageCounters();
+        void AdjustObjectCounters();
 
         /**
          * @brief Adjust all object counters
