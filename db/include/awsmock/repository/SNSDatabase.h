@@ -20,8 +20,8 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/dto/sns/model/MessageStatus.h>
 #include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/MessageStatus.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -360,7 +360,7 @@ namespace AwsMock::Database {
          * @param message message to delete
          * @throws Core::DatabaseException
          */
-        void DeleteMessage(const Entity::SNS::Message &message) const;
+        long DeleteMessage(const Entity::SNS::Message &message) const;
 
         /**
          * @brief Deletes a message by message ID.
@@ -368,7 +368,7 @@ namespace AwsMock::Database {
          * @param messageId message ID to delete
          * @throws Core::DatabaseException
          */
-        void DeleteMessage(const std::string &messageId) const;
+        long DeleteMessage(const std::string &messageId) const;
 
         /**
          * @brief Bulk delete of resources.
@@ -378,7 +378,7 @@ namespace AwsMock::Database {
          * @param messageIds vector of receipts
          * @throws Core::DatabaseException
          */
-        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const;
+        long DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const;
 
         /**
          * @brief Deletes old resources message.

@@ -279,7 +279,7 @@ namespace AwsMock::Database {
          * @param messageId message ID to delete
          * @throws Core::DatabaseException
          */
-        void DeleteMessage(const std::string &messageId);
+        long DeleteMessage(const std::string &messageId);
 
         /**
          * @brief Bulk delete of resources.
@@ -289,7 +289,7 @@ namespace AwsMock::Database {
          * @param messageIds vector of receipts
          * @throws Core::DatabaseException
          */
-        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds);
+        long DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds);
 
         /**
           * @brief Deletes old resources message.
@@ -306,6 +306,11 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         long DeleteAllMessages();
+
+        /**
+         * @brief Adjust all topic counters
+         */
+        void AdjustMessageCounters();
 
       private:
 

@@ -109,7 +109,7 @@ namespace AwsMock::Core {
         const std::string sqsQueueArn = "arn:aws:sqs:" + region + ":" + accountId + ":" + queueName;
 
         // act
-        const std::string result = AwsUtils::ConvertSQSQueueUrlToArn(region, sqsQueueUrl);
+        const std::string result = AwsUtils::ConvertToArn(region, sqsQueueUrl);
 
         // assert
         BOOST_CHECK_EQUAL(result, sqsQueueArn);

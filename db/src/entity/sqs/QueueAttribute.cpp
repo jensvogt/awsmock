@@ -15,7 +15,6 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("policy", policy),
                 kvp("receiveMessageWaitTime", static_cast<bsoncxx::types::b_int64>(receiveMessageWaitTime)),
                 kvp("visibilityTimeout", static_cast<bsoncxx::types::b_int64>(visibilityTimeout)),
-                kvp("redrivePolicy", redrivePolicy.ToDocument()),
                 kvp("redriveAllowPolicy", redriveAllowPolicy),
                 kvp("approximateNumberOfMessages", static_cast<bsoncxx::types::b_int64>(approximateNumberOfMessages)),
                 kvp("approximateNumberOfMessagesDelayed", static_cast<bsoncxx::types::b_int64>(approximateNumberOfMessagesDelayed)),
@@ -35,13 +34,14 @@ namespace AwsMock::Database::Entity::SQS {
             policy = Core::Bson::BsonUtils::GetStringValue(mResult, "policy");
             receiveMessageWaitTime = Core::Bson::BsonUtils::GetIntValue(mResult, "receiveMessageWaitTime");
             visibilityTimeout = Core::Bson::BsonUtils::GetIntValue(mResult, "visibilityTimeout");
-            redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
             redriveAllowPolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "redriveAllowPolicy");
             approximateNumberOfMessages = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessages");
             approximateNumberOfMessagesDelayed = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesDelayed");
             approximateNumberOfMessagesNotVisible = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesNotVisible");
             queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
-
+            if (mResult.value().find("redrivePolicy") != mResult.value().end()) {
+                redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
+            }
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());

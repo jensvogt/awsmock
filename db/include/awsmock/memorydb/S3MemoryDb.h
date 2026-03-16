@@ -14,8 +14,8 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/utils/SortColumn.h>
@@ -362,6 +362,12 @@ namespace AwsMock::Database {
          * @retrun number of objects deleted.
          */
         long DeleteAllObjects();
+        void AdjustObjectCounters();
+
+        /**
+         * @brief Adjust all object counters
+         */
+        void AdjustObjectCounters() const;
 
       private:
 

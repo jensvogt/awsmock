@@ -64,7 +64,7 @@ namespace AwsMock::Database {
         }
     };
 
-    BOOST_FIXTURE_TEST_SUITE(CognitoMemoryDbTests, DynamoDbFixture)
+    BOOST_FIXTURE_TEST_SUITE(DynamoMemoryDbTests, DynamoDbFixture)
 
     BOOST_AUTO_TEST_CASE(CreateTableTest) {
 

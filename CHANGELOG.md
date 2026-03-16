@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.14.48](https://github.com/jensvogt/awsmock/compare/v1.14.47...v1.14.48) (2026-03-16)
+
+
+### Bug Fixes
+
+* SQS/SNS load database when redrivePolicy is missing ([60f47d9](https://github.com/jensvogt/awsmock/commit/60f47d97dd90f2511b60e0f12503b2df36892cbd))
+
+## [1.14.47](https://github.com/jensvogt/awsmock/compare/1.14.46...v1.14.47) (2026-03-16)
+
+
+### Bug Fixes
+
+* SQS/SNS load database when redrivePolicy is missing ([7bd913e](https://github.com/jensvogt/awsmock/commit/7bd913eac6209f0329d59c42e9d2eab73b189cac))
+
+## [1.14.46](https://github.com/jensvogt/awsmock/compare/1.14.45...v1.14.46) (2026-03-15)
+
+
+### Bug Fixes
+
+* SQS/SNS memory DB delete methods ([b6f6e88](https://github.com/jensvogt/awsmock/commit/b6f6e88838d9268c145949610e5f16ee450835ca))
+
+## [1.14.45](https://github.com/jensvogt/awsmock/compare/v1.14.44...v1.14.45) (2026-03-14)
+
+
+### Bug Fixes
+
+* SQS message counter using memory db ([22a7a99](https://github.com/jensvogt/awsmock/commit/22a7a99d3ae708a2006ae4ce0024307375c30f5d))
+
+## [1.14.44](https://github.com/jensvogt/awsmock/compare/1.14.43...v1.14.44) (2026-03-14)
+
+
+### Bug Fixes
+
+* get SQS attributes, delay status ([b09e53c](https://github.com/jensvogt/awsmock/commit/b09e53ce80eef5268a5209a3c9cc265584aa4d4b))
+
+## [1.14.43](https://github.com/jensvogt/awsmock/compare/1.14.42...v1.14.43) (2026-03-14)
+
+
+### Bug Fixes
+
+* get SQS sttributes ([102ed86](https://github.com/jensvogt/awsmock/commit/102ed86c7a59b9c565cbdc1d8ae398d5b9c4e1a8))
+
 ## [1.14.42](https://github.com/jensvogt/awsmock/compare/1.14.41...v1.14.42) (2026-03-13)
 
 
