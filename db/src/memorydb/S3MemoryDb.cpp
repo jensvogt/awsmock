@@ -446,9 +446,18 @@ namespace AwsMock::Database {
     long S3MemoryDb::DeleteAllObjects() {
         boost::mutex::scoped_lock lock(_objectMutex);
 
-        long count = _objects.size();
+        const long count = _objects.size();
         log_debug << "Deleting objects, size: " << _objects.size();
         _objects.clear();
         return count;
+    }
+
+    void S3MemoryDb::AdjustMessageCounters() {
+        boost::mutex::scoped_lock lock(_objectMutex);
+
+        for (const auto &bucket: _buckets | std::views::values) {
+            _buckets[bucket.oid].keys = ObjectCount(bucket.region, bucket.name);
+        }
+        log_debug << "All object counters updated, count: " << _buckets.size();
     }
 }// namespace AwsMock::Database
