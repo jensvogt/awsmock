@@ -17,8 +17,7 @@ namespace AwsMock::Core {
      * @since 1.14.7
      */
     class EventBus {
-      public:
-
+    public:
         /**
          * @brief Singleton instance
          */
@@ -44,7 +43,18 @@ namespace AwsMock::Core {
          * @brief Signal for system shutdown
          */
         boost::signals2::signal<void()> sigShutdown;
+
+        /**
+         * @brief Signal monitoring system
+         */
+        boost::signals2::signal<void(std::string, std::string, std::string, double)> sigMetricGauge;
+
+        /**
+         * @brief Signal monitoring system
+         */
+        boost::signals2::signal<void(std::map<std::string, double>)> sigCollector;
     };
-};// namespace AwsMock::Core
+
+}; // namespace AwsMock::Core
 
 #endif//AWSMOCK_CORE_EVENTBUS_H

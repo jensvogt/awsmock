@@ -19,7 +19,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Linq.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
@@ -37,8 +36,7 @@ namespace AwsMock::Database {
      */
     class SQSMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -441,8 +439,14 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters();
 
-      private:
+        /**
+         * @brief Convert the queue map to a vector
+         *
+         * @return list of queues
+         */
+        Entity::SQS::QueueList QueuesToVector();
 
+    private:
         /**
          * SQS queue vector, when running without database
          */
@@ -464,6 +468,6 @@ namespace AwsMock::Database {
         static boost::mutex _sqsMessageMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SQS_MEMORYDB_H

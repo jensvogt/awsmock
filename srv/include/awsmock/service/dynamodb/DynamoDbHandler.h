@@ -15,7 +15,6 @@
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -31,12 +30,12 @@ namespace AwsMock::Service {
      */
     class DynamoDbHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler(boost::asio::io_context &ioc) : AbstractHandler("dynamodb-handler", ioc) {}
+        explicit DynamoDbHandler(boost::asio::io_context &ioc) : AbstractHandler("dynamodb-handler", ioc) {
+        }
 
         /**
          * @brief HTTP POST request.
@@ -49,14 +48,13 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * DynamoDB service
          */
         DynamoDbService _dynamoDbService;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_DYNAMODB_HANDLER_H

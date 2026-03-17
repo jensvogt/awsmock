@@ -10,8 +10,7 @@
 #include <utility>
 
 // Awsmock include
-#include <awsmock/core/monitoring/MonitoringCollector.h>
-#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/EventBus.h>
 
 #define TIME_DIFF (duration_cast<std::chrono::milliseconds>(system_clock::now() - _start).count())
 
@@ -29,8 +28,7 @@ namespace AwsMock::Monitoring {
      */
     class MonitoringTimer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
@@ -39,7 +37,8 @@ namespace AwsMock::Monitoring {
          *
          * @param name name of the underlying timer
          */
-        explicit MonitoringTimer(std::string name) : _shmUtils(Core::MonitoringCollector::instance()), _timerName(std::move(name)), _start(system_clock::now()) {}
+        explicit MonitoringTimer(std::string name) : /*_monitoringCollector(Core::MonitoringCollector::instance()),*/ _timerName(std::move(name)), _start(system_clock::now()) {
+        }
 
         /**
          * @brief Constructor
@@ -51,8 +50,10 @@ namespace AwsMock::Monitoring {
          * @param labelName label name of the underlying timer
          * @param labelValue label value of the underlying timer
          */
-        explicit MonitoringTimer(std::string name, std::string labelName, std::string labelValue) : _shmUtils(Core::MonitoringCollector::instance()), _timerName(std::move(name)),
-                                                                                                    _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {}
+        explicit MonitoringTimer(std::string name, std::string labelName, std::string labelValue) : /*_monitoringCollector(Core::MonitoringCollector::instance()),*/ _timerName(std::move(name)),
+                                                                                                                                                                     _labelName(std::move(labelName)), _labelValue(std::move(labelValue)),
+                                                                                                                                                                     _start(system_clock::now()) {
+        }
 
         /**
          * @brief Constructor
@@ -65,9 +66,10 @@ namespace AwsMock::Monitoring {
          * @param labelName label name of the underlying timer
          * @param labelValue label value of the underlying timer
          */
-        explicit MonitoringTimer(std::string timerName, std::string counterName, std::string labelName, std::string labelValue) : _shmUtils(Core::MonitoringCollector::instance()),
-                                                                                                                                  _timerName(std::move(timerName)), _counterName(std::move(counterName)),
-                                                                                                                                  _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {}
+        explicit MonitoringTimer(std::string timerName, std::string counterName, std::string labelName, std::string labelValue) : /*_monitoringCollector(Core::MonitoringCollector::instance()),*/
+            _timerName(std::move(timerName)), _counterName(std::move(counterName)),
+            _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {
+        }
 
         /**
          * @brief Destructor
@@ -76,16 +78,11 @@ namespace AwsMock::Monitoring {
          * Stop the timer and reports the execution to the metric service.
          */
         ~MonitoringTimer() {
-            if (!_counterName.empty()) {
-                _shmUtils.IncCountPerSec(_counterName, _labelName, _labelValue, 1.0);
-            }
-            if (_labelName.empty()) {
-                _shmUtils.SetGauge(_timerName, static_cast<double>(TIME_DIFF));
-                log_trace << "Timer deleted, name: " << _timerName;
-            } else {
-                _shmUtils.SetGauge(_timerName, _labelName, _labelValue, static_cast<double>(TIME_DIFF));
-                log_trace << "Timer deleted, name: " << _timerName << " labelName: " << _labelName << " labelValue: " << _labelValue;
-            }
+            // if (!_counterName.empty()) {
+            //     _monitoringCollector.IncCountPerSec(_counterName, _labelName, _labelValue, 1.0);
+            // }
+            Core::EventBus::instance().sigMetricGauge(_counterName, _labelName, _labelValue, 1.0);
+            Core::EventBus::instance().sigMetricGauge(_timerName, _labelName, _labelValue, static_cast<double>(TIME_DIFF));
         }
 
         /**
@@ -103,12 +100,11 @@ namespace AwsMock::Monitoring {
          */
         MonitoringTimer &operator=(const MonitoringTimer &) = delete;
 
-      private:
-
+    private:
         /**
          * Metric module
          */
-        Core::MonitoringCollector &_shmUtils;
+        //Core::MonitoringCollector &_monitoringCollector;
 
         /**
          * Name of the timer
@@ -136,6 +132,6 @@ namespace AwsMock::Monitoring {
         system_clock::time_point _start;
     };
 
-}// namespace AwsMock::Monitoring
+} // namespace AwsMock::Monitoring
 
 #endif//AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H

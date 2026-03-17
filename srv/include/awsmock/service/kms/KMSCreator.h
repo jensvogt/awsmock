@@ -18,7 +18,6 @@
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/KMSDatabase.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -29,8 +28,7 @@ namespace AwsMock::Service {
      */
     class KMSCreator {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -43,8 +41,7 @@ namespace AwsMock::Service {
          */
         static void CreateKmsKey(const std::string &keyId);
 
-      private:
-
+    private:
         /**
          * @brief Generate AES 256 key
          *
@@ -78,6 +75,6 @@ namespace AwsMock::Service {
         [[maybe_unused]] static void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length);
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_CREATOR_H

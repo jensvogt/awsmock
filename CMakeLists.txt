@@ -69,11 +69,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/ServiceException.cpp core/src/exception/JsonException.cpp core/src/exception/NotFoundException.cpp
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
-        core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/monitoring/MonitoringCollector.cpp
-        core/include/awsmock/core/crypto/CRC32Processor.h
-        dto/include/awsmock/dto/module/model/ExportType.h
-        db/include/awsmock/repository/DynamoDbToMongoTranslator.h
-        db/include/awsmock/repository/DynamoDbUnmarshaller.h)
+        core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -189,7 +185,7 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/application/ApplicationService.cpp srv/src/application/ApplicationCreator.cpp
         srv/src/application/ApplicationLogServer.cpp srv/src/application/ApplicationLogSession.cpp
         srv/src/apigateway/ApiGatewayService.cpp srv/src/apigateway/ApiGatewayHandler.cpp
-        srv/src/monitoring/MetricService.cpp srv/src/monitoring/MetricSystemCollector.cpp
+        srv/src/monitoring/MetricSystemCollector.cpp
         srv/src/monitoring/MonitoringHandler.cpp srv/src/monitoring/MonitoringServer.cpp
         srv/src/monitoring/MonitoringService.cpp srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp
         srv/src/frontend/FrontendSession.cpp)

@@ -7,7 +7,6 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
@@ -23,8 +22,7 @@ namespace AwsMock::Database {
      */
     class ApplicationDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -122,8 +120,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllApplications() const;
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -140,6 +137,6 @@ namespace AwsMock::Database {
         ApplicationMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_APPLICATION_DATABASE_H

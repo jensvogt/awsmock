@@ -26,15 +26,13 @@ namespace AwsMock::Service {
      */
     class TransferServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
-      private:
-
+    private:
         /**
          * @brief Creates the transfer server bucket
          */
@@ -106,11 +104,6 @@ namespace AwsMock::Service {
         Database::TransferDatabase &_transferDatabase;
 
         /**
-         * @brief Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
-
-        /**
          * AWS region
          */
         std::string _region;
@@ -171,7 +164,7 @@ namespace AwsMock::Service {
         /**
          * List of transfer servers
          */
-        std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
+        std::map<std::string, std::shared_ptr<FtpServer::FtpServer> > _transferServerList;
 
         /**
          * Actual FTP manager
@@ -194,6 +187,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVER_H

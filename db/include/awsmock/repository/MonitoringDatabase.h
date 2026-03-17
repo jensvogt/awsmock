@@ -20,10 +20,10 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
 
@@ -41,8 +41,7 @@ namespace AwsMock::Database {
      */
     class MonitoringDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -88,9 +87,15 @@ namespace AwsMock::Database {
          * @param limit value limit
          * @return list of counter values
          */
-        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit = 10) const;
+        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {},
+                                                                                   long limit = 10) const;
 
-        void UpdateMonitoringCounters();
+        /**
+         * @brief Saves the monitoring data to the database
+         *
+         * @param values key value map of values
+         */
+        void UpdateMonitoringCounters(const std::map<std::string, double> &values) const;
 
         /**
          * @brief Returns list of label values by label name
@@ -103,11 +108,6 @@ namespace AwsMock::Database {
         [[nodiscard]] std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit = -1) const;
 
         /**
-         * @brief Saves the monitoring data to the database
-         */
-        void UpdateMonitoringCounters() const;
-
-        /**
          * @brief Deletes old monitoring data
          *
          * @param retentionPeriod retention period in days
@@ -115,8 +115,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -131,8 +130,27 @@ namespace AwsMock::Database {
          * Use rolling mean
          */
         bool _rollingMean;
+
+        /**
+         * @brief Decompose the monitoring ID
+         *
+         * @param id monitoring ID
+         * @param name metric name
+         * @param labelName metric label name
+         * @param labelValue metric label value
+         */
+        static void GetIdValues(const std::string &id, std::string &name, std::string &labelName, std::string &labelValue);
     };
 
-}// namespace AwsMock::Database
+    inline void MonitoringDatabase::GetIdValues(const std::string &id, std::string &name, std::string &labelName, std::string &labelValue) {
+        if (std::vector<std::string> keys = Core::StringUtils::Split(id, ":"); keys.size() == 1) {
+            name = std::move(keys[0]);
+        } else {
+            name = std::move(keys[0]);
+            labelName = std::move(keys[1]);
+            labelValue = std::move(keys[2]);
+        }
+    }
+} // namespace AwsMock::Database
 
 #endif//AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H

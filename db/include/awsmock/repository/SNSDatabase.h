@@ -9,16 +9,11 @@
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/MessageStatus.h>
@@ -38,8 +33,7 @@ namespace AwsMock::Database {
      */
     class SNSDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -401,8 +395,7 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters() const;
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -424,6 +417,6 @@ namespace AwsMock::Database {
         SNSMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SNS_DATABASE_H

@@ -50,14 +50,14 @@ namespace AwsMock::Manager {
      */
     class Manager {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
          * @param ioc boost IO context
          */
-        explicit Manager(boost::asio::io_context &ioc) : _ioc(ioc) {};
+        explicit Manager(boost::asio::io_context &ioc) : _ioc(ioc) {
+        };
 
         /**
          * @brief Initialization
@@ -96,8 +96,7 @@ namespace AwsMock::Manager {
          */
         static void StopModules(Service::ModuleMap &moduleMap);
 
-      private:
-
+    private:
         /**
          * @brief @STart websocket logging, when configures
          */
@@ -129,11 +128,6 @@ namespace AwsMock::Manager {
         static void EnsureModuleExisting(const std::string &key);
 
         /**
-         * Create a shared memory segment for monitoring
-         */
-        void CreateSharedMemorySegment();
-
-        /**
          * Thread group
          */
         boost::thread_group _threadGroup;
@@ -144,16 +138,11 @@ namespace AwsMock::Manager {
         Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
 
         /**
-         * Global shared memory segment
-         */
-        std::unique_ptr<boost::interprocess::managed_shared_memory> _shm;
-
-        /**
          * Boost IO context
          */
         boost::asio::io_context &_ioc;
     };
 
-}// namespace AwsMock::Manager
+} // namespace AwsMock::Manager
 
 #endif//AWSMOCK_MANAGER_H

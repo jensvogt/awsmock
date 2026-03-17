@@ -6,8 +6,7 @@
 
 namespace AwsMock::Service {
 
-    DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()),
-                                                                 _metricService(Monitoring::MetricService::instance()), _scheduler(scheduler) {
+    DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _scheduler(scheduler) {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
@@ -68,12 +67,12 @@ namespace AwsMock::Service {
             totalItems += table.itemCount;
             totalSize += table.size;
 
-            _metricService.SetGauge(DYNAMODB_ITEMS_BY_TABLE, "table", table.name, table.itemCount);
-            _metricService.SetGauge(DYNAMODB_SIZE_BY_TABLE, "table", table.name, table.size);
+            Core::EventBus::instance().sigMetricGauge(DYNAMODB_ITEMS_BY_TABLE, "table", table.name, table.itemCount);
+            Core::EventBus::instance().sigMetricGauge(DYNAMODB_SIZE_BY_TABLE, "table", table.name, table.size);
         }
-        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables.size()));
-        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, totalItems);
-        _metricService.SetGauge(DYNAMODB_TABLE_SIZE, {}, {}, totalSize);
+        Core::EventBus::instance().sigMetricGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables.size()));
+        Core::EventBus::instance().sigMetricGauge(DYNAMODB_ITEM_COUNT, {}, {}, totalItems);
+        Core::EventBus::instance().sigMetricGauge(DYNAMODB_TABLE_SIZE, {}, {}, totalSize);
 
         log_trace << "DynamoDb monitoring finished";
     }
@@ -89,4 +88,4 @@ namespace AwsMock::Service {
         log_info << "DynamoDB server stopped";
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

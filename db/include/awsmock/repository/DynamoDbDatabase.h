@@ -9,7 +9,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
@@ -26,12 +25,12 @@ namespace AwsMock::Database {
      */
     class DynamoDbDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {}
+        explicit DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {
+        }
 
         /**
          * @brief Singleton instance
@@ -245,6 +244,7 @@ namespace AwsMock::Database {
          * @param limit query limit
          */
         [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
+
         void AdjustItemCounters() const;
 
         /**
@@ -275,8 +275,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllItems() const;
 
-      private:
-
+    private:
         /**
          * @brief Database name
          */
@@ -303,6 +302,6 @@ namespace AwsMock::Database {
         DynamoDbMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H

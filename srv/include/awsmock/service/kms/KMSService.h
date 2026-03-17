@@ -41,7 +41,6 @@
 #include <awsmock/dto/kms/model/KeyCounter.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 #define DEFAULT_KMS_ACCOUNT_ID "000000000000"
 
@@ -56,8 +55,7 @@ namespace AwsMock::Service {
      */
     class KMSService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -192,8 +190,7 @@ namespace AwsMock::Service {
          */
         void DeleteKey(const Dto::KMS::DeleteKeyRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Encrypt a plaintext.
          *
@@ -223,6 +220,6 @@ namespace AwsMock::Service {
         Database::KMSDatabase &_kmsDatabase;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_SERVICE_H

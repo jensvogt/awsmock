@@ -13,7 +13,6 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -24,16 +23,15 @@ namespace AwsMock::Service {
      */
     class SQSServer : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit SQSServer(Core::Scheduler &scheduler);
+
         void AdjustCounter() const;
 
-      private:
-
+    private:
         /**
          * @brief Reset resources
          *
@@ -83,11 +81,6 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
         /**
-         * Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
-
-        /**
          * SQS database
          */
         Database::SQSDatabase _sqsDatabase;
@@ -126,16 +119,11 @@ namespace AwsMock::Service {
         std::string _backupCron;
 
         /**
-         * Monitoring collector
-         */
-        Core::MonitoringCollector &_monitoringCollector;
-
-        /**
          * @brif Asynchronous tasks scheduler
          */
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVER_H

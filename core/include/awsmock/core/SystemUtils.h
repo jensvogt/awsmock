@@ -43,8 +43,7 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SystemUtils {
-      public:
-
+    public:
         /**
          * @brief Returns the current working directory.
          *
@@ -124,17 +123,6 @@ namespace AwsMock::Core {
         static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, std::string &output, std::string &error);
 
         /**
-         * @brief Run command in a shell
-         *
-         * @param shellcmd command
-         * @param args vector of string arguments
-         * @param input input stream
-         * @param output output stream
-         * @param error error stream
-         */
-        // static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error);
-
-        /**
          * @brief Return the next free port number
          *
          * @return next free port number
@@ -142,6 +130,6 @@ namespace AwsMock::Core {
         static int GetNextFreePort();
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #endif// AWSMOCK_CORE_SYSTEM_UTILS_H

@@ -57,7 +57,6 @@
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -73,12 +72,12 @@ namespace AwsMock::Service {
      */
     class DynamoDbService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _accountId(Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id")) {}
+        explicit DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _accountId(Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id")) {
+        }
 
         /**
          * @brief Creates a new table
@@ -222,8 +221,7 @@ namespace AwsMock::Service {
          */
         void DeleteAllItems(const Dto::DynamoDb::DeleteAllItemsRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Send the request to the DynamoDB container.
          *
@@ -273,6 +271,6 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_DYNAMODB_SERVICE_H

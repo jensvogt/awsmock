@@ -10,7 +10,6 @@
 #include <awsmock/dto/common/KMSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/kms/KMSService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -24,12 +23,12 @@ namespace AwsMock::Service {
      */
     class KMSHandler : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit KMSHandler(boost::asio::io_context &ioc) : AbstractHandler("kms-handler", ioc) {}
+        explicit KMSHandler(boost::asio::io_context &ioc) : AbstractHandler("kms-handler", ioc) {
+        }
 
         /**
          * @brief HTTP POST request.
@@ -42,14 +41,13 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * KMS service
          */
         KMSService _kmsService;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_HANDLER_H

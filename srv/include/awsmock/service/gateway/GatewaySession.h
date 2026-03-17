@@ -55,14 +55,14 @@ namespace AwsMock::Service {
             // The type-erased, saved work item
             struct work {
                 virtual ~work() = default;
+
                 virtual void operator()() = 0;
             };
 
             GatewaySession &self_;
-            std::vector<std::unique_ptr<work>> items_;
+            std::vector<std::unique_ptr<work> > items_;
 
-          public:
-
+        public:
             explicit queue(GatewaySession &self) : self_(self) {
                 items_.reserve(limit);
             }
@@ -100,9 +100,9 @@ namespace AwsMock::Service {
 
                     void operator()() override {
                         http::async_write(
-                                self_._stream,
-                                msg_,
-                                boost::beast::bind_front_handler(&GatewaySession::OnWrite, self_.shared_from_this(), msg_.need_eof()));
+                            self_._stream,
+                            msg_,
+                            boost::beast::bind_front_handler(&GatewaySession::OnWrite, self_.shared_from_this(), msg_.need_eof()));
                     }
                 };
 
@@ -115,8 +115,7 @@ namespace AwsMock::Service {
             }
         };
 
-      public:
-
+    public:
         /**
          * @brief HTTP session
          *
@@ -135,12 +134,12 @@ namespace AwsMock::Service {
          */
         void Run();
 
-      private:
-
+    private:
         /**
          * @brief Read callback
          */
         void DoRead();
+
         void OnReadHeader(boost::beast::error_code ec, std::size_t);
 
         /**
@@ -165,7 +164,7 @@ namespace AwsMock::Service {
          * @return
          */
         template<class Body, class Allocator>
-        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request);
+        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request);
 
         /**
          * @brief Called to start/continue the write-loop.
@@ -264,14 +263,9 @@ namespace AwsMock::Service {
         /**
          * The parser is stored in an optional container, so we can construct it from scratch it at the beginning of each new message.
          */
-        boost::optional<http::request_parser<http::dynamic_body>> _parser;
-
-        /**
-         * Metric service
-         */
-        Monitoring::MetricService _metricService = Monitoring::MetricService::instance();
+        boost::optional<http::request_parser<http::dynamic_body> > _parser;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICES_GATEWAY_SESSION_H

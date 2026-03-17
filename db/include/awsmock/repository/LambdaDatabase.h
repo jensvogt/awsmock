@@ -13,7 +13,6 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 #include <awsmock/memorydb/LambdaMemoryDb.h>
@@ -30,8 +29,7 @@ namespace AwsMock::Database {
      */
     class LambdaDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -306,8 +304,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllLambdas() const;
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -329,6 +326,6 @@ namespace AwsMock::Database {
         LambdaMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_LAMBDA_DATABASE_H

@@ -16,7 +16,6 @@
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 #define SECRETSMANAGER_DEFAULT_MONITORING_PERIOD 300
 
@@ -29,15 +28,13 @@ namespace AwsMock::Service {
      */
     class SecretsManagerServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit SecretsManagerServer(Core::Scheduler &scheduler);
 
-      private:
-
+    private:
         /**
          * @brief Update counters
          */
@@ -57,11 +54,6 @@ namespace AwsMock::Service {
          * @brief Database connection
          */
         Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-
-        /**
-         * @brief Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * @brief Secrets manager backup flag.
@@ -91,6 +83,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SECRETSMANAGER_SERVER_H

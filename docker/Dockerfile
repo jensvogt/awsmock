@@ -73,6 +73,7 @@ COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/bin
 COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/bin
 COPY --from=build /usr/src/awsmock/dist/etc/magic.mgc /usr/local/awsmock/etc
 COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
+COPY --from=build /usr/src/awsmock/dist/etc/ssh_host_key /usr/local/awsmock/etc/ssh_host_key
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/lib

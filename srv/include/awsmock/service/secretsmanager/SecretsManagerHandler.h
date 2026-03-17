@@ -12,7 +12,6 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace AwsMock::Service {
@@ -27,12 +26,12 @@ namespace AwsMock::Service {
      */
     class SecretsManagerHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * Constructor
          */
-        explicit SecretsManagerHandler(boost::asio::io_context &ioc) : AbstractHandler("secretsmanager-handler", ioc), _secretsManagerService(ioc) {}
+        explicit SecretsManagerHandler(boost::asio::io_context &ioc) : AbstractHandler("secretsmanager-handler", ioc), _secretsManagerService(ioc) {
+        }
 
         /**
          * HTTP POST request.
@@ -45,14 +44,13 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * Secrets manager module
          */
         SecretsManagerService _secretsManagerService;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H

@@ -24,15 +24,13 @@ namespace AwsMock::Service {
      */
     class SNSServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit SNSServer(Core::Scheduler &scheduler);
 
-      private:
-
+    private:
         /**
          * @brief Delete resources, which are over the retention period.
          */
@@ -100,16 +98,11 @@ namespace AwsMock::Service {
         std::string _backupCron;
 
         /**
-         * Monitoring collector
-         */
-        Core::MonitoringCollector &_monitoringCollector;
-
-        /**
          * @brif Asynchronous tasks scheduler
          */
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SNSSERVER_H

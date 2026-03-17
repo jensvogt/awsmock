@@ -93,7 +93,6 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/utils/SqsUtils.h>
 
 namespace AwsMock::Service {
@@ -105,12 +104,12 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {};
+        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
+        };
 
         /**
          * @brief Creates a new queue.
@@ -494,8 +493,7 @@ namespace AwsMock::Service {
          */
         void ReloadAllCounters() const;
 
-      private:
-
+    private:
         /**
          * @brief Send a lambda invocation request for a message.
          *
@@ -538,6 +536,6 @@ namespace AwsMock::Service {
 
         static boost::mutex _subscriptionMutex;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVICE_H

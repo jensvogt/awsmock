@@ -9,7 +9,6 @@
 #ifndef _WIN32
 #include <sys/times.h>
 #endif
-#include "../../../../../core/include/awsmock/core/monitoring/MonitoringCollector.h"
 
 #ifdef __linux__
 #include <sys/sysinfo.h>
@@ -26,10 +25,11 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 #ifdef _WIN32
 #include "windows.h"
@@ -72,8 +72,7 @@ namespace AwsMock::Monitoring {
      */
     class MetricSystemCollector {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -152,17 +151,17 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get total CPU utilization on Windows
          */
-        static void GetCpuInfoWin32() ;
+        static void GetCpuInfoWin32();
 
         /**
          * @brief Get CPU utilization on Windows
          */
-        static void GetCpuInfoAwsmockWin32() ;
+        static void GetCpuInfoAwsmockWin32();
 
         /**
          * @brief Get total memory utilization on Win32
          */
-        static void GetMemoryInfoWin32() ;
+        static void GetMemoryInfoWin32();
 
         /**
          * @brief Get memory utilization on Win32
@@ -176,8 +175,7 @@ namespace AwsMock::Monitoring {
 
 #endif
 
-      private:
-
+    private:
         /**
          * Number of cores
          */
@@ -242,19 +240,14 @@ namespace AwsMock::Monitoring {
         /**
          * Start time
          */
-        system_clock::time_point _startTime;
+        std::chrono::system_clock::time_point _startTime;
 
         /**
          * Monitoring period
          */
         int _period = 60;
-
-        /**
-         * Map of monitoring counters
-         */
-        Core::MonitoringCollector &_shmUtils;
     };
 
-}// namespace AwsMock::Monitoring
+} // namespace AwsMock::Monitoring
 
 #endif

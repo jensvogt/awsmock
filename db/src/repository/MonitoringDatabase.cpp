@@ -10,6 +10,9 @@ namespace AwsMock::Database {
     typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean> > Accumulator;
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {
+        Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> values) {
+            this->UpdateMonitoringCounters(values);
+        });
     }
 
     std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit) const {
@@ -192,12 +195,9 @@ namespace AwsMock::Database {
         return {};
     }
 
-    void MonitoringDatabase::UpdateMonitoringCounters() {
+    void MonitoringDatabase::UpdateMonitoringCounters(const std::map<std::string, double> &values) const {
 
         if (HasDatabase()) {
-
-            // Get the map of counters
-            Core::ShmMap *counterMap = Core::MonitoringCollector::instance().GetCounterMap();
 
             const auto client = ConnectionPool::instance().GetConnection();
             auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
@@ -206,37 +206,27 @@ namespace AwsMock::Database {
             try {
 
                 std::vector<value> documents;
-                for (auto &val: *counterMap | std::views::values) {
-
-                    double databaseValue = 0.0;
-                    if (val.type == Core::CounterType::COUNT_PER_SECOND || val.type == Core::CounterType::GAUGE) {
-                        // Average over number of counters or measuring period
-                        databaseValue = val.count > 0 ? val.value / static_cast<double>(val.count) : 0.0;
-                    } else if (val.type == Core::CounterType::COUNT_ABSOLUTE) {
-                        // Absolute value; will be kept
-                        databaseValue = val.value;
-                    }
+                for (auto &[key,val]: values) {
 
                     // Prepare insert query
                     document insertQuery;
-                    insertQuery.append(kvp("name", bsoncxx::types::b_string(val.name)));
-                    insertQuery.append(kvp("labelName", bsoncxx::types::b_string(val.labelName)));
-                    insertQuery.append(kvp("labelValue", bsoncxx::types::b_string(val.labelValue)));
-                    insertQuery.append(kvp("value", databaseValue));
-                    insertQuery.append(kvp("created", bsoncxx::types::b_date(val.timestamp)));
+                    std::string name, labelName, labelValue;
+                    GetIdValues(key, name, labelName, labelValue);
+                    insertQuery.append(kvp("name", name));
+                    insertQuery.append(kvp("labelName", labelName));
+                    insertQuery.append(kvp("labelValue", labelValue));
+                    insertQuery.append(kvp("value", val));
+                    insertQuery.append(kvp("created", bsoncxx::types::b_date(system_clock::now())));
                     documents.emplace_back(insertQuery.extract());
-                    val.count = 0;
-                    val.value = 0;
                 }
 
                 // Execute bulk update
-                long count{};
                 if (!documents.empty()) {
                     session.start_transaction();
-                    count += monitoringCollection.insert_many(documents)->inserted_count();
+                    monitoringCollection.insert_many(documents);
                     session.commit_transaction();
                 }
-                log_debug << "Imported monitoring values: " << count;
+                log_debug << "Imported monitoring values: " << documents.size();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();

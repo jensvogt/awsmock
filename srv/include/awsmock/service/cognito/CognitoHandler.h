@@ -13,7 +13,6 @@
 #include <awsmock/dto/common/CognitoClientCommand.h>
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -27,12 +26,12 @@ namespace AwsMock::Service {
      */
     class CognitoHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit CognitoHandler(boost::asio::io_context &ioc) : AbstractHandler("cognito-handler", ioc) {}
+        explicit CognitoHandler(boost::asio::io_context &ioc) : AbstractHandler("cognito-handler", ioc) {
+        }
 
         /**
          * @brief HTTP POST request.
@@ -45,8 +44,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * Cognito service
          */
@@ -64,9 +62,10 @@ namespace AwsMock::Service {
             defaultHeaders[to_string(http::field::access_control_allow_methods)] = "GET,PUT,POST,DELETE,HEAD,OPTIONS";
             return defaultHeaders;
         }
+
         static const std::map<std::string, std::string> headers;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_COGNITO_HANDLER_H
