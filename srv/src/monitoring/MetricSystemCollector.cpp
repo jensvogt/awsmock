@@ -112,7 +112,7 @@ namespace AwsMock::Monitoring {
         // skip first 13 fields
         for (int i = 0; i < 13; i++) ss >> token;
 
-        ss >> pt.utime >> pt.stime; // fields 14 and 15
+        ss >> pt.utime >> pt.stime;// fields 14 and 15
         pt.initialized = true;
         return pt;
     }
@@ -145,9 +145,9 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, " ");
-            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
+            Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
             log_trace << "Virtual memory: " << std::stol(tokens[22]);
-            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * static_cast<double>(sysconf(_SC_PAGESIZE)));
+            Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * static_cast<double>(sysconf(_SC_PAGESIZE)));
             log_trace << "Real Memory: " << std::stol(tokens[23]);
         }
         ifs.close();
@@ -173,7 +173,7 @@ namespace AwsMock::Monitoring {
             file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         if (const double percentUsed = static_cast<double>(total - free) / static_cast<double>(total) * 100; std::isnormal(percentUsed)) {
-            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
+            Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
         }
     }
 
@@ -182,7 +182,7 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, " ");
-            Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, Core::NumberUtils::ToDouble(tokens[19]));
+            Core::EventBus::instance().sigMetricGauge(TOTAL_THREADS, {}, {}, Core::NumberUtils::ToDouble(tokens[19]));
             log_debug << "Total threads: " << std::stod(tokens[19]);
         }
         ifs.close();
@@ -349,4 +349,4 @@ namespace AwsMock::Monitoring {
     }
 #endif
 
-} // namespace AwsMock::Monitoring
+}// namespace AwsMock::Monitoring

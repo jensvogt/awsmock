@@ -171,7 +171,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE: {
 
-                    Core::HttpUtils::DumpRequest(request);
+                    //Core::HttpUtils::DumpRequest(request);
 
                     Dto::SQS::SendMessageRequest sqsRequest = Dto::SQS::SendMessageRequest::FromJson(clientCommand);
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
