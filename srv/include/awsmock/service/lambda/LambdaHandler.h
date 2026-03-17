@@ -22,7 +22,6 @@
 #include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -36,14 +35,14 @@ namespace AwsMock::Service {
      */
     class LambdaHandler final : public AbstractHandler, std::enable_shared_from_this<LambdaHandler> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc), _lambdaService(ioc), _ioc(ioc) {
             _moduleService = std::make_shared<ModuleService>();
-            _lambdaService.sigLambdaCodeUpdated.connect(boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService)// This is the 'magic' that prevents crashes!
+            _lambdaService.sigLambdaCodeUpdated.connect(
+                boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService) // This is the 'magic' that prevents crashes!
             );
         }
 
@@ -91,8 +90,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * Lambda module
          */
@@ -106,6 +104,6 @@ namespace AwsMock::Service {
         boost::asio::io_context &_ioc;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_HANDLER_H

@@ -7,13 +7,13 @@
 
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
+#include <awsmock/service/monitoring/MonitoringCollector.h>
 
 namespace AwsMock::Service {
 
@@ -24,12 +24,14 @@ namespace AwsMock::Service {
      */
     class MonitoringServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
+         *
+         * @param scheduler boost periodic scheduler
+         * @param ioc boost io context boost periodic scheduler
          */
-        explicit MonitoringServer(Core::Scheduler &scheduler);
+        explicit MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
         /**
          * @brief Delete monitoring data older than the retention period.
@@ -39,13 +41,7 @@ namespace AwsMock::Service {
          */
         [[maybe_unused]] void DeleteMonitoringData() const;
 
-      private:
-
-        /**
-         * Monitoring data collector
-         */
-        void Collector() const;
-
+    private:
         /**
          * @brief Shutdown the server
          */
@@ -55,6 +51,11 @@ namespace AwsMock::Service {
          * Docker counter collector
          */
         static void CollectDockerCounter();
+
+        /**
+         * Asynchronous task scheduler
+         */
+        Core::Scheduler &_scheduler;
 
         /**
          * Monitoring system collector
@@ -67,11 +68,11 @@ namespace AwsMock::Service {
         Database::MonitoringDatabase &_monitoringDatabase = Database::MonitoringDatabase::instance();
 
         /**
-         * Asynchronous task scheduler
+         * Database connection
          */
-        Core::Scheduler &_scheduler;
+        Monitoring::MonitoringCollector _monitoringCollector;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVER_H

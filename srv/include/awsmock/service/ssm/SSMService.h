@@ -33,7 +33,6 @@
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/kms/KMSService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 #define DEFAULT_SSM_ACCOUNT_ID "000000000000"
 
@@ -48,8 +47,7 @@ namespace AwsMock::Service {
      */
     class SSMService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -141,8 +139,7 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
 
-      private:
-
+    private:
         /**
          * Account ID
          */
@@ -159,6 +156,6 @@ namespace AwsMock::Service {
         KMSService _kmsService;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_SERVICE_H

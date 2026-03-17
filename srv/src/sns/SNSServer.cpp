@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
+    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _scheduler(scheduler) {
 
         // Configuration
         _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete-period");
@@ -49,13 +49,13 @@ namespace AwsMock::Service {
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
         for (auto &topic: topicList) {
 
-            _monitoringCollector.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", topic.topicName, static_cast<double>(topic.messages));
-            _monitoringCollector.SetGauge(SNS_TOPIC_SIZE, "topic", topic.topicName, static_cast<double>(topic.size));
+            Core::EventBus::instance().sigMetricGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", topic.topicName, topic.messages);
+            Core::EventBus::instance().sigMetricGauge(SNS_TOPIC_SIZE, "topic", topic.topicName, topic.size);
             totalMessages += topic.messages;
             totalSize += topic.size;
         }
-        _monitoringCollector.SetGauge(SNS_TOPIC_COUNT, {}, {}, static_cast<double>(topicList.size()));
-        _monitoringCollector.SetGauge(SNS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
+        Core::EventBus::instance().sigMetricGauge(SNS_TOPIC_COUNT, {}, {}, static_cast<double>(topicList.size()));
+        Core::EventBus::instance().sigMetricGauge(SNS_MESSAGE_COUNT, {}, {}, totalMessages);
         log_debug << "SNS monitoring finished";
     }
 
@@ -69,4 +69,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("sns-delete-messages");
         _scheduler.Shutdown("sns-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

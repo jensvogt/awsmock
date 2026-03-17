@@ -6,9 +6,9 @@
 
 namespace AwsMock::Monitoring {
 
-    MetricSystemCollector::MetricSystemCollector() : _shmUtils(Core::MonitoringCollector::instance()) {
+    MetricSystemCollector::MetricSystemCollector() {
 
-        _startTime = system_clock::now();
+        _startTime = std::chrono::system_clock::now();
         _numProcessors = Core::SystemUtils::GetNumberOfCores();
     }
 
@@ -63,13 +63,13 @@ namespace AwsMock::Monitoring {
 
             if (sysDiff > 0 && nproc > 0) {
                 if (const auto userPercent = 100.0 * utimeDiff / sysDiff / nproc; std::isnormal(userPercent)) {
-                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", userPercent);
+                    Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", userPercent);
                 }
                 if (const auto systemPercent = 100.0 * stimeDiff / sysDiff / nproc; std::isnormal(systemPercent)) {
-                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", systemPercent);
+                    Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", systemPercent);
                 }
                 if (const auto totalPercent = 100.0 * procDiff / sysDiff / nproc; std::isnormal(totalPercent)) {
-                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", totalPercent);
+                    Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", totalPercent);
                 }
             }
         }
@@ -84,7 +84,8 @@ namespace AwsMock::Monitoring {
         if (file.is_open()) {
             std::string line;
             while (std::getline(file, line)) {
-                if (line.rfind("cpu ", 0) == 0) {// first line "cpu ..."
+                if (line.rfind("cpu ", 0) == 0) {
+                    // first line "cpu ..."
                     std::istringstream ss(line);
                     std::string cpuLabel;
                     ss >> cpuLabel >> cpu.user >> cpu.nice >> cpu.system >> cpu.idle >> cpu.iowait >> cpu.irq >> cpu.softirq >> cpu.steal;
@@ -111,7 +112,7 @@ namespace AwsMock::Monitoring {
         // skip first 13 fields
         for (int i = 0; i < 13; i++) ss >> token;
 
-        ss >> pt.utime >> pt.stime;// fields 14 and 15
+        ss >> pt.utime >> pt.stime; // fields 14 and 15
         pt.initialized = true;
         return pt;
     }
@@ -127,13 +128,13 @@ namespace AwsMock::Monitoring {
 
             const auto totalDiff = userDiff + systemDiff + idleDiff + static_cast<double>(_currentCpuTimes.steal - _previousCpuTimes.steal);
             if (const auto totalPercent = 100.0 - 100.0 * idleDiff / totalDiff; std::isnormal(totalPercent)) {
-                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+                Core::EventBus::instance().sigMetricGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
             }
             if (const auto systemPercent = 100.0 * systemDiff / totalDiff; std::isnormal(systemPercent)) {
-                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
+                Core::EventBus::instance().sigMetricGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
             }
             if (const auto userPercent = 100.0 * userDiff / totalDiff; std::isnormal(userPercent)) {
-                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
+                Core::EventBus::instance().sigMetricGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
             }
         }
         _previousCpuTimes = _currentCpuTimes;
@@ -278,29 +279,29 @@ namespace AwsMock::Monitoring {
 
 #elif _WIN32
 
-    void MetricSystemCollector::GetCpuInfoWin32()  {
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", GetPerformanceValue("\\Processor Information(_Total)\\% Processor Time"));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system",  GetPerformanceValue("\\Processor Information(_Total)\\% Privileged Time"));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user",  GetPerformanceValue("\\Processor Information(_Total)\\% User Time"));
+    void MetricSystemCollector::GetCpuInfoWin32() {
+        Core::EventBus::instance().sigMetricGauge(CPU_USAGE_TOTAL, "cpu_type", "total", GetPerformanceValue("\\Processor Information(_Total)\\% Processor Time"));
+        Core::EventBus::instance().sigMetricGauge(CPU_USAGE_TOTAL, "cpu_type", "system", GetPerformanceValue("\\Processor Information(_Total)\\% Privileged Time"));
+        Core::EventBus::instance().sigMetricGauge(CPU_USAGE_TOTAL, "cpu_type", "user", GetPerformanceValue("\\Processor Information(_Total)\\% User Time"));
     }
 
-    void MetricSystemCollector::GetCpuInfoAwsmockWin32()  {
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time"));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time"));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", GetPerformanceValue("\\Process(awsmockmgr)\\% User Time"));
+    void MetricSystemCollector::GetCpuInfoAwsmockWin32() {
+        Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time"));
+        Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time"));
+        Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", GetPerformanceValue("\\Process(awsmockmgr)\\% User Time"));
     }
 
-    void MetricSystemCollector::GetMemoryInfoWin32()  {
-        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", static_cast<double>(GetPerformanceValue("\\Memory\\% Committed Bytes In Use")));
+    void MetricSystemCollector::GetMemoryInfoWin32() {
+        Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", GetPerformanceValue("\\Memory\\% Committed Bytes In Use"));
     }
 
     void MetricSystemCollector::GetMemoryInfoAwsmockWin32() {
-        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\Virtual Bytes")));
-        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\Working Set")));
+        Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", GetPerformanceValue("\\Process(awsmockmgr)\\Virtual Bytes"));
+        Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", GetPerformanceValue("\\Process(awsmockmgr)\\Working Set"));
     }
 
     void MetricSystemCollector::GetThreadInfoWin32() {
-        Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, {}, {}, static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count")));
+        Core::EventBus::instance().sigMetricGauge(TOTAL_THREADS, {}, {}, GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count"));
     }
 
     double MetricSystemCollector::GetPerformanceValue(const std::string &counter) {
@@ -348,4 +349,4 @@ namespace AwsMock::Monitoring {
     }
 #endif
 
-}// namespace AwsMock::Monitoring
+} // namespace AwsMock::Monitoring

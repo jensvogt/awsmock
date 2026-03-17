@@ -7,7 +7,7 @@
 #include "awsmock/dto/sqs/internal/ExportMessagesRequest.h"
 
 namespace AwsMock::Service {
-    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
+    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _scheduler(scheduler) {
 
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring-period");
         _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset-period");
@@ -133,13 +133,13 @@ namespace AwsMock::Service {
         long totalSize = 0;
         const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
         for (auto &queue: queueList) {
-            _monitoringCollector.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, static_cast<double>(queue.attributes.approximateNumberOfMessages));
-            _monitoringCollector.SetGauge(SQS_QUEUE_SIZE, "queue", queue.name, static_cast<double>(queue.size));
+            Core::EventBus::instance().sigMetricGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, static_cast<double>(queue.attributes.approximateNumberOfMessages));
+            Core::EventBus::instance().sigMetricGauge(SQS_QUEUE_SIZE, "queue", queue.name, static_cast<double>(queue.size));
             totalMessages += queue.attributes.approximateNumberOfMessages;
             totalSize += queue.size;
         }
-        _monitoringCollector.SetGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(queueList.size()));
-        _monitoringCollector.SetGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
+        Core::EventBus::instance().sigMetricGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(queueList.size()));
+        Core::EventBus::instance().sigMetricGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
         log_debug << "SQS monitoring finished";
     }
 
@@ -151,7 +151,7 @@ namespace AwsMock::Service {
 
         if (!waitTime.empty()) {
             for (auto &[fst, snd]: waitTime) {
-                _monitoringCollector.SetGauge(SQS_MESSAGE_WAIT_TIME, "queue", fst, snd);
+                Core::EventBus::instance().sigMetricGauge(SQS_MESSAGE_WAIT_TIME, "queue", fst, snd);
             }
         }
         log_trace << "SQS wait time update finished";
@@ -167,4 +167,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("sns-delete-messages");
         _scheduler.Shutdown("sns-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

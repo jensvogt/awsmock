@@ -9,7 +9,6 @@
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
@@ -28,12 +27,12 @@ namespace AwsMock::Service {
      */
     class S3Handler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit S3Handler(boost::asio::io_context &ioc) : AbstractHandler("s3-handler", ioc), _s3Service(ioc) {}
+        explicit S3Handler(boost::asio::io_context &ioc) : AbstractHandler("s3-handler", ioc), _s3Service(ioc) {
+        }
 
         /**
          * @brief HTTP GET request.
@@ -90,8 +89,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * @brief Get the range for a range request
          *
@@ -138,6 +136,6 @@ namespace AwsMock::Service {
         S3Service _s3Service;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_HANDLER_H

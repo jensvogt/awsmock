@@ -23,7 +23,6 @@
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -34,8 +33,7 @@ namespace AwsMock::Service {
      */
     class DynamoDbServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -46,8 +44,7 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-      private:
-
+    private:
         /**
          * @brief Creates a local network.
          *
@@ -80,11 +77,6 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::DynamoDbDatabase &_dynamoDbDatabase;
-
-        /**
-         * Metric service
-         */
-        Monitoring::MetricService &_metricService;
 
         /**
          * @brief Dynamo DB backup flag.
@@ -130,6 +122,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVER_DYNAMODB_SERVER_H

@@ -32,8 +32,7 @@ namespace AwsMock::Service {
      */
     class LambdaServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -44,8 +43,7 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-      private:
-
+    private:
         /**
          * @brief Delete dangling, stopped containers
          */
@@ -119,11 +117,6 @@ namespace AwsMock::Service {
         LambdaService _lambdaService;
 
         /**
-         * Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
-
-        /**
          * @brief Dynamo DB backup flag.
          *
          * @par
@@ -167,16 +160,11 @@ namespace AwsMock::Service {
         int _logRetentionPeriod;
 
         /**
-         * Monitoring collector
-         */
-        Core::MonitoringCollector &_monitoringCollector;
-
-        /**
          * Asynchronous task scheduler
          */
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVER_H

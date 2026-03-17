@@ -7,8 +7,7 @@
 namespace AwsMock::Service {
 
     http::response<http::dynamic_body> ModuleHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Monitoring::MonitoringTimer measure(MODULE_HTTP_TIMER, "method", "GET");
-        Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "GET");
+        Monitoring::MonitoringTimer measure(MODULE_HTTP_TIMER, MODULE_HTTP_COUNTER, "method", "GET");
 
         std::string target = request.base()["x-awsmock-target"];
         std::string action = request.base()["x-awsmock-action"];
@@ -85,8 +84,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> ModuleHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Monitoring::MonitoringTimer measure(MODULE_HTTP_TIMER, "method", "POST");
-        Monitoring::MetricService::instance().IncrementCounter(MODULE_HTTP_COUNTER, "method", "POST");
+        Monitoring::MonitoringTimer measure(MODULE_HTTP_TIMER, MODULE_HTTP_COUNTER, "method", "POST");
 
         try {
 
@@ -166,4 +164,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -41,7 +41,7 @@ namespace AwsMock::Service {
         log_trace << "Application Monitoring starting";
 
         // Total count
-        // _metricService.SetGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase.CountApplications());
+        Core::EventBus::instance().sigMetricGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase.CountApplications());
 
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {
@@ -52,12 +52,12 @@ namespace AwsMock::Service {
                 const auto systemCpuDelta = static_cast<double>(containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);
                 const auto numberCpus = static_cast<double>(containerStat.cpuStats.onlineCpus);
                 if (const auto cpuPercentages = cpuDelta / systemCpuDelta / numberCpus * 100; std::isfinite(cpuPercentages) && cpuPercentages >= 0 && cpuPercentages <= 100) {
-                    _metricService.SetGauge(APPLICATION_CPU_USAGE, "application", application.name, cpuPercentages);
+                    Core::EventBus::instance().sigMetricGauge(APPLICATION_CPU_USAGE, "application", application.name, cpuPercentages);
                 }
                 const auto usedMemory = static_cast<double>(containerStat.memoryStats.usage - containerStat.memoryStats.stats.cache);
                 const auto totalMemory = static_cast<double>(containerStat.memoryStats.limit);
                 if (const double memoryPercentages = usedMemory / totalMemory * 100; std::isfinite(memoryPercentages) && memoryPercentages >= 0 && memoryPercentages <= 100) {
-                    _metricService.SetGauge(APPLICATION_MEMORY_USAGE, "application", application.name, memoryPercentages);
+                    Core::EventBus::instance().sigMetricGauge(APPLICATION_MEMORY_USAGE, "application", application.name, memoryPercentages);
                 }
             }
         }
@@ -207,4 +207,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

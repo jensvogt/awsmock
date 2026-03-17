@@ -16,7 +16,6 @@
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -51,8 +50,7 @@ namespace AwsMock::Service {
      */
     class LambdaCreator {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -77,8 +75,7 @@ namespace AwsMock::Service {
          */
         void UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) const;
 
-      private:
-
+    private:
         /**
          * @brief Create a lambda function instance
          *
@@ -173,6 +170,6 @@ namespace AwsMock::Service {
         bool _dockerized = Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_CREATOR_H

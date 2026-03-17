@@ -8,7 +8,6 @@
 // AwsMock includes
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 
 namespace AwsMock::Service {
@@ -27,8 +26,7 @@ namespace AwsMock::Service {
      */
     class ModuleMonitoring {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -39,13 +37,12 @@ namespace AwsMock::Service {
          */
         void UpdateCounter() const;
 
-      private:
-
+    private:
         /**
          * Module database connection
          */
         Database::ModuleDatabase &_moduleDatabase = Database::ModuleDatabase::instance();
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 #endif// AWSMOCK_SERVICE_MODULE_MONITORING_H

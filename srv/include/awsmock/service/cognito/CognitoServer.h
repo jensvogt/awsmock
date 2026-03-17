@@ -14,7 +14,6 @@
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -25,15 +24,13 @@ namespace AwsMock::Service {
      */
     class CognitoServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit CognitoServer(Core::Scheduler &scheduler);
 
-      private:
-
+    private:
         /**
          * @brief Update counters
          */
@@ -48,11 +45,6 @@ namespace AwsMock::Service {
          * @brief Shutdown the cognito server
          */
         void Shutdown() override;
-
-        /**
-         * @brief Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * @brief Database connection
@@ -93,6 +85,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_COGNITO_SERVER_H

@@ -3,8 +3,7 @@
 //
 
 #include <awsmock/server/Manager.h>
-
-#include "awsmock/core/EventBus.h"
+#include <awsmock/core/EventBus.h>
 
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
@@ -153,35 +152,20 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::CreateSharedMemorySegment() {
-
-        // Get shared memory size from the configuration file
-        long shmSize = Core::Configuration::instance().GetValue<long>("awsmock.shm-size");
-
-        // As Awsmock is not running under root set shared memory permissions
-        boost::interprocess::permissions unrestricted_permissions;
-        unrestricted_permissions.set_unrestricted();
-
-        // Create a managed shared memory segment.
-        boost::interprocess::shared_memory_object::remove(MONITORING_SEGMENT_NAME);
-        _shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, MONITORING_SEGMENT_NAME, shmSize, nullptr, unrestricted_permissions);
-    }
-
     void Manager::Run(const bool isService) {
-
-        // Create a shared memory segment for monitoring
-        CreateSharedMemorySegment();
 
         // Load available modules from configuration file
         LoadModulesFromConfiguration();
         log_info << "Module configuration loaded";
 
-        // Initialize monitoring
         Core::Scheduler scheduler(_ioc);
-        const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+        log_info << "Scheduler initialized";
+
+        // Initialize monitoring
+        const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler, _ioc);
         log_info << "Monitoring server started";
 
-        // Autoload the init file before modules start
+        // Autoload the init files before modules start
         AutoLoad();
 
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
@@ -267,4 +251,4 @@ namespace AwsMock::Manager {
 #endif
     }
 
-}// namespace AwsMock::Manager
+} // namespace AwsMock::Manager

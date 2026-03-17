@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
+    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _scheduler(scheduler) {
 
         // Get HTTP configuration values
         _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync-period");
@@ -87,14 +87,14 @@ namespace AwsMock::Service {
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         for (const auto &bucket: buckets) {
 
-            _monitoringCollector.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, static_cast<double>(bucket.keys));
-            _monitoringCollector.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, static_cast<double>(bucket.size));
+            Core::EventBus::instance().sigMetricGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, bucket.keys);
+            Core::EventBus::instance().sigMetricGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, bucket.size);
             totalKeys += bucket.keys;
             totalSize += bucket.size;
         }
-        _monitoringCollector.SetGauge(S3_BUCKET_COUNT, {}, {}, static_cast<double>(buckets.size()));
-        _monitoringCollector.SetGauge(S3_BUCKET_SIZE_COUNT, {}, {}, static_cast<double>(totalSize));
-        _monitoringCollector.SetGauge(S3_OBJECT_COUNT, {}, {}, static_cast<double>(totalKeys));
+        Core::EventBus::instance().sigMetricGauge(S3_BUCKET_COUNT, {}, {}, static_cast<double>(buckets.size()));
+        Core::EventBus::instance().sigMetricGauge(S3_BUCKET_SIZE_COUNT, {}, {}, totalSize);
+        Core::EventBus::instance().sigMetricGauge(S3_OBJECT_COUNT, {}, {}, totalKeys);
         log_debug << "S3 monitoring finished";
     }
 
@@ -110,4 +110,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("s3-sync-objects");
         _scheduler.Shutdown("s3-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

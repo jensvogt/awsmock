@@ -18,7 +18,6 @@
 #include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -89,11 +88,6 @@ namespace AwsMock::Service {
          * @brief Check application status
          */
         void WatchdogApplications() const;
-
-        /**
-         * @brief Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * @brief Database connection

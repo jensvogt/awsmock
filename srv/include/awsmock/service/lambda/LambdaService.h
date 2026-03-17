@@ -90,7 +90,6 @@
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 // Maximal output length for a synchronous invocation call
 #define MAX_OUTPUT_LENGTH (4 * 1024)
@@ -122,8 +121,7 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
@@ -556,8 +554,7 @@ namespace AwsMock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-      private:
-
+    private:
         /**
          * @brief Tries to find an idle lambda function instance
          *
@@ -656,8 +653,8 @@ namespace AwsMock::Service {
         /**
          * Function mutexes
          */
-        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
+        static std::map<std::string, std::shared_ptr<boost::mutex> > _instanceMutex;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

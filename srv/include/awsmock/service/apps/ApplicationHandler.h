@@ -11,8 +11,6 @@
 #include <awsmock/dto/common/ApplicationClientCommand.h>
 #include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
-
 
 namespace AwsMock::Service {
 
@@ -23,12 +21,12 @@ namespace AwsMock::Service {
      */
     class ApplicationHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit ApplicationHandler(boost::asio::io_context &ioc) : AbstractHandler("application-handler", ioc), _applicationService(ioc) {}
+        explicit ApplicationHandler(boost::asio::io_context &ioc) : AbstractHandler("application-handler", ioc), _applicationService(ioc) {
+        }
 
         /**
          * @brief HTTP POST request.
@@ -41,14 +39,13 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * Application service
          */
         ApplicationService _applicationService;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_APPLICATION_HANDLER_H

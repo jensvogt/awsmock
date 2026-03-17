@@ -19,7 +19,6 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
@@ -40,8 +39,7 @@ namespace AwsMock::Database {
      */
     class S3Database : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -459,12 +457,11 @@ namespace AwsMock::Database {
          */
         void AdjustObjectCounters() const;
 
-      private:
-
+    private:
         /**
          * Allowed event types
          */
-        static std::map<std::string, std::vector<std::string>> allowedEventTypes;
+        static std::map<std::string, std::vector<std::string> > allowedEventTypes;
 
         /**
          * Database name
@@ -487,6 +484,6 @@ namespace AwsMock::Database {
         S3MemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_S3_DATABASE_H

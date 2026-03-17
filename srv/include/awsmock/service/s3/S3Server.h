@@ -18,7 +18,6 @@
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -36,15 +35,13 @@ namespace AwsMock::Service {
      */
     class S3Server final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit S3Server(Core::Scheduler &scheduler);
 
-      private:
-
+    private:
         /**
          * @brief Synchronize S3 object between filesystem and database.
          */
@@ -60,12 +57,10 @@ namespace AwsMock::Service {
          */
         static void BackupS3();
 
-        void Shutdown() override;
-
         /**
-         * Metric service
+         * @brief Shutdown module
          */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+        void Shutdown() override;
 
         /**
          * Database connection
@@ -122,16 +117,11 @@ namespace AwsMock::Service {
         std::string _backupCron;
 
         /**
-         * Monitoring collector
-         */
-        Core::MonitoringCollector &_monitoringCollector;
-
-        /**
          * @brif Asynchronous tasks scheduler
          */
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVER_H

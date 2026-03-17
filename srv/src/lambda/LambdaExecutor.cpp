@@ -46,11 +46,11 @@ namespace AwsMock::Service {
         _lambdaDatabase.CreateLambdaResult(lambdaResult);
 
         // Set Counters
-        _monitoringCollector.SetGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, runtime);
+        Core::EventBus::instance().sigMetricGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, runtime);
 
         log_debug << "Lambda invocation finished, lambda: " << lambda.function << " output: " << response.body;
         log_info << "Lambda invocation finished, lambda: " << lambda.function;
         return lambdaResult;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -30,7 +30,7 @@ namespace AwsMock::Service {
 
     void SecretsManagerServer::UpdateCounter() const {
         const long secrets = _secretsManagerDatabase.CountSecrets();
-        _metricService.SetGauge(SECRETSMANAGER_SECRETS_COUNT, {}, {}, static_cast<double>(secrets));
+        Core::EventBus::instance().sigMetricGauge(SECRETSMANAGER_SECRETS_COUNT, {}, {}, secrets);
         log_trace << "Secrets manager update counter finished";
     }
 
@@ -43,4 +43,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("secretsmanager-monitoring");
         _scheduler.Shutdown("secretsmanager-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

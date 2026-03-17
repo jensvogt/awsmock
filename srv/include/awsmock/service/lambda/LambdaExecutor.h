@@ -15,7 +15,6 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -30,12 +29,12 @@ namespace AwsMock::Service {
      */
     class LambdaExecutor : public boost::enable_shared_from_this<LambdaExecutor> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() : _monitoringCollector(Core::MonitoringCollector::instance()) {}
+        explicit LambdaExecutor() {
+        }
 
         /**
          * @brief Executes a lambda function synchronized
@@ -46,13 +45,7 @@ namespace AwsMock::Service {
          */
         Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const;
 
-      private:
-
-        /**
-         * Monitoring collector
-         */
-        Core::MonitoringCollector &_monitoringCollector;
-
+    private:
         /**
          * Lambda database connection
          */
@@ -64,6 +57,6 @@ namespace AwsMock::Service {
         ContainerService &_containerService = ContainerService::instance();
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H

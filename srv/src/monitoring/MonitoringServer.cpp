@@ -6,11 +6,9 @@
 
 namespace AwsMock::Service {
 
-    MonitoringServer::MonitoringServer(Core::Scheduler &scheduler) : AbstractServer("monitoring"), _scheduler(scheduler) {
+    MonitoringServer::MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("monitoring"), _scheduler(scheduler), _monitoringCollector(ioc) {
 
-        Monitoring::MetricService::instance().Initialize();
         const int systemPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.system-period");
-        const int averagePeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.average-period");
         const int retentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.retention");
 
         // Start monitoring system collector
@@ -20,15 +18,19 @@ namespace AwsMock::Service {
         _scheduler.AddTask("monitoring-docker-collector", [] { CollectDockerCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
-        _scheduler.AddTask("monitoring-collector", [this] { this->Collector(); }, averagePeriod);
-        log_debug << "System collector started";
-
         // Start the database cleanup worker thread every day
         _scheduler.AddTask("monitoring-cleanup-database", [this] { this->DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
         log_debug << "Cleanup started";
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&MonitoringServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect([this]() {
+            this->Shutdown();
+        });
+
+        // Connect monitoring signal
+        Core::EventBus::instance().sigMetricGauge.connect([this](const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {
+            this->_monitoringCollector.SetGauge(name, labelName, labelValue, value);
+        });
 
         log_debug << "Monitoring module initialized";
     }
@@ -68,22 +70,18 @@ namespace AwsMock::Service {
                     const auto cpuDelta = static_cast<double>(stats.cpuStats.cpuUsage.total - stats.preCpuStats.cpuUsage.total);
                     if (numCpus > 0) {
                         const auto cpuPercent = cpuDelta / timeDiff / numCpus * 100.0;
-                        Core::MonitoringCollector::instance().SetGauge(DOCKER_CPU_TOTAL, "container", containerName, cpuPercent);
+                        Core::EventBus::instance().sigMetricGauge(DOCKER_CPU_TOTAL, "container", containerName, static_cast<double>(containers.size()));
                     }
 
                     // Memory
                     const auto availableMem = static_cast<double>(stats.memoryStats.limit);
                     const auto usedMem = static_cast<double>(stats.memoryStats.usage - stats.memoryStats.stats.cache);
                     const auto memPercent = usedMem / availableMem * 100.0;
-                    Core::MonitoringCollector::instance().SetGauge(DOCKER_MEMORY_TOTAL, "container", containerName, memPercent);
+                    Core::EventBus::instance().sigMetricGauge(DOCKER_MEMORY_TOTAL, "container", containerName, memPercent);
                 }
             }
-            Core::MonitoringCollector::instance().SetGauge(DOCKER_CONTAINER_COUNT, static_cast<long>(containers.size()));
+            Core::EventBus::instance().sigMetricGauge(DOCKER_CONTAINER_COUNT, {}, {}, static_cast<double>(containers.size()));
         }
-    }
-
-    void MonitoringServer::Collector() const {
-        _monitoringDatabase.UpdateMonitoringCounters();
     }
 
     void MonitoringServer::Shutdown() {
@@ -95,4 +93,4 @@ namespace AwsMock::Service {
         log_info << "Monitoring server stopped";
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

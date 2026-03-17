@@ -8,7 +8,6 @@
 // AwsMock includes
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/repository/KMSDatabase.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -21,8 +20,7 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class KMSMonitoring {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -33,19 +31,13 @@ namespace AwsMock::Service {
          */
         void UpdateCounter();
 
-      private:
-
-        /**
-         * @brief Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
-
+    private:
         /**
          * @brief Database connection
          */
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_MONITORING_H

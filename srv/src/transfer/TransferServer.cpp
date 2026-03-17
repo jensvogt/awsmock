@@ -157,7 +157,7 @@ namespace AwsMock::Service {
         log_trace << "Transfer monitoring starting";
 
         const long servers = _transferDatabase.CountServers();
-        _metricService.SetGauge(TRANSFER_SERVER_COUNT, {}, {}, static_cast<double>(servers));
+        Core::EventBus::instance().sigMetricGauge(TRANSFER_SERVER_COUNT, {}, {}, static_cast<double>(servers));
 
         log_trace << "Transfer monitoring finished";
     }
@@ -172,4 +172,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("ssm-backup");
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

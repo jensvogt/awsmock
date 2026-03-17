@@ -40,7 +40,7 @@ namespace AwsMock::Service {
 
         // Get total counts
         const long keys = _kmsDatabase.CountKeys();
-        _metricService.SetGauge(KMS_KEY_COUNT, {}, {}, keys);
+        Core::EventBus::instance().sigMetricGauge(KMS_KEY_COUNT, {}, {}, keys);
 
         log_trace << "KMS monitoring finished";
     }
@@ -68,4 +68,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("kms-backup");
         log_info << "KMS server stopped";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

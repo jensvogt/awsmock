@@ -5,8 +5,7 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc),
-                                                                                           _monitoringCollector(Core::MonitoringCollector::instance()), _scheduler(scheduler) {
+    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc), _scheduler(scheduler) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.GetValue<std::string>("awsmock.region");
@@ -168,14 +167,15 @@ namespace AwsMock::Service {
 
         // Get the lambda list
         const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
-        _monitoringCollector.SetGauge(LAMBDA_FUNCTION_COUNT, static_cast<double>(lambdas.size()));
+        Core::EventBus::instance().sigMetricGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas.size()));
 
         if (lambdas.empty()) {
             return;
         }
 
         for (const auto &lambda: lambdas) {
-            _monitoringCollector.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
+            Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambdas.size()));
+            //        _monitoringCollector.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
         }
         log_trace << "Lambda monitoring finished";
     }
@@ -210,4 +210,4 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("lambda", Dto::Module::ExportType::BOTH);
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
