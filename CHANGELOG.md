@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.14.49](https://github.com/jensvogt/awsmock/compare/1.14.48...v1.14.49) (2026-03-17)
+
+
+### Bug Fixes
+
+* add SFTP ssh host key ([8b80e78](https://github.com/jensvogt/awsmock/commit/8b80e78902635e4226dfe82eae90396e54f5b014))
+* remove shared memory ([e221ef8](https://github.com/jensvogt/awsmock/commit/e221ef825d644109d120d77ebd98f4c89ea93c2d))
+* remove shared memory ([77c6656](https://github.com/jensvogt/awsmock/commit/77c6656d9dd48343d67d57919091d7eb99d8de5e))
+
 ## [1.14.48](https://github.com/jensvogt/awsmock/compare/v1.14.47...v1.14.48) (2026-03-16)
 
 
