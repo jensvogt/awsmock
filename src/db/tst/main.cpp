@@ -12,14 +12,12 @@
 #include <memory>
 
 // Boost includes
-#include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/utils/ConnectionPool.h>
 
-std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::instance();
 
 #include "CognitoDatabaseTests.cpp"
@@ -61,17 +59,6 @@ static void InitializeDatabase() {
     pool.Configure();
 }
 
-void InitializeShm() {
-
-    // As Awsmock is not running under root set shared memory permissions
-    boost::interprocess::permissions unrestricted_permissions;
-    unrestricted_permissions.set_unrestricted();
-
-    // Create a managed shared memory segment.
-    boost::interprocess::shared_memory_object::remove(MONITORING_SEGMENT_NAME);
-    shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, MONITORING_SEGMENT_NAME, 65000, nullptr, unrestricted_permissions);
-}
-
 bool init_unit_test() {
 
     AwsMock::Core::LogStream::Initialize();
@@ -79,7 +66,6 @@ bool init_unit_test() {
     AwsMock::Core::TestUtils::CreateTestConfigurationFile();
 
     InitializeDatabase();
-    InitializeShm();
 
     return true;
 }

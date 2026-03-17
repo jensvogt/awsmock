@@ -14,18 +14,14 @@ namespace AwsMock::Dto {
 
     class TestBase {
 
-      public:
-
+    public:
         static bool InitUnitTests();
 
-        static void InitializeShm();
-
-      private:
-
+    private:
         std::string _endpoint, _region;
         Core::Configuration &_configuration = Core::Configuration::instance();
     };
 
-}// namespace AwsMock::Dto
+} // namespace AwsMock::Dto
 
 #endif// AWSMOCK_DTO_TEST_BASE_H

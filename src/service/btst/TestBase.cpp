@@ -72,7 +72,6 @@ namespace AwsMock::Service {
         Core::LogStream::RemoveConsoleLogs();
 
         InitializeDatabase();
-        InitializeShm();
 
         // Create services
         Database::TestUtils::CreateServices();
@@ -96,17 +95,6 @@ namespace AwsMock::Service {
         // Options
         pool = std::move(Database::ConnectionPool::instance());
         pool.Configure();
-    }
-
-    void TestBase::InitializeShm() {
-
-        // As Awsmock is not running under root set shared memory permissions
-        //boost::interprocess::permissions unrestricted_permissions;
-        //unrestricted_permissions.set_unrestricted();
-
-        // Create a managed shared memory segment.
-        //boost::interprocess::shared_memory_object::remove(MONITORING_SEGMENT_NAME);
-        //shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, MONITORING_SEGMENT_NAME, 65000, nullptr, unrestricted_permissions);
     }
 
     void TestBase::StartContainer() {
@@ -137,7 +125,7 @@ namespace AwsMock::Service {
         _ios.stop();
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 // entry point:
 int main(const int argc, char *argv[]) {
