@@ -7,8 +7,6 @@
 
 namespace AwsMock::Database {
 
-    typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean> > Accumulator;
-
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {
         Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> values) {
             this->UpdateMonitoringCounters(values);
@@ -57,86 +55,6 @@ namespace AwsMock::Database {
         return {};
     }
 
-    void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) const {
-        log_trace << "Set counter value, name: " << name << ", value: " << value << ", labelName: " << labelName << ", labelValue:" << labelValue;
-
-        if (HasDatabase()) {
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
-            auto session = client->start_session();
-
-            try {
-                if (name.empty()) {
-                    log_error << "Missing name";
-                    return;
-                }
-
-                document newDocument;
-                newDocument.append(kvp("value", value));
-                newDocument.append(kvp("count", 1));
-                newDocument.append(kvp("name", name));
-                if (!labelName.empty()) {
-                    newDocument.append(kvp("labelName", labelName));
-                }
-                if (!labelName.empty()) {
-                    newDocument.append(kvp("labelValue", labelValue));
-                }
-                newDocument.append(kvp("created", bsoncxx::types::b_date(system_clock::now())));
-
-                session.start_transaction();
-                _monitoringCollection.insert_one(newDocument.extract());
-                session.commit_transaction();
-
-            } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
-                log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what());
-            }
-        } else {
-            log_trace << "Performance counter not available if you running the memory DB";
-        }
-    }
-
-    void MonitoringDatabase::SetGauge(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) const {
-        log_trace << "Set gauge value, name: " << name << " value: " << value << " labelName: " << labelName << " labelValue:" << labelValue;
-
-        if (HasDatabase()) {
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
-            auto session = client->start_session();
-
-            try {
-                if (name.empty()) {
-                    log_error << "Missing name";
-                    return;
-                }
-
-                document newDocument;
-                newDocument.append(kvp("value", value));
-                newDocument.append(kvp("count", 1));
-                newDocument.append(kvp("name", name));
-                newDocument.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::UtcDateTimeNow())));
-                if (!labelName.empty()) {
-                    newDocument.append(kvp("labelName", labelName));
-                }
-                if (!labelValue.empty()) {
-                    newDocument.append(kvp("labelValue", labelValue));
-                }
-
-                session.start_transaction();
-                _monitoringCollection.insert_one(newDocument.extract());
-                session.commit_transaction();
-
-            } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
-                log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what());
-            }
-        } else {
-            log_trace << "Performance counter not available if you running the memory DB";
-        }
-    }
-
     std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const long step, const std::string &labelName,
                                                                                      const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
@@ -169,23 +87,13 @@ namespace AwsMock::Database {
 
                 // Find and accumulate
                 std::vector<Entity::Monitoring::Counter> result;
-                if (_rollingMean) {
-                    mongocxx::options::find opts;
-                    opts.sort(make_document(kvp("created", 1)));
-                    Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
-                    for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
-                        acc(it["value"].get_double().value);
-                        Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
-                        result.emplace_back(counter);
-                    }
-                } else {
-                    for (auto cursor = _monitoringCollection.find(document.extract()); auto it: cursor) {
-                        Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
-                        result.emplace_back(counter);
-                    }
+                for (auto cursor = _monitoringCollection.find(document.extract()); auto it: cursor) {
+                    Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
+                    result.emplace_back(counter);
                 }
                 log_debug << "Counters, name: " << name << ", count: " << result.size() << ", start:" << startUtc << ", end: " << endUtc;
                 return result;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());

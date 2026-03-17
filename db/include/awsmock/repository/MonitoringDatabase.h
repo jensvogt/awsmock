@@ -5,14 +5,7 @@
 #ifndef AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 #define AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 
-// C++ standard includes
-#include <string>
-
 // Boost includes
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics.hpp>
-#include <boost/accumulators/statistics/rolling_mean.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
 #include <boost/date_time/local_time_adjustor.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -22,7 +15,6 @@
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
