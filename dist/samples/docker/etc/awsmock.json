@@ -12,7 +12,6 @@
     "temp-dir": "/usr/local/awsmock/tmp",
     "backup-dir": "/usr/local/awsmock/data/backup",
     "backup-retention": 30,
-    "shm-size": 1048576,
     "json": {
       "pretty": false
     },

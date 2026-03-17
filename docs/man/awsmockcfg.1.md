@@ -49,7 +49,6 @@ awsmock.access.secret-access-key                  AWSMOCK_SECRET_ACCESS_KEY     
 awsmock.data.dir                                  AWSMOCK_DATA_DIR                                  base data directory, default /usr/local/awsmock/data
 awsmock.temp.dir                                  AWSMOCK_TEMP_DIR                                  temporary data directory, default /usr/local/awsmock/tmp
 awsmock.backup.dir                                AWSMOCK_BACKUP_DIR                                backup directory,, default /usr/local/awsmock/data/backup
-awsmock.shm-size                                  AWSMOCK_SHM_SIZE                                  shared memory size in bytes, default: 65536
 awsmock.json.pretty                               AWSMOCK_JSON_PRETTY                               pretty print output for XML and JSON, default: false
 awsmock.aws.signature.verify                      AWSMOCK_SIGNATURE_VERIFY                          check AWS sginature with each request, default: false
 awsmock.dockerized                                AWSMOCK_DOCKERIZED                                true when running as docker container, default: false
