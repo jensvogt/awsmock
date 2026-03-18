@@ -51,7 +51,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * Number of processes
          */
-        int numProcs;
+        int numProcs{};
 
         /**
          * Read timestamp

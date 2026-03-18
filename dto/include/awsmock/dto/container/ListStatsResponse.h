@@ -39,6 +39,11 @@ namespace AwsMock::Dto::Docker {
     struct ListStatsResponse final : Common::BaseCounter<ListStatsResponse> {
 
         /**
+         * @brief Total number of counters
+         */
+        long total{};
+
+        /**
          * Container list
          */
         std::vector<ContainerStat> containerStats;
@@ -47,6 +52,7 @@ namespace AwsMock::Dto::Docker {
 
         friend ListStatsResponse tag_invoke(boost::json::value_to_tag<ListStatsResponse>, boost::json::value const &v) {
             ListStatsResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
             if (v.is_array() && v.as_array().size() > 0) {
                 r.containerStats = boost::json::value_to<std::vector<ContainerStat>>(v);
             }
@@ -55,6 +61,7 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListStatsResponse const &obj) {
             jv = {
+                    {"total", obj.total},
                     {"containerStats", boost::json::value_from(obj.containerStats)},
             };
         }

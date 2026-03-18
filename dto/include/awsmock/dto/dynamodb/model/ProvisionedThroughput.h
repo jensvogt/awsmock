@@ -48,7 +48,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Number of decreases
          */
-        long numberOfDecreasesToday = 0;
+        long numberOfDecreasesToday{};
 
         /**
          * @brief Convert from a BSON document

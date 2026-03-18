@@ -30,7 +30,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Last update Unix timestamp
          */
-        long lastUpdateDateTime;
+        long lastUpdateDateTime{};
 
         /**
          * Table class

@@ -95,27 +95,27 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Key schema
          */
-        std::vector<KeySchema> keySchema;
+        std::vector<KeySchema> keySchema{};
 
         /**
          * Attribute definitions
          */
-        std::vector<AttributeDefinition> attributeDefinitions;
+        std::vector<AttributeDefinition> attributeDefinitions{};
 
         /**
          * Tags
          */
-        std::vector<Tag> tags;
+        std::vector<Tag> tags{};
 
         /**
          * Provisioned throughput
          */
-        ProvisionedThroughput provisionedThroughput;
+        ProvisionedThroughput provisionedThroughput{};
 
         /**
          * Table class summary
          */
-        TableClassSummary tableClassSummary;
+        TableClassSummary tableClassSummary{};
 
         /**
          * Table status

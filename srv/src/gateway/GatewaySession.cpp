@@ -55,7 +55,7 @@ namespace AwsMock::Service {
         if (_parser->get()[http::field::expect] == "100-continue") {
 
             // Check body size
-            const boost::optional<std::uint64_t> contentLength;
+            const boost::optional<std::uint64_t> contentLength{};
             _parser->get().content_length(contentLength);
             if (contentLength.value_or(0) > _bodyLimit) {
                 log_error << "Body too big ";
