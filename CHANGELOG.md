@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.52](https://github.com/jensvogt/awsmock/compare/v1.14.51...v1.14.52) (2026-03-18)
+
+
+### Bug Fixes
+
+* macOS port ([80c198d](https://github.com/jensvogt/awsmock/commit/80c198dc9b5ed35dd950920063415fc33d0c8992))
+
 ## [1.14.51](https://github.com/jensvogt/awsmock/compare/v1.14.50...v1.14.51) (2026-03-18)
 
 
