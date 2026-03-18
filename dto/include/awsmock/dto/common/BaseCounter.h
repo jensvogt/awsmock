@@ -122,8 +122,14 @@ namespace AwsMock::Dto::Common {
          */
         static std::string GetDemangledName(const std::string &name) {
             int status = -1;
-            std::string demangledName = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
-            return demangledName;
+            // abi::__cxa_demangle liefert einen mit malloc() allozierten char*
+
+            if (char *demangled = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status); status == 0 && demangled != nullptr) {
+                std::string result(demangled);
+                std::free(demangled);// WICHTIG: Speicher freigeben
+                return result;
+            }
+            return name;
         }
 #endif
 

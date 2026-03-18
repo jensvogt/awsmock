@@ -29,7 +29,7 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &fileName, long contentLength, const std::map<std::string, std::string> &headers) {
         // Prepare the response message
-        http::response<http::dynamic_body> response;
+        http::response<http::dynamic_body> response{};
         response.version(request.version());
         response.result(status);
         response.keep_alive(request.keep_alive());
@@ -63,7 +63,7 @@ namespace AwsMock::Service {
 
         try {
             // Prepare the response message
-            http::response<http::dynamic_body> response;
+            http::response<http::dynamic_body> response{};
             response.version(request.version());
             response.keep_alive(request.keep_alive());
             response.result(http::status::partial_content);
@@ -106,10 +106,10 @@ namespace AwsMock::Service {
 
     http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body, const std::map<std::string, std::string> &headers) {
         // Prepare the response message
-        http::response<http::dynamic_body> response;
+        http::response<http::dynamic_body> response{};
         response.version(request.version());
         response.result(status);
-        //response.keep_alive(request.keep_alive());
+        response.keep_alive(request.keep_alive());
         response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");

@@ -205,7 +205,7 @@ namespace AwsMock::Monitoring {
         if (res != KERN_SUCCESS) {
             return;
         }
-        Core::EventBus::instance().sigMetricGauge(TOTAL_THREADS, static_cast<double>(numberOfThreads));
+        Core::EventBus::instance().sigMetricGauge(TOTAL_THREADS, {}, {}, static_cast<double>(numberOfThreads));
         log_trace << "Total Threads: " << numberOfThreads;
     }
 
@@ -218,7 +218,7 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        if (const long diff = std::chrono::duration_cast<microseconds>(system_clock::now() - _startTime).count(); diff > 0) {
+        if (const long diff = std::chrono::duration_cast<microseconds>(std::chrono::system_clock::now() - _startTime).count(); diff > 0) {
 
             // User CPU
             long micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec;
