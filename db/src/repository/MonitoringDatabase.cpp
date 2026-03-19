@@ -8,7 +8,7 @@
 namespace AwsMock::Database {
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {
-        Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> values) {
+        Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> &values) {
             this->UpdateMonitoringCounters(values);
         });
     }
@@ -114,7 +114,7 @@ namespace AwsMock::Database {
             try {
 
                 std::vector<value> documents;
-                for (auto &[key,val]: values) {
+                for (auto &[key, val]: values) {
 
                     // Prepare insert query
                     document insertQuery;
@@ -171,4 +171,4 @@ namespace AwsMock::Database {
         return 0;
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

@@ -5,17 +5,9 @@
 #ifndef AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 #define AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 
-// Boost includes
-#include <boost/date_time/c_local_time_adjustor.hpp>
-#include <boost/date_time/local_time_adjustor.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
-
 // AwsMock includes
-#include <awsmock/core/EventBus.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/EventBus.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
 
@@ -33,7 +25,8 @@ namespace AwsMock::Database {
      */
     class MonitoringDatabase : public DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -46,26 +39,6 @@ namespace AwsMock::Database {
             static MonitoringDatabase monitoringDatabase;
             return monitoringDatabase;
         }
-
-        /**
-         * @brief Increments a metric counter
-         *
-         * @param name metric counter name
-         * @param labelName metric label name
-         * @param labelValue metric label name
-         * @param value metric value
-         */
-        void IncCounter(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
-
-        /**
-         * @brief Sets a metric gauge
-         *
-         * @param name metric counter name
-         * @param labelName metric label name
-         * @param labelValue metric label name
-         * @param value metric value
-         */
-        void SetGauge(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Returns the rolling mean
@@ -107,7 +80,8 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
 
-    private:
+      private:
+
         /**
          * Database name
          */
@@ -143,6 +117,6 @@ namespace AwsMock::Database {
             labelValue = std::move(keys[2]);
         }
     }
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
 #endif//AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H

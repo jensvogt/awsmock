@@ -409,7 +409,8 @@ namespace AwsMock::Service {
 
     Dto::Docker::ListStatsResponse ContainerService::ListContainerStats() const {
         Dto::Docker::ListStatsResponse response;
-        for (const Dto::Docker::ListContainerResponse listResponse = ListContainers(); const auto &container: listResponse.containerList) {
+        const Dto::Docker::ListContainerResponse listResponse = ListContainers();
+        for (const auto &container: listResponse.containerList) {
             auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + container.id + "/stats?stream=false&one-shot=true");
             if (statusCode != http::status::ok) {
                 log_warning << "List container stats failed, statusCode: " << statusCode << " body " << body;
@@ -421,6 +422,7 @@ namespace AwsMock::Service {
             containerStat.name = container.GetContainerName();
             response.containerStats.emplace_back(containerStat);
         }
+        response.total = listResponse.containerList.size();
         return response;
     }
 

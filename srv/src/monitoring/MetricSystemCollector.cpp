@@ -112,7 +112,7 @@ namespace AwsMock::Monitoring {
         // skip first 13 fields
         for (int i = 0; i < 13; i++) ss >> token;
 
-        ss >> pt.utime >> pt.stime; // fields 14 and 15
+        ss >> pt.utime >> pt.stime;// fields 14 and 15
         pt.initialized = true;
         return pt;
     }
@@ -145,9 +145,9 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, " ");
-            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
+            Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
             log_trace << "Virtual memory: " << std::stol(tokens[22]);
-            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * static_cast<double>(sysconf(_SC_PAGESIZE)));
+            Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * static_cast<double>(sysconf(_SC_PAGESIZE)));
             log_trace << "Real Memory: " << std::stol(tokens[23]);
         }
         ifs.close();
@@ -173,7 +173,7 @@ namespace AwsMock::Monitoring {
             file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         if (const double percentUsed = static_cast<double>(total - free) / static_cast<double>(total) * 100; std::isnormal(percentUsed)) {
-            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
+            Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
         }
     }
 
@@ -182,7 +182,7 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, " ");
-            Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, Core::NumberUtils::ToDouble(tokens[19]));
+            Core::EventBus::instance().sigMetricGauge(TOTAL_THREADS, {}, {}, Core::NumberUtils::ToDouble(tokens[19]));
             log_debug << "Total threads: " << std::stod(tokens[19]);
         }
         ifs.close();
@@ -205,7 +205,7 @@ namespace AwsMock::Monitoring {
         if (res != KERN_SUCCESS) {
             return;
         }
-        Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, static_cast<double>(numberOfThreads));
+        Core::EventBus::instance().sigMetricGauge(TOTAL_THREADS, {}, {}, static_cast<double>(numberOfThreads));
         log_trace << "Total Threads: " << numberOfThreads;
     }
 
@@ -218,24 +218,24 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        if (const long diff = std::chrono::duration_cast<microseconds>(system_clock::now() - _startTime).count(); diff > 0) {
+        if (const long diff = std::chrono::duration_cast<microseconds>(std::chrono::system_clock::now() - _startTime).count(); diff > 0) {
 
             // User CPU
             long micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec;
             double percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
-            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percent);
+            Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percent);
             log_trace << "User CPU: " << percent;
 
             // System CPU
             micros = r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
-            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percent);
+            Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percent);
             log_trace << "System CPU: " << percent;
 
             // Total CPU
             micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
-            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percent);
+            Core::EventBus::instance().sigMetricGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percent);
             log_trace << "Total CPU: " << percent;
         }
     }
@@ -257,7 +257,7 @@ namespace AwsMock::Monitoring {
         const unsigned long long totalTicksSinceLastTime = totalTicks - _previousTotalTicks;
         const unsigned long long idleTicksSinceLastTime = idleTicks - _previousIdleTicks;
         const float totalPercent = 1.0f - (totalTicksSinceLastTime > 0 ? static_cast<float>(idleTicksSinceLastTime) / static_cast<float>(totalTicksSinceLastTime) : 0);
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+        Core::EventBus::instance().sigMetricGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
         _previousTotalTicks = totalTicks;
         _previousIdleTicks = idleTicks;
     }
@@ -272,8 +272,8 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
-        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", static_cast<double>(t_info.resident_size));
+        Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
+        Core::EventBus::instance().sigMetricGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", static_cast<double>(t_info.resident_size));
         log_trace << "Virtual memory, virtual: " << t_info.virtual_size << " real: " << t_info.resident_size;
     }
 
@@ -349,4 +349,4 @@ namespace AwsMock::Monitoring {
     }
 #endif
 
-} // namespace AwsMock::Monitoring
+}// namespace AwsMock::Monitoring
