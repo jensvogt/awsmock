@@ -415,7 +415,8 @@ namespace AwsMock::Service {
 
             // Create a MongoDB filter from DynamodDb query
             auto filter = ToMongoFilter(expression, attrs);
-            log_debug << "MongoDB query: " << bsoncxx::to_json(filter);
+            log_info << "MongoDB query: " << bsoncxx::to_json(filter);
+            std::string tmp = bsoncxx::to_json(filter);
 
             // Query database
             std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase.ExecuteQuery(filter, true, request.limit);

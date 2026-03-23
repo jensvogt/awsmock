@@ -176,6 +176,7 @@ namespace AwsMock::Database {
         putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
         Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
         // Value1
         Dto::DynamoDb::PutItemRequest putRequest2;
@@ -185,12 +186,12 @@ namespace AwsMock::Database {
         putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest2.attributes["value"] = CreateDefaultAttributeValue(2);
         putResponse = _dynamoDbService.PutItem(putRequest2);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
         // Query
         Dto::DynamoDb::QueryRequest queryRequest;
         queryRequest.region = TEST_REGION;
         queryRequest.tableName = TEST_TABLE;
-        queryRequest.limit = 10;
         queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value = :AMZN_MAPPED_value";
         queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
         queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
@@ -203,6 +204,192 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
         BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
+    }
+
+    BOOST_AUTO_TEST_CASE(QueryItemTest3) {
+
+        // arrange
+        const Service::DynamoDbService _dynamoDbService;
+        const Dto::DynamoDb::CreateTableRequest request = CreateDefaultTableRequest();
+        const Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(request);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest1;
+        putRequest1.region = TEST_REGION;
+        putRequest1.tableName = TEST_TABLE;
+        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest2;
+        putRequest2.region = TEST_REGION;
+        putRequest2.tableName = TEST_TABLE;
+        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest2.attributes["value"] = CreateDefaultAttributeValue(2);
+        putResponse = _dynamoDbService.PutItem(putRequest2);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Query
+        Dto::DynamoDb::QueryRequest queryRequest;
+        queryRequest.region = TEST_REGION;
+        queryRequest.tableName = TEST_TABLE;
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value > :AMZN_MAPPED_value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(1);
+
+        // act
+        const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
+        BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
+        BOOST_CHECK_EQUAL("2", queryResponse.items.at(0).at("value").numberValue);
+    }
+
+    BOOST_AUTO_TEST_CASE(QueryItemTest4) {
+
+        // arrange
+        const Service::DynamoDbService _dynamoDbService;
+        const Dto::DynamoDb::CreateTableRequest request = CreateDefaultTableRequest();
+        const Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(request);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest1;
+        putRequest1.region = TEST_REGION;
+        putRequest1.tableName = TEST_TABLE;
+        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest2;
+        putRequest2.region = TEST_REGION;
+        putRequest2.tableName = TEST_TABLE;
+        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest2.attributes["value"] = CreateDefaultAttributeValue(1);
+        putResponse = _dynamoDbService.PutItem(putRequest2);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Query
+        Dto::DynamoDb::QueryRequest queryRequest;
+        queryRequest.region = TEST_REGION;
+        queryRequest.tableName = TEST_TABLE;
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value < :AMZN_MAPPED_value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(2);
+
+        // act
+        const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
+        BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
+        BOOST_CHECK_EQUAL("1", queryResponse.items.at(0).at("value").numberValue);
+    }
+
+    BOOST_AUTO_TEST_CASE(QueryItemTest5) {
+
+        // arrange
+        const Service::DynamoDbService _dynamoDbService;
+        const Dto::DynamoDb::CreateTableRequest request = CreateDefaultTableRequest();
+        const Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(request);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest1;
+        putRequest1.region = TEST_REGION;
+        putRequest1.tableName = TEST_TABLE;
+        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest2;
+        putRequest2.region = TEST_REGION;
+        putRequest2.tableName = TEST_TABLE;
+        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest2.attributes["value"] = CreateDefaultAttributeValue(2);
+        putResponse = _dynamoDbService.PutItem(putRequest2);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Query
+        Dto::DynamoDb::QueryRequest queryRequest;
+        queryRequest.region = TEST_REGION;
+        queryRequest.tableName = TEST_TABLE;
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value >= :AMZN_MAPPED_value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(2);
+
+        // act
+        const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
+        BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
+        BOOST_CHECK_EQUAL("2", queryResponse.items.at(0).at("value").numberValue);
+    }
+
+    BOOST_AUTO_TEST_CASE(QueryItemTest6) {
+
+        // arrange
+        const Service::DynamoDbService _dynamoDbService;
+        const Dto::DynamoDb::CreateTableRequest request = CreateDefaultTableRequest();
+        const Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(request);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest1;
+        putRequest1.region = TEST_REGION;
+        putRequest1.tableName = TEST_TABLE;
+        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.keys["ean"] = CreateDefaultAttributeValue("ABC");
+        putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Value1
+        Dto::DynamoDb::PutItemRequest putRequest2;
+        putRequest2.region = TEST_REGION;
+        putRequest2.tableName = TEST_TABLE;
+        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest1.keys["ean"] = CreateDefaultAttributeValue("DEF");
+        putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        putRequest2.attributes["value"] = CreateDefaultAttributeValue(1);
+        putResponse = _dynamoDbService.PutItem(putRequest2);
+        BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
+
+        // Query
+        Dto::DynamoDb::QueryRequest queryRequest;
+        queryRequest.region = TEST_REGION;
+        queryRequest.tableName = TEST_TABLE;
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value <= :AMZN_MAPPED_value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(2);
+
+        // act
+        const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
+        BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
+        BOOST_CHECK_EQUAL("1", queryResponse.items.at(0).at("value").numberValue);
     }
 
     BOOST_AUTO_TEST_CASE(DeleteTableTest) {

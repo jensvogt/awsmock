@@ -256,9 +256,21 @@ namespace AwsMock::Database {
          * @param req request
          * @param scanIndexForward scan forward
          * @param limit query limit
+         * @return list of items
+         * @throws DatabaseException
          */
         [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
-        std::vector<Entity::DynamoDb::Item> ExecuteQuery(const value &filter, bool scanIndexForward, int limit) const;
+
+        /**
+         * @brief Execute query
+         *
+         * @param filter query filter
+         * @param scanIndexForward scan forward
+         * @param limit query limit, default: 0
+         * @return list of items
+         * @throws DatabaseException
+         */
+        std::vector<Entity::DynamoDb::Item> ExecuteQuery(const value &filter, bool scanIndexForward, int limit = 0) const;
 
         void AdjustItemCounters() const;
 
