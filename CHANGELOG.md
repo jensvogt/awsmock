@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.0](https://github.com/jensvogt/awsmock/compare/1.15.0...v1.16.0) (2026-03-23)
+
+
+### Features
+
+* DynamoDB queries added ([d39aa90](https://github.com/jensvogt/awsmock/commit/d39aa908b2723217aa832d4b5b99b2cae08ce57e))
+* DynamoDB queries added ([3368a33](https://github.com/jensvogt/awsmock/commit/3368a33a33a8aea33a6f4b22bcc5fecc111e09f9))
+
 ## [1.15.0](https://github.com/jensvogt/awsmock/compare/v1.14.52...v1.15.0) (2026-03-18)
 
 
