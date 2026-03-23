@@ -11,13 +11,12 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/repository/DynamoDbToMongoTranslator.h>
 #include <awsmock/utils/SortColumn.h>
 
-#define QUERY_SIZE_LIMIT 1024 * 1024
+#define QUERY_SIZE_LIMIT (1024 * 1024)
 
 namespace AwsMock::Database {
 

@@ -329,6 +329,7 @@ namespace AwsMock::Service {
             return doc.extract();
         }
 
+        // TODO: For Type== 'N' the values should be stored as integers/doubles
         static value build_single(const Condition &cond, const ExpressionAttributeValues &attr_values) {
 
             using bsoncxx::builder::basic::kvp;
