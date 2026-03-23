@@ -33,10 +33,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
             Core::Bson::BsonUtils::SetStringValue(itemDoc, "region", region);
             Core::Bson::BsonUtils::SetStringValue(itemDoc, "tableName", tableName);
             Core::Bson::BsonUtils::SetLongValue(itemDoc, "size", size);
-            Core::Bson::BsonUtils::SetDateValue(itemDoc, "created", created);
-            Core::Bson::BsonUtils::SetDateValue(itemDoc, "modified", modified);
             Core::Bson::BsonUtils::SetDocumentValue(itemDoc, "attributes", attributesDoc);
             Core::Bson::BsonUtils::SetDocumentValue(itemDoc, "keys", keysDoc);
+            Core::Bson::BsonUtils::SetDateValue(itemDoc, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(itemDoc, "modified", modified);
             return itemDoc.extract();
 
         } catch (const std::exception &exc) {

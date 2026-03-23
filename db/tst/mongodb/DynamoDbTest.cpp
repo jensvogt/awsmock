@@ -21,12 +21,15 @@ namespace AwsMock::Database {
         item.region = region;
 
         Entity::DynamoDb::AttributeValue key1Value;
-        key1Value.stringValue = "key-value-1";
+        key1Value.stringValue = "test-value-1";
         item.keys["test-attribute-1"] = key1Value;
 
         Entity::DynamoDb::AttributeValue attr1Value;
-        attr1Value.stringValue = "attr-value-1";
+        attr1Value.stringValue = "test-value-1";
         item.attributes["test-attribute-1"] = attr1Value;
+        Entity::DynamoDb::AttributeValue attr2Value;
+        attr2Value.numberValue = "1";
+        item.attributes["test-attribute-2"] = attr2Value;
         return item;
     }
 
@@ -135,7 +138,7 @@ namespace AwsMock::Database {
 
         // arrange key
         Entity::DynamoDb::AttributeValue key1Value;
-        key1Value.stringValue = "key-value-1";
+        key1Value.stringValue = "test-value-1";
         std::map<std::string, Entity::DynamoDb::AttributeValue> keys;
         keys["test-attribute-1"] = key1Value;
 
@@ -147,8 +150,9 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, item.keys.empty());
         BOOST_CHECK_EQUAL(false, item.attributes.empty());
-        BOOST_CHECK_EQUAL(item.attributes["test-attribute-1"].stringValue, "attr-value-1");
-        BOOST_CHECK_EQUAL(item.keys["test-attribute-1"].stringValue, "key-value-1");
+        BOOST_CHECK_EQUAL(item.keys["test-attribute-1"].stringValue, "test-value-1");
+        BOOST_CHECK_EQUAL(item.attributes["test-attribute-1"].stringValue, "test-value-1");
+        BOOST_CHECK_EQUAL(item.attributes["test-attribute-2"].numberValue, "1");
     }
 
     BOOST_AUTO_TEST_CASE(ListItemTest) {

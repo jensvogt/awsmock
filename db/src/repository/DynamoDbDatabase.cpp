@@ -814,7 +814,7 @@ namespace AwsMock::Database {
         return items;
     }
 
-    std::vector<Entity::DynamoDb::Item> DynamoDbDatabase::ExecuteQuery(const bsoncxx::document::value &filter, const bool scanIndexForward, const int limit) const {
+    std::vector<Entity::DynamoDb::Item> DynamoDbDatabase::ExecuteQuery(const value &filter, const bool scanIndexForward, const int limit) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "execute_query");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -823,8 +823,8 @@ namespace AwsMock::Database {
         mongocxx::options::find opts{};
 
         // DynamoDB Sort Key sorting (Ascending vs Descending). You'd need to know which field is the Sort Key from your Table Metadata
-        std::string sortKey = "SK";
-        opts.sort(make_document(kvp(sortKey, scanIndexForward ? 1 : -1)));
+        //std::string sortKey = "SK";
+        //opts.sort(make_document(kvp(sortKey, scanIndexForward ? 1 : -1)));
 
         if (limit > 0) {
             opts.limit(limit);
