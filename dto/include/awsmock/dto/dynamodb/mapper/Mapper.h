@@ -124,6 +124,16 @@ namespace AwsMock::Dto::DynamoDb {
         static KeySchema map(const Database::Entity::DynamoDb::KeySchema &keySchemaEntity);
 
         /**
+         * @brief Maps a list of key schema entities to a list of key schema DTOs
+         *
+         * @param keySchemaEntities list of key schema entities
+         * @return list of key schema DTOs
+         * @see Dto::DynamoDb::KeySchema
+         * @see Database::Entity::DynamoDb::KeySchema
+         */
+        static std::vector<KeySchema> map(const std::vector<Database::Entity::DynamoDb::KeySchema> &keySchemaEntities);
+
+        /**
          * @brief Maps a table attribute DTO to an attribute entity
          *
          * @param attributeDefinitionDto DynamoDb table attribute
@@ -134,11 +144,21 @@ namespace AwsMock::Dto::DynamoDb {
         static Database::Entity::DynamoDb::AttributeDefinition map(const AttributeDefinition &attributeDefinitionDto);
 
         /**
+         * @brief Maps a Dynamodb attribute definition entity to a attribute definition DTO
          *
          * @param attributeDefinitionEntity
-         * @return
+         * @return attribute definition DTO
          */
         static AttributeDefinition map(const Database::Entity::DynamoDb::AttributeDefinition &attributeDefinitionEntity);
+
+        /**
+         * @brief Maps a list Dynamodb attribute definition entity to a list of attribute definition DTOs
+         *
+         * @param attributeDefinitions list of attribute definition entities
+         * @return list of attribute definition DTOs
+         */
+        static std::vector<AttributeDefinition> map(const std::vector<Database::Entity::DynamoDb::AttributeDefinition> &attributeDefinitions);
+
         static std::map<std::string, Database::Entity::DynamoDb::AttributeValue> map(const std::map<std::string, AttributeValue> &keyDtos);
 
         /**

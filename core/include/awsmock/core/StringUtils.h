@@ -286,6 +286,16 @@ namespace AwsMock::Core {
         static void Replace(std::string &target, const std::string &pattern, const std::string &replacement);
 
         /**
+         * @brief Replace in C-string.
+         *
+         * @param target original
+         * @param pattern pattern
+         * @param replacement replacement string
+         * @return update string
+         */
+        static std::string ReplaceCopy(const std::string &target, const std::string &pattern, const std::string &replacement);
+
+        /**
          * @brief Returns a stripped string with continuation chars (...)
          *
          * @param input original string

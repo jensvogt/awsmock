@@ -85,7 +85,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Expression attribute values
          */
-        std::map<std::string, ExpressionAttributeValue> expressionAttributeValues{};
+        std::map<std::string, AttributeValue> expressionAttributeValues{};
 
       private:
 
@@ -99,7 +99,7 @@ namespace AwsMock::Dto::DynamoDb {
                 r.expressionAttributeNames = boost::json::value_to<std::map<std::string, std::string>>(v.at("ExpressionAttributeNames"));
             }
             if (Core::Json::AttributeExists(v, "ExpressionAttributeValues")) {
-                r.expressionAttributeValues = boost::json::value_to<std::map<std::string, ExpressionAttributeValue>>(v.at("ExpressionAttributeValues"));
+                r.expressionAttributeValues = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("ExpressionAttributeValues"));
             }
             return r;
         }

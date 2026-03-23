@@ -36,7 +36,8 @@ namespace AwsMock::Database {
      */
     class SQSMemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -98,13 +99,17 @@ namespace AwsMock::Database {
         Entity::SQS::Queue GetQueueById(const std::string &oid);
 
         /**
-         * @brief List all available queues
+         * @brief Get a paged and sorted list of all available queues
          *
+         * @param prefix queue name prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sort columns
          * @param region AWS region
-         * @return List of SQS queues
+         * @return list of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ListQueues(const std::string &region = {});
+        Entity::SQS::QueueList ListQueues(const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}, const std::string &region = {});
 
         /**
          * @brief List available queues, using paging
@@ -446,7 +451,8 @@ namespace AwsMock::Database {
          */
         Entity::SQS::QueueList QueuesToVector();
 
-    private:
+      private:
+
         /**
          * SQS queue vector, when running without database
          */
@@ -468,6 +474,6 @@ namespace AwsMock::Database {
         static boost::mutex _sqsMessageMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SQS_MEMORYDB_H

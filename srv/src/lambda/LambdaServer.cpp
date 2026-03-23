@@ -207,7 +207,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaServer::BackupLambda() {
-        ModuleService::BackupModule("lambda", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("lambda", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

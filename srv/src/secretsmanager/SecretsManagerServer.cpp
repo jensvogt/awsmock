@@ -35,7 +35,7 @@ namespace AwsMock::Service {
     }
 
     void SecretsManagerServer::BackupSecretsManger() {
-        ModuleService::BackupModule("secretsmanager", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("secretsmanager", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void SecretsManagerServer::Shutdown() {
@@ -43,4 +43,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("secretsmanager-monitoring");
         _scheduler.Shutdown("secretsmanager-backup");
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

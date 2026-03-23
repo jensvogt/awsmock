@@ -158,7 +158,7 @@ namespace AwsMock::Service {
     }
 
     void SQSServer::BackupSqs() {
-        ModuleService::BackupModule("sqs", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("sqs", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void SQSServer::Shutdown() {

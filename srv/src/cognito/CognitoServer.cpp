@@ -50,7 +50,7 @@ namespace AwsMock::Service {
     }
 
     void CognitoServer::BackupCognito() {
-        ModuleService::BackupModule("cognito", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("cognito", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void CognitoServer::Shutdown() {
@@ -58,4 +58,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("cognito-backup");
         log_info << "Cognito server stopped";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

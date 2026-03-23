@@ -72,7 +72,8 @@ namespace AwsMock::Monitoring {
      */
     class MetricSystemCollector {
 
-    public:
+      public:
+
         /**
          * @brief Constructor.
          */
@@ -175,7 +176,8 @@ namespace AwsMock::Monitoring {
 
 #endif
 
-    private:
+      private:
+
         /**
          * Number of cores
          */
@@ -248,6 +250,6 @@ namespace AwsMock::Monitoring {
         int _period = 60;
     };
 
-} // namespace AwsMock::Monitoring
+}// namespace AwsMock::Monitoring
 
-#endif
+#endif// AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H

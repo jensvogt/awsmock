@@ -151,6 +151,17 @@ namespace AwsMock::Database {
         bool ItemExists(const Entity::DynamoDb::Item &item);
 
         /**
+         * @brief Checks the existence of an item.
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @param keys item keys
+         * @return true if the database exists, otherwise false
+         * @throws DatabaseException
+         */
+        bool ItemExists(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys);
+
+        /**
          * @brief Returns a list of DynamoDB items
          *
          * @param region AWS region.

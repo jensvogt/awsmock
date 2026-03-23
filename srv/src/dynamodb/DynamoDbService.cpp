@@ -4,6 +4,8 @@
 
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
+#include "awsmock/dto/cognito/mapper/Mapper.h"
+
 namespace AwsMock::Service {
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const {
@@ -16,6 +18,10 @@ namespace AwsMock::Service {
 
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_debug << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
+            Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            createTableResponse.tableArn = table.arn;
+            createTableResponse.keySchemas = Dto::DynamoDb::Mapper::map(table.keySchema);
+            createTableResponse.attributeDefinitions = Dto::DynamoDb::Mapper::map(table.attributeDefinitions);
             return createTableResponse;
         }
 
@@ -56,6 +62,9 @@ namespace AwsMock::Service {
             }
 
             table = _dynamoDbDatabase.CreateTable(table);
+            createTableResponse.tableArn = table.arn;
+            createTableResponse.keySchemas = Dto::DynamoDb::Mapper::map(table.keySchema);
+            createTableResponse.attributeDefinitions = Dto::DynamoDb::Mapper::map(table.attributeDefinitions);
             log_debug << "DynamoDb table created, name: " << table.name;
 
         } catch (Core::JsonException &exc) {
@@ -271,6 +280,7 @@ namespace AwsMock::Service {
 
             Dto::DynamoDb::DeleteTableResponse deleteTableResponse = {};
             deleteTableResponse.region = table.region;
+            deleteTableResponse.tableId = table.oid;
             deleteTableResponse.tableName = table.name;
             deleteTableResponse.tableArn = table.arn;
             deleteTableResponse.itemCount = deleted;
@@ -312,6 +322,15 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
+        if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName, Dto::DynamoDb::Mapper::map(request.keys))) {
+            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+            Dto::DynamoDb::GetItemResponse getItemResponse;
+            getItemResponse.region = request.region;
+            getItemResponse.user = request.user;
+            getItemResponse.requestId = request.requestId;
+            return getItemResponse;
+        }
+
         try {
             const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, Dto::DynamoDb::Mapper::map(request.keys));
 
@@ -330,7 +349,7 @@ namespace AwsMock::Service {
 
     Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(Dto::DynamoDb::PutItemRequest &request) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "put_item");
-        log_info << "Start put item, region: " << request.region << " name: " << request.tableName;
+        log_debug << "Start put item, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
@@ -390,22 +409,31 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::DynamoToMongoTranslator::DynamoRequest dynamoRequest;
-            dynamoRequest.attrNames = request.expressionAttributeNames;
-            for (auto &[fst, snd]: request.expressionAttributeValues) {
-                if (fst == "S") {
-                    dynamoRequest.attrValues[fst] = snd.expressionAttributeValues[fst];
-                }
-            }
+            // Add table name
+            std::string expression = CreateExpression(request.keyConditionExpression);
+            ExpressionAttributeValues attrs = CreateAttributeValues(request.tableName, request.expressionAttributeValues);
 
-            std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase.ExecuteQuery(dynamoRequest, true, 100);
+            // Create a MongoDB filter from DynamodDb query
+            auto filter = ToMongoFilter(expression, attrs);
+            log_debug << "MongoDB query: " << bsoncxx::to_json(filter);
 
+            // Query database
+            std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase.ExecuteQuery(filter, true, request.limit);
+
+            // Prepare response
             Dto::DynamoDb::QueryResponse queryResponse;
+            queryResponse.tableName = request.tableName;
+            for (const auto &item: items) {
+                queryResponse.items.emplace_back(Dto::DynamoDb::Mapper::map(item.attributes));
+            }
             return queryResponse;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb query failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb query failed, error: " + exc.message());
+        } catch (Core::DynamoDbParseException &exc) {
+            log_error << "DynamoDb query parsing failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDb query parsing failed, error: " + std::string(exc.message()));
         }
     }
 
@@ -498,4 +526,22 @@ namespace AwsMock::Service {
         }
     }
 
+    std::string DynamoDbService::CreateExpression(const std::string &inputExpression) {
+        std::string expression = Core::StringUtils::ReplaceCopy(inputExpression, "AMZN_MAPPED_", "");
+        expression = Core::StringUtils::ReplaceCopy(expression, "#", "");
+        return "tableName = :tableName AND " + expression;
+    }
+
+    ExpressionAttributeValues DynamoDbService::CreateAttributeValues(const std::string &tableName, std::map<std::string, Dto::DynamoDb::AttributeValue> expressionAttributeValues) {
+
+        ExpressionAttributeValues attr;
+        for (auto &[fst, snd]: expressionAttributeValues) {
+            attr[Core::StringUtils::ReplaceCopy(fst, "AMZN_MAPPED_", "")] = snd;
+        }
+        Dto::DynamoDb::AttributeValue tableAttributeValue;
+        tableAttributeValue.type = "S";
+        tableAttributeValue.stringValue = tableName;
+        attr[":tableName"] = tableAttributeValue;
+        return attr;
+    }
 }// namespace AwsMock::Service
