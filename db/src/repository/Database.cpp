@@ -43,6 +43,12 @@ namespace AwsMock::Database {
             {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}, false}},
             {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}, false}},
             {"monitoring_idx3", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}}, false}},
+            // DynamoDb tables
+            {"dynamodb_table_idx1", {"dynamodb_table", {{"region", 1}, {"name", 1}}, true}},
+            {"dynamodb_table_idx2", {"dynamodb_table", {{"region", 1}, {"name", 1}, {"itemCount", -1}}, false}},
+            // DynamoDb tables
+            {"dynamodb_item_idx1", {"dynamodb_item", {{"tableName", 1}}, false}},
+            {"dynamodb_item_idx2", {"dynamodb_item", {{"tableName", 1}, {"keys", 1}}, false}},
     };
 
     DatabaseBase::DatabaseBase() : _useDatabase(false) {

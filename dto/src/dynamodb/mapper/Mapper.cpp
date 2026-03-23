@@ -184,6 +184,14 @@ namespace AwsMock::Dto::DynamoDb {
         return keySchemaDto;
     }
 
+    std::vector<KeySchema> Mapper::map(const std::vector<Database::Entity::DynamoDb::KeySchema> &keySchemaEntities) {
+        std::vector<KeySchema> keySchemasDtos;
+        for (const auto &keySchemaEntity: keySchemaEntities) {
+            keySchemasDtos.emplace_back(map(keySchemaEntity));
+        }
+        return keySchemasDtos;
+    }
+
     // Attribute definition entity -> DTO
     Database::Entity::DynamoDb::AttributeDefinition Mapper::map(const AttributeDefinition &attributeDefinitionDto) {
         Database::Entity::DynamoDb::AttributeDefinition attributeDefinitionEntity;
@@ -198,6 +206,14 @@ namespace AwsMock::Dto::DynamoDb {
         attributeDefinitionDto.attributeName = attributeDefinitionEntity.attributeName;
         attributeDefinitionDto.attributeType = attributeDefinitionEntity.attributeType;
         return attributeDefinitionDto;
+    }
+
+    std::vector<AttributeDefinition> Mapper::map(const std::vector<Database::Entity::DynamoDb::AttributeDefinition> &attributeDefinitions) {
+        std::vector<AttributeDefinition> attributeDefinitionsDto;
+        for (const auto &attributeDefinition: attributeDefinitions) {
+            attributeDefinitionsDto.emplace_back(map(attributeDefinition));
+        }
+        return attributeDefinitionsDto;
     }
 
     // Attribute value DTO -> entity

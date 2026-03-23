@@ -43,7 +43,7 @@ namespace AwsMock::Service {
     }
 
     void SSMServer::BackupSsm() {
-        ModuleService::BackupModule("ssm", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("ssm", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void SSMServer::Shutdown() {

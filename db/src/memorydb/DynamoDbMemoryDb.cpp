@@ -145,6 +145,13 @@ namespace AwsMock::Database {
                                     }) != _items.end();
     }
 
+    bool DynamoDbMemoryDb::ItemExists(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) {
+        return std::ranges::find_if(_items,
+                                    [region, tableName, keys](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
+                                        return i.second.region == region && i.second.tableName == tableName && i.second.keys == keys;
+                                    }) != _items.end();
+    }
+
     Entity::DynamoDb::ItemList DynamoDbMemoryDb::ListItems(const std::string &region, const std::string &tableName) const {
 
         Entity::DynamoDb::ItemList items;

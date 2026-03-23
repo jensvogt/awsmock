@@ -89,7 +89,7 @@ namespace AwsMock::Service {
 
                     Dto::DynamoDb::GetItemRequest itemRequest = Dto::DynamoDb::GetItemRequest::FromJson(clientCommand);
                     Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
-                    log_info << "Get item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", feature: " << itemRequest.keys["featureName"].stringValue;
+                    log_info << "Get item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName;
                     return SendResponse(request, http::status::ok, itemResponse.ToJson());
                 }
 

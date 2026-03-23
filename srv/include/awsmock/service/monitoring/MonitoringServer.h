@@ -11,9 +11,10 @@
 #include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
+#include <awsmock/service/monitoring/MetricDockerCollector.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
-#include <awsmock/service/monitoring/MonitoringService.h>
 #include <awsmock/service/monitoring/MonitoringCollector.h>
+#include <awsmock/service/monitoring/MonitoringService.h>
 
 namespace AwsMock::Service {
 
@@ -24,7 +25,8 @@ namespace AwsMock::Service {
      */
     class MonitoringServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -41,7 +43,8 @@ namespace AwsMock::Service {
          */
         [[maybe_unused]] void DeleteMonitoringData() const;
 
-    private:
+      private:
+
         /**
          * @brief Shutdown the server
          */
@@ -63,6 +66,11 @@ namespace AwsMock::Service {
         Monitoring::MetricSystemCollector _metricSystemCollector;
 
         /**
+         * Monitoring docker collector
+         */
+        Monitoring::MetricDockerCollector _metricDockerCollector;
+
+        /**
          * Database connection
          */
         Database::MonitoringDatabase &_monitoringDatabase = Database::MonitoringDatabase::instance();
@@ -73,6 +81,6 @@ namespace AwsMock::Service {
         Monitoring::MonitoringCollector _monitoringCollector;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVER_H

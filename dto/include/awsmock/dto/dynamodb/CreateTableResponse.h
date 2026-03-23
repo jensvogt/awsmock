@@ -97,17 +97,17 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Key schema
          */
-        std::vector<std::map<std::string, std::string>> keySchemas;
+        std::vector<KeySchema> keySchemas;
 
         /**
          * Tags
          */
-        std::vector<std::map<std::string, std::string>> tags;
+        std::map<std::string, std::string> tags;
 
         /**
          * Attribute definitions
          */
-        std::vector<std::map<std::string, std::string>> attributes;
+        std::vector<AttributeDefinition> attributeDefinitions;
 
         /**
          * Table status
@@ -126,25 +126,13 @@ namespace AwsMock::Dto::DynamoDb {
                 r.itemCount = Core::Json::GetLongValue(tableObject, "ItemCount");
                 r.tableStatus = TableStatusTypeFromString(Core::Json::GetStringValue(tableObject, "TableStatus"));
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
-                    r.tags = boost::json::value_to<std::vector<std::map<std::string, std::string>>>(tableObject.at("Tags"));
+                    r.tags = boost::json::value_to<std::map<std::string, std::string>>(tableObject.at("Tags"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "AttributeDefinitions")) {
-                    for (boost::json::array attributeDefinitionsArray = tableObject.at("AttributeDefinitions").as_array(); const auto &a: attributeDefinitionsArray) {
-                        boost::json::object attributeDefinitionObject = a.as_object();
-                        std::map<std::string, std::string> attributeDefinition;
-                        attributeDefinition["AttributeName"] = a.at("AttributeName").as_string();
-                        attributeDefinition["AttributeType"] = a.at("AttributeType").as_string();
-                        r.attributes.push_back(std::move(attributeDefinition));
-                    }
+                    r.attributeDefinitions = boost::json::value_to<std::vector<AttributeDefinition>>(tableObject.at("AttributeDefinitions"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "KeySchema")) {
-                    for (boost::json::array attributeDefinitionsArray = tableObject.at("KeySchema").as_array(); const auto &a: attributeDefinitionsArray) {
-                        boost::json::object attributeDefinitionObject = a.as_object();
-                        std::map<std::string, std::string> keySchema;
-                        keySchema["AttributeName"] = a.at("AttributeName").as_string();
-                        keySchema["KeyType"] = a.at("KeyType").as_string();
-                        r.keySchemas.emplace_back(keySchema);
-                    }
+                    r.keySchemas = boost::json::value_to<std::vector<KeySchema>>(tableObject.at("KeySchema"));
                 }
             }
             return r;
@@ -162,24 +150,10 @@ namespace AwsMock::Dto::DynamoDb {
                 jv.as_object()["Tags"] = boost::json::value_from(obj.tags);
             }
             if (!obj.keySchemas.empty()) {
-                boost::json::array jvKeySchema;
-                for (const auto &k: obj.keySchemas) {
-                    boost::json::object jvKeySchemaItem;
-                    jvKeySchemaItem["AttributeName"] = k.at("AttributeName");
-                    jvKeySchemaItem["KeyType"] = k.at("KeyType");
-                    jvKeySchema.push_back(std::move(jvKeySchemaItem));
-                }
-                jv.as_object()["KeySchema"] = jvKeySchema;
+                jv.as_object()["KeySchema"] = boost::json::value_from(obj.keySchemas);
             }
-            if (!obj.attributes.empty()) {
-                boost::json::array jvAttributeArray;
-                for (const auto &a: obj.attributes) {
-                    boost::json::object jvAttributeItem;
-                    jvAttributeItem["AttributeName"] = a.at("AttributeName");
-                    jvAttributeItem["AttributeType"] = a.at("AttributeType");
-                    jvAttributeArray.push_back(std::move(jvAttributeItem));
-                }
-                jv.as_object()["AttributeDefinitions"] = jvAttributeArray;
+            if (!obj.attributeDefinitions.empty()) {
+                jv.as_object()["AttributeDefinitions"] = boost::json::value_from(obj.attributeDefinitions);
             }
         }
     };

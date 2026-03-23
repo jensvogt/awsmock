@@ -11,10 +11,13 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/repository/DynamoDbToMongoTranslator.h>
 #include <awsmock/utils/SortColumn.h>
+
+#define QUERY_SIZE_LIMIT 1024 * 1024
 
 namespace AwsMock::Database {
 
@@ -25,7 +28,8 @@ namespace AwsMock::Database {
      */
     class DynamoDbDatabase : public DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -169,6 +173,17 @@ namespace AwsMock::Database {
         [[nodiscard]] bool ItemExists(const Entity::DynamoDb::Item &item) const;
 
         /**
+         * @brief Checks the existence of an item.
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @param keys item keys
+         * @return true if the database exists, otherwise false
+         * @throws DatabaseException
+         */
+        bool ItemExists(const std::string &region, const std::string &tableName, std::map<std::string, Entity::DynamoDb::AttributeValue> keys) const;
+
+        /**
          * @brief Returns a list of DynamoDB items
          *
          * @param region AWS region.
@@ -244,6 +259,7 @@ namespace AwsMock::Database {
          * @param limit query limit
          */
         [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
+        std::vector<Entity::DynamoDb::Item> ExecuteQuery(const value &filter, bool scanIndexForward, int limit) const;
 
         void AdjustItemCounters() const;
 
@@ -275,7 +291,8 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllItems() const;
 
-    private:
+      private:
+
         /**
          * @brief Database name
          */
@@ -302,6 +319,6 @@ namespace AwsMock::Database {
         DynamoDbMemoryDb &_memoryDb;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H

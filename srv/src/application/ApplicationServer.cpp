@@ -121,7 +121,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::BackupApplication() {
-        ModuleService::BackupModule("application", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("application", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void ApplicationServer::RestartApplications() const {
@@ -207,4 +207,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

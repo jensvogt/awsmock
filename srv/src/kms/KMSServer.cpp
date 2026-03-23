@@ -58,7 +58,7 @@ namespace AwsMock::Service {
     }
 
     void KMSServer::BackupKms() {
-        ModuleService::BackupModule("kms", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("kms", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void KMSServer::Shutdown() {
@@ -68,4 +68,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("kms-backup");
         log_info << "KMS server stopped";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

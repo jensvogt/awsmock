@@ -12,14 +12,14 @@ namespace AwsMock::Service {
         const int retentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.retention");
 
         // Start monitoring system collector
-        _scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
+        _scheduler.AddTask("monitoring-system-collector", [this] { _metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
-        _scheduler.AddTask("monitoring-docker-collector", [] { CollectDockerCounter(); }, systemPeriod);
+        _scheduler.AddTask("monitoring-docker-collector", [this] { _metricDockerCollector.CollectDockerCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
         // Start the database cleanup worker thread every day
-        _scheduler.AddTask("monitoring-cleanup-database", [this] { this->DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
+        _scheduler.AddTask("monitoring-cleanup-database", [this] { DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
         log_debug << "Cleanup started";
 
         // Connect stop signal
@@ -45,45 +45,6 @@ namespace AwsMock::Service {
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;
     }
 
-    void MonitoringServer::CollectDockerCounter() {
-
-        // Get the container list
-        if (const std::vector<Dto::Docker::Container> containers = ContainerService::instance().ListContainers().containerList; !containers.empty()) {
-
-            for (const auto &container: containers) {
-
-                // Sanitize name
-                std::string containerName = container.image;
-                if (Core::StringUtils::Contains(containerName, ":")) {
-                    containerName = containerName.substr(0, containerName.find(':'));
-                }
-                if (Core::StringUtils::StartsWith(containerName, "/")) {
-                    containerName = containerName.substr(1);
-                }
-
-                // Get statistics
-                const Dto::Docker::ContainerStat stats = ContainerService::instance().GetContainerStats(container.id);
-
-                // CPU
-                if (const double timeDiff = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(stats.read - stats.preRead).count()); timeDiff > 0) {
-                    const auto numCpus = static_cast<double>(stats.cpuStats.onlineCpus);
-                    const auto cpuDelta = static_cast<double>(stats.cpuStats.cpuUsage.total - stats.preCpuStats.cpuUsage.total);
-                    if (numCpus > 0) {
-                        const auto cpuPercent = cpuDelta / timeDiff / numCpus * 100.0;
-                        Core::EventBus::instance().sigMetricGauge(DOCKER_CPU_TOTAL, "container", containerName, static_cast<double>(containers.size()));
-                    }
-
-                    // Memory
-                    const auto availableMem = static_cast<double>(stats.memoryStats.limit);
-                    const auto usedMem = static_cast<double>(stats.memoryStats.usage - stats.memoryStats.stats.cache);
-                    const auto memPercent = usedMem / availableMem * 100.0;
-                    Core::EventBus::instance().sigMetricGauge(DOCKER_MEMORY_TOTAL, "container", containerName, memPercent);
-                }
-            }
-            Core::EventBus::instance().sigMetricGauge(DOCKER_CONTAINER_COUNT, {}, {}, static_cast<double>(containers.size()));
-        }
-    }
-
     void MonitoringServer::Shutdown() {
         log_debug << "Monitoring server shutdown";
         _scheduler.Shutdown("monitoring-system-collector");
@@ -93,4 +54,4 @@ namespace AwsMock::Service {
         log_info << "Monitoring server stopped";
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
