@@ -172,7 +172,7 @@ namespace AwsMock::Database {
         // act
         std::vector<Entity::DynamoDb::Item> items = dynamoDbDatabase.ListItems();
 
-        item = dynamoDbDatabase.GetItemByKeys(table.region, table.name, keys);
+        item = dynamoDbDatabase.GetItemByKeys(table.region, table.name, TODO, TODO);
 
         // assert
         BOOST_CHECK_EQUAL(false, item.keys.empty());
@@ -213,7 +213,7 @@ namespace AwsMock::Database {
         BOOST_CHECK_EQUAL(false, item.oid.empty());
 
         // act
-        dynamoDbDatabase.DeleteItem(TEST_TABLE_REGION, TEST_TABLE_NAME, item.keys);
+        dynamoDbDatabase.DeleteItem(TEST_TABLE_REGION, TEST_TABLE_NAME, TODO, TODO);
         const long count = dynamoDbDatabase.CountItems(TEST_TABLE_REGION, TEST_TABLE_NAME);
 
         // assert

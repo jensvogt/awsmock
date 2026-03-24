@@ -13,6 +13,7 @@
 
 // AwsMock includes
 #include "model/AttributeValue.h"
+#include "model/Item.h"
 
 
 #include <awsmock/core/JsonUtils.h>
@@ -43,14 +44,14 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Item array
          */
-        std::map<std::string, AttributeValue> attributes;
+        std::unordered_map<std::string, AttributeValue> attributes;
 
       private:
 
         friend DeleteItemResponse tag_invoke(boost::json::value_to_tag<DeleteItemResponse>, boost::json::value const &v) {
             DeleteItemResponse r;
             if (Core::Json::AttributeExists(v, "Attributes")) {
-                r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("Attributes"));
+                r.attributes = boost::json::value_to<std::unordered_map<std::string, AttributeValue>>(v.at("Attributes"));
             }
             return r;
         }

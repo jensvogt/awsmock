@@ -45,6 +45,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::Item
          */
         static Database::Entity::DynamoDb::Item map(const DeleteItemRequest &request);
+        static Database::Entity::DynamoDb::DynamoValue mapAttribute(const AttributeValue &attr);
 
         /**
          * @brief Maps a DynamoDB PutItemRequest to an entity, which can be saved in the database.
@@ -65,6 +66,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::AttributeValue
          */
         static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::AttributeValue> &attributeValue);
+        static std::unordered_map<std::string, AttributeValue> map(const std::unordered_map<std::string, Database::Entity::DynamoDb::DynamoValue> &attributes);
 
         /**
          * @brief Maps a DynamoDB item attribute entity to an item attribute DTO.
@@ -82,7 +84,8 @@ namespace AwsMock::Dto::DynamoDb {
          * @param attributeValueDto attribute value DTO
          * @return attribute value entity
          */
-        static Database::Entity::DynamoDb::AttributeValue map(const AttributeValue &attributeValueDto);
+        static Database::Entity::DynamoDb::DynamoValue map(const AttributeValue &attributeValueDto);
+        static AttributeValue map(const Database::Entity::DynamoDb::DynamoValue &dv);
 
         /**
          * @brief Maps a DynamoDB item entity to an item DTO.

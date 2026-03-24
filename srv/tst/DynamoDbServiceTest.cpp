@@ -26,32 +26,38 @@ namespace AwsMock::Database {
 
         // First attribute
         Dto::DynamoDb::AttributeDefinition attribute1;
-        attribute1.attributeName = "test-attribute-1";
+        attribute1.attributeName = "webSite";
         attribute1.attributeType = "S";
         attributes.push_back(attribute1);
 
-        // First attribute
+        // Second attribute
         Dto::DynamoDb::AttributeDefinition attribute2;
-        attribute2.attributeName = "test-attribute-2";
+        attribute2.attributeName = "town";
         attribute2.attributeType = "S";
         attributes.push_back(attribute2);
 
-        // First attribute
+        // Third attribute
         Dto::DynamoDb::AttributeDefinition attribute3;
-        attribute3.attributeName = "test-attribute-3";
+        attribute3.attributeName = "street";
         attribute3.attributeType = "S";
         attributes.push_back(attribute3);
+
+        // Fourth attribute
+        Dto::DynamoDb::AttributeDefinition attribute4;
+        attribute4.attributeName = "streetNo";
+        attribute4.attributeType = "N";
+        attributes.push_back(attribute4);
 
         // Key schemas
         std::vector<Dto::DynamoDb::KeySchema> keySchemas;
 
         Dto::DynamoDb::KeySchema keySchema1;
-        keySchema1.attributeName = "test-attribute-1";
+        keySchema1.attributeName = "datenlieferantId";
         keySchema1.keyType = "HASH";
         keySchemas.push_back(keySchema1);
 
         Dto::DynamoDb::KeySchema keySchema2;
-        keySchema2.attributeName = "test-attribute-2";
+        keySchema2.attributeName = "ean";
         keySchema2.keyType = "RANGE";
         keySchemas.push_back(keySchema2);
 
@@ -73,12 +79,6 @@ namespace AwsMock::Database {
         attribute.type = "N";
         attribute.numberValue = std::to_string(value);
         return attribute;
-    }
-
-    std::vector<Dto::DynamoDb::AttributeValue> CreateDefaultAttributes(const std::string &attributeName, const std::string &value) {
-        std::vector<Dto::DynamoDb::AttributeValue> attributes;
-        attributes.push_back(CreateDefaultAttributeValue(value));
-        return attributes;
     }
 
     struct DynamoDbServiceFixture {
@@ -117,11 +117,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest;
         putRequest.region = TEST_REGION;
         putRequest.tableName = TEST_TABLE;
-        putRequest.keys["test-key-1"] = CreateDefaultAttributeValue("test-value-1");
-        putRequest.keys["test-key-2"] = CreateDefaultAttributeValue("test-value-2");
-        putRequest.attributes["test-attribute-1"] = CreateDefaultAttributeValue("test-value-1");
-        putRequest.attributes["test-attribute-2"] = CreateDefaultAttributeValue("test-value-2");
-        putRequest.attributes["test-attribute-3"] = CreateDefaultAttributeValue("test-value-3");
+        putRequest.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI333");
+        putRequest.attributes["ean"] = CreateDefaultAttributeValue("ABC");
+        putRequest.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/public");
+        putRequest.attributes["town"] = CreateDefaultAttributeValue("Hamburg");
+        putRequest.attributes["street"] = CreateDefaultAttributeValue("Elbchaussee");
+        putRequest.attributes["streetNo"] = CreateDefaultAttributeValue(265);
 
         // act
         const Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest);
@@ -129,7 +130,9 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, putResponse.item.tableName.empty());
         BOOST_CHECK_EQUAL(false, putResponse.item.attributes.empty());
-        BOOST_CHECK_EQUAL(false, putResponse.item.keys.empty());
+        BOOST_CHECK_EQUAL(6, putResponse.item.attributes.size());
+        BOOST_CHECK_EQUAL("DLI333", putResponse.item.attributes.at("datenlieferantId").stringValue);
+        BOOST_CHECK_EQUAL("ABC", putResponse.item.attributes.at("ean").stringValue);
     }
 
     BOOST_AUTO_TEST_CASE(QueryItemTest1) {
@@ -141,7 +144,6 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest;
         putRequest.region = TEST_REGION;
         putRequest.tableName = TEST_TABLE;
-        putRequest.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         const Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest);
 
@@ -172,9 +174,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest1;
         putRequest1.region = TEST_REGION;
         putRequest1.tableName = TEST_TABLE;
-        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        putRequest1.attributes["ean"] = CreateDefaultAttributeValue("ABC");
+        putRequest1.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/public");
+        putRequest1.attributes["town"] = CreateDefaultAttributeValue("Hamburg");
+        putRequest1.attributes["street"] = CreateDefaultAttributeValue("Elbchaussee");
+        putRequest1.attributes["streetNo"] = CreateDefaultAttributeValue(265);
         Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -182,9 +187,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest2;
         putRequest2.region = TEST_REGION;
         putRequest2.tableName = TEST_TABLE;
-        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest2.attributes["value"] = CreateDefaultAttributeValue(2);
+        putRequest2.attributes["ean"] = CreateDefaultAttributeValue("DEF");
+        putRequest2.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/private");
+        putRequest2.attributes["town"] = CreateDefaultAttributeValue("Berlin");
+        putRequest2.attributes["street"] = CreateDefaultAttributeValue("Einsteinstrasse");
+        putRequest2.attributes["streetNo"] = CreateDefaultAttributeValue(32);
         putResponse = _dynamoDbService.PutItem(putRequest2);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -192,11 +200,11 @@ namespace AwsMock::Database {
         Dto::DynamoDb::QueryRequest queryRequest;
         queryRequest.region = TEST_REGION;
         queryRequest.tableName = TEST_TABLE;
-        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value = :AMZN_MAPPED_value";
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_ean = :AMZN_MAPPED_ean";
         queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
-        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_ean"] = "ean";
         queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(2);
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_ean"] = CreateDefaultAttributeValue("ABC");
 
         // act
         const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
@@ -204,6 +212,8 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
         BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
+        BOOST_CHECK_EQUAL(1, queryResponse.items.size());
+        BOOST_CHECK_EQUAL("ABC", queryResponse.items.at(0).at("ean").stringValue);
     }
 
     BOOST_AUTO_TEST_CASE(QueryItemTest3) {
@@ -217,9 +227,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest1;
         putRequest1.region = TEST_REGION;
         putRequest1.tableName = TEST_TABLE;
-        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        putRequest1.attributes["ean"] = CreateDefaultAttributeValue("ABC");
+        putRequest1.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/public");
+        putRequest1.attributes["town"] = CreateDefaultAttributeValue("Hamburg");
+        putRequest1.attributes["street"] = CreateDefaultAttributeValue("Elbchaussee");
+        putRequest1.attributes["streetNo"] = CreateDefaultAttributeValue(265);
         Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -227,9 +240,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest2;
         putRequest2.region = TEST_REGION;
         putRequest2.tableName = TEST_TABLE;
-        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest2.attributes["value"] = CreateDefaultAttributeValue(2);
+        putRequest2.attributes["ean"] = CreateDefaultAttributeValue("DEF");
+        putRequest2.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/private");
+        putRequest2.attributes["town"] = CreateDefaultAttributeValue("Berlin");
+        putRequest2.attributes["street"] = CreateDefaultAttributeValue("Einsteinstrasse");
+        putRequest2.attributes["streetNo"] = CreateDefaultAttributeValue(32);
         putResponse = _dynamoDbService.PutItem(putRequest2);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -237,11 +253,11 @@ namespace AwsMock::Database {
         Dto::DynamoDb::QueryRequest queryRequest;
         queryRequest.region = TEST_REGION;
         queryRequest.tableName = TEST_TABLE;
-        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value > :AMZN_MAPPED_value";
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_ean > :AMZN_MAPPED_ean";
         queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
-        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_ean"] = "ean";
         queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(1);
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_ean"] = CreateDefaultAttributeValue("ABC");
 
         // act
         const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
@@ -249,7 +265,8 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
         BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
-        BOOST_CHECK_EQUAL("2", queryResponse.items.at(0).at("value").numberValue);
+        BOOST_CHECK_EQUAL(1, queryResponse.items.size());
+        BOOST_CHECK_EQUAL("DEF", queryResponse.items.at(0).at("ean").stringValue);
     }
 
     BOOST_AUTO_TEST_CASE(QueryItemTest4) {
@@ -263,9 +280,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest1;
         putRequest1.region = TEST_REGION;
         putRequest1.tableName = TEST_TABLE;
-        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        putRequest1.attributes["ean"] = CreateDefaultAttributeValue("ABC");
+        putRequest1.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/public");
+        putRequest1.attributes["town"] = CreateDefaultAttributeValue("Hamburg");
+        putRequest1.attributes["street"] = CreateDefaultAttributeValue("Elbchaussee");
+        putRequest1.attributes["streetNo"] = CreateDefaultAttributeValue(265);
         Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -273,9 +293,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest2;
         putRequest2.region = TEST_REGION;
         putRequest2.tableName = TEST_TABLE;
-        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest2.attributes["value"] = CreateDefaultAttributeValue(1);
+        putRequest2.attributes["ean"] = CreateDefaultAttributeValue("DEF");
+        putRequest2.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/private");
+        putRequest2.attributes["town"] = CreateDefaultAttributeValue("Berlin");
+        putRequest2.attributes["street"] = CreateDefaultAttributeValue("Einsteinstrasse");
+        putRequest2.attributes["streetNo"] = CreateDefaultAttributeValue(32);
         putResponse = _dynamoDbService.PutItem(putRequest2);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -283,11 +306,11 @@ namespace AwsMock::Database {
         Dto::DynamoDb::QueryRequest queryRequest;
         queryRequest.region = TEST_REGION;
         queryRequest.tableName = TEST_TABLE;
-        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value < :AMZN_MAPPED_value";
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_ean < :AMZN_MAPPED_ean";
         queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
-        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_ean"] = "ean";
         queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(2);
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_ean"] = CreateDefaultAttributeValue("DEF");
 
         // act
         const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
@@ -295,7 +318,8 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
         BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
-        BOOST_CHECK_EQUAL("1", queryResponse.items.at(0).at("value").numberValue);
+        BOOST_CHECK_EQUAL(1, queryResponse.items.size());
+        BOOST_CHECK_EQUAL("ABC", queryResponse.items.at(0).at("ean").stringValue);
     }
 
     BOOST_AUTO_TEST_CASE(QueryItemTest5) {
@@ -309,9 +333,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest1;
         putRequest1.region = TEST_REGION;
         putRequest1.tableName = TEST_TABLE;
-        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        putRequest1.attributes["ean"] = CreateDefaultAttributeValue("ABC");
+        putRequest1.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/public");
+        putRequest1.attributes["town"] = CreateDefaultAttributeValue("Hamburg");
+        putRequest1.attributes["street"] = CreateDefaultAttributeValue("Elbchaussee");
+        putRequest1.attributes["streetNo"] = CreateDefaultAttributeValue(265);
         Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -319,9 +346,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest2;
         putRequest2.region = TEST_REGION;
         putRequest2.tableName = TEST_TABLE;
-        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
         putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest2.attributes["value"] = CreateDefaultAttributeValue(2);
+        putRequest2.attributes["ean"] = CreateDefaultAttributeValue("DEF");
+        putRequest2.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/private");
+        putRequest2.attributes["town"] = CreateDefaultAttributeValue("Berlin");
+        putRequest2.attributes["street"] = CreateDefaultAttributeValue("Einsteinstrasse");
+        putRequest2.attributes["streetNo"] = CreateDefaultAttributeValue(32);
         putResponse = _dynamoDbService.PutItem(putRequest2);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -329,11 +359,11 @@ namespace AwsMock::Database {
         Dto::DynamoDb::QueryRequest queryRequest;
         queryRequest.region = TEST_REGION;
         queryRequest.tableName = TEST_TABLE;
-        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value >= :AMZN_MAPPED_value";
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_ean >= :AMZN_MAPPED_ean";
         queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
-        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_ean"] = "ean";
         queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(2);
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_ean"] = CreateDefaultAttributeValue("ABC");
 
         // act
         const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
@@ -341,7 +371,9 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
         BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
-        BOOST_CHECK_EQUAL("2", queryResponse.items.at(0).at("value").numberValue);
+        BOOST_CHECK_EQUAL(2, queryResponse.items.size());
+        BOOST_CHECK_EQUAL("ABC", queryResponse.items.at(0).at("ean").stringValue);
+        BOOST_CHECK_EQUAL("DEF", queryResponse.items.at(1).at("ean").stringValue);
     }
 
     BOOST_AUTO_TEST_CASE(QueryItemTest6) {
@@ -355,10 +387,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest1;
         putRequest1.region = TEST_REGION;
         putRequest1.tableName = TEST_TABLE;
-        putRequest1.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest1.keys["ean"] = CreateDefaultAttributeValue("ABC");
         putRequest1.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest1.attributes["value"] = CreateDefaultAttributeValue(1);
+        putRequest1.attributes["ean"] = CreateDefaultAttributeValue("ABC");
+        putRequest1.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/public");
+        putRequest1.attributes["town"] = CreateDefaultAttributeValue("Hamburg");
+        putRequest1.attributes["street"] = CreateDefaultAttributeValue("Elbchaussee");
+        putRequest1.attributes["streetNo"] = CreateDefaultAttributeValue(265);
         Dto::DynamoDb::PutItemResponse putResponse = _dynamoDbService.PutItem(putRequest1);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -366,10 +400,12 @@ namespace AwsMock::Database {
         Dto::DynamoDb::PutItemRequest putRequest2;
         putRequest2.region = TEST_REGION;
         putRequest2.tableName = TEST_TABLE;
-        putRequest2.keys["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest1.keys["ean"] = CreateDefaultAttributeValue("DEF");
         putRequest2.attributes["datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        putRequest2.attributes["value"] = CreateDefaultAttributeValue(1);
+        putRequest2.attributes["ean"] = CreateDefaultAttributeValue("DEF");
+        putRequest2.attributes["webSite"] = CreateDefaultAttributeValue("http://DLI2361/private");
+        putRequest2.attributes["town"] = CreateDefaultAttributeValue("Berlin");
+        putRequest2.attributes["street"] = CreateDefaultAttributeValue("Einsteinstrasse");
+        putRequest2.attributes["streetNo"] = CreateDefaultAttributeValue(32);
         putResponse = _dynamoDbService.PutItem(putRequest2);
         BOOST_CHECK_EQUAL(TEST_TABLE, putResponse.item.tableName);
 
@@ -377,11 +413,11 @@ namespace AwsMock::Database {
         Dto::DynamoDb::QueryRequest queryRequest;
         queryRequest.region = TEST_REGION;
         queryRequest.tableName = TEST_TABLE;
-        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_value <= :AMZN_MAPPED_value";
+        queryRequest.keyConditionExpression = "#AMZN_MAPPED_datenlieferantId = :AMZN_MAPPED_datenlieferantId AND #AMZN_MAPPED_ean <= :AMZN_MAPPED_ean";
         queryRequest.expressionAttributeNames["#AMZN_MAPPED_datenlieferantId"] = "datenlieferantId";
-        queryRequest.expressionAttributeNames["#AMZN_MAPPED_value"] = "value";
+        queryRequest.expressionAttributeNames["#AMZN_MAPPED_ean"] = "ean";
         queryRequest.expressionAttributeValues[":AMZN_MAPPED_datenlieferantId"] = CreateDefaultAttributeValue("DLI2361");
-        queryRequest.expressionAttributeValues[":AMZN_MAPPED_value"] = CreateDefaultAttributeValue(2);
+        queryRequest.expressionAttributeValues[":AMZN_MAPPED_ean"] = CreateDefaultAttributeValue("DEF");
 
         // act
         const Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
@@ -389,7 +425,9 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, queryResponse.tableName.empty());
         BOOST_CHECK_EQUAL(false, queryResponse.items.empty());
-        BOOST_CHECK_EQUAL("1", queryResponse.items.at(0).at("value").numberValue);
+        BOOST_CHECK_EQUAL(2, queryResponse.items.size());
+        BOOST_CHECK_EQUAL("ABC", queryResponse.items.at(0).at("ean").stringValue);
+        BOOST_CHECK_EQUAL("DEF", queryResponse.items.at(1).at("ean").stringValue);
     }
 
     BOOST_AUTO_TEST_CASE(DeleteTableTest) {

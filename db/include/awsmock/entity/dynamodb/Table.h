@@ -95,6 +95,30 @@ namespace AwsMock::Database::Entity::DynamoDb {
         system_clock::time_point modified = system_clock::now();
 
         /**
+         * @brief Get partition key name
+         */
+        [[nodiscard]] std::string GetPartitionKeyName() const {
+            for (const auto &key: keySchema) {
+                if (key.keyType == "HASH") {
+                    return key.attributeName;
+                }
+            }
+            return {};
+        }
+
+        /**
+         * @brief Get partition key name
+         */
+        [[nodiscard]] std::string GetSortKeyName() const {
+            for (const auto &key: keySchema) {
+                if (key.keyType == "RANGE") {
+                    return key.attributeName;
+                }
+            }
+            return {};
+        }
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
