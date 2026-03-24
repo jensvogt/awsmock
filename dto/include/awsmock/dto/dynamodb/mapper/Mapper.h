@@ -65,7 +65,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Dto::DynamoDb::AttributeValue
          * @see Database::Entity::DynamoDb::AttributeValue
          */
-        static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::AttributeValue> &attributeValue);
+        static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::DynamoValue> &attributeValue);
         static std::unordered_map<std::string, AttributeValue> map(const std::unordered_map<std::string, Database::Entity::DynamoDb::DynamoValue> &attributes);
 
         /**
@@ -76,7 +76,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Dto::DynamoDb::AttributeValue
          * @see Database::Entity::DynamoDb::AttributeValue
          */
-        static AttributeValue map(const Database::Entity::DynamoDb::AttributeValue &attributeValueEntity);
+        static AttributeValue map(const Database::Entity::DynamoDb::DynamoValue &attributeValueEntity);
 
         /**
          * @brief Maps a DynamoDB item attribute DTO to an item attribute entity.
@@ -85,7 +85,6 @@ namespace AwsMock::Dto::DynamoDb {
          * @return attribute value entity
          */
         static Database::Entity::DynamoDb::DynamoValue map(const AttributeValue &attributeValueDto);
-        static AttributeValue map(const Database::Entity::DynamoDb::DynamoValue &dv);
 
         /**
          * @brief Maps a DynamoDB item entity to an item DTO.
@@ -162,7 +161,7 @@ namespace AwsMock::Dto::DynamoDb {
          */
         static std::vector<AttributeDefinition> map(const std::vector<Database::Entity::DynamoDb::AttributeDefinition> &attributeDefinitions);
 
-        static std::map<std::string, Database::Entity::DynamoDb::AttributeValue> map(const std::map<std::string, AttributeValue> &keyDtos);
+        static std::map<std::string, Database::Entity::DynamoDb::DynamoValue> map(const std::map<std::string, AttributeValue> &keyDtos);
 
         /**
          * @brief Maps a DynamoDB item entity to an item counter DTO.

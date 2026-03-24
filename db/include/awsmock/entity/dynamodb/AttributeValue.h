@@ -21,59 +21,59 @@ namespace AwsMock::Database::Entity::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AttributeValue final : Common::BaseEntity<AttributeValue> {
-
-        /**
-         * String value
-         */
-        std::string stringValue;
-
-        /**
-         * String set value
-         */
-        std::vector<std::string> stringSetValue;
-
-        /**
-         * Number value
-         */
-        std::string numberValue;
-
-        /**
-         * Number set value
-         */
-        std::vector<std::string> numberSetValue;
-
-        /**
-         * Boolean value
-         */
-        bool boolValue{};
-
-        /**
-         * Null value
-         */
-        std::shared_ptr<bool> nullValue;
-
-        /**
-         * @brief Converts the entity to a MongoDB document
-         *
-         * @return entity as MongoDB document.
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
-
-        /**
-         * @brief Converts the MongoDB document to an entity
-         *
-         * @param mResult query result.
-         */
-        void FromDocument(view_or_value<view, value> mResult);
-
-        /**
-         * @brief Equality operator
-         */
-        bool operator==(const AttributeValue &other) const {
-            return stringValue == other.stringValue && boolValue == other.boolValue && numberValue == other.numberValue && stringSetValue == other.stringSetValue && numberSetValue == other.numberSetValue && boolValue == other.boolValue;
-        }
-    };
+    // struct AttributeValue final : Common::BaseEntity<AttributeValue> {
+    //
+    //     /**
+    //      * String value
+    //      */
+    //     std::string stringValue;
+    //
+    //     /**
+    //      * String set value
+    //      */
+    //     std::vector<std::string> stringSetValue;
+    //
+    //     /**
+    //      * Number value
+    //      */
+    //     std::string numberValue;
+    //
+    //     /**
+    //      * Number set value
+    //      */
+    //     std::vector<std::string> numberSetValue;
+    //
+    //     /**
+    //      * Boolean value
+    //      */
+    //     bool boolValue{};
+    //
+    //     /**
+    //      * Null value
+    //      */
+    //     std::shared_ptr<bool> nullValue;
+    //
+    //     /**
+    //      * @brief Converts the entity to a MongoDB document
+    //      *
+    //      * @return entity as MongoDB document.
+    //      */
+    //     [[nodiscard]] view_or_value<view, value> ToDocument() const override;
+    //
+    //     /**
+    //      * @brief Converts the MongoDB document to an entity
+    //      *
+    //      * @param mResult query result.
+    //      */
+    //     void FromDocument(view_or_value<view, value> mResult);
+    //
+    //     /**
+    //      * @brief Equality operator
+    //      */
+    //     bool operator==(const AttributeValue &other) const {
+    //         return stringValue == other.stringValue && boolValue == other.boolValue && numberValue == other.numberValue && stringSetValue == other.stringSetValue && numberSetValue == other.numberSetValue && boolValue == other.boolValue;
+    //     }
+    // };
 }// namespace AwsMock::Database::Entity::DynamoDb
 
 #endif// AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_VALUE_H
