@@ -180,7 +180,7 @@ namespace AwsMock::Service {
          * @param request get item request DTO
          * @return GetItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::GetItemResponse GetItem(Dto::DynamoDb::GetItemRequest &request) const;
 
         /**
          * @brief Puts an item
@@ -212,7 +212,7 @@ namespace AwsMock::Service {
          * @param request delete item request DTO
          * @return DeleteItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::DeleteItemResponse DeleteItem(Dto::DynamoDb::DeleteItemRequest &request) const;
 
         /**
          * @brief delete all items

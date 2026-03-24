@@ -399,14 +399,21 @@ namespace AwsMock::Database {
                     query.append(kvp("tableName", item.tableName));
                 }
 
-                // Primary keys
-                if (!item.keys.empty()) {
-                    document keyObject;
-                    for (const auto &[k, v]: item.keys) {
-                        keyObject.append(kvp(k, v.ToDocument()));
-                    }
-                    query.append(kvp("keys", keyObject));
-                }
+                // Partition key
+                if (item.partitionKey.index() == 0)
+                    query.append(kvp("partitionKey", std::get<std::string>(item.partitionKey)));
+                if (item.partitionKey.index() == 1)
+                    query.append(kvp("partitionKey", std::get<double>(item.partitionKey)));
+                // if (item.partitionKey.index() == 2)
+                //     query.append(kvp("partitionKey", std::get<std::vector<uint8_t>>(item.partitionKey)));
+
+                // Sort key
+                if (item.sortKey.index() == 0)
+                    query.append(kvp("sortKey", std::get<std::string>(item.sortKey)));
+                if (item.sortKey.index() == 1)
+                    query.append(kvp("sortKey", std::get<double>(item.sortKey)));
+                // if (item.sortKey.index() == 2)
+                //     query.append(kvp("sortKey", std::get<std::vector<uint8_t>>(item.sortKey)));
 
                 return _itemCollection.count_documents(query.view(), options) > 0;
 
@@ -517,7 +524,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const {
+    Entity::DynamoDb::Item DynamoDbDatabase::GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "get_item_by_key");
 
         if (HasDatabase()) {
@@ -535,12 +542,9 @@ namespace AwsMock::Database {
                 }
 
                 // Primary keys
-                if (!keys.empty()) {
-                    document keyObject;
-                    for (const auto &[k, v]: keys) {
-                        keyObject.append(kvp(k, v.ToDocument()));
-                    }
-                    query.append(kvp("keys", keyObject));
+                query.append(kvp("partitionKey", partitionKey));
+                if (!sortKey.empty()) {
+                    query.append(kvp("sortkey", sortKey));
                 }
 
                 if (const auto mResult = _itemCollection.find_one(query.view())) {
@@ -557,7 +561,7 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
         }
-        return _memoryDb.GetItemByKeys(region, tableName, keys);
+        return _memoryDb.GetItemByKeys(region, tableName, partitionKey, sortKey);
     }
 
     Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(Entity::DynamoDb::Item &item) const {
@@ -619,20 +623,21 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
 
-                Entity::DynamoDb::Item dbItem = GetItemByKeys(item.region, item.tableName, item.keys);
-                dbItem.modified = system_clock::now();
-                dbItem.attributes = item.attributes;
+                // TODO: FIx me
+                // Entity::DynamoDb::Item dbItem = GetItemByKeys(item.region, item.tableName, item.partitionKey, item.sortKey);
+                // dbItem.modified = system_clock::now();
+                // dbItem.attributes = item.attributes;
 
-                document query;
-                query.append(kvp("_id", bsoncxx::oid(dbItem.oid)));
+                // document query;
+                // query.append(kvp("_id", bsoncxx::oid(dbItem.oid)));
 
-                const auto result = _itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
-                session.commit_transaction();
-                if (result.has_value()) {
-                    item = Entity::DynamoDb::Item().FromDocument(result->view());
-                    log_debug << "DynamoDb item updated, oid: " << item.oid;
-                    return item;
-                }
+                // const auto result = _itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
+                // session.commit_transaction();
+                // if (result.has_value()) {
+                //     item = Entity::DynamoDb::Item().FromDocument(result->view());
+                //     log_debug << "DynamoDb item updated, oid: " << item.oid;
+                //     return item;
+                // }
                 return {};
             } catch (const Core::DatabaseException &exc) {
                 session.abort_transaction();
@@ -681,7 +686,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountItems(region);
     }
 
-    void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const {
+    void DynamoDbDatabase::DeleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "delete_item");
 
         if (HasDatabase()) {
@@ -694,7 +699,7 @@ namespace AwsMock::Database {
             try {
 
                 // Get the item
-                const Entity::DynamoDb::Item item = GetItemByKeys(region, tableName, keys);
+                const Entity::DynamoDb::Item item = GetItemByKeys(region, tableName, partitionKey, sortKey);
                 bsoncxx::oid id(item.oid);
 
                 session.start_transaction();
@@ -720,7 +725,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.DeleteItem(region, tableName, keys);
+            _memoryDb.DeleteItem(region, tableName, partitionKey, sortKey);
         }
     }
 

@@ -46,7 +46,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Boolean value
          */
-        std::shared_ptr<bool> boolValue;
+        bool boolValue{};
 
         /**
          * Null value

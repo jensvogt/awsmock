@@ -6,6 +6,7 @@
 #define AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
 
 // C++ includes
+#include <set>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,38 @@
 #include <awsmock/entity/dynamodb/AttributeValue.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
+
+    // Forward declare for nested types
+    struct DynamoValue;
+
+    using KeyValue = std::variant<std::string, double, std::vector<uint8_t>>;
+    using DynamoList = std::vector<std::shared_ptr<DynamoValue>>;
+    using DynamoMap = std::unordered_map<std::string, std::shared_ptr<DynamoValue>>;
+
+    // Wrapper to distinguish Binary from Binary Set
+    struct BinarySet {
+        std::vector<std::vector<uint8_t>> values;
+    };
+
+    struct DynamoValue {
+        using DynamoVariant = std::variant<
+                std::string,          // S
+                double,               // N
+                std::vector<uint8_t>, // B
+                bool,                 // BOOL
+                std::nullptr_t,       // NULL
+                std::set<std::string>,// SS
+                std::set<double>,     // NS
+                BinarySet,            // BS
+                DynamoList,           // L
+                DynamoMap             // M
+                >;
+
+        DynamoVariant value;
+    };
+
+    // Forward declaration
+    bsoncxx::types::bson_value::value DynamoValueToBson(const DynamoValue &dv);
 
     /**
      * @brief DynamoDB item primary key
@@ -51,6 +84,16 @@ namespace AwsMock::Database::Entity::DynamoDb {
         std::string tableName;
 
         /**
+         * Partition key
+         */
+        KeyValue partitionKey;
+
+        /**
+         * Sortkey key
+         */
+        KeyValue sortKey;
+
+        /**
          * Item size in bytes
          */
         long size{};
@@ -58,12 +101,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Attributes
          */
-        std::map<std::string, AttributeValue> attributes;
-
-        /**
-         * Key schemas
-         */
-        std::map<std::string, AttributeValue> keys;
+        std::unordered_map<std::string, DynamoValue> attributes;
 
         /**
          * Creation date
@@ -90,10 +128,32 @@ namespace AwsMock::Database::Entity::DynamoDb {
         Item FromDocument(const view_or_value<view, value> &mResult);
 
         /**
+         * @brief Convert keys to BSON
+         *
+         * @param kv key
+         * @return BSON object
+         */
+        static bsoncxx::types::bson_value::value KeyValueToBson(const KeyValue &kv);
+
+        /**
+         * @brief Convert keys from BSON
+         *
+         * @param val BSON object
+         * @return value
+         */
+        static KeyValue KeyValueFromBson(const bsoncxx::types::bson_value::view &val);
+
+        bsoncxx::types::bson_value::value DynamoValueToBson(const DynamoValue &dv) const;
+
+        static DynamoValue DynamoValueFromBson(const bsoncxx::types::bson_value::view &val);
+
+        static std::unordered_map<std::string, DynamoValue> AttributesFromBson(const view &doc);
+
+        /**
          * @brief Equality operator
          */
         bool operator==(const Item &other) const {
-            return keys == other.keys;
+            return partitionKey == other.partitionKey && sortKey == other.sortKey;
         }
     };
 

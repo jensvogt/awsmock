@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             Core::Bson::BsonUtils::SetIntValue(attributeDoc, "N", std::stoi(numberValue));
         }
         if (boolValue) {
-            Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "BOOL", *boolValue);
+            Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "BOOL", boolValue);
         }
         if (nullValue) {
             Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "nullptr", *nullValue);
@@ -48,7 +48,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         } else if (mResult.view().find("N") != mResult.view().end()) {
             numberValue = std::to_string(Core::Bson::BsonUtils::GetLongValue(mResult, "N"));
         } else if (mResult.view().find("BOOL") != mResult.view().end()) {
-            boolValue = std::make_shared<bool>(Core::Bson::BsonUtils::GetBoolValue(mResult, "BOOL"));
+            boolValue = Core::Bson::BsonUtils::GetBoolValue(mResult, "BOOL");
         } else if (mResult.view().find("nullptr") != mResult.view().end()) {
             nullValue = std::make_shared<bool>(Core::Bson::BsonUtils::GetBoolValue(mResult, "nullptr"));
         }

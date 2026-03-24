@@ -55,7 +55,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Boolean value
          */
-        std::shared_ptr<bool> boolValue;
+        bool boolValue;
 
         /**
          * Null value
@@ -106,7 +106,7 @@ namespace AwsMock::Dto::DynamoDb {
                             mapValue[std::string(k.get_string().value)] = a;
                         }
                     } else if (ele.key() == "BOOL") {
-                        boolValue = std::make_shared<bool>(jsonObject["BOOL"].get_bool().value);
+                        boolValue = jsonObject["BOOL"].get_bool().value;
                     } else if (ele.key() == "NULL") {
                         nullValue = std::make_shared<bool>(true);
                     }
@@ -178,7 +178,7 @@ namespace AwsMock::Dto::DynamoDb {
                 r.mapValue = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("M"));
             } else if (Core::Json::AttributeExists(v, "BOOL")) {
                 r.type = "BOOL";
-                r.boolValue = std::make_shared<bool>(Core::Json::GetBoolValue(v, "BOOL"));
+                r.boolValue = Core::Json::GetBoolValue(v, "BOOL");
             } else if (Core::Json::AttributeExists(v, "NULL")) {
                 r.type = "NULL";
                 r.nullValue = std::make_shared<bool>(Core::Json::GetBoolValue(v, "NULL"));
@@ -200,7 +200,7 @@ namespace AwsMock::Dto::DynamoDb {
             } else if (obj.type == "M") {
                 jv = {{"M", boost::json::value_from(obj.mapValue)}};
             } else if (obj.type == "BOOL" && obj.boolValue) {
-                jv = {{"BOOL", *obj.boolValue}};
+                jv = {{"BOOL", obj.boolValue}};
             } else if (obj.type == "NULL" && obj.nullValue) {
                 jv = {{"NULL", *obj.nullValue}};
             }

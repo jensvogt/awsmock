@@ -48,14 +48,14 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Attributes
          */
-        std::map<std::string, AttributeValue> attributes;
+        std::unordered_map<std::string, AttributeValue> attributes;
 
       private:
 
         friend GetItemResponse tag_invoke(boost::json::value_to_tag<GetItemResponse>, boost::json::value const &v) {
             GetItemResponse r = {};
             if (Core::Json::AttributeExists(v, "Item")) {
-                r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("Item"));
+                r.attributes = boost::json::value_to<std::unordered_map<std::string, AttributeValue>>(v.at("Item"));
             }
             return r;
         }
