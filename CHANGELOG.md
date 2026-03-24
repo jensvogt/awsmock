@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.3](https://github.com/jensvogt/awsmock/compare/v1.16.2...v1.16.3) (2026-03-24)
+
+
+### Bug Fixes
+
+* fix dynamodb attributes as variants tests ([52944f2](https://github.com/jensvogt/awsmock/commit/52944f26018fd2e130d8c4e315780238a58f62fc))
+* fix dynamodb attributes as variants tests ([90a3aea](https://github.com/jensvogt/awsmock/commit/90a3aea20486c04a2f3975741c8807db775eddba))
+
 ## [1.16.2](https://github.com/jensvogt/awsmock/compare/1.16.1...v1.16.2) (2026-03-24)
 
 
