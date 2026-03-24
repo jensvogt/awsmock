@@ -3,16 +3,12 @@
 //
 
 #include <awsmock/entity/dynamodb/Item.h>
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/basic/kvp.hpp>
-#include <bsoncxx/types/bson_value/value.hpp>
-#include <bsoncxx/types/bson_value/view.hpp>
 
 template<typename T>
 struct always_false : std::false_type {};
 
 namespace AwsMock::Database::Entity::DynamoDb {
+
     bsoncxx::types::bson_value::value Item::KeyValueToBson(const KeyValue &kv) {
 
         return std::visit([]<typename T0>(const T0 &val) -> bsoncxx::types::bson_value::value {
@@ -54,7 +50,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    bsoncxx::types::bson_value::value Item::DynamoValueToBson(const DynamoValue &dv) const {
+    bsoncxx::types::bson_value::value Item::DynamoValueToBson(const DynamoValue &val) const {
         return std::visit([this]<typename T0>(const T0 &val) -> bsoncxx::types::bson_value::value {
             using T = std::decay_t<T0>;
 
@@ -103,11 +99,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
                 return bsoncxx::types::bson_value::value{doc.view()};
 
             } else {
-                //static_assert(always_false<T>::value, "Unhandled KeyValue type");
-                throw std::logic_error("Unhandled KeyValue type");
+                throw Core::DatabaseException("Unhandled KeyValue type");
             }
         },
-                          dv.value);
+                          val.value);
     }
 
     DynamoValue Item::DynamoValueFromBson(const bsoncxx::types::bson_value::view &val) {
@@ -131,7 +126,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             }
 
             case bsoncxx::type::k_array: {
-                auto arr = val.get_array().value;
+                const auto arr = val.get_array().value;
                 auto it = arr.begin();
 
                 if (it == arr.end())
@@ -142,19 +137,17 @@ namespace AwsMock::Database::Entity::DynamoDb {
                     for (const auto &el: arr)
                         ss.insert(std::string{el.get_string().value});
                     return DynamoValue{ss};
-
-                } else if (it->type() == bsoncxx::type::k_double) {
+                }
+                if (it->type() == bsoncxx::type::k_double) {
                     std::set<double> ns;
                     for (const auto &el: arr)
                         ns.insert(el.get_double().value);
                     return DynamoValue{ns};
-
-                } else {
-                    DynamoList list;
-                    for (const auto &el: arr)
-                        list.push_back(std::make_shared<DynamoValue>(DynamoValueFromBson(el.get_value())));
-                    return DynamoValue{list};
                 }
+                DynamoList list;
+                for (const auto &el: arr)
+                    list.push_back(std::make_shared<DynamoValue>(DynamoValueFromBson(el.get_value())));
+                return DynamoValue{list};
             }
 
             case bsoncxx::type::k_document: {

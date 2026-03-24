@@ -425,7 +425,7 @@ namespace AwsMock::Database {
         return _memoryDb.ItemExists(item);
     }
 
-    bool DynamoDbDatabase::ItemExists(const std::string &region, const std::string &tableName, std::map<std::string, Entity::DynamoDb::AttributeValue> keys) const {
+    bool DynamoDbDatabase::ItemExists(const std::string &region, const std::string &tableName, std::string &partitionKey, const std::string &sortKey) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "item_exists");
 
         if (HasDatabase()) {
@@ -448,12 +448,11 @@ namespace AwsMock::Database {
                 }
 
                 // Primary keys
-                if (!keys.empty()) {
-                    document keyObject;
-                    for (const auto &[k, v]: keys) {
-                        keyObject.append(kvp(k, v.ToDocument()));
-                    }
-                    query.append(kvp("keys", keyObject));
+                if (!partitionKey.empty()) {
+                    query.append(kvp("partitionKey", partitionKey));
+                }
+                if (!partitionKey.empty()) {
+                    query.append(kvp("sortKey", sortKey));
                 }
 
                 return _itemCollection.count_documents(query.view(), options) > 0;
@@ -463,9 +462,9 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
         }
-        return _memoryDb.ItemExists(region, tableName, keys);
+        return _memoryDb.ItemExists(region, tableName, partitionKey, sortKey);
     }
-    Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) const {
+ Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "list_items");
 
         if (HasDatabase()) {

@@ -12,6 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/dynamodb/AttributeValue.h>
 
@@ -143,10 +144,28 @@ namespace AwsMock::Database::Entity::DynamoDb {
          */
         static KeyValue KeyValueFromBson(const bsoncxx::types::bson_value::view &val);
 
-        bsoncxx::types::bson_value::value DynamoValueToBson(const DynamoValue &dv) const;
+        /**
+         * @brief Convert value from BSON value
+         *
+         * @param val BSON object
+         * @return BSON value
+         */
+        bsoncxx::types::bson_value::value DynamoValueToBson(const DynamoValue &val) const;
 
+        /**
+         * @brief Convert BSON value to value
+         *
+         * @param val BSON object
+         * @return DynamoValue
+         */
         static DynamoValue DynamoValueFromBson(const bsoncxx::types::bson_value::view &val);
 
+        /**
+         * @brief Convert BSON view to attribute map
+         *
+         * @param doc BSON document
+         * @return attribute map
+         */
         static std::unordered_map<std::string, DynamoValue> AttributesFromBson(const view &doc);
 
         /**

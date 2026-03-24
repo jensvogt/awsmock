@@ -322,21 +322,21 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName, Dto::DynamoDb::Mapper::map(request.keys))) {
-            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            Dto::DynamoDb::GetItemResponse getItemResponse;
-            getItemResponse.region = request.region;
-            getItemResponse.user = request.user;
-            getItemResponse.requestId = request.requestId;
-            return getItemResponse;
-        }
-
         try {
 
-            // Get the table
+            // Get the table and the primary keys
             const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
             std::string partitionKey = request.keys[table.GetPartitionKeyName()].stringValue;
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
+
+            if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName, partitionKey, sortKey)) {
+                log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+                Dto::DynamoDb::GetItemResponse getItemResponse;
+                getItemResponse.region = request.region;
+                getItemResponse.user = request.user;
+                getItemResponse.requestId = request.requestId;
+                return getItemResponse;
+            }
 
             // Get item
             const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, partitionKey, sortKey);

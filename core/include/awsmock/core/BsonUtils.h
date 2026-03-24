@@ -26,6 +26,7 @@
 #include <bsoncxx/exception/exception.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/string/to_string.hpp>
+#include <bsoncxx/types/bson_value/value.hpp>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>

@@ -128,12 +128,6 @@ namespace AwsMock::Database {
         item = dynamoDbDatabase.CreateItem(item);
         BOOST_CHECK_EQUAL(false, item.oid.empty());
 
-        // arrange key
-        Entity::DynamoDb::AttributeValue key1Value;
-        key1Value.stringValue = "test-value-1";
-        std::map<std::string, Entity::DynamoDb::AttributeValue> keys;
-        keys["test-attribute-1"] = key1Value;
-
         // act
         item = dynamoDbDatabase.GetItemByKeys(table.region, table.name, "test-value-1");
 
