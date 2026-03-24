@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.2](https://github.com/jensvogt/awsmock/compare/1.16.1...v1.16.2) (2026-03-24)
+
+
+### Bug Fixes
+
+* fix mongo db dynamodb tests ([62669b2](https://github.com/jensvogt/awsmock/commit/62669b25dbceae66917c68f2345462967ee3cc0b))
+
 ## [1.16.1](https://github.com/jensvogt/awsmock/compare/v1.16.0...v1.16.1) (2026-03-23)
 
 
