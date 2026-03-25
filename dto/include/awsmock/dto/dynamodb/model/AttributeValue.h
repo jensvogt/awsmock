@@ -58,6 +58,16 @@ namespace AwsMock::Dto::DynamoDb {
         bool boolValue;
 
         /**
+         * Binary value
+         */
+        std::vector<uint8_t> binaryValue;
+
+        /**
+         * Binary set value
+         */
+        std::vector<std::vector<uint8_t>> binarySetValue;
+
+        /**
          * Null value
          */
         std::shared_ptr<bool> nullValue;
@@ -71,88 +81,6 @@ namespace AwsMock::Dto::DynamoDb {
          * Map value
          */
         std::map<std::string, AttributeValue> mapValue;
-
-        /**
-         * @brief Convert from JSON object.
-         *
-         * @param jsonObject JSON object
-         */
-        void FromDocument(const view &jsonObject) {
-
-            try {
-                for (const bsoncxx::document::element &ele: jsonObject) {
-                    if (ele.key() == "S") {
-                        stringValue = bsoncxx::string::to_string(jsonObject["S"].get_string().value);
-                    } else if (ele.key() == "SS") {
-                        for (bsoncxx::array::view jsonArray = jsonObject["SS"].get_array().value; const auto &value: jsonArray) {
-                            stringSetValue.emplace_back(value.get_string().value);
-                        }
-                    } else if (ele.key() == "N") {
-                        numberValue = bsoncxx::string::to_string(jsonObject["N"].get_string().value);
-                    } else if (ele.key() == "NS") {
-                        for (bsoncxx::array::view jsonArray = jsonObject["NS"].get_array().value; const auto &value: jsonArray) {
-                            numberSetValue.emplace_back(value.get_string().value);
-                        }
-                    } else if (ele.key() == "L") {
-                        for (bsoncxx::array::view jsonArray = jsonObject["L"].get_array().value; const auto &value: jsonArray) {
-                            AttributeValue a;
-                            a.FromDocument(value.get_document());
-                            listValue.emplace_back(a);
-                        }
-                    } else if (ele.key() == "M") {
-                        for (const auto &k: jsonObject["M"].get_document().value) {
-                            AttributeValue a;
-                            a.FromDocument(jsonObject["M"].get_document().view()[k.get_string()].get_document());
-                            mapValue[std::string(k.get_string().value)] = a;
-                        }
-                    } else if (ele.key() == "BOOL") {
-                        boolValue = jsonObject["BOOL"].get_bool().value;
-                    } else if (ele.key() == "NULL") {
-                        nullValue = std::make_shared<bool>(true);
-                    }
-                }
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Convert to JSON value
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "S", stringValue);
-                Core::Bson::BsonUtils::SetStringValue(document, "N", numberValue);
-
-                if (!stringSetValue.empty()) {
-                    array jsonArray;
-                    for (const auto &value: stringSetValue) {
-                        jsonArray.append(value);
-                    }
-                    document.append(kvp("SS", jsonArray));
-                }
-
-                if (!numberSetValue.empty()) {
-                    array jsonArray;
-                    for (const auto &value: numberSetValue) {
-                        jsonArray.append(value);
-                    }
-                    document.append(kvp("NS", jsonArray));
-                }
-
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
 
       private:
 

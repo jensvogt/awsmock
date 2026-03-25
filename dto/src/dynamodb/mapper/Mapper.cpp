@@ -75,10 +75,10 @@ namespace AwsMock::Dto::DynamoDb {
             } else if (attr.type == "N") {
                 dv.value.emplace<double>(std::stod(attr.numberValue));
 
-                // } else if (attr.type == "B") {
-                //     // Base64 decode if needed, or raw bytes
-                //     std::vector<uint8_t> bytes(attr.binaryValue.begin(), attr.binaryValue.end());
-                //     dv.value.emplace<std::vector<uint8_t>>(std::move(bytes));
+            } else if (attr.type == "B") {
+                // Base64 decode if needed, or raw bytes
+                std::vector<uint8_t> bytes(attr.binaryValue.begin(), attr.binaryValue.end());
+                dv.value.emplace<std::vector<uint8_t>>(std::move(bytes));
 
             } else if (attr.type == "BOOL") {
                 dv.value.emplace<bool>(attr.boolValue);
@@ -160,27 +160,63 @@ namespace AwsMock::Dto::DynamoDb {
 
     // Attribute Value entity -> DTO
     AttributeValue Mapper::map(const Database::Entity::DynamoDb::DynamoValue &attributeValueEntity) {
-        AttributeValue attributeValue = {};
-        if (attributeValueEntity.value.index() == 0) {
-            attributeValue.type = "S";
-            attributeValue.stringValue = std::get<0>(attributeValueEntity.value);
-        } else if (attributeValueEntity.value.index() == 1) {
-            attributeValue.type = "N";
-            attributeValue.numberValue = std::get<0>(attributeValueEntity.value);
-            // } else if (!attributeValue.stringSetValue.empty()) {
-            //     attributeValue.stringSetValue = attributeValueEntity.stringSetValue;
-            //     attributeValue.type = "SS";
-            // } else if (!attributeValue.numberSetValue.empty()) {
-            //     attributeValue.numberSetValue = attributeValueEntity.numberSetValue;
-            //     attributeValue.type = "NS";
-            // } else if (!attributeValue.boolValue) {
-            //     attributeValue.boolValue = attributeValueEntity.boolValue;
-            //     attributeValue.type = "BOOL";
-            // } else if (!attributeValue.nullValue) {
-            //     attributeValue.nullValue = attributeValueEntity.nullValue;
-            //     attributeValue.type = "NULL";
-        }
-        return attributeValue;
+        AttributeValue attr;
+
+        std::visit([&attr]<typename T0>(const T0 &val) {
+            using T = std::decay_t<T0>;
+
+            if constexpr (std::is_same_v<T, std::string>) {
+                attr.type = "S";
+                attr.stringValue = val;
+
+            } else if constexpr (std::is_same_v<T, double>) {
+                attr.type = "N";
+                attr.numberValue = std::to_string(val);
+
+            } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
+                attr.type = "B";
+                const std::vector<uint8_t> bytes(attr.binaryValue.begin(), attr.binaryValue.end());
+                attr.binaryValue = bytes;
+
+            } else if constexpr (std::is_same_v<T, bool>) {
+                attr.type = "BOOL";
+                attr.boolValue = val;
+
+            } else if constexpr (std::is_same_v<T, std::nullptr_t>) {
+                attr.type = "NULL";
+
+            } else if constexpr (std::is_same_v<T, std::set<std::string>>) {
+                attr.type = "SS";
+                attr.stringSetValue = std::vector<std::string>(val.begin(), val.end());
+
+            } else if constexpr (std::is_same_v<T, std::set<double>>) {
+                attr.type = "NS";
+                for (const auto &n: val)
+                    attr.numberSetValue.push_back(std::to_string(n));
+
+            } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::BinarySet>) {
+                attr.type = "BS";
+                for (const auto &b: val.values) {
+                    std::vector<uint8_t> bytes(attr.binaryValue.begin(), attr.binaryValue.end());
+                    attr.binarySetValue.emplace_back(bytes);
+                }
+
+            } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::DynamoList>) {
+                attr.type = "L";
+                for (const auto &el: val)
+                    attr.listValue.push_back(Mapper::map(*el));
+
+            } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::DynamoMap>) {
+                attr.type = "M";
+                for (const auto &[k, v]: val)
+                    attr.mapValue[k] = Mapper::map(*v);
+
+            } else {
+                throw Core::DatabaseException("Unhandled DynamoValue type");
+            }
+        },
+                   attributeValueEntity.value);
+        return attr;
     }
 
     Database::Entity::DynamoDb::DynamoValue Mapper::map(const AttributeValue &attr) {

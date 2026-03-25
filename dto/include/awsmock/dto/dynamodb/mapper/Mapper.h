@@ -11,7 +11,6 @@
 #include <awsmock/dto/dynamodb/PutItemRequest.h>
 #include <awsmock/dto/dynamodb/model/Item.h>
 #include <awsmock/dto/dynamodb/model/ItemCounter.h>
-#include <awsmock/entity/dynamodb/AttributeValue.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
 

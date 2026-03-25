@@ -14,7 +14,6 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/common/BaseEntity.h>
-#include <awsmock/entity/dynamodb/AttributeValue.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
