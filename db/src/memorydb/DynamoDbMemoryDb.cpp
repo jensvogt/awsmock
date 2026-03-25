@@ -141,7 +141,14 @@ namespace AwsMock::Database {
     bool DynamoDbMemoryDb::ItemExists(const Entity::DynamoDb::Item &item) {
         return std::ranges::find_if(_items,
                                     [item](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
-                                        return i.second.region == item.region && i.second.tableName == item.tableName && i.second.keys == item.keys;
+                                        return i.second.region == item.region && i.second.tableName == item.tableName && i.second.partitionKey == item.partitionKey && i.second.sortKey == item.sortKey;
+                                    }) != _items.end();
+    }
+
+    bool DynamoDbMemoryDb::ItemExists(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) {
+        return std::ranges::find_if(_items,
+                                    [region, tableName, partitionKey, sortKey](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
+                                        return i.second.region == region && i.second.tableName == tableName && std::get<0>(i.second.partitionKey) == partitionKey && std::get<0>(i.second.sortKey) == sortKey;
                                     }) != _items.end();
     }
 
@@ -236,11 +243,15 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const {
+    Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const {
 
+        // TODO: Fix me
         const auto it =
-                std::ranges::find_if(_items, [region, tableName, keys](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
-                    return item.second.region == region && item.second.tableName == tableName && item.second.keys == keys;
+                std::ranges::find_if(_items, [region, tableName, partitionKey, sortKey](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
+                    if (sortKey.empty()) {
+                        return item.second.region == region && item.second.tableName == tableName;// && item.second.partitionKey == partitionKey;
+                    }
+                    return item.second.region == region && item.second.tableName == tableName;// && item.second.partitionKey == partitionKey && item.second.sortKey == sortKey;
                 });
 
         if (it == _items.end()) {
@@ -286,12 +297,16 @@ namespace AwsMock::Database {
         return static_cast<long>(_items.size());
     }
 
-    void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) {
+    void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) {
         boost::mutex::scoped_lock lock(_itemMutex);
 
-        const auto count = std::erase_if(_items, [region, tableName, keys](const auto &item) {
+        // TODO: Fix me
+        const auto count = std::erase_if(_items, [region, tableName, partitionKey, sortKey](const auto &item) {
             auto const &[k, v] = item;
-            return v.region == region && v.tableName == tableName;
+            if (sortKey.empty()) {
+                return v.region == region && v.tableName == tableName;// && v.partitionKey == partitionKey;
+            }
+            return v.region == region && v.tableName == tableName;// && v.partitionKey == partitionKey && v.sortKey == sortKey;
         });
         log_debug << "DynamoDB items deleted, count: " << count;
     }

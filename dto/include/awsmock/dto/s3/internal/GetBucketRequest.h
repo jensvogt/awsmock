@@ -31,10 +31,14 @@ namespace AwsMock::Dto::S3 {
         friend GetBucketRequest tag_invoke(boost::json::value_to_tag<GetBucketRequest>, boost::json::value const &v) {
             GetBucketRequest r;
             r.bucketName = Core::Json::GetStringValue(v, "bucketName");
+            r.region = Core::Json::GetStringValue(v, "region");
+            r.user = Core::Json::GetStringValue(v, "user");
+            r.requestId = Core::Json::GetStringValue(v, "requestId");
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetBucketRequest const &obj) {
+        friend void
+        tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetBucketRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},

@@ -78,7 +78,7 @@ namespace AwsMock::Service {
     }
 
     void DynamoDbServer::BackupDynamoDb() {
-        ModuleService::BackupModule("dynamodb", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("dynamodb", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void DynamoDbServer::Shutdown() {
@@ -88,4 +88,4 @@ namespace AwsMock::Service {
         log_info << "DynamoDB server stopped";
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

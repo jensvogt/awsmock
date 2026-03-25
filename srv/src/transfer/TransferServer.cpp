@@ -163,7 +163,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::BackupTransfer() {
-        ModuleService::BackupModule("transfer", Dto::Module::ExportType::BOTH);
+        ModuleService::BackupModule("transfer", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void TransferServer::Shutdown() {
@@ -172,4 +172,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("ssm-backup");
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

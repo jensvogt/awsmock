@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.16.4](https://github.com/jensvogt/awsmock/compare/v1.16.3...v1.16.4) (2026-03-25)
+
+
+### Bug Fixes
+
+* fix dynamodb attributes as variants tests ([b6fea4e](https://github.com/jensvogt/awsmock/commit/b6fea4ece2811c1d683544abeaac5440aca2f1a9))
+
+## [1.16.3](https://github.com/jensvogt/awsmock/compare/v1.16.2...v1.16.3) (2026-03-24)
+
+
+### Bug Fixes
+
+* fix dynamodb attributes as variants tests ([52944f2](https://github.com/jensvogt/awsmock/commit/52944f26018fd2e130d8c4e315780238a58f62fc))
+* fix dynamodb attributes as variants tests ([90a3aea](https://github.com/jensvogt/awsmock/commit/90a3aea20486c04a2f3975741c8807db775eddba))
+
+## [1.16.2](https://github.com/jensvogt/awsmock/compare/1.16.1...v1.16.2) (2026-03-24)
+
+
+### Bug Fixes
+
+* fix mongo db dynamodb tests ([62669b2](https://github.com/jensvogt/awsmock/commit/62669b25dbceae66917c68f2345462967ee3cc0b))
+
+## [1.16.1](https://github.com/jensvogt/awsmock/compare/v1.16.0...v1.16.1) (2026-03-23)
+
+
+### Bug Fixes
+
+* fix mongo db dynamodb tests ([14f8ac4](https://github.com/jensvogt/awsmock/commit/14f8ac476ae04572f99b2820a99ade5aba571cf9))
+
+## [1.16.0](https://github.com/jensvogt/awsmock/compare/1.15.0...v1.16.0) (2026-03-23)
+
+
+### Features
+
+* DynamoDB queries added ([d39aa90](https://github.com/jensvogt/awsmock/commit/d39aa908b2723217aa832d4b5b99b2cae08ce57e))
+* DynamoDB queries added ([3368a33](https://github.com/jensvogt/awsmock/commit/3368a33a33a8aea33a6f4b22bcc5fecc111e09f9))
+
 ## [1.15.0](https://github.com/jensvogt/awsmock/compare/v1.14.52...v1.15.0) (2026-03-18)
 
 

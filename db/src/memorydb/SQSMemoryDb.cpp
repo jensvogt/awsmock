@@ -4,6 +4,8 @@
 
 #include <awsmock/memorydb/SQSMemoryDb.h>
 
+#include "awsmock/core/PagingUtils.h"
+
 namespace AwsMock::Database {
 
     boost::mutex SQSMemoryDb::_sqsQueueMutex;
@@ -28,8 +30,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-            return queue.second.queueArn == queueArn;
-        }) != _queues.end();
+                   return queue.second.queueArn == queueArn;
+               }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -115,17 +117,36 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) {
+    Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) {
 
-        const Entity::SQS::QueueList queueList = QueuesToVector();
-
-        const auto q = Core::from(queueList);
+        const auto q = Core::from(QueuesToVector());
         if (!region.empty()) {
             q.where([region](const Entity::SQS::Queue &item) { return item.region == region; });
         }
-
-        log_trace << "Got queue list, size: " << queueList.size();
-        return q.to_vector();
+        if (!prefix.empty()) {
+            q.where([prefix](const Entity::SQS::Queue &item) { return Core::StringUtils::StartsWith(item.name, prefix); });
+        }
+        log_trace << "Got queue list, size: " << q.to_vector().size();
+        if (!sortColumns.empty()) {
+            std::ranges::sort(q.to_vector(), [sortColumns](const Entity::SQS::Queue &a, const Entity::SQS::Queue &b) {
+                for (const auto &[column, sortDirection]: sortColumns) {
+                    if (column == "name") {
+                        return sortDirection == 1 ? a.name < b.name : b.name < a.name;
+                    }
+                    if (column == "size") {
+                        return sortDirection == 1 ? a.size < b.size : b.size < a.size;
+                    }
+                    if (column == "messages") {
+                        return sortDirection == 1 ? a.attributes.approximateNumberOfMessages < b.attributes.approximateNumberOfMessages : b.attributes.approximateNumberOfMessages < a.attributes.approximateNumberOfMessages;
+                    }
+                }
+                return false;
+            });
+        }
+        if (pageSize > 0) {
+            return q.to_vector();
+        }
+        return Core::PageVector(q.to_vector(), pageSize, pageIndex);
     }
 
     Entity::SQS::QueueList SQSMemoryDb::ExportQueues(const std::vector<SortColumn> &sortColumns) {
@@ -620,4 +641,4 @@ namespace AwsMock::Database {
         std::ranges::transform(_queues, std::back_inserter(queueList), [](auto const &pair) { return pair.second; });
         return queueList;
     }
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

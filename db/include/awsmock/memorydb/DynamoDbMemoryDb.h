@@ -151,6 +151,20 @@ namespace AwsMock::Database {
         bool ItemExists(const Entity::DynamoDb::Item &item);
 
         /**
+         * @brief Checks the existence of an item.
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @param partitionKey
+         * @param sortKey
+         * @param partitionKey
+         * @param sortKey
+         * @return true if the database exists, otherwise false
+         * @throws DatabaseException
+         */
+        bool ItemExists(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey);
+
+        /**
          * @brief Returns a list of DynamoDB items
          *
          * @param region AWS region.
@@ -173,11 +187,14 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param tableName name of the table
-         * @param keys map of primary keys
+         * @param partitionKey
+         * @param sortKey
+         * @param partitionKey
+         * @param sortKey
          * @return item entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const;
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const;
 
         /**
          * @brief Creates a new item
@@ -210,9 +227,10 @@ namespace AwsMock::Database {
          *
          * @param region AWS region.
          * @param tableName name of the table
-         * @param keys primary key of the item
+         * @param partitionKey partition key
+         * @param sortKey sort key, default = {}
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys);
+        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey = {});
 
         /**
          * @brief Deletes all item of a table

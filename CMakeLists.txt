@@ -3,9 +3,12 @@ cmake_minimum_required(VERSION 3.22)
 # -------------------------------------------------------------------------
 # Read version.txt
 # -------------------------------------------------------------------------
-include(cmake/ReadVersion.cmake)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/version.txt" VERSION_STRING_RAW)
+string(STRIP "${VERSION_STRING_RAW}" VERSION_STRING)
 
 project(awsmock VERSION ${VERSION_STRING} LANGUAGES CXX)
+
+include(cmake/ReadVersion.cmake)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,6 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
+set(LEXY_HAS_NTTP OFF)
 enable_testing()
 
 # -------------------------------------------------------------------------
@@ -60,7 +64,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/utils/DateTimeUtils.cpp core/src/utils/CryptoUtils.cpp core/src/utils/AwsUtils.cpp
         core/src/utils/SystemUtils.cpp core/src/utils/TarUtils.cpp core/src/utils/RandomUtils.cpp
         core/src/utils/TestUtils.cpp core/src/utils/HttpUtils.cpp core/src/utils/NumberUtils.cpp
-        core/src/utils/XmlUtils.cpp core/src/utils/UnixSocket.cpp
+        core/src/utils/XmlUtils.cpp core/src/utils/UnixSocket.cpp core/src/exception/DynamoDbParseException.cpp
         core/src/utils/HttpSocket.cpp core/src/utils/JwtUtils.cpp core/src/scheduler/PeriodicTask.cpp
         core/src/scheduler/Scheduler.cpp core/src/utils/BackupUtils.cpp core/src/config/Configuration.cpp
         core/src/utils/SrpUtils.cpp core/src/utils/DomainSocket.cpp core/src/scheduler/CronTask.cpp
@@ -69,7 +73,8 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/ServiceException.cpp core/src/exception/JsonException.cpp core/src/exception/NotFoundException.cpp
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
-        core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp)
+        core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
+)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -132,7 +137,7 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/transfer/Transfer.cpp db/src/memorydb/TransferMemoryDb.cpp db/src/entity/cognito/UserPool.cpp
         db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp db/src/entity/cognito/Group.cpp
         db/src/memorydb/CognitoMemoryDb.cpp db/src/repository/CognitoDatabase.cpp db/src/entity/dynamodb/Item.cpp
-        db/src/entity/dynamodb/Table.cpp db/src/entity/dynamodb/AttributeValue.cpp db/src/repository/DynamoDbDatabase.cpp
+        db/src/entity/dynamodb/Table.cpp db/src/repository/DynamoDbDatabase.cpp
         db/src/entity/dynamodb/ProvisionedThroughput.cpp db/src/memorydb/DynamoDbMemoryDb.cpp db/src/entity/secretsmanager/Secret.cpp
         db/src/entity/secretsmanager/SecretVersion.cpp db/src/entity/secretsmanager/RotationRules.cpp
         db/src/repository/SecretsManagerDatabase.cpp db/src/memorydb/SecretsManagerMemoryDb.cpp db/src/entity/kms/Key.cpp
@@ -185,7 +190,7 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/application/ApplicationService.cpp srv/src/application/ApplicationCreator.cpp
         srv/src/application/ApplicationLogServer.cpp srv/src/application/ApplicationLogSession.cpp
         srv/src/apigateway/ApiGatewayService.cpp srv/src/apigateway/ApiGatewayHandler.cpp
-        srv/src/monitoring/MetricSystemCollector.cpp
+        srv/src/monitoring/MetricSystemCollector.cpp srv/src/monitoring/MetricDockerCollector.cpp
         srv/src/monitoring/MonitoringHandler.cpp srv/src/monitoring/MonitoringServer.cpp
         srv/src/monitoring/MonitoringService.cpp srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp
         srv/src/frontend/FrontendSession.cpp)
@@ -198,6 +203,9 @@ target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL
         LibArchive::LibArchive ssh)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+if (NOT WIN32)
+    add_subdirectory(srv/tst)
+endif ()
 
 # -------------------------------------------------------------------------
 # AWSMock Manager (main program)

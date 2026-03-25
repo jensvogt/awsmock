@@ -267,7 +267,7 @@ namespace AwsMock::Database {
             log_trace << "Got queue list, size: " << queueList.size();
             return queueList;
         }
-        return _memoryDb.ListQueues(region);
+        return _memoryDb.ListQueues(prefix, pageSize, pageIndex, sortColumns, region);
     }
 
     Entity::SQS::QueueList SQSDatabase::ExportQueues(const std::vector<SortColumn> &sortColumns) const {

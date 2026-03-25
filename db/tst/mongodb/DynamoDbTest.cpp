@@ -20,13 +20,9 @@ namespace AwsMock::Database {
         item.tableName = tableName;
         item.region = region;
 
-        Entity::DynamoDb::AttributeValue key1Value;
-        key1Value.stringValue = "key-value-1";
-        item.keys["test-attribute-1"] = key1Value;
-
-        Entity::DynamoDb::AttributeValue attr1Value;
-        attr1Value.stringValue = "attr-value-1";
-        item.attributes["test-attribute-1"] = attr1Value;
+        item.partitionKey.emplace<std::string>("test-value-1");
+        item.attributes["test-attribute-1"].value.emplace<std::string>("test-value-1");
+        item.attributes["test-attribute-2"].value.emplace<std::string>("test-value-2");
         return item;
     }
 
@@ -116,7 +112,6 @@ namespace AwsMock::Database {
         item = dynamoDbDatabase.CreateItem(item);
 
         // assert
-        BOOST_CHECK_EQUAL(false, item.keys.empty());
         BOOST_CHECK_EQUAL(false, item.attributes.empty());
         BOOST_CHECK_EQUAL(table.name, item.tableName);
     }
@@ -133,22 +128,13 @@ namespace AwsMock::Database {
         item = dynamoDbDatabase.CreateItem(item);
         BOOST_CHECK_EQUAL(false, item.oid.empty());
 
-        // arrange key
-        Entity::DynamoDb::AttributeValue key1Value;
-        key1Value.stringValue = "key-value-1";
-        std::map<std::string, Entity::DynamoDb::AttributeValue> keys;
-        keys["test-attribute-1"] = key1Value;
-
         // act
-        std::vector<Entity::DynamoDb::Item> items = dynamoDbDatabase.ListItems();
-
-        item = dynamoDbDatabase.GetItemByKeys(table.region, table.name, keys);
+        item = dynamoDbDatabase.GetItemByKeys(table.region, table.name, "test-value-1");
 
         // assert
-        BOOST_CHECK_EQUAL(false, item.keys.empty());
         BOOST_CHECK_EQUAL(false, item.attributes.empty());
-        BOOST_CHECK_EQUAL(item.attributes["test-attribute-1"].stringValue, "attr-value-1");
-        BOOST_CHECK_EQUAL(item.keys["test-attribute-1"].stringValue, "key-value-1");
+        BOOST_CHECK_EQUAL(std::get<0>(item.attributes["test-attribute-1"].value), "test-value-1");
+        BOOST_CHECK_EQUAL(std::get<0>(item.attributes["test-attribute-2"].value), "test-value-2");
     }
 
     BOOST_AUTO_TEST_CASE(ListItemTest) {

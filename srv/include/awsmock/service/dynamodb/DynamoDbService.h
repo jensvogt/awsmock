@@ -21,6 +21,7 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
+#include <awsmock/core/exception/DynamoDbParseException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
@@ -57,6 +58,7 @@
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
+#include <awsmock/service/dynamodb/DynamoDbQueryHelper.h>
 
 namespace AwsMock::Service {
 
@@ -70,9 +72,10 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbService {
+    class DynamoDbService : public DynamoDbQueryHelper {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -177,7 +180,7 @@ namespace AwsMock::Service {
          * @param request get item request DTO
          * @return GetItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::GetItemResponse GetItem(Dto::DynamoDb::GetItemRequest &request) const;
 
         /**
          * @brief Puts an item
@@ -209,7 +212,7 @@ namespace AwsMock::Service {
          * @param request delete item request DTO
          * @return DeleteItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::DeleteItemResponse DeleteItem(Dto::DynamoDb::DeleteItemRequest &request) const;
 
         /**
          * @brief delete all items
@@ -221,44 +224,26 @@ namespace AwsMock::Service {
          */
         void DeleteAllItems(const Dto::DynamoDb::DeleteAllItemsRequest &request) const;
 
-    private:
+      private:
+
         /**
-         * @brief Send the request to the DynamoDB container.
+         * @brief create query expression.
+         *
+         * @param inputExpression input expression from request
+         * @return DynamodBD query expression
+         */
+        static std::string CreateExpression(const std::string &inputExpression);
+
+        /**
+         * @brief Create the attributes value map
          *
          * @par
-         * The authorization header is taken from the original request.
+         * Adds also the table name as attribute values
          *
-         * @param body original HTTP request body
-         * @param headers original HTTP request headers
-         * @return response body
+         * @param expressionAttributeValues expression attributes from request
+         * @return attribute value map
          */
-        [[nodiscard]] Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) const;
-
-        /**
-         * @brief Send the request to the DynamoDB container.
-         *
-         * @par
-         * The authorization header is calculated from the request parameter.
-         *
-         * @param body original HTTP request body
-         * @param headers original HTTP request headers
-         * @return response body
-         */
-        Dto::DynamoDb::DynamoDbResponse SendAuthorizedDynamoDbRequest(const std::string &body, std::map<std::string, std::string> &headers) const;
-
-        /**
-         * @brief Prepare the headers for the docker request
-         *
-         * @param command DynamoDB command
-         */
-        static std::map<std::string, std::string> PrepareHeaders(const std::string &command);
-
-        /**
-         * @brief Prepare the headers for the docker request
-         *
-         * @param command DynamoDB streams command
-         */
-        static std::map<std::string, std::string> PrepareStreamHeaders(const std::string &command);
+        static ExpressionAttributeValues CreateAttributeValues(const std::string &tableName, std::map<std::string, Dto::DynamoDb::AttributeValue> expressionAttributeValues);
 
         /**
          * Database connection
@@ -271,6 +256,6 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_DYNAMODB_SERVICE_H

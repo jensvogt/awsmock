@@ -15,7 +15,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/PagingUtils.h>
-#include <awsmock/core/Semaphore.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
@@ -121,7 +120,8 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -554,7 +554,8 @@ namespace AwsMock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-    private:
+      private:
+
         /**
          * @brief Tries to find an idle lambda function instance
          *
@@ -653,8 +654,8 @@ namespace AwsMock::Service {
         /**
          * Function mutexes
          */
-        static std::map<std::string, std::shared_ptr<boost::mutex> > _instanceMutex;
+        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

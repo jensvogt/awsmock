@@ -11,7 +11,6 @@
 #include <awsmock/dto/dynamodb/PutItemRequest.h>
 #include <awsmock/dto/dynamodb/model/Item.h>
 #include <awsmock/dto/dynamodb/model/ItemCounter.h>
-#include <awsmock/entity/dynamodb/AttributeValue.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
 
@@ -45,6 +44,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::Item
          */
         static Database::Entity::DynamoDb::Item map(const DeleteItemRequest &request);
+        static Database::Entity::DynamoDb::DynamoValue mapAttribute(const AttributeValue &attr);
 
         /**
          * @brief Maps a DynamoDB PutItemRequest to an entity, which can be saved in the database.
@@ -64,7 +64,8 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Dto::DynamoDb::AttributeValue
          * @see Database::Entity::DynamoDb::AttributeValue
          */
-        static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::AttributeValue> &attributeValue);
+        static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::DynamoValue> &attributeValue);
+        static std::unordered_map<std::string, AttributeValue> map(const std::unordered_map<std::string, Database::Entity::DynamoDb::DynamoValue> &attributes);
 
         /**
          * @brief Maps a DynamoDB item attribute entity to an item attribute DTO.
@@ -74,7 +75,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Dto::DynamoDb::AttributeValue
          * @see Database::Entity::DynamoDb::AttributeValue
          */
-        static AttributeValue map(const Database::Entity::DynamoDb::AttributeValue &attributeValueEntity);
+        static AttributeValue map(const Database::Entity::DynamoDb::DynamoValue &attributeValueEntity);
 
         /**
          * @brief Maps a DynamoDB item attribute DTO to an item attribute entity.
@@ -82,7 +83,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @param attributeValueDto attribute value DTO
          * @return attribute value entity
          */
-        static Database::Entity::DynamoDb::AttributeValue map(const AttributeValue &attributeValueDto);
+        static Database::Entity::DynamoDb::DynamoValue map(const AttributeValue &attributeValueDto);
 
         /**
          * @brief Maps a DynamoDB item entity to an item DTO.
@@ -124,6 +125,16 @@ namespace AwsMock::Dto::DynamoDb {
         static KeySchema map(const Database::Entity::DynamoDb::KeySchema &keySchemaEntity);
 
         /**
+         * @brief Maps a list of key schema entities to a list of key schema DTOs
+         *
+         * @param keySchemaEntities list of key schema entities
+         * @return list of key schema DTOs
+         * @see Dto::DynamoDb::KeySchema
+         * @see Database::Entity::DynamoDb::KeySchema
+         */
+        static std::vector<KeySchema> map(const std::vector<Database::Entity::DynamoDb::KeySchema> &keySchemaEntities);
+
+        /**
          * @brief Maps a table attribute DTO to an attribute entity
          *
          * @param attributeDefinitionDto DynamoDb table attribute
@@ -134,12 +145,22 @@ namespace AwsMock::Dto::DynamoDb {
         static Database::Entity::DynamoDb::AttributeDefinition map(const AttributeDefinition &attributeDefinitionDto);
 
         /**
+         * @brief Maps a Dynamodb attribute definition entity to a attribute definition DTO
          *
          * @param attributeDefinitionEntity
-         * @return
+         * @return attribute definition DTO
          */
         static AttributeDefinition map(const Database::Entity::DynamoDb::AttributeDefinition &attributeDefinitionEntity);
-        static std::map<std::string, Database::Entity::DynamoDb::AttributeValue> map(const std::map<std::string, AttributeValue> &keyDtos);
+
+        /**
+         * @brief Maps a list Dynamodb attribute definition entity to a list of attribute definition DTOs
+         *
+         * @param attributeDefinitions list of attribute definition entities
+         * @return list of attribute definition DTOs
+         */
+        static std::vector<AttributeDefinition> map(const std::vector<Database::Entity::DynamoDb::AttributeDefinition> &attributeDefinitions);
+
+        static std::map<std::string, Database::Entity::DynamoDb::DynamoValue> map(const std::map<std::string, AttributeValue> &keyDtos);
 
         /**
          * @brief Maps a DynamoDB item entity to an item counter DTO.

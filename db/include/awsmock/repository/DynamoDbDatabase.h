@@ -16,6 +16,8 @@
 #include <awsmock/repository/DynamoDbToMongoTranslator.h>
 #include <awsmock/utils/SortColumn.h>
 
+#define QUERY_SIZE_LIMIT (1024 * 1024)
+
 namespace AwsMock::Database {
 
     /**
@@ -25,7 +27,8 @@ namespace AwsMock::Database {
      */
     class DynamoDbDatabase : public DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -169,6 +172,20 @@ namespace AwsMock::Database {
         [[nodiscard]] bool ItemExists(const Entity::DynamoDb::Item &item) const;
 
         /**
+         * @brief Checks the existence of an item.
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @param partitionKey
+         * @param sortKey
+         * @param partitionKey
+         * @param sortKey
+         * @return true if the database exists, otherwise false
+         * @throws DatabaseException
+         */
+        bool ItemExists(const std::string &region, const std::string &tableName, std::string &partitionKey, const std::string &sortKey) const;
+
+        /**
          * @brief Returns a list of DynamoDB items
          *
          * @param region AWS region.
@@ -193,11 +210,12 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param tableName name of the table
-         * @param keys map of primary keys
+         * @param partitionKey partition key
+         * @param sortKey sort key, default = {}
          * @return item entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const;
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey = {}) const;
 
         /**
          * @brief Creates a new item
@@ -242,8 +260,21 @@ namespace AwsMock::Database {
          * @param req request
          * @param scanIndexForward scan forward
          * @param limit query limit
+         * @return list of items
+         * @throws DatabaseException
          */
         [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
+
+        /**
+         * @brief Execute query
+         *
+         * @param filter query filter
+         * @param scanIndexForward scan forward
+         * @param limit query limit, default: 0
+         * @return list of items
+         * @throws DatabaseException
+         */
+        std::vector<Entity::DynamoDb::Item> ExecuteQuery(const value &filter, bool scanIndexForward, int limit = 0) const;
 
         void AdjustItemCounters() const;
 
@@ -252,10 +283,11 @@ namespace AwsMock::Database {
          *
          * @param region AWS region.
          * @param tableName name of the table
-         * @param keys primary key of the item
+         * @param partitionKey partition key
+         * @param sortKey sort key, default = {}
          * @throws DatabaseException
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys) const;
+        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey = {}) const;
 
         /**
          * @brief Deletes all item of a table
@@ -275,7 +307,8 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllItems() const;
 
-    private:
+      private:
+
         /**
          * @brief Database name
          */
@@ -302,6 +335,6 @@ namespace AwsMock::Database {
         DynamoDbMemoryDb &_memoryDb;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
