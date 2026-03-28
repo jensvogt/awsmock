@@ -69,20 +69,9 @@ namespace AwsMock::Service {
                     snsRequest.user = clientCommand.user;
                     snsRequest.requestId = clientCommand.requestId;
                     snsRequest.contentType = clientCommand.contentType;
-                    //snsRequest.topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
-                    // ReSharper disable once CppRedundantDereferencingAndTakingAddress
-                    if (auto it = params.find("TopicArn"); it != params.end()) {
-                        snsRequest.topicArn = (*params.find("TopicArn")).value;
-                    }
-                    // ReSharper disable once CppRedundantDereferencingAndTakingAddress
-                    if (auto it = params.find("TargetArn"); it != params.end()) {
-                        snsRequest.targetArn = (*params.find("TargetArn")).value;
-                    }
-                    // ReSharper disable once CppRedundantDereferencingAndTakingAddress
-                    if (auto it = params.find("Message"); it != params.end()) {
-                        snsRequest.message = (*params.find("Message")).value;
-                    }
-
+                    snsRequest.topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
+                    snsRequest.targetArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TargetArn", "");
+                    snsRequest.message = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Message", "");
                     // TODO: add SNS message attributes
                     //snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
                     Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);

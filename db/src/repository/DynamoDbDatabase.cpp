@@ -543,10 +543,6 @@ namespace AwsMock::Database {
                 // Primary keys
                 if (partitionKey.index() == 0) {
                     query.append(kvp("partitionKey", std::get<std::string>(partitionKey)));
-                } else if (partitionKey.index() == 1) {
-                    query.append(kvp("partitionKey", std::get<double>(partitionKey)));
-                    // } else if (partitionKey.index() == 2) {
-                    //     query.append(kvp("partitionKey", std::get<std::vector<uint8_t>>(partitionKey)));
                 }
 
                 if (sortKey.index() == 0) {
@@ -633,21 +629,29 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
 
-                // TODO: FIx me
-                Entity::DynamoDb::Item dbItem = GetItemByKeys(item.region, item.tableName, item.partitionKey, item.sortKey);
+                // Get partitionKey/sortKey from attributes
+                Entity::DynamoDb::KeyValue partitionKey = DynamoVariantToKeyValue(item.attributes[table.GetPartitionKeyName()].value);
+                Entity::DynamoDb::KeyValue sortKey;
+                if (!table.GetSortKeyName().empty()) {
+                    sortKey = DynamoVariantToKeyValue(item.attributes[table.GetSortKeyName()].value);
+                }
+
+                // Get the database item
+                Entity::DynamoDb::Item dbItem = GetItemByKeys(item.region, item.tableName, partitionKey, sortKey);
                 dbItem.modified = system_clock::now();
                 dbItem.attributes = item.attributes;
 
                 // document query;
-                // query.append(kvp("_id", bsoncxx::oid(dbItem.oid)));
+                document query;
+                query.append(kvp("_id", bsoncxx::oid(dbItem.oid)));
 
-                // const auto result = _itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
-                // session.commit_transaction();
-                // if (result.has_value()) {
-                //     item = Entity::DynamoDb::Item().FromDocument(result->view());
-                //     log_debug << "DynamoDb item updated, oid: " << item.oid;
-                //     return item;
-                // }
+                const auto result = _itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
+                session.commit_transaction();
+                if (result.has_value()) {
+                    item = Entity::DynamoDb::Item().FromDocument(result->view());
+                    log_debug << "DynamoDb item updated, oid: " << item.oid;
+                    return item;
+                }
                 return {};
             } catch (const Core::DatabaseException &exc) {
                 session.abort_transaction();
@@ -921,5 +925,52 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException(exc.what());
             }
         }
+    }
+
+    Entity::DynamoDb::KeyValue DynamoDbDatabase::DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const {
+        return std::visit([]<typename T0>(const T0 &val) -> Entity::DynamoDb::KeyValue {
+            using T = std::decay_t<T0>;
+
+            if constexpr (std::is_same_v<T, std::string>) {
+                return val;
+            } else if constexpr (std::is_same_v<T, double>) {
+                return val;
+            } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
+                return val;
+            } else {
+                throw Core::DatabaseException("DynamoValue type is not a valid KeyValue (S, N, or B)");
+            }
+        },
+                          variant);
+    }
+
+    void DynamoDbDatabase::DumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) const {
+        std::string tmp0 = table.GetPartitionKeyName();
+        std::string tmp1 = table.GetSortKeyName();
+        auto debugVariant = [](const Entity::DynamoDb::DynamoValue::DynamoVariant &variant, const std::string &name) {
+            std::visit([&name, variant]<typename T0>(const T0 &val) {
+                using T = std::decay_t<T0>;
+                if constexpr (std::is_same_v<T, std::string>)
+                    std::cerr << name << " type: string, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, double>)
+                    std::cerr << name << " type: double, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, std::vector<uint8_t>>)
+                    std::cerr << name << " type: binary\n";
+                else if constexpr (std::is_same_v<T, bool>)
+                    std::cerr << name << " type: bool, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, std::nullptr_t>)
+                    std::cerr << name << " type: null\n";
+                else if constexpr (std::is_same_v<T, std::set<std::string>>)
+                    std::cerr << name << " type: SS\n";
+                else if constexpr (std::is_same_v<T, std::set<double>>)
+                    std::cerr << name << " type: NS\n";
+                else
+                    std::cerr << name << " type: unknown index: " << variant.index() << "\n";
+            },
+                       variant);
+        };
+
+        debugVariant(item.attributes[table.GetPartitionKeyName()].value, "partitionKey");
+        debugVariant(item.attributes[table.GetSortKeyName()].value, "sortKey");
     }
 }// namespace AwsMock::Database

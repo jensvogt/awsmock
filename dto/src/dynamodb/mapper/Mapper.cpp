@@ -73,11 +73,11 @@ namespace AwsMock::Dto::DynamoDb {
 
             } else if constexpr (std::is_same_v<T, double>) {
                 attr.type = "N";
-                attr.numberValue = std::to_string(val);
+                attr.numberValue = DoubleToString(val);
 
             } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
                 attr.type = "B";
-                const std::vector<uint8_t> bytes(attr.binaryValue.begin(), attr.binaryValue.end());
+                const std::vector bytes(attr.binaryValue.begin(), attr.binaryValue.end());
                 attr.binaryValue = bytes;
 
             } else if constexpr (std::is_same_v<T, bool>) {
@@ -299,5 +299,15 @@ namespace AwsMock::Dto::DynamoDb {
             itemCounters.emplace_back(mapCounter(i));
         }
         return itemCounters;
+    }
+    std::string Mapper::DoubleToString(const double val) {
+        if (val == std::floor(val) && std::abs(val) < 1e15) {
+            return std::to_string(static_cast<long long>(val));
+        }
+        // Remove trailing zeros for non-integers
+        std::string s = std::to_string(val);
+        s.erase(s.find_last_not_of('0') + 1);
+        if (s.back() == '.') s.pop_back();
+        return s;
     }
 }// namespace AwsMock::Dto::DynamoDb
