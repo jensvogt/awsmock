@@ -585,30 +585,21 @@ namespace AwsMock::Database {
 
             try {
 
-                document tableSearchQuery;
-                tableSearchQuery.append(kvp("tableName", item.tableName));
-
-                document tableUpdateQuery;
-                tableUpdateQuery.append(kvp("$inc", make_document(kvp("itemCount", bsoncxx::types::b_int64(1)))));
-                tableUpdateQuery.append(kvp("$inc", make_document(kvp("size", bsoncxx::types::b_int64(item.size)))));
-
                 session.start_transaction();
                 const auto itemResult = _itemCollection.insert_one(item.ToDocument());
-                _tableCollection.update_one(tableSearchQuery.view(), tableUpdateQuery.view());
                 session.commit_transaction();
 
                 log_trace << "DynamoDb item created, oid: " << itemResult->inserted_id().get_oid().value.to_string();
                 item.oid = itemResult->inserted_id().get_oid().value.to_string();
+                return item;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-        } else {
-            item = _memoryDb.CreateItem(item);
         }
-        return item;
+        return _memoryDb.CreateItem(item);
     }
 
     Entity::DynamoDb::Item DynamoDbDatabase::UpdateItem(Entity::DynamoDb::Item &item) const {
@@ -804,6 +795,41 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllItems();
     }
 
+    std::vector<Entity::DynamoDb::Item> DynamoDbDatabase::GetItems(const std::string &region, const std::string &tableName) const {
+        Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "get_items");
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
+
+                document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!tableName.empty()) {
+                    query.append(kvp("tableName", tableName));
+                }
+                std::vector<Entity::DynamoDb::Item> items;
+                for (auto cursor = _itemCollection.find(query.view()); auto &&doc: cursor) {
+                    Entity::DynamoDb::Item item;
+                    item.FromDocument(doc);
+                    items.push_back(item);
+                }
+                log_debug << "DynamoDB items exported";
+                return items;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        //  return _memoryDb.GetItems(region, tableName);
+        return {};
+    }
+
     std::vector<Entity::DynamoDb::Item> DynamoDbDatabase::ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, const bool scanIndexForward, const int limit) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "execute_query");
 
@@ -828,7 +854,6 @@ namespace AwsMock::Database {
             Entity::DynamoDb::Item item;
             item.FromDocument(doc);
             items.push_back(item);
-            std::cout << bsoncxx::to_json(doc) << std::endl;
         }
         return items;
     }

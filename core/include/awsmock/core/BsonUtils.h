@@ -4,6 +4,7 @@
 
 #ifndef AWS_MOCK_CORE_BSON_UTILS_H
 #define AWS_MOCK_CORE_BSON_UTILS_H
+#include <boost/json/array.hpp>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -389,7 +390,66 @@ namespace AwsMock::Core::Bson {
         static std::string ToJsonString(const array &array) {
             return bsoncxx::to_json(array);
         }
+
+        static boost::json::array BsonArrayToJson(const bsoncxx::array::view &bsonArray) {
+            boost::json::array jsonArray;
+
+            for (const auto &el: bsonArray) {
+                jsonArray.push_back(BsonValueToJson(el.get_value()));
+            }
+
+            return jsonArray;
+        }
+
+        static boost::json::value BsonValueToJson(const bsoncxx::types::bson_value::view &val) {
+            switch (val.type()) {
+
+                case bsoncxx::type::k_string:
+                    return boost::json::value{std::string{val.get_string().value}};
+
+                case bsoncxx::type::k_double:
+                    return boost::json::value{val.get_double().value};
+
+                case bsoncxx::type::k_int32:
+                    return boost::json::value{val.get_int32().value};
+
+                case bsoncxx::type::k_int64:
+                    return boost::json::value{val.get_int64().value};
+
+                case bsoncxx::type::k_bool:
+                    return boost::json::value{val.get_bool().value};
+
+                case bsoncxx::type::k_null:
+                    return boost::json::value{nullptr};
+
+                case bsoncxx::type::k_array:
+                    return boost::json::value{BsonArrayToJson(val.get_array().value)};
+
+                case bsoncxx::type::k_document: {
+                    boost::json::object obj;
+                    for (const auto &el: val.get_document().value)
+                        obj[std::string{el.key()}] = BsonValueToJson(el.get_value());
+                    return boost::json::value{obj};
+                }
+
+                case bsoncxx::type::k_decimal128: {
+                    return boost::json::value{std::stod(val.get_decimal128().value.to_string())};
+                }
+
+                case bsoncxx::type::k_date: {
+                    // Convert to milliseconds since epoch
+                    return boost::json::value{val.get_date().value.count()};
+                }
+
+                case bsoncxx::type::k_oid:
+                    return boost::json::value{std::string{val.get_oid().value.to_string()}};
+
+                default:
+                    return boost::json::value{nullptr};
+            }
+        }
     };
+
 }// namespace AwsMock::Core::Bson
 
 #endif// AWS_MOCK_CORE_BSON_UTILS_H

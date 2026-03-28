@@ -44,7 +44,7 @@ namespace AwsMock::Dto::Common {
         std::string cmd;
         if (const std::string cType = request["Content-Type"]; Core::StringUtils::ContainsIgnoreCase(cType, "application/x-www-form-urlencoded")) {
 
-            cmd = Core::HttpUtils::GetStringParameter(payload, "Action");
+            cmd = Core::HttpUtils::GetStringParameterFromBody(payload, "Action");
 
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 

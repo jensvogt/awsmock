@@ -5,6 +5,7 @@
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
 #include "awsmock/dto/cognito/mapper/Mapper.h"
+#include "awsmock/dto/dynamodb/internal/ExportItemsResponse.h"
 
 namespace AwsMock::Service {
 
@@ -330,7 +331,7 @@ namespace AwsMock::Service {
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
 
             if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName, partitionKey, sortKey)) {
-                log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+                log_debug << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
                 Dto::DynamoDb::GetItemResponse getItemResponse;
                 getItemResponse.region = request.region;
                 getItemResponse.user = request.user;
@@ -528,6 +529,30 @@ namespace AwsMock::Service {
             createRequest.region = request.region;
             Dto::DynamoDb::CreateTableResponse createResponse = CreateTable(createRequest);
             log_debug << "DynamoDb item deleted, table: " << request.tableName;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd delete item failed, message: " << exc.message();
+            throw Core::ServiceException("DynamoDbd delete item failed, message: " + exc.message());
+        }
+    }
+
+    Dto::DynamoDb::ExportItemsResponse DynamoDbService::ExportItems(const Dto::DynamoDb::ExportItemsRequest &request) const {
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "export_items");
+        log_debug << "Start exporting all items, region: " << request.region << " table: " << request.tableName;
+
+        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+            throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
+        }
+
+        try {
+
+            // Get items
+            Dto::DynamoDb::ExportItemsResponse response;
+            response.tableName = request.tableName;
+            response.region = request.region;
+            response.infrastructure.dynamoDbItems = _dynamoDbDatabase.GetItems(request.region, request.tableName);
+            return response;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete item failed, message: " << exc.message();

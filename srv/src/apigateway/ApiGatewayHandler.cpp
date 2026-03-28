@@ -18,11 +18,11 @@ namespace AwsMock::Service {
                 case Dto::Common::ApiGatewayCommandType::GET_API_KEYS: {
 
                     Dto::ApiGateway::GetApiKeysRequest serviceRequest;
-                    serviceRequest.nameQuery = Core::HttpUtils::GetStringParameter(request.target(), "nameQuery");
-                    serviceRequest.customerId = Core::HttpUtils::GetStringParameter(request.target(), "customerId");
+                    serviceRequest.nameQuery = Core::HttpUtils::GetStringParameterFromBody(request.target(), "nameQuery");
+                    serviceRequest.customerId = Core::HttpUtils::GetStringParameterFromBody(request.target(), "customerId");
                     serviceRequest.includeValues = Core::HttpUtils::GetBoolParameter(request.target(), "includeValues");
                     serviceRequest.limit = Core::HttpUtils::GetLongParameter(request.target(), "limit", 0, 100, 100);
-                    serviceRequest.position = Core::HttpUtils::GetStringParameter(request.target(), "position");
+                    serviceRequest.position = Core::HttpUtils::GetStringParameterFromBody(request.target(), "position");
                     const Dto::ApiGateway::GetApiKeysResponse serviceResponse = _apiGatewayService.GetApiKeys(serviceRequest);
                     log_info << "API key list created";
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
