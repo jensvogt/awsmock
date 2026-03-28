@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.5](https://github.com/jensvogt/awsmock/compare/1.16.4...v1.16.5) (2026-03-28)
+
+
+### Bug Fixes
+
+* fix SNS publish attribute parsing ([d228850](https://github.com/jensvogt/awsmock/commit/d228850fdd6e945c6880f694533e661e989db2e4))
+
 ## [1.16.4](https://github.com/jensvogt/awsmock/compare/v1.16.3...v1.16.4) (2026-03-25)
 
 
