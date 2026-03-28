@@ -388,20 +388,8 @@ namespace AwsMock::Service {
             response.item.region = item.region;
             response.item.tableName = item.tableName;
             response.item.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
-            if (item.partitionKey.index() == 0) {
-                response.item.attributes[table.GetPartitionKeyName()].type = "S";
-                response.item.attributes[table.GetPartitionKeyName()].stringValue = std::get<std::string>(item.partitionKey);
-            } else if (item.partitionKey.index() == 1) {
-                response.item.attributes[table.GetPartitionKeyName()].type = "N";
-                response.item.attributes[table.GetPartitionKeyName()].numberValue = std::get<std::string>(item.partitionKey);
-            }
-            if (item.partitionKey.index() == 0) {
-                response.item.attributes[table.GetSortKeyName()].type = "S";
-                response.item.attributes[table.GetSortKeyName()].stringValue = std::get<std::string>(item.sortKey);
-            } else if (item.partitionKey.index() == 1) {
-                response.item.attributes[table.GetSortKeyName()].type = "N";
-                response.item.attributes[table.GetSortKeyName()].numberValue = std::get<std::string>(item.sortKey);
-            }
+            response.item.attributes[table.GetPartitionKeyName()] = Dto::DynamoDb::Mapper::map(item.partitionKey);
+            response.item.attributes[table.GetSortKeyName()] = Dto::DynamoDb::Mapper::map(item.sortKey);
             response.item.created = item.created;
             response.item.modified = item.modified;
             return response;
@@ -470,9 +458,9 @@ namespace AwsMock::Service {
             scanResponse.requestId = request.requestId;
             scanResponse.tableName = request.tableName;
             scanResponse.count = count;
-            scanResponse.scannedCount = items.size();
+            scanResponse.scannedCount = static_cast<long>(items.size());
             for (const auto &item: items) {
-                //scanResponse.items.emplace_back(Dto::DynamoDb::Mapper::map(item.attributes));
+                scanResponse.items.emplace_back(Dto::DynamoDb::Mapper::map(item.attributes));
             }
             return scanResponse;
 
@@ -499,7 +487,7 @@ namespace AwsMock::Service {
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
 
             // Get the item
-            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, partitionKey, sortKey);
+            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, item.partitionKey, item.sortKey);
 
             // Delete item
             _dynamoDbDatabase.DeleteItem(request.region, request.tableName, partitionKey, sortKey);

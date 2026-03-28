@@ -4,8 +4,6 @@
 
 #include <awsmock/entity/dynamodb/KeySchema.h>
 
-#include "awsmock/dto/cognito/AdminCreateUserRequest.h"
-
 namespace AwsMock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> KeySchema::ToDocument() const {

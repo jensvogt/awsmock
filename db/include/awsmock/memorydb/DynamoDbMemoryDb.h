@@ -194,7 +194,7 @@ namespace AwsMock::Database {
          * @return item entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const;
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) const;
 
         /**
          * @brief Creates a new item
@@ -230,7 +230,7 @@ namespace AwsMock::Database {
          * @param partitionKey partition key
          * @param sortKey sort key, default = {}
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey = {});
+        void DeleteItem(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey = {});
 
         /**
          * @brief Deletes all item of a table

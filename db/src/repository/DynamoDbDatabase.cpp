@@ -464,7 +464,7 @@ namespace AwsMock::Database {
         }
         return _memoryDb.ItemExists(region, tableName, partitionKey, sortKey);
     }
- Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) const {
+    Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "list_items");
 
         if (HasDatabase()) {
@@ -523,7 +523,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::DynamoDb::Item DynamoDbDatabase::GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const {
+    Entity::DynamoDb::Item DynamoDbDatabase::GetItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "get_item_by_key");
 
         if (HasDatabase()) {
@@ -541,9 +541,20 @@ namespace AwsMock::Database {
                 }
 
                 // Primary keys
-                query.append(kvp("partitionKey", partitionKey));
-                if (!sortKey.empty()) {
-                    query.append(kvp("sortkey", sortKey));
+                if (partitionKey.index() == 0) {
+                    query.append(kvp("partitionKey", std::get<std::string>(partitionKey)));
+                } else if (partitionKey.index() == 1) {
+                    query.append(kvp("partitionKey", std::get<double>(partitionKey)));
+                    // } else if (partitionKey.index() == 2) {
+                    //     query.append(kvp("partitionKey", std::get<std::vector<uint8_t>>(partitionKey)));
+                }
+
+                if (sortKey.index() == 0) {
+                    query.append(kvp("sortKey", std::get<std::string>(sortKey)));
+                } else if (sortKey.index() == 1) {
+                    query.append(kvp("sortKey", std::get<double>(sortKey)));
+                    // } else if (sortKey.index() == 2) {
+                    //     query.append(kvp("sortKey", std::get<std::vector<uint8_t>>(sortKey)));
                 }
 
                 if (const auto mResult = _itemCollection.find_one(query.view())) {
@@ -623,9 +634,9 @@ namespace AwsMock::Database {
                 const Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
 
                 // TODO: FIx me
-                // Entity::DynamoDb::Item dbItem = GetItemByKeys(item.region, item.tableName, item.partitionKey, item.sortKey);
-                // dbItem.modified = system_clock::now();
-                // dbItem.attributes = item.attributes;
+                Entity::DynamoDb::Item dbItem = GetItemByKeys(item.region, item.tableName, item.partitionKey, item.sortKey);
+                dbItem.modified = system_clock::now();
+                dbItem.attributes = item.attributes;
 
                 // document query;
                 // query.append(kvp("_id", bsoncxx::oid(dbItem.oid)));
