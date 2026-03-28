@@ -223,6 +223,15 @@ namespace AwsMock::Database {
         long CountItems(const std::string &region = {}) const;
 
         /**
+         * @brief Get a list of all items of a table
+         *
+         * @param region AWS region
+         * @param tableName table name
+         * @return list of items;
+         */
+        std::vector<Entity::DynamoDb::Item> GetItems(const std::string &region, const std::string &tableName);
+
+        /**
          * @brief Deletes an item
          *
          * @param region AWS region.
@@ -248,6 +257,7 @@ namespace AwsMock::Database {
          * @return nuber of items deleted.
          */
         long DeleteAllItems();
+        Entity::DynamoDb::ItemList ItemsToVector();
 
       private:
 

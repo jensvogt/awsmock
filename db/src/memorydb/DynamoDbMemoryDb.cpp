@@ -3,6 +3,9 @@
 //
 
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
+
+#include "awsmock/core/Linq.h"
+
 #include <boost/accumulators/statistics/count.hpp>
 
 namespace AwsMock::Database {
@@ -293,6 +296,18 @@ namespace AwsMock::Database {
         return static_cast<long>(_items.size());
     }
 
+    std::vector<Entity::DynamoDb::Item> DynamoDbMemoryDb::GetItems(const std::string &region, const std::string &tableName) {
+
+        const auto q = Core::from(ItemsToVector());
+        if (!region.empty()) {
+            q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
+        }
+        if (!tableName.empty()) {
+            q.where([tableName](const Entity::DynamoDb::Item &item) { return item.tableName == tableName; });
+        }
+        return q.to_vector();
+    }
+
     void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) {
         boost::mutex::scoped_lock lock(_itemMutex);
 
@@ -323,4 +338,9 @@ namespace AwsMock::Database {
         return count;
     }
 
+    inline Entity::DynamoDb::ItemList DynamoDbMemoryDb::ItemsToVector() {
+        Entity::DynamoDb::ItemList itemList;
+        std::ranges::transform(_items, std::back_inserter(itemList), [](auto const &pair) { return pair.second; });
+        return itemList;
+    }
 }// namespace AwsMock::Database

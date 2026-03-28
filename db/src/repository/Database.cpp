@@ -48,7 +48,8 @@ namespace AwsMock::Database {
             {"dynamodb_table_idx2", {"dynamodb_table", {{"region", 1}, {"name", 1}, {"itemCount", -1}}, false}},
             // DynamoDb tables
             {"dynamodb_item_idx1", {"dynamodb_item", {{"tableName", 1}}, false}},
-            {"dynamodb_item_idx2", {"dynamodb_item", {{"tableName", 1}, {"keys", 1}}, false}},
+            {"dynamodb_item_idx2", {"dynamodb_item", {{"tableName", 1}, {"partitionKey", 1}}, false}},
+            {"dynamodb_item_idx3", {"dynamodb_item", {{"tableName", 1}, {"partitionKey", 1}, {"sortKey", 1}}, false}},
     };
 
     DatabaseBase::DatabaseBase() : _useDatabase(false) {

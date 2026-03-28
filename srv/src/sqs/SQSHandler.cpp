@@ -409,8 +409,8 @@ namespace AwsMock::Service {
 
         for (int i = 1; i <= count; i++) {
             Dto::SQS::QueueAttribute attribute;
-            attribute.attributeName = Core::HttpUtils::GetStringParameter(payload, "UserAttribute." + std::to_string(i) + ".Name"),
-            attribute.attributeValue = Core::HttpUtils::GetStringParameter(payload, "UserAttribute." + std::to_string(i) + ".Value");
+            attribute.attributeName = Core::HttpUtils::GetStringParameterFromBody(payload, "UserAttribute." + std::to_string(i) + ".Name"),
+            attribute.attributeValue = Core::HttpUtils::GetStringParameterFromBody(payload, "UserAttribute." + std::to_string(i) + ".Value");
             queueAttributes.emplace_back(attribute);
         }
         return queueAttributes;
@@ -423,8 +423,8 @@ namespace AwsMock::Service {
         log_trace << "Got tags count, count: " << count;
 
         for (int i = 1; i <= count; i++) {
-            std::string key = Core::HttpUtils::GetStringParameter(payload, "Tag." + std::to_string(i) + ".Key");
-            if (std::string value = Core::HttpUtils::GetStringParameter(payload, "Tag." + std::to_string(i) + ".Value"); !key.empty() && !value.empty()) {
+            std::string key = Core::HttpUtils::GetStringParameterFromBody(payload, "Tag." + std::to_string(i) + ".Key");
+            if (std::string value = Core::HttpUtils::GetStringParameterFromBody(payload, "Tag." + std::to_string(i) + ".Value"); !key.empty() && !value.empty()) {
                 queueTags[key] = value;
             }
         }
@@ -437,7 +437,7 @@ namespace AwsMock::Service {
 
         std::vector<std::string> attributeNames;
         for (int i = 1; i <= count; i++) {
-            attributeNames.emplace_back(Core::HttpUtils::GetStringParameter(payload, "AttributeName." + std::to_string(i)));
+            attributeNames.emplace_back(Core::HttpUtils::GetStringParameterFromBody(payload, "AttributeName." + std::to_string(i)));
         }
         return attributeNames;
     }
@@ -448,12 +448,12 @@ namespace AwsMock::Service {
 
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         for (int i = 1; i <= attributeCount / 3; i++) {
-            std::string name = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Name");
-            std::string dataTape = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
+            std::string name = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttribute." + std::to_string(i) + ".Name");
+            std::string dataTape = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
 
             std::string stringValue;
             if (dataTape == "String" || dataTape == "Number") {
-                stringValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
+                stringValue = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
             }
             Dto::SQS::MessageAttribute messageAttribute;
             messageAttribute.stringValue = stringValue;

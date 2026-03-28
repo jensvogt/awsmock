@@ -155,7 +155,7 @@ namespace AwsMock::Core {
         return def;
     }
 
-    std::string HttpUtils::GetStringParameter(const std::string &uri, const std::string &name, const std::string &def) {
+    std::string HttpUtils::GetStringParameterFromBody(const std::string &uri, const std::string &name, const std::string &def) {
 
         // Parse as URL query string by prepending a dummy host
         boost::url url("http://dummy?" + uri);
@@ -166,6 +166,18 @@ namespace AwsMock::Core {
             return (*it).value;
         }
         return def;
+    }
+
+    std::string HttpUtils::GetStringParameter(const std::string &uri, const std::string &name) {
+
+        // Parse as URL query string by prepending a dummy host
+        boost::url url(uri);
+        const auto params = url.params();
+        if (const auto it = params.find(name); it != params.end()) {
+            // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+            return (*it).value;
+        }
+        return {};
     }
 
     bool HttpUtils::GetBoolParameter(const std::string &uri, const std::string &name, const bool &def) {

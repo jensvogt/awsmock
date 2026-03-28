@@ -307,6 +307,15 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllItems() const;
 
+        /**
+         * @brief Get a list of all items of a table
+         *
+         * @param region AWS region
+         * @param tableName table name
+         * @return list of items;
+         */
+        std::vector<Entity::DynamoDb::Item> GetItems(const std::string &region, const std::string &tableName) const;
+
       private:
 
         Entity::DynamoDb::KeyValue DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const;
