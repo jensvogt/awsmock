@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.6](https://github.com/jensvogt/awsmock/compare/v1.16.5...v1.16.6) (2026-03-28)
+
+
+### Bug Fixes
+
+* fix dynamodb partition key/sortKey handling ([d96efe2](https://github.com/jensvogt/awsmock/commit/d96efe20c89d960145670affcd4e204ba0e93d85))
+* fix dynamodb partition key/sortKey handling ([e5d56f1](https://github.com/jensvogt/awsmock/commit/e5d56f119a07ab04a19b8502b62f14d68a36f7ed))
+
 ## [1.16.5](https://github.com/jensvogt/awsmock/compare/1.16.4...v1.16.5) (2026-03-28)
 
 
