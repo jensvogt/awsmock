@@ -51,17 +51,17 @@ namespace AwsMock::Database::Entity::DynamoDb {
     }
 
     bsoncxx::types::bson_value::value Item::DynamoValueToBson(const DynamoValue &val) const {
-        return std::visit([this]<typename T0>(const T0 &val) -> bsoncxx::types::bson_value::value {
+        return std::visit([this]<typename T0>(const T0 &value) -> bsoncxx::types::bson_value::value {
             using T = std::decay_t<T0>;
 
             if constexpr (std::is_same_v<T, std::string>) {
-                return bsoncxx::types::bson_value::value{val};
+                return bsoncxx::types::bson_value::value{value};
 
             } else if constexpr (std::is_same_v<T, double>) {
-                return bsoncxx::types::bson_value::value{val};
+                return bsoncxx::types::bson_value::value{value};
 
             } else if constexpr (std::is_same_v<T, bool>) {
-                return bsoncxx::types::bson_value::value{val};
+                return bsoncxx::types::bson_value::value{value};
 
             } else if constexpr (std::is_same_v<T, std::nullptr_t>) {
                 return bsoncxx::types::bson_value::value{bsoncxx::types::b_null{}};
@@ -71,30 +71,30 @@ namespace AwsMock::Database::Entity::DynamoDb {
                 return bsoncxx::types::bson_value::value{
                         bsoncxx::types::b_binary{
                                 bsoncxx::binary_sub_type::k_binary,
-                                static_cast<uint32_t>(val.size()),
-                                val.data()}};
+                                static_cast<uint32_t>(value.size()),
+                                value.data()}};
 
             } else if constexpr (std::is_same_v<T, std::set<std::string>>) {
                 array arr;
-                for (const auto &s: val)
+                for (const auto &s: value)
                     arr.append(s);
                 return bsoncxx::types::bson_value::value{arr.view()};
 
             } else if constexpr (std::is_same_v<T, std::set<double>>) {
                 array arr;
-                for (const auto &n: val)
+                for (const auto &n: value)
                     arr.append(n);
                 return bsoncxx::types::bson_value::value{arr.view()};
 
             } else if constexpr (std::is_same_v<T, DynamoList>) {
                 array arr;
-                for (const auto &item: val)
+                for (const auto &item: value)
                     arr.append(DynamoValueToBson(*item));// item is shared_ptr<DynamoValue>
                 return bsoncxx::types::bson_value::value{arr.view()};
 
             } else if constexpr (std::is_same_v<T, DynamoMap>) {
                 document doc;
-                for (const auto &[k, v]: val)
+                for (const auto &[k, v]: value)
                     doc.append(kvp(k, DynamoValueToBson(*v)));// v is shared_ptr<DynamoValue>
                 return bsoncxx::types::bson_value::value{doc.view()};
 
@@ -113,6 +113,18 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             case bsoncxx::type::k_double:
                 return DynamoValue{val.get_double().value};
+
+            case bsoncxx::type::k_int32:
+                return DynamoValue{static_cast<double>(val.get_int32().value)};
+
+            case bsoncxx::type::k_int64:
+                return DynamoValue{static_cast<double>(val.get_int64().value)};
+
+            case bsoncxx::type::k_decimal128: {
+                const auto dec = val.get_decimal128().value;
+                const std::string str = dec.to_string();
+                return DynamoValue{std::stod(str)};
+            }
 
             case bsoncxx::type::k_bool:
                 return DynamoValue{val.get_bool().value};
@@ -222,6 +234,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
         } catch (const std::exception &exc) {
             log_error << exc.what();
+            log_error << bsoncxx::to_json(mResult);
             throw Core::JsonException(exc.what());
         }
     }

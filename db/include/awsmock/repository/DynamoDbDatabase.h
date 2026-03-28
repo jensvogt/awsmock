@@ -309,6 +309,9 @@ namespace AwsMock::Database {
 
       private:
 
+        Entity::DynamoDb::KeyValue DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const;
+        void DumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) const;
+
         /**
          * @brief Database name
          */
