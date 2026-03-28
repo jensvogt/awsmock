@@ -73,7 +73,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Item array
          */
-        std::vector<std::map<std::string, AttributeValue>> items;
+        std::vector<std::unordered_map<std::string, AttributeValue>> items;
 
       private:
 
@@ -84,7 +84,7 @@ namespace AwsMock::Dto::DynamoDb {
             r.scannedCount = Core::Json::GetLongValue(v, "ScannedCount");
             if (Core::Json::AttributeExists(v, "Items")) {
                 for (boost::json::array itemsJson = v.at("Items").as_array(); auto &item: itemsJson) {
-                    std::map<std::string, AttributeValue> itemMap;
+                    std::unordered_map<std::string, AttributeValue> itemMap;
                     for (auto &attribute: item.as_object()) {
                         itemMap[attribute.key()] = boost::json::value_to<AttributeValue>(attribute.value());
                     }

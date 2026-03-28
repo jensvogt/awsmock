@@ -59,15 +59,32 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::PUBLISH: {
+
+                    // Parse as URL query string by prepending a dummy host
+                    boost::url url("http://dummy?" + clientCommand.payload);
+                    auto params = url.params();
+
                     Dto::SNS::PublishRequest snsRequest;
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
-                    snsRequest.contentType = clientCommand.contentType;
-                    snsRequest.topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
-                    snsRequest.targetArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TargetArn");
-                    snsRequest.message = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Message");
-                    snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
                     snsRequest.requestId = clientCommand.requestId;
+                    snsRequest.contentType = clientCommand.contentType;
+                    //snsRequest.topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
+                    // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+                    if (auto it = params.find("TopicArn"); it != params.end()) {
+                        snsRequest.topicArn = (*params.find("TopicArn")).value;
+                    }
+                    // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+                    if (auto it = params.find("TargetArn"); it != params.end()) {
+                        snsRequest.targetArn = (*params.find("TargetArn")).value;
+                    }
+                    // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+                    if (auto it = params.find("Message"); it != params.end()) {
+                        snsRequest.message = (*params.find("Message")).value;
+                    }
+
+                    // TODO: add SNS message attributes
+                    //snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
                     Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
 
                     std::map<std::string, std::string> headers;
@@ -310,4 +327,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -5,6 +5,9 @@
 #ifndef AWSMOCK_DTO_DYNAMODB_MAPPER_H
 #define AWSMOCK_DTO_DYNAMODB_MAPPER_H
 
+// C++ includes
+#include <ranges>
+
 // AwsMock includes
 #include <awsmock/dto/dynamodb/DeleteItemRequest.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
@@ -44,7 +47,6 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::Item
          */
         static Database::Entity::DynamoDb::Item map(const DeleteItemRequest &request);
-        static Database::Entity::DynamoDb::DynamoValue mapAttribute(const AttributeValue &attr);
 
         /**
          * @brief Maps a DynamoDB PutItemRequest to an entity, which can be saved in the database.
@@ -59,12 +61,11 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * @brief Maps a DynamoDB PutItemRequest to an entity, which can be saved in the database.
          *
-         * @param attributeValue attribute value entity
+         * @param attributes attribute value entities
          * @return Dynamodb attribute DTO
          * @see Dto::DynamoDb::AttributeValue
          * @see Database::Entity::DynamoDb::AttributeValue
          */
-        static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::DynamoValue> &attributeValue);
         static std::unordered_map<std::string, AttributeValue> map(const std::unordered_map<std::string, Database::Entity::DynamoDb::DynamoValue> &attributes);
 
         /**
@@ -84,6 +85,7 @@ namespace AwsMock::Dto::DynamoDb {
          * @return attribute value entity
          */
         static Database::Entity::DynamoDb::DynamoValue map(const AttributeValue &attributeValueDto);
+        static AttributeValue map(const Database::Entity::DynamoDb::KeyValue &keyValue);
 
         /**
          * @brief Maps a DynamoDB item entity to an item DTO.
