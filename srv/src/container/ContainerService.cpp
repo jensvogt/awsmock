@@ -5,6 +5,9 @@
 #include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
+
+    thread_local std::shared_ptr<Core::DomainSocket> ContainerService::_domainSocket;
+
     ContainerService::ContainerService() {
         // Get network mode
         _networkName = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
@@ -16,12 +19,23 @@ namespace AwsMock::Service {
         _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
 #else
         _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket") : Core::Configuration::instance().GetValue<std::string>("awsmock.podman.socket");
-        _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
+        //_domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
 #endif
     }
 
+    std::shared_ptr<Core::DomainSocket> ContainerService::GetSocket() const {
+        if (!_domainSocket) {
+#ifdef WIN32
+            _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
+#else
+            _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
+#endif
+        }
+        return _domainSocket;
+    }
+
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
-        const Core::DomainSocketResult result = _domainSocket->SendJson(http::verb::get, "/images/" + name + ":" + tag + "/json", {}, {});
+        const Core::DomainSocketResult result = GetSocket()->SendJson(http::verb::get, "/images/" + name + ":" + tag + "/json", {}, {});
         if (result.statusCode == http::status::ok) {
             log_debug << "Docker image found, name: " << name << ":" << tag;
             return true;
@@ -31,7 +45,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage); statusCode == http::status::ok) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage); statusCode == http::status::ok) {
             log_debug << "Docker image created, name: " << name << ":" << tag;
 
             // Wait for image creation
@@ -46,7 +60,7 @@ namespace AwsMock::Service {
 
     Dto::Docker::Image ContainerService::GetImageByName(const std::string &name, const std::string &tag, const bool locked) const {
         const std::string imageName = name + ":" + tag;
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/images/" + imageName + "/json");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/images/" + imageName + "/json");
         if (statusCode != http::status::ok) {
             log_warning << "Get image by name failed, name: " << imageName << ", statusCode: " << statusCode;
             return {};
@@ -63,7 +77,7 @@ namespace AwsMock::Service {
 
         std::string dockerFile = WriteLambdaDockerFile(codeDir, handler, runtime, environment);
         std::string imageFile = BuildImageFile(codeDir, name);
-        auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
+        auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
         log_trace << "Build image, status: " << statusCode << ", body: " << body;
         if (statusCode != http::status::ok) {
             log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
@@ -81,7 +95,7 @@ namespace AwsMock::Service {
         // Write the docker file
         std::string dockerFile = WriteApplicationDockerFile(codeDir, name, archive, privatePort, runtime, environment);
         const std::string imageFile = BuildImageFile(codeDir, name);
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, image: " << name << ":" << tag << ", statusCode: " << statusCode << ", body: " << body;
             return dockerFile;
         }
@@ -105,14 +119,14 @@ namespace AwsMock::Service {
         Core::StringUtils::Replace(tarFileName, ".", "-");
         const std::string imageFile = BuildImageFile(codeDir, tarFileName);
 
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, statusCode: " << statusCode << ", body: " << body;
         }
         return dockerFile;
     }
 
     std::vector<Dto::Docker::Image> ContainerService::ListImagesByName(const std::string &name, const std::string &tag) const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/images/json?all=true");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/images/json?all=true");
         if (statusCode != http::status::ok) {
             log_error << "Get image by name failed, statusCode: " << statusCode;
             throw Core::ServiceException("Get image by name failed", statusCode);
@@ -137,7 +151,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::DeleteImage(const std::string &id) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::delete_, "/images/" + id + "?force=true"); statusCode != http::status::ok) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::delete_, "/images/" + id + "?force=true"); statusCode != http::status::ok) {
             log_error << "Delete image failed, statusCode: " << statusCode << ", id: " << id;
             throw Core::ServiceException("Delete image failed, id: " + id, statusCode);
         }
@@ -145,7 +159,7 @@ namespace AwsMock::Service {
     }
 
     bool ContainerService::ContainerExists(const std::string &containerName) const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerName + "/json");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerName + "/json");
         if (statusCode == http::status::ok) {
             log_debug << "Docker container found, name: " << containerName;
             return true;
@@ -179,7 +193,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Docker::Container ContainerService::GetContainerById(const std::string &containerId) const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json");
         if (statusCode != http::status::ok) {
             log_warning << "Get docker container by ID failed, statusCode: " << statusCode;
             return {};
@@ -191,7 +205,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Docker::Container ContainerService::GetContainerByName(const std::string &name) const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + name + "/json");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + name + "/json");
         if (statusCode != http::status::ok) {
             log_warning << "Get container by name failed, name: " << name << ", statusCode: " << statusCode;
             return {};
@@ -204,7 +218,7 @@ namespace AwsMock::Service {
 
     Dto::Docker::InspectContainerResponse ContainerService::InspectContainer(const std::string &containerId) const {
         Dto::Docker::InspectContainerResponse inspectContainerResponse{};
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         if (statusCode != http::status::ok) {
             inspectContainerResponse.status = statusCode;
             log_warning << "Inspect container failed, containerId: " << Core::StringUtils::Continuation(containerId, 16) << ", statusCode: " << statusCode;
@@ -218,7 +232,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Docker::ListContainerResponse ContainerService::ListContainers() const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
             log_warning << "List docker containers failed, state: " << statusCode;
             return {};
@@ -235,7 +249,7 @@ namespace AwsMock::Service {
 
     std::vector<Dto::Docker::Container> ContainerService::ListContainerByImageName(const std::string &name, const std::string &tag) const {
         // Send request
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
             log_warning << "List docker container by image name failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
             return {};
@@ -301,7 +315,7 @@ namespace AwsMock::Service {
         request.hostConfig = hostConfig;
         log_debug << "Create container request: " << request.ToJson();
 
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
             log_info << "Create container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return {};
@@ -349,7 +363,7 @@ namespace AwsMock::Service {
         request.hostConfig = hostConfig;
         log_debug << "Create container request: " << request.ToJson();
 
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
             log_info << "Create container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return {};
@@ -395,7 +409,7 @@ namespace AwsMock::Service {
         request.hostConfig = hostConfig;
         log_debug << "Create container request: " << request.ToJson();
 
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + containerName, request.ToJson());
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + containerName, request.ToJson());
         if (statusCode != http::status::created) {
             log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
             return {};
@@ -411,7 +425,7 @@ namespace AwsMock::Service {
         Dto::Docker::ListStatsResponse response;
         const Dto::Docker::ListContainerResponse listResponse = ListContainers();
         for (const auto &container: listResponse.containerList) {
-            auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + container.id + "/stats?stream=false&one-shot=true");
+            auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + container.id + "/stats?stream=false&one-shot=true");
             if (statusCode != http::status::ok) {
                 log_warning << "List container stats failed, statusCode: " << statusCode << " body " << body;
                 return {};
@@ -442,7 +456,7 @@ namespace AwsMock::Service {
         });
 
         // First the last 1000 lines
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=" + std::to_string(tail) + "&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=" + std::to_string(tail) + "&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
             ws.text(true);
             ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
         }
@@ -452,7 +466,7 @@ namespace AwsMock::Service {
             system_clock::time_point last = system_clock::now();
             while (ws.is_open()) {
                 const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(last));
-                if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true&tail=1000"); statusCode == http::status::ok && contentLength > 0) {
+                if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true&tail=1000"); statusCode == http::status::ok && contentLength > 0) {
                     if (ws.is_open()) {
                         ws.text(true);
                         ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
@@ -478,7 +492,7 @@ namespace AwsMock::Service {
     }
 
     bool ContainerService::NetworkExists(const std::string &name) const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/networks/" + name);
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/networks/" + name);
         if (statusCode == http::status::ok) {
             log_debug << "Docker network found, name: " << name;
             return true;
@@ -490,7 +504,7 @@ namespace AwsMock::Service {
     Dto::Docker::CreateNetworkResponse ContainerService::CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) const {
         Dto::Docker::CreateNetworkResponse response;
 
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
             log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
             response.FromJson(body);
         } else {
@@ -500,7 +514,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::StartContainer(const std::string &containerId) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
             log_warning << "Start container failed, id: " << containerId << ", statusCode: " << statusCode;
             return;
         }
@@ -508,7 +522,7 @@ namespace AwsMock::Service {
     }
 
     bool ContainerService::IsContainerRunning(const std::string &containerId) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json"); statusCode == http::status::ok) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json"); statusCode == http::status::ok) {
             log_debug << "Container running, statusCode: " << statusCode;
             const Dto::Docker::InspectContainerResponse response = response.FromJson(body);
             log_debug << "Docker container state, id: " << containerId << " state: " << std::boolalpha << response.state.running;
@@ -532,7 +546,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::RestartDockerContainer(const std::string &containerId) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/restart"); statusCode != http::status::no_content) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/restart"); statusCode != http::status::no_content) {
             log_warning << "Restart container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
@@ -542,7 +556,7 @@ namespace AwsMock::Service {
     std::string ContainerService::GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const {
         std::string logMessages;
         const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(start));
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true");
         if (statusCode == http::status::ok) {
             log_debug << "Container logs received, containerId: " << containerId;
             return body;
@@ -552,7 +566,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Docker::ContainerStat ContainerService::GetContainerStats(const std::string &containerId) const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
         if (statusCode == http::status::ok) {
             log_debug << "Container statistics received, containerId: " << containerId;
             return Dto::Docker::ContainerStat::FromJson(body);
@@ -566,7 +580,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::StopContainer(const std::string &containerId) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/stop"); statusCode != http::status::no_content && statusCode != http::status::not_modified) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/stop"); statusCode != http::status::no_content && statusCode != http::status::not_modified) {
             log_warning << "Stop container failed, statusCode: " << statusCode;
             return;
         }
@@ -578,7 +592,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::KillContainer(const std::string &containerId, const std::string &signal) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content) {
             if (statusCode == http::status::conflict) {
                 log_debug << "Kill container failed, containerId: " << containerId << ", statusCode: " << statusCode;
                 return;
@@ -594,7 +608,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::DeleteContainer(const std::string &containerId) const {
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::delete_, "/containers/" + containerId + "?force=true"); statusCode != http::status::no_content) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::delete_, "/containers/" + containerId + "?force=true"); statusCode != http::status::no_content) {
             log_warning << "Delete container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
@@ -609,7 +623,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::PruneContainers() const {
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/prune");
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/prune");
         if (statusCode != http::status::ok) {
             log_warning << "Prune containers failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;

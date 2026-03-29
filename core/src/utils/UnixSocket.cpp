@@ -46,7 +46,7 @@ namespace AwsMock::Core {
 
             boost::beast::flat_buffer buffer;
             response_parser<string_body> parser;
-            parser.body_limit(8 * 1024 * 1024);
+            //            parser.body_limit(8 * 1024 * 1024);
 
             http::read(socket, buffer, parser, ec);
             if (ec) {
@@ -137,7 +137,7 @@ namespace AwsMock::Core {
             timeout.tv_sec = 1;
             timeout.tv_usec = 0;
 #ifdef WIN32
-            setsockopt(socket.native_handle(), SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
+            setsockopt(socket.native_handle(), SOL_SOCKET, SO_RCVTIMEO, (char *) &timeout, sizeof(timeout));
 #else
             setsockopt(socket.native_handle(), SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 #endif

@@ -215,7 +215,7 @@ namespace AwsMock::Database {
          * @return item entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey = {}) const;
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey = {}) const;
 
         /**
          * @brief Creates a new item
@@ -276,6 +276,9 @@ namespace AwsMock::Database {
          */
         std::vector<Entity::DynamoDb::Item> ExecuteQuery(const value &filter, bool scanIndexForward, int limit = 0) const;
 
+        /**
+         * @brief Adjust the item counters and updates the table entities.
+         */
         void AdjustItemCounters() const;
 
         /**
@@ -307,7 +310,19 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllItems() const;
 
+        /**
+         * @brief Get a list of all items of a table
+         *
+         * @param region AWS region
+         * @param tableName table name
+         * @return list of items;
+         */
+        std::vector<Entity::DynamoDb::Item> GetItems(const std::string &region, const std::string &tableName) const;
+
       private:
+
+        Entity::DynamoDb::KeyValue DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const;
+        void DumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) const;
 
         /**
          * @brief Database name

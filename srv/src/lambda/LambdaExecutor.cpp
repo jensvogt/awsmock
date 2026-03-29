@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const {
+    Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload) const {
         Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
         log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.publicPort;
 
@@ -53,4 +53,4 @@ namespace AwsMock::Service {
         return lambdaResult;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

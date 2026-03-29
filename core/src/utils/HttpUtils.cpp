@@ -130,42 +130,66 @@ namespace AwsMock::Core {
     }
 
     int HttpUtils::GetIntParameter(const std::string &uri, const std::string &name, const int min, const int max, const int def) {
-        int value = def;
-        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
-            log_debug << "Query parameter found, name: " << name << " value: " << value;
-            value = std::stoi(parameters[name]);
-            value = value > min && value < max ? value : def;
+
+        // Parse as URL query string by prepending a dummy host
+        boost::url url("http://dummy?" + uri);
+        const auto params = url.params();
+
+        if (const auto it = params.find(name); it != params.end()) {
+            // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+            return std::stoi((*it).value);
         }
-        return value;
+        return def;
     }
 
     long HttpUtils::GetLongParameter(const std::string &uri, const std::string &name, const long min, const long max, const long def) {
 
-        long value = def;
-        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
-            log_debug << "Query parameter found, name: " << name << " value: " << value;
-            value = std::stol(parameters[name]);
-            value = value > min && value < max ? value : def;
+        // Parse as URL query string by prepending a dummy host
+        boost::url url("http://dummy?" + uri);
+        const auto params = url.params();
+
+        if (const auto it = params.find(name); it != params.end()) {
+            // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+            return std::stol((*it).value);
         }
-        return value;
+        return def;
     }
 
-    std::string HttpUtils::GetStringParameter(const std::string &uri, const std::string &name, const std::string &def) {
-        std::string value = def;
-        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
-            value = parameters[name];
-            log_debug << "Query parameter found, name: " << name << " value: " << value;
+    std::string HttpUtils::GetStringParameterFromBody(const std::string &uri, const std::string &name, const std::string &def) {
+
+        // Parse as URL query string by prepending a dummy host
+        boost::url url("http://dummy?" + uri);
+        const auto params = url.params();
+
+        if (const auto it = params.find(name); it != params.end()) {
+            // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+            return (*it).value;
         }
-        return value;
+        return def;
+    }
+
+    std::string HttpUtils::GetStringParameter(const std::string &uri, const std::string &name) {
+
+        // Parse as URL query string by prepending a dummy host
+        boost::url url(uri);
+        const auto params = url.params();
+        if (const auto it = params.find(name); it != params.end()) {
+            // ReSharper disable once CppRedundantDereferencingAndTakingAddress
+            return (*it).value;
+        }
+        return {};
     }
 
     bool HttpUtils::GetBoolParameter(const std::string &uri, const std::string &name, const bool &def) {
-        bool value = def;
-        if (const std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
-            log_debug << "Query parameter found, name: " << name << " value: " << value;
-            value = true;
+        // Parse as URL query string by prepending a dummy host
+        boost::url url("http://dummy?" + uri);
+        const auto params = url.params();
+
+        if (const auto it = params.find(name); it != params.end()) {
+            // ReSharper disable CppRedundantDereferencingAndTakingAddress
+            return (*it).value == "true" || (*it).value == "1";
         }
-        return value;
+        return def;
     }
 
     bool HttpUtils::HasQueryParameter(const std::string &uri, const std::string &name) {

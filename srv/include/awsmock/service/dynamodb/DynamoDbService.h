@@ -10,6 +10,7 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/dynamodb/internal/ExportItemsResponse.h"
 #include "awsmock/repository/DynamoDbToMongoTranslator.h"
 
 
@@ -48,6 +49,7 @@
 #include <awsmock/dto/dynamodb/QueryResponse.h>
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
+#include <awsmock/dto/dynamodb/internal/ExportItemsRequest.h>
 #include <awsmock/dto/dynamodb/internal/GetTableDetailCountersRequest.h>
 #include <awsmock/dto/dynamodb/internal/GetTableDetailCountersResponse.h>
 #include <awsmock/dto/dynamodb/internal/ListItemCountersRequest.h>
@@ -223,6 +225,18 @@ namespace AwsMock::Service {
          * @param request delete items request
          */
         void DeleteAllItems(const Dto::DynamoDb::DeleteAllItemsRequest &request) const;
+
+        /**
+         * @brief Export all items of a table
+         *
+         * @param request export items request
+         */
+        Dto::DynamoDb::ExportItemsResponse ExportItems(const Dto::DynamoDb::ExportItemsRequest &request) const;
+
+        /**
+         * @brief Recalculates the item counters
+         */
+        void ResetItemCounters() const;
 
       private:
 

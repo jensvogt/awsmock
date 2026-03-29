@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.16.9](https://github.com/jensvogt/awsmock/compare/v1.16.8...v1.16.9) (2026-03-29)
+
+
+### Bug Fixes
+
+* fix SQS redrive policy ([ff24f6a](https://github.com/jensvogt/awsmock/commit/ff24f6a578791705409f6e4f6eac333858109bae))
+
+## [1.16.8](https://github.com/jensvogt/awsmock/compare/v1.16.7...v1.16.8) (2026-03-29)
+
+
+### Bug Fixes
+
+* fix SQS redrive policy ([f2a8fcb](https://github.com/jensvogt/awsmock/commit/f2a8fcb4e6018bbd4d08d58f8d3cc6c59f23d75c))
+* fix SQS redrive policy ([eaec254](https://github.com/jensvogt/awsmock/commit/eaec254bd1683e0b8f7a192fea684135fcff0a8a))
+* fix SQS redrive policy ([78d32e8](https://github.com/jensvogt/awsmock/commit/78d32e84ee831a5c981a6d3dfc4fa636d2d9e6c6))
+
+## [1.16.7](https://github.com/jensvogt/awsmock/compare/1.16.6...v1.16.7) (2026-03-29)
+
+
+### Bug Fixes
+
+* fix docker service ([5ff7fce](https://github.com/jensvogt/awsmock/commit/5ff7fce5931d4b3bdd0c721c90703e6e84943244))
+* fix dynamodb update trigger ([0a6bd50](https://github.com/jensvogt/awsmock/commit/0a6bd503c6c53d557c95cb1964b24b5c5fb12a59))
+
+## [1.16.6](https://github.com/jensvogt/awsmock/compare/v1.16.5...v1.16.6) (2026-03-28)
+
+
+### Bug Fixes
+
+* fix dynamodb partition key/sortKey handling ([d96efe2](https://github.com/jensvogt/awsmock/commit/d96efe20c89d960145670affcd4e204ba0e93d85))
+* fix dynamodb partition key/sortKey handling ([e5d56f1](https://github.com/jensvogt/awsmock/commit/e5d56f119a07ab04a19b8502b62f14d68a36f7ed))
+
+## [1.16.5](https://github.com/jensvogt/awsmock/compare/1.16.4...v1.16.5) (2026-03-28)
+
+
+### Bug Fixes
+
+* fix SNS publish attribute parsing ([d228850](https://github.com/jensvogt/awsmock/commit/d228850fdd6e945c6880f694533e661e989db2e4))
+
 ## [1.16.4](https://github.com/jensvogt/awsmock/compare/v1.16.3...v1.16.4) (2026-03-25)
 
 

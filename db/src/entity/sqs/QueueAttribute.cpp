@@ -13,6 +13,7 @@ namespace AwsMock::Database::Entity::SQS {
                 kvp("maxMessageSize", static_cast<bsoncxx::types::b_int64>(maxMessageSize)),
                 kvp("messageRetentionPeriod", static_cast<bsoncxx::types::b_int64>(messageRetentionPeriod)),
                 kvp("policy", policy),
+                kvp("redrivePolicy", redrivePolicy.ToDocument()),
                 kvp("receiveMessageWaitTime", static_cast<bsoncxx::types::b_int64>(receiveMessageWaitTime)),
                 kvp("visibilityTimeout", static_cast<bsoncxx::types::b_int64>(visibilityTimeout)),
                 kvp("redriveAllowPolicy", redriveAllowPolicy),

@@ -194,7 +194,7 @@ namespace AwsMock::Database {
          * @return item entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const;
+        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) const;
 
         /**
          * @brief Creates a new item
@@ -223,6 +223,20 @@ namespace AwsMock::Database {
         long CountItems(const std::string &region = {}) const;
 
         /**
+         * @brief Get a list of all items of a table
+         *
+         * @param region AWS region
+         * @param tableName table name
+         * @return list of items;
+         */
+        std::vector<Entity::DynamoDb::Item> GetItems(const std::string &region, const std::string &tableName);
+
+        /**
+         * @brief Adjust the item counters and updates the table entities.
+         */
+        void AdjustItemCounters();
+
+        /**
          * @brief Deletes an item
          *
          * @param region AWS region.
@@ -230,7 +244,7 @@ namespace AwsMock::Database {
          * @param partitionKey partition key
          * @param sortKey sort key, default = {}
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey = {});
+        void DeleteItem(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey = {});
 
         /**
          * @brief Deletes all item of a table
@@ -248,6 +262,7 @@ namespace AwsMock::Database {
          * @return nuber of items deleted.
          */
         long DeleteAllItems();
+        Entity::DynamoDb::ItemList ItemsToVector();
 
       private:
 
