@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.16.8](https://github.com/jensvogt/awsmock/compare/v1.16.7...v1.16.8) (2026-03-29)
+
+
+### Bug Fixes
+
+* fix SQS redrive policy ([f2a8fcb](https://github.com/jensvogt/awsmock/commit/f2a8fcb4e6018bbd4d08d58f8d3cc6c59f23d75c))
+* fix SQS redrive policy ([eaec254](https://github.com/jensvogt/awsmock/commit/eaec254bd1683e0b8f7a192fea684135fcff0a8a))
+* fix SQS redrive policy ([78d32e8](https://github.com/jensvogt/awsmock/commit/78d32e84ee831a5c981a6d3dfc4fa636d2d9e6c6))
+
 ## [1.16.7](https://github.com/jensvogt/awsmock/compare/1.16.6...v1.16.7) (2026-03-29)
 
 
