@@ -29,12 +29,12 @@ namespace AwsMock::Service {
      */
     class LambdaExecutor : public boost::enable_shared_from_this<LambdaExecutor> {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() {
-        }
+        explicit LambdaExecutor() = default;
 
         /**
          * @brief Executes a lambda function synchronized
@@ -43,9 +43,10 @@ namespace AwsMock::Service {
          * @param instance lambda instance ID
          * @param payload lambda payload
          */
-        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const;
+        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload) const;
 
-    private:
+      private:
+
         /**
          * Lambda database connection
          */
@@ -57,6 +58,6 @@ namespace AwsMock::Service {
         ContainerService &_containerService = ContainerService::instance();
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
