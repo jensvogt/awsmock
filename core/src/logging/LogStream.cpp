@@ -169,6 +169,9 @@ namespace AwsMock::Core {
         if (file_sink) {
             file_sink->set_filter(boost::log::trivial::severity >= _severity);
         }
+        if (webSocketSink) {
+            webSocketSink->set_filter(boost::log::trivial::severity >= _severity);
+        }
     }
 
     void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {
