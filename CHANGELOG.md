@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.7](https://github.com/jensvogt/awsmock/compare/1.16.6...v1.16.7) (2026-03-29)
+
+
+### Bug Fixes
+
+* fix docker service ([5ff7fce](https://github.com/jensvogt/awsmock/commit/5ff7fce5931d4b3bdd0c721c90703e6e84943244))
+* fix dynamodb update trigger ([0a6bd50](https://github.com/jensvogt/awsmock/commit/0a6bd503c6c53d557c95cb1964b24b5c5fb12a59))
+
 ## [1.16.6](https://github.com/jensvogt/awsmock/compare/v1.16.5...v1.16.6) (2026-03-28)
 
 
