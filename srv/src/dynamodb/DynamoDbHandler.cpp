@@ -141,6 +141,13 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, dynamoDbResponse.ToJson());
                 }
 
+                case Dto::Common::DynamoDbCommandType::RESET_ITEM_COUNTERS: {
+
+                    _dynamoDbService.ResetItemCounters();
+                    log_info << "Reset item counters";
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {
                     log_error << "Bad request, method: POST clientCommand: " << Dto::Common::DynamoDbCommandTypeToString(clientCommand.command);
                     return SendResponse(request, http::status::bad_request, "Bad request, method: POST clientCommand: " + Dto::Common::DynamoDbCommandTypeToString(clientCommand.command));

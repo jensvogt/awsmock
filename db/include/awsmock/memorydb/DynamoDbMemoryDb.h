@@ -232,6 +232,11 @@ namespace AwsMock::Database {
         std::vector<Entity::DynamoDb::Item> GetItems(const std::string &region, const std::string &tableName);
 
         /**
+         * @brief Adjust the item counters and updates the table entities.
+         */
+        void AdjustItemCounters();
+
+        /**
          * @brief Deletes an item
          *
          * @param region AWS region.

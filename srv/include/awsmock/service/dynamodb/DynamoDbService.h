@@ -233,6 +233,11 @@ namespace AwsMock::Service {
          */
         Dto::DynamoDb::ExportItemsResponse ExportItems(const Dto::DynamoDb::ExportItemsRequest &request) const;
 
+        /**
+         * @brief Recalculates the item counters
+         */
+        void ResetItemCounters() const;
+
       private:
 
         /**

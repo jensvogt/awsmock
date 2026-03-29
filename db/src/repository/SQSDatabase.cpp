@@ -127,24 +127,20 @@ namespace AwsMock::Database {
     Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &queueArn) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
-        Entity::SQS::Queue queue;
         if (HasDatabase()) {
-            Entity::SQS::Queue result;
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
 
-            const auto mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
-
-            if (!mResult) {
-                log_error << "Queue not found, queueArn: " << queueArn;
-                throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
+            if (const auto mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)))) {
+                Entity::SQS::Queue queue;
+                queue.FromDocument(mResult->view());
+                return queue;
             }
-            queue = result.FromDocument(mResult->view());
-        } else {
-            queue = _memoryDb.GetQueueByArn(queueArn);
+            log_error << "Queue not found, queueArn: " << queueArn;
+            throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
         }
-        return queue;
+        return _memoryDb.GetQueueByArn(queueArn);
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByDlq(const std::string &dlqQueueArn) const {

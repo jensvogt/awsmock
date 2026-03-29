@@ -308,6 +308,23 @@ namespace AwsMock::Database {
         return q.to_vector();
     }
 
+    void DynamoDbMemoryDb::AdjustItemCounters() {
+
+        for (auto &table: _tables | std::views::values) {
+
+            // Count items belonging to this table
+            table.itemCount = std::ranges::count_if(_items, [&table](const auto &pair) {
+                return pair.second.tableName == table.name;
+            });
+
+            // Sum size of items belonging to this table
+            table.size = std::accumulate(_items.begin(), _items.end(), 0L,
+                                         [&table](long sum, const auto &pair) {
+                                             return pair.second.tableName == table.name ? sum + pair.second.size : sum;
+                                         });
+        }
+    }
+
     void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) {
         boost::mutex::scoped_lock lock(_itemMutex);
 
