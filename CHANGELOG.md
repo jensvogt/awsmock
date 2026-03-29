@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.10](https://github.com/jensvogt/awsmock/compare/v1.16.9...v1.16.10) (2026-03-29)
+
+
+### Bug Fixes
+
+* set log level on websocket sink ([5453440](https://github.com/jensvogt/awsmock/commit/5453440747f8908b1b530e923ef40d3185d14809))
+
 ## [1.16.9](https://github.com/jensvogt/awsmock/compare/v1.16.8...v1.16.9) (2026-03-29)
 
 
