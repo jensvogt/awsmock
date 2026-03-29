@@ -560,6 +560,21 @@ namespace AwsMock::Service {
         }
     }
 
+    void DynamoDbService::ResetItemCounters() const {
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "reset_item_counters");
+        log_debug << "Reset item counters";
+
+        try {
+
+            // Recalculate item counters
+            _dynamoDbDatabase.AdjustItemCounters();
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd reset item counters failed, message: " << exc.message();
+            throw Core::ServiceException("DynamoDbd reset item counters failed, message: " + exc.message());
+        }
+    }
+
     std::string DynamoDbService::CreateExpression(const std::string &inputExpression) {
         std::string expression = Core::StringUtils::ReplaceCopy(inputExpression, "AMZN_MAPPED_", "");
         expression = Core::StringUtils::ReplaceCopy(expression, "#", "");

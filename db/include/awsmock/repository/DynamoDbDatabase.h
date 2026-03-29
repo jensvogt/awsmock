@@ -276,6 +276,9 @@ namespace AwsMock::Database {
          */
         std::vector<Entity::DynamoDb::Item> ExecuteQuery(const value &filter, bool scanIndexForward, int limit = 0) const;
 
+        /**
+         * @brief Adjust the item counters and updates the table entities.
+         */
         void AdjustItemCounters() const;
 
         /**
