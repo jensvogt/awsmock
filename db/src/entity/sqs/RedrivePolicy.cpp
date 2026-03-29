@@ -21,5 +21,4 @@ namespace AwsMock::Database::Entity::SQS {
         maxReceiveCount = Core::Bson::BsonUtils::GetIntValue(mResult, "maxReceiveCount");
     }
 
-
 }// namespace AwsMock::Database::Entity::SQS
