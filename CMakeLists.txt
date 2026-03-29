@@ -220,6 +220,8 @@ target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmock
         Boost::program_options Boost::chrono LibArchive::LibArchive ssh magic)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+target_compile_options(awsmockmgr PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+target_link_options(awsmockmgr PRIVATE -fsanitize=address)
 if (WIN32)
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockmgr PUBLIC Boost::system pcre2-posix pcre2-8 crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)

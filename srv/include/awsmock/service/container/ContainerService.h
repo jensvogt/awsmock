@@ -96,7 +96,8 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -454,7 +455,8 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-    private:
+      private:
+
         /**
          * @brief Write the lambda docker file.
          *
@@ -522,6 +524,15 @@ namespace AwsMock::Service {
          */
         static void AddEnvironment(std::ofstream &ofs, const std::map<std::string, std::string> &environment);
 
+        static thread_local std::shared_ptr<Core::DomainSocket> _domainSocket;
+
+        /**
+         * @brief Guarded domain socket helper
+         *
+         * @return domain socket
+         */
+        std::shared_ptr<Core::DomainSocket> GetSocket() const;
+
         /**
          * Docker version
          */
@@ -550,8 +561,9 @@ namespace AwsMock::Service {
         /**
          * Docker listening socket
          */
-        std::shared_ptr<Core::DomainSocket> _domainSocket;
+        // std::shared_ptr<Core::DomainSocket> _domainSocket;
+        // mutable std::mutex _socketMutex;
     };
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_DOCKER_SERVICE_H
