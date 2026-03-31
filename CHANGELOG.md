@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.12](https://github.com/jensvogt/awsmock/compare/v1.16.11...v1.16.12) (2026-03-31)
+
+
+### Bug Fixes
+
+* fix SNS attributes ([c9fedec](https://github.com/jensvogt/awsmock/commit/c9fedec50c16a8696ead605111d6bd4f22775dde))
+
 ## [1.16.11](https://github.com/jensvogt/awsmock/compare/1.16.10...v1.16.11) (2026-03-31)
 
 
