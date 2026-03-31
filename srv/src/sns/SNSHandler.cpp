@@ -60,10 +60,6 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PUBLISH: {
 
-                    // Parse as URL query string by prepending a dummy host
-                    boost::url url("http://dummy?" + clientCommand.payload);
-                    auto params = url.params();
-
                     Dto::SNS::PublishRequest snsRequest;
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
@@ -72,8 +68,7 @@ namespace AwsMock::Service {
                     snsRequest.topicArn = Core::HttpUtils::GetStringParameterFromBody(clientCommand.payload, "TopicArn");
                     snsRequest.targetArn = Core::HttpUtils::GetStringParameterFromBody(clientCommand.payload, "TargetArn", "");
                     snsRequest.message = Core::HttpUtils::GetStringParameterFromBody(clientCommand.payload, "Message", "");
-                    // TODO: add SNS message attributes
-                    //snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
+                    snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
                     Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
 
                     std::map<std::string, std::string> headers;
