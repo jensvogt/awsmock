@@ -66,15 +66,15 @@ namespace AwsMock::Dto::Cognito {
     struct CreateUserPoolClientResponse final : Common::BaseCounter<CreateUserPoolClientResponse> {
 
         /**
-         * @brief User group client
+         * @brief User pool client
          */
-        UserPoolClient userGroupClient;
+        UserPoolClient userPoolClient;
 
       private:
 
         friend CreateUserPoolClientResponse tag_invoke(boost::json::value_to_tag<CreateUserPoolClientResponse>, boost::json::value const &v) {
             CreateUserPoolClientResponse r;
-            r.userGroupClient = boost::json::value_to<UserPoolClient>(v.at("UserPoolClient"));
+            r.userPoolClient = boost::json::value_to<UserPoolClient>(v.at("UserPoolClient"));
             return r;
         }
 
@@ -83,7 +83,7 @@ namespace AwsMock::Dto::Cognito {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"UserGroupClient", boost::json::value_from(obj.userGroupClient)},
+                    {"UserPoolClient", boost::json::value_from(obj.userPoolClient)},
             };
         }
     };

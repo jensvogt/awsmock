@@ -193,9 +193,9 @@ namespace AwsMock::Service {
                 case Dto::Common::CognitoCommandType::ADMIN_INITIATE_AUTH: {
 
                     Dto::Cognito::AdminInitiateAuthRequest cognitoRequest = Dto::Cognito::AdminInitiateAuthRequest::FromJson(clientCommand);
-                    _cognitoService.ConfirmUser(cognitoRequest);
-                    log_info << "User confirmed, userPoolId: " << cognitoRequest.userPoolId << " userName: " << cognitoRequest.userName;
-                    return SendResponse(request, http::status::ok);
+                    Dto::Cognito::AdminInitiateAuthResponse cognitoResponse = _cognitoService.AdminInitiateAuth(cognitoRequest);
+                    log_info << "InitiateAuth, userPoolId: " << cognitoRequest.userPoolId << "clientId: " << cognitoRequest.clientId << ", body: " << cognitoResponse.ToJson();
+                    return SendResponse(request, http::status::ok, cognitoResponse.ToJson());
                 }
 
                 case Dto::Common::CognitoCommandType::INITIATE_AUTH: {
@@ -288,4 +288,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

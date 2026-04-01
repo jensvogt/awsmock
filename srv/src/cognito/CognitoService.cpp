@@ -6,7 +6,6 @@
 #include <awsmock/service/cognito/CognitoService.h>
 
 namespace AwsMock::Service {
-
     CognitoService::CognitoService() : _database(Database::CognitoDatabase::instance()) {
         _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
     }
@@ -245,7 +244,13 @@ namespace AwsMock::Service {
             Dto::Cognito::CreateUserPoolClientResponse response{};
             response.requestId = request.requestId;
             response.region = userPool.region;
-            response.userGroupClient.clientId = userPoolClient.clientId;
+            response.userPoolClient.clientId = userPoolClient.clientId;
+            response.userPoolClient.userPoolId = userPoolClient.userPoolId;
+            response.userPoolClient.clientName = userPoolClient.clientName;
+            response.userPoolClient.clientSecret = userPoolClient.clientSecret;
+            response.userPoolClient.idTokenValidity = userPoolClient.idTokenValidity;
+            response.userPoolClient.accessTokenValidity = userPoolClient.accessTokenValidity;
+            response.userPoolClient.refreshTokenValidity = userPoolClient.refreshTokenValidity;
             log_trace << "Create user pool client result: " + response.ToJson();
             return response;
 
@@ -675,8 +680,8 @@ namespace AwsMock::Service {
         try {
             const Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
 
-            _database.DeleteUser(user);
-            log_trace << "User deleted, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
+            const long deleted = _database.DeleteUser(user);
+            log_trace << "User deleted, userName:  " << request.userName << " userPoolId: " << request.userPoolId << ", deleted: " << deleted;
         } catch (bsoncxx::exception &ex) {
             log_error << "Delete user request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -729,8 +734,8 @@ namespace AwsMock::Service {
         }
 
         try {
-            _database.DeleteGroup(request.region, request.userPoolId, request.groupName);
-            log_trace << "Cognito group deleted, group: " << request.ToString();
+            const long deleted = _database.DeleteGroup(request.region, request.userPoolId, request.groupName);
+            log_trace << "Cognito group deleted, userPoolId: " << request.userPoolId << ", groupName: " << request.groupName << ", deleted: " << deleted;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "Delete group request failed, message: " << ex.what();
@@ -795,6 +800,35 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Cognito::AdminInitiateAuthResponse CognitoService::AdminInitiateAuth(Dto::Cognito::AdminInitiateAuthRequest &request) const {
+        Monitoring::MonitoringTimer measure(COGNITO_SERVICE_TIMER, COGNITO_SERVICE_COUNTER, "action", "admin_initiate_auth");
+        log_debug << "Admin initiate auth request, region:  " << request.region << " clientId: " << request.clientId;
+
+        if (!_database.ClientIdExists(request.region, request.clientId)) {
+            log_error << "Client id does not exist, region: " << request.region << " clientId: " << request.clientId;
+            throw Core::NotFoundException("Client id does not exist, region: " + request.region + " clientId: " + request.clientId);
+        }
+
+        // std::string tmp = request.GetUserId();
+        // if (!_database.UserExists(request.region, request.GetUserId())) {
+        //     log_error << "User does not exist, region: " << request.region << " user: " << request.GetUserId();
+        //     throw Core::NotFoundException("User does not exist, region: " + request.region + " user: " + request.GetUserId());
+        // }
+
+        Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByClientId(request.clientId);
+        const Database::Entity::Cognito::UserPoolClient userPoolClient = userPool.GetClient(request.clientId);
+
+        Dto::Cognito::AdminInitiateAuthResponse response;
+        response.region = request.region;
+        response.user = request.user;
+        response.session = Core::StringUtils::CreateRandomUuid();
+        response.availableChallenges.emplace_back("PASSWORD_VERIFIER_CHALLENGE");
+        response.availableChallenges.emplace_back("PASSWORD_SRP");
+        response.challengeName = "PASSWORD_VERIFIER_CHALLENGE";
+        log_info << response.ToJson();
+        return response;
+    }
+
     Dto::Cognito::InitiateAuthResponse CognitoService::InitiateAuth(Dto::Cognito::InitiateAuthRequest &request) const {
         Monitoring::MonitoringTimer measure(COGNITO_SERVICE_TIMER, COGNITO_SERVICE_COUNTER, "action", "initiate_auth");
         log_debug << "Confirm initiate auth request, region:  " << request.region << " clientId: " << request.clientId;
@@ -813,39 +847,19 @@ namespace AwsMock::Service {
         Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByClientId(request.clientId);
         const Database::Entity::Cognito::UserPoolClient userPoolClient = userPool.GetClient(request.clientId);
 
-        // Verify A
-        Core::SrpUtils srpUtils;
-        if (!srpUtils.VerifyA(request.authParameters.at("SRP_A"))) {
-            log_error << "Failed to verify user spr auth request: " << request.authParameters.at("SRP_A");
-            throw Core::UnauthorizedException("Failed to verify user spr auth request: " + request.authParameters.at("SRP_A"));
+        // SRP challenge
+        switch (request.authFlow) {
+            case Dto::Cognito::AuthFlowType::USER_SRP_AUTH: {
+                return ProcessSrpChallenge(request);
+            }
+            case Dto::Cognito::AuthFlowType::USER_PASSWORD_AUTH: {
+                return ProcessUserPasswordChallenge(request);
+            }
+            default:
+                log_error << "Unknown Authentication challenge";
+                break;
         }
-
-        BIGNUM *salt = BN_new();
-        BIGNUM *v = BN_new();
-        std::string saltStr = "BEB25379D1A8581EB5A727673A2441EE";
-        BN_hex2bn(&salt, "BEB25379D1A8581EB5A727673A2441EE");
-        BN_hex2bn(&v, "7E273DE8696FFC4F4E337D05B4B375BEB0DDE1569E8FA00A9886D8129BADA1F1822223CA1A605B530E379BA4729FDC59F105B4787E5186F5C671085A1447B52A48CF1970B4FB6F8400BBF4CEBFBB168152E08AB5EA53D15C1AFF87B2B9DA6E04E058AD51CC72BFC9033B564E26480D78E955A5E29E7AB245DB2BE315E2099AFB");
-        srpUtils.SetSaltAndV(salt, v);
-        const BIGNUM *srpB = srpUtils.CalcB();
-        //  BN_print_fp(stderr, srpB);
-        std::string srpBStr = BN_bn2hex(srpB);
-
-        Dto::Cognito::InitiateAuthResponse response;
-        response.region = request.region;
-        response.user = request.user;
-        response.clientId = request.clientId;
-        response.session = Core::StringUtils::CreateRandomUuid();
-        response.availableChallenges.emplace_back("PASSWORD_VERIFIER_CHALLENGE");
-        response.availableChallenges.emplace_back("PASSWORD_SRP");
-        response.challengeName = "PASSWORD_VERIFIER_CHALLENGE";
-        response.challengeParameters = {
-                {"SRP_B", srpBStr},
-                {"USERNAME", request.authParameters.at("USERNAME")},
-                {"SALT", saltStr},
-                {"USER_ID_FOR_SRP", request.authParameters.at("USERNAME")},
-                {"SECRET_BLOCK", Core::StringUtils::GenerateRandomString(40)}};
-        log_info << response.ToJson();
-        return response;
+        return {};
     }
 
     Dto::Cognito::RespondToAuthChallengeResponse CognitoService::RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request) const {
@@ -879,5 +893,55 @@ namespace AwsMock::Service {
     void CognitoService::GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request) {
         Monitoring::MonitoringTimer measure(COGNITO_SERVICE_TIMER, COGNITO_SERVICE_COUNTER, "action", "global_sign_out");
         log_debug << "Global sign out request, region:  " << request.region << " accessToken: " << request.accessToken;
+    }
+
+    Dto::Cognito::InitiateAuthResponse CognitoService::ProcessSrpChallenge(const Dto::Cognito::InitiateAuthRequest &request) {
+
+        // Verify A
+        Core::SrpUtils srpUtils;
+        if (!srpUtils.VerifyA(request.authParameters.at("SRP_A"))) {
+            log_error << "Failed to verify user spr auth request: " << request.authParameters.at("SRP_A");
+            throw Core::UnauthorizedException("Failed to verify user spr auth request: " + request.authParameters.at("SRP_A"));
+        }
+
+        BIGNUM *salt = BN_new();
+        BIGNUM *v = BN_new();
+        std::string saltStr = "BEB25379D1A8581EB5A727673A2441EE";
+        BN_hex2bn(&salt, "BEB25379D1A8581EB5A727673A2441EE");
+        BN_hex2bn(&v, "7E273DE8696FFC4F4E337D05B4B375BEB0DDE1569E8FA00A9886D8129BADA1F1822223CA1A605B530E379BA4729FDC59F105B4787E5186F5C671085A1447B52A48CF1970B4FB6F8400BBF4CEBFBB168152E08AB5EA53D15C1AFF87B2B9DA6E04E058AD51CC72BFC9033B564E26480D78E955A5E29E7AB245DB2BE315E2099AFB");
+        srpUtils.SetSaltAndV(salt, v);
+        const BIGNUM *srpB = srpUtils.CalcB();
+        //  BN_print_fp(stderr, srpB);
+        std::string srpBStr = BN_bn2hex(srpB);
+
+        Dto::Cognito::InitiateAuthResponse response;
+        response.region = request.region;
+        response.user = request.user;
+        response.clientId = request.clientId;
+        response.session = Core::StringUtils::CreateRandomUuid();
+        response.availableChallenges.emplace_back("PASSWORD_VERIFIER_CHALLENGE");
+        response.availableChallenges.emplace_back("PASSWORD_SRP");
+        response.challengeName = "PASSWORD_VERIFIER_CHALLENGE";
+        response.challengeParameters = {
+                {"SRP_B", srpBStr},
+                {"USERNAME", request.authParameters.at("USERNAME")},
+                {"SALT", saltStr},
+                {"USER_ID_FOR_SRP", request.authParameters.at("USERNAME")},
+                {"SECRET_BLOCK", Core::StringUtils::GenerateRandomString(40)}};
+        return response;
+    }
+    Dto::Cognito::InitiateAuthResponse CognitoService::ProcessUserPasswordChallenge(const Dto::Cognito::InitiateAuthRequest &request) {
+
+        Dto::Cognito::InitiateAuthResponse response;
+        response.region = request.region;
+        response.user = request.user;
+        response.clientId = request.clientId;
+        response.session = Core::StringUtils::CreateRandomUuid();
+        response.availableChallenges.emplace_back("PASSWORD");
+        response.challengeName = "PASSWORD";
+        response.challengeParameters = {
+                {"USERNAME", request.authParameters.at("USERNAME")},
+                {"PASSWORD", request.authParameters.at("PASSWORD")}};
+        return response;
     }
 }// namespace AwsMock::Service
