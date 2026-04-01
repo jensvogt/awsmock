@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.16.13](https://github.com/jensvogt/awsmock/compare/v1.16.12...v1.16.13) (2026-04-01)
+
+
+### Bug Fixes
+
+* cognito auth flow ([ddc7a82](https://github.com/jensvogt/awsmock/commit/ddc7a828be75d0b99a88bb5140d2fd2e645d7bf4))
+* cognito auth flow ([463965f](https://github.com/jensvogt/awsmock/commit/463965fbfed88bde28b1a517f1f1b88e5f98f073))
+* fix cognito user password challenge ([3d3f5ca](https://github.com/jensvogt/awsmock/commit/3d3f5caeb96454c54281e06c154421a5b3db3d19))
+* fix cognito user password challenge ([e16cb8b](https://github.com/jensvogt/awsmock/commit/e16cb8b40496f6b30f657e6a66d540d53a255d0b))
+
 ## [1.16.12](https://github.com/jensvogt/awsmock/compare/v1.16.11...v1.16.12) (2026-03-31)
 
 
