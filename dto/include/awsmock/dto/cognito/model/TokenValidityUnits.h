@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Cognito {
             {hours, "hours"},
             {days, "days"}};
 
-    [[maybe_unused]] static std::string ValidityUnitToString(ValidityUnits validityUnits) {
+    [[maybe_unused]] static std::string ValidityUnitToString(const ValidityUnits &validityUnits) {
         return ValidityUnitsNames[validityUnits];
     }
 
@@ -63,65 +63,24 @@ namespace AwsMock::Dto::Cognito {
          */
         ValidityUnits refreshToken = hours;
 
-        /**
-         * @brief Convert from a JSON object
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
-
-            try {
-
-                accessToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "AccessToken"));
-                idToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "IdToken"));
-                refreshToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "RefreshToken"));
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         * @throws JsonException
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "AccessToken", ValidityUnitToString(accessToken));
-                Core::Bson::BsonUtils::SetStringValue(document, "IdToken", ValidityUnitToString(idToken));
-                Core::Bson::BsonUtils::SetStringValue(document, "RefreshToken", ValidityUnitToString(refreshToken));
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
       private:
 
         friend TokenValidityUnits tag_invoke(boost::json::value_to_tag<TokenValidityUnits>, boost::json::value const &v) {
             TokenValidityUnits r;
-            r.accessToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "accessToken"));
-            r.idToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "idToken"));
-            r.refreshToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "refreshToken"));
+            r.accessToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "AccessToken"));
+            r.idToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "IdToken"));
+            r.refreshToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "RefreshToken"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TokenValidityUnits const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"accessToken", ValidityUnitToString(obj.accessToken)},
-                    {"idToken", ValidityUnitToString(obj.idToken)},
-                    {"refreshToken", ValidityUnitToString(obj.refreshToken)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"AccessToken", ValidityUnitToString(obj.accessToken)},
+                    {"IdToken", ValidityUnitToString(obj.idToken)},
+                    {"RefreshToken", ValidityUnitToString(obj.refreshToken)},
             };
         }
     };

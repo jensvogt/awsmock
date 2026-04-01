@@ -97,8 +97,12 @@ namespace AwsMock::Dto::Cognito {
             InitiateAuthRequest r;
             r.authFlow = AuthFlowTypeFromString(Core::Json::GetStringValue(v, "AuthFlow"));
             r.clientId = Core::Json::GetStringValue(v, "ClientId");
-            r.authParameters = boost::json::value_to<std::map<std::string, std::string>>(v.at("AuthParameters"));
-            r.clientMetaData = boost::json::value_to<std::map<std::string, std::string>>(v.at("ClientMetaData"));
+            if (Core::Json::AttributeExists(v, "AuthParameters")) {
+                r.authParameters = boost::json::value_to<std::map<std::string, std::string>>(v.at("AuthParameters"));
+            }
+            if (Core::Json::AttributeExists(v, "ClientMetaData")) {
+                r.clientMetaData = boost::json::value_to<std::map<std::string, std::string>>(v.at("ClientMetaData"));
+            }
             return r;
         }
 

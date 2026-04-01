@@ -113,33 +113,38 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> clientMetadata;
 
-    private:
+      private:
+
         friend AdminInitiateAuthRequest tag_invoke(boost::json::value_to_tag<AdminInitiateAuthRequest>, boost::json::value const &v) {
             AdminInitiateAuthRequest r;
             r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
-            r.session = Core::Json::GetStringValue(v, "SessionSession");
+            r.session = Core::Json::GetStringValue(v, "Session");
             r.authFlow = Core::Json::GetStringValue(v, "AuthFlow");
+            r.clientId = Core::Json::GetStringValue(v, "ClientId");
             if (Core::Json::AttributeExists(v, "AuthParameters")) {
-                r.authParameters = boost::json::value_to<std::map<std::string, std::string> >(v.at("AuthParameters"));
+                r.authParameters = boost::json::value_to<std::map<std::string, std::string>>(v.at("AuthParameters"));
             }
             if (Core::Json::AttributeExists(v, "ClientMetadata")) {
-                r.clientMetadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("ClientMetadata"));
+                r.clientMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("ClientMetadata"));
             }
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminConfirmUserRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminInitiateAuthRequest const &obj) {
             jv = {
-                {"Region", obj.region},
-                {"User", obj.user},
-                {"RequestId", obj.requestId},
-                {"UserPoolId", obj.userPoolId},
-                {"Username", obj.userName},
-                {"ClientMetadata", boost::json::value_from(obj.clientMetadata)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Session", obj.userPoolId},
+                    {"Session", obj.session},
+                    {"AuthFlow", obj.authFlow},
+                    {"ClientId", obj.clientId},
+                    {"AuthParameters", boost::json::value_from(obj.authParameters)},
+                    {"ClientMetadata", boost::json::value_from(obj.clientMetadata)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::Cognito
+}// namespace AwsMock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_ADMIN_INITIATE_AUTH_REQUEST_H

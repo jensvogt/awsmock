@@ -51,4 +51,4 @@ namespace AwsMock::Dto::Cognito {
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif//AWSMOCK_DTO_COGNITO_AUTH_FLOW_H
+#endif// AWSMOCK_DTO_COGNITO_AUTH_FLOW_H

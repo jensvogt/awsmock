@@ -80,31 +80,6 @@ namespace AwsMock::Dto::Cognito {
          */
         system_clock::time_point modified;
 
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-                Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
-                Core::Bson::BsonUtils::SetStringValue(document, "ClientId", clientId);
-                Core::Bson::BsonUtils::SetStringValue(document, "ClientName", clientName);
-                Core::Bson::BsonUtils::SetStringValue(document, "ClientSecret", clientSecret);
-                Core::Bson::BsonUtils::SetDateValue(document, "CreationDate", created);
-                Core::Bson::BsonUtils::SetDateValue(document, "LastModified", modified);
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
       private:
 
         friend UserPoolClient tag_invoke(boost::json::value_to_tag<UserPoolClient>, boost::json::value const &v) {

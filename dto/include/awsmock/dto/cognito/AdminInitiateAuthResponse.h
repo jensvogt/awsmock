@@ -2,11 +2,10 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_INITIATE_AUTH_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_INITIATE_AUTH_RESPONSE_H
+#ifndef AWSMOCK_DTO_COGNITO_ADMIN_INITIATE_AUTH_RESPONSE_H
+#define AWSMOCK_DTO_COGNITO_ADMIN_INITIATE_AUTH_RESPONSE_H
 
 // C++ standard includes
-#include <map>
 #include <string>
 
 // AwsMock includes
@@ -16,25 +15,24 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief Initiate authentication request
-     *
-     * Example:
+     * @brief Admin initiate auth response
      * @code{.json}
      * {
      *   "AuthenticationResult": {
-     *      "AccessToken": "string",
-     *      "ExpiresIn": number,
-     *      "IdToken": "string",
-     *      "NewDeviceMetadata": {
-     *         "DeviceGroupKey": "string",
-     *         "DeviceKey": "string"
-     *      },
-     *      "RefreshToken": "string",
-     *      "TokenType": "string"
+     *     "AccessToken": "string",
+     *     "ExpiresIn": number,
+     *     "IdToken": "string",
+     *     "NewDeviceMetadata": {
+     *        "DeviceGroupKey": "string",
+     *        "DeviceKey": "string"
+     *     },
+     *     "RefreshToken": "string",
+     *     "TokenType": "string"
      *   },
+     *   "AvailableChallenges": [ "string" ],
      *   "ChallengeName": "string",
      *   "ChallengeParameters": {
-     *      "string" : "string"
+     *     "string" : "string"
      *   },
      *   "Session": "string"
      * }
@@ -42,7 +40,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct InitiateAuthResponse final : Common::BaseCounter<InitiateAuthResponse> {
+    struct AdminInitiateAuthResponse final : Common::BaseCounter<AdminCreateUserResponse> {
 
         /**
          * Authentication result
@@ -55,16 +53,6 @@ namespace AwsMock::Dto::Cognito {
         std::vector<std::string> availableChallenges;
 
         /**
-         * Session
-         */
-        std::string session;
-
-        /**
-         * Client ID
-         */
-        std::string clientId;
-
-        /**
          * Challenge name
          */
         std::string challengeName;
@@ -74,13 +62,17 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> challengeParameters;
 
+        /**
+         * Session
+         */
+        std::string session;
+
       private:
 
-        friend InitiateAuthResponse tag_invoke(boost::json::value_to_tag<InitiateAuthResponse>, boost::json::value const &v) {
-            InitiateAuthResponse r;
-            r.session = Core::Json::GetStringValue(v, "Session");
-            r.clientId = Core::Json::GetStringValue(v, "ClientId");
+        friend AdminInitiateAuthResponse tag_invoke(boost::json::value_to_tag<AdminInitiateAuthResponse>, boost::json::value const &v) {
+            AdminInitiateAuthResponse r = {};
             r.challengeName = Core::Json::GetStringValue(v, "ChallengeName");
+            r.session = Core::Json::GetStringValue(v, "Session");
             if (Core::Json::AttributeExists(v, "AuthenticationResult")) {
                 r.authenticationResult = boost::json::value_to<AuthenticationResult>(v.at("AuthenticationResult"));
             }
@@ -93,14 +85,12 @@ namespace AwsMock::Dto::Cognito {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, InitiateAuthResponse const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminInitiateAuthResponse const &obj) {
             jv = {
                     {"Region", obj.region},
-                    {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Session", obj.session},
-                    {"ClientId", obj.clientId},
                     {"ChallengeName", obj.challengeName},
+                    {"Session", obj.session},
                     {"AuthenticationResult", boost::json::value_from(obj.authenticationResult)},
                     {"AvailableChallenges", boost::json::value_from(obj.availableChallenges)},
                     {"ChallengeParameters", boost::json::value_from(obj.challengeParameters)},
@@ -110,4 +100,4 @@ namespace AwsMock::Dto::Cognito {
 
 }// namespace AwsMock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_INITIATE_AUTH_RESPONSE_H
+#endif// AWSMOCK_DTO_COGNITO_ADMIN_INITIATE_AUTH_RESPONSE_H

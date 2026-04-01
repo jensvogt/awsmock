@@ -30,6 +30,8 @@
 #include <awsmock/dto/cognito/AdminEnableUserRequest.h>
 #include <awsmock/dto/cognito/AdminGetUserRequest.h>
 #include <awsmock/dto/cognito/AdminGetUserResponse.h>
+#include <awsmock/dto/cognito/AdminInitiateAuthRequest.h>
+#include <awsmock/dto/cognito/AdminInitiateAuthResponse.h>
 #include <awsmock/dto/cognito/AdminRemoveUserFromGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
 #include <awsmock/dto/cognito/CreateGroupResponse.h>
@@ -265,6 +267,22 @@ namespace AwsMock::Service {
         void ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request) const;
 
         /**
+         * @brief Admin initiate authentication
+         *
+         * @par
+         * AWS Cognito challenges page: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-authentication-flow-methods.html#amazon-cognito-user-pools-authentication-flow-methods-password
+         *
+         * @par
+         * For USER_SRP see: https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol
+         *
+         * @param request confirm user request
+         * @return AdminInitiateAuthResponse DTO
+         * @see AdminInitiateAuthRequest
+         * @see AdminInitiateAuthResponse
+         */
+        Dto::Cognito::AdminInitiateAuthResponse AdminInitiateAuth(Dto::Cognito::AdminInitiateAuthRequest &request) const;
+
+        /**
          * @brief Initiate authentication
          *
          * @par
@@ -362,6 +380,22 @@ namespace AwsMock::Service {
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const;
 
       private:
+
+        /**
+         * @brief Process SRP challenge.
+         *
+         * @param request cognito initiate request
+         * @return initiate auth response
+         */
+        static Dto::Cognito::InitiateAuthResponse ProcessSrpChallenge(const Dto::Cognito::InitiateAuthRequest &request);
+
+        /**
+         * @brief Process user password challenge.
+         *
+         * @param request cognito initiate request
+         * @return initiate auth response
+         */
+        static Dto::Cognito::InitiateAuthResponse ProcessUserPasswordChallenge(const Dto::Cognito::InitiateAuthRequest &request);
 
         /**
          * Database connection

@@ -48,28 +48,6 @@ namespace AwsMock::Dto::Cognito {
          */
         long expiredIn{};
 
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "AccessToken", accessToken);
-                Core::Bson::BsonUtils::SetStringValue(document, "IdToken", idToken);
-                Core::Bson::BsonUtils::SetStringValue(document, "RefreshToken", refreshToken);
-                Core::Bson::BsonUtils::SetStringValue(document, "TokenType", tokenType);
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
       private:
 
         friend AuthenticationResult tag_invoke(boost::json::value_to_tag<AuthenticationResult>, boost::json::value const &v) {
