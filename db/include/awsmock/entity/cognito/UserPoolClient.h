@@ -7,6 +7,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
@@ -60,6 +61,11 @@ namespace AwsMock::Database::Entity::Cognito {
         long refreshTokenValidity{};
 
         /**
+         * Auth flows
+         */
+        std::vector<std::string> explicitAuthFlows = {"ADMIN_NO_SRP_AUTH", "CUSTOM_AUTH_FLOW_ONLY", "USER_PASSWORD_AUTH", "ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_CUSTOM_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_AUTH"};
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -81,7 +87,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @param mResult query result.
          */
-        void FromDocument(std::optional<view> mResult);
+        void FromDocument(const std::optional<view> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::Cognito

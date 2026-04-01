@@ -118,10 +118,10 @@ namespace AwsMock::Dto::Cognito {
             r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
             r.clientName = Core::Json::GetStringValue(v, "ClientName");
             r.generateSecret = Core::Json::GetBoolValue(v, "GenerateSecret");
-            r.accessTokenValidity = Core::Json::GetLongValue(v, "AccessTokenValidity");
-            r.idTokenValidity = Core::Json::GetLongValue(v, "IdTokenValidity");
-            r.refreshTokenValidity = Core::Json::GetLongValue(v, "RefreshTokenValidity");
-            r.authSessionValidity = Core::Json::GetLongValue(v, "AuthSessionValidity");
+            r.accessTokenValidity = Core::Json::GetLongValue(v, "AccessTokenValidity", r.accessTokenValidity);
+            r.idTokenValidity = Core::Json::GetLongValue(v, "IdTokenValidity", r.idTokenValidity);
+            r.refreshTokenValidity = Core::Json::GetLongValue(v, "RefreshTokenValidity", r.refreshTokenValidity);
+            r.authSessionValidity = Core::Json::GetLongValue(v, "AuthSessionValidity", r.authSessionValidity);
             r.tokenValidityUnits = boost::json::value_to<TokenValidityUnits>(v, "TokenValidityUnits");
             return r;
         }
