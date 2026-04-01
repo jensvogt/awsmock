@@ -48,7 +48,7 @@ namespace AwsMock::Dto::Cognito {
         }
         return AuthFlowType::USER_PASSWORD_AUTH;
     }
-
+    
 }// namespace AwsMock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_AUTH_FLOW_H

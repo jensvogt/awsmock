@@ -2,9 +2,6 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include "awsmock/core/exception/DatabaseException.h"
-
-
 #include <awsmock/entity/cognito/UserPoolClient.h>
 
 namespace AwsMock::Database::Entity::Cognito {
@@ -25,7 +22,7 @@ namespace AwsMock::Database::Entity::Cognito {
         return userPoolDocument;
     }
 
-    void UserPoolClient::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void UserPoolClient::FromDocument(const std::optional<view> &mResult) {
 
         try {
 
@@ -39,6 +36,10 @@ namespace AwsMock::Database::Entity::Cognito {
             generateSecret = Core::Bson::BsonUtils::GetBoolValue(mResult, "generateSecret");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
+
+            if (mResult.value()["explicitAuthFlows"].length() > 0) {
+                Core::Bson::FromBsonArray(mResult.value(), "explicitAuthFlows", &explicitAuthFlows);
+            }
 
         } catch (std::exception &exc) {
             log_error << exc.what();

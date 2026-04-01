@@ -12,6 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/cognito/model/AuthFlow.h>
 #include <awsmock/dto/cognito/model/TokenValidityUnits.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -71,6 +72,11 @@ namespace AwsMock::Dto::Cognito {
         TokenValidityUnits tokenValidityUnits;
 
         /**
+         * @brief Auth flows
+         */
+        std::vector<AuthFlowType> explicitAuthFlows = {AuthFlowType::USER_PASSWORD_AUTH, AuthFlowType::ADMIN_USER_PASSWORD_AUTH, AuthFlowType::USER_SRP_AUTH};
+
+        /**
          * Created
          */
         system_clock::time_point created;
@@ -95,6 +101,13 @@ namespace AwsMock::Dto::Cognito {
             r.tokenValidityUnits = boost::json::value_to<TokenValidityUnits>(v.at("TokenValidityUnits"));
             r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
+            if (Core::Json::AttributeExists(v, "ExplicitAuthFlows")) {
+                for (const auto &a: v.at("ExplicitAuthFlows").as_array()) {
+                    if (!std::ranges::contains(r.explicitAuthFlows, AuthFlowTypeFromString(a.as_string().data()))) {
+                        r.explicitAuthFlows.emplace_back(AuthFlowTypeFromString(a.as_string().data()));
+                    }
+                }
+            }
             return r;
         }
 
@@ -115,6 +128,13 @@ namespace AwsMock::Dto::Cognito {
                     {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
+            if (!obj.explicitAuthFlows.empty()) {
+                boost::json::array authFlows;
+                for (const auto &a: obj.explicitAuthFlows) {
+                    authFlows.emplace_back(AuthFlowTypeToString(a));
+                }
+                jv.as_object()["ExplicitAuthFlows"] = authFlows;
+            }
         }
     };
 

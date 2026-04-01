@@ -78,7 +78,7 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, cognitoResponse.ToJson());
                 }
 
-                case Dto::Common::CognitoCommandType::DESCRIBE_USER_POOL_CLIENTS: {
+                case Dto::Common::CognitoCommandType::DESCRIBE_USER_POOL_CLIENT: {
 
                     Dto::Cognito::DescribeUserPoolClientRequest cognitoRequest = Dto::Cognito::DescribeUserPoolClientRequest::FromJson(clientCommand);
                     Dto::Cognito::DescribeUserPoolClientResponse cognitoResponse = _cognitoService.DescribeUserPoolClient(cognitoRequest);
