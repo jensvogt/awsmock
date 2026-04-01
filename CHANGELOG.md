@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.14](https://github.com/jensvogt/awsmock/compare/v1.16.13...v1.16.14) (2026-04-01)
+
+
+### Bug Fixes
+
+* fix cognito user client explicit auth flows ([c2ff49a](https://github.com/jensvogt/awsmock/commit/c2ff49a4e687155d7c93d0c073bc59345f153278))
+
 ## [1.16.13](https://github.com/jensvogt/awsmock/compare/v1.16.12...v1.16.13) (2026-04-01)
 
 
