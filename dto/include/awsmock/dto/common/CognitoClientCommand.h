@@ -64,46 +64,49 @@ namespace AwsMock::Dto::Common {
         ADMIN_ADD_USER_TO_GROUP,
         ADMIN_REMOVE_USER_FROM_GROUP,
         ADMIN_CONFIRM_SIGN_UP,
+        ADMIN_INITIATE_AUTH,
         UNKNOWN
     };
 
     static std::map<CognitoCommandType, std::string> CognitoCommandTypeNames{
-            {CognitoCommandType::CREATE_USER_POOL, "create-user-pool"},
-            {CognitoCommandType::CREATE_USER_POOL_DOMAIN, "create-user-pool-domain"},
-            {CognitoCommandType::CREATE_USER_POOL_CLIENT, "create-user-pool-client"},
-            {CognitoCommandType::UPDATE_USER_POOL, "update-user-pool"},
-            {CognitoCommandType::UPDATE_USER_POOL_DOMAIN, "update-user-pool-domain"},
-            {CognitoCommandType::UPDATE_USER_POOL_CLIENT, "update-user-pool-client"},
-            {CognitoCommandType::DESCRIBE_USER_POOL, "describe-user-pool"},
-            {CognitoCommandType::LIST_USER_POOLS, "list-user-pools"},
-            {CognitoCommandType::LIST_USER_POOL_CLIENTS, "list-user-pool-clients"},
-            {CognitoCommandType::LIST_USER_POOL_COUNTERS, "list-user-pool-counters"},
-            {CognitoCommandType::LIST_USERS, "list-users"},
-            {CognitoCommandType::LIST_USER_COUNTERS, "list-user-counters"},
-            {CognitoCommandType::DESCRIBE_USER_POOL, "describe-user-pool"},
-            {CognitoCommandType::DESCRIBE_USER_POOL_CLIENTS, "describe-user-pool-clients"},
-            {CognitoCommandType::DELETE_USER_POOL, "delete-user-pool"},
-            {CognitoCommandType::DELETE_USER_POOL_CLIENT, "delete-user-pool-client"},
-            {CognitoCommandType::CREATE_USER, "create-user"},
-            {CognitoCommandType::ENABLE_USER, "enable-user"},
-            {CognitoCommandType::DISABLE_USER, "disable-user"},
-            {CognitoCommandType::DELETE_USER, "delete-user"},
-            {CognitoCommandType::CREATE_GROUP, "create-group"},
-            {CognitoCommandType::LIST_GROUPS, "list-groups"},
-            {CognitoCommandType::DELETE_GROUP, "delete-group"},
-            {CognitoCommandType::LIST_USERS_IN_GROUP, "list-users-in-group"},
-            {CognitoCommandType::INITIATE_AUTH, "initiate-auth"},
-            {CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE, "respond-to-auth-challenge"},
-            {CognitoCommandType::SIGN_UP, "sign-up"},
-            {CognitoCommandType::ADMIN_CREATE_USER, "admin-create-user"},
-            {CognitoCommandType::ADMIN_GET_USER, "admin-get-user"},
-            {CognitoCommandType::ADMIN_ENABLE_USER, "admin-enable-user"},
-            {CognitoCommandType::ADMIN_DISABLE_USER, "admin-disable-user"},
-            {CognitoCommandType::ADMIN_DELETE_USER, "admin-delete-user"},
-            {CognitoCommandType::ADMIN_CONFIRM_SIGN_UP, "admin-confirm-sign-up"},
-            {CognitoCommandType::GLOBAL_SIGN_OUT, "global-sign-out"},
-            {CognitoCommandType::ADMIN_ADD_USER_TO_GROUP, "admin-add-user-to-group"},
-            {CognitoCommandType::ADMIN_REMOVE_USER_FROM_GROUP, "admin-remove-user-from-group"}};
+        {CognitoCommandType::CREATE_USER_POOL, "create-user-pool"},
+        {CognitoCommandType::CREATE_USER_POOL_DOMAIN, "create-user-pool-domain"},
+        {CognitoCommandType::CREATE_USER_POOL_CLIENT, "create-user-pool-client"},
+        {CognitoCommandType::UPDATE_USER_POOL, "update-user-pool"},
+        {CognitoCommandType::UPDATE_USER_POOL_DOMAIN, "update-user-pool-domain"},
+        {CognitoCommandType::UPDATE_USER_POOL_CLIENT, "update-user-pool-client"},
+        {CognitoCommandType::DESCRIBE_USER_POOL, "describe-user-pool"},
+        {CognitoCommandType::LIST_USER_POOLS, "list-user-pools"},
+        {CognitoCommandType::LIST_USER_POOL_CLIENTS, "list-user-pool-clients"},
+        {CognitoCommandType::LIST_USER_POOL_COUNTERS, "list-user-pool-counters"},
+        {CognitoCommandType::LIST_USERS, "list-users"},
+        {CognitoCommandType::LIST_USER_COUNTERS, "list-user-counters"},
+        {CognitoCommandType::DESCRIBE_USER_POOL, "describe-user-pool"},
+        {CognitoCommandType::DESCRIBE_USER_POOL_CLIENTS, "describe-user-pool-clients"},
+        {CognitoCommandType::DELETE_USER_POOL, "delete-user-pool"},
+        {CognitoCommandType::DELETE_USER_POOL_CLIENT, "delete-user-pool-client"},
+        {CognitoCommandType::CREATE_USER, "create-user"},
+        {CognitoCommandType::ENABLE_USER, "enable-user"},
+        {CognitoCommandType::DISABLE_USER, "disable-user"},
+        {CognitoCommandType::DELETE_USER, "delete-user"},
+        {CognitoCommandType::CREATE_GROUP, "create-group"},
+        {CognitoCommandType::LIST_GROUPS, "list-groups"},
+        {CognitoCommandType::DELETE_GROUP, "delete-group"},
+        {CognitoCommandType::LIST_USERS_IN_GROUP, "list-users-in-group"},
+        {CognitoCommandType::INITIATE_AUTH, "initiate-auth"},
+        {CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE, "respond-to-auth-challenge"},
+        {CognitoCommandType::SIGN_UP, "sign-up"},
+        {CognitoCommandType::ADMIN_CREATE_USER, "admin-create-user"},
+        {CognitoCommandType::ADMIN_GET_USER, "admin-get-user"},
+        {CognitoCommandType::ADMIN_ENABLE_USER, "admin-enable-user"},
+        {CognitoCommandType::ADMIN_DISABLE_USER, "admin-disable-user"},
+        {CognitoCommandType::ADMIN_DELETE_USER, "admin-delete-user"},
+        {CognitoCommandType::ADMIN_CONFIRM_SIGN_UP, "admin-confirm-sign-up"},
+        {CognitoCommandType::GLOBAL_SIGN_OUT, "global-sign-out"},
+        {CognitoCommandType::ADMIN_ADD_USER_TO_GROUP, "admin-add-user-to-group"},
+        {CognitoCommandType::ADMIN_REMOVE_USER_FROM_GROUP, "admin-remove-user-from-group"},
+        {CognitoCommandType::ADMIN_INITIATE_AUTH, "admin-initiate-auth"}
+    };
 
     [[maybe_unused]] static std::string CognitoCommandTypeToString(const CognitoCommandType commandType) {
         return CognitoCommandTypeNames[commandType];
@@ -169,6 +172,6 @@ namespace AwsMock::Dto::Common {
         friend std::ostream &operator<<(std::ostream &os, const CognitoClientCommand &i);
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_COGNITO_CLIENT_COMMAND_H

@@ -133,27 +133,6 @@ namespace AwsMock::Core {
         if (!Configuration::instance().GetValue<bool>("awsmock.logging.console-active")) {
             RemoveConsoleLogs();
         }
-
-        // if (!Configuration::instance().GetValue<bool>("awsmock.logging.websocket-active")) {
-        //     auto mgr = std::make_shared<Service::Logging::WebSocketSessionManager>();
-        //     net::io_context ioc;
-        //
-        //     // 1. Start WebSocket Server in a background thread
-        //     boost::thread([&ioc, mgr]() {
-        //         RunLoggingWebSocketServer(ioc, 9002, mgr);
-        //     }).detach();
-        //
-        //     // 2. Setup Boost.Log Sink
-        //     auto backend = boost::make_shared<Service::Logging::WebSocketSinkBackend>(mgr);
-        //     using sink_t = boost::log::sinks::synchronous_sink<Service::Logging::WebSocketSinkBackend>;
-        //     const auto sink = boost::make_shared<sink_t>(backend);
-        //
-        //     boost::log::core::get()->add_sink(sink);
-        //
-        //     boost::thread([&ioc]() {
-        //         ioc.run();
-        //     }).detach();
-        // }
     }
 
     std::string LogStream::GetSeverity() {
@@ -163,15 +142,8 @@ namespace AwsMock::Core {
     void LogStream::SetSeverity(const std::string &lvl) {
         _currentLevel = lvl;
         from_string(lvl.c_str(), lvl.length(), _severity);
-        if (console_sink) {
-            console_sink->set_filter(boost::log::trivial::severity >= _severity);
-        }
-        if (file_sink) {
-            file_sink->set_filter(boost::log::trivial::severity >= _severity);
-        }
-        if (webSocketSink) {
-            webSocketSink->set_filter(boost::log::trivial::severity >= _severity);
-        }
+        const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
+        core->set_filter(boost::log::trivial::severity >= _severity);
     }
 
     void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {

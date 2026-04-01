@@ -41,11 +41,11 @@ namespace AwsMock::Dto::SNS {
         void FromDocument(const view_or_value<view, value> &jsonObject) {
 
             try {
-                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "stringValue");
+                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
                 if (!stringValue.empty()) {
                     dataType = STRING;
                 }
-                dataType = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "dataType"));
+                dataType = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
             } catch (bsoncxx::exception &e) {
                 log_error << e.what();
                 throw Core::JsonException(e.what());
@@ -71,8 +71,7 @@ namespace AwsMock::Dto::SNS {
             }
         }
 
-      private:
-
+    private:
         friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
             MessageAttribute r;
             r.stringValue = Core::Json::GetStringValue(v, "StringValue");
@@ -82,14 +81,14 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
             jv = {
-                    {"StringValue", obj.stringValue},
-                    {"DataType", MessageAttributeDataTypeToString(obj.dataType)},
+                {"StringValue", obj.stringValue},
+                {"DataType", MessageAttributeDataTypeToString(obj.dataType)},
             };
         }
     };
 
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
-}// namespace AwsMock::Dto::SNS
+} // namespace AwsMock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_MESSAGE_ATTRIBUTE_H

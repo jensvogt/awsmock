@@ -26,7 +26,7 @@ namespace AwsMock::Manager {
     void Manager::InitializeWebsocketLogging() const {
 
         if (Core::Configuration::instance().GetValue<bool>("awsmock.logging.websocket-active")) {
-            const unsigned int port = Core::Configuration::instance().GetValue<unsigned int>("awsmock.logging.websocket-port");
+            const auto port = Core::Configuration::instance().GetValue<unsigned int>("awsmock.logging.websocket-port");
             Core::LogStream::AddLoggingWebSocket(_ioc, port);
         }
     }

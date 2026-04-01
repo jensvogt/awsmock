@@ -19,9 +19,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-            response.topicName = topic.topicName,
-            response.owner = topic.owner,
-            response.topicArn = topic.topicArn;
+                    response.topicName = topic.topicName,
+                    response.owner = topic.owner,
+                    response.topicArn = topic.topicArn;
             return response;
         }
 
@@ -35,9 +35,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-            response.topicName = topic.topicName,
-            response.owner = topic.owner,
-            response.topicArn = topic.topicArn;
+                    response.topicName = topic.topicName,
+                    response.owner = topic.owner,
+                    response.topicArn = topic.topicArn;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -229,13 +229,15 @@ namespace AwsMock::Service {
 
             // Update database
             //message = Dto::SNS::Mapper::map(request, topic);
-            Database::Entity::SNS::Message message = {.region = request.region,
-                                                      .topicArn = request.topicArn,
-                                                      .targetArn = request.targetArn,
-                                                      .message = request.message,
-                                                      .messageId = Core::AwsUtils::CreateMessageId(),
-                                                      .contentType = request.contentType,
-                                                      .size = static_cast<long>(request.message.length())};
+            Database::Entity::SNS::Message message = {
+                .region = request.region,
+                .topicArn = request.topicArn,
+                .targetArn = request.targetArn,
+                .message = request.message,
+                .messageId = Core::AwsUtils::CreateMessageId(),
+                .contentType = request.contentType,
+                .size = static_cast<long>(request.message.length())
+            };
 
             // Attributes
             if (!request.messageAttributes.empty()) {
@@ -743,7 +745,7 @@ namespace AwsMock::Service {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
         // Convert from URL to ARN, as the URL has the port in it, which does not work when we use a random port (i.e. awsmock-container)
-        std::string queueArn = Core::AwsUtils::ConvertToArn(request.region, subscription.endpoint);
+        const std::string queueArn = Core::AwsUtils::ConvertToArn(request.region, subscription.endpoint);
 
         // Get queue by ARN
         const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByArn(queueArn);
@@ -945,4 +947,4 @@ namespace AwsMock::Service {
         log_debug << "Topic counters updated, queue: " << topic.topicArn;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
