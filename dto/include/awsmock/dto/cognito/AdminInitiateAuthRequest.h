@@ -117,7 +117,11 @@ namespace AwsMock::Dto::Cognito {
         friend AdminInitiateAuthRequest tag_invoke(boost::json::value_to_tag<AdminInitiateAuthRequest>, boost::json::value const &v) {
             AdminInitiateAuthRequest r;
             r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
-            r.userName = Core::Json::GetStringValue(v, "Username");
+            r.session = Core::Json::GetStringValue(v, "SessionSession");
+            r.authFlow = Core::Json::GetStringValue(v, "AuthFlow");
+            if (Core::Json::AttributeExists(v, "AuthParameters")) {
+                r.authParameters = boost::json::value_to<std::map<std::string, std::string> >(v.at("AuthParameters"));
+            }
             if (Core::Json::AttributeExists(v, "ClientMetadata")) {
                 r.clientMetadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("ClientMetadata"));
             }
