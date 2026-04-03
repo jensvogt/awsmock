@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.15](https://github.com/jensvogt/awsmock/compare/1.16.14...v1.16.15) (2026-04-03)
+
+
+### Bug Fixes
+
+* fix import/export of infrastructure data ([5cf7522](https://github.com/jensvogt/awsmock/commit/5cf7522b88a3ba28bbc4e571dc09780f2f39c6fa))
+
 ## [1.16.14](https://github.com/jensvogt/awsmock/compare/v1.16.13...v1.16.14) (2026-04-01)
 
 
