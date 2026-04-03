@@ -131,6 +131,16 @@ namespace AwsMock::Database::Entity::SQS {
         std::string contentType;
 
         /**
+         * Message group ID
+         */
+        std::string messageGroupId;
+
+        /**
+         * Message deduplication ID
+         */
+        std::string messageDeduplicationId;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -181,6 +191,6 @@ namespace AwsMock::Database::Entity::SQS {
 
     typedef std::vector<Message> MessageList;
 
-}// namespace AwsMock::Database::Entity::SQS
+} // namespace AwsMock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_H

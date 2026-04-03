@@ -93,6 +93,16 @@ namespace AwsMock::Dto::SQS {
         std::string body;
 
         /**
+         * Message group ID
+         */
+        std::string messageGroupId;
+
+        /**
+         * Message deduplication id
+         */
+        std::string messageDeduplicationId;
+
+        /**
          * Delay seconds
          */
         long delaySeconds{};
@@ -112,38 +122,41 @@ namespace AwsMock::Dto::SQS {
          */
         std::map<std::string, MessageAttribute> messageAttributes;
 
-      private:
-
+    private:
         friend SendMessageRequest tag_invoke(boost::json::value_to_tag<SendMessageRequest>, boost::json::value const &v) {
             SendMessageRequest r;
             r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
             r.body = Core::Json::GetStringValue(v, "MessageBody");
             r.contentType = Core::Json::GetStringValue(v, "ContentType");
+            r.messageGroupId = Core::Json::GetStringValue(v, "MessageGroupId");
+            r.messageDeduplicationId = Core::Json::GetStringValue(v, "MessageDeduplicationId");
             r.delaySeconds = Core::Json::GetLongValue(v, "DelaySeconds");
             if (Core::Json::AttributeExists(v, "Attributes")) {
-                r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("Attributes"));
+                r.attributes = boost::json::value_to<std::map<std::string, std::string> >(v.at("Attributes"));
             }
             if (Core::Json::AttributeExists(v, "MessageAttributes")) {
-                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
+                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute> >(v.at("MessageAttributes"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SendMessageRequest const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
-                    {"QueueUrl", obj.queueUrl},
-                    {"MessageBody", obj.body},
-                    {"ContentType", obj.contentType},
-                    {"DelaySeconds", obj.delaySeconds},
-                    {"Attributes", boost::json::value_from(obj.attributes)},
-                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
+                {"Region", obj.region},
+                {"User", obj.user},
+                {"RequestId", obj.requestId},
+                {"QueueUrl", obj.queueUrl},
+                {"MessageBody", obj.body},
+                {"ContentType", obj.contentType},
+                {"MessageGroupId", obj.messageGroupId},
+                {"MessageDeduplicationId", obj.messageDeduplicationId},
+                {"DelaySeconds", obj.delaySeconds},
+                {"Attributes", boost::json::value_from(obj.attributes)},
+                {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_SEND_MESSAGE_REQUEST_H
