@@ -58,8 +58,6 @@ namespace AwsMock::Database::Entity::SQS {
         messageDoc.append(kvp("md5MessageAttributes", md5MessageAttributes));
         messageDoc.append(kvp("md5MessageSystemAttributes", md5MessageSystemAttributes));
         messageDoc.append(kvp("contentType", contentType));
-        messageDoc.append(kvp("messageGroupId", messageGroupId));
-        messageDoc.append(kvp("messageDeduplicationId", messageDeduplicationId));
         messageDoc.append(kvp("attributes", attributesDoc));
         messageDoc.append(kvp("messageAttributes", messageAttributesDoc));
         MongoUtils::SetDatetime(messageDoc, "reset", reset);

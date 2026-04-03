@@ -13,9 +13,9 @@
 
 
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -61,6 +61,16 @@ namespace AwsMock::Dto::SQS {
          */
         std::string sequenceNumber = Core::StringUtils::CreateRandomUuid();
 
+        /**
+         * Message group ID
+         */
+        std::string messageGroupId = Core::StringUtils::CreateRandomUuid();
+
+        /**
+         * Message deduplication  ID
+         */
+        std::string messageDeduplicationId = Core::StringUtils::CreateRandomUuid();
+
       private:
 
         friend SendMessageResponse tag_invoke(boost::json::value_to_tag<SendMessageResponse>, boost::json::value const &v) {
@@ -70,6 +80,8 @@ namespace AwsMock::Dto::SQS {
             r.md5MessageAttributes = Core::Json::GetStringValue(v, "MD5MessageAttributes");
             r.md5MessageSystemAttributes = Core::Json::GetStringValue(v, "MD5MessageSystemAttributes");
             r.sequenceNumber = Core::Json::GetStringValue(v, "SequenceNumber");
+            r.messageGroupId = Core::Json::GetStringValue(v, "MessageGroupId");
+            r.messageDeduplicationId = Core::Json::GetStringValue(v, "MessageDeduplicationId");
             return r;
         }
 
@@ -84,6 +96,8 @@ namespace AwsMock::Dto::SQS {
                     {"MD5OfMessageAttributes", obj.md5MessageAttributes},
                     {"MD5OfMessageSystemAttributes", obj.md5MessageSystemAttributes},
                     {"SequenceNumber", obj.sequenceNumber},
+                    {"MessageGroupId", obj.messageGroupId},
+                    {"MessageDeduplicationId", obj.messageDeduplicationId},
             };
         }
     };
