@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/cognito/model/AuthFlow.h>
 #include <awsmock/dto/cognito/model/TokenValidityUnits.h>
 

@@ -4,22 +4,33 @@
 
 #include <awsmock/entity/cognito/UserPoolClient.h>
 
+#include "awsmock/dto/cognito/model/AuthFlow.h"
+
 namespace AwsMock::Database::Entity::Cognito {
 
     view_or_value<view, value> UserPoolClient::ToDocument() const {
 
-        view_or_value<view, value> userPoolDocument = make_document(
-                kvp("userPoolId", userPoolId),
-                kvp("clientId", clientId),
-                kvp("clientName", clientName),
-                kvp("clientSecret", clientSecret),
-                kvp("generateSecret", generateSecret),
-                kvp("accessTokenValidity", bsoncxx::types::b_int64(accessTokenValidity)),
-                kvp("idTokenValidity", bsoncxx::types::b_int64(idTokenValidity)),
-                kvp("refreshTokenValidity", bsoncxx::types::b_int64(refreshTokenValidity)),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
-        return userPoolDocument;
+        document userPoolDocument;
+        userPoolDocument.append(kvp("userPoolId", userPoolId));
+        userPoolDocument.append(kvp("clientId", clientId));
+        userPoolDocument.append(kvp("clientName", clientName));
+        userPoolDocument.append(kvp("clientSecret", clientSecret));
+        userPoolDocument.append(kvp("generateSecret", generateSecret));
+        userPoolDocument.append(kvp("accessTokenValidity", bsoncxx::types::b_int64(accessTokenValidity)));
+        userPoolDocument.append(kvp("idTokenValidity", bsoncxx::types::b_int64(idTokenValidity)));
+        userPoolDocument.append(kvp("refreshTokenValidity", bsoncxx::types::b_int64(refreshTokenValidity)));
+        userPoolDocument.append(kvp("created", bsoncxx::types::b_date(created)));
+        userPoolDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
+
+        if (!explicitAuthFlows.empty()) {
+            array authFlowsArray;
+            for (const auto &f: explicitAuthFlows) {
+                authFlowsArray.append(f);
+            }
+            userPoolDocument.append(kvp("authFlows", authFlowsArray));
+        }
+
+        return userPoolDocument.extract();
     }
 
     void UserPoolClient::FromDocument(const std::optional<view> &mResult) {
