@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.16.16](https://github.com/jensvogt/awsmock/compare/v1.16.15...v1.16.16) (2026-04-03)
+
+
+### Bug Fixes
+
+* fix import/export of infrastructure data ([1bf1f2b](https://github.com/jensvogt/awsmock/commit/1bf1f2b5cca5f7e5d5ea85e2c542937e6e8ca998))
+* fix import/export of infrastructure data ([21cd21f](https://github.com/jensvogt/awsmock/commit/21cd21f2c08ede7992f43122b40d983c3c2ece80))
+* SQS message group ID ([3a7ab69](https://github.com/jensvogt/awsmock/commit/3a7ab690c50a84f3fb96c1d760224180e65a0b6b))
+* SQS message group ID ([558f77e](https://github.com/jensvogt/awsmock/commit/558f77e1ce3b992c4eabc073358a92d76ae8ea40))
+
 ## [1.16.15](https://github.com/jensvogt/awsmock/compare/1.16.14...v1.16.15) (2026-04-03)
 
 
