@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.17](https://github.com/jensvogt/awsmock/compare/v1.16.16...v1.16.17) (2026-04-04)
+
+
+### Bug Fixes
+
+* rearrange dynamodb items ([c3848b9](https://github.com/jensvogt/awsmock/commit/c3848b9a35dcd6289377f2dd7a97fef35909d87b))
+
 ## [1.16.16](https://github.com/jensvogt/awsmock/compare/v1.16.15...v1.16.16) (2026-04-03)
 
 
