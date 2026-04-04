@@ -203,7 +203,7 @@ namespace AwsMock::Service {
         try {
             Dto::DynamoDb::ListItemCountersResponse itemResponse;
             itemResponse.total = _dynamoDbDatabase.CountItems(request.region, request.tableName, request.prefix);
-            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName));
+            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns)));
             return itemResponse;
 
         } catch (Core::JsonException &exc) {
@@ -348,6 +348,49 @@ namespace AwsMock::Service {
             getItemResponse.user = request.user;
             getItemResponse.requestId = request.requestId;
             getItemResponse.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
+            return getItemResponse;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd get item failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd get item failed, , error: " + exc.message());
+        }
+    }
+
+    Dto::DynamoDb::GetItemCounterResponse DynamoDbService::GetItemCounter(Dto::DynamoDb::GetItemCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "get_item");
+        log_debug << "Start get item counter, region: " << request.region << " name: " << request.tableName;
+
+        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
+        }
+
+        try {
+
+            // Get the table and the primary keys
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+
+            if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName, request.partitionKey, request.sortKey)) {
+                log_debug << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+                Dto::DynamoDb::GetItemCounterResponse getItemResponse;
+                getItemResponse.region = request.region;
+                getItemResponse.user = request.user;
+                getItemResponse.requestId = request.requestId;
+                return getItemResponse;
+            }
+
+            // Get item
+            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, request.partitionKey, request.sortKey);
+
+            // Prepare response
+            Dto::DynamoDb::GetItemCounterResponse getItemResponse;
+            getItemResponse.region = request.region;
+            getItemResponse.user = request.user;
+            getItemResponse.requestId = request.requestId;
+            getItemResponse.tableName = request.tableName;
+            getItemResponse.partitionKey = request.partitionKey;
+            getItemResponse.sortKey = request.sortKey;
+            getItemResponse.itemCounter.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
             return getItemResponse;
 
         } catch (Core::JsonException &exc) {

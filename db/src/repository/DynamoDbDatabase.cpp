@@ -464,7 +464,8 @@ namespace AwsMock::Database {
         }
         return _memoryDb.ItemExists(region, tableName, partitionKey, sortKey);
     }
-    Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName) const {
+
+    Entity::DynamoDb::ItemList DynamoDbDatabase::ListItems(const std::string &region, const std::string &tableName, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "list_items");
 
         if (HasDatabase()) {
@@ -483,7 +484,23 @@ namespace AwsMock::Database {
                     query.append(kvp("tableName", tableName));
                 }
 
-                for (auto itemCursor = _itemCollection.find(query.extract()); const auto item: itemCursor) {
+                mongocxx::options::find opts;
+                if (pageSize > 0) {
+                    opts.limit(pageSize);
+                    if (pageIndex > 0) {
+                        opts.skip(pageSize * pageIndex);
+                    }
+                }
+
+                if (!sortColumns.empty()) {
+                    document sort;
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+
+                for (auto itemCursor = _itemCollection.find(query.extract(), opts); const auto item: itemCursor) {
                     Entity::DynamoDb::Item result;
                     result.FromDocument(item);
                     items.push_back(result);
@@ -574,8 +591,6 @@ namespace AwsMock::Database {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "create_item");
 
         item.created = system_clock::now();
-        item.size = sizeof(item) + sizeof(long);
-
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -586,7 +601,9 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto itemResult = _itemCollection.insert_one(item.ToDocument());
+                const auto view = item.ToDocument().view();
+                item.size = static_cast<long>(view.length()) + sizeof(long);
+                const auto itemResult = _itemCollection.insert_one(view);
                 session.commit_transaction();
 
                 log_trace << "DynamoDb item created, oid: " << itemResult->inserted_id().get_oid().value.to_string();
@@ -636,7 +653,10 @@ namespace AwsMock::Database {
                 document query;
                 query.append(kvp("_id", bsoncxx::oid(dbItem.oid)));
 
-                const auto result = _itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
+                const auto view = dbItem.ToDocument().view();
+                dbItem.size = static_cast<long>(view.length()) + sizeof(long);
+
+                const auto result = _itemCollection.find_one_and_update(query.extract(), dbItem.ToDocument(), opts);
                 session.commit_transaction();
                 if (result.has_value()) {
                     item = Entity::DynamoDb::Item().FromDocument(result->view());
@@ -893,55 +913,65 @@ namespace AwsMock::Database {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "adjust_item_counter");
 
         if (HasDatabase()) {
-
             const auto client = ConnectionPool::instance().GetConnection();
             auto itemCollection = (*client)[_databaseName][_itemCollectionName];
             auto tableCollection = (*client)[_databaseName][_tableCollectionName];
+
+            // Build aggregation pipeline
+            mongocxx::pipeline p{};
+
+            // Calculate bsonSize of each document
+            p.add_fields(make_document(
+                    kvp("bsonSize", make_document(
+                                            kvp("$bsonSize", "$$ROOT")))));
+
+            // Group by tableName, sum sizes and count items
+            p.group(make_document(
+                    kvp("_id", "$tableName"),
+                    kvp("size", make_document(kvp("$sum", "$bsonSize"))),
+                    kvp("itemCount", make_document(kvp("$sum", 1)))));
+
+            // Reshape output
+            p.project(make_document(
+                    kvp("_id", 0),
+                    kvp("tableName", "$_id"),
+                    kvp("size", 1),
+                    kvp("itemCount", 1)));
+
             auto session = client->start_session();
+            session.start_transaction();
 
             try {
-                mongocxx::pipeline p{};
-                p.group(make_document(
-                        kvp("_id", "$tableName"),
-                        kvp("size", make_document(kvp("$sum", "$size"))),
-                        kvp("itemCount", make_document(kvp("$sum", 1)))));
-
-                document projectDocument;
-                projectDocument.append(kvp("_id", 0),
-                                       kvp("tableName", "$_id"),
-                                       kvp("size", 1),
-                                       kvp("itemCount", 1));
-                p.project(projectDocument.extract());
-
-                session.start_transaction();
-
-                // Initialize all topics with zero message counts
-                tableCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                                  kvp("size", bsoncxx::types::b_int64()),
-                                                                                  kvp("itemCount", bsoncxx::types::b_int64())))));
+                // Reset all tables to zero
+                tableCollection.update_many(
+                        {},
+                        make_document(kvp("$set", make_document(
+                                                          kvp("size", bsoncxx::types::b_int64{0}),
+                                                          kvp("itemCount", bsoncxx::types::b_int64{0})))));
 
                 auto bulk = tableCollection.create_bulk_write();
-                for (auto cursor = itemCollection.aggregate(p); const auto t: cursor) {
+
+                for (auto cursor = itemCollection.aggregate(p); const auto &t: cursor) {
+
+                    const auto tableName = Core::Bson::BsonUtils::GetStringValue(t, "tableName");
+                    const auto size = Core::Bson::BsonUtils::GetLongValue(t, "size");
+                    const auto itemCount = Core::Bson::BsonUtils::GetLongValue(t, "itemCount");
+
                     bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("name", Core::Bson::BsonUtils::GetStringValue(t, "tableName"))),
+                            make_document(kvp("name", tableName)),
                             make_document(kvp("$set", make_document(
-                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                              kvp("itemCount", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "itemCount"))))))));
-                    log_info << "Table: " << Core::Bson::BsonUtils::GetStringValue(t, "tableName")
-                             << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
-                             << ", itemCount: " << Core::Bson::BsonUtils::GetLongValue(t, "itemCount");
+                                                              kvp("size", bsoncxx::types::b_int64{size}),
+                                                              kvp("itemCount", bsoncxx::types::b_int64{itemCount}))))));
+
+                    log_info << "Table stats updated: " << tableName << ", size: " << size << " bytes" << ", itemCount: " << itemCount;
                 }
 
-                // Bulk updates
+                // Execute bulk write only if there are updates
                 if (!bulk.empty()) {
-                    try {
-                        auto result = bulk.execute();
-                        log_debug << "Bulk write result: " << result->modified_count();
-                    } catch (const mongocxx::exception &exc) {
-                        log_error << "Bulk write failed: " << exc.what();
-                        throw Core::DatabaseException(exc.what());
-                    }
+                    auto result = bulk.execute();
+                    log_debug << "Bulk write result, modified: " << result->modified_count();
                 }
+
                 session.commit_transaction();
                 return;
 

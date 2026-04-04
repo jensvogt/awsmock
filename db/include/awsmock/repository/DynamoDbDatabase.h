@@ -190,10 +190,13 @@ namespace AwsMock::Database {
          *
          * @param region AWS region.
          * @param tableName table name
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sort columns
          * @return list of DynamoDB tables
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}) const;
+        [[nodiscard]] Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
 
 
         /**

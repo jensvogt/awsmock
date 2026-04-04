@@ -184,6 +184,7 @@ namespace AwsMock::Dto::DynamoDb {
          */
         static std::vector<ItemCounter> mapCounter(const std::vector<Database::Entity::DynamoDb::Item> &itemEntities);
         static std::string DoubleToString(double val);
+        static std::string KeyValueToString(const KeyValue &value);
     };
 
 }// namespace AwsMock::Dto::DynamoDb

@@ -41,6 +41,7 @@ namespace AwsMock::Dto::Common {
         LIST_STREAMS,
         LIST_STREAMS_COUNTERS,
         GET_TABLE_DETAIL_COUNTERS,
+        GET_ITEM_COUNTER,
         IMPORT_ITEMS,
         EXPORT_ITEMS,
         RESET_ITEM_COUNTERS,
@@ -64,6 +65,7 @@ namespace AwsMock::Dto::Common {
             {DynamoDbCommandType::LIST_STREAMS, "list-streams"},
             {DynamoDbCommandType::LIST_STREAMS_COUNTERS, "list-stream-counters"},
             {DynamoDbCommandType::GET_TABLE_DETAIL_COUNTERS, "get-table-detail-counters"},
+            {DynamoDbCommandType::GET_ITEM_COUNTER, "get-item-counter"},
             {DynamoDbCommandType::IMPORT_ITEMS, "import-items"},
             {DynamoDbCommandType::EXPORT_ITEMS, "export-items"},
             {DynamoDbCommandType::RESET_ITEM_COUNTERS, "reset-item-counters"},
@@ -75,7 +77,7 @@ namespace AwsMock::Dto::Common {
 
     [[maybe_unused]] static DynamoDbCommandType DynamoDbCommandTypeFromString(const std::string &commandType) {
         for (auto &[fst, snd]: DynamoDbCommandTypeNames) {
-            if (Core::StringUtils::StartsWith(commandType, snd)) {
+            if (commandType == snd) {
                 return fst;
             }
         }

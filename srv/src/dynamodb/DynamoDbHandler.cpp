@@ -93,6 +93,14 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, itemResponse.ToJson());
                 }
 
+                case Dto::Common::DynamoDbCommandType::GET_ITEM_COUNTER: {
+
+                    Dto::DynamoDb::GetItemCounterRequest itemRequest = Dto::DynamoDb::GetItemCounterRequest::FromJson(clientCommand);
+                    Dto::DynamoDb::GetItemCounterResponse itemResponse = _dynamoDbService.GetItemCounter(itemRequest);
+                    log_info << "Get item counter, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName;
+                    return SendResponse(request, http::status::ok, itemResponse.ToJson());
+                }
+
                 case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
 
                     Dto::DynamoDb::PutItemRequest itemRequest = Dto::DynamoDb::PutItemRequest::FromJson(clientCommand);
