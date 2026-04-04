@@ -284,6 +284,8 @@ namespace AwsMock::Dto::DynamoDb {
         itemCounterDto.id = itemEntity.oid;
         itemCounterDto.tableName = itemEntity.tableName;
         itemCounterDto.size = itemEntity.size;
+        itemCounterDto.partitionKey = KeyValueToString(itemEntity.partitionKey);
+        itemCounterDto.sortKey = KeyValueToString(itemEntity.sortKey);
         itemCounterDto.created = itemEntity.created;
         itemCounterDto.modified = itemEntity.modified;
         for (const auto &[fst, snd]: itemEntity.attributes) {
@@ -300,6 +302,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
         return itemCounters;
     }
+
     std::string Mapper::DoubleToString(const double val) {
         if (val == std::floor(val) && std::abs(val) < 1e15) {
             return std::to_string(static_cast<long long>(val));
@@ -309,5 +312,24 @@ namespace AwsMock::Dto::DynamoDb {
         s.erase(s.find_last_not_of('0') + 1);
         if (s.back() == '.') s.pop_back();
         return s;
+    }
+
+    std::string Mapper::KeyValueToString(const KeyValue &value) {
+        return std::visit([]<typename T0>(const T0 &v) -> std::string {
+            if constexpr (std::is_same_v<std::decay_t<T0>, bool>)
+                return v ? "true" : "false";
+            else if constexpr (std::is_same_v<std::decay_t<T0>, std::string>)
+                return v;
+            else if constexpr (std::is_same_v<std::decay_t<T0>, std::vector<unsigned char>>)
+                return std::string(v.begin(), v.end());
+            else if constexpr (std::is_arithmetic_v<std::decay_t<T0>>)
+                return std::to_string(v);
+            else {
+                std::ostringstream oss;
+                oss << v;
+                return oss.str();
+            }
+        },
+                          value);
     }
 }// namespace AwsMock::Dto::DynamoDb

@@ -1,9 +1,15 @@
 FROM debian:stable-slim AS build
 
 RUN apt update && apt install -y ca-certificates git cmake build-essential gcc-13 g++-13 cmake libicu-dev curl unzip \
-    doxygen pandoc autoconf autoconf-archive automake libtool curl zip unzip tar wget pkg-config && \
+    doxygen pandoc autoconf autoconf-archive automake libtool curl zip unzip tar wget pkg-config ninja-build && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Force HTTP/1.1 to avoid HTTP/2 framing errors
+RUN echo '--http1.1' >> /root/.curlrc
+
+# vcpkg needs this
+ENV VCPKG_FORCE_SYSTEM_BINARIES=1
 
 WORKDIR /usr/local/vcpkg
 

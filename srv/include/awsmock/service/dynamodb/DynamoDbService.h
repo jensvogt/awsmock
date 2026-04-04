@@ -50,6 +50,8 @@
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
 #include <awsmock/dto/dynamodb/internal/ExportItemsRequest.h>
+#include <awsmock/dto/dynamodb/internal/GetItemCounterRequest.h>
+#include <awsmock/dto/dynamodb/internal/GetItemCounterResponse.h>
 #include <awsmock/dto/dynamodb/internal/GetTableDetailCountersRequest.h>
 #include <awsmock/dto/dynamodb/internal/GetTableDetailCountersResponse.h>
 #include <awsmock/dto/dynamodb/internal/ListItemCountersRequest.h>
@@ -183,6 +185,7 @@ namespace AwsMock::Service {
          * @return GetItemResponse
          */
         [[nodiscard]] Dto::DynamoDb::GetItemResponse GetItem(Dto::DynamoDb::GetItemRequest &request) const;
+        Dto::DynamoDb::GetItemCounterResponse GetItemCounter(Dto::DynamoDb::GetItemCounterRequest &request) const;
 
         /**
          * @brief Puts an item

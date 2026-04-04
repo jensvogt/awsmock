@@ -6,16 +6,12 @@
 #define AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H
 
 // C++ standard includes
-#include <map>
 #include <string>
-
-// Boost include<
-#include <boost/beast.hpp>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/dynamodb/model/Item.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
