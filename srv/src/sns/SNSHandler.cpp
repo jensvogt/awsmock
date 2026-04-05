@@ -311,5 +311,18 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-    
-}// namespace AwsMock::Service
+
+    std::map<std::string, std::string> SNSHandler::GetTags(const std::string &payload) {
+
+        std::map<std::string, std::string> tags;
+        const int count = Core::HttpUtils::CountQueryParametersByPrefix("/?" + payload, "Tags.member") / 2;
+        for (int i = 1; i <= count; i++) {
+            const std::string tagKey = Core::HttpUtils::GetStringParameterFromBody(payload, "Tags.member." + std::to_string(i) + ".Key");
+            const std::string tagValue = Core::HttpUtils::GetStringParameterFromBody(payload, "Tags.member." + std::to_string(i) + ".Value");
+            tags[tagKey] = tagValue;
+        }
+        log_trace << "Got tags count, count: " << count;
+        return tags;
+    }
+
+} // namespace AwsMock::Service
