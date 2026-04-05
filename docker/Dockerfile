@@ -6,20 +6,23 @@ FROM alpine:latest AS build
 #    apt clean && \
 #    rm -rf /var/lib/apt/lists/*
 RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
-    automake libtool m4 make gettext-dev patch ncurses-dev ncurses-terminfo-base
+     autoconf-archive automake libtool m4 make gettext-dev patch pkgconf ncurses-dev ncurses-terminfo-base doxygen pandoc \
+     pkgconfig coreutils bash perl
 
 # vcpkg needs this
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
 ENV VCPKG_ROOT=/usr/local/vcpkg
 ENV VCPKG_MAX_CONCURRENCY=4
 ENV CMAKE_BUILD_PARALLEL_LEVEL=4
+ENV ACLOCAL_PATH=/usr/share/aclocal
 
 WORKDIR /usr/local/vcpkg
 
 RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
 
-#COPY libssh-0.11.3.tar.xz /usr/local/vcpkg/downloads/
+RUN mkdir -p /usr/local/vcpkg/downloads
+COPY ./libssh-0.11.3.tar.xz /usr/local/vcpkg/downloads
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -33,22 +36,23 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     -DVCPKG_OVERLAY_TRIPLETS=./dist/vcpkg -DVCPKG_TARGET_TRIPLET=x64-linux-release -DCMAKE_BUILD_TYPE=Release -Wno-dev && \
     cmake --build build
 
-#FROM node:22-bookworm AS buildfrontend
-#
-#RUN apt update && apt-get install -y git
-#
-# Install aws-mock-ui
-#WORKDIR /usr/src
-#RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
-#    cd /usr/src/awsmock-ui && \
-#    npm install -g @angular/cli && \
-#    npm install --force && \
-#    npm run build --prod
+FROM node:24-alpine AS buildfrontend
+
+RUN apk update && apk upgrade && apk add --no-cache git
+
+# Build aws-mock-ui
+WORKDIR /usr/src
+RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
+    cd /usr/src/awsmock-ui && \
+    npm install -g @angular/cli && \
+    npm install --force && \
+    npm run build --prod
 
 # Stick to alpine:latest
-FROM debian:stable-slim
+FROM alpine:latest
 
-RUN apt update && apt upgrade -y && apt install -y curl unzip libssh-4 libarchive13 libmagic1
+RUN apk update && apk upgrade && apk add --no-cache unzip libssh libarchive libmagic curl aws-cli
+#RUN apt update && apt upgrade -y && apt install -y curl unzip libssh-4 libarchive13 libmagic1
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -66,17 +70,8 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/tmp && \
     mkdir -p /usr/local/awsmock/frontend
 
-# Install AWS CLI (v2, latest)
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
- && unzip -qq awscliv2.zip \
- && ./aws/install \
- && rm -rf awscliv2.zip aws
-
-# Just in case, ensure it's available at /usr/local/bin/aws
-RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
-
 # Install frontend
-#COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
+COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
 # Install aws-mock
 COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/bin
