@@ -13,15 +13,18 @@ ENV VCPKG_FORCE_SYSTEM_BINARIES=1
 
 WORKDIR /usr/local/vcpkg
 
+ENV VCPKG_ROOT=/usr/local/vcpkg
+ENV VCPKG_CURL_FLAGS="--http1.1"
+
 RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
-ENV VCPKG_ROOT=/usr/local/vcpkg
 
 # Create build environment
 RUN mkdir -p /usr/src
 
 # Install aws-mock
 WORKDIR /usr/src
+RUN export VCPKG_KEEP_ENV_VARS=CURL_CLI_FLAGS
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
     mkdir build && \
