@@ -211,7 +211,7 @@ endif ()
 # AWSMock Manager (main program)
 # -------------------------------------------------------------------------
 
-add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/WindowsService.cpp
+add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/WindowsService.cpp
         manager/src/main.cpp)
 target_include_directories(awsmockmgr PRIVATE ${CMAKE_SOURCE_DIR}/manager/include ${CMAKE_SOURCE_DIR}/core/include
         ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)

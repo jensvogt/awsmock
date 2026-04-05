@@ -1,47 +1,49 @@
-FROM debian:stable-slim AS build
+FROM alpine:latest AS build
 
-RUN apt update && apt install -y ca-certificates git cmake build-essential gcc-13 g++-13 cmake libicu-dev curl unzip \
-    doxygen pandoc autoconf autoconf-archive automake libtool curl zip unzip tar wget pkg-config ninja-build && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Force HTTP/1.1 to avoid HTTP/2 framing errors
-RUN echo '--http1.1' >> /root/.curlrc
+#RUN apk update && apt install -y ca-certificates git cmake build-essential gcc-13 g++-13 cmake libicu-dev curl unzip \
+#    doxygen pandoc autoconf autoconf-archive automake libtool curl zip unzip tar wget pkg-config ninja-build perl \
+#    linux-headers-$(uname -r) && \
+#    apt clean && \
+#    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
+    automake libtool m4 make gettext-dev patch ncurses-dev ncurses-terminfo-base
 
 # vcpkg needs this
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
+ENV VCPKG_ROOT=/usr/local/vcpkg
+ENV VCPKG_MAX_CONCURRENCY=4
+ENV CMAKE_BUILD_PARALLEL_LEVEL=4
 
 WORKDIR /usr/local/vcpkg
 
-ENV VCPKG_ROOT=/usr/local/vcpkg
-ENV VCPKG_CURL_FLAGS="--http1.1"
-
 RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
+
+COPY libssh-0.11.3.tar.xz /usr/local/vcpkg/downloads/
 
 # Create build environment
 RUN mkdir -p /usr/src
 
 # Install aws-mock
 WORKDIR /usr/src
-RUN export VCPKG_KEEP_ENV_VARS=CURL_CLI_FLAGS
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
     mkdir build && \
-    cmake -S . -B build -DBUILD_DOCUMENTATION=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -Wno-dev && \
-    cmake --build build --parallel $(($(nproc)/2))
+    cmake -S . -B build -DBUILD_DOCUMENTATION=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake \
+    -DVCPKG_OVERLAY_TRIPLETS=./dist/vcpkg -DVCPKG_TARGET_TRIPLET=x64-linux-release -DCMAKE_BUILD_TYPE=Release -Wno-dev && \
+    cmake --build build
 
-FROM node:22-bookworm AS buildfrontend
-
-RUN apt update && apt-get install -y git
-
+#FROM node:22-bookworm AS buildfrontend
+#
+#RUN apt update && apt-get install -y git
+#
 # Install aws-mock-ui
-WORKDIR /usr/src
-RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
-    cd /usr/src/awsmock-ui && \
-    npm install -g @angular/cli && \
-    npm install --force && \
-    npm run build --prod
+#WORKDIR /usr/src
+#RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
+#    cd /usr/src/awsmock-ui && \
+#    npm install -g @angular/cli && \
+#    npm install --force && \
+#    npm run build --prod
 
 # Stick to alpine:latest
 FROM debian:stable-slim
@@ -74,7 +76,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
 
 # Install frontend
-COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
+#COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
 # Install aws-mock
 COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/bin

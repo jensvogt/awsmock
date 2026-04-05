@@ -23,12 +23,12 @@ namespace AwsMock::Service {
      */
     class SNSHandler final : public AbstractHandler, public std::enable_shared_from_this<SNSHandler> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit SNSHandler(boost::asio::io_context &ioc) : AbstractHandler("sns-handler", ioc), _snsService(ioc) {}
+        explicit SNSHandler(boost::asio::io_context &ioc) : AbstractHandler("sns-handler", ioc), _snsService(ioc) {
+        }
 
         /**
          * @brief HTTP POST request.
@@ -41,8 +41,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * Get the message attributes.
          *
@@ -50,6 +49,14 @@ namespace AwsMock::Service {
          * @return list of message userAttributes
          */
         static std::map<std::string, Dto::SNS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+
+        /**
+         * @brief Get the tags from the URL inside the payload
+         *
+         * @param payload HTTP body
+         * @return map of tags key/value pairs
+         */
+        static std::map<std::string, std::string> GetTags(const std::string &payload);
 
         /**
          * SNS module
@@ -62,6 +69,6 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVER_LAMBDA_SERVER_H
