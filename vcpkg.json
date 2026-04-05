@@ -16,5 +16,5 @@
     "openssl",
     "mongo-cxx-driver"
   ],
-  "builtin-baseline": "4c9dcea1b6526f9034b4028665bc336ddd027dcf"
+  "builtin-baseline": "77df67cfff9c12ccfdb52284e07c87c75092f723"
 }

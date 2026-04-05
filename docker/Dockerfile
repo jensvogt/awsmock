@@ -19,7 +19,7 @@ WORKDIR /usr/local/vcpkg
 RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
 
-COPY libssh-0.11.3.tar.xz /usr/local/vcpkg/downloads/
+#COPY libssh-0.11.3.tar.xz /usr/local/vcpkg/downloads/
 
 # Create build environment
 RUN mkdir -p /usr/src
