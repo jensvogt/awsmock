@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.18](https://github.com/jensvogt/awsmock/compare/v1.16.17...v1.16.18) (2026-04-05)
+
+
+### Bug Fixes
+
+* SQS message group ID ([8c84dfc](https://github.com/jensvogt/awsmock/commit/8c84dfc7897563927609995c8b24ca6423393df8))
+* SQS message group ID ([44a2370](https://github.com/jensvogt/awsmock/commit/44a2370af21cb3d69f98e82238f968f5a4b772c9))
+
 ## [1.16.17](https://github.com/jensvogt/awsmock/compare/v1.16.16...v1.16.17) (2026-04-04)
 
 
