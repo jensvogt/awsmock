@@ -155,7 +155,7 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.modules.cognito.backup.cron", "AWSMOCK_MODULES_COGNITO_BACKUP_CRON", "0 0 0 * * ?");
         DefineProperty<int>("awsmock.modules.cognito.backup.count", "AWSMOCK_MODULES_COGNITO_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.cognito.counter-period", "AWSMOCK_MODULES_COGNITO_COUNTER_PERIOD", 300);
-        DefineProperty<int>("awsmock.modules.cognito.monitoring.period", "AWSMOCK_MODULES_COGNITO_MONITORING_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.cognito.monitoring-period", "AWSMOCK_MODULES_COGNITO_MONITORING_PERIOD", 300);
 
         // DynamoDB
         DefineProperty<bool>("awsmock.modules.dynamodb.active", "AWSMOCK_MODULES_DYNAMODB_ACTIVE", true);
@@ -176,24 +176,25 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.secretsmanager.backup.active", "AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.secretsmanager.backup.cron", "AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_CRON", "0 0 0 * * ?");
         DefineProperty<int>("awsmock.modules.secretsmanager.backup.count", "AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_COUNT", 5);
-        DefineProperty<int>("awsmock.modules.secretsmanager.monitoring.period", "AWSMOCK_MODULES_SECRETSMANAGER_MONITORING_PERIOD", 300);
-        DefineProperty<int>("awsmock.modules.secretsmanager.worker.period", "AWSMOCK_MODULES_SECRETSMANAGER_WORKER_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.secretsmanager.monitoring-period", "AWSMOCK_MODULES_SECRETSMANAGER_MONITORING_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.secretsmanager.worker-period", "AWSMOCK_MODULES_SECRETSMANAGER_WORKER_PERIOD", 300);
 
         // KMS
         DefineProperty<bool>("awsmock.modules.kms.active", "AWSMOCK_MODULES_KMS_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.kms.backup.active", "AWSMOCK_MODULES_KMS_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.kms.backup.cron", "AWSMOCK_MODULES_KMS_BACKUP_CRON", "0 0 0 * * ?");
         DefineProperty<int>("awsmock.modules.kms.backup.count", "AWSMOCK_MODULES_KMS_BACKUP_COUNT", 5);
-        DefineProperty<int>("awsmock.modules.kms.monitoring.period", "AWSMOCK_SERVICE_KMS_MONITORING_PERIOD", 300);
-        DefineProperty<int>("awsmock.modules.kms.remove.period", "AWSMOCK_WORKER_KMS_REMOVE_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.kms.monitoring-period", "AWSMOCK_SERVICE_KMS_MONITORING_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.kms.remove-period", "AWSMOCK_WORKER_KMS_REMOVE_PERIOD", 300);
 
         // SSM
         DefineProperty<bool>("awsmock.modules.ssm.active", "AWSMOCK_MODULES_SSM_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.ssm.backup.active", "AWSMOCK_MODULES_SSM_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.ssm.backup.cron", "AWSMOCK_MODULES_SSM_BACKUP_CRON", "0 0 0 * * ?");
         DefineProperty<int>("awsmock.modules.ssm.backup.count", "AWSMOCK_MODULES_SSM_BACKUP_COUNT", 5);
-        DefineProperty<int>("awsmock.modules.ssm.monitoring.period", "AWSMOCK_SERVICE_SSM_MONITORING_PERIOD", 300);
-        DefineProperty<int>("awsmock.modules.ssm.remove.period", "AWSMOCK_WORKER_SSM_REMOVE_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.ssm.monitoring-period", "AWSMOCK_SERVICE_SSM_MONITORING_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.ssm.remove-period", "AWSMOCK_WORKER_SSM_REMOVE_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.ssm.worker-period", "AWSMOCK_WORKER_SSM_WORKER_PERIOD", 300);
 
         // Application
         DefineProperty<bool>("awsmock.modules.application.active", "AWSMOCK_MODULES_APPLICATION_ACTIVE", true);
@@ -210,6 +211,7 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.modules.application.runtime.java11", "AWSMOCK_MODULES_APPLICATION_JAVA11", "alpine/java:11.0.22-jdk");
         DefineProperty<std::string>("awsmock.modules.application.runtime.java17", "AWSMOCK_MODULES_APPLICATION_JAVA17", "openjdk:17-jdk-alpine");
         DefineProperty<std::string>("awsmock.modules.application.runtime.java21", "AWSMOCK_MODULES_APPLICATION_JAVA21", "alpine/java:21-jdk");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.java25", "AWSMOCK_MODULES_APPLICATION_JAVA25", "alpine/java:25-jdk");
         DefineProperty<std::string>("awsmock.modules.application.runtime.python3-9", "AWSMOCK_MODULES_APPLICATION_PYTHON39", "python:3.9");
         DefineProperty<std::string>("awsmock.modules.application.runtime.python3-10", "AWSMOCK_MODULES_APPLICATION_PYTHON310", "python:3.10");
         DefineProperty<std::string>("awsmock.modules.application.runtime.python3-11", "AWSMOCK_MODULES_APPLICATION_PYTHON311", "python:3.11");
@@ -285,6 +287,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.logging.file-active", "AWSMOCK_LOG_FILE_ACTIVE", false);
         DefineProperty<bool>("awsmock.logging.console-active", "AWSMOCK_LOG_CONSOLE_ACTIVE", true);
         DefineProperty<bool>("awsmock.logging.websocket-active", "AWSMOCK_LOG_WEBSOCKET_ACTIVE", false);
+        DefineProperty<int>("awsmock.logging.websocket-port", "AWSMOCK_LOG_WEBSOCKET_PORT", 4569);
     }
 
     std::string Configuration::GetFilename() const {
@@ -400,4 +403,4 @@ namespace AwsMock::Core {
         os << "Configuration=" << oss.str();
         return os;
     }
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
