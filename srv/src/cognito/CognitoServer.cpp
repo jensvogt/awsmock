@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     CognitoServer::CognitoServer(Core::Scheduler &scheduler) : AbstractServer("cognito"), _module("cognito"), _scheduler(scheduler) {
 
         // Get HTTP configuration values
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.cognito.monitoring.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.cognito.monitoring-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.cognito.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.cognito.backup.cron");
 
@@ -58,4 +58,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("cognito-backup");
         log_info << "Cognito server stopped";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
