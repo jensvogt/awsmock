@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.20](https://github.com/jensvogt/awsmock/compare/v1.16.19...v1.16.20) (2026-04-06)
+
+
+### Bug Fixes
+
+* cognito configuration ([1f7f9eb](https://github.com/jensvogt/awsmock/commit/1f7f9eb64a60167bd0db6101a8903b9a56333d6c))
+* SQS message group ID ([0989dfe](https://github.com/jensvogt/awsmock/commit/0989dfe8dcf883cc472bb0d76e0ae04fb0b34bb3))
+
 ## [1.16.19](https://github.com/jensvogt/awsmock/compare/v1.16.18...v1.16.19) (2026-04-05)
 
 
