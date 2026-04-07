@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.16.21](https://github.com/jensvogt/awsmock/compare/v1.16.20...v1.16.21) (2026-04-07)
+
+
+### Bug Fixes
+
+* cognito configuration ([e0a4b5a](https://github.com/jensvogt/awsmock/commit/e0a4b5a14e34191d1acb953af082600ed2e900ff))
+* cognito configuration ([56974f2](https://github.com/jensvogt/awsmock/commit/56974f2ed4995f01bff94c137db197d0c1ae6973))
+* memory db for SQS/SNS ([508e9b1](https://github.com/jensvogt/awsmock/commit/508e9b1102b0e27e1f3bd5e9885723988d6f6676))
+* memory db for SQS/SNS ([8cc0616](https://github.com/jensvogt/awsmock/commit/8cc06160a4a0b21d7906a596dd163b51ede0c75b))
+
 ## [1.16.20](https://github.com/jensvogt/awsmock/compare/v1.16.19...v1.16.20) (2026-04-06)
 
 
