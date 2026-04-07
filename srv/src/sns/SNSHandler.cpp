@@ -294,10 +294,15 @@ namespace AwsMock::Service {
     }
 
     std::map<std::string, Dto::SNS::MessageAttribute> SNSHandler::GetMessageAttributes(const std::string &payload) {
+
+        std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes;
         const int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttributes");
         log_debug << "Got message attribute count: " << attributeCount;
 
-        std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes;
+        if (attributeCount == 0) {
+            return messageAttributes;
+        }
+
         for (int i = 1; i <= attributeCount / 2; i++) {
             const std::string attributeName = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttributes.entry." + std::to_string(i) + ".Name");
 
@@ -308,20 +313,26 @@ namespace AwsMock::Service {
                 messageAttributes[attributeName] = attribute;
             }
         }
-        log_debug << "Extracted message attribute count: " << messageAttributes.size();
+        log_debug << "Extracted message attribute, count: " << messageAttributes.size();
         return messageAttributes;
     }
 
     std::map<std::string, std::string> SNSHandler::GetTags(const std::string &payload) {
 
         std::map<std::string, std::string> tags;
-        const int count = Core::HttpUtils::CountQueryParametersByPrefix("/?" + payload, "Tags.member") / 2;
-        for (int i = 1; i <= count; i++) {
+        const int tagCount = Core::HttpUtils::CountQueryParametersByPrefix("/?" + payload, "Tags.member") / 2;
+        log_debug << "Got tag count: " << tagCount;
+
+        if (tagCount == 0) {
+            return tags;
+        }
+
+        for (int i = 1; i <= tagCount; i++) {
             const std::string tagKey = Core::HttpUtils::GetStringParameterFromBody(payload, "Tags.member." + std::to_string(i) + ".Key");
             const std::string tagValue = Core::HttpUtils::GetStringParameterFromBody(payload, "Tags.member." + std::to_string(i) + ".Value");
             tags[tagKey] = tagValue;
         }
-        log_trace << "Got tags count, count: " << count;
+        log_trace << "Extracted tags, count: " << tags.size();
         return tags;
     }
 

@@ -687,10 +687,10 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::DELETE_ALL_OBJECTS: {
                     // Build request
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, s3Request] {
-                        const auto s3response = _s3Service.DeleteObjects(s3Request);
-                        log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
-                    });
+                    //                    boost::asio::post(_ioc, [this, s3Request] {
+                    const auto s3response = _s3Service.DeleteObjects(s3Request);
+                    log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
+                    //                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -910,4 +910,4 @@ namespace AwsMock::Service {
         key = Core::StringUtils::SubStringAfter(path, "/");
         log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

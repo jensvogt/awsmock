@@ -131,8 +131,11 @@ namespace AwsMock::Service {
         } catch (Core::ServiceException &exc) {
             log_error << "ServiceException: " << exc.message();
             return SendResponse(request, http::status::internal_server_error, exc.message());
+        } catch (Core::NotFoundException &exc) {
+            log_error << "NotFoundExcpetion: " << exc.message();
+            return SendResponse(request, http::status::not_found, exc.message());
         }
         log_error << "Unknown method";
         return SendResponse(request, http::status::bad_request, "Unknown method");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

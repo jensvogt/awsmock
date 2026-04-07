@@ -30,8 +30,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                   return queue.second.queueArn == queueArn;
-               }) != _queues.end();
+            return queue.second.queueArn == queueArn;
+        }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -544,15 +544,15 @@ namespace AwsMock::Database {
         if (queueArn.empty()) {
             return static_cast<long>(_messages.size());
         }
-        return std::ranges::count_if(_messages, [queueArn](const auto &pair) {
+        return static_cast<long>(std::ranges::count_if(_messages, [queueArn](const auto &pair) {
             return pair.second.queueArn == queueArn;
-        });
+        }));
     }
 
     long SQSMemoryDb::CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) {
-        return std::ranges::count_if(_messages, [queueArn, status](const auto &pair) {
+        return static_cast<long>(std::ranges::count_if(_messages, [queueArn, status](const auto &pair) {
             return pair.second.queueArn == queueArn && pair.second.status == status;
-        });
+        }));
     }
 
     Entity::SQS::MessageWaitTime SQSMemoryDb::GetAverageMessageWaitingTime() {
@@ -641,4 +641,4 @@ namespace AwsMock::Database {
         std::ranges::transform(_queues, std::back_inserter(queueList), [](auto const &pair) { return pair.second; });
         return queueList;
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

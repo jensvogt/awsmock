@@ -4,10 +4,6 @@
 
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 
-#include "awsmock/core/Linq.h"
-
-#include <boost/accumulators/statistics/count.hpp>
-
 namespace AwsMock::Database {
 
     boost::mutex DynamoDbMemoryDb::_tableMutex;
@@ -157,59 +153,23 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::ItemList DynamoDbMemoryDb::ListItems(const std::string &region, const std::string &tableName) const {
 
-        Entity::DynamoDb::ItemList items;
-        if (region.empty() && tableName.empty()) {
-
-            for (const auto &val: _items | std::views::values) {
-                items.emplace_back(val);
-            }
-
-        } else if (tableName.empty()) {
-
-            for (const auto &val: _items | std::views::values) {
-                if (val.region == region) {
-                    items.emplace_back(val);
-                }
-            }
-
-        } else {
-
-            for (const auto &val: _items | std::views::values) {
-                if (val.region == region && val.tableName == tableName) {
-                    items.emplace_back(val);
-                }
-            }
+        const auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
         }
-
-        log_trace << "Got DynamoDB items, size: " << items.size();
-        return items;
+        if (!tableName.empty()) {
+            q.where([tableName](const Entity::DynamoDb::Item &item) { return item.tableName == tableName; });
+        }
+        log_trace << "Got DynamoDB items, region: " << region << ", tableName: " << tableName << ", size: " << q.count();
+        return q.to_vector();
     }
 
     long DynamoDbMemoryDb::GetTableSize(const std::string &region, const std::string &tableName) const {
 
-        long size = 0;
-        if (region.empty() && tableName.empty()) {
-
-            for (const auto &val: _items | std::views::values) {
-                size += val.size;
-            }
-
-        } else if (tableName.empty()) {
-
-            for (const auto &val: _items | std::views::values) {
-                if (val.region == region) {
-                    size += val.size;
-                }
-            }
-
-        } else {
-
-            for (const auto &val: _items | std::views::values) {
-                if (val.region == region && val.tableName == tableName) {
-                    size += val.size;
-                }
-            }
-        }
+        const long size = std::accumulate(_items.begin(), _items.end(), 0L,
+                                          [tableName, region](long sum, const auto &pair) {
+                                              return pair.second.region == region && pair.second.tableName == tableName ? sum + pair.second.size : sum;
+                                          });
 
         log_trace << "Got DynamoDB size, region: " << region << ", tableName: " << tableName << ", size: " << size;
         return size;
@@ -298,7 +258,7 @@ namespace AwsMock::Database {
 
     std::vector<Entity::DynamoDb::Item> DynamoDbMemoryDb::GetItems(const std::string &region, const std::string &tableName) {
 
-        const auto q = Core::from(ItemsToVector());
+        const auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
             q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
         }
@@ -313,9 +273,9 @@ namespace AwsMock::Database {
         for (auto &table: _tables | std::views::values) {
 
             // Count items belonging to this table
-            table.itemCount = std::ranges::count_if(_items, [&table](const auto &pair) {
+            table.itemCount = static_cast<long>(std::ranges::count_if(_items, [&table](const auto &pair) {
                 return pair.second.tableName == table.name;
-            });
+            }));
 
             // Sum size of items belonging to this table
             table.size = std::accumulate(_items.begin(), _items.end(), 0L,
@@ -329,8 +289,7 @@ namespace AwsMock::Database {
         boost::mutex::scoped_lock lock(_itemMutex);
 
         const auto count = std::erase_if(_items, [region, tableName, partitionKey, sortKey](const auto &item) {
-            auto const &[k, v] = item;
-            return v.region == region && v.tableName == tableName && v.partitionKey == partitionKey && v.sortKey == sortKey;
+            return item.second.region == region && item.second.tableName == tableName && item.second.partitionKey == partitionKey && item.second.sortKey == sortKey;
         });
         log_debug << "DynamoDB items deleted, count: " << count;
     }
@@ -339,8 +298,7 @@ namespace AwsMock::Database {
         boost::mutex::scoped_lock lock(_itemMutex);
 
         const auto count = std::erase_if(_items, [region, tableName](const auto &item) {
-            auto const &[k, v] = item;
-            return v.region == region && v.tableName == tableName;
+            return item.second.region == region && item.second.tableName == tableName;
         });
         log_debug << "DynamoDB items deleted, tableName: " << tableName << " count: " << count;
         return static_cast<long>(count);
@@ -354,10 +312,4 @@ namespace AwsMock::Database {
         _items.clear();
         return count;
     }
-
-    inline Entity::DynamoDb::ItemList DynamoDbMemoryDb::ItemsToVector() {
-        Entity::DynamoDb::ItemList itemList;
-        std::ranges::transform(_items, std::back_inserter(itemList), [](auto const &pair) { return pair.second; });
-        return itemList;
-    }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
