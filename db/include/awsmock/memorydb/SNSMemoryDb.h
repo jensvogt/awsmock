@@ -7,12 +7,14 @@
 
 // C++ includes
 #include <string>
+#include <unordered_set>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Linq.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/utils/SortColumn.h>
@@ -28,8 +30,7 @@ namespace AwsMock::Database {
      */
     class SNSMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -312,8 +313,7 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters();
 
-      private:
-
+    private:
         /**
          * SNS topic vector when running without a database
          */
@@ -335,6 +335,6 @@ namespace AwsMock::Database {
         static boost::mutex _snsMessageMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SNS_MEMORYDB_H

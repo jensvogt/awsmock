@@ -390,7 +390,7 @@ namespace AwsMock::Service {
     }
 
     void ModuleService::CleanObjects(const Dto::Module::CleanInfrastructureRequest &request) {
-        log_info << "Cleaning objects, length: " << request.modules.size();
+        log_info << "Cleaning objects, modules: " << request.modules.size();
 
         long count = 0;
         for (const auto &m: request.modules) {
@@ -481,4 +481,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_info << "Infrastructure exported, file: " << filename;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
