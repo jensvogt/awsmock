@@ -142,7 +142,7 @@ namespace AwsMock::Database {
          * @param maxKeys maximal number of return elements
          * @return list of S3 objects
          */
-        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) const;
+        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
 
         /**
          * @brief Count objects in a bucket.

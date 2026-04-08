@@ -2,7 +2,7 @@ set(BINARY db_memory_tst)
 set(STATIC_LIB awsmockdb)
 set(CMAKE_BUILD_TYPE "Debug")
 
-set(SOURCES Main.cpp DynamoDbTest.cpp CognitoDbTest.cpp SQSDbTest.cpp SNSDbTest.cpp)
+set(SOURCES Main.cpp DynamoDbTest.cpp CognitoDbTest.cpp SQSDbTest.cpp SNSDbTest.cpp S3DbTest.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PUBLIC ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/db/include)

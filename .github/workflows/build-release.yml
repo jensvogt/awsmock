@@ -88,57 +88,10 @@ jobs:
             echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
           }
 
-      #      - name: Restore Vcpkg Cache
-      #        id: vcpkg-cache-restore
-      #        uses: actions/cache/restore@v4
-      #        with:
-      #          path: |
-      #            vcpkg
-      #            vcpkg/installed
-      #            vcpkg/vcpkg_installed
-      #            vcpkg/packages
-      #            vcpkg/buildtrees
-      #            vcpkg/downloads
-      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-      #          restore-keys: |
-      #            runnerOS=${{ runner.os }}-vcpkgGitCommit=
-      #
-      #      - name: Setup vcpkg tool only (lukka/run-vcpkg)
-      #        id: vcpkg-setup
-      #        uses: lukka/run-vcpkg@v11
-      #        with:
-      #          vcpkgJsonGlob: 'vcpkg.json'
-      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-      #          runVcpkgInstall: false
-      #          doNotCache: false
-
-      #      - name: Run vcpkg install
-      #        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
-      #        id: vcpkg-installation
-      #        uses: lukka/run-vcpkg@v11
-      #        with:
-      #          vcpkgJsonGlob: 'vcpkg.json'
-      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-      #          runVcpkgInstall: false
-      #          doNotCache: false
-
-      #      - name: Save Vcpkg Cache
-      #        uses: actions/cache/save@v4
-      #        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
-      #        with:
-      #          path: |
-      #            vcpkg
-      #            vcpkg/installed
-      #            vcpkg/vcpkg_installed
-      #            vcpkg/packages
-      #            vcpkg/buildtrees
-      #            vcpkg/downloads
-      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-
       - name: Build (Backend)
         shell: cmd
         run: |
-          cp ./docker/libssh-0.11.3.tar.xz ${{ env.VCPKG_ROOT }}/downloads
+          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
@@ -293,7 +246,7 @@ jobs:
 
       - name: Build (Backend)
         run: |
-          cp ./docker/libssh-0.11.3.tar.xz ${{ env.VCPKG_ROOT }}/downloads
+          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release
 
@@ -443,7 +396,7 @@ jobs:
 
       - name: Bugfix for libssh
         run: |
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ env.VCPKG_ROOT }}/downloads
+          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
 
       - name: Setup vcpkg (using lukka/run-vcpkg)
         id: vcpkg-installation
@@ -469,7 +422,7 @@ jobs:
 
       - name: Build (Backend)
         run: |
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ env.VCPKG_ROOT }}/downloads
+          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
@@ -663,7 +616,7 @@ jobs:
 
       - name: Build (Backend)
         run: |
-          cp ./docker/libssh-0.11.3.tar.xz ${{ env.VCPKG_ROOT }}/downloads
+          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel

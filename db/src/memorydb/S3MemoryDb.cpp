@@ -44,8 +44,6 @@ namespace AwsMock::Database {
 
     Entity::S3::Bucket S3MemoryDb::GetBucketByRegionName(const std::string &region, const std::string &name) {
 
-        Entity::S3::Bucket result;
-
         const auto it = std::ranges::find_if(_buckets,
                                              [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
                                                  return bucket.second.region == region && bucket.second.name == name;
@@ -59,8 +57,6 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Bucket S3MemoryDb::GetBucketByArn(const std::string &bucketArn) {
-
-        Entity::S3::Bucket result;
 
         const auto it = std::ranges::find_if(_buckets,
                                              [bucketArn](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
@@ -114,43 +110,33 @@ namespace AwsMock::Database {
         }) > 0;
     }
 
-    std::vector<Entity::S3::Object> S3MemoryDb::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) const {
+    std::vector<Entity::S3::Object> S3MemoryDb::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) {
 
-        std::vector<Entity::S3::Object> objectList;
-        for (const auto &val: _objects | std::views::values) {
-            if (val.region == region && val.bucket == bucket && objectList.size() < maxKeys) {
-                objectList.emplace_back(val);
-            } else {
-                break;
-            }
+        const auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q.where([region](const Entity::S3::Object &object) { return object.region == region; });
         }
-        return objectList;
+        if (!bucket.empty()) {
+            q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
+        }
+        if (maxKeys > 0) {
+            return q | std::views::take(maxKeys) | std::ranges::to<std::vector>();
+        }
+        return q.to_vector();
     }
 
     long S3MemoryDb::GetBucketObjectCount(const std::string &region, const std::string &bucket) const {
 
-        long count = 0;
-        for (const auto &val: _objects | std::views::values) {
-            if (val.region == region && val.bucket == bucket) {
-                count++;
-            } else {
-                break;
-            }
-        }
-        return count;
+        return std::ranges::count_if(_objects, [region,bucket](const auto &object) {
+            return object.second.region == region && object.second.bucket == bucket;
+        });
     }
 
     long S3MemoryDb::GetBucketSize(const std::string &region, const std::string &bucket) const {
-
-        long size = 0;
-        for (const auto &val: _objects | std::views::values) {
-            if (val.region == region && val.bucket == bucket) {
-                size += val.size;
-            } else {
-                break;
-            }
-        }
-        return size;
+        return std::accumulate(_objects.begin(), _objects.end(), 0L,
+                               [region,bucket](long sum, const auto &item) {
+                                   return item.second.region == region && item.second.bucket == bucket ? sum + item.second.size : sum;
+                               });
     }
 
     long S3MemoryDb::BucketCount() const {
@@ -160,16 +146,15 @@ namespace AwsMock::Database {
 
     std::vector<Entity::S3::Object> S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) const {
 
-        std::vector<Entity::S3::Object> objectList;
-        std::ranges::transform(_objects, std::back_inserter(objectList), [](auto const &pair) { return pair.second; });
-
-        const auto q = Core::from(objectList);
-
+        const auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        if (!bucket.empty()) {
+            q.where([bucket](const Entity::S3::Object &item) { return item.bucket == bucket; });
+        }
         if (!prefix.empty()) {
             q.where([prefix](const Entity::S3::Object &item) { return Core::StringUtils::StartsWith(item.oid, prefix); });
         }
 
-        log_trace << "Got object list, size: " << objectList.size();
+        log_trace << "Got object list, size: " << q.count();
         return q.to_vector();
     }
 
@@ -177,21 +162,16 @@ namespace AwsMock::Database {
         boost::mutex::scoped_lock lock(_bucketMutex);
 
         const auto count = std::erase_if(_objects, [bucket](const auto &item) {
-            auto const &[key, value] = item;
-            return value.region == bucket.region && value.bucket == bucket.name;
+            return item.second.region == bucket.region && item.second.bucket == bucket.name;
         });
         return static_cast<long>(count);
     }
 
     Entity::S3::Bucket S3MemoryDb::UpdateBucket(const Entity::S3::Bucket &bucket) {
-
         boost::mutex::scoped_lock lock(_bucketMutex);
-
-        std::string region = bucket.region;
-        std::string name = bucket.name;
         const auto it = std::ranges::find_if(_buckets,
-                                             [region, name](const std::pair<std::string, Entity::S3::Bucket> &b) {
-                                                 return b.second.region == region && b.second.name == name;
+                                             [bucket](const std::pair<std::string, Entity::S3::Bucket> &b) {
+                                                 return b.second.region == bucket.region && b.second.name == bucket.name;
                                              });
         _buckets[it->first] = bucket;
         return _buckets[it->first];
@@ -214,11 +194,8 @@ namespace AwsMock::Database {
     void S3MemoryDb::DeleteBucket(const Entity::S3::Bucket &bucket) {
         boost::mutex::scoped_lock lock(_bucketMutex);
 
-        std::string region = bucket.region;
-        std::string name = bucket.name;
-        const auto count = std::erase_if(_buckets, [region, name](const auto &item) {
-            auto const &[key, value] = item;
-            return value.region == region && value.name == name;
+        const auto count = std::erase_if(_buckets, [bucket](const auto &item) {
+            return item.second.region == bucket.region && item.second.name == bucket.name;
         });
         log_debug << "Bucket deleted, count: " << count;
     }
