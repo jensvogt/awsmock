@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.16.22](https://github.com/jensvogt/awsmock/compare/v1.16.21...v1.16.22) (2026-04-08)
+
+
+### Bug Fixes
+
+* memory db for SQS/SNS ([120fd8f](https://github.com/jensvogt/awsmock/commit/120fd8f687afdbe39208da55a647e688f8d3158c))
+* rearrange dynamodb items ([0762bd2](https://github.com/jensvogt/awsmock/commit/0762bd2bbf778d1e5e83238684e8ce6a0283c0a2))
+* S3/Dynamodb tests ([a280398](https://github.com/jensvogt/awsmock/commit/a2803987de42b465430a7381e730aa7acfa97163))
+* S3/Dynamodb tests ([46c0baa](https://github.com/jensvogt/awsmock/commit/46c0baad0c9fa77da2d440295626629cde59fd1c))
+
 ## [1.16.21](https://github.com/jensvogt/awsmock/compare/v1.16.20...v1.16.21) (2026-04-07)
 
 
