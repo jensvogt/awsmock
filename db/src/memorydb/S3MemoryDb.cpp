@@ -4,6 +4,8 @@
 
 #include <awsmock/memorydb/S3MemoryDb.h>
 
+#include "awsmock/core/NumberUtils.h"
+
 namespace AwsMock::Database {
 
     boost::mutex S3MemoryDb::_bucketMutex;
@@ -81,7 +83,7 @@ namespace AwsMock::Database {
 
     Entity::S3::BucketList S3MemoryDb::ListBuckets() {
         boost::mutex::scoped_lock lock(_bucketMutex);
-        return _buckets | std::views::values | std::ranges::to<std::vector>();
+        return Core::NumberUtils::toVector(_buckets);
     }
 
     Entity::S3::BucketList S3MemoryDb::ExportBuckets(const std::vector<SortColumn> &sortColumns) const {
@@ -106,18 +108,18 @@ namespace AwsMock::Database {
 
     bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) const {
         return std::ranges::count_if(_objects, [bucket](const auto &object) {
-            return object.second.region == bucket.region && object.second.bucket == bucket.name;
-        }) > 0;
+                   return object.second.region == bucket.region && object.second.bucket == bucket.name;
+               }) > 0;
     }
 
     std::vector<Entity::S3::Object> S3MemoryDb::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) {
 
-        const auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
-            q.where([region](const Entity::S3::Object &object) { return object.region == region; });
+            q = q.where([region](const Entity::S3::Object &object) { return object.region == region; });
         }
         if (!bucket.empty()) {
-            q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
+            q = q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
         }
         if (maxKeys > 0) {
             return q | std::views::take(maxKeys) | std::ranges::to<std::vector>();
@@ -127,14 +129,14 @@ namespace AwsMock::Database {
 
     long S3MemoryDb::GetBucketObjectCount(const std::string &region, const std::string &bucket) const {
 
-        return std::ranges::count_if(_objects, [region,bucket](const auto &object) {
+        return std::ranges::count_if(_objects, [region, bucket](const auto &object) {
             return object.second.region == region && object.second.bucket == bucket;
         });
     }
 
     long S3MemoryDb::GetBucketSize(const std::string &region, const std::string &bucket) const {
         return std::accumulate(_objects.begin(), _objects.end(), 0L,
-                               [region,bucket](long sum, const auto &item) {
+                               [region, bucket](long sum, const auto &item) {
                                    return item.second.region == region && item.second.bucket == bucket ? sum + item.second.size : sum;
                                });
     }
@@ -146,12 +148,12 @@ namespace AwsMock::Database {
 
     std::vector<Entity::S3::Object> S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) const {
 
-        const auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!bucket.empty()) {
-            q.where([bucket](const Entity::S3::Object &item) { return item.bucket == bucket; });
+            q = q.where([bucket](const Entity::S3::Object &item) { return item.bucket == bucket; });
         }
         if (!prefix.empty()) {
-            q.where([prefix](const Entity::S3::Object &item) { return Core::StringUtils::StartsWith(item.oid, prefix); });
+            q = q.where([prefix](const Entity::S3::Object &item) { return Core::StringUtils::StartsWith(item.key, prefix); });
         }
 
         log_trace << "Got object list, size: " << q.count();
@@ -257,8 +259,11 @@ namespace AwsMock::Database {
                                              [object](const std::pair<std::string, Entity::S3::Object> &o) {
                                                  return o.second.bucket == object.bucket && o.second.key == object.key;
                                              });
-        _objects[it->first] = object;
-        return _objects[it->first];
+        if (it != _objects.end()) {
+            _objects[it->first] = object;
+            return _objects[it->first];
+        }
+        return {};
     }
 
     Entity::S3::Object S3MemoryDb::GetObjectById(const std::string &oid) {
@@ -305,12 +310,12 @@ namespace AwsMock::Database {
     long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
         boost::mutex::scoped_lock lock(_objectMutex);
 
-        const auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
-            q.where([region](const Entity::S3::Object &object) { return object.region == region; });
+            q = q.where([region](const Entity::S3::Object &object) { return object.region == region; });
         }
         if (!bucket.empty()) {
-            q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
+            q = q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
         }
         log_debug << "Object count, region: " << region << ", bucket: " << bucket << ", count: " << q.count();
         return static_cast<long>(q.count());
@@ -318,9 +323,9 @@ namespace AwsMock::Database {
 
     std::vector<Entity::S3::Object> S3MemoryDb::ListObjects(const std::string &prefix) {
 
-        const auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!prefix.empty()) {
-            q.where([prefix](const Entity::S3::Object &object) { return Core::StringUtils::StartsWith(object.key, prefix); });
+            q = q.where([prefix](const Entity::S3::Object &object) { return Core::StringUtils::StartsWith(object.key, prefix); });
         }
         log_trace << "Objects list, prefix: " << prefix << ", count: " << q.count();
         return q.to_vector();
@@ -328,15 +333,15 @@ namespace AwsMock::Database {
 
     std::vector<Entity::S3::Object> S3MemoryDb::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
 
-        const auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
-            q.where([region](const Entity::S3::Object &object) { return object.region == region; });
+            q = q.where([region](const Entity::S3::Object &object) { return object.region == region; });
         }
         if (!bucket.empty()) {
-            q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
+            q = q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
         }
         if (!prefix.empty()) {
-            q.where([prefix](const Entity::S3::Object &object) { return Core::StringUtils::StartsWith(object.key, prefix); });
+            q = q.where([prefix](const Entity::S3::Object &object) { return Core::StringUtils::StartsWith(object.key, prefix); });
         }
         log_trace << "Versioned object list, region: " << region << ", bucket: " << bucket << ", size: " << q.count();
         return q.to_vector();
@@ -380,4 +385,4 @@ namespace AwsMock::Database {
         }
         log_debug << "All object counters updated, count: " << _buckets.size();
     }
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

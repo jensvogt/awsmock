@@ -198,7 +198,7 @@ namespace AwsMock::Database {
         BOOST_CHECK_EQUAL(false, item.oid.empty());
 
         // act
-        dynamoDbDatabase.DeleteItem(TEST_TABLE_REGION, TEST_TABLE_NAME, "attr-value-1");
+        dynamoDbDatabase.DeleteItem(TEST_TABLE_REGION, TEST_TABLE_NAME, "key-value-1");
         const long count = dynamoDbDatabase.CountItems(TEST_TABLE_REGION, TEST_TABLE_NAME);
 
         // assert

@@ -20,8 +20,8 @@ namespace AwsMock::Database {
     bool SNSMemoryDb::TopicExists(const std::string &arn) {
 
         return std::ranges::find_if(_topics, [arn](const std::pair<std::string, Entity::SNS::Topic> &topic) {
-            return topic.second.topicArn == arn;
-        }) != _topics.end();
+                   return topic.second.topicArn == arn;
+               }) != _topics.end();
     }
 
     Entity::SNS::Topic SNSMemoryDb::GetTopicById(const std::string &oid) {
@@ -239,8 +239,8 @@ namespace AwsMock::Database {
     bool SNSMemoryDb::MessageExists(const std::string &id) {
 
         return std::ranges::find_if(_messages, [id](const std::pair<std::string, Entity::SNS::Message> &message) {
-            return message.first == id;
-        }) != _messages.end();
+                   return message.first == id;
+               }) != _messages.end();
     }
 
     Entity::SNS::Message SNSMemoryDb::CreateMessage(const Entity::SNS::Message &message) {
@@ -277,9 +277,9 @@ namespace AwsMock::Database {
     }
 
     long SNSMemoryDb::CountMessagesByStatus(const std::string &topicArn, const Entity::SNS::MessageStatus status) const {
-        return static_cast<long>(std::ranges::count_if(_messages, [topicArn, status](const auto &pair) {
+        return std::ranges::count_if(_messages, [topicArn, status](const auto &pair) {
             return pair.second.topicArn == topicArn && pair.second.status == status;
-        }));
+        });
     }
 
     Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) const {
@@ -382,4 +382,4 @@ namespace AwsMock::Database {
         }
         log_debug << "Topic counters updated, count: " << _topics.size();
     }
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

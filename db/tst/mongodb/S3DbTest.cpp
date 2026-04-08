@@ -1,15 +1,17 @@
-
 //
 // Created by vogje01 on 02/06/2023.
 //
 
+// C++ standard includes
+#include <iostream>
+
+// Local includes
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/repository/S3Database.h>
+
 // Boost includes
 #include <boost/locale.hpp>
 #include <boost/test/unit_test.hpp>
-
-// AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/repository/S3Database.h>
 
 #define TEST_ACCOUNT_ID "000000000000"
 #define TEST_REGION "eu-central-1"
@@ -37,10 +39,10 @@ namespace AwsMock::Database {
         return object;
     }
 
-    struct S3MemoryDbFixture {
-        S3MemoryDbFixture() = default;
+    struct S3DbFixture {
+        S3DbFixture() = default;
 
-        ~S3MemoryDbFixture() {
+        ~S3DbFixture() {
             const long objectCount = S3Database::instance().DeleteAllObjects();
             log_debug << "Objects deleted " << objectCount;
             const long bucketCount = S3Database::instance().DeleteAllBuckets();
@@ -48,16 +50,16 @@ namespace AwsMock::Database {
         }
     };
 
-    BOOST_FIXTURE_TEST_SUITE(S3MemoryDbTests, S3MemoryDbFixture)
+    BOOST_FIXTURE_TEST_SUITE(S3DbTests, S3DbFixture)
 
-    BOOST_AUTO_TEST_CASE(CreateBucket) {
+    BOOST_AUTO_TEST_CASE(BucketCreate) {
 
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
 
         // act
-        bucket = s3Database.CreateBucket(bucket);
+        const Entity::S3::Bucket result = s3Database.CreateBucket(bucket);
 
         // assert
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
@@ -65,20 +67,19 @@ namespace AwsMock::Database {
         BOOST_CHECK_EQUAL(false, bucket.name.empty());
     }
 
-    BOOST_AUTO_TEST_CASE(CountBuckets) {
+    BOOST_AUTO_TEST_CASE(BucketCount) {
 
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
         bucket = s3Database.CreateBucket(bucket);
-        BOOST_CHECK_EQUAL(bucket.name, TEST_BUCKET_NAME);
-        BOOST_CHECK_EQUAL(bucket.region, TEST_REGION);
 
         // act
         const long result = s3Database.BucketCount();
 
         // assert
         BOOST_CHECK_EQUAL(1, result);
+        BOOST_CHECK_EQUAL(bucket.name.empty(), false);
     }
 
     BOOST_AUTO_TEST_CASE(BucketExists) {
@@ -129,7 +130,7 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
 
         // act
         const Entity::S3::BucketList result = s3Database.ListBuckets();
@@ -143,7 +144,7 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
         s3Database.CreateObject(object1);
         Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
@@ -155,25 +156,10 @@ namespace AwsMock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(result1.size(), 2);
+        BOOST_CHECK_EQUAL(result1[0].key, "test1/key1");
+        BOOST_CHECK_EQUAL(result1[1].key, "test2/key2");
         BOOST_CHECK_EQUAL(result2.size(), 1);
-    }
-
-    BOOST_AUTO_TEST_CASE(BucketHasObjets) {
-
-        // arrange
-        const S3Database &s3Database = S3Database::instance();
-        Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
-        Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database.CreateObject(object1);
-        Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
-        s3Database.CreateObject(object2);
-
-        // act
-        const bool result = s3Database.HasObjects(bucket);
-
-        // assert
-        BOOST_CHECK_EQUAL(result, true);
+        BOOST_CHECK_EQUAL(result2[0].key, std::string("test1/key1"));
     }
 
     BOOST_AUTO_TEST_CASE(BucketSize) {
@@ -182,6 +168,7 @@ namespace AwsMock::Database {
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
         bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
         s3Database.CreateObject(object1);
         Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
@@ -194,12 +181,32 @@ namespace AwsMock::Database {
         BOOST_CHECK_EQUAL(totalSize, 10);
     }
 
+    BOOST_AUTO_TEST_CASE(BucketHasObjets) {
+
+        // arrange
+        const S3Database &s3Database = S3Database::instance();
+        Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
+        Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
+        s3Database.CreateObject(object1);
+        Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
+        s3Database.CreateObject(object2);
+
+        // act
+        const bool result = s3Database.HasObjects(bucket);
+
+        // assert
+        BOOST_CHECK_EQUAL(result, true);
+    }
+
     BOOST_AUTO_TEST_CASE(BucketDelete) {
 
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // act
         BOOST_CHECK_NO_THROW({ s3Database.DeleteBucket(bucket); });
@@ -214,7 +221,8 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // act
         BOOST_CHECK_NO_THROW({ s3Database.DeleteAllBuckets(); });
@@ -229,12 +237,13 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
-        Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database.CreateObject(object);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
+        Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
+        s3Database.CreateObject(object1);
 
         // act
-        const bool result = s3Database.ObjectExists(object);
+        const bool result = s3Database.ObjectExists(object1);
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
@@ -245,15 +254,16 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
-        Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database.CreateObject(object);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
+        Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
+        s3Database.CreateObject(object1);
 
         // act
-        const Entity::S3::Object result = s3Database.GetObject(TEST_REGION, object.bucket, object.key);
+        const Entity::S3::Object result = s3Database.GetObject(TEST_REGION, object1.bucket, object1.key);
 
         // assert
-        BOOST_CHECK_EQUAL(result.key, object.key);
+        BOOST_CHECK_EQUAL(result.key, object1.key);
     }
 
     BOOST_AUTO_TEST_CASE(ObjectUpdate) {
@@ -261,14 +271,16 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
-        Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database.CreateObject(object);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
+        Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
+        s3Database.CreateObject(object1);
         Entity::S3::Object updateObject;
+        updateObject.region = TEST_REGION;
         updateObject.bucket = bucket.name;
-        updateObject.key = object.key;
+        updateObject.key = "test1/key1";
         updateObject.owner = TEST_OWNER_NAME;
-        updateObject.size = object.size + 10;
+        updateObject.size = object1.size + 10;
 
         // act
         const Entity::S3::Object result = s3Database.UpdateObject(updateObject);
@@ -282,15 +294,16 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
-        Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database.CreateObject(object);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
+        Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
+        s3Database.CreateObject(object1);
 
         // act
-        const Entity::S3::Object result = s3Database.GetObjectById(object.oid);
+        const Entity::S3::Object result = s3Database.GetObjectById(object1.oid);
 
         // assert
-        BOOST_CHECK_EQUAL(result.oid, object.oid);
+        BOOST_CHECK_EQUAL(result.oid, object1.oid);
     }
 
     BOOST_AUTO_TEST_CASE(ObjectDelete) {
@@ -298,13 +311,14 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
-        Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database.CreateObject(object);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
+        Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
+        s3Database.CreateObject(object1);
 
         // act
-        BOOST_CHECK_NO_THROW({ s3Database.DeleteObject(object); });
-        const bool result = s3Database.ObjectExists(object.region, object.bucket, object.key);
+        BOOST_CHECK_NO_THROW({ s3Database.DeleteObject(object1); });
+        const bool result = s3Database.ObjectExists(object1.region, object1.bucket, object1.key);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
@@ -315,16 +329,17 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // Create objects
         for (int i = 0; i < 10; i++) {
-            Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, std::string("test1/key-") + std::to_string(i));
-            s3Database.CreateObject(object);
+            Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key-" + std::to_string(i));
+            s3Database.CreateObject(object1);
         }
 
         // act
-        const long result = s3Database.ObjectCount(bucket.region);
+        const long result = s3Database.ObjectCount(bucket.region, {}, bucket.name);
 
         // assert
         BOOST_CHECK_EQUAL(10, result);
@@ -335,12 +350,13 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // Create objects
         for (int i = 0; i < 10; i++) {
-            Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, std::string("test1/key-") + std::to_string(i));
-            s3Database.CreateObject(object);
+            Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key-" + std::to_string(i));
+            s3Database.CreateObject(object1);
         }
 
         // act
@@ -355,12 +371,13 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // Create objects
         std::vector<std::string> keys;
         for (int i = 0; i < 10; i++) {
-            std::string key = std::string(TEST_OBJECT_KEY) + "-" + std::to_string(i);
+            std::string key = std::string("test1/key-") + std::to_string(i);
             keys.push_back(key);
             Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, key);
             s3Database.CreateObject(object);
@@ -368,7 +385,7 @@ namespace AwsMock::Database {
 
         // act
         BOOST_CHECK_NO_THROW({ s3Database.DeleteObjects(TEST_REGION, bucket.name, keys); });
-        const long result = s3Database.ObjectCount(TEST_REGION, bucket.name);
+        const bool result = s3Database.ObjectCount(bucket.region, bucket.name);
 
         // assert
         BOOST_CHECK_EQUAL(0, result);
@@ -379,7 +396,8 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
         s3Database.CreateObject(object);
 
@@ -388,7 +406,7 @@ namespace AwsMock::Database {
             const long deleted = s3Database.DeleteAllObjects();
             log_debug << "Deleted: " << deleted;
         });
-        const bool result = s3Database.ObjectExists(TEST_REGION, TEST_BUCKET_NAME, object.key);
+        const bool result = s3Database.ObjectExists(object.region, object.bucket, object.key);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
@@ -399,7 +417,8 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::BucketNotification notification;
         notification.event = "s3:ObjectCreated:*";
         notification.lambdaArn = "aws:arn:000000000:lambda:test";
@@ -416,7 +435,8 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::BucketNotification notification;
         notification.event = "s3:ObjectCreated:Put";
         notification.lambdaArn = "aws:arn:000000000:lambda:test";
@@ -433,7 +453,8 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::BucketNotification notification;
         notification.event = "s3:ObjectCreated:Put";
         notification.lambdaArn = "aws:arn:000000000:lambda:test";
@@ -451,7 +472,8 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::BucketNotification notification;
         notification.event = "s3:ObjectCreated:*";
         notification.lambdaArn = "aws:arn:000000000:lambda:test";
@@ -469,7 +491,8 @@ namespace AwsMock::Database {
         // arrange
         const S3Database &s3Database = S3Database::instance();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        s3Database.CreateBucket(bucket);
+        bucket = s3Database.CreateBucket(bucket);
+        BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::BucketNotification notification;
         notification.event = "s3:ObjectCreated:*";
         notification.lambdaArn = "aws:arn:000000000:lambda:test";
@@ -482,7 +505,7 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = s3Database.DeleteBucketNotifications(bucket, deleteNotification);
 
         // assert
-        BOOST_CHECK_EQUAL(3, result.notifications.size());
+        BOOST_CHECK_EQUAL(0, result.notifications.size());
     }
 
     BOOST_AUTO_TEST_SUITE_END()

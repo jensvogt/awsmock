@@ -4,8 +4,6 @@
 
 #include <awsmock/memorydb/SQSMemoryDb.h>
 
-#include "awsmock/core/PagingUtils.h"
-
 namespace AwsMock::Database {
 
     boost::mutex SQSMemoryDb::_sqsQueueMutex;
@@ -30,8 +28,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-            return queue.second.queueArn == queueArn;
-        }) != _queues.end();
+                   return queue.second.queueArn == queueArn;
+               }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -119,7 +117,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) {
 
-        const auto q = Core::from(QueuesToVector());
+        const auto q = Core::from(_queues | std::views::values|std::ranges::to<std::vector>());
         if (!region.empty()) {
             q.where([region](const Entity::SQS::Queue &item) { return item.region == region; });
         }
@@ -641,4 +639,4 @@ namespace AwsMock::Database {
         std::ranges::transform(_queues, std::back_inserter(queueList), [](auto const &pair) { return pair.second; });
         return queueList;
     }
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

@@ -185,8 +185,7 @@ namespace AwsMock::FtpServer {
         }
 
         if (_lastCommand == "QUIT") {
-            // Close command socket
-            boost::asio::bind_executor(command_write_strand_, [me = shared_from_this()]() {
+            boost::asio::post(command_write_strand_, [me = shared_from_this()]() {
                 me->command_socket_.close();
             });
         } else {

@@ -10,6 +10,8 @@
 
 // Boost includes
 #include <boost/lexical_cast.hpp>
+#include <ranges>
+#include <vector>
 
 // AwsMock includes
 
@@ -94,7 +96,14 @@ namespace AwsMock::Core {
          * @return converted double
          */
         static double ToDouble(const std::string &str);
+
+        template<typename R>
+        static auto toVector(R &&r) {
+            auto v = r | std::views::values;
+            return std::vector(std::ranges::begin(v), std::ranges::end(v));
+        }
     };
+
 
 }// namespace AwsMock::Core
 

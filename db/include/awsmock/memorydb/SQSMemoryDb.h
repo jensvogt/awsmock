@@ -24,6 +24,7 @@
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
+#include <awsmock/core/PagingUtils.h>
 
 namespace AwsMock::Database {
 

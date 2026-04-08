@@ -50,6 +50,19 @@ namespace AwsMock::Database {
         return table;
     }
 
+    struct S3DynamoDbFixture {
+        S3DynamoDbFixture() = default;
+
+        ~S3DynamoDbFixture() {
+            const long objectCount = DynamoDbDatabase::instance().DeleteAllItems();
+            log_debug << "Items deleted " << objectCount;
+            const long bucketCount = DynamoDbDatabase::instance().DeleteAllTables();
+            log_debug << "Tables deleted " << bucketCount;
+        }
+    };
+
+    BOOST_FIXTURE_TEST_SUITE(S3DynamoDbTests, S3DynamoDbFixture)
+
     BOOST_AUTO_TEST_CASE(CreateTableTest) {
 
         // arrange
@@ -155,5 +168,7 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, items.empty());
     }
+
+    BOOST_AUTO_TEST_SUITE_END()
 
 }// namespace AwsMock::Database
