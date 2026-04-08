@@ -7,7 +7,7 @@ FROM alpine:latest AS build
 #    rm -rf /var/lib/apt/lists/*
 RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
      autoconf-archive automake libtool m4 make gettext-dev patch pkgconf ncurses-dev ncurses-terminfo-base doxygen pandoc \
-     pkgconfig coreutils bash perl
+     pkgconfig coreutils bash perl g++-14
 
 # vcpkg needs this
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
