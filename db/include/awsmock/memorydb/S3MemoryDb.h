@@ -16,6 +16,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Linq.h>
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/s3/Bucket.h>
@@ -31,7 +32,8 @@ namespace AwsMock::Database {
      */
     class S3MemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -369,7 +371,8 @@ namespace AwsMock::Database {
          */
         void AdjustObjectCounters();
 
-    private:
+      private:
+
         /**
          * @brief Convert the bucket map to a vector
          *
@@ -405,6 +408,6 @@ namespace AwsMock::Database {
         static boost::mutex _objectMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_S3_MEMORYDB_H

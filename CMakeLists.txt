@@ -10,13 +10,14 @@ project(awsmock VERSION ${VERSION_STRING} LANGUAGES CXX)
 
 include(cmake/ReadVersion.cmake)
 
+set(CMAKE_C_COMPILER gcc-14)
+set(CMAKE_CXX_COMPILER g++-14)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
-set(LEXY_HAS_NTTP OFF)
 enable_testing()
 
 # -------------------------------------------------------------------------
@@ -44,6 +45,8 @@ find_package(mongocxx CONFIG REQUIRED)
 find_package(Boost CONFIG REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup unit_test_framework locale)
 find_package(jwt-cpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
+
+
 find_package(libssh CONFIG REQUIRED)
 if (WIN32)
     set(EXTERNAL_INC_DIR ${CMAKE_SOURCE_DIR}/extern/win32/include)

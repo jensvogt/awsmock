@@ -595,13 +595,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto view = item.ToDocument().view();
+                const auto doc = item.ToDocument();// owned document
+                const auto view = doc.view();      // non-owning view into doc
                 item.size = static_cast<long>(view.length()) + sizeof(long);
                 const auto itemResult = _itemCollection.insert_one(view);
                 session.commit_transaction();

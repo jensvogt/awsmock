@@ -18,6 +18,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Linq.h>
+#include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
@@ -210,11 +211,11 @@ namespace AwsMock::Database {
         /**
          * @brief Count the number of queues for a given region.
          *
-         * @param prefix queue name prefix
          * @param region AWS region
+         * @param prefix queue name prefix
          * @return number of queues in the given region.
          */
-        long CountQueues(const std::string &prefix = {}, const std::string &region = {}) const;
+        long CountQueues(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Calculates the total size of all messages in the queue
@@ -407,11 +408,11 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all resources of a queue
          *
-         * @param queue message queue to delete resources from
+         * @param queueArn message queue to delete resources from
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessages(const std::string &queue);
+        long DeleteMessages(const std::string &queueArn);
 
         /**
          * @brief Deletes a message.
@@ -443,13 +444,6 @@ namespace AwsMock::Database {
          * @brief Adjust all queue counters
          */
         void AdjustMessageCounters();
-
-        /**
-         * @brief Convert the queue map to a vector
-         *
-         * @return list of queues
-         */
-        Entity::SQS::QueueList QueuesToVector();
 
       private:
 

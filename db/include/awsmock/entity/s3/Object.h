@@ -65,7 +65,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * Object size
          */
-        long size;
+        long size{};
 
         /**
          * Object MD5Sum
@@ -137,6 +137,6 @@ namespace AwsMock::Database::Entity::S3 {
         void FromDocument(const std::optional<view> &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::S3
 
 #endif//AWSMOCK_DB_ENTITY_S3_OBJECT_H

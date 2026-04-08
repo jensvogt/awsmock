@@ -75,17 +75,17 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Pagination score
          */
-        double score = 0.0;
+        double score{};
 
         /**
          * Queue size in bytes
          */
-        long size = 0;
+        long size{};
 
         /**
          * DLQ flag
          */
-        bool isDlq = false;
+        bool isDlq{};
 
         /**
          * Content type
