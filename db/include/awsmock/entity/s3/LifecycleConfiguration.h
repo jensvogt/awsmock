@@ -9,18 +9,15 @@
 #include <string>
 
 // AwsMock includes
-#include "LifecycleTransition.h"
-#include "awsmock/dto/s3/model/LifecycleTransition.h"
-
-
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/s3/LifecycleStatus.h>
+#include <awsmock/entity/s3/LifecycleTransition.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
     /**
-     * @brief Life cycle rule for a S3 bucket
+     * @brief Life cycle rules for a S3 bucket
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -82,6 +79,6 @@ namespace AwsMock::Database::Entity::S3 {
         [[maybe_unused]] void FromDocument(const view &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_LIFE_CYCLE_CONFIGURATION_H
