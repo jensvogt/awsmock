@@ -215,7 +215,7 @@ namespace AwsMock::Database {
          * @param prefix queue name prefix
          * @return number of queues in the given region.
          */
-        long CountQueues(const std::string &region = {}, const std::string &prefix = {}) const;
+        long CountQueues(const std::string &region = {}, const std::string &prefix = {});
 
         /**
          * @brief Calculates the total size of all messages in the queue
@@ -223,7 +223,7 @@ namespace AwsMock::Database {
          * @param queueArn AWS queue ARN
          * @return total size of the queue
          */
-        long GetQueueSize(const std::string &queueArn) const;
+        [[nodiscard]] long GetQueueSize(const std::string &queueArn) const;
 
         /**
          * @brief Deletes a queue.
@@ -258,7 +258,7 @@ namespace AwsMock::Database {
          * @return true if message exists, otherwise false
          * @throws Core::DatabaseException
          */
-        bool MessageExists(const std::string &receiptHandle) const;
+        [[nodiscard]] bool MessageExists(const std::string &receiptHandle) const;
 
         /**
          * @brief Checks whether the message exists by message ID
@@ -267,7 +267,7 @@ namespace AwsMock::Database {
          * @return true if message exists, otherwise false
          * @throws Core::DatabaseException
          */
-        bool MessageExistsByMessageId(const std::string &messageId) const;
+        [[nodiscard]] bool MessageExistsByMessageId(const std::string &messageId) const;
 
         /**
          * @brief Returns a message by ID.

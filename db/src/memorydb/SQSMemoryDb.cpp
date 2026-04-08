@@ -227,7 +227,7 @@ namespace AwsMock::Database {
         }
     }
 
-    long SQSMemoryDb::CountQueues(const std::string &region = {}, const std::string &prefix = {}) const {
+    long SQSMemoryDb::CountQueues(const std::string &region, const std::string &prefix) {
 
         auto q = Core::from(_queues | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
