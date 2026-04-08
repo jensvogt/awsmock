@@ -16,7 +16,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY ON)
 set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
-set(LEXY_HAS_NTTP OFF)
 enable_testing()
 
 # -------------------------------------------------------------------------

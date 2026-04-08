@@ -368,7 +368,7 @@ namespace AwsMock::Core {
         if (StringUtils::Contains(value, "$")) {
             size_t offset = 0;
             static std::regex envRegex(R"(\$(\w+|\{\w+\}))", std::regex::ECMAScript);
-            const std::string matchText = value;
+            const std::string &matchText = value;
             std::sregex_token_iterator matchIter(matchText.begin(), matchText.end(), envRegex, {0, 1});
             for (const std::sregex_token_iterator end; matchIter != end; ++matchIter) {
                 const std::string match = matchIter->str();
@@ -403,4 +403,4 @@ namespace AwsMock::Core {
         os << "Configuration=" << oss.str();
         return os;
     }
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

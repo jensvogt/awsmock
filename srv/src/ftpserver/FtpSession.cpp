@@ -47,12 +47,12 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::sendRawFtpMessage(const std::string &raw_message) {
         command_write_strand_.post([me = shared_from_this(), raw_message]() {
-                                       const bool write_in_progress = !me->command_output_queue_.empty();
-                                       me->command_output_queue_.push_back(raw_message);
-                                       if (!write_in_progress) {
-                                           me->startSendingMessages();
-                                       }
-                                   },
+            const bool write_in_progress = !me->command_output_queue_.empty();
+            me->command_output_queue_.push_back(raw_message);
+            if (!write_in_progress) {
+                me->startSendingMessages();
+            }
+        },
                                    nullptr);
     }
 
@@ -107,7 +107,7 @@ namespace AwsMock::FtpServer {
                              // in contiguous memory.
                              stream.read(&packet_string[0], length - 2);
 
-                             stream.ignore(2); // Remove the "\r\n"
+                             stream.ignore(2);// Remove the "\r\n"
                              log_debug << "FTP << " << packet_string;
 
                              me->handleFtpCommand(packet_string);
@@ -128,53 +128,53 @@ namespace AwsMock::FtpServer {
             parameters = command.substr(space_index + 1, std::string::npos);
         }
 
-        const std::map<std::string, std::function<void(std::string)> > command_map{
-            // Access control commands
-            {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
-            {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
-            {"ACCT", std::bind(&FtpSession::handleFtpCommandACCT, this, std::placeholders::_1)},
-            {"CWD", std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
-            {"CDUP", std::bind(&FtpSession::handleFtpCommandCDUP, this, std::placeholders::_1)},
-            {"REIN", std::bind(&FtpSession::handleFtpCommandREIN, this, std::placeholders::_1)},
-            {"QUIT", std::bind(&FtpSession::handleFtpCommandQUIT, this, std::placeholders::_1)},
+        const std::map<std::string, std::function<void(std::string)>> command_map{
+                // Access control commands
+                {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
+                {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
+                {"ACCT", std::bind(&FtpSession::handleFtpCommandACCT, this, std::placeholders::_1)},
+                {"CWD", std::bind(&FtpSession::handleFtpCommandCWD, this, std::placeholders::_1)},
+                {"CDUP", std::bind(&FtpSession::handleFtpCommandCDUP, this, std::placeholders::_1)},
+                {"REIN", std::bind(&FtpSession::handleFtpCommandREIN, this, std::placeholders::_1)},
+                {"QUIT", std::bind(&FtpSession::handleFtpCommandQUIT, this, std::placeholders::_1)},
 
-            // Transfer parameter commands
-            {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
-            {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
-            {"EPRT", std::bind(&FtpSession::handleFtpCommandEPRT, this, std::placeholders::_1)},
-            {"EPSV", std::bind(&FtpSession::handleFtpCommandEPSV, this, std::placeholders::_1)},
-            {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
-            {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
-            {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
-            {"LPRT", std::bind(&FtpSession::handleFtpCommandLPRT, this, std::placeholders::_1)},
-            {"LPSV", std::bind(&FtpSession::handleFtpCommandLPSV, this, std::placeholders::_1)},
+                // Transfer parameter commands
+                {"PORT", std::bind(&FtpSession::handleFtpCommandPORT, this, std::placeholders::_1)},
+                {"PASV", std::bind(&FtpSession::handleFtpCommandPASV, this, std::placeholders::_1)},
+                {"EPRT", std::bind(&FtpSession::handleFtpCommandEPRT, this, std::placeholders::_1)},
+                {"EPSV", std::bind(&FtpSession::handleFtpCommandEPSV, this, std::placeholders::_1)},
+                {"TYPE", std::bind(&FtpSession::handleFtpCommandTYPE, this, std::placeholders::_1)},
+                {"STRU", std::bind(&FtpSession::handleFtpCommandSTRU, this, std::placeholders::_1)},
+                {"MODE", std::bind(&FtpSession::handleFtpCommandMODE, this, std::placeholders::_1)},
+                {"LPRT", std::bind(&FtpSession::handleFtpCommandLPRT, this, std::placeholders::_1)},
+                {"LPSV", std::bind(&FtpSession::handleFtpCommandLPSV, this, std::placeholders::_1)},
 
-            // Ftp module commands
-            {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
-            {"STOR", std::bind(&FtpSession::handleFtpCommandSTOR, this, std::placeholders::_1)},
-            {"STOU", std::bind(&FtpSession::handleFtpCommandSTOU, this, std::placeholders::_1)},
-            {"APPE", std::bind(&FtpSession::handleFtpCommandAPPE, this, std::placeholders::_1)},
-            {"ALLO", std::bind(&FtpSession::handleFtpCommandALLO, this, std::placeholders::_1)},
-            {"REST", std::bind(&FtpSession::handleFtpCommandREST, this, std::placeholders::_1)},
-            {"RNFR", std::bind(&FtpSession::handleFtpCommandRNFR, this, std::placeholders::_1)},
-            {"RNTO", std::bind(&FtpSession::handleFtpCommandRNTO, this, std::placeholders::_1)},
-            {"ABOR", std::bind(&FtpSession::handleFtpCommandABOR, this, std::placeholders::_1)},
-            {"DELE", std::bind(&FtpSession::handleFtpCommandDELE, this, std::placeholders::_1)},
-            {"RMD", std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
-            {"MKD", std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
-            {"PWD", std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
-            {"LIST", std::bind(&FtpSession::handleFtpCommandLIST, this, std::placeholders::_1)},
-            {"NLST", std::bind(&FtpSession::handleFtpCommandNLST, this, std::placeholders::_1)},
-            {"SITE", std::bind(&FtpSession::handleFtpCommandSITE, this, std::placeholders::_1)},
-            {"SYST", std::bind(&FtpSession::handleFtpCommandSYST, this, std::placeholders::_1)},
-            {"STAT", std::bind(&FtpSession::handleFtpCommandSTAT, this, std::placeholders::_1)},
-            {"HELP", std::bind(&FtpSession::handleFtpCommandHELP, this, std::placeholders::_1)},
-            {"NOOP", std::bind(&FtpSession::handleFtpCommandNOOP, this, std::placeholders::_1)},
+                // Ftp module commands
+                {"RETR", std::bind(&FtpSession::handleFtpCommandRETR, this, std::placeholders::_1)},
+                {"STOR", std::bind(&FtpSession::handleFtpCommandSTOR, this, std::placeholders::_1)},
+                {"STOU", std::bind(&FtpSession::handleFtpCommandSTOU, this, std::placeholders::_1)},
+                {"APPE", std::bind(&FtpSession::handleFtpCommandAPPE, this, std::placeholders::_1)},
+                {"ALLO", std::bind(&FtpSession::handleFtpCommandALLO, this, std::placeholders::_1)},
+                {"REST", std::bind(&FtpSession::handleFtpCommandREST, this, std::placeholders::_1)},
+                {"RNFR", std::bind(&FtpSession::handleFtpCommandRNFR, this, std::placeholders::_1)},
+                {"RNTO", std::bind(&FtpSession::handleFtpCommandRNTO, this, std::placeholders::_1)},
+                {"ABOR", std::bind(&FtpSession::handleFtpCommandABOR, this, std::placeholders::_1)},
+                {"DELE", std::bind(&FtpSession::handleFtpCommandDELE, this, std::placeholders::_1)},
+                {"RMD", std::bind(&FtpSession::handleFtpCommandRMD, this, std::placeholders::_1)},
+                {"MKD", std::bind(&FtpSession::handleFtpCommandMKD, this, std::placeholders::_1)},
+                {"PWD", std::bind(&FtpSession::handleFtpCommandPWD, this, std::placeholders::_1)},
+                {"LIST", std::bind(&FtpSession::handleFtpCommandLIST, this, std::placeholders::_1)},
+                {"NLST", std::bind(&FtpSession::handleFtpCommandNLST, this, std::placeholders::_1)},
+                {"SITE", std::bind(&FtpSession::handleFtpCommandSITE, this, std::placeholders::_1)},
+                {"SYST", std::bind(&FtpSession::handleFtpCommandSYST, this, std::placeholders::_1)},
+                {"STAT", std::bind(&FtpSession::handleFtpCommandSTAT, this, std::placeholders::_1)},
+                {"HELP", std::bind(&FtpSession::handleFtpCommandHELP, this, std::placeholders::_1)},
+                {"NOOP", std::bind(&FtpSession::handleFtpCommandNOOP, this, std::placeholders::_1)},
 
-            // Modern FTP Commands
-            {"FEAT", std::bind(&FtpSession::handleFtpCommandFEAT, this, std::placeholders::_1)},
-            {"OPTS", std::bind(&FtpSession::handleFtpCommandOPTS, this, std::placeholders::_1)},
-            {"SIZE", std::bind(&FtpSession::handleFtpCommandSIZE, this, std::placeholders::_1)},
+                // Modern FTP Commands
+                {"FEAT", std::bind(&FtpSession::handleFtpCommandFEAT, this, std::placeholders::_1)},
+                {"OPTS", std::bind(&FtpSession::handleFtpCommandOPTS, this, std::placeholders::_1)},
+                {"SIZE", std::bind(&FtpSession::handleFtpCommandSIZE, this, std::placeholders::_1)},
         };
 
         if (const auto command_it = command_map.find(ftp_command); command_it != command_map.end()) {
@@ -186,7 +186,7 @@ namespace AwsMock::FtpServer {
 
         if (_lastCommand == "QUIT") {
             // Close command socket
-            command_write_strand_.wrap([me = shared_from_this()]() {
+            boost::asio::bind_executor(command_write_strand_, [me = shared_from_this()]() {
                 me->command_socket_.close();
             });
         } else {
@@ -1182,7 +1182,7 @@ namespace AwsMock::FtpServer {
 
                 stream << (file_status.type() == FileType::Dir ? 'd' : '-') << file_status.permissionString() << "   1 ";
                 stream << std::setw(10) << file_status.ownerString() << " " << std::setw(10)
-                        << file_status.groupString() << " ";
+                       << file_status.groupString() << " ";
                 stream << std::setw(10) << file_status.fileSize() << " ";
                 stream << file_status.timeString() << " ";
                 stream << filename;
@@ -1191,13 +1191,13 @@ namespace AwsMock::FtpServer {
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
-            const auto dir_listing_rawdata = std::make_shared<std::vector<char> >();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
             dir_listing_rawdata->reserve(dir_listing_string.size());
             std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
             // Send the string out
             me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
         });
     }
 
@@ -1221,13 +1221,13 @@ namespace AwsMock::FtpServer {
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
-            const auto dir_listing_rawdata = std::make_shared<std::vector<char> >();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
             dir_listing_rawdata->reserve(dir_listing_string.size());
             std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
             // Send the string out
             me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
             // Nullpointer indicates the end of transmission
         });
     }
@@ -1253,74 +1253,74 @@ namespace AwsMock::FtpServer {
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file,
                                              const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
         file_rw_strand_.post([me = shared_from_this(), file, data_socket]() {
-                                 if (file->file_stream_.eof()) return;
+            if (file->file_stream_.eof()) return;
 
-                                 const auto buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
-                                 file->file_stream_.read(buffer->data(), static_cast<std::streamsize>(buffer->size()));
-                                 const auto bytes_read = file->file_stream_.gcount();
-                                 buffer->resize(static_cast<size_t>(bytes_read));
+            const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
+            file->file_stream_.read(buffer->data(), static_cast<std::streamsize>(buffer->size()));
+            const auto bytes_read = file->file_stream_.gcount();
+            buffer->resize(static_cast<size_t>(bytes_read));
 
-                                 if (!file->file_stream_.eof()) {
-                                     me->addDataToBufferAndSend(buffer,
-                                                                data_socket,
-                                                                [me, file, data_socket]() {
-                                                                    me->readDataFromFileAndSend(file, data_socket);
-                                                                });
-                                 } else {
-                                     me->addDataToBufferAndSend(buffer, data_socket);
-                                     me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(nullptr), data_socket);
-                                 }
-                             },
+            if (!file->file_stream_.eof()) {
+                me->addDataToBufferAndSend(buffer,
+                                           data_socket,
+                                           [me, file, data_socket]() {
+                                               me->readDataFromFileAndSend(file, data_socket);
+                                           });
+            } else {
+                me->addDataToBufferAndSend(buffer, data_socket);
+                me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(nullptr), data_socket);
+            }
+        },
                              nullptr);
     }
 
-    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char> > &data,
+    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char>> &data,
                                             const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
                                             const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post([me = shared_from_this(), data, data_socket, fetch_more]() {
-                                     const bool write_in_progress = (!me->data_buffer_.empty());
+            const bool write_in_progress = (!me->data_buffer_.empty());
 
-                                     me->data_buffer_.push_back(data);
+            me->data_buffer_.push_back(data);
 
-                                     if (!write_in_progress) {
-                                         me->writeDataToSocket(data_socket, fetch_more);
-                                     }
-                                 },
+            if (!write_in_progress) {
+                me->writeDataToSocket(data_socket, fetch_more);
+            }
+        },
                                  nullptr);
     }
 
     void FtpSession::writeDataToSocket(const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
                                        const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post(
-            [me = shared_from_this(), data_socket, fetch_more]() {
-                if (auto data = me->data_buffer_.front()) {
-                    // Send out the buffer
-                    async_write(*data_socket,
-                                boost::asio::buffer(*data),
-                                boost::asio::bind_executor(me->data_buffer_strand_,
-                                                           [me, data_socket, data, fetch_more](
-                                                       const boost::beast::error_code &ec,
-                                                       std::size_t /*bytes_to_transfer*/) {
-                                                               me->data_buffer_.pop_front();
+                [me = shared_from_this(), data_socket, fetch_more]() {
+                    if (auto data = me->data_buffer_.front()) {
+                        // Send out the buffer
+                        async_write(*data_socket,
+                                    boost::asio::buffer(*data),
+                                    boost::asio::bind_executor(me->data_buffer_strand_,
+                                                               [me, data_socket, data, fetch_more](
+                                                                       const boost::beast::error_code &ec,
+                                                                       std::size_t /*bytes_to_transfer*/) {
+                                                                   me->data_buffer_.pop_front();
 
-                                                               if (ec) {
-                                                                   log_error << "Data write error: " << ec.message();
-                                                                   return;
-                                                               }
+                                                                   if (ec) {
+                                                                       log_error << "Data write error: " << ec.message();
+                                                                       return;
+                                                                   }
 
-                                                               fetch_more();
+                                                                   fetch_more();
 
-                                                               if (!me->data_buffer_.empty()) {
-                                                                   me->writeDataToSocket(data_socket, fetch_more);
-                                                               }
-                                                           }));
-                } else {
-                    // we got to the end of transmission
-                    me->data_buffer_.pop_front();
-                    me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
-                }
-            },
-            nullptr);
+                                                                   if (!me->data_buffer_.empty()) {
+                                                                       me->writeDataToSocket(data_socket, fetch_more);
+                                                                   }
+                                                               }));
+                    } else {
+                        // we got to the end of transmission
+                        me->data_buffer_.pop_front();
+                        me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
+                    }
+                },
+                nullptr);
     }
 
     ////////////////////////////////////////////////////////
@@ -1343,7 +1343,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
-        const auto buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
+        const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
 
         async_read(*data_socket,
                    boost::asio::buffer(*buffer),
@@ -1363,23 +1363,23 @@ namespace AwsMock::FtpServer {
                    });
     }
 
-    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char> > &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more) {
+    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more) {
         file_rw_strand_.post([me = shared_from_this(), data, file, fetch_more] {
-                                 fetch_more();
-                                 file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
-                             },
+            fetch_more();
+            file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
+        },
                              nullptr);
     }
 
     void FtpSession::endDataReceiving(const std::shared_ptr<IoFile> &file) {
         file_rw_strand_.post([me = shared_from_this(), file] {
-                                 file->file_stream_.flush();
-                                 file->file_stream_.close();
-                                 me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
+            file->file_stream_.flush();
+            file->file_stream_.close();
+            me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
 
-                                 // Send to AWS S3
-                                 me->SendCreateObjectRequest(file->_user, file->_fileName);
-                             },
+            // Send to AWS S3
+            me->SendCreateObjectRequest(file->_user, file->_fileName);
+        },
                              nullptr);
     }
 
@@ -1415,7 +1415,7 @@ namespace AwsMock::FtpServer {
 
         for (const char c: unquoted_ftp_path) {
             output.push_back(c);
-            if (c == '\"') // Escape quote by double-quote
+            if (c == '\"')// Escape quote by double-quote
                 output.push_back(c);
         }
 
@@ -1543,4 +1543,4 @@ namespace AwsMock::FtpServer {
         }
         return key;
     }
-} // namespace AwsMock::FtpServer
+}// namespace AwsMock::FtpServer
