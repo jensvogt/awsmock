@@ -8,12 +8,14 @@
 // C++ includes
 #include <ranges>
 #include <string>
+#include <unordered_set>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/Linq.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/s3/Bucket.h>
@@ -29,8 +31,7 @@ namespace AwsMock::Database {
      */
     class S3MemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -141,7 +142,7 @@ namespace AwsMock::Database {
          * @param maxKeys maximal number of return elements
          * @return list of S3 objects
          */
-        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) const;
+        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
 
         /**
          * @brief Count objects in a bucket.
@@ -213,7 +214,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        [[nodiscard]] std::vector<Entity::S3::Object> ListObjects(const std::string &prefix = {}) const;
+        [[nodiscard]] std::vector<Entity::S3::Object> ListObjects(const std::string &prefix = {});
 
         /**
          * @brief Gets a list of versioned objects
@@ -337,7 +338,7 @@ namespace AwsMock::Database {
          * @return number of object in bucket
          * @throws DatabaseException
          */
-        long ObjectCount(const std::string &region = {}, const std::string &bucket = {}) const;
+        long ObjectCount(const std::string &region = {}, const std::string &bucket = {});
 
         /**
          * @brief Delete an object.
@@ -362,14 +363,26 @@ namespace AwsMock::Database {
          * @retrun number of objects deleted.
          */
         long DeleteAllObjects();
-        void AdjustObjectCounters();
 
         /**
-         * @brief Adjust all object counters
+         * Recalculate the object counters
          */
-        void AdjustObjectCounters() const;
+        void AdjustObjectCounters();
 
-      private:
+    private:
+        /**
+         * @brief Convert the bucket map to a vector
+         *
+         * @return vector of buckets
+         */
+        std::vector<Entity::S3::Bucket> BucketsToVector();
+
+        /**
+         * @brief Convert the object map to a vector
+         *
+         * @return vector of objects
+         */
+        std::vector<Entity::S3::Object> ObjectsToVector();
 
         /**
          * S3 bucket map, when running without database
@@ -392,6 +405,6 @@ namespace AwsMock::Database {
         static boost::mutex _objectMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_S3_MEMORYDB_H

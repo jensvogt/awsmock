@@ -14,29 +14,27 @@ namespace AwsMock::Service {
         log_trace << "Create bucket request, s3Request: " << s3Request.ToString();
 
         // Get the region and account ID
-        const std::string region = s3Request.region;
         const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
 
         // Check existence
-        CheckBucketNonExistence(region, s3Request.name);
+        CheckBucketNonExistence(s3Request.region, s3Request.name);
 
         try {
             // Update database
-            const std::string arn = Core::AwsUtils::CreateS3BucketArn(region, accountId, s3Request.name);
             Database::Entity::S3::Bucket bucket;
-            bucket.region = region;
+            bucket.region = s3Request.region;
             bucket.name = s3Request.name;
             bucket.owner = s3Request.owner;
-            bucket.arn = arn;
+            bucket.arn = Core::AwsUtils::CreateS3BucketArn(s3Request.region, accountId, s3Request.name);
             bucket = _database.CreateBucket(bucket);
 
             Dto::S3::CreateBucketResponse response;
-            response.region = region;
-            response.arn = Core::CreateArn("s3", region, accountId, s3Request.name);
+            response.region = bucket.region;
+            response.arn = bucket.arn;
 
-            log_trace << "S3 create bucket response: " << response.ToXml();
             log_debug << "Bucket created, bucket: " << s3Request.name;
             return response;
+
         } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
@@ -920,6 +918,7 @@ namespace AwsMock::Service {
             // Delete from database
             _database.DeleteObjects(request.region, request.bucket, request.keys);
             log_debug << "Database object deleted, count: " << request.keys.size();
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 delete objects failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -1680,4 +1679,4 @@ namespace AwsMock::Service {
         }
         return sContentType;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

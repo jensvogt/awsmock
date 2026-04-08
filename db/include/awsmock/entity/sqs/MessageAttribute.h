@@ -11,10 +11,6 @@
 #include <utility>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 
@@ -27,12 +23,13 @@ namespace AwsMock::Database::Entity::SQS {
         BINARY_LIST,
         UNKNOWN
     };
+
     static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
-            {STRING, "String"},
-            {STRING_LIST, "StringList"},
-            {BINARY, "Binary"},
-            {BINARY_LIST, "BinaryList"},
-            {UNKNOWN, "Unknown"},
+        {STRING, "String"},
+        {STRING_LIST, "StringList"},
+        {BINARY, "Binary"},
+        {BINARY_LIST, "BinaryList"},
+        {UNKNOWN, "Unknown"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeTypeToString(MessageAttributeType messageAttributeType) {
@@ -71,18 +68,6 @@ namespace AwsMock::Database::Entity::SQS {
         MessageAttributeType dataType = STRING;
 
         /**
-         * Attribute binary value
-         */
-        // TODO: proper implementation of bytes
-        //std::vector<std::byte> binaryValue;
-
-        /**
-         * Attribute a binary value list
-         */
-        // TODO: proper implementation of bytes
-        //std::vector<std::vector<std::byte>> binaryListValues;
-
-        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
@@ -95,40 +80,10 @@ namespace AwsMock::Database::Entity::SQS {
          * @return entity as MongoDB document.
          */
         void FromDocument(const view_or_value<view, value> &object);
-        /*
-      private:
-
-        friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
-            MessageAttribute r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
-            r.stringValue = v.at("stringValue").as_string();
-            r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("stringValue"));
-            // TODO: proper implementation of bytes
-            //r.binaryValue = boost::json::value_to<std::vector<std::byte>>(v.at("binaryValue"));
-            //r.binaryListValues = boost::json::value_to<std::vector<std::vector<std::byte>>>(v.at("binaryListValues"));
-            r.dataType = MessageAttributeTypeFromString(v.at("attributeType").as_string().data());
-            return r;
-        }
-
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
-            jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"stringValue", obj.stringValue},
-                    {"stringListValue", boost::json::value_from(obj.stringListValues)},
-                    // TODO: proper implementation of bytes
-                    //{"binaryValue", boost::json::value_from(obj.binaryValue)},
-                    //{"binaryListValues", boost::json::value_from(obj.binaryListValues)},
-                    {"dataType", MessageAttributeTypeToString(obj.dataType)},
-            };
-        }*/
     };
 
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
-}// namespace AwsMock::Database::Entity::SQS
+} // namespace AwsMock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_ATTRIBUTE_H

@@ -10,11 +10,13 @@
 
 namespace AwsMock::Database {
 
-    std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
-            {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
-            {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
+    std::map<std::string, std::vector<std::string> > S3Database::allowedEventTypes = {
+        {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
+        {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
+    };
 
-    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {}
+    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {
+    }
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "bucket_exists");
@@ -187,7 +189,6 @@ namespace AwsMock::Database {
     Entity::S3::BucketList S3Database::ListBuckets(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_bucket");
 
-        Entity::S3::BucketList bucketList;
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -216,18 +217,16 @@ namespace AwsMock::Database {
                 query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
 
+            Entity::S3::BucketList bucketList;
             for (auto bucketCursor = _bucketCollection.find(query.extract(), opts); const auto &bucket: bucketCursor) {
                 Entity::S3::Bucket result;
                 result.FromDocument(bucket);
                 bucketList.push_back(result);
             }
+            return bucketList;
 
-        } else {
-
-            bucketList = _memoryDb.ListBuckets();
         }
-        log_trace << "Got bucket list, size:" << bucketList.size();
-        return bucketList;
+        return _memoryDb.ListBuckets();
     }
 
     Entity::S3::BucketList S3Database::ExportBuckets(const std::vector<SortColumn> &sortColumns) const {
@@ -1122,9 +1121,9 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.group(make_document(
-                        kvp("_id", "$bucketArn"),
-                        kvp("size", make_document(kvp("$sum", "$size"))),
-                        kvp("keys", make_document(kvp("$sum", 1)))));
+                    kvp("_id", "$bucketArn"),
+                    kvp("size", make_document(kvp("$sum", "$size"))),
+                    kvp("keys", make_document(kvp("$sum", 1)))));
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
@@ -1137,16 +1136,16 @@ namespace AwsMock::Database {
 
                 // Initialize all topics with zero message counts
                 bucketCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                                   kvp("size", bsoncxx::types::b_int64()),
-                                                                                   kvp("keys", bsoncxx::types::b_int64())))));
+                                                                       kvp("size", bsoncxx::types::b_int64()),
+                                                                       kvp("keys", bsoncxx::types::b_int64())))));
 
                 auto bulk = bucketCollection.create_bulk_write();
                 for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
                     bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
-                            make_document(kvp("$set", make_document(
-                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                              kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys"))))))));
+                        make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
+                        make_document(kvp("$set", make_document(
+                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                              kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys"))))))));
                     log_debug << "Bucket: " << Core::Bson::BsonUtils::GetStringValue(t, "bucketArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
                               << ", keys: " << Core::Bson::BsonUtils::GetLongValue(t, "keys");
@@ -1174,4 +1173,4 @@ namespace AwsMock::Database {
         _memoryDb.AdjustObjectCounters();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

@@ -13,7 +13,7 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/Linq.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
@@ -28,8 +28,7 @@ namespace AwsMock::Database {
      */
     class DynamoDbMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -262,10 +261,8 @@ namespace AwsMock::Database {
          * @return nuber of items deleted.
          */
         long DeleteAllItems();
-        Entity::DynamoDb::ItemList ItemsToVector();
 
-      private:
-
+    private:
         /**
          * Table map
          */
@@ -287,6 +284,6 @@ namespace AwsMock::Database {
         static boost::mutex _itemMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_DYNAMODB_MEMORYDB_H

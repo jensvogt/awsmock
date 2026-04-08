@@ -32,7 +32,7 @@
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 
 #ifdef _WIN32
-#include "windows.h"
+//#include "windows.h"
 #include <Wbemidl.h>
 #include <comdef.h>
 #include <pdh.h>
@@ -72,8 +72,7 @@ namespace AwsMock::Monitoring {
      */
     class MetricSystemCollector {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -176,8 +175,7 @@ namespace AwsMock::Monitoring {
 
 #endif
 
-      private:
-
+    private:
         /**
          * Number of cores
          */
@@ -250,6 +248,6 @@ namespace AwsMock::Monitoring {
         int _period = 60;
     };
 
-}// namespace AwsMock::Monitoring
+} // namespace AwsMock::Monitoring
 
 #endif// AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
