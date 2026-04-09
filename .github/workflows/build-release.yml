@@ -371,6 +371,7 @@ jobs:
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
           vcpkgGitCommitId: '52b31c6c30f442a01688a0d557e81f39bc076b8c'
+          doNotUpdateVcpkg: false
 
       - name: Bugfix for libssh
         run: |
