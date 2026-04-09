@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.25](https://github.com/jensvogt/awsmock/compare/v1.16.24...v1.16.25) (2026-04-09)
+
+
+### Bug Fixes
+
+* S3/Dynamodb tests ([9d5a857](https://github.com/jensvogt/awsmock/commit/9d5a8573fc455b000c42913993279c4208f432b6))
+
 ## [1.16.24](https://github.com/jensvogt/awsmock/compare/v1.16.23...v1.16.24) (2026-04-08)
 
 
