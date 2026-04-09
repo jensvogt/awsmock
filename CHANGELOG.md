@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.29](https://github.com/jensvogt/awsmock/compare/v1.16.28...v1.16.29) (2026-04-09)
+
+
+### Bug Fixes
+
+* release github actions ([1518154](https://github.com/jensvogt/awsmock/commit/15181546c1f548cf1596757c178193a7b10fc8e6))
+* release github actions ([fe3ef29](https://github.com/jensvogt/awsmock/commit/fe3ef294aa97a0335ef563c1c445c19e1bf144c7))
+
 ## [1.16.28](https://github.com/jensvogt/awsmock/compare/v1.16.27...v1.16.28) (2026-04-09)
 
 
