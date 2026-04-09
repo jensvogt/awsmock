@@ -370,7 +370,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
-          vcpkgGitCommitId: '77df67cfff9c12ccfdb52284e07c87c75092f723'
+          vcpkgGitCommitId: '52b31c6c30f442a01688a0d557e81f39bc076b8c'
 
       - name: Bugfix for libssh
         run: |
