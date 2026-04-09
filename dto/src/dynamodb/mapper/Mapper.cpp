@@ -9,11 +9,11 @@ namespace AwsMock::Dto::DynamoDb {
     Database::Entity::DynamoDb::Table Mapper::map(const DescribeTableResponse &response) {
         Database::Entity::DynamoDb::Table tableEntity;
         tableEntity.region = response.region,
-        tableEntity.name = response.tableName,
-        tableEntity.arn = response.tableArn,
-        tableEntity.status = TableStatusTypeToString(response.tableStatus),
-        tableEntity.itemCount = response.itemCount;
-        tableEntity.size = response.tableSize;
+                tableEntity.name = response.tableName,
+                tableEntity.arn = response.tableArn,
+                tableEntity.status = TableStatusTypeToString(response.tableStatus),
+                tableEntity.items = response.items;
+        tableEntity.size = response.size;
         tableEntity.provisionedThroughput.FromDocument(response.provisionedThroughput.ToDocument());
 
         if (!response.attributeDefinitions.empty()) {
@@ -65,58 +65,58 @@ namespace AwsMock::Dto::DynamoDb {
         AttributeValue attr;
 
         std::visit([&attr]<typename T0>(const T0 &val) {
-            using T = std::decay_t<T0>;
+                       using T = std::decay_t<T0>;
 
-            if constexpr (std::is_same_v<T, std::string>) {
-                attr.type = "S";
-                attr.stringValue = val;
+                       if constexpr (std::is_same_v<T, std::string>) {
+                           attr.type = "S";
+                           attr.stringValue = val;
 
-            } else if constexpr (std::is_same_v<T, double>) {
-                attr.type = "N";
-                attr.numberValue = DoubleToString(val);
+                       } else if constexpr (std::is_same_v<T, double>) {
+                           attr.type = "N";
+                           attr.numberValue = DoubleToString(val);
 
-            } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
-                attr.type = "B";
-                const std::vector bytes(attr.binaryValue.begin(), attr.binaryValue.end());
-                attr.binaryValue = bytes;
+                       } else if constexpr (std::is_same_v<T, std::vector<uint8_t> >) {
+                           attr.type = "B";
+                           const std::vector bytes(attr.binaryValue.begin(), attr.binaryValue.end());
+                           attr.binaryValue = bytes;
 
-            } else if constexpr (std::is_same_v<T, bool>) {
-                attr.type = "BOOL";
-                attr.boolValue = val;
+                       } else if constexpr (std::is_same_v<T, bool>) {
+                           attr.type = "BOOL";
+                           attr.boolValue = val;
 
-            } else if constexpr (std::is_same_v<T, std::nullptr_t>) {
-                attr.type = "NULL";
+                       } else if constexpr (std::is_same_v<T, std::nullptr_t>) {
+                           attr.type = "NULL";
 
-            } else if constexpr (std::is_same_v<T, std::set<std::string>>) {
-                attr.type = "SS";
-                attr.stringSetValue = std::vector<std::string>(val.begin(), val.end());
+                       } else if constexpr (std::is_same_v<T, std::set<std::string> >) {
+                           attr.type = "SS";
+                           attr.stringSetValue = std::vector<std::string>(val.begin(), val.end());
 
-            } else if constexpr (std::is_same_v<T, std::set<double>>) {
-                attr.type = "NS";
-                for (const auto &n: val)
-                    attr.numberSetValue.push_back(std::to_string(n));
+                       } else if constexpr (std::is_same_v<T, std::set<double> >) {
+                           attr.type = "NS";
+                           for (const auto &n: val)
+                               attr.numberSetValue.push_back(std::to_string(n));
 
-            } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::BinarySet>) {
-                attr.type = "BS";
-                for (const auto &b: val.values) {
-                    std::vector<uint8_t> bytes(attr.binaryValue.begin(), attr.binaryValue.end());
-                    attr.binarySetValue.emplace_back(bytes);
-                }
+                       } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::BinarySet>) {
+                           attr.type = "BS";
+                           for (const auto &b: val.values) {
+                               std::vector<uint8_t> bytes(attr.binaryValue.begin(), attr.binaryValue.end());
+                               attr.binarySetValue.emplace_back(bytes);
+                           }
 
-            } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::DynamoList>) {
-                attr.type = "L";
-                for (const auto &el: val)
-                    attr.listValue.push_back(Mapper::map(*el));
+                       } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::DynamoList>) {
+                           attr.type = "L";
+                           for (const auto &el: val)
+                               attr.listValue.push_back(Mapper::map(*el));
 
-            } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::DynamoMap>) {
-                attr.type = "M";
-                for (const auto &[k, v]: val)
-                    attr.mapValue[k] = Mapper::map(*v);
+                       } else if constexpr (std::is_same_v<T, Database::Entity::DynamoDb::DynamoMap>) {
+                           attr.type = "M";
+                           for (const auto &[k, v]: val)
+                               attr.mapValue[k] = Mapper::map(*v);
 
-            } else {
-                throw Core::DatabaseException("Unhandled DynamoValue type");
-            }
-        },
+                       } else {
+                           throw Core::DatabaseException("Unhandled DynamoValue type");
+                       }
+                   },
                    attributeValueEntity.value);
         return attr;
     }
@@ -131,7 +131,7 @@ namespace AwsMock::Dto::DynamoDb {
             dv.value.emplace<double>(std::stod(attr.numberValue));
 
         } else if (attr.type == "B") {
-            dv.value.emplace<std::vector<uint8_t>>(attr.binaryValue.begin(), attr.binaryValue.end());
+            dv.value.emplace<std::vector<uint8_t> >(attr.binaryValue.begin(), attr.binaryValue.end());
 
         } else if (attr.type == "BOOL") {
             dv.value.emplace<bool>(attr.boolValue);
@@ -140,13 +140,13 @@ namespace AwsMock::Dto::DynamoDb {
             dv.value.emplace<std::nullptr_t>(nullptr);
 
         } else if (attr.type == "SS") {
-            dv.value.emplace<std::set<std::string>>(attr.stringSetValue.begin(), attr.stringSetValue.end());
+            dv.value.emplace<std::set<std::string> >(attr.stringSetValue.begin(), attr.stringSetValue.end());
 
         } else if (attr.type == "NS") {
             std::set<double> ns;
             for (const auto &n: attr.numberSetValue)
                 ns.insert(std::stod(n));
-            dv.value.emplace<std::set<double>>(std::move(ns));
+            dv.value.emplace<std::set<double> >(std::move(ns));
 
         } else if (attr.type == "BS") {
             Database::Entity::DynamoDb::BinarySet bs;
@@ -180,7 +180,7 @@ namespace AwsMock::Dto::DynamoDb {
         } else if (keyValue.index() == 1) {
             result.numberValue = std::to_string(std::get<double>(keyValue));
         } else if (keyValue.index() == 2) {
-            result.binaryValue = std::get<std::vector<uint8_t>>(keyValue);
+            result.binaryValue = std::get<std::vector<uint8_t> >(keyValue);
         }
         return result;
     }
@@ -316,20 +316,20 @@ namespace AwsMock::Dto::DynamoDb {
 
     std::string Mapper::KeyValueToString(const KeyValue &value) {
         return std::visit([]<typename T0>(const T0 &v) -> std::string {
-            if constexpr (std::is_same_v<std::decay_t<T0>, bool>)
-                return v ? "true" : "false";
-            else if constexpr (std::is_same_v<std::decay_t<T0>, std::string>)
-                return v;
-            else if constexpr (std::is_same_v<std::decay_t<T0>, std::vector<unsigned char>>)
-                return std::string(v.begin(), v.end());
-            else if constexpr (std::is_arithmetic_v<std::decay_t<T0>>)
-                return std::to_string(v);
-            else {
-                std::ostringstream oss;
-                oss << v;
-                return oss.str();
-            }
-        },
+                              if constexpr (std::is_same_v<std::decay_t<T0>, bool>)
+                                  return v ? "true" : "false";
+                              else if constexpr (std::is_same_v<std::decay_t<T0>, std::string>)
+                                  return v;
+                              else if constexpr (std::is_same_v<std::decay_t<T0>, std::vector<unsigned char> >)
+                                  return std::string(v.begin(), v.end());
+                              else if constexpr (std::is_arithmetic_v<std::decay_t<T0> >)
+                                  return std::to_string(v);
+                              else {
+                                  std::ostringstream oss;
+                                  oss << v;
+                                  return oss.str();
+                              }
+                          },
                           value);
     }
-}// namespace AwsMock::Dto::DynamoDb
+} // namespace AwsMock::Dto::DynamoDb

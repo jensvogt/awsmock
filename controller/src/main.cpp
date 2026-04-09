@@ -37,14 +37,6 @@
 #define DEFAULT_CONFIG_FILE std::string("/usr/local/awsmock/etc/awsmock.json")
 #endif
 
-// Allowed actions
-static std::list<std::string> allowedActions() {
-    return {
-        "set-logLevel", "get-loglevel", "logs", "list", "enable", "disable", "start", "stop", "restart", "status",
-        "export", "import", "clean", "clean-objects", "config", "ping", "loglevel"
-    };
-}
-
 /**
  * Show help
  */
@@ -134,13 +126,13 @@ int main(const int argc, char *argv[]) {
     }
 
     // Show usage.
-    if (vm.find("help") != vm.end()) {
+    if (vm.contains("help")) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show the version
-    if (vm.find("version") != vm.end()) {
+    if (vm.contains("version")) {
         std::cout << std::endl
                 << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                 << std::endl;
@@ -149,14 +141,14 @@ int main(const int argc, char *argv[]) {
 
     // Read the configuration file.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.find("config") != vm.end()) {
+    if (vm.contains("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
     // Set the log level.
-    if (vm.find("loglevel") != vm.end()) {
+    if (vm.contains("loglevel")) {
         const std::string value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
@@ -173,26 +165,19 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::LogStream::AddFile(logDir, prefix, size, count);
     }
 
-    if (vm.find("host") != vm.end()) {
+    if (vm.contains("host")) {
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.gateway.http.host", vm["host"].as<std::string>());
     }
 
-    if (vm.find("port") != vm.end()) {
+    if (vm.contains("port")) {
         AwsMock::Core::Configuration::instance().SetValue<int>("awsmock.gateway.http.port", vm["port"].as<int>());
     }
 
     // Check command
     bool found = false;
     const std::string &action = commands.front();
-    for (const std::string &s: allowedActions()) {
-        if (s == action) {
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        std::cerr << std::endl
-                << "Unknown command: " << action << std::endl;
+    if (const std::vector<std::string> availableCommands = AwsMock::Controller::CommandTypeList(); std::ranges::contains(availableCommands, action)) {
+        std::cerr << std::endl << "Unknown command: " << action << std::endl;
         ShowHelp(desc);
         return EXIT_FAILURE;
     }

@@ -123,7 +123,7 @@ namespace AwsMock::Service {
                 tableCounter.region = table.region;
                 tableCounter.tableName = table.name;
                 tableCounter.tableArn = table.arn;
-                tableCounter.items = table.itemCount;
+                tableCounter.items = table.items;
                 tableCounter.size = table.size;
                 tableCounter.created = table.created;
                 tableCounter.modified = table.modified;
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
             const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
             tableResponse.tableCounters.region = table.region;
             tableResponse.tableCounters.tableName = table.name;
-            tableResponse.tableCounters.items = table.itemCount;
+            tableResponse.tableCounters.items = table.items;
             tableResponse.tableCounters.size = table.size;
             tableResponse.tableCounters.status = table.status;
             tableResponse.tableCounters.created = table.created;
@@ -221,7 +221,7 @@ namespace AwsMock::Service {
             Dto::DynamoDb::DescribeTableResponse response;
             response.region = request.region;
             response.tableName = request.tableName;
-            response.itemCount = table.itemCount;
+            response.items = table.items;
             response.tableArn = table.arn;
             response.tableStatus = Dto::DynamoDb::TableStatusTypeFromString(table.status);
 
@@ -423,7 +423,7 @@ namespace AwsMock::Service {
 
             // Update table
             table.size += item.size;
-            table.itemCount++;
+            table.items++;
             table = _dynamoDbDatabase.UpdateTable(table);
             log_debug << "Database updated, region: " << table.region << " tableName: " << table.name;
 
@@ -637,4 +637,4 @@ namespace AwsMock::Service {
         return attr;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

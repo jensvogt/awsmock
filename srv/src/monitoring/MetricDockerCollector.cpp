@@ -32,7 +32,7 @@ namespace AwsMock::Monitoring {
                     const auto cpuDelta = static_cast<double>(stats.cpuStats.cpuUsage.total - stats.preCpuStats.cpuUsage.total);
                     if (numCpus > 0) {
                         const auto cpuPercent = cpuDelta / timeDiff / numCpus * 100.0;
-                        Core::EventBus::instance().sigMetricGauge(DOCKER_CPU_TOTAL, "container", containerName, static_cast<double>(containers.size()));
+                        Core::EventBus::instance().sigMetricGauge(DOCKER_CPU_TOTAL, "container", containerName, cpuPercent);
                     }
 
                     // Memory
@@ -46,4 +46,4 @@ namespace AwsMock::Monitoring {
         }
     }
 
-}// namespace AwsMock::Monitoring
+} // namespace AwsMock::Monitoring

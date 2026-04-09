@@ -113,7 +113,7 @@ namespace AwsMock::Database {
                                                  return t.second.arn == tableArn;
                                              });
         if (it != _tables.end()) {
-            it->second.itemCount = items;
+            it->second.items = items;
             it->second.size = size;
         }
     }
@@ -273,7 +273,7 @@ namespace AwsMock::Database {
         for (auto &table: _tables | std::views::values) {
 
             // Count items belonging to this table
-            table.itemCount = static_cast<long>(std::ranges::count_if(_items, [&table](const auto &pair) {
+            table.items = static_cast<long>(std::ranges::count_if(_items, [&table](const auto &pair) {
                 return pair.second.tableName == table.name;
             }));
 

@@ -83,7 +83,7 @@ namespace AwsMock::Core::Json {
 
     inline std::vector<std::string> GetStringArrayValue(const boost::json::value &value, const std::string &name, const std::string &defaultValue = {}) {
         if (AttributeExists(value, name)) {
-            return boost::json::value_to<std::vector<std::string>>(value.at(name));
+            return boost::json::value_to<std::vector<std::string> >(value.at(name));
         }
         return {defaultValue};
     }
@@ -91,6 +91,21 @@ namespace AwsMock::Core::Json {
     inline system_clock::time_point GetDatetimeValue(const boost::json::value &value, const std::string &name) {
         if (AttributeExists(value, name)) {
             return DateTimeUtils::FromISO8601(value.at(name).as_string().data());
+        }
+        return {};
+    }
+
+    inline system_clock::time_point GetDatetimeValueUTC(const boost::json::value &value, const std::string &name) {
+        if (AttributeExists(value, name)) {
+            std::stringstream ss{value.at(name).as_string().data()};
+            system_clock::time_point tp;
+            // The %FT%T%Z format covers:
+            // %F (Date: YYYY-MM-DD)
+            // T  (Literal separator)
+            // %T (Time: HH:MM:SS and subseconds)
+            // %Z (The UTC 'Z' suffix)
+            ss >> std::chrono::parse("%FT%T%Z", tp);
+            return tp;
         }
         return {};
     }
@@ -118,6 +133,6 @@ namespace AwsMock::Core::Json {
     inline bool findObject(boost::json::value &value, const std::string &name) {
         return value.as_object().if_contains(name);
     }
-}// namespace AwsMock::Core::Json
+} // namespace AwsMock::Core::Json
 
 #endif// AWS_MOCK_CORE_JSON_UTILS_H

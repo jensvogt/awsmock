@@ -78,8 +78,7 @@ namespace AwsMock::Dto::Docker {
          */
         CpuStat preCpuStats;
 
-      private:
-
+    private:
         friend ContainerStat tag_invoke(boost::json::value_to_tag<ContainerStat>, boost::json::value const &v) {
             ContainerStat r;
             r.containerId = Core::Json::GetStringValue(v, "id");
@@ -89,8 +88,8 @@ namespace AwsMock::Dto::Docker {
             r.memoryStats = boost::json::value_to<MemoryStat>(v.at("memory_stats"));
             r.cpuStats = boost::json::value_to<CpuStat>(v.at("cpu_stats"));
             r.preCpuStats = boost::json::value_to<CpuStat>(v.at("precpu_stats"));
-            r.read = Core::Json::GetDatetimeValue(v, "read");
-            r.preRead = Core::Json::GetDatetimeValue(v, "preread");
+            r.read = Core::Json::GetDatetimeValueUTC(v, "read");
+            r.preRead = Core::Json::GetDatetimeValueUTC(v, "preread");
             if (Core::Json::AttributeExists(v, "state")) {
                 r.state = boost::json::value_to<State>(v.at("state"));
             }
@@ -99,20 +98,20 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ContainerStat const &obj) {
             jv = {
-                    {"id", obj.containerId},
-                    {"name", obj.name},
-                    {"os_type", obj.osType},
-                    {"num_procs", obj.numProcs},
-                    {"memory_stats", boost::json::value_from(obj.memoryStats)},
-                    {"cpu_stats", boost::json::value_from(obj.cpuStats)},
-                    {"precpu_stats", boost::json::value_from(obj.preCpuStats)},
-                    {"read", Core::DateTimeUtils::ToISO8601(obj.read)},
-                    {"preread", Core::DateTimeUtils::ToISO8601(obj.preRead)},
-                    {"state", boost::json::value_from(obj.state)},
+                {"id", obj.containerId},
+                {"name", obj.name},
+                {"os_type", obj.osType},
+                {"num_procs", obj.numProcs},
+                {"memory_stats", boost::json::value_from(obj.memoryStats)},
+                {"cpu_stats", boost::json::value_from(obj.cpuStats)},
+                {"precpu_stats", boost::json::value_from(obj.preCpuStats)},
+                {"read", Core::DateTimeUtils::ToISO8601(obj.read)},
+                {"preread", Core::DateTimeUtils::ToISO8601(obj.preRead)},
+                {"state", boost::json::value_from(obj.state)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+} // namespace AwsMock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_CONTAINER_H
