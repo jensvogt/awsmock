@@ -132,6 +132,8 @@ awsmock.modules.lambda.counter.period             AWSMOCK_MODULES_LAMBDA_COUNTER
 awsmock.modules.lambda.runtime.java11             AWSMOCK_MODULES_LAMBDA_RUNTIME_JAVA11             Java 11 image, default: pubic.ecr.aws/lambda/java:11
 awsmock.modules.lambda.runtime.java17             AWSMOCK_MODULES_LAMBDA_RUNTIME_JAVA17             Java 17 image, default: pubic.ecr.aws/lambda/java:17
 awsmock.modules.lambda.runtime.java21             AWSMOCK_MODULES_LAMBDA_RUNTIME_JAVA21             Java 21 image, default: pubic.ecr.aws/lambda/java:21
+awsmock.modules.lambda.runtime.java25             AWSMOCK_MODULES_LAMBDA_RUNTIME_JAVA25             Java 25 image, default: pubic.ecr.aws/lambda/java:25
+awsmock.modules.lambda.runtime.java26             AWSMOCK_MODULES_LAMBDA_RUNTIME_JAVA26             Java 26 image, default: pubic.ecr.aws/lambda/java:26
 awsmock.modules.lambda.runtime.python3-9          AWSMOCK_MODULES_LAMBDA_RUNTIME_PYTHON39           Python 3.8 image, default: pubic.ecr.aws/lambda/python:3.8
 awsmock.modules.lambda.runtime.python3-10         AWSMOCK_MODULES_LAMBDA_RUNTIME_PYTHON310          Python 3.8 image, default: pubic.ecr.aws/lambda/python:3.10
 awsmock.modules.lambda.runtime.python3-11         AWSMOCK_MODULES_LAMBDA_RUNTIME_PYTHON311          Python 3.8 image, default: pubic.ecr.aws/lambda/python:3.11
