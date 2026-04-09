@@ -67,7 +67,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Item count
          */
-        long itemCount{};
+        long items{};
 
         /**
          * Size in bytes
@@ -135,6 +135,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
     typedef std::vector<Table> TableList;
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+} // namespace AwsMock::Database::Entity::DynamoDb
 
 #endif// AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H

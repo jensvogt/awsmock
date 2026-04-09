@@ -87,22 +87,22 @@ namespace AwsMock::Controller {
     };
 
     static std::map<CommandType, std::string> CommandTypeNames{
-            {CommandType::CONFIG, "config"},
-            {CommandType::SET_LOG_LEVEL, "set-loglevel"},
-            {CommandType::GET_LOG_LEVEL, "get-loglevel"},
-            {CommandType::LIST, "list"},
-            {CommandType::STATUS, "status"},
-            {CommandType::ENABLE, "enable"},
-            {CommandType::DISABLE, "disable"},
-            {CommandType::START, "start"},
-            {CommandType::RESTART, "restart"},
-            {CommandType::STOP, "stop"},
-            {CommandType::IMPORT, "import"},
-            {CommandType::EXPORT, "export"},
-            {CommandType::CLEAN, "clean"},
-            {CommandType::CLEAN_OBJECTS, "clean-objects"},
-            {CommandType::PING, "ping"},
-            {CommandType::UNKNOWN, "unknown"},
+        {CommandType::CONFIG, "config"},
+        {CommandType::SET_LOG_LEVEL, "set-loglevel"},
+        {CommandType::GET_LOG_LEVEL, "get-loglevel"},
+        {CommandType::LIST, "list"},
+        {CommandType::STATUS, "status"},
+        {CommandType::ENABLE, "enable"},
+        {CommandType::DISABLE, "disable"},
+        {CommandType::START, "start"},
+        {CommandType::RESTART, "restart"},
+        {CommandType::STOP, "stop"},
+        {CommandType::IMPORT, "import"},
+        {CommandType::EXPORT, "export"},
+        {CommandType::CLEAN, "clean"},
+        {CommandType::CLEAN_OBJECTS, "clean-objects"},
+        {CommandType::PING, "ping"},
+        {CommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string CommandTypeToString(const CommandType &commandType) {
@@ -118,6 +118,10 @@ namespace AwsMock::Controller {
         return CommandType::UNKNOWN;
     }
 
+    static std::vector<std::string> CommandTypeList() {
+        return CommandTypeNames | std::views::values | std::ranges::to<std::vector>();
+    }
+
     /**
      * @brief AwsMock controller
      *
@@ -128,8 +132,7 @@ namespace AwsMock::Controller {
      */
     class AwsMockCtl {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -326,8 +329,7 @@ namespace AwsMock::Controller {
          */
         void PingManager() const;
 
-      private:
-
+    private:
         /**
          * @brief Add an authorization header.
          *
@@ -441,6 +443,6 @@ namespace AwsMock::Controller {
         std::vector<Dto::Lambda::Function> _lambdas;
     };
 
-}// namespace AwsMock::Controller
+} // namespace AwsMock::Controller
 
 #endif// AWSMOCK_CONTROLLER_CONTROLLER_H
