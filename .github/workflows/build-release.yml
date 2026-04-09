@@ -349,7 +349,8 @@ jobs:
 
       - name: Install vcpkg
         run: |
-          git clone https://github.com/microsoft/vcpkg.git .
+          git clone https://github.com/microsoft/vcpkg.git ${{ env.VCPKG_ROOT }}
+          cd ${{ env.VCPKG_ROOT }}
           ./bootstrap-vcpkg.sh
 
       #      - name: Ensure vcpkg.json exists (fallback)
