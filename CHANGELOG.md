@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.16.27](https://github.com/jensvogt/awsmock/compare/v1.16.26...v1.16.27) (2026-04-09)
+
+
+### Bug Fixes
+
+* docker cpu/memory stats on Windows ([d9e47f3](https://github.com/jensvogt/awsmock/commit/d9e47f39aa420dc2d5cc49a62f09c21b5baa9981))
+* docker cpu/memory stats on Windows ([e908d49](https://github.com/jensvogt/awsmock/commit/e908d49d7a4df05cc59dc53b10b791d7d4306f2a))
+* release github actions ([6a6107a](https://github.com/jensvogt/awsmock/commit/6a6107ab96ea91a6b14fb91c552edb445d612678))
+
 ## [1.16.26](https://github.com/jensvogt/awsmock/compare/v1.16.25...v1.16.26) (2026-04-09)
 
 
