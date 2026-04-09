@@ -328,6 +328,9 @@ jobs:
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
+      CXX: g++-14
+      CC: gcc-14
+      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       PACKAGE_DIR: "${{ github.workspace }}/package-deb"
       BUILD_DIR: "${{ github.workspace }}/build-deb"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
@@ -341,84 +344,96 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
+          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool g++-14
           sudo gem install --no-document fpm
 
-      - name: Ensure vcpkg.json exists (fallback)
-        shell: bash
+      - name: Install vcpkg
         run: |
-          vf="${{ github.workspace }}/vcpkg.json"
-          if [ ! -f "$vf" ]; then
-            echo "vcpkg.json not found; creating minimal fallback at $vf"
-          else
-            echo "vcpkg.json found at $vf"
-          fi
+          git clone https://github.com/microsoft/vcpkg.git .
+          ./bootstrap-vcpkg.sh
 
-      - name: Ensure vcpkg toolchain exists (Linux)
-        shell: bash
-        run: |
-          v="${{ github.workspace }}/vcpkg"
-          if [ ! -d "$v" ]; then
-            echo "Cloning vcpkg into $v"
-            git clone https://github.com/microsoft/vcpkg.git "$v"
-            echo "Bootstrapping vcpkg"
-            "${v}/bootstrap-vcpkg.sh"
-          else
-            echo "vcpkg already present at $v"
-          fi
-
-      - name: Get vcpkg commit (Linux - rpm)
-        id: vcpkg-commit-rpm
-        shell: bash
-        run: |
-          v="${{ github.workspace }}/vcpkg"
-          if [ -d "$v" ]; then
-            sha=$(git -C "$v" rev-parse --short HEAD)
-            echo "VCPKG_COMMIT=$sha" >> $GITHUB_ENV
-          else
-            echo "VCPKG_COMMIT=unknown" >> $GITHUB_ENV
-          fi
-
-      - name: Restore Vcpkg Cache (tool only - rpm)
-        id: vcpkg-cache-restore-rpm
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-          restore-keys: |
-            runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+      #      - name: Ensure vcpkg.json exists (fallback)
+      #        shell: bash
+      #        run: |
+      #          vf="${{ github.workspace }}/vcpkg.json"
+      #          if [ ! -f "$vf" ]; then
+      #            echo "vcpkg.json not found; creating minimal fallback at $vf"
+      #          else
+      #            echo "vcpkg.json found at $vf"
+      #          fi
+      #
+      #      - name: Ensure vcpkg toolchain exists (Linux)
+      #        shell: bash
+      #        run: |
+      #          v="${{ github.workspace }}/vcpkg"
+      #          if [ ! -d "$v" ]; then
+      #            echo "Cloning vcpkg into $v"
+      #            git clone https://github.com/microsoft/vcpkg.git "$v"
+      #            echo "Bootstrapping vcpkg"
+      #            "${v}/bootstrap-vcpkg.sh"
+      #          else
+      #            echo "vcpkg already present at $v"
+      #          fi
+      #
+      #      - name: Get vcpkg commit (Linux - rpm)
+      #        id: vcpkg-commit-rpm
+      #        shell: bash
+      #        run: |
+      #          v="${{ github.workspace }}/vcpkg"
+      #          if [ -d "$v" ]; then
+      #            sha=$(git -C "$v" rev-parse --short HEAD)
+      #            echo "VCPKG_COMMIT=$sha" >> $GITHUB_ENV
+      #          else
+      #            echo "VCPKG_COMMIT=unknown" >> $GITHUB_ENV
+      #          fi
+      #
+      #      - name: Restore Vcpkg Cache (tool only - rpm)
+      #        id: vcpkg-cache-restore-rpm
+      #        uses: actions/cache/restore@v4
+      #        with:
+      #          path: |
+      #            vcpkg
+      #            vcpkg/installed
+      #            vcpkg/vcpkg_installed
+      #            vcpkg/packages
+      #            vcpkg/buildtrees
+      #            vcpkg/downloads
+      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+      #          restore-keys: |
+      #            runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
 
       - name: Bugfix for libssh
         run: |
           cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
 
-      - name: Setup vcpkg (using lukka/run-vcpkg)
-        id: vcpkg-installation
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-          doNotCache: false
+      #      - name: Setup vcpkg (using lukka/run-vcpkg)
+      #        id: vcpkg-installation
+      #        uses: lukka/run-vcpkg@v11
+      #        with:
+      #          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      #          runVcpkgInstall: true
+      #          doNotCache: false
+      #
+      #      - name: Save Vcpkg Cache
+      #        uses: actions/cache/save@v4
+      #        if: ${{ steps.vcpkg-cache-restore-rpm.outputs.cache-hit != 'true' }}
+      #        with:
+      #          path: |
+      #            vcpkg
+      #            vcpkg/installed
+      #            vcpkg/vcpkg_installed
+      #            vcpkg/packages
+      #            vcpkg/buildtrees
+      #            vcpkg/downloads
+      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
 
-      - name: Save Vcpkg Cache
-        uses: actions/cache/save@v4
-        if: ${{ steps.vcpkg-cache-restore-rpm.outputs.cache-hit != 'true' }}
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+      - name: Set g++-14 as default
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
+          sudo update-alternatives --set g++ /usr/bin/g++-14
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
 
       - name: Build (Backend)
         run: |
