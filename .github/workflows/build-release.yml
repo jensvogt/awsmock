@@ -326,7 +326,7 @@ jobs:
     name: Build & Package (Linux DEB)
     runs-on: ubuntu-latest
     needs: release-please
-    #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       CXX: g++-14
       CC: gcc-14
@@ -558,77 +558,83 @@ jobs:
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
 
-      - name: Ensure vcpkg.json exists (fallback)
-        shell: bash
+      - name: Install vcpkg
         run: |
-          vf="${{ github.workspace }}/vcpkg.json"
-          if [ ! -f "$vf" ]; then
-            echo "vcpkg.json not found; creating minimal fallback at $vf"
-          else
-            echo "vcpkg.json found at $vf"
-          fi
+          git clone https://github.com/microsoft/vcpkg.git ${{ env.VCPKG_ROOT }}
+          cd ${{ env.VCPKG_ROOT }}
+          ./bootstrap-vcpkg.sh
 
-      - name: Ensure vcpkg toolchain exists (Linux)
-        shell: bash
-        run: |
-          v="${{ github.workspace }}/vcpkg"
-          if [ ! -d "$v" ]; then
-            echo "Cloning vcpkg into $v"
-            git clone https://github.com/microsoft/vcpkg.git "$v"
-            echo "Bootstrapping vcpkg"
-            "${v}/bootstrap-vcpkg.sh"
-          else
-            echo "vcpkg already present at $v"
-          fi
-
-      - name: Get vcpkg commit (Linux - rpm)
-        id: vcpkg-commit-rpm
-        shell: bash
-        run: |
-          v="${{ github.workspace }}/vcpkg"
-          if [ -d "$v" ]; then
-            sha=$(git -C "$v" rev-parse --short HEAD)
-            echo "VCPKG_COMMIT=$sha" >> $GITHUB_ENV
-          else
-            echo "VCPKG_COMMIT=unknown" >> $GITHUB_ENV
-          fi
-
-      - name: Restore Vcpkg Cache
-        id: vcpkg-cache-restore-rpm
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-          restore-keys: |
-            runnerOS=${{ runner.os }}-vcpkgGitCommit=
-
-      - name: Setup vcpkg (using lukka/run-vcpkg)
-        id: vcpkg-installation
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-          doNotCache: false
-
-      - name: Save Vcpkg Cache (tool only - rpm)
-        uses: actions/cache/save@v4
-        if: ${{ steps.vcpkg-cache-restore-rpm.outputs.cache-hit != 'true' }}
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+      #      - name: Ensure vcpkg.json exists (fallback)
+      #        shell: bash
+      #        run: |
+      #          vf="${{ github.workspace }}/vcpkg.json"
+      #          if [ ! -f "$vf" ]; then
+      #            echo "vcpkg.json not found; creating minimal fallback at $vf"
+      #          else
+      #            echo "vcpkg.json found at $vf"
+      #          fi
+      #
+      #      - name: Ensure vcpkg toolchain exists (Linux)
+      #        shell: bash
+      #        run: |
+      #          v="${{ github.workspace }}/vcpkg"
+      #          if [ ! -d "$v" ]; then
+      #            echo "Cloning vcpkg into $v"
+      #            git clone https://github.com/microsoft/vcpkg.git "$v"
+      #            echo "Bootstrapping vcpkg"
+      #            "${v}/bootstrap-vcpkg.sh"
+      #          else
+      #            echo "vcpkg already present at $v"
+      #          fi
+      #
+      #      - name: Get vcpkg commit (Linux - rpm)
+      #        id: vcpkg-commit-rpm
+      #        shell: bash
+      #        run: |
+      #          v="${{ github.workspace }}/vcpkg"
+      #          if [ -d "$v" ]; then
+      #            sha=$(git -C "$v" rev-parse --short HEAD)
+      #            echo "VCPKG_COMMIT=$sha" >> $GITHUB_ENV
+      #          else
+      #            echo "VCPKG_COMMIT=unknown" >> $GITHUB_ENV
+      #          fi
+      #
+      #      - name: Restore Vcpkg Cache
+      #        id: vcpkg-cache-restore-rpm
+      #        uses: actions/cache/restore@v4
+      #        with:
+      #          path: |
+      #            vcpkg
+      #            vcpkg/installed
+      #            vcpkg/vcpkg_installed
+      #            vcpkg/packages
+      #            vcpkg/buildtrees
+      #            vcpkg/downloads
+      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+      #          restore-keys: |
+      #            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+      #
+      #      - name: Setup vcpkg (using lukka/run-vcpkg)
+      #        id: vcpkg-installation
+      #        uses: lukka/run-vcpkg@v11
+      #        with:
+      #          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
+      #          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+      #          runVcpkgInstall: true
+      #          doNotCache: false
+      #
+      #      - name: Save Vcpkg Cache (tool only - rpm)
+      #        uses: actions/cache/save@v4
+      #        if: ${{ steps.vcpkg-cache-restore-rpm.outputs.cache-hit != 'true' }}
+      #        with:
+      #          path: |
+      #            vcpkg
+      #            vcpkg/installed
+      #            vcpkg/vcpkg_installed
+      #            vcpkg/packages
+      #            vcpkg/buildtrees
+      #            vcpkg/downloads
+      #          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
 
       - name: Build (Backend)
         run: |
