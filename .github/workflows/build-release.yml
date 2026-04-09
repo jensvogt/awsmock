@@ -405,6 +405,7 @@ jobs:
 
       - name: Bugfix for libssh
         run: |
+          mkdir -p ${{ github.workspace }}/vcpkg/downloads
           cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
 
       #      - name: Setup vcpkg (using lukka/run-vcpkg)
@@ -438,7 +439,6 @@ jobs:
 
       - name: Build (Backend)
         run: |
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
