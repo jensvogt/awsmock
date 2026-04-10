@@ -96,9 +96,9 @@ namespace AwsMock::Database::Entity::S3 {
         });
     }
 
-    LambdaNotification Bucket::GetLambdaNotificationByArn(const std::string &arn) {
-        const auto it = std::ranges::find_if(lambdaNotifications, [arn](const LambdaNotification &eventNotification) {
-            return eventNotification.lambdaArn == arn;
+    LambdaNotification Bucket::GetLambdaNotificationByArn(const std::string &bucketArn) {
+        const auto it = std::ranges::find_if(lambdaNotifications, [bucketArn](const LambdaNotification &eventNotification) {
+            return eventNotification.lambdaArn == bucketArn;
         });
         if (it != lambdaNotifications.end()) {
             return *it;
@@ -183,10 +183,15 @@ namespace AwsMock::Database::Entity::S3 {
         b.created = Core::Bson::BsonUtils::GetDateValue(mResult.value()["created"]);
         b.modified = Core::Bson::BsonUtils::GetDateValue(mResult.value()["modified"]);
 
+        // Bucket encryption
+        if (mResult.value().find("bucketEncryption") != mResult.value().end()) {
+            b.bucketEncryption = BucketEncryption::FromDocument(mResult.value()["queueNotifications"].get_document());
+        }
+
         // SQS queue notification configuration
         if (mResult.value().find("queueNotifications") != mResult.value().end()) {
             b.queueNotifications.clear();
-            for (bsoncxx::array::view notificationView{mResult.value()["queueNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
+            for (const bsoncxx::array::view notificationView{mResult.value()["queueNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 b.queueNotifications.emplace_back(QueueNotification::FromDocument(notificationElement.get_document().view()));
             }
         }
@@ -194,7 +199,7 @@ namespace AwsMock::Database::Entity::S3 {
         // SNS topic notification configuration
         if (mResult.value().find("topicNotifications") != mResult.value().end()) {
             b.topicNotifications.clear();
-            for (bsoncxx::array::view notificationView{mResult.value()["topicNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
+            for (const bsoncxx::array::view notificationView{mResult.value()["topicNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 b.topicNotifications.emplace_back(TopicNotification::FromDocument(notificationElement.get_document().view()));
             }
         }
@@ -202,7 +207,7 @@ namespace AwsMock::Database::Entity::S3 {
         // Lambda function notification configuration
         if (mResult.value().find("lambdaConfigurations") != mResult.value().end()) {
             b.lambdaNotifications.clear();
-            for (bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
+            for (const bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 b.lambdaNotifications.emplace_back(LambdaNotification::FromDocument(notificationElement.get_document().view()));
             }
         }
@@ -210,10 +215,8 @@ namespace AwsMock::Database::Entity::S3 {
         // Lifecycle configurations
         if (mResult.value().find("lifecycleConfigurations") != mResult.value().end()) {
             b.lifecycleConfigurations.clear();
-            for (bsoncxx::array::view lifecycleView{mResult.value()["lifecycleConfigurations"].get_array().value}; const bsoncxx::array::element &lifecycleElement: lifecycleView) {
-                LifecycleConfiguration configuration;
-                configuration.FromDocument(lifecycleElement.get_document().view());
-                b.lifecycleConfigurations.emplace_back(configuration);
+            for (const bsoncxx::array::view lifecycleView{mResult.value()["lifecycleConfigurations"].get_array().value}; const bsoncxx::array::element &lifecycleElement: lifecycleView) {
+                b.lifecycleConfigurations.emplace_back(LifecycleConfiguration::FromDocument(lifecycleElement.get_document().view()));
             }
         }
 
@@ -221,9 +224,7 @@ namespace AwsMock::Database::Entity::S3 {
         if (mResult.value().find("defaultMetadata") != mResult.value().end()) {
             b.defaultMetadata.clear();
             for (const view metadataView = mResult.value()["defaultMetadata"].get_document().value; const bsoncxx::document::element &metadataElement: metadataView) {
-                std::string key = bsoncxx::string::to_string(metadataElement.key());
-                std::string value = bsoncxx::string::to_string(metadataView[key].get_string().value);
-                b.defaultMetadata.emplace(key, value);
+                b.defaultMetadata.emplace(bsoncxx::string::to_string(metadataElement.key()), bsoncxx::string::to_string(metadataView[key].get_string().value));
             }
         }
         return b;
