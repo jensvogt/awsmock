@@ -2,17 +2,15 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
-#define AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
+#ifndef AWSMOCK_DTO_S3_GET_BUCKET_METADATA_RESPONSE_H
+#define AWSMOCK_DTO_S3_GET_BUCKET_METADATA_RESPONSE_H
 
 // C++ standard includes
 #include <map>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/entity/s3/StorageClass.h"
-
-
+#include <awsmock/entity/s3/StorageClass.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -21,7 +19,7 @@ namespace AwsMock::Dto::S3 {
 
     using std::chrono::system_clock;
 
-    struct GetMetadataResponse final : Common::BaseCounter<GetMetadataResponse> {
+    struct GetBucketMetadataResponse final : Common::BaseCounter<GetBucketMetadataResponse> {
 
         /**
          * Bucket
@@ -68,8 +66,8 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-        friend GetMetadataResponse tag_invoke(boost::json::value_to_tag<GetMetadataResponse>, boost::json::value const &v) {
-            GetMetadataResponse r;
+        friend GetBucketMetadataResponse tag_invoke(boost::json::value_to_tag<GetBucketMetadataResponse>, boost::json::value const &v) {
+            GetBucketMetadataResponse r;
             r.bucket = Core::Json::GetStringValue(v, "bucket");
             r.key = Core::Json::GetStringValue(v, "key");
             r.md5Sum = Core::Json::GetStringValue(v, "md5Sum");
@@ -84,7 +82,7 @@ namespace AwsMock::Dto::S3 {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetMetadataResponse const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetBucketMetadataResponse const &obj) {
             jv = {
                 {"region", obj.region},
                 {"user", obj.user},
@@ -104,4 +102,4 @@ namespace AwsMock::Dto::S3 {
 
 } // namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
+#endif// AWSMOCK_DTO_S3_GET_BUCKET_METADATA_RESPONSE_H

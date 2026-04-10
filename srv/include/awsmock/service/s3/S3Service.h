@@ -36,8 +36,8 @@
 #include <awsmock/dto/s3/GetBucketLifecycleConfigurationResponse.h>
 #include <awsmock/dto/s3/GetEventSourceRequest.h>
 #include <awsmock/dto/s3/GetEventSourceResponse.h>
-#include <awsmock/dto/s3/GetMetadataRequest.h>
-#include <awsmock/dto/s3/GetMetadataResponse.h>
+#include <awsmock/dto/s3/GetObjectMetadataRequest.h>
+#include <awsmock/dto/s3/GetObjectMetadataResponse.h>
 #include <awsmock/dto/s3/GetObjectRequest.h>
 #include <awsmock/dto/s3/GetObjectResponse.h>
 #include <awsmock/dto/s3/ListAllBucketResponse.h>
@@ -116,7 +116,7 @@ namespace AwsMock::Service {
          * @param request get metadata request
          * @return GetMetadataResponse
          */
-        [[nodiscard]] Dto::S3::GetMetadataResponse GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const;
+        [[nodiscard]] Dto::S3::GetObjectMetadataResponse GetBucketMetadata(const Dto::S3::GetObjectMetadataRequest &request) const;
 
         /**
          * @brief Returns the S3 bucket.
@@ -136,7 +136,7 @@ namespace AwsMock::Service {
          * @param request get metadata request
          * @return GetMetadataResponse
          */
-        [[nodiscard]] Dto::S3::GetMetadataResponse GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const;
+        [[nodiscard]] Dto::S3::GetObjectMetadataResponse GetObjectMetadata(const Dto::S3::GetObjectMetadataRequest &request) const;
 
         /**
          * @brief Creates a new bucket
