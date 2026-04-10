@@ -274,10 +274,10 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Returns a given lambda notification by function arn
          *
-         * @param arn function ARN
+         * @param bucketArn function ARN
          * @return found notification or notifications.end().
          */
-        LambdaNotification GetLambdaNotificationByArn(const std::string &arn);
+        LambdaNotification GetLambdaNotificationByArn(const std::string &bucketArn);
 
         /**
          * @brief Returns a boolean indicating the versioning state

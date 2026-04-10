@@ -50,6 +50,7 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
+      X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,12 +74,6 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
-
-      - name: Bugfix for libssh (Windows)
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/vcpkg/downloads"
-          Copy-Item "${{ github.workspace }}/docker/libssh-0.11.3.tar.xz" -Destination "${{ github.workspace }}/vcpkg/downloads/" -Force
 
       - name: Build (Backend)
         shell: cmd
@@ -151,6 +146,7 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
       SERVICE_NAME: de.jensvogt.awsmock
+      X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -163,81 +159,20 @@ jobs:
         run: |
           brew install doxygen pandoc file autoconf autoconf-archive automake libtool
 
-      - name: Ensure vcpkg.json exists (fallback)
-        shell: bash
-        run: |
-          vf="${{ github.workspace }}/vcpkg.json"
-          if [ ! -f "$vf" ]; then
-            echo "vcpkg.json not found; creating minimal fallback at $vf"
-          else
-            echo "vcpkg.json found at $vf"
-          fi
-
-      - name: Ensure vcpkg toolchain exists (macOS)
-        shell: bash
-        run: |
-          v="${{ github.workspace }}/vcpkg"
-          if [ ! -d "$v" ]; then
-            echo "Cloning vcpkg into $v"
-            git clone https://github.com/microsoft/vcpkg.git "$v"
-            echo "Bootstrapping vcpkg"
-            "${v}/bootstrap-vcpkg.sh"
-          else
-            echo "vcpkg already present at $v"
-          fi
-
-      - name: Get vcpkg commit
-        id: vcpkg-commit
-        shell: pwsh
-        run: |
-          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
-          if (Test-Path $v) {
-            $sha = (git -C $v rev-parse --short HEAD).Trim()
-            echo "VCPKG_COMMIT=$sha" >> $Env:GITHUB_ENV
-          } else {
-            echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
-          }
-
-      - name: Restore Vcpkg Cache
-        id: vcpkg-cache-restore
-        uses: actions/cache/restore@v4
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
         with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
-          restore-keys: |
-            runnerOS=${{ runner.os }}-vcpkgGitCommit=
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
-      - name: Setup vcpkg (using lukka/run-vcpkg)
-        id: vcpkg-installation
+      - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgJsonGlob: '${{ github.workspace }}/vcpkg.json'
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-          doNotCache: false
-
-      - name: Save Vcpkg Cache
-        uses: actions/cache/save@v4
-        if: ${{ steps.vcpkg-cache-restore.outputs.cache-hit != 'true' }}
-        with:
-          path: |
-            vcpkg
-            vcpkg/installed
-            vcpkg/vcpkg_installed
-            vcpkg/packages
-            vcpkg/buildtrees
-            vcpkg/downloads
-          key: runnerOS=${{ runner.os }}-vcpkgGitCommit=${{ env.VCPKG_COMMIT }}
+          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
 
       - name: Build (Backend)
         run: |
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release
 
@@ -326,6 +261,7 @@ jobs:
       BUILD_DIR: "${{ github.workspace }}/build-deb"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
       VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+      X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -350,11 +286,6 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
-
-      - name: Bugfix for libssh
-        run: |
-          mkdir -p ${{ github.workspace }}/vcpkg/downloads
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
 
       - name: Set g++-14 as default
         run: |
@@ -474,6 +405,7 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-rpm"
       BUILD_DIR: "${{ github.workspace }}/build-rpm"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+      X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -492,11 +424,6 @@ jobs:
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
 
-      - name: Bugfix for libssh
-        run: |
-          mkdir -p ${{ github.workspace }}/vcpkg/downloads
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
-
       - name: Set g++-14 as default
         run: |
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
@@ -506,7 +433,6 @@ jobs:
 
       - name: Build (Backend)
         run: |
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel

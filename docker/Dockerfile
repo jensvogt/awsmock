@@ -21,8 +21,8 @@ WORKDIR /usr/local/vcpkg
 RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
 
-RUN mkdir -p /usr/local/vcpkg/downloads
-COPY ./libssh-0.11.3.tar.xz /usr/local/vcpkg/downloads
+# libssh workaround
+ENV X_VCPKG_ASSET_SOURCES="clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
 
 # Create build environment
 RUN mkdir -p /usr/src
