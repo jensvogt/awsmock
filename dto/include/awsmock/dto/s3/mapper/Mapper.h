@@ -9,7 +9,7 @@
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/s3/CreateBucketRequest.h>
 #include <awsmock/dto/s3/CreateBucketResponse.h>
-#include <awsmock/dto/s3/GetMetadataResponse.h>
+#include <awsmock/dto/s3/GetObjectMetadataResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h>
@@ -242,11 +242,25 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-    class GetMetadataResponseMapper : public StaticMapper<GetMetadataResponseMapper, Database::Entity::S3::Object, GetMetadataResponse> {
+    class GetBucketMetadataResponseMapper : public StaticMapper<GetBucketMetadataResponseMapper, Database::Entity::S3::Bucket, GetObjectMetadataResponse> {
 
     public:
-        static GetMetadataResponse toDto(const Database::Entity::S3::Object &e) {
-            GetMetadataResponse d;
+        static GetObjectMetadataResponse toDto(const Database::Entity::S3::Bucket &e) {
+            GetObjectMetadataResponse d;
+            d.region = e.region;
+            d.bucket = e.name;
+            d.size = e.size;
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+    };
+
+    class GetObjectMetadataResponseMapper : public StaticMapper<GetObjectMetadataResponseMapper, Database::Entity::S3::Object, GetObjectMetadataResponse> {
+
+    public:
+        static GetObjectMetadataResponse toDto(const Database::Entity::S3::Object &e) {
+            GetObjectMetadataResponse d;
             d.region = e.region;
             d.bucket = e.bucket;
             d.key = e.key;
@@ -347,7 +361,7 @@ namespace AwsMock::Dto::S3 {
             return e;
         }
     };
-    
+
 } // namespace AwsMock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_MAPPER_H

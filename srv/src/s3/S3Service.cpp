@@ -78,7 +78,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::GetMetadataResponse S3Service::GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const {
+    Dto::S3::GetObjectMetadataResponse S3Service::GetBucketMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket_metadata");
         log_trace << "Get bucket metadata request, s3Request: " << request.ToString();
 
@@ -87,16 +87,8 @@ namespace AwsMock::Service {
 
         try {
             const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-            Dto::S3::GetMetadataResponse response;
-            response.region = bucket.region;
-            response.bucket = bucket.name;
-            response.created = bucket.created;
-            response.modified = bucket.modified;
+            return Dto::S3::GetBucketMetadataResponseMapper::toDto(bucket);
 
-            log_trace << "S3 get bucket metadata response: " + response.ToString();
-            log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key;
-
-            return response;
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get object metadata failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -146,7 +138,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::GetMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const {
+    Dto::S3::GetObjectMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object_metadata");
         log_trace << "Get metadata request, s3Request: " << request.bucket << ", key: " << request.key;
 
@@ -162,7 +154,7 @@ namespace AwsMock::Service {
         try {
             const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-            Dto::S3::GetMetadataResponse response = Dto::S3::GetMetadataResponseMapper::toDto(object);
+            Dto::S3::GetObjectMetadataResponse response = Dto::S3::GetObjectMetadataResponseMapper::toDto(object);
             log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
             return response;
 
