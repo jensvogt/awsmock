@@ -62,43 +62,23 @@ jobs:
         with:
           arch: x64
 
-      - name: Install vcpkg
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git ${{ env.VCPKG_ROOT }}
-          cd ${{ env.VCPKG_ROOT }}
-          ./bootstrap-vcpkg.bat
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
-      #      - name: Ensure vcpkg toolchain exists (Windows)
-      #        id: ensure-vcpkg-windows
-      #        shell: pwsh
-      #        run: |
-      #          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
-      #          if (-not (Test-Path $v)) {
-      #            Write-Host "Cloning vcpkg into $v"
-      #            git clone https://github.com/microsoft/vcpkg.git $v
-      #            Write-Host "Bootstrapping vcpkg"
-      #            & "${v}\bootstrap-vcpkg.bat"
-      #          } else {
-      #            Write-Host "vcpkg already present at $v"
-      #          }
-      #          echo "VCPKG_ROOT=$v" >> $Env:GITHUB_ENV
-      #
-      #      - name: Get vcpkg commit (Windows)
-      #        id: vcpkg-commit
-      #        shell: pwsh
-      #        run: |
-      #          $v = Join-Path $Env:GITHUB_WORKSPACE 'vcpkg'
-      #          if (Test-Path $v) {
-      #            $sha = (git -C $v rev-parse --short HEAD).Trim()
-      #            echo "VCPKG_COMMIT=$sha" >> $Env:GITHUB_ENV
-      #          } else {
-      #            echo "VCPKG_COMMIT=unknown" >> $Env:GITHUB_ENV
-      #          }
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
 
-      - name: Bugfix for libssh
+      - name: Bugfix for libssh (Windows)
+        shell: pwsh
         run: |
-          mkdir -p ${{ github.workspace }}/vcpkg/downloads
-          cp ${{ github.workspace }}/docker/libssh-0.11.3.tar.xz ${{ github.workspace }}/vcpkg/downloads
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/vcpkg/downloads"
+          Copy-Item "${{ github.workspace }}/docker/libssh-0.11.3.tar.xz" -Destination "${{ github.workspace }}/vcpkg/downloads/" -Force
 
       - name: Build (Backend)
         shell: cmd
