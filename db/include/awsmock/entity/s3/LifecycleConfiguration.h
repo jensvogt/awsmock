@@ -75,8 +75,9 @@ namespace AwsMock::Database::Entity::S3 {
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
+         * @return lifecycle entity.
          */
-        [[maybe_unused]] void FromDocument(const view &mResult);
+        static LifecycleConfiguration FromDocument(const view &mResult);
     };
 
 } // namespace AwsMock::Database::Entity::S3

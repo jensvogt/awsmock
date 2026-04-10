@@ -27,21 +27,21 @@ namespace AwsMock::Database::Entity::S3 {
         return lifecycleConfigurationDoc.extract();
     }
 
-    void LifecycleConfiguration::FromDocument(const view &mResult) {
+    LifecycleConfiguration LifecycleConfiguration::FromDocument(const view &mResult) {
 
-        id = Core::Bson::BsonUtils::GetStringValue(mResult["id"]);
-        prefix = Core::Bson::BsonUtils::GetStringValue(mResult["prefix"]);
-        status = LifeCycleStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult["status"]));
+        LifecycleConfiguration l;
+        l.id = Core::Bson::BsonUtils::GetStringValue(mResult["id"]);
+        l.prefix = Core::Bson::BsonUtils::GetStringValue(mResult["prefix"]);
+        l.status = LifeCycleStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult["status"]));
 
         // Transitions
         if (mResult.find("transitions") != mResult.end()) {
-            transitions.clear();
+            l.transitions.clear();
             for (const bsoncxx::array::view transitionView{mResult["transitions"].get_array().value}; const bsoncxx::array::element &transitionElement: transitionView) {
-                LifecycleTransition transition;
-                transition.FromDocument(transitionElement.get_document().view());
-                transitions.emplace_back(transition);
+                l.transitions.emplace_back(LifecycleTransition::FromDocument(transitionElement.get_document().view()));
             }
         }
+        return l;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3

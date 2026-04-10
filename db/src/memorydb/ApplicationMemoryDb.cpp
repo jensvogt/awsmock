@@ -56,14 +56,11 @@ namespace AwsMock::Database {
     }
 
     Entity::Apps::Application ApplicationMemoryDb::UpdateApplication(Entity::Apps::Application &application) {
-
         boost::mutex::scoped_lock lock(_applicationMutex);
 
-        std::string region = application.region;
-        std::string name = application.name;
         const auto it = std::ranges::find_if(_applications,
-                                             [region, name](const std::pair<std::string, Entity::Apps::Application> &application) {
-                                                 return application.second.region == region && application.second.name == name;
+                                             [application](const std::pair<std::string, Entity::Apps::Application> &a) {
+                                                 return a.second.region == application.region && a.second.name == application.name;
                                              });
 
         if (it == _applications.end()) {
@@ -76,42 +73,38 @@ namespace AwsMock::Database {
 
     std::vector<Entity::Apps::Application> ApplicationMemoryDb::ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
 
-        std::vector<Entity::Apps::Application> applicationList;
+        auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
-
-            for (const auto &val: _applications | std::views::values) {
-                if (val.region == region) {
-                    applicationList.emplace_back(val);
+            q = q.where([region](const Entity::Apps::Application &application) { return application.region == region; });
+        }
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::Apps::Application &application) { return Core::StringUtils::StartsWith(application.region, prefix); });
+        }
+        if (!sortColumns.empty()) {
+            std::ranges::sort(q.to_vector(), [sortColumns](const Entity::Apps::Application &a, const Entity::Apps::Application &b) {
+                for (const auto &[column, sortDirection]: sortColumns) {
+                    if (column == "name") {
+                        return sortDirection == 1 ? a.name < b.name : b.name < a.name;
+                    }
                 }
-            }
-
-        } else {
-
-            for (const auto &val: _applications | std::views::values) {
-                applicationList.emplace_back(val);
-            }
+                return false;
+            });
         }
 
-        log_trace << "Got application list, size: " << applicationList.size();
-        return applicationList;
+        // Create page iterators
+        return Core::PageVector<Entity::Apps::Application>(q.to_vector(), pageSize, pageIndex);
     }
 
     long ApplicationMemoryDb::CountApplications(const std::string &region, const std::string &prefix) const {
 
-        long count = 0;
-        if (region.empty()) {
-
-            count = static_cast<long>(_applications.size());
-
-        } else {
-
-            for (const auto &val: _applications | std::views::values) {
-                if (val.region == region) {
-                    count++;
-                }
-            }
+        auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q = q.where([region](const Entity::Apps::Application &application) { return application.region == region; });
         }
-        return count;
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::Apps::Application &application) { return Core::StringUtils::StartsWith(application.region, prefix); });
+        }
+        return static_cast<long>(q.count());
     }
 
     long ApplicationMemoryDb::DeleteApplication(const std::string &region, const std::string &name) {
@@ -121,7 +114,7 @@ namespace AwsMock::Database {
             return a.second.region == region && a.second.name == name;
         });
         log_debug << "Application deleted, name: " << name << " count: " << count;
-        return count;
+        return static_cast<long>(count);
     }
 
     long ApplicationMemoryDb::DeleteAllApplications() {
@@ -132,4 +125,4 @@ namespace AwsMock::Database {
         log_debug << "All applications deleted";
         return count;
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

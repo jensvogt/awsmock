@@ -62,8 +62,8 @@ namespace AwsMock::Dto::Module {
     void Infrastructure::FromDocument(const view &document) {
 
         // S3
-        Core::Bson::FromBsonArray(document, "s3-buckets", &s3Buckets);
-        Core::Bson::FromBsonArray(document, "s3-objects", &s3Objects);
+        Core::Bson::FromBsonArray1(document, "s3-buckets", &s3Buckets);
+        Core::Bson::FromBsonArray1(document, "s3-objects", &s3Objects);
 
         // SQS
         Core::Bson::FromBsonArray(document, "sqs-queues", &sqsQueues);
@@ -103,4 +103,4 @@ namespace AwsMock::Dto::Module {
         Core::Bson::FromBsonArray(document, "api-gateway-keys", &apiKeys);
     }
 
-}// namespace AwsMock::Dto::Module
+} // namespace AwsMock::Dto::Module

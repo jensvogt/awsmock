@@ -46,24 +46,23 @@ namespace AwsMock::Database::Entity::S3 {
 
     LambdaNotification LambdaNotification::FromDocument(const view &mResult) {
 
+        LambdaNotification n;
         try {
 
-            id = Core::Bson::BsonUtils::GetStringValue(mResult["id"]);
-            lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult["lambdaArn"]);
+            n.id = Core::Bson::BsonUtils::GetStringValue(mResult["id"]);
+            n.lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult["lambdaArn"]);
 
             // Extract events
             if (mResult.find("events") != mResult.end()) {
                 for (const view eventsView = mResult["events"].get_array().value; bsoncxx::document::element event: eventsView) {
-                    events.emplace_back(event.get_string().value);
+                    n.events.emplace_back(event.get_string().value);
                 }
             }
 
             // Extract filter rules
             if (mResult.find("filterRules") != mResult.end()) {
                 for (const view filterRulesView = mResult["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
-                    FilterRule filterRule;
-                    filterRule.FromDocument(filterRuleElement.get_document().view());
-                    filterRules.emplace_back(filterRule);
+                    n.filterRules.emplace_back(FilterRule::FromDocument(filterRuleElement.get_document().view()));
                 }
             }
 
@@ -71,7 +70,7 @@ namespace AwsMock::Database::Entity::S3 {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-        return *this;
+        return n;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3

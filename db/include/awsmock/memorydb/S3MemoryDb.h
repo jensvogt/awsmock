@@ -17,6 +17,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/Linq.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/s3/Bucket.h>
@@ -32,8 +33,7 @@ namespace AwsMock::Database {
      */
     class S3MemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -213,10 +213,15 @@ namespace AwsMock::Database {
         /**
          * @brief List all objects.
          *
+         * @param region AWS region
          * @param prefix S3 key prefix
+         * @param bucket S3 bucket name
+         * @param pageSize maximal number of results
+         * @param pageIndex page index
+         * @param sortColumns list of sort columns
          * @return ObjectList
          */
-        [[nodiscard]] std::vector<Entity::S3::Object> ListObjects(const std::string &prefix = {});
+        [[nodiscard]] std::vector<Entity::S3::Object> ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {});
 
         /**
          * @brief Gets a list of versioned objects
@@ -227,7 +232,7 @@ namespace AwsMock::Database {
          * @return list of S3 object
          * @throws DatabaseException
          */
-        std::vector<Entity::S3::Object> ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
+        [[nodiscard]] std::vector<Entity::S3::Object> ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
 
         /**
          * @brief Delete a bucket.
@@ -346,9 +351,10 @@ namespace AwsMock::Database {
          * @brief Delete an object.
          *
          * @param object object entity
+         * @return number of objects deleted
          * @throws DatabaseException
          */
-        void DeleteObject(const Entity::S3::Object &object);
+        long DeleteObject(const Entity::S3::Object &object);
 
         /**
          * @brief Updates an existing object in the S3 object table
@@ -371,8 +377,7 @@ namespace AwsMock::Database {
          */
         void AdjustObjectCounters();
 
-      private:
-
+    private:
         /**
          * @brief Convert the bucket map to a vector
          *
@@ -408,6 +413,6 @@ namespace AwsMock::Database {
         static boost::mutex _objectMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_S3_MEMORYDB_H
