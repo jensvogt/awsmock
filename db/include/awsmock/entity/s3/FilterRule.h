@@ -32,20 +32,21 @@ namespace AwsMock::Database::Entity::S3 {
         std::string value;
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[maybe_unused]] [[nodiscard]] view_or_value<view, bsoncxx::document::value> ToDocument() const override;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
+         * @return filter rule entity
          */
-        [[maybe_unused]] void FromDocument(const view &mResult);
+        static FilterRule FromDocument(const view &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_FILTER_RULE_H

@@ -17,7 +17,6 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
 
-
 namespace AwsMock::Core::Json {
 
     using std::chrono::system_clock;
@@ -97,6 +96,19 @@ namespace AwsMock::Core::Json {
 
     inline system_clock::time_point GetDatetimeValueUTC(const boost::json::value &value, const std::string &name) {
         if (AttributeExists(value, name)) {
+#ifdef __APPLE__
+            std::string dateStr = value.at(name).as_string().c_str();
+            struct tm tm = {};
+
+            // strptime is the standard on macOS/Linux
+            char *res = strptime(dateStr.c_str(), "%Y-%m-%dT%H:%M:%SZ", &tm);
+
+            if (res != nullptr) {
+                // timegm is the thread-safe UTC version of mktime on macOS/Linux
+                time_t t = timegm(&tm);
+                return std::chrono::system_clock::from_time_t(t);
+            }
+#else
             std::stringstream ss{value.at(name).as_string().data()};
             system_clock::time_point tp;
             // The %FT%T%Z format covers:
@@ -106,6 +118,7 @@ namespace AwsMock::Core::Json {
             // %Z (The UTC 'Z' suffix)
             ss >> std::chrono::parse("%FT%T%Z", tp);
             return tp;
+#endif
         }
         return {};
     }

@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Linq.h>
+#include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -27,8 +28,7 @@ namespace AwsMock::Database {
      */
     class LambdaMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -155,12 +155,12 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param prefix name prefix
-         * @param maxResults maximal number of results
-         * @param skip number of records to skip
+         * @param pageSize maximal number of results
+         * @param pageIndex number of records to skip
          * @param sortColumns sorting columns
          * @return list of lambda function counters
          */
-        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {});
+        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {});
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.
@@ -280,8 +280,7 @@ namespace AwsMock::Database {
          */
         long DeleteAllLambdas();
 
-      private:
-
+    private:
         /**
          * Lambda map
          */
@@ -303,6 +302,6 @@ namespace AwsMock::Database {
         static boost::mutex _lambdaResultMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H

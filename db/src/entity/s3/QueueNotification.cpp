@@ -24,7 +24,7 @@ namespace AwsMock::Database::Entity::S3 {
         queueNotificationDoc.append(kvp("queueArn", queueArn));
 
         // Events
-        auto eventsDoc = bsoncxx::builder::basic::array{};
+        auto eventsDoc = array{};
         for (const auto &event: events) {
             eventsDoc.append(event);
         }
@@ -41,24 +41,23 @@ namespace AwsMock::Database::Entity::S3 {
 
     QueueNotification QueueNotification::FromDocument(const std::optional<view> &mResult) {
 
+        QueueNotification n;
         try {
 
-            id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
-            queueArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["queueArn"]);
+            n.id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
+            n.queueArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["queueArn"]);
 
             // Extract events
             if (mResult.value().find("events") != mResult.value().end()) {
                 for (const view eventsView = mResult.value()["events"].get_array().value; const bsoncxx::document::element &eventElement: eventsView) {
-                    events.emplace_back(eventElement.get_string().value);
+                    n.events.emplace_back(eventElement.get_string().value);
                 }
             }
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
                 for (const view filterRulesView = mResult.value()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
-                    FilterRule filterRule;
-                    filterRule.FromDocument(filterRuleElement.get_document().view());
-                    filterRules.emplace_back(filterRule);
+                    n.filterRules.emplace_back(FilterRule::FromDocument(filterRuleElement.get_document().view()));
                 }
             }
 
@@ -66,7 +65,7 @@ namespace AwsMock::Database::Entity::S3 {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
         }
-        return *this;
+        return n;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3

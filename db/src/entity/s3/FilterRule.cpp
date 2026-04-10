@@ -15,10 +15,12 @@ namespace AwsMock::Database::Entity::S3 {
         return filterRuleDoc.extract();
     }
 
-    void FilterRule::FromDocument(const view &mResult) {
+    FilterRule FilterRule::FromDocument(const view &mResult) {
 
-        name = Core::Bson::BsonUtils::GetStringValue(mResult["name"]);
-        value = Core::Bson::BsonUtils::GetStringValue(mResult["value"]);
+        FilterRule f;
+        f.name = Core::Bson::BsonUtils::GetStringValue(mResult["name"]);
+        f.value = Core::Bson::BsonUtils::GetStringValue(mResult["value"]);
+        return f;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3

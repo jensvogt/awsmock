@@ -12,8 +12,9 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
+#include <awsmock/core/Linq.h>
+#include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
@@ -30,8 +31,7 @@ namespace AwsMock::Database {
      */
     class ApplicationMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -130,8 +130,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllApplications();
 
-      private:
-
+    private:
         /**
          * Application map
          */
@@ -143,6 +142,6 @@ namespace AwsMock::Database {
         static boost::mutex _applicationMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H

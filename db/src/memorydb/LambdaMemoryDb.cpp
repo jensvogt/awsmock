@@ -40,51 +40,38 @@ namespace AwsMock::Database {
     bool LambdaMemoryDb::LambdaExistsByArn(const std::string &arn) {
 
         return std::ranges::find_if(_lambdas, [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                   return lambda.second.arn == arn;
-               }) != _lambdas.end();
+            return lambda.second.arn == arn;
+        }) != _lambdas.end();
     }
 
     Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdasWithEventSource(const std::string &eventSourceArn) {
 
-        Entity::Lambda::LambdaList lambdaList;
-        for (const auto &val: _lambdas | std::views::values) {
-            if (val.HasEventSource(eventSourceArn)) {
-                lambdaList.emplace_back(val);
-            }
+        auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
+        if (!eventSourceArn.empty()) {
+            q = q.where([eventSourceArn](const Entity::Lambda::Lambda &lambda) { return lambda.HasEventSource(eventSourceArn); });
         }
-
-        log_trace << "Got lambda list, size: " << lambdaList.size();
-        return lambdaList;
+        return q.to_vector();
     }
 
     Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdas(const std::string &region) {
 
-        Entity::Lambda::LambdaList lambdaList;
-        if (region.empty()) {
-            for (const auto &val: _lambdas | std::views::values) {
-                lambdaList.emplace_back(val);
-            }
-        } else {
-            for (const auto &val: _lambdas | std::views::values) {
-                if (val.region == region) {
-                    lambdaList.emplace_back(val);
-                }
-            }
+        auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q = q.where([region](const Entity::Lambda::Lambda &lambda) { return lambda.region == region; });
         }
-
-        log_trace << "Got lambda list, size: " << lambdaList.size();
-        return lambdaList;
+        return q.to_vector();
     }
 
     std::vector<Entity::Lambda::Lambda> LambdaMemoryDb::ListLambdaCounters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
-        Entity::Lambda::LambdaList result;
 
-        // Get values
-        for (auto &val: _lambdas | std::views::values) {
-            result.push_back(val);
+        auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q = q.where([region](const Entity::Lambda::Lambda &item) { return item.region == region; });
+        }
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::Lambda::Lambda &item) { return Core::StringUtils::StartsWith(item.function, prefix); });
         }
 
-        auto q = Core::from(result);
         q = q.order_by([](const Entity::Lambda::Lambda &key1, const Entity::Lambda::Lambda &key2) { return key1.oid < key2.oid; });
 
         for (const auto &[column, sortDirection]: sortColumns) {
@@ -93,21 +80,8 @@ namespace AwsMock::Database {
             }
         }
 
-        if (!region.empty()) {
-            q.where([region](const Entity::Lambda::Lambda &item) { return item.region == region; });
-        }
-        if (!prefix.empty()) {
-            q.where([prefix](const Entity::Lambda::Lambda &item) { return Core::StringUtils::StartsWith(item.function, prefix); });
-        }
-        result = q.to_vector();
-
         // Create page iterators
-        if (pageSize > 0) {
-            auto start = result.begin() + pageIndex * pageSize;
-            auto end = (pageIndex + 1) * pageSize < result.size() ? result.begin() + (pageIndex + 1) * pageSize : result.end();
-            return {start, end};
-        }
-        return result;
+        return Core::PageVector<Entity::Lambda::Lambda>(q.to_vector(), pageSize, pageIndex);
     }
 
     Entity::Lambda::Lambda LambdaMemoryDb::CreateLambda(const Entity::Lambda::Lambda &lambda) {
@@ -169,16 +143,11 @@ namespace AwsMock::Database {
 
     long LambdaMemoryDb::LambdaCount(const std::string &region) const {
 
-        long count = 0;
-        if (region.empty()) {
-            return static_cast<long>(_lambdas.size());
+        auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q = q.where([region](const Entity::Lambda::Lambda &item) { return item.region == region; });
         }
-        for (const auto &val: _lambdas | std::views::values) {
-            if (val.region == region) {
-                count++;
-            }
-        }
-        return count;
+        return q.count();
     }
 
     Entity::Lambda::Lambda LambdaMemoryDb::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
@@ -187,8 +156,8 @@ namespace AwsMock::Database {
         std::string region = lambda.region;
         std::string function = lambda.function;
         const auto it = std::ranges::find_if(_lambdas,
-                                             [region, function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                                                 return lambda.second.region == region && lambda.second.function == function;
+                                             [lambda](const std::pair<std::string, Entity::Lambda::Lambda> &l) {
+                                                 return l.second.region == lambda.region && l.second.function == lambda.function;
                                              });
 
         if (it == _lambdas.end()) {
@@ -232,8 +201,8 @@ namespace AwsMock::Database {
 
     bool LambdaMemoryDb::LambdaResultExists(const std::string &oid) {
         return std::ranges::find_if(_lambdaResults, [oid](const std::pair<std::string, Entity::Lambda::LambdaResult> &lambdaResult) {
-                   return lambdaResult.first == oid;
-               }) != _lambdaResults.end();
+            return lambdaResult.first == oid;
+        }) != _lambdaResults.end();
     }
 
     Entity::Lambda::LambdaResult LambdaMemoryDb::GetLambdaResultById(const std::string &oid) {
@@ -255,9 +224,8 @@ namespace AwsMock::Database {
     long LambdaMemoryDb::DeleteResultsCounter(const std::string &oid) {
         boost::mutex::scoped_lock lock(_lambdaResultMutex);
 
-        const auto count = std::erase_if(_lambdas, [oid](const auto &item) {
-            auto const &[key, value] = item;
-            return key == oid;
+        const auto count = std::erase_if(_lambdas, [oid](const auto &l) {
+            return l.first == oid;
         });
         log_debug << "Lambda results deleted, count: " << count;
         return count;
@@ -266,9 +234,8 @@ namespace AwsMock::Database {
     long LambdaMemoryDb::DeleteResultsCounters(const std::string &lambdaArn) {
         boost::mutex::scoped_lock lock(_lambdaResultMutex);
 
-        const auto count = std::erase_if(_lambdas, [lambdaArn](const auto &item) {
-            auto const &[key, value] = item;
-            return value.arn == lambdaArn;
+        const auto count = std::erase_if(_lambdas, [lambdaArn](const auto &l) {
+            return l.second.arn == lambdaArn;
         });
         log_debug << "Lambda results deleted, count: " << count;
         return static_cast<long>(count);
@@ -285,9 +252,8 @@ namespace AwsMock::Database {
     long LambdaMemoryDb::RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
-        const auto count = std::erase_if(_lambdaResults, [cutOff](const auto &item) {
-            auto const &[key, value] = item;
-            return value.timestamp < cutOff;
+        const auto count = std::erase_if(_lambdaResults, [cutOff](const auto &l) {
+            return l.second.timestamp < cutOff;
         });
         log_debug << "Lambda results deleted, count: " << count;
         return static_cast<long>(count);
@@ -296,9 +262,8 @@ namespace AwsMock::Database {
     void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
-        const auto count = std::erase_if(_lambdas, [functionName](const auto &item) {
-            auto const &[key, value] = item;
-            return value.function == functionName;
+        const auto count = std::erase_if(_lambdas, [functionName](const auto &l) {
+            return l.second.function == functionName;
         });
         log_debug << "Lambda deleted, count: " << count;
     }
@@ -310,4 +275,4 @@ namespace AwsMock::Database {
         _lambdas.clear();
         return deleted;
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
