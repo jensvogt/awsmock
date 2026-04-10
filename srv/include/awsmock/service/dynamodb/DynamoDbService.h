@@ -26,7 +26,7 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
 #include <awsmock/dto/dynamodb/DeleteAllItemsRequest.h>

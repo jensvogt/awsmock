@@ -17,7 +17,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
 #include <awsmock/dto/kms/DecryptRequest.h>

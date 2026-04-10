@@ -21,7 +21,7 @@
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
-#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/sqs/AddAttributeRequest.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>

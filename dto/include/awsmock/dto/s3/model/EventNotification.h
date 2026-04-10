@@ -79,8 +79,7 @@ namespace AwsMock::Dto::S3 {
          */
         std::string sourceIPAddress;
 
-      private:
-
+    private:
         friend RequestParameter tag_invoke(boost::json::value_to_tag<RequestParameter>, boost::json::value const &v) {
             RequestParameter r;
             r.requestParameters = Core::Json::GetStringValue(v, "requestParameters");
@@ -90,11 +89,11 @@ namespace AwsMock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RequestParameter const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
-                    {"requestParameters", obj.requestParameters},
-                    {"sourceIPAddress", obj.sourceIPAddress},
+                {"Region", obj.region},
+                {"User", obj.user},
+                {"RequestId", obj.requestId},
+                {"requestParameters", obj.requestParameters},
+                {"sourceIPAddress", obj.sourceIPAddress},
             };
         }
     };
@@ -111,8 +110,7 @@ namespace AwsMock::Dto::S3 {
          */
         std::string xAmzId2;
 
-      private:
-
+    private:
         friend ResponseElements tag_invoke(boost::json::value_to_tag<ResponseElements>, boost::json::value const &v) {
             ResponseElements r;
             r.xAmzRequestId = Core::Json::GetStringValue(v, "xAmzRequestId");
@@ -122,8 +120,8 @@ namespace AwsMock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ResponseElements const &obj) {
             jv = {
-                    {"xAmzRequestId", obj.xAmzRequestId},
-                    {"xAmzId2", obj.xAmzId2},
+                {"xAmzRequestId", obj.xAmzRequestId},
+                {"xAmzId2", obj.xAmzId2},
             };
         }
     };
@@ -155,8 +153,17 @@ namespace AwsMock::Dto::S3 {
          */
         std::string sequencer;
 
-      private:
+        /**
+         * Creation date
+         */
+        system_clock::time_point created = system_clock::now();
 
+        /**
+         * Last modification date
+         */
+        system_clock::time_point modified = system_clock::now();
+
+    private:
         friend Object tag_invoke(boost::json::value_to_tag<Object>, boost::json::value const &v) {
             Object r;
             r.key = Core::Json::GetStringValue(v, "key");
@@ -164,16 +171,23 @@ namespace AwsMock::Dto::S3 {
             r.etag = Core::Json::GetStringValue(v, "etag");
             r.versionId = Core::Json::GetStringValue(v, "versionId");
             r.sequencer = Core::Json::GetStringValue(v, "sequencer");
+            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.modified = Core::Json::GetDatetimeValue(v, "modified");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Object const &obj) {
             jv = {
-                    {"key", obj.key},
-                    {"size", obj.size},
-                    {"etag", boost::json::value_from(obj.etag)},
-                    {"versionId", obj.versionId},
-                    {"sequencer", obj.sequencer},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
+                {"key", obj.key},
+                {"size", obj.size},
+                {"etag", obj.etag},
+                {"versionId", obj.versionId},
+                {"sequencer", obj.sequencer},
+                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
@@ -195,8 +209,7 @@ namespace AwsMock::Dto::S3 {
          */
         Owner ownerIdentity;
 
-      private:
-
+    private:
         friend NotificationBucket tag_invoke(boost::json::value_to_tag<NotificationBucket>, boost::json::value const &v) {
             NotificationBucket r;
             r.name = Core::Json::GetStringValue(v, "s3SchemaVersion");
@@ -207,9 +220,9 @@ namespace AwsMock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, NotificationBucket const &obj) {
             jv = {
-                    {"name", obj.name},
-                    {"arn", obj.arn},
-                    {"ownerIdentity", boost::json::value_from(obj.ownerIdentity)},
+                {"name", obj.name},
+                {"arn", obj.arn},
+                {"ownerIdentity", boost::json::value_from(obj.ownerIdentity)},
             };
         }
     };
@@ -236,8 +249,7 @@ namespace AwsMock::Dto::S3 {
          */
         Object object;
 
-      private:
-
+    private:
         friend S3 tag_invoke(boost::json::value_to_tag<S3>, boost::json::value const &v) {
             S3 r;
             r.s3SchemaVersion = Core::Json::GetStringValue(v, "s3SchemaVersion");
@@ -249,10 +261,10 @@ namespace AwsMock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, S3 const &obj) {
             jv = {
-                    {"s3SchemaVersion", obj.s3SchemaVersion},
-                    {"configurationId", obj.configurationId},
-                    {"bucket", boost::json::value_from(obj.bucket)},
-                    {"object", boost::json::value_from(obj.object)},
+                {"s3SchemaVersion", obj.s3SchemaVersion},
+                {"configurationId", obj.configurationId},
+                {"bucket", boost::json::value_from(obj.bucket)},
+                {"object", boost::json::value_from(obj.object)},
             };
         }
     };
@@ -299,8 +311,7 @@ namespace AwsMock::Dto::S3 {
          */
         S3 s3;
 
-      private:
-
+    private:
         friend Record tag_invoke(boost::json::value_to_tag<Record>, boost::json::value const &v) {
             Record r;
             r.eventVersion = Core::Json::GetStringValue(v, "eventVersion");
@@ -316,14 +327,14 @@ namespace AwsMock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Record const &obj) {
             jv = {
-                    {"eventVersion", obj.eventVersion},
-                    {"eventSource", obj.eventSource},
-                    {"eventTime", Core::DateTimeUtils::ToISO8601(obj.eventTime)},
-                    {"eventName", obj.eventName},
-                    {"userIdentity", boost::json::value_from(obj.userIdentity)},
-                    {"requestParameter", boost::json::value_from(obj.requestParameter)},
-                    {"responseElements", boost::json::value_from(obj.responseElements)},
-                    {"s3", boost::json::value_from(obj.s3)},
+                {"eventVersion", obj.eventVersion},
+                {"eventSource", obj.eventSource},
+                {"eventTime", Core::DateTimeUtils::ToISO8601(obj.eventTime)},
+                {"eventName", obj.eventName},
+                {"userIdentity", boost::json::value_from(obj.userIdentity)},
+                {"requestParameter", boost::json::value_from(obj.requestParameter)},
+                {"responseElements", boost::json::value_from(obj.responseElements)},
+                {"s3", boost::json::value_from(obj.s3)},
             };
         }
     };
@@ -343,23 +354,22 @@ namespace AwsMock::Dto::S3 {
          */
         std::vector<Record> records;
 
-      private:
-
+    private:
         friend EventNotification tag_invoke(boost::json::value_to_tag<EventNotification>, boost::json::value const &v) {
             EventNotification r;
             if (!r.records.empty()) {
-                r.records = boost::json::value_to<std::vector<Record>>(v.at("Records"));
+                r.records = boost::json::value_to<std::vector<Record> >(v.at("Records"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EventNotification const &obj) {
             jv = {
-                    {"Records", boost::json::value_from(obj.records)},
+                {"Records", boost::json::value_from(obj.records)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::S3
+} // namespace AwsMock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H

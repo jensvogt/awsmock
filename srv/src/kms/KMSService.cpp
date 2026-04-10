@@ -49,7 +49,7 @@ namespace AwsMock::Service {
 
         try {
             Dto::KMS::ListKeyCountersResponse listKeyCountersResponse;
-            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             listKeyCountersResponse.total = _kmsDatabase.CountKeys();
 
             for (const auto &k: keyList) {

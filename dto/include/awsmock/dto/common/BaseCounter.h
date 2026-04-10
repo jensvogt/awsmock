@@ -28,6 +28,7 @@ namespace AwsMock::Dto::Common {
      */
     template<typename T>
     struct BaseCounter {
+
         virtual ~BaseCounter() = default;
 
         /**
@@ -126,7 +127,7 @@ namespace AwsMock::Dto::Common {
 
             if (char *demangled = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status); status == 0 && demangled != nullptr) {
                 std::string result(demangled);
-                std::free(demangled);// WICHTIG: Speicher freigeben
+                std::free(demangled); // WICHTIG: Speicher freigeben
                 return result;
             }
             return name;
@@ -160,8 +161,7 @@ namespace AwsMock::Dto::Common {
             return os;
         }
 
-      private:
-
+    private:
         /**
          * brief Deserialization
          *
@@ -184,13 +184,13 @@ namespace AwsMock::Dto::Common {
          */
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, BaseCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
             };
         }
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_BASE_COUNTER_H

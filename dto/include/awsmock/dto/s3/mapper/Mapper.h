@@ -6,18 +6,22 @@
 #define AWSMOCK_DTO_S3_MAPPER_H
 
 // AwsMock includes
-#include "awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h"
-
-
+#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/s3/CreateBucketRequest.h>
+#include <awsmock/dto/s3/CreateBucketResponse.h>
+#include <awsmock/dto/s3/GetMetadataResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
+#include <awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h>
 #include <awsmock/dto/s3/internal/GetBucketRequest.h>
 #include <awsmock/dto/s3/internal/GetBucketResponse.h>
 #include <awsmock/dto/s3/model/Bucket.h>
+#include <awsmock/dto/s3/model/BucketCounter.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
+#include <awsmock/dto/s3/model/LifecycleStatus.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
@@ -25,210 +29,325 @@
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
 
-
 namespace AwsMock::Dto::S3 {
 
-    /**
-     * @brief Maps an entity to the corresponding DTO
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    class Mapper {
+    class FilterRuleMapper : public StaticMapper<FilterRuleMapper, Database::Entity::S3::FilterRule, FilterRule> {
+    public:
+        static FilterRule toDto(const Database::Entity::S3::FilterRule &e) {
+            FilterRule d;
+            d.region = e.region;
+            d.name = NameTypeFromString(e.name);
+            d.filterValue = e.value;
+            return d;
+        }
 
-      public:
-
-        /**
-         * @brief Maps a S3 object entity list to a list version response
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param objectList S3 object entity list
-         * @param request request struct
-         * @return ListObjectVersionsResponse
-         * @see ListObjectVersionsResponse
-         */
-        static ListObjectVersionsResponse map(const ListObjectVersionsRequest &request, const std::vector<Database::Entity::S3::Object> &objectList);
-
-        /**
-         * @brief Maps a S3 object entity list to a get bucket request
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param request get bucket request
-         * @param bucket bucket entity
-         * @return GetBucketResponse
-         * @see GetBucketResponse
-         */
-        static GetBucketResponse map(const GetBucketRequest &request, const Database::Entity::S3::Bucket &bucket);
-
-        /**
-         * @brief Maps a S3 DTO to a bucket entity
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param bucketDto bucket DTO
-         * @return Bucket
-         * @see Bucket
-         */
-        static Database::Entity::S3::Bucket map(const Bucket &bucketDto);
-
-        /**
-         * @brief Maps a S3 entity to a bucket DTO
-         *
-         * @param bucketEntity bucket entity
-         * @return Bucket DTO
-         * @see Bucket
-         */
-        static Bucket map(const Database::Entity::S3::Bucket &bucketEntity);
-
-        /**
-         * @brief Maps a S3 queue configuration entity to a queue configuration DTO
-         *
-         * @param lambdaConfigurationEntity lambda configuration entities
-         * @return LambdaConfiguration DTOs
-         * @see LambdaConfiguration
-         */
-        static LambdaConfiguration map(const Database::Entity::S3::LambdaNotification &lambdaConfigurationEntity);
-
-        /**
-         * @brief Maps a S3 event notification to an SNS topic event notification.
-         *
-         * @param notificationId S3 notification ID
-         * @param bucket corresponding S3 bucket
-         * @param object corresponding S3 object
-         * @param event SNS event notification
-         * @return
-         */
-        static EventNotification map(const std::string &notificationId, Bucket &bucket, Object &object, const std::string &event);
-
-        /**
-         * @brief Maps a lifecycle transition
-         *
-         * @param transition lifecycle transition
-         * @return lifecycle transition entity
-         */
-        static Database::Entity::S3::LifecycleTransition map(const LifecycleTransition &transition);
-
-        /**
-         * @brief Maps a single lifecycle rule
-         *
-         * @param rule lifecycle rule
-         * @return lifecycle rule entity
-         */
-        static Database::Entity::S3::LifecycleConfiguration map(const LifecycleRule &rule);
-
-        /**
-         * @brief Maps a S3 lifecycle put request to a list lifecycle rules
-         *
-         * @param request S3 lifecycle configuration request
-         * @return
-         */
-        static std::vector<Database::Entity::S3::LifecycleConfiguration> map(const PutBucketLifecycleConfigurationRequest &request);
-
-        /**
-         * @brief Converts a transition entity to a DTO
-         *
-         * @param transition transition entity
-         * @return transition DTO
-         */
-        static LifecycleTransition map(const Database::Entity::S3::LifecycleTransition &transition);
-
-        /**
-         * @brief Converts a single lifecycle configuration to a lifecycle rule
-         *
-         * @param configuration lifecycle configuration
-         * @return configuration lifecycle rule
-         */
-        static LifecycleRule map(const Database::Entity::S3::LifecycleConfiguration &configuration);
-
-        /**
-         * @brief Maps a lifecycle configuration to a lifecycle rule.
-         *
-         * @param configurations
-         * @return
-         */
-        static std::vector<LifecycleRule> map(const std::vector<Database::Entity::S3::LifecycleConfiguration> &configurations);
-
-        /**
-         * @brief Maps a S3 queue configuration DTO list to a queue configuration entity
-         *
-         * @param lambdaConfigurationDtos list of lambda configuration
-         * @return list of LambdaConfiguration
-         * @see LambdaConfiguration
-         */
-        static std::vector<Database::Entity::S3::LambdaNotification> map(const std::vector<LambdaConfiguration> &lambdaConfigurationDtos);
-
-        /**
-         * @brief Maps a S3 lambda configuration DTO to a lambda configuration entity
-         *
-         * @param lambdaConfigurationDto lambda configuration
-         * @return lambdaNotification entity
-         * @see LambdaConfiguration
-         */
-        static Database::Entity::S3::LambdaNotification map(const LambdaConfiguration &lambdaConfigurationDto);
-
-      private:
-
-        /**
-         * @brief Maps a S3 queue configuration entity list to a queue configuration DTO
-         *
-         * @param queueConfigurationEntities queue configuration entities
-         * @return QueueConfiguration DTOs
-         * @see QueueConfiguration
-         */
-        static std::vector<QueueConfiguration> map(const std::vector<Database::Entity::S3::QueueNotification> &queueConfigurationEntities);
-
-        /**
-         * @brief Maps a S3 topic configuration entity list to a queue configuration DTO
-         *
-         * @param topicConfigurationEntities topic configuration entities
-         * @return TopicConfiguration
-         * @see TopicConfiguration
-         */
-        static std::vector<TopicConfiguration> map(const std::vector<Database::Entity::S3::TopicNotification> &topicConfigurationEntities);
-
-        /**
-         * @brief Maps a S3 queue configuration entity list to a queue configuration DTO
-         *
-         * @param lambdaConfigurationEntities list of lambda configuration entities
-         * @return LambdaConfiguration DTOs
-         * @see LambdaConfiguration
-         */
-        static std::vector<LambdaConfiguration> map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaConfigurationEntities);
-
-        /**
-         * @brief Maps lambda event entities to lambda event entities DTOs
-         *
-         * @param lambdaNotificationEventTypeEntities
-         * @return vector of strings
-         */
-        static std::vector<std::string> map(const std::vector<NotificationEventType> &lambdaNotificationEventTypeEntities);
-
-        /**
-         * @brief Maps a lambda filter rule DTO to a lambda filter rule Entity
-         *
-         * @param filterRulesDtos
-         * @return
-         */
-        static std::vector<Database::Entity::S3::FilterRule> map(const std::vector<FilterRule> &filterRulesDtos);
-
-        /**
-         * @brief Maps event string to event types.
-         *
-         * @param eventStrs event strings
-         * @return NotificationEventTypes
-         */
-        static std::vector<NotificationEventType> map(const std::vector<std::string> &eventStrs);
-
-        /**
-         * @brief Map filter rules entities to file rules DTOs
-         *
-         * @param filterRulesEntities filter rules entities
-         * @return filter rules DTOs
-         */
-        static std::vector<FilterRule> map(const std::vector<Database::Entity::S3::FilterRule> &filterRulesEntities);
+        static Database::Entity::S3::FilterRule toEntity(const FilterRule &d) {
+            Database::Entity::S3::FilterRule e;
+            e.region = d.region;
+            e.name = NameTypeToString(d.name);
+            e.value = d.filterValue;
+            return e;
+        }
     };
 
-}// namespace AwsMock::Dto::S3
+    class QueueConfigurationMapper : public StaticMapper<QueueConfigurationMapper, Database::Entity::S3::QueueNotification, QueueConfiguration> {
+
+    public:
+        static QueueConfiguration toDto(const Database::Entity::S3::QueueNotification &e) {
+            QueueConfiguration d;
+            d.region = e.region;
+            d.id = e.id;
+            d.queueArn = e.queueArn;
+            d.filterRules = FilterRuleMapper::toDtoList(e.filterRules);
+            for (const auto &event: e.events) {
+                d.events.emplace_back(EventTypeFromString(event));
+            }
+            return d;
+        }
+
+        static Database::Entity::S3::QueueNotification toEntity(const QueueConfiguration &d) {
+            Database::Entity::S3::QueueNotification e;
+            e.region = d.region;
+            e.id = d.id;
+            e.queueArn = d.queueArn;
+            e.filterRules = FilterRuleMapper::toEntityList(d.filterRules);
+            for (const auto &event: d.events) {
+                e.events.emplace_back(EventTypeToString(event));
+            }
+            return e;
+        }
+    };
+
+    class TopicConfigurationMapper : public StaticMapper<TopicConfigurationMapper, Database::Entity::S3::TopicNotification, TopicConfiguration> {
+
+    public:
+        static TopicConfiguration toDto(const Database::Entity::S3::TopicNotification &e) {
+            TopicConfiguration d;
+            d.region = e.region;
+            d.id = e.id;
+            d.topicArn = e.topicArn;
+            d.filterRules = FilterRuleMapper::toDtoList(e.filterRules);
+            for (const auto &event: e.events) {
+                d.events.emplace_back(EventTypeFromString(event));
+            }
+            return d;
+        }
+
+        static Database::Entity::S3::TopicNotification toEntity(const TopicConfiguration &d) {
+            Database::Entity::S3::TopicNotification e;
+            e.region = d.region;
+            e.id = d.id;
+            e.topicArn = d.topicArn;
+            e.filterRules = FilterRuleMapper::toEntityList(d.filterRules);
+            for (const auto &event: d.events) {
+                e.events.emplace_back(EventTypeToString(event));
+            }
+            return e;
+        }
+    };
+
+    class LambdaConfigurationMapper : public StaticMapper<LambdaConfigurationMapper, Database::Entity::S3::LambdaNotification, LambdaConfiguration> {
+
+    public:
+        static LambdaConfiguration toDto(const Database::Entity::S3::LambdaNotification &e) {
+            LambdaConfiguration d;
+            d.region = e.region;
+            d.id = e.id;
+            d.lambdaArn = e.lambdaArn;
+            d.filterRules = FilterRuleMapper::toDtoList(e.filterRules);
+            for (const auto &event: e.events) {
+                d.events.emplace_back(EventTypeFromString(event));
+            }
+            return d;
+        }
+
+        static Database::Entity::S3::LambdaNotification toEntity(const LambdaConfiguration &d) {
+            Database::Entity::S3::LambdaNotification e;
+            e.region = d.region;
+            e.id = d.id;
+            e.lambdaArn = d.lambdaArn;
+            e.filterRules = FilterRuleMapper::toEntityList(d.filterRules);
+            for (const auto &event: d.events) {
+                e.events.emplace_back(EventTypeToString(event));
+            }
+            return e;
+        }
+    };
+
+    class LifecycleTransitionMapper : public StaticMapper<LifecycleTransitionMapper, Database::Entity::S3::LifecycleTransition, LifecycleTransition> {
+    public:
+        static LifecycleTransition toDto(const Database::Entity::S3::LifecycleTransition &e) {
+            LifecycleTransition d;
+            d.region = e.region;
+            d.date = e.date;
+            d.days = e.days;
+            d.storageClass = StorageClassFromString(StorageClassToString(e.storageClass));
+            return d;
+        }
+
+        static Database::Entity::S3::LifecycleTransition toEntity(const LifecycleTransition &d) {
+            Database::Entity::S3::LifecycleTransition e;
+            e.region = d.region;
+            e.days = d.days;
+            e.date = d.date;
+            e.storageClass = Database::Entity::S3::StorageClassFromString(StorageClassToString(d.storageClass));
+            return e;
+        }
+    };
+
+    class LifecycleMapper : public StaticMapper<LifecycleMapper, Database::Entity::S3::Bucket, LifecycleRule> {
+    public:
+        static LifecycleRule toDto(const Database::Entity::S3::LifecycleConfiguration &e) {
+            LifecycleRule d;
+            d.region = e.region;
+            d.prefix = e.prefix;
+            d.transitions = LifecycleTransitionMapper::toDtoList(e.transitions);
+            d.status = LifeCycleStatusFromString(Database::Entity::S3::LifeCycleStatusToString(e.status));
+            return d;
+        }
+
+        static Database::Entity::S3::LifecycleConfiguration toEntity(const LifecycleRule &d) {
+            Database::Entity::S3::LifecycleConfiguration e;
+            e.region = d.region;
+            e.prefix = d.prefix;
+            e.status = Database::Entity::S3::LifeCycleStatusFromString(LifeCycleStatusToString(d.status));
+            e.transitions = LifecycleTransitionMapper::toEntityList(d.transitions);
+            return e;
+        }
+    };
+
+    class BucketCounterMapper : public StaticMapper<BucketCounterMapper, Database::Entity::S3::Bucket, BucketCounter> {
+
+    public:
+        static BucketCounter toDto(const Database::Entity::S3::Bucket &e) {
+            BucketCounter d;
+            d.region = e.region;
+            d.bucketArn = e.arn;
+            d.bucketName = e.name;
+            d.keys = e.keys;
+            d.size = e.size;
+            d.owner = e.owner;
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+    };
+
+    class BucketCreateRequestMapper : public StaticMapper<BucketCreateRequestMapper, Database::Entity::S3::Bucket, CreateBucketRequest> {
+
+    public:
+        static Database::Entity::S3::Bucket toEntity(const CreateBucketRequest &r) {
+            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            Database::Entity::S3::Bucket b;
+            b.region = r.region;
+            b.owner = r.owner;
+            b.name = r.name;
+            b.arn = Core::AwsUtils::CreateS3BucketArn(r.region, accountId, r.name);
+            return b;
+        }
+    };
+
+    class BucketCreateResponseMapper : public StaticMapper<BucketCreateResponseMapper, Database::Entity::S3::Bucket, CreateBucketResponse> {
+
+    public:
+        static CreateBucketResponse toDto(const Database::Entity::S3::Bucket &b) {
+            CreateBucketResponse r;
+            r.region = b.region;
+            r.user = b.owner;
+            r.arn = b.arn;
+            return r;
+        }
+    };
+
+    class BucketGetResponseMapper : public StaticMapper<BucketGetResponseMapper, Database::Entity::S3::Bucket, GetBucketResponse> {
+
+    public:
+        static GetBucketResponse toDto(const Database::Entity::S3::Bucket &b) {
+            GetBucketResponse r;
+            r.region = b.region;
+            r.user = b.owner;
+            r.owner = b.owner;
+            r.arn = b.arn;
+            r.bucket = b.name;
+            r.size = b.size;
+            r.keys = b.keys;
+            r.defaultMetadata = b.defaultMetadata;
+            r.created = b.created;
+            r.modified = b.modified;
+            r.versionStatus = BucketVersionStatusToString(b.versionStatus);
+            r.queueConfigurations = QueueConfigurationMapper::toDtoList(b.queueNotifications);
+            r.topicConfigurations = TopicConfigurationMapper::toDtoList(b.topicNotifications);
+            r.lambdaConfigurations = LambdaConfigurationMapper::toDtoList(b.lambdaNotifications);
+            return r;
+        }
+    };
+
+    class GetMetadataResponseMapper : public StaticMapper<GetMetadataResponseMapper, Database::Entity::S3::Object, GetMetadataResponse> {
+
+    public:
+        static GetMetadataResponse toDto(const Database::Entity::S3::Object &e) {
+            GetMetadataResponse d;
+            d.region = e.region;
+            d.bucket = e.bucket;
+            d.key = e.key;
+            d.md5Sum = e.md5sum;
+            d.contentType = e.contentType;
+            d.size = e.size;
+            d.metadata = e.metadata;
+            d.storageClass = Database::Entity::S3::StorageClassToString(e.storageClass);
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+    };
+
+    class ListVersionsResponseMapper : public StaticMapper<ListVersionsResponseMapper, std::vector<Database::Entity::S3::Object>, ListObjectVersionsResponse> {
+
+    public:
+        static ListObjectVersionsResponse toDto(const std::vector<Database::Entity::S3::Object> &e) {
+            ListObjectVersionsResponse d;
+            for (const auto &object: e) {
+                ObjectVersion version;
+                version.key = object.key;
+                version.eTag = object.md5sum;
+                version.versionId = object.versionId;
+                version.storageClass = "STANDARD";
+                version.isLatest = false;
+                version.size = object.size;
+                version.lastModified = object.modified;
+                version.owner.id = object.owner;
+                d.versions.emplace_back(version);
+            }
+            return d;
+        }
+    };
+
+    class BucketMapper : public StaticMapper<BucketMapper, Database::Entity::S3::Bucket, Bucket> {
+
+    public:
+        static Bucket toDto(const Database::Entity::S3::Bucket &e) {
+            Bucket d;
+            d.region = e.region;
+            d.arn = e.arn;
+            d.bucketName = e.name;
+            d.queueConfigurations = QueueConfigurationMapper::toDtoList(e.queueNotifications);
+            d.topicConfigurations = TopicConfigurationMapper::toDtoList(e.topicNotifications);
+            d.lambdaConfigurations = LambdaConfigurationMapper::toDtoList(e.lambdaNotifications);
+            d.defaultMetadata = e.defaultMetadata;
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+
+        static Database::Entity::S3::Bucket toEntity(const Bucket &d) {
+            Database::Entity::S3::Bucket e;
+            e.region = d.region;
+            e.name = d.bucketName;
+            e.arn = d.arn;
+            e.owner = d.owner;
+            e.arn = d.arn;
+            e.size = d.size;
+            e.keys = d.keys;
+            e.queueNotifications = QueueConfigurationMapper::toEntityList(d.queueConfigurations);
+            e.topicNotifications = TopicConfigurationMapper::toEntityList(d.topicConfigurations);
+            e.lambdaNotifications = LambdaConfigurationMapper::toEntityList(d.lambdaConfigurations);
+            e.defaultMetadata = d.defaultMetadata;
+            e.created = d.created;
+            e.modified = d.modified;
+            return e;
+        }
+    };
+
+    class ObjectMapper : public StaticMapper<ObjectMapper, Database::Entity::S3::Object, Object> {
+
+    public:
+        static Object toDto(const Database::Entity::S3::Object &e) {
+            Object d;
+            d.region = e.region;
+            d.key = e.key;
+            d.size = e.size;
+            d.contentType = e.contentType;
+            d.etag = e.md5sum;
+            d.versionId = e.versionId;
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+
+        static Database::Entity::S3::Object toEntity(const Object &d) {
+            Database::Entity::S3::Object e;
+            e.region = d.region;
+            e.key = d.key;
+            e.size = d.size;
+            e.contentType = d.contentType;
+            e.md5sum = d.etag;
+            e.versionId = d.versionId;
+            e.created = d.created;
+            e.modified = d.modified;
+            return e;
+        }
+    };
+    
+} // namespace AwsMock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_MAPPER_H
