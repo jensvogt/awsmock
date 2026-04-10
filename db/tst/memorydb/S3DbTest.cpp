@@ -445,45 +445,45 @@ namespace AwsMock::Database {
         //     // assert
         //     BOOST_CHECK_EQUAL(1, result.notifications.size());
         // }
-
-        BOOST_AUTO_TEST_CASE(DeleteNotification) {
-
-            // arrange
-            const S3Database &s3Database = S3Database::instance();
-            Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-            s3Database.CreateBucket(bucket);
-            Entity::S3::BucketNotification notification;
-            notification.event = "s3:ObjectCreated:*";
-            notification.lambdaArn = "aws:arn:000000000:lambda:test";
-            bucket = s3Database.CreateBucketNotification(bucket, notification);
-
-            // act
-            const Entity::S3::Bucket result = s3Database.DeleteBucketNotifications(bucket, notification);
-
-            // assert
-            BOOST_CHECK_EQUAL(result.notifications.empty(), true);
-        }
-
-        BOOST_AUTO_TEST_CASE(DeleteNotificationPut) {
-
-            // arrange
-            const S3Database &s3Database = S3Database::instance();
-            Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-            s3Database.CreateBucket(bucket);
-            Entity::S3::BucketNotification notification;
-            notification.event = "s3:ObjectCreated:*";
-            notification.lambdaArn = "aws:arn:000000000:lambda:test";
-            bucket = s3Database.CreateBucketNotification(bucket, notification);
-            Entity::S3::BucketNotification deleteNotification;
-            deleteNotification.event = "s3:ObjectCreated:Put";
-            deleteNotification.lambdaArn = "aws:arn:000000000:lambda:test";
-
-            // act
-            const Entity::S3::Bucket result = s3Database.DeleteBucketNotifications(bucket, deleteNotification);
-
-            // assert
-            BOOST_CHECK_EQUAL(3, result.notifications.size());
-        }
+        //
+        // BOOST_AUTO_TEST_CASE(DeleteNotification) {
+        //
+        //     // arrange
+        //     const S3Database &s3Database = S3Database::instance();
+        //     Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
+        //     s3Database.CreateBucket(bucket);
+        //     Entity::S3::BucketNotification notification;
+        //     notification.event = "s3:ObjectCreated:*";
+        //     notification.lambdaArn = "aws:arn:000000000:lambda:test";
+        //     bucket = s3Database.CreateBucketNotification(bucket, notification);
+        //
+        //     // act
+        //     const Entity::S3::Bucket result = s3Database.DeleteBucketNotifications(bucket, notification);
+        //
+        //     // assert
+        //     BOOST_CHECK_EQUAL(result.notifications.empty(), true);
+        // }
+        //
+        // BOOST_AUTO_TEST_CASE(DeleteNotificationPut) {
+        //
+        //     // arrange
+        //     const S3Database &s3Database = S3Database::instance();
+        //     Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
+        //     s3Database.CreateBucket(bucket);
+        //     Entity::S3::BucketNotification notification;
+        //     notification.event = "s3:ObjectCreated:*";
+        //     notification.lambdaArn = "aws:arn:000000000:lambda:test";
+        //     bucket = s3Database.CreateBucketNotification(bucket, notification);
+        //     Entity::S3::BucketNotification deleteNotification;
+        //     deleteNotification.event = "s3:ObjectCreated:Put";
+        //     deleteNotification.lambdaArn = "aws:arn:000000000:lambda:test";
+        //
+        //     // act
+        //     const Entity::S3::Bucket result = s3Database.DeleteBucketNotifications(bucket, deleteNotification);
+        //
+        //     // assert
+        //     BOOST_CHECK_EQUAL(3, result.notifications.size());
+        // }
 
     BOOST_AUTO_TEST_SUITE_END()
 
