@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.35](https://github.com/jensvogt/awsmock/compare/v1.16.34...v1.16.35) (2026-04-10)
+
+
+### Bug Fixes
+
+* fix windows github action ([bd6f5b0](https://github.com/jensvogt/awsmock/commit/bd6f5b0501751046a7e6f15c5d62eaf0ca465f74))
+* fix windows github action ([bf0c32c](https://github.com/jensvogt/awsmock/commit/bf0c32c67d0ac849a7572c3e3eb028ca09c3fccb))
+
 ## [1.16.34](https://github.com/jensvogt/awsmock/compare/v1.16.33...v1.16.34) (2026-04-10)
 
 
