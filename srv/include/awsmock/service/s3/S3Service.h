@@ -16,6 +16,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/BsonConverter.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -140,10 +141,10 @@ namespace AwsMock::Service {
         /**
          * @brief Creates a new bucket
          *
-         * @param s3Request S3 create request
+         * @param request S3 create request
          * @return CreateBucketResponse
          */
-        [[nodiscard]] Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) const;
+        [[nodiscard]] Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &request) const;
 
         /**
          * @brief Purge a bucket

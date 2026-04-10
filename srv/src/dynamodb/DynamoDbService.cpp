@@ -118,7 +118,7 @@ namespace AwsMock::Service {
 
             Dto::DynamoDb::ListTableCountersResponse tableResponse;
             tableResponse.total = _dynamoDbDatabase.CountTables(request.region, request.prefix);
-            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns)); const auto &table: tables) {
+            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)); const auto &table: tables) {
                 Dto::DynamoDb::TableCounter tableCounter;
                 tableCounter.region = table.region;
                 tableCounter.tableName = table.name;
@@ -203,7 +203,7 @@ namespace AwsMock::Service {
         try {
             Dto::DynamoDb::ListItemCountersResponse itemResponse;
             itemResponse.total = _dynamoDbDatabase.CountItems(request.region, request.tableName, request.prefix);
-            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns)));
+            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)));
             return itemResponse;
 
         } catch (Core::JsonException &exc) {

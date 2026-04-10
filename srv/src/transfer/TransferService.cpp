@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/common/mapper/Mapper.h"
+#include "awsmock/dto/common/mapper/SortColumnMapper.h"
 #include "awsmock/dto/dynamodb/mapper/Mapper.h"
 #include "awsmock/dto/transfer/model/Tag.h"
 
@@ -164,7 +164,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server_counters");
 
         try {
-            const std::vector<Database::SortColumn> sortColumns = Dto::Common::Mapper::map(request.sortColumns);
+            const std::vector<Database::SortColumn> sortColumns = Dto::Common::SortColumnMapper::map(request.sortColumns);
             const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region, request.prefix, request.pageSize, request.pageIndex, sortColumns);
 
             auto response = Dto::Transfer::ListServerCountersResponse();
@@ -245,7 +245,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_user_counters");
 
         try {
-            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
 
             auto response = Dto::Transfer::ListUserCountersResponse();
             response.total = _transferDatabase.CountUsers(request.region, request.serverId);

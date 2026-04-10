@@ -22,7 +22,7 @@
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsResponse.h>

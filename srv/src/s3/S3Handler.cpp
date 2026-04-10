@@ -11,7 +11,9 @@ namespace AwsMock::Service {
 
         try {
             switch (clientCommand.command) {
+
                 case Dto::Common::S3CommandType::LIST_BUCKETS: {
+
                     Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
                     log_info << "List buckets, count: " << s3Response.total;
                     log_trace << s3Response;

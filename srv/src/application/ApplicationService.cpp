@@ -481,7 +481,7 @@ namespace AwsMock::Service {
 
             Dto::Apps::ListApplicationCountersResponse response;
 
-            const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             response.total = _database.CountApplications(request.region, request.prefix);
             log_trace << "Got applications, region: " << request.region;
 

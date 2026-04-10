@@ -103,7 +103,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * Bucket notifications
          */
-        std::vector<BucketNotification> notifications{};
+        //std::vector<BucketNotification> notifications{};
 
         /**
          * Queue notification configurations
@@ -157,7 +157,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @return true if notification with the given event name exists.
          * @deprecated use HasQueueNotification,HasTopicNotification, HasLambdaNotification
          */
-        bool HasNotification(const std::string &eventName);
+        //bool HasNotification(const std::string &eventName);
 
         /**
          * @brief Checks whether a notification with the given ID exists.
@@ -297,7 +297,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          * @return bucket object
          */
-        static Bucket FromDocument(std::optional<view> mResult);
+        static Bucket FromDocument(const std::optional<view> &mResult);
     };
 
     typedef std::vector<Bucket> BucketList;

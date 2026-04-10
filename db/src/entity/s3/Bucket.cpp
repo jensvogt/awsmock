@@ -6,11 +6,11 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    bool Bucket::HasNotification(const std::string &eventName) {
-        return std::ranges::find_if(notifications, [eventName](const BucketNotification &eventNotification) {
-            return eventNotification.event == eventName;
-        }) != notifications.end();
-    }
+    // bool Bucket::HasNotification(const std::string &eventName) {
+    //     return std::ranges::find_if(notifications, [eventName](const BucketNotification &eventNotification) {
+    //         return eventNotification.event == eventName;
+    //     }) != notifications.end();
+    // }
 
     bool Bucket::HasQueueNotificationId(const std::string &id) {
         return std::ranges::find_if(queueNotifications, [id](const QueueNotification &notification) {
@@ -70,13 +70,13 @@ namespace AwsMock::Database::Entity::S3 {
         return !bucketEncryption.kmsKeyId.empty() && !bucketEncryption.sseAlgorithm.empty();
     }
 
-    BucketNotification Bucket::GetNotification(const std::string &eventName) {
-        const auto it =
-                std::ranges::find_if(notifications, [eventName](const BucketNotification &eventNotification) {
-                    return eventNotification.event == eventName;
-                });
-        return *it;
-    }
+    // BucketNotification Bucket::GetNotification(const std::string &eventName) {
+    //     const auto it =
+    //             std::ranges::find_if(notifications, [eventName](const BucketNotification &eventNotification) {
+    //                 return eventNotification.event == eventName;
+    //             });
+    //     return *it;
+    // }
 
     QueueNotification Bucket::GetQueueNotification(const std::string &eventName) {
         return *std::ranges::find_if(queueNotifications, [eventName](const QueueNotification &eventNotification) {
@@ -113,10 +113,10 @@ namespace AwsMock::Database::Entity::S3 {
     view_or_value<view, value> Bucket::ToDocument() const {
 
         // Bucket notifications are deprecated, should be removed at a certain point
-        auto notificationsDoc = array{};
-        for (const auto &notification: notifications) {
-            notificationsDoc.append(notification.ToDocument());
-        }
+        // auto notificationsDoc = array{};
+        // for (const auto &notification: notifications) {
+        //     notificationsDoc.append(notification.ToDocument());
+        // }
 
         // Queue notifications
         auto queueNotificationsDoc = array{};
@@ -155,7 +155,7 @@ namespace AwsMock::Database::Entity::S3 {
             kvp("arn", arn),
             kvp("size", bsoncxx::types::b_int64(size)),
             kvp("keys", bsoncxx::types::b_int64(keys)),
-            kvp("notifications", notificationsDoc),
+            //            kvp("notifications", notificationsDoc),
             kvp("queueNotifications", queueNotificationsDoc),
             kvp("topicNotifications", topicNotificationsDoc),
             kvp("lambdaConfigurations", lambdaNotificationsDoc),
@@ -169,7 +169,7 @@ namespace AwsMock::Database::Entity::S3 {
         return bucketDoc;
     }
 
-    Bucket Bucket::FromDocument(std::optional<view> mResult) {
+    Bucket Bucket::FromDocument(const std::optional<view> &mResult) {
 
         Bucket b;
         b.oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
@@ -224,7 +224,7 @@ namespace AwsMock::Database::Entity::S3 {
         if (mResult.value().find("defaultMetadata") != mResult.value().end()) {
             b.defaultMetadata.clear();
             for (const view metadataView = mResult.value()["defaultMetadata"].get_document().value; const bsoncxx::document::element &metadataElement: metadataView) {
-                b.defaultMetadata.emplace(bsoncxx::string::to_string(metadataElement.key()), bsoncxx::string::to_string(metadataView[key].get_string().value));
+                b.defaultMetadata.emplace(bsoncxx::string::to_string(metadataElement.key()), bsoncxx::string::to_string(metadataView[bsoncxx::string::to_string(metadataElement.key())].get_string().value));
             }
         }
         return b;
