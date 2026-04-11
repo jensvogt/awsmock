@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.37](https://github.com/jensvogt/awsmock/compare/v1.16.36...v1.16.37) (2026-04-11)
+
+
+### Bug Fixes
+
+* SQS cleanup ([a195114](https://github.com/jensvogt/awsmock/commit/a195114b855fc695821f5cd1671d4325a7cfa783))
+
 ## [1.16.36](https://github.com/jensvogt/awsmock/compare/v1.16.35...v1.16.36) (2026-04-10)
 
 
