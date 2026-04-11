@@ -85,12 +85,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Table size
          */
-        long tableSize{};
+        long size{};
 
         /**
          * Item count
          */
-        long itemCount{};
+        long items{};
 
         /**
          * Key schema
@@ -132,8 +132,7 @@ namespace AwsMock::Dto::DynamoDb {
          */
         bool deletionProtectionEnabled{};
 
-      private:
-
+    private:
         friend DescribeTableResponse tag_invoke(boost::json::value_to_tag<DescribeTableResponse>, boost::json::value const &v) {
             DescribeTableResponse r = {};
             if (Core::Json::AttributeExists(v, "Table")) {
@@ -141,20 +140,20 @@ namespace AwsMock::Dto::DynamoDb {
                 r.region = Core::Json::GetStringValue(tableObject, "Region");
                 r.tableName = Core::Json::GetStringValue(tableObject, "TableName");
                 r.tableArn = Core::Json::GetStringValue(tableObject, "TableArn");
-                r.tableSize = Core::Json::GetLongValue(tableObject, "TableSizeBytes");
-                r.itemCount = Core::Json::GetLongValue(tableObject, "ItemCount");
+                r.size = Core::Json::GetLongValue(tableObject, "TableSizeBytes");
+                r.items = Core::Json::GetLongValue(tableObject, "ItemCount");
                 r.provisionedThroughput = boost::json::value_to<ProvisionedThroughput>(tableObject, "ProvisionedThroughput");
                 r.tableStatus = TableStatusTypeFromString(Core::Json::GetStringValue(tableObject, "TableStatus"));
                 r.createdDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(tableObject, "CreatedDateTime"));
                 r.deletionProtectionEnabled = Core::Json::GetBoolValue(tableObject, "DeletionProtectionEnabled");
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
-                    r.tags = boost::json::value_to<std::vector<Tag>>(tableObject.at("Tags"));
+                    r.tags = boost::json::value_to<std::vector<Tag> >(tableObject.at("Tags"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "AttributeDefinitions")) {
-                    r.attributeDefinitions = boost::json::value_to<std::vector<AttributeDefinition>>(tableObject.at("AttributeDefinitions"));
+                    r.attributeDefinitions = boost::json::value_to<std::vector<AttributeDefinition> >(tableObject.at("AttributeDefinitions"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "KeySchema")) {
-                    r.keySchema = boost::json::value_to<std::vector<KeySchema>>(tableObject.at("KeySchema"));
+                    r.keySchema = boost::json::value_to<std::vector<KeySchema> >(tableObject.at("KeySchema"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "TableClassSummary")) {
                     r.tableClassSummary = boost::json::value_to<TableClassSummary>(v.at("TableClassSummary"));
@@ -166,16 +165,16 @@ namespace AwsMock::Dto::DynamoDb {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeTableResponse const &obj) {
             jv = {};
             boost::json::object tableObject = {
-                    {"Region", obj.region},
-                    {"TableName", obj.tableName},
-                    {"TableArn", obj.tableArn},
-                    {"TableSizeBytes", obj.tableSize},
-                    {"ItemCount", obj.itemCount},
-                    {"ProvisionedThroughput", boost::json::value_from(obj.provisionedThroughput)},
-                    {"TableStatus", TableStatusTypeToString(obj.tableStatus)},
-                    {"CreatedDateTime", Core::DateTimeUtils::UnixTimestamp(obj.createdDateTime)},
-                    {"DeletionProtectionEnabled", obj.deletionProtectionEnabled},
-                    {"TableClassSummary", boost::json::value_from(obj.tableClassSummary)},
+                {"Region", obj.region},
+                {"TableName", obj.tableName},
+                {"TableArn", obj.tableArn},
+                {"TableSizeBytes", obj.size},
+                {"ItemCount", obj.items},
+                {"ProvisionedThroughput", boost::json::value_from(obj.provisionedThroughput)},
+                {"TableStatus", TableStatusTypeToString(obj.tableStatus)},
+                {"CreatedDateTime", Core::DateTimeUtils::UnixTimestamp(obj.createdDateTime)},
+                {"DeletionProtectionEnabled", obj.deletionProtectionEnabled},
+                {"TableClassSummary", boost::json::value_from(obj.tableClassSummary)},
             };
             if (!obj.tags.empty()) {
                 tableObject["Tags"] = boost::json::value_from(obj.tags);
@@ -190,6 +189,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+} // namespace AwsMock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_RESPONSE_H

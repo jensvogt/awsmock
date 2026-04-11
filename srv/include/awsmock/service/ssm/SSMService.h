@@ -15,7 +15,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/ssm/DeleteParameterRequest.h>
 #include <awsmock/dto/ssm/DescribeParametersRequest.h>
 #include <awsmock/dto/ssm/DescribeParametersResponse.h>

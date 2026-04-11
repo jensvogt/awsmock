@@ -2,26 +2,24 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
-#define AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
+#ifndef AWSMOCK_DTO_S3_GET_BUCKET_METADATA_RESPONSE_H
+#define AWSMOCK_DTO_S3_GET_BUCKET_METADATA_RESPONSE_H
 
 // C++ standard includes
 #include <map>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/entity/s3/StorageClass.h"
-
-
+#include <awsmock/entity/s3/StorageClass.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    //using std::chrono::system_clock;
+    using std::chrono::system_clock;
 
-    struct GetMetadataResponse final : Common::BaseCounter<GetMetadataResponse> {
+    struct GetBucketMetadataResponse final : Common::BaseCounter<GetBucketMetadataResponse> {
 
         /**
          * Bucket
@@ -51,7 +49,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Size
          */
-        long size;
+        long size{};
 
         /**
          * Metadata
@@ -68,8 +66,8 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-        friend GetMetadataResponse tag_invoke(boost::json::value_to_tag<GetMetadataResponse>, boost::json::value const &v) {
-            GetMetadataResponse r;
+        friend GetBucketMetadataResponse tag_invoke(boost::json::value_to_tag<GetBucketMetadataResponse>, boost::json::value const &v) {
+            GetBucketMetadataResponse r;
             r.bucket = Core::Json::GetStringValue(v, "bucket");
             r.key = Core::Json::GetStringValue(v, "key");
             r.md5Sum = Core::Json::GetStringValue(v, "md5Sum");
@@ -79,29 +77,29 @@ namespace AwsMock::Dto::S3 {
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "metadata")) {
-                r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+                r.metadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("metadata"));
             }
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetMetadataResponse const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetBucketMetadataResponse const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"bucket", obj.bucket},
-                    {"key", obj.bucket},
-                    {"md5Sum", obj.md5Sum},
-                    {"contentType", obj.contentType},
-                    {"storageClass", obj.storageClass},
-                    {"size", obj.size},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-                    {"metadata", boost::json::value_from(obj.metadata)},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
+                {"bucket", obj.bucket},
+                {"key", obj.bucket},
+                {"md5Sum", obj.md5Sum},
+                {"contentType", obj.contentType},
+                {"storageClass", obj.storageClass},
+                {"size", obj.size},
+                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                {"metadata", boost::json::value_from(obj.metadata)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::S3
+} // namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
+#endif// AWSMOCK_DTO_S3_GET_BUCKET_METADATA_RESPONSE_H

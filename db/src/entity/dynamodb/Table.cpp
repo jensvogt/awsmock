@@ -12,14 +12,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             document tableDoc;
             tableDoc.append(
-                    kvp("region", region),
-                    kvp("name", name),
-                    kvp("arn", arn),
-                    kvp("status", status),
-                    kvp("size", bsoncxx::types::b_int64(size)),
-                    kvp("itemCount", bsoncxx::types::b_int64(itemCount)),
-                    kvp("created", bsoncxx::types::b_date(created)),
-                    kvp("modified", bsoncxx::types::b_date(modified)));
+                kvp("region", region),
+                kvp("name", name),
+                kvp("arn", arn),
+                kvp("status", status),
+                kvp("size", bsoncxx::types::b_int64(size)),
+                kvp("items", bsoncxx::types::b_int64(items)),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
             // Tags
             if (!tags.empty()) {
@@ -70,7 +70,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
-        itemCount = Core::Bson::BsonUtils::GetLongValue(mResult, "itemCount");
+        items = Core::Bson::BsonUtils::GetLongValue(mResult, "items");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
@@ -116,4 +116,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+} // namespace AwsMock::Database::Entity::DynamoDb

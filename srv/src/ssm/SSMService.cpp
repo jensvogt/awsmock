@@ -246,7 +246,7 @@ namespace AwsMock::Service {
 
             // Get from the database
             response.total = _ssmDatabase.CountParameters(request.region, request.prefix);
-            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             response.parameterCounters = Dto::SSM::Mapper::map(parameterEntities);
             for (auto &p: response.parameterCounters) {
                 if (p.type == Dto::SSM::ParameterType::secureString) {
@@ -306,7 +306,7 @@ namespace AwsMock::Service {
             _ssmDatabase.DeleteParameter(parameterEntity);
 
             // Get the list from the database
-            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             log_trace << "SSM parameters found: " << parameterEntities.size();
 
             Dto::SSM::ListParameterCountersRequest listRequest;

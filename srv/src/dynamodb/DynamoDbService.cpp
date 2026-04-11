@@ -118,12 +118,12 @@ namespace AwsMock::Service {
 
             Dto::DynamoDb::ListTableCountersResponse tableResponse;
             tableResponse.total = _dynamoDbDatabase.CountTables(request.region, request.prefix);
-            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns)); const auto &table: tables) {
+            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)); const auto &table: tables) {
                 Dto::DynamoDb::TableCounter tableCounter;
                 tableCounter.region = table.region;
                 tableCounter.tableName = table.name;
                 tableCounter.tableArn = table.arn;
-                tableCounter.items = table.itemCount;
+                tableCounter.items = table.items;
                 tableCounter.size = table.size;
                 tableCounter.created = table.created;
                 tableCounter.modified = table.modified;
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
             const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
             tableResponse.tableCounters.region = table.region;
             tableResponse.tableCounters.tableName = table.name;
-            tableResponse.tableCounters.items = table.itemCount;
+            tableResponse.tableCounters.items = table.items;
             tableResponse.tableCounters.size = table.size;
             tableResponse.tableCounters.status = table.status;
             tableResponse.tableCounters.created = table.created;
@@ -203,7 +203,7 @@ namespace AwsMock::Service {
         try {
             Dto::DynamoDb::ListItemCountersResponse itemResponse;
             itemResponse.total = _dynamoDbDatabase.CountItems(request.region, request.tableName, request.prefix);
-            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns)));
+            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)));
             return itemResponse;
 
         } catch (Core::JsonException &exc) {
@@ -221,7 +221,7 @@ namespace AwsMock::Service {
             Dto::DynamoDb::DescribeTableResponse response;
             response.region = request.region;
             response.tableName = request.tableName;
-            response.itemCount = table.itemCount;
+            response.items = table.items;
             response.tableArn = table.arn;
             response.tableStatus = Dto::DynamoDb::TableStatusTypeFromString(table.status);
 
@@ -423,7 +423,7 @@ namespace AwsMock::Service {
 
             // Update table
             table.size += item.size;
-            table.itemCount++;
+            table.items++;
             table = _dynamoDbDatabase.UpdateTable(table);
             log_debug << "Database updated, region: " << table.region << " tableName: " << table.name;
 
@@ -637,4 +637,4 @@ namespace AwsMock::Service {
         return attr;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

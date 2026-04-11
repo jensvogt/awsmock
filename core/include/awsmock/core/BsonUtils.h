@@ -72,6 +72,15 @@ namespace AwsMock::Core::Bson {
     }
 
     template<class Element>
+    void FromBsonArray1(const view &value, const std::string &name, std::vector<Element> *a) {
+        if (auto it = value.find(name); it != value.end() && it->type() == bsoncxx::type::k_array) {
+            for (const auto arrayView = it->get_array().value; const auto &arrayElement: arrayView) {
+                a->emplace_back(Element::FromDocument(arrayElement.get_document().view()));
+            }
+        }
+    }
+
+    template<class Element>
     void FromBsonArray(const value &value, const std::string &name, std::vector<Element> *a) {
         if (value.find(name) != value.end()) {
             for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
@@ -110,7 +119,7 @@ namespace AwsMock::Core::Bson {
         if (FindBsonObject(viewDocument.value(), name)) {
             std::map<std::string, std::string> valueMap;
             for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element
-                                                                                                &tagElement: tagsView) {
+                 &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 valueMap.emplace(key, value);
@@ -126,6 +135,7 @@ namespace AwsMock::Core::Bson {
                 document.append(kvp(name, bsoncxx::oid(value)));
             }
         }
+
         static void SetStringValue(document &document, const std::string &name, const std::string &value) {
             if (!value.empty()) {
                 document.append(kvp(name, value));
@@ -376,7 +386,8 @@ namespace AwsMock::Core::Bson {
                     return bsoncxx::types::b_date(element.get_date());
                 case bsoncxx::type::k_timestamp:
                     return std::chrono::time_point<system_clock, std::chrono::milliseconds>{
-                            std::chrono::milliseconds{element.get_timestamp().timestamp}};
+                        std::chrono::milliseconds{element.get_timestamp().timestamp}
+                    };
                 default:
                     break;
             }
@@ -450,6 +461,6 @@ namespace AwsMock::Core::Bson {
         }
     };
 
-}// namespace AwsMock::Core::Bson
+} // namespace AwsMock::Core::Bson
 
 #endif// AWS_MOCK_CORE_BSON_UTILS_H

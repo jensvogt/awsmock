@@ -13,7 +13,7 @@ namespace AwsMock::Database::Entity::S3 {
         return std::ranges::any_of(filterRules,
                                    [key](const FilterRule &rule) {
                                        return (rule.name == "prefix" && key.starts_with(rule.value)) || (rule.name ==
-                                                                                                                 "suffix" &&
+                                                                                                         "suffix" &&
                                                                                                          key.ends_with(rule.value));
                                    });
     }
@@ -39,25 +39,24 @@ namespace AwsMock::Database::Entity::S3 {
         return topicNotificationDoc.extract();
     }
 
-    TopicNotification TopicNotification::FromDocument(std::optional<view> mResult) {
+    TopicNotification TopicNotification::FromDocument(const std::optional<view> &mResult) {
+        TopicNotification t;
         try {
-            id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
-            topicArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["topicArn"]);
+            t.id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
+            t.topicArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["topicArn"]);
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
-                filterRules.clear();
+                t.filterRules.clear();
                 for (const bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value}; const bsoncxx::array::element &filterRuleElement: filterRulesView) {
-                    FilterRule filterRule;
-                    filterRule.FromDocument(filterRuleElement.get_document());
-                    filterRules.emplace_back(filterRule);
+                    t.filterRules.emplace_back(FilterRule::FromDocument(filterRuleElement.get_document()));
                 }
             }
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
         }
-        return *this;
+        return t;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3

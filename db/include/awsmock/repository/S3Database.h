@@ -431,9 +431,10 @@ namespace AwsMock::Database {
          * @brief Delete an object.
          *
          * @param object object entity
+         * @return number of objects deleted
          * @throws DatabaseException
          */
-        void DeleteObject(const Entity::S3::Object &object) const;
+        long DeleteObject(const Entity::S3::Object &object) const;
 
         /**
          * @brief Updates an existing object in the S3 object table

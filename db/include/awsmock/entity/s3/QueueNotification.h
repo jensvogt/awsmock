@@ -66,16 +66,17 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
+         * @return queue notification entity
          */
-        QueueNotification FromDocument(const std::optional<view> &mResult);
+        static QueueNotification FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_QUEUE_NOTIFICATION_H

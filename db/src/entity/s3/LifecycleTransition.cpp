@@ -20,11 +20,12 @@ namespace AwsMock::Database::Entity::S3 {
         return transitionDoc.extract();
     }
 
-    void LifecycleTransition::FromDocument(const view &mResult) {
-
-        days = Core::Bson::BsonUtils::GetIntValue(mResult["days"]);
-        date = Core::Bson::BsonUtils::GetDateValue(mResult["date"]);
-        storageClass = StorageClassFromString(Core::Bson::BsonUtils::GetStringValue(mResult["storageClass"]));
+    LifecycleTransition LifecycleTransition::FromDocument(const view &mResult) {
+        LifecycleTransition t;
+        t.days = Core::Bson::BsonUtils::GetIntValue(mResult["days"]);
+        t.date = Core::Bson::BsonUtils::GetDateValue(mResult["date"]);
+        t.storageClass = StorageClassFromString(Core::Bson::BsonUtils::GetStringValue(mResult["storageClass"]));
+        return t;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3

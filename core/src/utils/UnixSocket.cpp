@@ -2,14 +2,15 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#include "awsmock/core/FileUtils.h"
-
-
-#include <awsmock/core/UnixSocket.h>
+// Boost includes
 #include <boost/asio/streambuf.hpp>
 #include <boost/exception/detail/exception_ptr.hpp>
 #include <boost/json/detail/buffer.hpp>
 #include <boost/json/detail/stream.hpp>
+
+// Awsmock includes
+#include <awsmock/core/FileUtils.h>
+#include <awsmock/core/UnixSocket.h>
 
 namespace AwsMock::Core {
 
@@ -165,4 +166,4 @@ namespace AwsMock::Core {
         return socket;
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

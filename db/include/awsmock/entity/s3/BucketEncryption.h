@@ -36,20 +36,21 @@ namespace AwsMock::Database::Entity::S3 {
         std::string kmsKeyId;
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
+         * @return bucket encryption entity
          */
-        void FromDocument(const std::optional<view> &mResult);
+        static BucketEncryption FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_BUCKET_ENCRYPTION_H

@@ -75,6 +75,9 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
+        core/include/awsmock/core/BsonConverter.h
+        core/include/awsmock/core/BsonCursorRange.h
+        dto/include/awsmock/dto/common/mapper/Mapper.h
 )
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
@@ -102,10 +105,10 @@ set(DTO_SOURCES dto/src/common/UserAgent.cpp dto/src/common/S3ClientCommand.cpp 
         dto/src/common/MonitoringClientCommand.cpp dto/src/common/CognitoClientCommand.cpp
         dto/src/common/ApiGatewayClientCommand.cpp dto/src/common/ApplicationClientCommand.cpp
         dto/src/common/ContainerClientCommand.cpp dto/src/sqs/mapper/Mapper.cpp dto/src/sns/mapper/Mapper.cpp
-        dto/src/s3/mapper/Mapper.cpp dto/src/lambda/mapper/Mapper.cpp dto/src/cognito/mapper/Mapper.cpp
-        dto/src/transfer/mapper/Mapper.cpp dto/src/dynamodb/mapper/Mapper.cpp dto/src/secretsmanager/mapper/Mapper.cpp
-        dto/src/ssm/mapper/Mapper.cpp dto/src/apps/mapper/Mapper.cpp dto/src/apigateway/mapper/Mapper.cpp
-        dto/src/module/model/Module.cpp dto/src/module/mapper/Mapper.cpp dto/src/module/ExportInfrastructureResponse.cpp
+        dto/src/lambda/mapper/Mapper.cpp dto/src/cognito/mapper/Mapper.cpp dto/src/transfer/mapper/Mapper.cpp
+        dto/src/dynamodb/mapper/Mapper.cpp dto/src/secretsmanager/mapper/Mapper.cpp dto/src/ssm/mapper/Mapper.cpp
+        dto/src/apps/mapper/Mapper.cpp dto/src/apigateway/mapper/Mapper.cpp dto/src/module/model/Module.cpp
+        dto/src/module/mapper/Mapper.cpp dto/src/module/ExportInfrastructureResponse.cpp
         dto/src/module/ListModuleNamesResponse.cpp dto/src/module/ImportInfrastructureRequest.cpp
         dto/src/monitoring/mapper/Mapper.cpp)
 

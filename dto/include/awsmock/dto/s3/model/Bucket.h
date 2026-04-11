@@ -88,8 +88,7 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-      private:
-
+    private:
         friend Bucket tag_invoke(boost::json::value_to_tag<Bucket>, boost::json::value const &v) {
             Bucket r;
             r.bucketName = Core::Json::GetStringValue(v, "BucketName");
@@ -101,29 +100,30 @@ namespace AwsMock::Dto::S3 {
             r.created = Core::Json::GetDatetimeValue(v, "Created");
             r.modified = Core::Json::GetDatetimeValue(v, "Modified");
             if (Core::Json::AttributeExists(v, "DefaultMetadata")) {
-                r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("DefaultMetadata"));
+                r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("DefaultMetadata"));
             }
             return r;
         }
+
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Bucket const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"BucketName", obj.bucketName},
-                    {"Owner", obj.owner},
-                    {"Arn", obj.arn},
-                    {"Keys", obj.keys},
-                    {"Size", obj.size},
-                    {"VersionStatus", obj.versionStatus},
-                    {"QueueConfigurations", boost::json::value_from(obj.queueConfigurations)},
-                    {"TopicConfigurations", boost::json::value_from(obj.topicConfigurations)},
-                    {"LambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
-                    {"DefaultMetadata", boost::json::value_from(obj.defaultMetadata)},
-                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                {"Region", obj.region},
+                {"BucketName", obj.bucketName},
+                {"Owner", obj.owner},
+                {"Arn", obj.arn},
+                {"Keys", obj.keys},
+                {"Size", obj.size},
+                {"VersionStatus", obj.versionStatus},
+                {"QueueConfigurations", boost::json::value_from(obj.queueConfigurations)},
+                {"TopicConfigurations", boost::json::value_from(obj.topicConfigurations)},
+                {"LambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
+                {"DefaultMetadata", boost::json::value_from(obj.defaultMetadata)},
+                {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::S3
+} // namespace AwsMock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_MODEL_BUCKET_H

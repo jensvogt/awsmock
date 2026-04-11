@@ -47,7 +47,7 @@ namespace AwsMock::Database::Entity::S3 {
         std::vector<FilterRule> filterRules;
 
         /**
-         * Check filter
+         * @brief Check filter
          *
          * @param key object key
          * @return true in case filter exists and key matches
@@ -55,20 +55,21 @@ namespace AwsMock::Database::Entity::S3 {
         bool CheckFilter(const std::string &key);
 
         /**
-         * Converts the entity to a MongoDB document
+         * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
-         * Converts the MongoDB document to an entity
+         * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
+         * @return topic notification entity
          */
-        TopicNotification FromDocument(std::optional<bsoncxx::document::view> mResult);
+        static TopicNotification FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_TOPIC_NOTIFICATION_H

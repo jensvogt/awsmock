@@ -9,31 +9,19 @@ namespace AwsMock::Service {
         return _database.BucketExists(region, bucket);
     }
 
-    Dto::S3::CreateBucketResponse S3Service::CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) const {
+    Dto::S3::CreateBucketResponse S3Service::CreateBucket(const Dto::S3::CreateBucketRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "create_bucket");
-        log_trace << "Create bucket request, s3Request: " << s3Request.ToString();
-
-        // Get the region and account ID
-        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        log_trace << "Create bucket request, s3Request: " << request.ToString();
 
         // Check existence
-        CheckBucketNonExistence(s3Request.region, s3Request.name);
+        CheckBucketNonExistence(request.region, request.name);
 
         try {
             // Update database
-            Database::Entity::S3::Bucket bucket;
-            bucket.region = s3Request.region;
-            bucket.name = s3Request.name;
-            bucket.owner = s3Request.owner;
-            bucket.arn = Core::AwsUtils::CreateS3BucketArn(s3Request.region, accountId, s3Request.name);
+            Database::Entity::S3::Bucket bucket = Dto::S3::BucketCreateRequestMapper::toEntity(request);
             bucket = _database.CreateBucket(bucket);
-
-            Dto::S3::CreateBucketResponse response;
-            response.region = bucket.region;
-            response.arn = bucket.arn;
-
-            log_debug << "Bucket created, bucket: " << s3Request.name;
-            return response;
+            log_debug << "Bucket created, bucket: " << request.name;
+            return Dto::S3::BucketCreateResponseMapper::toDto(bucket);
 
         } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
@@ -60,6 +48,7 @@ namespace AwsMock::Service {
             const long deleted = _database.PurgeBucket(bucket);
             log_debug << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
             return deleted;
+
         } catch (Core::JsonException &exc) {
             log_error << "S3 purge bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
@@ -89,7 +78,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::GetMetadataResponse S3Service::GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const {
+    Dto::S3::GetObjectMetadataResponse S3Service::GetBucketMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket_metadata");
         log_trace << "Get bucket metadata request, s3Request: " << request.ToString();
 
@@ -98,16 +87,8 @@ namespace AwsMock::Service {
 
         try {
             const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-            Dto::S3::GetMetadataResponse response;
-            response.region = bucket.region;
-            response.bucket = bucket.name;
-            response.created = bucket.created;
-            response.modified = bucket.modified;
+            return Dto::S3::GetBucketMetadataResponseMapper::toDto(bucket);
 
-            log_trace << "S3 get bucket metadata response: " + response.ToString();
-            log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key;
-
-            return response;
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get object metadata failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -125,7 +106,7 @@ namespace AwsMock::Service {
             const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
             log_debug << "Bucket returned, bucket: " << request.bucketName;
 
-            return Dto::S3::Mapper::map(request, bucket);
+            return Dto::S3::BucketGetResponseMapper::toDto(bucket);
 
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get bucket failed, message: " << ex.what();
@@ -149,7 +130,7 @@ namespace AwsMock::Service {
 
             Dto::S3::GetEventSourceResponse response;
             Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotification(request.functionArn);
-            response.lambdaConfiguration = Dto::S3::Mapper::map(bucket.GetLambdaNotification(request.functionArn));
+            response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
             return response;
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get event source failed, message: " << ex.what();
@@ -157,7 +138,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::GetMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const {
+    Dto::S3::GetObjectMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object_metadata");
         log_trace << "Get metadata request, s3Request: " << request.bucket << ", key: " << request.key;
 
@@ -173,22 +154,10 @@ namespace AwsMock::Service {
         try {
             const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-            Dto::S3::GetMetadataResponse response;
-            response.region = request.region;
-            response.bucket = object.bucket;
-            response.key = object.key;
-            response.md5Sum = object.md5sum;
-            response.contentType = object.contentType;
-            response.size = object.size;
-            response.metadata = object.metadata;
-            response.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
-            response.created = object.created;
-            response.modified = object.modified;
-
-            log_trace << "S3 get object metadata response: " + response.ToString();
+            Dto::S3::GetObjectMetadataResponse response = Dto::S3::GetObjectMetadataResponseMapper::toDto(object);
             log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
-
             return response;
+
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get object metadata failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -254,14 +223,14 @@ namespace AwsMock::Service {
         log_trace << "List all buckets request";
 
         try {
-            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+
             Dto::S3::ListAllBucketResponse listAllBucketResponse;
-            for (const auto &b: bucketList) {
-                listAllBucketResponse.bucketList.emplace_back(Dto::S3::Mapper::map(b));
-            }
-            listAllBucketResponse.total = static_cast<long>(bucketList.size());
+            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+            listAllBucketResponse.total = _database.BucketCount();
+            listAllBucketResponse.bucketList = Dto::S3::BucketMapper::toDtoList(bucketList);
             log_debug << "Count all buckets, size: " << bucketList.size();
             return listAllBucketResponse;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 Create Bucket failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -273,26 +242,15 @@ namespace AwsMock::Service {
         log_trace << "List buckets counters request";
 
         try {
-            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
 
             Dto::S3::ListBucketCounterResponse listAllBucketResponse;
+
+            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             listAllBucketResponse.total = _database.BucketCount(request.region, request.prefix);
-
-            for (const auto &bucket: bucketList) {
-                Dto::S3::BucketCounter bucketCounter;
-                bucketCounter.region = bucket.region;
-                bucketCounter.bucketName = bucket.name;
-                bucketCounter.bucketArn = bucket.arn;
-                bucketCounter.keys = bucket.keys;
-                bucketCounter.size = bucket.size;
-                bucketCounter.owner = bucket.owner;
-                bucketCounter.created = bucket.created;
-                bucketCounter.modified = bucket.modified;
-                listAllBucketResponse.bucketCounters.emplace_back(bucketCounter);
-            }
+            listAllBucketResponse.bucketCounters = Dto::S3::BucketCounterMapper::toDtoList(bucketList);
             log_debug << "List bucket counters, size: " << bucketList.size();
-
             return listAllBucketResponse;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 list bucket counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -307,9 +265,8 @@ namespace AwsMock::Service {
             const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
             Dto::S3::ListBucketArnsResponse listBucketArnsResponse;
-            for (const auto &bucket: bucketList) {
-                listBucketArnsResponse.bucketArns.emplace_back(bucket.arn);
-            }
+            std::ranges::transform(bucketList, std::back_inserter(listBucketArnsResponse.bucketArns),
+                                   [&](const Database::Entity::S3::Bucket &b) { return b.arn; });
             log_debug << "List bucket ARNs, size: " << bucketList.size();
             return listBucketArnsResponse;
         } catch (bsoncxx::exception &ex) {
@@ -327,6 +284,7 @@ namespace AwsMock::Service {
 
             // TODO: mapper implementation
             Dto::S3::ListBucketResponse listBucketResponse;
+            //listBucketResponse.contents.bucketCounters = Dto::S3::BucketCounterMapper::toDtoList(objectList);
             listBucketResponse.name = s3Request.name;
             for (auto &it: objectList) {
                 Dto::S3::Owner owner;
@@ -374,7 +332,7 @@ namespace AwsMock::Service {
 
         // Update bucket
         Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-        bucket.lifecycleConfigurations = Dto::S3::Mapper::map(request);
+        //bucket.lifecycleConfigurations = Dto::S3::LifecycleMapper::toEntityList(request.rules);
 
         _database.UpdateBucket(bucket);
         log_debug << "Put bucket lifecycle configuration, bucket: " << request.bucket;
@@ -396,11 +354,11 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("Bucket odes not have a lifecycle configuration");
         }
 
-        // Convert to DTO
         Dto::S3::GetBucketLifecycleConfigurationResponse response;
-        for (const auto &configuration: bucket.lifecycleConfigurations) {
-            response.rules.emplace_back(Dto::S3::Mapper::map(configuration));
-        }
+        // Convert to DTO
+        // for (const auto &configuration: bucket.lifecycleConfigurations) {
+        //     response.rules.emplace_back(Dto::S3::Mapper::map(configuration));
+        // }
 
         log_debug << "Get bucket lifecycle configuration, bucket: " << request.bucket;
         return response;
@@ -963,10 +921,12 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("Bucket is not versioned");
         }
 
-        Dto::S3::ListObjectVersionsResponse response;
         try {
+
+            Dto::S3::ListObjectVersionsResponse response;
             const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(request.region, request.bucket, request.prefix);
-            return Dto::S3::Mapper::map(request, objectList);
+            return Dto::S3::ListVersionsResponseMapper::toDto(objectList);
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 list object versions request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -1595,36 +1555,37 @@ namespace AwsMock::Service {
     }
 
     void S3Service::PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) const {
+        bool modified = false;
         for (const auto &lambdaConfiguration: lambdaConfigurations) {
+            auto newEntity = Dto::S3::LambdaConfigurationMapper::toEntity(lambdaConfiguration);
 
             // Check existence, if existing do an update
             if (!lambdaConfiguration.id.empty() && bucket.HasLambdaNotificationId(lambdaConfiguration.id)) {
-                log_debug << "Lambda notification configuration exists already, id: " << lambdaConfiguration.id;
-                bucket.lambdaNotifications.emplace_back(Dto::S3::Mapper::map(lambdaConfiguration));
-                bucket = _database.UpdateBucket(bucket);
-                continue;
-            }
+                log_debug << "Updating existing lambda notification, id: " << lambdaConfiguration.id;
 
-            // General attributes
-            const std::string attrId = lambdaConfiguration.id.empty() ? Core::StringUtils::CreateRandomUuid() : lambdaConfiguration.id;
-            Database::Entity::S3::LambdaNotification lambdaNotification;
-            lambdaNotification.id = attrId;
-            lambdaNotification.lambdaArn = lambdaConfiguration.lambdaArn;
-
-            // Get events
-            for (const auto &event: lambdaConfiguration.events) {
-                lambdaNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
+                std::ranges::replace_if(bucket.lambdaNotifications,
+                                        [&lambdaConfiguration](const Database::Entity::S3::LambdaNotification &existing) {
+                                            return existing.id == lambdaConfiguration.id;
+                                        },
+                                        newEntity
+                );
+                modified = true;
             }
-
-            // Get filter rules
-            for (const auto &filterRule: lambdaConfiguration.filterRules) {
-                Database::Entity::S3::FilterRule filterRuleEntity;
-                filterRuleEntity.name = Dto::S3::NameTypeToString(filterRule.name);
-                filterRuleEntity.value = filterRule.filterValue;
-                lambdaNotification.filterRules.emplace_back(filterRuleEntity);
+            // Handle Create (New Notification)
+            else {
+                if (newEntity.id.empty()) {
+                    newEntity.id = Core::StringUtils::CreateRandomUuid();
+                }
+                log_debug << "Adding new lambda notification, id: " << newEntity.id;
+                bucket.lambdaNotifications.emplace_back(std::move(newEntity));
+                modified = true;
             }
-            bucket.lambdaNotifications.emplace_back(lambdaNotification);
-            log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
+        }
+
+        // Single Atomic Update (Better for stability and performance)
+        if (modified) {
+            bucket = _database.UpdateBucket(bucket);
+            log_debug << "Bucket updated. Total lambda notifications: " << bucket.lambdaNotifications.size();
         }
     }
 
