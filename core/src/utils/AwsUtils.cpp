@@ -5,17 +5,6 @@
 #include <awsmock/core/AwsUtils.h>
 
 namespace AwsMock::Core {
-    std::string AwsUtils::CreateS3BucketArn(const std::string &region, const std::string &accountId, const std::string &bucket) {
-        return CreateArn("s3", region, accountId, bucket);
-    }
-
-    std::string AwsUtils::CreateS3ObjectArn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key) {
-        return CreateArn("s3", region, accountId, bucket + "/" + key);
-    }
-
-    std::string AwsUtils::CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function) {
-        return CreateArn("lambda", region, accountId, "function:" + function);
-    }
 
     std::string AwsUtils::CreateApiKeyId() {
         return StringUtils::GenerateRandomAlphanumericString(12);
@@ -95,9 +84,33 @@ namespace AwsMock::Core {
     std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
         return CreateArn("sqs", region, accountId, queueName);
     }
+    //
+    // std::string AwsUtils::CreateSQSQueueUrl(const std::string &region, const std::string &accountId, const std::string &queueName) {
+    //     const std::string hostName = SystemUtils::GetHostName();
+    //     const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.port");
+    //     return "http://sqs." + region + "." + hostName + ":" + port + "/" + accountId + "/" + queueName;
+    // }
+    // //
+    // std::string AwsUtils::CreateSQSQueueUrl(const std::string &queueName) {
+    //     const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+    //     const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+    //     return CreateSQSQueueUrl(region, accountId, queueName);
+    // }
 
     std::string AwsUtils::CreateSQSSenderId() {
         return StringUtils::GenerateRandomString(21) + ":none@example.com";
+    }
+
+    std::string AwsUtils::CreateS3BucketArn(const std::string &region, const std::string &accountId, const std::string &bucket) {
+        return CreateArn("s3", region, accountId, bucket);
+    }
+
+    std::string AwsUtils::CreateS3ObjectArn(const std::string &region, const std::string &accountId, const std::string &bucket, const std::string &key) {
+        return CreateArn("s3", region, accountId, bucket + "/" + key);
+    }
+
+    std::string AwsUtils::CreateLambdaArn(const std::string &region, const std::string &accountId, const std::string &function) {
+        return CreateArn("lambda", region, accountId, "function:" + function);
     }
 
     std::string AwsUtils::CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName) {

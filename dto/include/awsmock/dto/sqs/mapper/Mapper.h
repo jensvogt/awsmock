@@ -7,6 +7,8 @@
 
 // AwsMock includes
 #include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/sqs/CreateQueueRequest.h>
+#include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
@@ -75,6 +77,47 @@ namespace AwsMock::Dto::SQS {
             e.receiveMessageWaitTime = d.receiveMessageWaitTime;
             e.redrivePolicy = RedrivePolicyMapper::toEntity(d.redrivePolicy);
             return e;
+        }
+    };
+
+    class CreateQueueRequestMapper : public StaticMapper<CreateQueueRequestMapper, Database::Entity::SQS::Queue, CreateQueueRequest> {
+
+      public:
+
+        static Database::Entity::SQS::Queue toEntity(const CreateQueueRequest &d) {
+            Database::Entity::SQS::Queue e;
+            e.region = d.region;
+            e.name = d.queueName;
+            e.owner = d.user;
+            e.arn = Core::CreateSQSQueueArn(d.queueName);
+            e.url = Core::CreateSQSQueueUrl(d.queueName);
+            for (const auto &[fst, snd]: d.attributes) {
+                if (fst == "QueueArn") e.attributes.queueArn = snd;
+                if (fst == "DelaySeconds") e.attributes.delaySeconds = std::stol(snd);
+                if (fst == "MaxMessageSize") e.attributes.maxMessageSize = std::stol(snd);
+                if (fst == "MessageRetentionPeriod") e.attributes.messageRetentionPeriod = std::stol(snd);
+                if (fst == "ReceiveMessageWaitTime") e.attributes.receiveMessageWaitTime = std::stol(snd);
+                if (fst == "VisibilityTimeout") e.attributes.visibilityTimeout = std::stol(snd);
+                if (fst == "Policy") e.attributes.policy = snd;
+                if (fst == "RedriveAllowPolicy") e.attributes.redriveAllowPolicy = snd;
+            }
+            e.tags = d.tags;
+            return e;
+        }
+    };
+
+    class CreateQueueResponseMapper : public StaticMapper<CreateQueueResponseMapper, Database::Entity::SQS::Queue, CreateQueueResponse> {
+
+      public:
+
+        static CreateQueueResponse toDto(const Database::Entity::SQS::Queue &e) {
+            CreateQueueResponse d;
+            d.region = e.region;
+            d.owner = e.owner;
+            d.queueName = e.name;
+            d.queueArn = e.arn;
+            d.queueUrl = e.url;
+            return d;
         }
     };
 
