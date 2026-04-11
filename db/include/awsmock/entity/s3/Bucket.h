@@ -40,9 +40,9 @@ namespace AwsMock::Database::Entity::S3 {
     };
 
     static std::map<BucketVersionStatus, std::string> BucketVersionStatusNames{
-        {ENABLED, "enabled"},
-        {SUSPENDED, "suspended"},
-        {DISABLED, "disabled"},
+            {ENABLED, "enabled"},
+            {SUSPENDED, "suspended"},
+            {DISABLED, "disabled"},
     };
 
     [[maybe_unused]] static std::string BucketVersionStatusToString(const BucketVersionStatus bucketVersionStatus) {
@@ -149,15 +149,6 @@ namespace AwsMock::Database::Entity::S3 {
          * Last modification date
          */
         system_clock::time_point modified = system_clock::now();
-
-        /**
-         * @brief Checks whether a notification with the given event name exists.
-         *
-         * @param eventName name of the event
-         * @return true if notification with the given event name exists.
-         * @deprecated use HasQueueNotification,HasTopicNotification, HasLambdaNotification
-         */
-        //bool HasNotification(const std::string &eventName);
 
         /**
          * @brief Checks whether a notification with the given ID exists.
@@ -302,6 +293,6 @@ namespace AwsMock::Database::Entity::S3 {
 
     typedef std::vector<Bucket> BucketList;
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace AwsMock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_BUCKET_H

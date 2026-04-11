@@ -52,9 +52,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * Port bindings
          */
-        // TODO: cleanup
         std::map<std::string, std::vector<Port>> portBindings;
-        //PortBinding portBindings;
 
         /**
          * Log config

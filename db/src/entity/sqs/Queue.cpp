@@ -27,15 +27,13 @@ namespace AwsMock::Database::Entity::SQS {
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "owner", owner);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "name", name);
-        Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueUrl", queueUrl);
-        Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueArn", queueArn);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "url", url);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "arn", arn);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "attributes", attributes.ToDocument());
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "tags", tagsDoc);
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "defaultMessageAttributes", defaultMessageAttributeDoc);
         Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
-        Core::Bson::BsonUtils::SetBoolValue(rootDocument, "isDlq", isDlq);
-        Core::Bson::BsonUtils::SetStringValue(rootDocument, "mainQueue", mainQueue);
         Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
         Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
 
@@ -49,11 +47,9 @@ namespace AwsMock::Database::Entity::SQS {
             region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
             name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
             owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
-            queueUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "queueUrl");
-            queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
+            url = Core::Bson::BsonUtils::GetStringValue(mResult, "url");
+            arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
-            isDlq = Core::Bson::BsonUtils::GetBoolValue(mResult, "isDlq");
-            mainQueue = Core::Bson::BsonUtils::GetStringValue(mResult, "mainQueue");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

@@ -129,8 +129,7 @@ namespace AwsMock::Service {
                 log_debug << "Found lambda arn, arn: " << arn;
 
                 std::string body = Core::HttpUtils::GetBodyAsString(request);
-                Dto::Lambda::CreateTagRequest lambdaRequest;
-                lambdaRequest.FromJson(body);
+                Dto::Lambda::CreateTagRequest lambdaRequest = lambdaRequest.FromJson(body);
 
                 _lambdaService.CreateTag(lambdaRequest);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;

@@ -15,8 +15,8 @@
 #endif
 
 // AwsMock includes
-#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/BsonConverter.h>
+#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -94,12 +94,13 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {
-        };
+                                                           };
 
         /**
          * @brief Checks whether a bucket exists
@@ -405,7 +406,8 @@ namespace AwsMock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
@@ -567,6 +569,15 @@ namespace AwsMock::Service {
         static std::string SanitizeContentType(const std::string &contentType, const std::string &filePath, const std::string &s3Key);
 
         /**
+         * @brief Add the event source mapping to the lambda function
+         *
+         * @param bucket bucket entity
+         * @param lambdaConfiguration
+         * @param lambdaConfiguration
+         */
+        void AddLambdaEventSource(const Database::Entity::S3::Bucket &bucket, const Dto::S3::LambdaConfiguration &lambdaConfiguration) const;
+
+        /**
          * Database connection
          */
         Database::S3Database &_database;
@@ -581,6 +592,6 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context _ioc;
     };
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H

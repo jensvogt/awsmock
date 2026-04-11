@@ -30,7 +30,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Maximal number of retries before the message will be sent to the DQL
          */
-        long maxReceiveCount = 0;
+        long maxReceiveCount = 3;
 
         /**
          * @brief Converts the entity to a MongoDB document

@@ -10,18 +10,15 @@
 #include <awsmock/dto/s3/CreateBucketRequest.h>
 #include <awsmock/dto/s3/CreateBucketResponse.h>
 #include <awsmock/dto/s3/GetObjectMetadataResponse.h>
-#include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
-#include <awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h>
-#include <awsmock/dto/s3/internal/GetBucketRequest.h>
 #include <awsmock/dto/s3/internal/GetBucketResponse.h>
 #include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/s3/model/BucketCounter.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
+#include <awsmock/dto/s3/model/LifecycleStatus.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
-#include <awsmock/dto/s3/model/LifecycleStatus.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
@@ -32,7 +29,8 @@
 namespace AwsMock::Dto::S3 {
 
     class FilterRuleMapper : public StaticMapper<FilterRuleMapper, Database::Entity::S3::FilterRule, FilterRule> {
-    public:
+      public:
+
         static FilterRule toDto(const Database::Entity::S3::FilterRule &e) {
             FilterRule d;
             d.region = e.region;
@@ -52,7 +50,8 @@ namespace AwsMock::Dto::S3 {
 
     class QueueConfigurationMapper : public StaticMapper<QueueConfigurationMapper, Database::Entity::S3::QueueNotification, QueueConfiguration> {
 
-    public:
+      public:
+
         static QueueConfiguration toDto(const Database::Entity::S3::QueueNotification &e) {
             QueueConfiguration d;
             d.region = e.region;
@@ -80,7 +79,8 @@ namespace AwsMock::Dto::S3 {
 
     class TopicConfigurationMapper : public StaticMapper<TopicConfigurationMapper, Database::Entity::S3::TopicNotification, TopicConfiguration> {
 
-    public:
+      public:
+
         static TopicConfiguration toDto(const Database::Entity::S3::TopicNotification &e) {
             TopicConfiguration d;
             d.region = e.region;
@@ -108,7 +108,8 @@ namespace AwsMock::Dto::S3 {
 
     class LambdaConfigurationMapper : public StaticMapper<LambdaConfigurationMapper, Database::Entity::S3::LambdaNotification, LambdaConfiguration> {
 
-    public:
+      public:
+
         static LambdaConfiguration toDto(const Database::Entity::S3::LambdaNotification &e) {
             LambdaConfiguration d;
             d.region = e.region;
@@ -135,7 +136,8 @@ namespace AwsMock::Dto::S3 {
     };
 
     class LifecycleTransitionMapper : public StaticMapper<LifecycleTransitionMapper, Database::Entity::S3::LifecycleTransition, LifecycleTransition> {
-    public:
+      public:
+
         static LifecycleTransition toDto(const Database::Entity::S3::LifecycleTransition &e) {
             LifecycleTransition d;
             d.region = e.region;
@@ -156,7 +158,8 @@ namespace AwsMock::Dto::S3 {
     };
 
     class LifecycleMapper : public StaticMapper<LifecycleMapper, Database::Entity::S3::Bucket, LifecycleRule> {
-    public:
+      public:
+
         static LifecycleRule toDto(const Database::Entity::S3::LifecycleConfiguration &e) {
             LifecycleRule d;
             d.region = e.region;
@@ -178,7 +181,8 @@ namespace AwsMock::Dto::S3 {
 
     class BucketCounterMapper : public StaticMapper<BucketCounterMapper, Database::Entity::S3::Bucket, BucketCounter> {
 
-    public:
+      public:
+
         static BucketCounter toDto(const Database::Entity::S3::Bucket &e) {
             BucketCounter d;
             d.region = e.region;
@@ -195,7 +199,8 @@ namespace AwsMock::Dto::S3 {
 
     class BucketCreateRequestMapper : public StaticMapper<BucketCreateRequestMapper, Database::Entity::S3::Bucket, CreateBucketRequest> {
 
-    public:
+      public:
+
         static Database::Entity::S3::Bucket toEntity(const CreateBucketRequest &r) {
             const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             Database::Entity::S3::Bucket b;
@@ -209,7 +214,8 @@ namespace AwsMock::Dto::S3 {
 
     class BucketCreateResponseMapper : public StaticMapper<BucketCreateResponseMapper, Database::Entity::S3::Bucket, CreateBucketResponse> {
 
-    public:
+      public:
+
         static CreateBucketResponse toDto(const Database::Entity::S3::Bucket &b) {
             CreateBucketResponse r;
             r.region = b.region;
@@ -221,7 +227,8 @@ namespace AwsMock::Dto::S3 {
 
     class BucketGetResponseMapper : public StaticMapper<BucketGetResponseMapper, Database::Entity::S3::Bucket, GetBucketResponse> {
 
-    public:
+      public:
+
         static GetBucketResponse toDto(const Database::Entity::S3::Bucket &b) {
             GetBucketResponse r;
             r.region = b.region;
@@ -244,7 +251,8 @@ namespace AwsMock::Dto::S3 {
 
     class GetBucketMetadataResponseMapper : public StaticMapper<GetBucketMetadataResponseMapper, Database::Entity::S3::Bucket, GetObjectMetadataResponse> {
 
-    public:
+      public:
+
         static GetObjectMetadataResponse toDto(const Database::Entity::S3::Bucket &e) {
             GetObjectMetadataResponse d;
             d.region = e.region;
@@ -258,7 +266,8 @@ namespace AwsMock::Dto::S3 {
 
     class GetObjectMetadataResponseMapper : public StaticMapper<GetObjectMetadataResponseMapper, Database::Entity::S3::Object, GetObjectMetadataResponse> {
 
-    public:
+      public:
+
         static GetObjectMetadataResponse toDto(const Database::Entity::S3::Object &e) {
             GetObjectMetadataResponse d;
             d.region = e.region;
@@ -277,7 +286,8 @@ namespace AwsMock::Dto::S3 {
 
     class ListVersionsResponseMapper : public StaticMapper<ListVersionsResponseMapper, std::vector<Database::Entity::S3::Object>, ListObjectVersionsResponse> {
 
-    public:
+      public:
+
         static ListObjectVersionsResponse toDto(const std::vector<Database::Entity::S3::Object> &e) {
             ListObjectVersionsResponse d;
             for (const auto &object: e) {
@@ -298,7 +308,8 @@ namespace AwsMock::Dto::S3 {
 
     class BucketMapper : public StaticMapper<BucketMapper, Database::Entity::S3::Bucket, Bucket> {
 
-    public:
+      public:
+
         static Bucket toDto(const Database::Entity::S3::Bucket &e) {
             Bucket d;
             d.region = e.region;
@@ -334,7 +345,8 @@ namespace AwsMock::Dto::S3 {
 
     class ObjectMapper : public StaticMapper<ObjectMapper, Database::Entity::S3::Object, Object> {
 
-    public:
+      public:
+
         static Object toDto(const Database::Entity::S3::Object &e) {
             Object d;
             d.region = e.region;
@@ -362,6 +374,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-} // namespace AwsMock::Dto::S3
+}// namespace AwsMock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_MAPPER_H

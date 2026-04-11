@@ -34,28 +34,46 @@ namespace AwsMock::Dto::SQS {
         std::string queueArn;
 
         /**
+         * DQL ARN
+         */
+        std::string deadLetterQueueArn;
+
+        /**
          * Delay in seconds
          */
-        long delay;
+        long delay{};
 
         /**
          * Visibility timeout
          */
-        long visibilityTimeout;
+        long visibilityTimeout{};
 
         /**
          * Retention period
          */
-        long retentionPeriod;
+        long retentionPeriod{};
 
-    private:
+        /**
+         * Max retries
+         */
+        long maxRetries{};
+
+        /**
+         * Owner
+         */
+        std::string owner;
+
+      private:
 
         friend UpdateQueueRequest tag_invoke(boost::json::value_to_tag<UpdateQueueRequest>, boost::json::value const &v) {
             UpdateQueueRequest r;
-            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.queueArn = Core::Json::GetStringValue(v, "arn");
+            r.deadLetterQueueArn = Core::Json::GetStringValue(v, "deadLetterQueueArn");
             r.delay = Core::Json::GetLongValue(v, "delay");
             r.visibilityTimeout = Core::Json::GetLongValue(v, "visibilityTimeout");
             r.retentionPeriod = Core::Json::GetLongValue(v, "retentionPeriod");
+            r.maxRetries = Core::Json::GetLongValue(v, "maxRetries");
+            r.owner = Core::Json::GetStringValue(v, "owner");
             return r;
         }
 
@@ -64,10 +82,13 @@ namespace AwsMock::Dto::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"queueArn", obj.queueArn},
+                    {"arn", obj.queueArn},
+                    {"deadLetterQueueArn", obj.deadLetterQueueArn},
                     {"delay", obj.delay},
                     {"visibilityTimeout", obj.visibilityTimeout},
                     {"retentionPeriod", obj.retentionPeriod},
+                    {"maxRetries", obj.maxRetries},
+                    {"owner", obj.owner},
             };
         }
     };

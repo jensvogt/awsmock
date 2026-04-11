@@ -220,10 +220,10 @@ namespace AwsMock::Database {
         /**
          * @brief Calculates the total size of all messages in the queue
          *
-         * @param queueArn AWS queue ARN
+         * @param arn AWS queue ARN
          * @return total size of the queue
          */
-        [[nodiscard]] long GetQueueSize(const std::string &queueArn) const;
+        [[nodiscard]] long GetQueueSize(const std::string &arn) const;
 
         /**
          * @brief Deletes a queue.

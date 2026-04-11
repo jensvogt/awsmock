@@ -401,17 +401,25 @@ namespace AwsMock::Service {
         }
     }
 
-    std::vector<Dto::SQS::QueueAttribute> SQSHandler::GetQueueAttributes(const std::string &payload) {
-        std::vector<Dto::SQS::QueueAttribute> queueAttributes;
+    Dto::SQS::QueueAttribute SQSHandler::GetQueueAttributes(const std::string &payload) {
+        Dto::SQS::QueueAttribute queueAttributes = {};
 
         const int count = Core::HttpUtils::CountQueryParametersByPrefix(payload, "UserAttribute") / 2;
         log_trace << "Got attribute count, count: " << count;
 
         for (int i = 1; i <= count; i++) {
             Dto::SQS::QueueAttribute attribute;
-            attribute.attributeName = Core::HttpUtils::GetStringParameterFromBody(payload, "UserAttribute." + std::to_string(i) + ".Name"),
-            attribute.attributeValue = Core::HttpUtils::GetStringParameterFromBody(payload, "UserAttribute." + std::to_string(i) + ".Value");
-            queueAttributes.emplace_back(attribute);
+            const std::string name = Core::HttpUtils::GetStringParameterFromBody(payload, "UserAttribute." + std::to_string(i) + ".Name");
+            const std::string value = Core::HttpUtils::GetStringParameterFromBody(payload, "UserAttribute." + std::to_string(i) + ".Value");
+            log_trace << "Adding queue attribute, name: " << name << ", value: " << value;
+            if (name == "QueueArn") queueAttributes.queueArn = value;
+            if (name == "DelaySeconds") queueAttributes.delaySeconds = std::stol(value);
+            if (name == "MaxMessageSize") queueAttributes.maxMessageSize = std::stol(value);
+            if (name == "MessageRetentionPeriod") queueAttributes.messageRetentionPeriod = std::stol(value);
+            if (name == "ReceiveMessageWaitTime") queueAttributes.receiveMessageWaitTime = std::stol(value);
+            if (name == "VisibilityTimeout") queueAttributes.visibilityTimeout = std::stol(value);
+            if (name == "Policy") queueAttributes.policy = value;
+            if (name == "RedriveAllowPolicy") queueAttributes.redriveAllowPolicy = value;
         }
         return queueAttributes;
     }

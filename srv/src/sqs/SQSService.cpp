@@ -24,8 +24,8 @@ namespace AwsMock::Service {
             response.region = queue.region;
             response.queueName = queue.name;
             response.owner = queue.owner;
-            response.queueUrl = queue.queueUrl;
-            response.queueArn = queue.queueArn;
+            response.queueUrl = queue.url;
+            response.queueArn = queue.arn;
             return response;
         }
 
@@ -53,17 +53,12 @@ namespace AwsMock::Service {
             if (request.attributes.contains("Policy")) {
                 attributes.policy = request.attributes.at("Policy");
             }
-            // TODO: deserialize redrive policy
             if (request.attributes.contains("RedrivePolicy")) {
-                //attributes.redrivePolicy = boost::json::value_to<Database::Dto::SQS::RedriveMessagesRequest>(request.attributes.at("RedrivePolicy"));
+                attributes.redrivePolicy.deadLetterTargetArn = request.attributes.at("RedrivePolicy");
             }
             if (request.attributes.contains("RedriveAllowPolicy")) {
                 attributes.redriveAllowPolicy = request.attributes.at("RedriveAllowPolicy");
             }
-            if (request.attributes.contains("RedriveAllowPolicy")) {
-                attributes.redriveAllowPolicy = request.attributes.at("RedriveAllowPolicy");
-            }
-
             if (request.attributes.contains("QueueArn")) {
                 attributes.queueArn = request.attributes.at("QueueArn");
             }
@@ -74,8 +69,8 @@ namespace AwsMock::Service {
             queue.region = request.region;
             queue.name = request.queueName;
             queue.owner = request.owner;
-            queue.queueUrl = queueUrl;
-            queue.queueArn = queueArn;
+            queue.url = queueUrl;
+            queue.arn = queueArn;
             queue.attributes = attributes;
             queue.tags = request.tags;
             queue = _sqsDatabase.CreateQueue(queue);
@@ -85,8 +80,8 @@ namespace AwsMock::Service {
             Dto::SQS::CreateQueueResponse response;
             response.region = queue.region;
             response.queueName = queue.name;
-            response.queueUrl = queue.queueUrl;
-            response.queueArn = queue.queueArn;
+            response.queueUrl = queue.url;
+            response.queueArn = queue.arn;
             response.owner = queue.owner;
             return response;
 
@@ -131,7 +126,7 @@ namespace AwsMock::Service {
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
             Dto::SQS::ListQueueArnsResponse listQueueResponse;
             for (const auto &queue: queueList) {
-                listQueueResponse.queueArns.emplace_back(queue.queueArn);
+                listQueueResponse.queueArns.emplace_back(queue.arn);
             }
             log_trace << "SQS create queue ARN list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
@@ -176,8 +171,8 @@ namespace AwsMock::Service {
             Dto::SQS::GetQueueDetailsResponse sqsResponse;
             sqsResponse.messageCount = _sqsDatabase.CountMessages(request.queueArn);
             sqsResponse.queueName = queue.name;
-            sqsResponse.queueArn = queue.queueArn;
-            sqsResponse.queueUrl = queue.queueUrl;
+            sqsResponse.queueArn = queue.arn;
+            sqsResponse.queueUrl = queue.url;
             sqsResponse.region = queue.region;
             sqsResponse.retentionPeriod = queue.attributes.messageRetentionPeriod;
             sqsResponse.maxMessageSize = queue.attributes.maxMessageSize;
@@ -219,8 +214,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::ListQueueAttributeCountersResponse SQSService::ListQueueAttributeCounters(
-            const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
+    Dto::SQS::ListQueueAttributeCountersResponse SQSService::ListQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_queue_attribute_counters");
         log_trace << "List queue attribute counters request: " << request.ToString();
 
@@ -384,7 +378,7 @@ namespace AwsMock::Service {
             queue.attributes.approximateNumberOfMessagesDelayed = 0;
             queue.attributes.approximateNumberOfMessagesNotVisible = 0;
             queue = _sqsDatabase.UpdateQueue(queue);
-            log_trace << "SQS queue counter updated, queueArn: " << queue.queueArn;
+            log_trace << "SQS queue counter updated, queueArn: " << queue.arn;
             return deleted;
 
         } catch (Core::DatabaseException &ex) {
@@ -401,7 +395,7 @@ namespace AwsMock::Service {
             for (const auto &queue: _sqsDatabase.ListQueues()) {
                 Dto::SQS::PurgeQueueRequest request;
                 request.region = queue.region;
-                request.queueUrl = queue.queueUrl;
+                request.queueUrl = queue.url;
                 deleted += PurgeQueue(request);
             }
             return deleted;
@@ -478,9 +472,9 @@ namespace AwsMock::Service {
 
             // Get queue
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, queueUrl);
-            log_debug << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
+            log_debug << "SQS get queue URL, region: " << request.region << " queueName: " << queue.url;
             Dto::SQS::GetQueueUrlResponse response;
-            response.queueUrl = queue.queueUrl;
+            response.queueUrl = queue.url;
             return response;
 
         } catch (Core::DatabaseException &ex) {
@@ -507,7 +501,7 @@ namespace AwsMock::Service {
 
         try {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(arn);
-            log_debug << "Got queue: " << queue.queueUrl;
+            log_debug << "Got queue: " << queue.url;
 
             Dto::SQS::GetQueueAttributesResponse response;
             if (CheckAttribute(request.attributeNames, "all")) {
@@ -520,7 +514,7 @@ namespace AwsMock::Service {
                 response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
                 response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
                 response.attributes.emplace_back("Policy", queue.attributes.policy);
-                response.attributes.emplace_back("QueueArn", queue.queueArn);
+                response.attributes.emplace_back("QueueArn", queue.arn);
                 response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
                 response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
             } else {
@@ -561,7 +555,7 @@ namespace AwsMock::Service {
                     response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
                 }
                 if (CheckAttribute(request.attributeNames, "QueueArn")) {
-                    response.attributes.emplace_back("QueueArn", queue.queueArn);
+                    response.attributes.emplace_back("QueueArn", queue.arn);
                 }
             }
             return response;
@@ -607,7 +601,7 @@ namespace AwsMock::Service {
             if (!attributes["QueueArn"].empty()) {
                 queue.attributes.queueArn = attributes["QueueArn"];
             } else {
-                queue.attributes.queueArn = queue.queueArn;
+                queue.attributes.queueArn = queue.arn;
             }
 
             // Update database
@@ -634,7 +628,7 @@ namespace AwsMock::Service {
             log_debug << "Queue returned, queue: " << queue.name;
 
             Dto::SQS::GetEventSourceResponse response;
-            response.lambdaConfiguration.arn = queue.queueArn;
+            response.lambdaConfiguration.arn = queue.arn;
             response.lambdaConfiguration.enabled = true;
             response.lambdaConfiguration.uuid = queue.oid;
             return response;
@@ -793,7 +787,7 @@ namespace AwsMock::Service {
             response.total = static_cast<long>(queue.defaultMessageAttributes.size());
             response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
 
-            log_debug << "Default message attribute added, queueArn: " << queue.queueArn << ", name: " << request.name;
+            log_debug << "Default message attribute added, queueArn: " << queue.arn << ", name: " << request.name;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -823,7 +817,7 @@ namespace AwsMock::Service {
             response.total = static_cast<long>(queue.defaultMessageAttributes.size());
             response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
 
-            log_debug << "Default message attribute updated, queueArn: " << queue.queueArn << ", name: " << request.name;
+            log_debug << "Default message attribute updated, queueArn: " << queue.arn << ", name: " << request.name;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -852,7 +846,7 @@ namespace AwsMock::Service {
             response.total = static_cast<long>(queue.defaultMessageAttributes.size());
             response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
 
-            log_debug << "Default message attribute deleted, queueArn: " << queue.queueArn << ", name: " << request.name;
+            log_debug << "Default message attribute deleted, queueArn: " << queue.arn << ", name: " << request.name;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -944,6 +938,9 @@ namespace AwsMock::Service {
             queue.attributes.delaySeconds = request.delay;
             queue.attributes.visibilityTimeout = request.visibilityTimeout;
             queue.attributes.messageRetentionPeriod = request.retentionPeriod;
+            queue.attributes.redrivePolicy.deadLetterTargetArn = request.deadLetterQueueArn;
+            queue.attributes.redrivePolicy.maxReceiveCount = request.maxRetries;
+            queue.owner = request.owner;
             queue = _sqsDatabase.UpdateQueue(queue);
             log_debug << "Queue updated, queueArn: " << request.queueArn;
 
@@ -972,7 +969,7 @@ namespace AwsMock::Service {
             // Update database
             Database::Entity::SQS::Queue queue;
             queue.region = request.region;
-            queue.queueUrl = request.queueUrl;
+            queue.url = request.queueUrl;
             deleted = _sqsDatabase.DeleteQueue(queue);
             log_debug << "Queue deleted, queue: " << request.queueUrl << " count:" << deleted;
 
@@ -1032,7 +1029,7 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.UpdateQueue(queue);
 
             // Set parameters
-            message.queueArn = queue.queueArn;
+            message.queueArn = queue.arn;
             message.queueName = queue.name;
             message.contentType = request.contentType;
             message.size = static_cast<long>(request.body.size());
@@ -1048,8 +1045,8 @@ namespace AwsMock::Service {
             log_debug << "Message send, queueName: " << queue.name;
 
             // Find Lambdas with this as an event source
-            CheckLambdaNotifications(queue.queueArn, message);
-            log_debug << "Send message, queueArn: " << queue.queueArn;
+            CheckLambdaNotifications(queue.arn, message);
+            log_debug << "Send message, queueArn: " << queue.arn;
             return Dto::SQS::Mapper::map(request, message);
 
         } catch (Core::DatabaseException &ex) {
@@ -1135,8 +1132,8 @@ namespace AwsMock::Service {
             if (waitTimeSeconds == 0) {
 
                 // Short polling period
-                _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
-                log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
+                _sqsDatabase.ReceiveMessages(queue.arn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
+                log_trace << "Messages in list, url: " << queue.url << " count: " << messageList.size();
 
             } else {
 
@@ -1145,8 +1142,8 @@ namespace AwsMock::Service {
                 const auto begin = system_clock::now();
                 while (elapsed < waitTimeSeconds) {
 
-                    _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
-                    log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
+                    _sqsDatabase.ReceiveMessages(queue.arn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
+                    log_trace << "Messages in list, url: " << queue.url << " count: " << messageList.size();
 
                     if (!messageList.empty()) {
                         break;

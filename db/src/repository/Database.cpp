@@ -14,12 +14,7 @@ namespace AwsMock::Database {
             {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}}, false}},
             {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}, false}},
             // SQS queues
-            {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}, false}},
-            {"sqs_queue_idx2", {"sqs_queue", {{"region", 1}, {"queueUrl", 1}}, false}},
-            {"sqs_queue_idx3", {"sqs_queue", {
-                                                     {"queueArn", 1},
-                                             },
-                                true}},
+            {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}, true}},
             // SNS messages
             {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}, false}},
             // SNS topics

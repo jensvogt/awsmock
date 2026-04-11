@@ -9,6 +9,68 @@ namespace AwsMock::Service {
         return _database.BucketExists(region, bucket);
     }
 
+    Dto::S3::GetObjectMetadataResponse S3Service::GetBucketMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket_metadata");
+        log_trace << "Get bucket metadata request, s3Request: " << request.ToString();
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        try {
+            const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+            return Dto::S3::GetBucketMetadataResponseMapper::toDto(bucket);
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get object metadata failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::S3::GetBucketResponse S3Service::GetBucket(const Dto::S3::GetBucketRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket");
+        log_trace << "Get bucket request, s3Request: " << request.ToString();
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucketName);
+
+        try {
+            const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
+            log_debug << "Bucket returned, bucket: " << request.bucketName;
+
+            return Dto::S3::BucketGetResponseMapper::toDto(bucket);
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::S3::GetObjectMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object_metadata");
+        log_trace << "Get metadata request, s3Request: " << request.bucket << ", key: " << request.key;
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        // Check existence. If it does not exist, log an info message as this method is also used to check the existence of the object
+        if (!request.key.empty() && !_database.ObjectExists(request.region, request.bucket, request.key)) {
+            log_info << "Object does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
+            throw Core::NotFoundException("Object does not exist, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
+        }
+
+        try {
+            const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+
+            Dto::S3::GetObjectMetadataResponse response = Dto::S3::GetObjectMetadataResponseMapper::toDto(object);
+            log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get object metadata failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::S3::CreateBucketResponse S3Service::CreateBucket(const Dto::S3::CreateBucketRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "create_bucket");
         log_trace << "Create bucket request, s3Request: " << request.ToString();
@@ -78,146 +140,6 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::GetObjectMetadataResponse S3Service::GetBucketMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket_metadata");
-        log_trace << "Get bucket metadata request, s3Request: " << request.ToString();
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        try {
-            const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-            return Dto::S3::GetBucketMetadataResponseMapper::toDto(bucket);
-
-        } catch (bsoncxx::exception &ex) {
-            log_warning << "S3 get object metadata failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    Dto::S3::GetBucketResponse S3Service::GetBucket(const Dto::S3::GetBucketRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket");
-        log_trace << "Get bucket request, s3Request: " << request.ToString();
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucketName);
-
-        try {
-            const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
-            log_debug << "Bucket returned, bucket: " << request.bucketName;
-
-            return Dto::S3::BucketGetResponseMapper::toDto(bucket);
-
-        } catch (bsoncxx::exception &ex) {
-            log_warning << "S3 get bucket failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    Dto::S3::GetEventSourceResponse S3Service::GetEventSource(const Dto::S3::GetEventSourceRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_event_source");
-        log_trace << "Get event source request, s3Request: " << request.ToString();
-
-        // Check existence
-        if (!_database.BucketExists(request.eventSourceArn)) {
-            log_warning << "Bucket does not exists, arn: " << request.eventSourceArn;
-            throw Core::NotFoundException("Bucket does not exists, arn: " + request.eventSourceArn);
-        }
-
-        try {
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByArn(request.eventSourceArn);
-            log_debug << "Bucket returned, bucket: " << bucket.name;
-
-            Dto::S3::GetEventSourceResponse response;
-            Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotification(request.functionArn);
-            response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
-            return response;
-        } catch (bsoncxx::exception &ex) {
-            log_warning << "S3 get event source failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    Dto::S3::GetObjectMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object_metadata");
-        log_trace << "Get metadata request, s3Request: " << request.bucket << ", key: " << request.key;
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        // Check existence. If it does not exist, log an info message as this method is also used to check the existence of the object
-        if (!request.key.empty() && !_database.ObjectExists(request.region, request.bucket, request.key)) {
-            log_info << "Object does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
-            throw Core::NotFoundException("Object does not exist, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
-        }
-
-        try {
-            const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
-
-            Dto::S3::GetObjectMetadataResponse response = Dto::S3::GetObjectMetadataResponseMapper::toDto(object);
-            log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
-            return response;
-
-        } catch (bsoncxx::exception &ex) {
-            log_warning << "S3 get object metadata failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    Dto::S3::GetObjectResponse S3Service::GetObject(const Dto::S3::GetObjectRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object");
-        log_trace << "Get object request, s3Request: " << request.ToJson();
-        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        if (!request.key.empty()) {
-            if (!_database.ObjectExists(request.region, request.bucket, request.key)) {
-                log_error << "Object " << request.key << " does not exist";
-                throw Core::NotFoundException("Object does not exist");
-            }
-        }
-
-        try {
-            const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
-
-            Database::Entity::S3::Object object;
-            if (bucketEntity.IsVersioned() && !request.versionId.empty()) {
-                object = _database.GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
-                if (object.oid.empty()) {
-                    log_error << "Object " << request.key << " does not exist";
-                    throw Core::ServiceException("Object does not exist");
-                }
-            } else {
-                object = _database.GetObject(request.region, request.bucket, request.key);
-            }
-
-            std::string filename = s3DataDir + Core::FileUtils::separator() + object.internalName;
-
-            // Check decryption
-            CheckDecryption(bucketEntity, object, filename);
-
-            Dto::S3::GetObjectResponse response;
-            response.bucket = object.bucket;
-            response.key = object.key;
-            response.size = object.size;
-            response.filename = filename;
-            response.contentType = object.contentType;
-            response.metadata = object.metadata;
-            response.md5sum = object.md5sum;
-            response.created = object.created;
-            response.modified = object.modified;
-            response.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
-            log_debug << "Object returned, bucket: " << request.bucket << ", key: " << request.key << ", size: " << response.size;
-            return response;
-
-        } catch (bsoncxx::exception &ex) {
-            log_error << "S3 get object failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
     Dto::S3::ListAllBucketResponse S3Service::ListAllBuckets() const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "list_buckets");
         log_trace << "List all buckets request";
@@ -233,6 +155,39 @@ namespace AwsMock::Service {
 
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 Create Bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::S3::ListBucketResponse S3Service::ListBucket(const Dto::S3::ListBucketRequest &s3Request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "list_bucket");
+        log_trace << "List bucket request: " + s3Request.ToString();
+
+        try {
+            const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket(s3Request.name, s3Request.prefix);
+
+            // TODO: mapper implementation
+            Dto::S3::ListBucketResponse listBucketResponse;
+            //listBucketResponse.contents.bucketCounters = Dto::S3::BucketCounterMapper::toDtoList(objectList);
+            listBucketResponse.name = s3Request.name;
+            for (auto &it: objectList) {
+                Dto::S3::Owner owner;
+                owner.displayName = it.owner;
+                owner.id = it.owner;
+
+                Dto::S3::Content content;
+                content.key = it.key;
+                content.etag = it.md5sum;
+                content.size = it.size;
+                content.owner = owner;
+                content.storageClass = "STANDARD";
+                content.modified = system_clock::now();
+                listBucketResponse.contents.push_back(content);
+            }
+            log_debug << "Bucket list returned, count: " << objectList.size();
+            return listBucketResponse;
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 list bucket failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -271,39 +226,6 @@ namespace AwsMock::Service {
             return listBucketArnsResponse;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 list bucket ARNs failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    Dto::S3::ListBucketResponse S3Service::ListBucket(const Dto::S3::ListBucketRequest &s3Request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "list_bucket");
-        log_trace << "List bucket request: " + s3Request.ToString();
-
-        try {
-            const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket(s3Request.name, s3Request.prefix);
-
-            // TODO: mapper implementation
-            Dto::S3::ListBucketResponse listBucketResponse;
-            //listBucketResponse.contents.bucketCounters = Dto::S3::BucketCounterMapper::toDtoList(objectList);
-            listBucketResponse.name = s3Request.name;
-            for (auto &it: objectList) {
-                Dto::S3::Owner owner;
-                owner.displayName = it.owner;
-                owner.id = it.owner;
-
-                Dto::S3::Content content;
-                content.key = it.key;
-                content.etag = it.md5sum;
-                content.size = it.size;
-                content.owner = owner;
-                content.storageClass = "STANDARD";
-                content.modified = system_clock::now();
-                listBucketResponse.contents.push_back(content);
-            }
-            log_debug << "Bucket list returned, count: " << objectList.size();
-            return listBucketResponse;
-        } catch (bsoncxx::exception &ex) {
-            log_error << "S3 list bucket failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -544,6 +466,84 @@ namespace AwsMock::Service {
         response.checksumSha1 = object.sha1sum;
         response.checksumSha256 = object.sha256sum;
         return response;
+    }
+
+    Dto::S3::GetEventSourceResponse S3Service::GetEventSource(const Dto::S3::GetEventSourceRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_event_source");
+        log_trace << "Get event source request, s3Request: " << request.ToString();
+
+        // Check existence
+        if (!_database.BucketExists(request.eventSourceArn)) {
+            log_warning << "Bucket does not exists, arn: " << request.eventSourceArn;
+            throw Core::NotFoundException("Bucket does not exists, arn: " + request.eventSourceArn);
+        }
+
+        try {
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByArn(request.eventSourceArn);
+            log_debug << "Bucket returned, bucket: " << bucket.name;
+
+            Dto::S3::GetEventSourceResponse response;
+            Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotification(request.functionArn);
+            response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
+            return response;
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get event source failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::S3::GetObjectResponse S3Service::GetObject(const Dto::S3::GetObjectRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object");
+        log_trace << "Get object request, s3Request: " << request.ToJson();
+        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        if (!request.key.empty()) {
+            if (!_database.ObjectExists(request.region, request.bucket, request.key)) {
+                log_error << "Object " << request.key << " does not exist";
+                throw Core::NotFoundException("Object does not exist");
+            }
+        }
+
+        try {
+            const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
+
+            Database::Entity::S3::Object object;
+            if (bucketEntity.IsVersioned() && !request.versionId.empty()) {
+                object = _database.GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
+                if (object.oid.empty()) {
+                    log_error << "Object " << request.key << " does not exist";
+                    throw Core::ServiceException("Object does not exist");
+                }
+            } else {
+                object = _database.GetObject(request.region, request.bucket, request.key);
+            }
+
+            std::string filename = s3DataDir + Core::FileUtils::separator() + object.internalName;
+
+            // Check decryption
+            CheckDecryption(bucketEntity, object, filename);
+
+            Dto::S3::GetObjectResponse response;
+            response.bucket = object.bucket;
+            response.key = object.key;
+            response.size = object.size;
+            response.filename = filename;
+            response.contentType = object.contentType;
+            response.metadata = object.metadata;
+            response.md5sum = object.md5sum;
+            response.created = object.created;
+            response.modified = object.modified;
+            response.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
+            log_debug << "Object returned, bucket: " << request.bucket << ", key: " << request.key << ", size: " << response.size;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 get object failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
     }
 
     Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
@@ -818,292 +818,6 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_object");
-        log_trace << "Delete object request: " << request.ToString();
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        if (_database.ObjectExists(request.region, request.bucket, request.key)) {
-            try {
-                // Get the object from the database
-                const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
-
-                // Delete from database
-                _database.DeleteObject(object);
-                log_debug << "Database object deleted, bucket: " + request.bucket + ", key: " << request.key;
-
-                // Delete the file system object
-                DeleteObject(object.bucket, object.key, object.internalName);
-
-                // Check notifications
-                CheckNotifications(request.region, request.bucket, request.key, 0, "ObjectRemoved");
-
-                log_debug << "Object deleted, bucket: " << request.bucket << " key: " << request.key;
-            } catch (Core::JsonException &exc) {
-                log_error << "S3 delete object failed, message: " + exc.message();
-                throw Core::ServiceException(exc.message());
-            }
-        }
-    }
-
-    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_objects");
-        log_trace << "Delete objects request: " << request.ToString();
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        Dto::S3::DeleteObjectsResponse response;
-        response.keys = request.keys;
-        try {
-            // Delete file system objects
-            for (const auto &key: request.keys) {
-                if (!key.empty()) {
-                    // Delete from database
-                    Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, key);
-                    log_debug << "Database object deleted, count: " << request.keys.size();
-
-                    DeleteObject(object.bucket, object.key, object.internalName);
-                    log_debug << "File system object deleted: " << key;
-
-                    // Check notifications
-                    CheckNotifications(request.region, request.bucket, key, 0, "ObjectRemoved");
-                }
-            }
-
-            // Delete from database
-            _database.DeleteObjects(request.region, request.bucket, request.keys);
-            log_debug << "Database object deleted, count: " << request.keys.size();
-
-        } catch (bsoncxx::exception &ex) {
-            log_error << "S3 delete objects failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-        log_debug << "DeleteObjects succeeded, bucket: " << request.bucket;
-        return response;
-    }
-
-    void S3Service::PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "put_bucket_encryption");
-        log_trace << "Put bucket encryption request, algorithm: " << request.sseAlgorithm;
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        try {
-            Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
-
-            Database::Entity::S3::BucketEncryption bucketEncryption;
-            bucketEncryption.sseAlgorithm = request.sseAlgorithm;
-            bucketEncryption.kmsKeyId = request.kmsKeyId;
-
-            bucketEntity.bucketEncryption = bucketEncryption;
-            bucketEntity = _database.UpdateBucket(bucketEntity);
-            log_debug << "PutBucketEncryption succeeded, bucket: " << request.bucket;
-        } catch (bsoncxx::exception &ex) {
-            log_error << "S3 put bucket encryption request failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    Dto::S3::ListObjectVersionsResponse S3Service::ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "list_option_versions");
-        log_trace << "List object versions request: " << request.ToString();
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        // Get bucket
-        if (const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket); !bucketEntity.IsVersioned()) {
-            log_error << "Bucket is not versioning";
-            throw Core::NotFoundException("Bucket is not versioned");
-        }
-
-        try {
-
-            Dto::S3::ListObjectVersionsResponse response;
-            const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(request.region, request.bucket, request.prefix);
-            return Dto::S3::ListVersionsResponseMapper::toDto(objectList);
-
-        } catch (bsoncxx::exception &ex) {
-            log_error << "S3 list object versions request failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_bucket");
-        log_trace << "Delete bucket request, name: " << request.bucket;
-
-        Database::Entity::S3::Bucket bucket;
-        bucket.region = request.region;
-        bucket.name = request.bucket;
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        // Check empty
-        if (_database.HasObjects(bucket)) {
-            log_error << "Bucket is not empty";
-            throw Core::NotFoundException("Bucket is not empty");
-        }
-
-        try {
-            // Delete directory
-            DeleteBucket(request.bucket);
-
-            // Delete bucket from database
-            _database.DeleteBucket(bucket);
-            log_debug << "Bucket deleted, bucket: " << bucket.name;
-        } catch (bsoncxx::exception &ex) {
-            log_error << "S3 Delete Bucket failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
-    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "check_notifications");
-        log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
-
-        Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
-
-        // Create S3 bucket and object
-        Dto::S3::Object s3Object;
-        s3Object.key = key;
-        s3Object.size = size;
-        s3Object.etag = Core::StringUtils::CreateRandomUuid();
-
-        Dto::S3::Bucket s3Bucket;
-        s3Bucket.bucketName = bucketEntity.name;
-
-        if (bucketEntity.HasQueueNotificationEvent(event)) {
-            if (Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event); notification.CheckFilter(key)) {
-                // Create the event record
-                Dto::S3::NotificationBucket notificationBucket;
-                notificationBucket.name = s3Bucket.bucketName;
-                notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
-                Dto::S3::S3 s3;
-                s3.configurationId = notification.id;
-                s3.bucket = notificationBucket;
-                s3.object = s3Object;
-
-                Dto::S3::Record record;
-                record.region = region;
-                record.eventName = event;
-                record.s3 = s3;
-                Dto::S3::EventNotification eventNotification;
-
-                eventNotification.records.push_back(record);
-                log_debug << "Found notification records, count: " << eventNotification.records.size();
-
-                // Queue notification
-                SendQueueNotificationRequest(eventNotification, notification);
-                log_trace << "SQS message created, eventNotification: " + eventNotification.ToString();
-                log_debug << "SQS message created, queueArn: " << notification.queueArn;
-            }
-        }
-
-        if (bucketEntity.HasTopicNotificationEvent(event)) {
-            if (Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event); notification.CheckFilter(key)) {
-                // Create the event record
-                Dto::S3::NotificationBucket notificationBucket;
-                notificationBucket.name = s3Bucket.bucketName;
-                notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
-                Dto::S3::S3 s3;
-                s3.configurationId = notification.id;
-                s3.bucket = notificationBucket;
-                s3.object = s3Object;
-
-                Dto::S3::Record record;
-                record.region = region;
-                record.eventName = event;
-                record.s3 = s3;
-
-                Dto::S3::EventNotification eventNotification;
-
-                eventNotification.records.push_back(record);
-                log_debug << "Found notification records, count: " << eventNotification.records.size();
-
-                // Queue notification
-                SendTopicNotificationRequest(eventNotification, notification);
-                log_trace << "SNS message created, eventNotification: " + eventNotification.ToString();
-                log_debug << "SNS message created, topicArn: " << notification.topicArn;
-            }
-        }
-
-        if (bucketEntity.HasLambdaNotificationEvent(event)) {
-            if (Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event); notification.CheckFilter(key)) {
-                // Create the event record
-                Dto::S3::NotificationBucket notificationBucket;
-                notificationBucket.name = s3Bucket.bucketName;
-                notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
-                Dto::S3::S3 s3;
-                s3.configurationId = notification.id;
-                s3.bucket = notificationBucket;
-                s3.object = s3Object;
-
-                Dto::S3::Record record;
-                record.region = region;
-                record.eventName = event;
-                record.s3 = s3;
-                Dto::S3::EventNotification eventNotification;
-
-                eventNotification.records.push_back(record);
-                log_debug << "Found notification records, count: " << eventNotification.records.size();
-
-                // Lambda notification
-                SendLambdaInvocationRequest(eventNotification, notification);
-                log_trace << "Lambda function invoked, eventNotification: " + eventNotification.ToString();
-                log_debug << "Lambda function invoked, lambdaArn:" << notification.lambdaArn;
-            }
-        }
-    }
-
-    Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) const {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "put_bucket_notification");
-
-        // Check existence
-        CheckBucketExistence(request.region, request.bucket);
-
-        try {
-            Dto::S3::PutBucketNotificationConfigurationResponse response;
-
-            // Get bucket
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-            log_debug << "Bucket received, region:" << bucket.region << " bucket: " << bucket.name;
-
-            // Add notification configurations
-            if (!request.queueConfigurations.empty()) {
-                PutQueueNotificationConfigurations(bucket, request.queueConfigurations);
-            }
-            if (!request.topicConfigurations.empty()) {
-                PutTopicNotificationConfigurations(bucket, request.topicConfigurations);
-            }
-            if (!request.lambdaConfigurations.empty()) {
-                PutLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
-            }
-
-            // Update database
-            bucket = _database.UpdateBucket(bucket);
-            log_debug << "Bucket updated, region:" << bucket.region << " bucket: " << bucket.name;
-
-            // Copy configurations
-            response.queueConfigurations = request.queueConfigurations;
-            response.topicConfigurations = request.topicConfigurations;
-            response.lambdaConfigurations = request.lambdaConfigurations;
-
-            return response;
-        } catch (bsoncxx::exception &ex) {
-            log_error << "S3 put notification configurations failed, message: " << ex.what();
-            throw Core::ServiceException(ex.what());
-        }
-    }
-
     Dto::S3::ListObjectCounterResponse S3Service::ListObjectCounters(const Dto::S3::ListObjectCounterRequest &s3Request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "list_object_counters");
         log_trace << "List objects counters request";
@@ -1248,44 +962,189 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
+    void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_object");
+        log_trace << "Delete object request: " << request.ToString();
 
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-        const auto transferDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
-        const auto transferBucket = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
 
-        if (!internalName.empty()) {
-            std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
-            Core::FileUtils::RemoveFile(filename);
-            log_debug << "File system object deleted, filename: " << filename;
+        if (_database.ObjectExists(request.region, request.bucket, request.key)) {
+            try {
+                // Get the object from the database
+                const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-            if (bucket == transferBucket) {
-                filename = key;
-                filename = transferDir + Core::FileUtils::separator() + Core::FileUtils::SetFileSeparator(filename);
-                Core::FileUtils::RemoveFile(filename);
-                log_debug << "Transfer file system object deleted, filename: " << filename;
+                // Delete from database
+                _database.DeleteObject(object);
+                log_debug << "Database object deleted, bucket: " + request.bucket + ", key: " << request.key;
+
+                // Delete the file system object
+                DeleteObject(object.bucket, object.key, object.internalName);
+
+                // Check notifications
+                CheckNotifications(request.region, request.bucket, request.key, 0, "ObjectRemoved");
+
+                log_debug << "Object deleted, bucket: " << request.bucket << " key: " << request.key;
+            } catch (Core::JsonException &exc) {
+                log_error << "S3 delete object failed, message: " + exc.message();
+                throw Core::ServiceException(exc.message());
             }
         }
     }
 
-    void S3Service::DeleteBucket(const std::string &bucket) {
-        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_bucket");
+    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_objects");
+        log_trace << "Delete objects request: " << request.ToString();
 
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-        Core::DirUtils::EnsureDirectory(dataS3Dir);
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
 
-        // TODO: List object in bucket und delete each object individually
-        if (const std::string bucketDir = dataS3Dir + Core::FileUtils::separator() + bucket; Core::DirUtils::DirectoryExists(bucketDir)) {
-            Core::DirUtils::DeleteDirectory(bucketDir);
-            log_debug << "Bucket directory deleted, bucketDir: " + bucketDir;
+        Dto::S3::DeleteObjectsResponse response;
+        response.keys = request.keys;
+        try {
+            // Delete file system objects
+            for (const auto &key: request.keys) {
+                if (!key.empty()) {
+                    // Delete from database
+                    Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, key);
+                    log_debug << "Database object deleted, count: " << request.keys.size();
+
+                    DeleteObject(object.bucket, object.key, object.internalName);
+                    log_debug << "File system object deleted: " << key;
+
+                    // Check notifications
+                    CheckNotifications(request.region, request.bucket, key, 0, "ObjectRemoved");
+                }
+            }
+
+            // Delete from database
+            _database.DeleteObjects(request.region, request.bucket, request.keys);
+            log_debug << "Database object deleted, count: " << request.keys.size();
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 delete objects failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+        log_debug << "DeleteObjects succeeded, bucket: " << request.bucket;
+        return response;
+    }
+
+    Dto::S3::PutBucketNotificationConfigurationResponse S3Service::PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "put_bucket_notification");
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        try {
+
+            // Get bucket
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+            log_debug << "Bucket received, region:" << bucket.region << " bucket: " << bucket.name;
+
+            // Add notification configurations
+            if (!request.queueConfigurations.empty()) {
+                PutQueueNotificationConfigurations(bucket, request.queueConfigurations);
+            }
+            if (!request.topicConfigurations.empty()) {
+                PutTopicNotificationConfigurations(bucket, request.topicConfigurations);
+            }
+            if (!request.lambdaConfigurations.empty()) {
+                PutLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
+            }
+
+            // Update database
+            bucket = _database.UpdateBucket(bucket);
+            log_debug << "Bucket updated, region:" << bucket.region << " bucket: " << bucket.name;
+
+            // Copy configurations
+            Dto::S3::PutBucketNotificationConfigurationResponse response;
+            response.queueConfigurations = request.queueConfigurations;
+            response.topicConfigurations = request.topicConfigurations;
+            response.lambdaConfigurations = request.lambdaConfigurations;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put notification configurations failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
         }
     }
 
-    std::string S3Service::GetMultipartUploadDirectory(const std::string &uploadId) {
-        const auto tempDir = Core::Configuration::instance().GetValue<std::string>("awsmock.temp-dir");
-        Core::DirUtils::EnsureDirectory(tempDir);
-        return tempDir + Core::FileUtils::separator() + uploadId;
+    void S3Service::PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "put_bucket_encryption");
+        log_trace << "Put bucket encryption request, algorithm: " << request.sseAlgorithm;
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        try {
+            Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
+
+            Database::Entity::S3::BucketEncryption bucketEncryption;
+            bucketEncryption.sseAlgorithm = request.sseAlgorithm;
+            bucketEncryption.kmsKeyId = request.kmsKeyId;
+
+            bucketEntity.bucketEncryption = bucketEncryption;
+            bucketEntity = _database.UpdateBucket(bucketEntity);
+            log_debug << "PutBucketEncryption succeeded, bucket: " << request.bucket;
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put bucket encryption request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::S3::ListObjectVersionsResponse S3Service::ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "list_option_versions");
+        log_trace << "List object versions request: " << request.ToString();
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        // Get bucket
+        if (const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket); !bucketEntity.IsVersioned()) {
+            log_error << "Bucket is not versioning";
+            throw Core::NotFoundException("Bucket is not versioned");
+        }
+
+        try {
+
+            Dto::S3::ListObjectVersionsResponse response;
+            const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(request.region, request.bucket, request.prefix);
+            return Dto::S3::ListVersionsResponseMapper::toDto(objectList);
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 list object versions request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_bucket");
+        log_trace << "Delete bucket request, name: " << request.bucket;
+
+        Database::Entity::S3::Bucket bucket;
+        bucket.region = request.region;
+        bucket.name = request.bucket;
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        // Check empty
+        if (_database.HasObjects(bucket)) {
+            log_error << "Bucket is not empty";
+            throw Core::NotFoundException("Bucket is not empty");
+        }
+
+        try {
+            // Delete directory
+            DeleteBucket(request.bucket);
+
+            // Delete bucket from database
+            _database.DeleteBucket(bucket);
+            log_debug << "Bucket deleted, bucket: " << bucket.name;
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 Delete Bucket failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
     }
 
     void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
@@ -1328,86 +1187,189 @@ namespace AwsMock::Service {
         log_debug << "Lambda invocation send";
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) {
-        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-        Core::DirUtils::EnsureDirectory(dataS3Dir);
+    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "check_notifications");
+        log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
 
-        // Write the file
-        std::string fileName = Core::AwsUtils::CreateS3FileName();
-        std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
+        Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
-        // Write the file in chunks
-        std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-        long count = Core::FileUtils::StreamCopier(stream, ofs, request.contentLength);
-        ofs.close();
-        log_debug << "File copied, count: " << count;
+        // Create S3 bucket and object
+        Dto::S3::Object s3Object;
+        s3Object.key = key;
+        s3Object.size = size;
+        s3Object.etag = Core::StringUtils::CreateRandomUuid();
 
-        // Check file encoding
-        if (Core::FileUtils::IsBase64(filePath)) {
-            log_debug << "File is base64 encoded, file: " << filePath;
-            Core::FileUtils::Base64DecodeFile(filePath);
-        }
+        Dto::S3::Bucket s3Bucket;
+        s3Bucket.bucketName = bucketEntity.name;
 
-        // Get content type
-        std::string contentType = SanitizeContentType(request.contentType, filePath, request.key);
+        if (bucketEntity.HasQueueNotificationEvent(event)) {
+            if (Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event); notification.CheckFilter(key)) {
+                // Create the event record
+                Dto::S3::NotificationBucket notificationBucket;
+                notificationBucket.name = s3Bucket.bucketName;
+                notificationBucket.arn = s3Bucket.arn;
+                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                Dto::S3::S3 s3;
+                s3.configurationId = notification.id;
+                s3.bucket = notificationBucket;
+                s3.object = s3Object;
 
-        // Create entity
-        Database::Entity::S3::Object object;
-        object.region = request.region;
-        object.bucket = request.bucket;
-        object.bucketArn = Core::AwsUtils::CreateS3BucketArn(request.region, accountId, request.bucket);
-        object.key = request.key;
-        object.owner = request.owner;
-        object.size = size;
-        object.contentType = contentType;
-        object.internalName = fileName;
-        object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
+                Dto::S3::Record record;
+                record.region = region;
+                record.eventName = event;
+                record.s3 = s3;
+                Dto::S3::EventNotification eventNotification;
 
-        // Metadata
-        if (bucket.defaultMetadata.empty()) {
-            object.metadata = bucket.defaultMetadata;
-        }
-        object.metadata.merge(request.metadata);
+                eventNotification.records.push_back(record);
+                log_debug << "Found notification records, count: " << eventNotification.records.size();
 
-        // Meta data
-        object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
-        log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", md5: " << object.md5sum;
-        if (!request.checksumAlgorithm.empty()) {
-            const std::string filename = dataS3Dir + "/" + object.internalName;
-            if (request.checksumAlgorithm == "SHA1") {
-                object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
-                log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", sha1: " << object.sha1sum;
-            } else if (request.checksumAlgorithm == "SHA256") {
-                object.sha256sum = Core::Crypto::GetSha256FromFile(filename);
-                log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", sha256: " << object.sha256sum;
+                // Queue notification
+                SendQueueNotificationRequest(eventNotification, notification);
+                log_trace << "SQS message created, eventNotification: " + eventNotification.ToString();
+                log_debug << "SQS message created, queueArn: " << notification.queueArn;
             }
         }
 
-        // Update database
-        object = _database.CreateOrUpdateObject(object);
-        log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
+        if (bucketEntity.HasTopicNotificationEvent(event)) {
+            if (Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event); notification.CheckFilter(key)) {
+                // Create the event record
+                Dto::S3::NotificationBucket notificationBucket;
+                notificationBucket.name = s3Bucket.bucketName;
+                notificationBucket.arn = s3Bucket.arn;
+                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                Dto::S3::S3 s3;
+                s3.configurationId = notification.id;
+                s3.bucket = notificationBucket;
+                s3.object = s3Object;
 
-        // Check encryption
-        CheckEncryption(bucket, object);
-        log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
+                Dto::S3::Record record;
+                record.region = region;
+                record.eventName = event;
+                record.s3 = s3;
 
-        // Check notification
-        CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-        log_debug << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
+                Dto::S3::EventNotification eventNotification;
 
-        Dto::S3::PutObjectResponse response;
-        response.bucket = request.bucket;
-        response.key = request.key;
-        response.etag = object.md5sum;
-        response.md5Sum = object.md5sum;
-        response.contentLength = size;
-        response.contentType = contentType;
-        response.sha1Sum = object.sha1sum;
-        response.sha256sum = object.sha256sum;
-        response.metadata = request.metadata;
+                eventNotification.records.push_back(record);
+                log_debug << "Found notification records, count: " << eventNotification.records.size();
 
-        return response;
+                // Queue notification
+                SendTopicNotificationRequest(eventNotification, notification);
+                log_trace << "SNS message created, eventNotification: " + eventNotification.ToString();
+                log_debug << "SNS message created, topicArn: " << notification.topicArn;
+            }
+        }
+
+        if (bucketEntity.HasLambdaNotificationEvent(event)) {
+            if (Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event); notification.CheckFilter(key)) {
+                // Create the event record
+                Dto::S3::NotificationBucket notificationBucket;
+                notificationBucket.name = s3Bucket.bucketName;
+                notificationBucket.arn = s3Bucket.arn;
+                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                Dto::S3::S3 s3;
+                s3.configurationId = notification.id;
+                s3.bucket = notificationBucket;
+                s3.object = s3Object;
+
+                Dto::S3::Record record;
+                record.region = region;
+                record.eventName = event;
+                record.s3 = s3;
+                Dto::S3::EventNotification eventNotification;
+
+                eventNotification.records.push_back(record);
+                log_debug << "Found notification records, count: " << eventNotification.records.size();
+
+                // Lambda notification
+                SendLambdaInvocationRequest(eventNotification, notification);
+                log_trace << "Lambda function invoked, eventNotification: " + eventNotification.ToString();
+                log_debug << "Lambda function invoked, lambdaArn:" << notification.lambdaArn;
+            }
+        }
+    }
+
+    void S3Service::CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object) {
+        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        Core::DirUtils::EnsureDirectory(dataS3Dir);
+        if (bucket.HasEncryption()) {
+            const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
+            const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
+            log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
+            const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
+            Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
+            Core::Crypto::Aes256EncryptFile(dataS3Dir + "/" + object.internalName, rawKey);
+            free(rawKey);
+        }
+    }
+
+    void S3Service::CheckBucketExistence(const std::string &region, const std::string &name) {
+        // Check existence
+        if (!Database::S3Database::instance().BucketExists(region, name)) {
+            log_warning << "Bucket does not exists, region: " << region << " name: " << name;
+            throw Core::NotFoundException("Bucket does not exists, region: " + region + " name: " + name);
+        }
+    }
+
+    void S3Service::CheckBucketNonExistence(const std::string &region, const std::string &name) {
+        // Check existence
+        if (Database::S3Database::instance().BucketExists(region, name)) {
+            log_warning << "Bucket exists already, region: " << region << " name: " << name;
+            throw Core::NotFoundException("Bucket exists already, region: " + region + ", name: " + name);
+        }
+    }
+
+    void S3Service::CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile) {
+        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        Core::DirUtils::EnsureDirectory(dataS3Dir);
+        if (bucket.HasEncryption()) {
+            const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
+            const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
+            log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
+            const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
+            Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
+            Core::Crypto::Aes256DecryptFile(dataS3Dir + "/" + object.internalName, outFile, rawKey);
+            free(rawKey);
+        }
+    }
+
+    std::string S3Service::GetMultipartUploadDirectory(const std::string &uploadId) {
+        const auto tempDir = Core::Configuration::instance().GetValue<std::string>("awsmock.temp-dir");
+        Core::DirUtils::EnsureDirectory(tempDir);
+        return tempDir + Core::FileUtils::separator() + uploadId;
+    }
+
+    void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_object");
+
+        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto transferDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const auto transferBucket = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
+
+        if (!internalName.empty()) {
+            std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
+            Core::FileUtils::RemoveFile(filename);
+            log_debug << "File system object deleted, filename: " << filename;
+
+            if (bucket == transferBucket) {
+                filename = key;
+                filename = transferDir + Core::FileUtils::separator() + Core::FileUtils::SetFileSeparator(filename);
+                Core::FileUtils::RemoveFile(filename);
+                log_debug << "Transfer file system object deleted, filename: " << filename;
+            }
+        }
+    }
+
+    void S3Service::DeleteBucket(const std::string &bucket) {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_bucket");
+
+        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        Core::DirUtils::EnsureDirectory(dataS3Dir);
+
+        // TODO: List object in bucket und delete each object individually
+        if (const std::string bucketDir = dataS3Dir + Core::FileUtils::separator() + bucket; Core::DirUtils::DirectoryExists(bucketDir)) {
+            Core::DirUtils::DeleteDirectory(bucketDir);
+            log_debug << "Bucket directory deleted, bucketDir: " + bucketDir;
+        }
     }
 
     Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) {
@@ -1492,6 +1454,88 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) {
+        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        Core::DirUtils::EnsureDirectory(dataS3Dir);
+
+        // Write the file
+        std::string fileName = Core::AwsUtils::CreateS3FileName();
+        std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
+
+        // Write the file in chunks
+        std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
+        long count = Core::FileUtils::StreamCopier(stream, ofs, request.contentLength);
+        ofs.close();
+        log_debug << "File copied, count: " << count;
+
+        // Check file encoding
+        if (Core::FileUtils::IsBase64(filePath)) {
+            log_debug << "File is base64 encoded, file: " << filePath;
+            Core::FileUtils::Base64DecodeFile(filePath);
+        }
+
+        // Get content type
+        std::string contentType = SanitizeContentType(request.contentType, filePath, request.key);
+
+        // Create entity
+        Database::Entity::S3::Object object;
+        object.region = request.region;
+        object.bucket = request.bucket;
+        object.bucketArn = Core::AwsUtils::CreateS3BucketArn(request.region, accountId, request.bucket);
+        object.key = request.key;
+        object.owner = request.owner;
+        object.size = size;
+        object.contentType = contentType;
+        object.internalName = fileName;
+        object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
+
+        // Metadata
+        if (bucket.defaultMetadata.empty()) {
+            object.metadata = bucket.defaultMetadata;
+        }
+        object.metadata.merge(request.metadata);
+
+        // Meta data
+        object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
+        log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", md5: " << object.md5sum;
+        if (!request.checksumAlgorithm.empty()) {
+            const std::string filename = dataS3Dir + "/" + object.internalName;
+            if (request.checksumAlgorithm == "SHA1") {
+                object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
+                log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", sha1: " << object.sha1sum;
+            } else if (request.checksumAlgorithm == "SHA256") {
+                object.sha256sum = Core::Crypto::GetSha256FromFile(filename);
+                log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", sha256: " << object.sha256sum;
+            }
+        }
+
+        // Update database
+        object = _database.CreateOrUpdateObject(object);
+        log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
+
+        // Check encryption
+        CheckEncryption(bucket, object);
+        log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
+
+        // Check notification
+        CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
+        log_debug << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
+
+        Dto::S3::PutObjectResponse response;
+        response.bucket = request.bucket;
+        response.key = request.key;
+        response.etag = object.md5sum;
+        response.md5Sum = object.md5sum;
+        response.contentLength = size;
+        response.contentType = contentType;
+        response.sha1Sum = object.sha1sum;
+        response.sha256sum = object.sha256sum;
+        response.metadata = request.metadata;
+
+        return response;
+    }
+
     void S3Service::PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) {
         for (const auto &queueConfiguration: queueConfigurations) {
             // Check existence
@@ -1555,6 +1599,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) const {
+
         bool modified = false;
         for (const auto &lambdaConfiguration: lambdaConfigurations) {
             auto newEntity = Dto::S3::LambdaConfigurationMapper::toEntity(lambdaConfiguration);
@@ -1563,73 +1608,28 @@ namespace AwsMock::Service {
             if (!lambdaConfiguration.id.empty() && bucket.HasLambdaNotificationId(lambdaConfiguration.id)) {
                 log_debug << "Updating existing lambda notification, id: " << lambdaConfiguration.id;
 
-                std::ranges::replace_if(bucket.lambdaNotifications,
-                                        [&lambdaConfiguration](const Database::Entity::S3::LambdaNotification &existing) {
-                                            return existing.id == lambdaConfiguration.id;
-                                        },
-                                        newEntity
-                );
+                std::ranges::replace_if(bucket.lambdaNotifications, [&lambdaConfiguration](const Database::Entity::S3::LambdaNotification &existing) { return existing.id == lambdaConfiguration.id; }, newEntity);
                 modified = true;
-            }
-            // Handle Create (New Notification)
-            else {
+
+            } else {
+                log_debug << "Adding new lambda notification, id: " << newEntity.id;
+
+                // Set notification id
                 if (newEntity.id.empty()) {
                     newEntity.id = Core::StringUtils::CreateRandomUuid();
                 }
-                log_debug << "Adding new lambda notification, id: " << newEntity.id;
                 bucket.lambdaNotifications.emplace_back(std::move(newEntity));
                 modified = true;
             }
+
+            // Add it to the lambda event sources
+            AddLambdaEventSource(bucket, lambdaConfiguration);
         }
 
         // Single Atomic Update (Better for stability and performance)
         if (modified) {
             bucket = _database.UpdateBucket(bucket);
             log_debug << "Bucket updated. Total lambda notifications: " << bucket.lambdaNotifications.size();
-        }
-    }
-
-    void S3Service::CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object) {
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-        Core::DirUtils::EnsureDirectory(dataS3Dir);
-        if (bucket.HasEncryption()) {
-            const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
-            const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
-            log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
-            const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
-            Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
-            Core::Crypto::Aes256EncryptFile(dataS3Dir + "/" + object.internalName, rawKey);
-            free(rawKey);
-        }
-    }
-
-    void S3Service::CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile) {
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-        Core::DirUtils::EnsureDirectory(dataS3Dir);
-        if (bucket.HasEncryption()) {
-            const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
-            const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
-            log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
-            const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
-            Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
-            Core::Crypto::Aes256DecryptFile(dataS3Dir + "/" + object.internalName, outFile, rawKey);
-            free(rawKey);
-        }
-    }
-
-    void S3Service::CheckBucketExistence(const std::string &region, const std::string &name) {
-        // Check existence
-        if (!Database::S3Database::instance().BucketExists(region, name)) {
-            log_warning << "Bucket does not exists, region: " << region << " name: " << name;
-            throw Core::NotFoundException("Bucket does not exists, region: " + region + " name: " + name);
-        }
-    }
-
-    void S3Service::CheckBucketNonExistence(const std::string &region, const std::string &name) {
-        // Check existence
-        if (Database::S3Database::instance().BucketExists(region, name)) {
-            log_warning << "Bucket exists already, region: " << region << " name: " << name;
-            throw Core::NotFoundException("Bucket exists already, region: " + region + ", name: " + name);
         }
     }
 
@@ -1640,4 +1640,17 @@ namespace AwsMock::Service {
         }
         return sContentType;
     }
-} // namespace AwsMock::Service
+
+    void S3Service::AddLambdaEventSource(const Database::Entity::S3::Bucket &bucket, const Dto::S3::LambdaConfiguration &lambdaConfiguration) const {
+        Dto::Lambda::AddEventSourceRequest request;
+        request.uuid = lambdaConfiguration.id;
+        request.enabled = true;
+        request.functionArn = lambdaConfiguration.lambdaArn;
+        request.eventSourceArn = bucket.arn;
+        for (const auto &e: lambdaConfiguration.events) {
+            request.events.emplace_back(EventTypeToString(e));
+        }
+        _lambdaService.AddEventSource(request);
+    }
+
+}// namespace AwsMock::Service
