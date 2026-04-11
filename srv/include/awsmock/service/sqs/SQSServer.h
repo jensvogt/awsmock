@@ -23,15 +23,25 @@ namespace AwsMock::Service {
      */
     class SQSServer : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit SQSServer(Core::Scheduler &scheduler);
 
+        /**
+         * @brief Adjust queue counters
+         */
         void AdjustCounter() const;
 
-    private:
+        /**
+         * @ſbrief Server shutdown
+         */
+        void Shutdown() override;
+
+      private:
+
         /**
          * @brief Reset resources
          *
@@ -57,11 +67,6 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Sets the DLQ flags
-         */
-        void SetDlq() const;
-
-        /**
          * @brief Resets the queue URL.
          *
          * @par
@@ -74,11 +79,6 @@ namespace AwsMock::Service {
          * @brief Backup the SQS queues and messages
          */
         static void BackupSqs();
-
-        /**
-         * @ſbrief Server shutdown
-         */
-        void Shutdown() override;
 
         /**
          * SQS database
@@ -124,6 +124,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVER_H

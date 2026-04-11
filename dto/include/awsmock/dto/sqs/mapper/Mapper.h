@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_SQS_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
@@ -20,6 +21,97 @@
 #include <awsmock/utils/SqsUtils.h>
 
 namespace AwsMock::Dto::SQS {
+
+    class RedrivePolicyMapper : public StaticMapper<RedrivePolicyMapper, Database::Entity::SQS::RedrivePolicy, RedrivePolicy> {
+      public:
+
+        static RedrivePolicy toDto(const Database::Entity::SQS::RedrivePolicy &e) {
+            RedrivePolicy d;
+            d.deadLetterTargetArn = e.deadLetterTargetArn;
+            d.maxReceiveCount = e.maxReceiveCount;
+            return d;
+        }
+
+        static Database::Entity::SQS::RedrivePolicy toEntity(const RedrivePolicy &d) {
+            Database::Entity::SQS::RedrivePolicy e;
+            e.deadLetterTargetArn = d.deadLetterTargetArn;
+            e.maxReceiveCount = d.maxReceiveCount;
+            return e;
+        }
+    };
+
+    class QueueAttributeMapper : public StaticMapper<QueueAttributeMapper, Database::Entity::SQS::QueueAttribute, QueueAttribute> {
+      public:
+
+        static QueueAttribute toDto(const Database::Entity::SQS::QueueAttribute &e) {
+            QueueAttribute d;
+            d.queueArn = e.queueArn;
+            d.approximateNumberOfMessages = e.approximateNumberOfMessages;
+            d.approximateNumberOfMessagesDelayed = e.approximateNumberOfMessagesDelayed;
+            d.approximateNumberOfMessagesNotVisible = e.approximateNumberOfMessagesNotVisible;
+            d.policy = e.policy;
+            d.delaySeconds = e.delaySeconds;
+            d.maxMessageSize = e.maxMessageSize;
+            d.messageRetentionPeriod = e.messageRetentionPeriod;
+            d.visibilityTimeout = e.visibilityTimeout;
+            d.redriveAllowPolicy = e.redriveAllowPolicy;
+            d.receiveMessageWaitTime = e.receiveMessageWaitTime;
+            d.redrivePolicy = RedrivePolicyMapper::toDto(e.redrivePolicy);
+            return d;
+        }
+
+        static Database::Entity::SQS::QueueAttribute toEntity(const QueueAttribute &d) {
+            Database::Entity::SQS::QueueAttribute e;
+            e.queueArn = d.queueArn;
+            e.approximateNumberOfMessages = d.approximateNumberOfMessages;
+            e.approximateNumberOfMessagesDelayed = d.approximateNumberOfMessagesDelayed;
+            e.approximateNumberOfMessagesNotVisible = d.approximateNumberOfMessagesNotVisible;
+            e.policy = d.policy;
+            e.delaySeconds = d.delaySeconds;
+            e.maxMessageSize = d.maxMessageSize;
+            e.messageRetentionPeriod = d.messageRetentionPeriod;
+            e.visibilityTimeout = d.visibilityTimeout;
+            e.redriveAllowPolicy = d.redriveAllowPolicy;
+            e.receiveMessageWaitTime = d.receiveMessageWaitTime;
+            e.redrivePolicy = RedrivePolicyMapper::toEntity(d.redrivePolicy);
+            return e;
+        }
+    };
+
+    class QueueMapper : public StaticMapper<QueueMapper, Database::Entity::SQS::Queue, Queue> {
+
+      public:
+
+        static Queue toDto(const Database::Entity::SQS::Queue &e) {
+            Queue d;
+            d.region = e.region;
+            d.name = e.name;
+            d.arn = e.arn;
+            d.url = e.url;
+            d.owner = e.owner;
+            d.tags = e.tags;
+            d.size = e.size;
+            d.attributes = QueueAttributeMapper::toDto(e.attributes);
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+
+        static Database::Entity::SQS::Queue toEntity(const Queue &d) {
+            Database::Entity::SQS::Queue e;
+            e.region = d.region;
+            e.name = d.name;
+            e.url = d.url;
+            e.arn = d.arn;
+            e.owner = d.owner;
+            e.tags = d.tags;
+            e.size = d.size;
+            e.attributes = QueueAttributeMapper::toEntity(d.attributes);
+            e.created = d.created;
+            e.modified = d.modified;
+            return e;
+        }
+    };
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -48,7 +140,7 @@ namespace AwsMock::Dto::SQS {
          * @return queue DTO
          * @see Queue
          */
-        static Queue map(const Database::Entity::SQS::Queue &queueEntity);
+        //static Queue map(const Database::Entity::SQS::Queue &queueEntity);
 
         /**
          * @brief Maps a list of SQS queue entity to a list of SQS queue DTO
@@ -57,7 +149,7 @@ namespace AwsMock::Dto::SQS {
          * @return queue DTO
          * @see Queue
          */
-        static std::vector<Queue> map(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
+        //static std::vector<Queue> map(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
 
         /**
          * @brief Maps a list of SQS queue entity to a list of SQS queue URLs

@@ -1,11 +1,11 @@
 #pragma once
 
 // C++ includes
+#include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <iostream>
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
@@ -16,7 +16,7 @@ namespace AwsMock::FtpServer {
 
     class UserDatabase {
 
-    public:
+      public:
 
         /**
          * Constructor
@@ -25,8 +25,6 @@ namespace AwsMock::FtpServer {
 
         /**
          * Add a new user to the database.
-         *
-         * // TODO:Should be replaced by Aws User database
          *
          * @param username name of the user
          * @param password user password
@@ -45,7 +43,7 @@ namespace AwsMock::FtpServer {
          */
         std::shared_ptr<FtpUser> getUser(const std::string &username, const std::string &password) const;
 
-    private:
+      private:
 
         /**
          * Check whether the user is the anonymous user
@@ -70,7 +68,7 @@ namespace AwsMock::FtpServer {
         /**
          * User database
          */
-        std::map<std::string, std::shared_ptr<FtpUser> > database_;
+        std::map<std::string, std::shared_ptr<FtpUser>> database_;
 
         /**
          * Anonymous user

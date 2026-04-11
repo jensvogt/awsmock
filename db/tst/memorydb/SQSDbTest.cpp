@@ -29,8 +29,8 @@ namespace AwsMock::Database {
         Entity::SQS::Queue queue;
         queue.region = region;
         queue.name = queueName;
-        queue.queueArn = Core::AwsUtils::CreateSQSQueueArn(region, TEST_ACCOUNT_ID, queueName);
-        queue.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.queueArn);
+        queue.arn = Core::AwsUtils::CreateSQSQueueArn(region, TEST_ACCOUNT_ID, queueName);
+        queue.url = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.arn);
         return queue;
     }
 
@@ -56,7 +56,7 @@ namespace AwsMock::Database {
         queue = sqsDatabase.CreateQueue(queue);
 
         // assert
-        BOOST_CHECK_EQUAL(false, queue.queueArn.empty());
+        BOOST_CHECK_EQUAL(false, queue.arn.empty());
         BOOST_CHECK_EQUAL(false, queue.oid.empty());
         BOOST_CHECK_EQUAL(false, queue.name.empty());
         BOOST_CHECK_EQUAL(0, queue.attributes.approximateNumberOfMessages);
@@ -70,7 +70,7 @@ namespace AwsMock::Database {
         const SQSDatabase &sqsDatabase = SQSDatabase::instance();
         Entity::SQS::Queue queue = CreateDefaultTopic(TEST_REGION, TEST_QUEUE_NAME);
         queue = sqsDatabase.CreateQueue(queue);
-        BOOST_CHECK_EQUAL(false, queue.queueArn.empty());
+        BOOST_CHECK_EQUAL(false, queue.arn.empty());
         BOOST_CHECK_EQUAL(false, queue.oid.empty());
         BOOST_CHECK_EQUAL(false, queue.name.empty());
         Entity::SQS::Message message = CreateDefaultSNSMessage(TEST_REGION, queue.name);
@@ -78,7 +78,7 @@ namespace AwsMock::Database {
         // act
         message = sqsDatabase.CreateMessage(message);
         sqsDatabase.AdjustMessageCounters();
-        queue = sqsDatabase.GetQueueByArn(queue.queueArn);
+        queue = sqsDatabase.GetQueueByArn(queue.arn);
 
         // assert
         BOOST_CHECK_EQUAL(true, message.receiptHandle.empty());
@@ -92,7 +92,7 @@ namespace AwsMock::Database {
         const SQSDatabase &sqsDatabase = SQSDatabase::instance();
         Entity::SQS::Queue queue = CreateDefaultTopic(TEST_REGION, TEST_QUEUE_NAME);
         queue = sqsDatabase.CreateQueue(queue);
-        BOOST_CHECK_EQUAL(false, queue.queueArn.empty());
+        BOOST_CHECK_EQUAL(false, queue.arn.empty());
         BOOST_CHECK_EQUAL(false, queue.oid.empty());
         BOOST_CHECK_EQUAL(false, queue.name.empty());
         Entity::SQS::Message message = CreateDefaultSNSMessage(TEST_REGION, queue.name);
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
         // act
         const long count = sqsDatabase.DeleteMessage(message);
         sqsDatabase.AdjustMessageCounters();
-        queue = sqsDatabase.GetQueueByArn(queue.queueArn);
+        queue = sqsDatabase.GetQueueByArn(queue.arn);
 
         // assert
         BOOST_CHECK_EQUAL(1, count);

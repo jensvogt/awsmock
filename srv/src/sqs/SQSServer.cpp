@@ -24,7 +24,6 @@ namespace AwsMock::Service {
 
         // Start reset messages task
         _scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
-        _scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, -1);
         _scheduler.AddTask("sqs-seturl", [this] { this->SetUrl(); }, -1);
 
         // Start backup
@@ -53,21 +52,21 @@ namespace AwsMock::Service {
         // Loop over queues and do some maintenance work
         for (auto &queue: queueList) {
 
-            if (const long messageCount = _sqsDatabase.CountMessages(queue.queueArn); messageCount > 0) {
+            if (const long messageCount = _sqsDatabase.CountMessages(queue.arn); messageCount > 0) {
 
                 // Check the retention period
                 if (queue.attributes.messageRetentionPeriod > 0) {
-                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
+                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.MessageRetention(queue.url, queue.attributes.messageRetentionPeriod);
                 }
 
                 // Check visibility timeout
                 if (queue.attributes.visibilityTimeout > 0) {
-                    queue.attributes.approximateNumberOfMessagesNotVisible -= _sqsDatabase.ResetMessages(queue.queueArn, queue.attributes.visibilityTimeout);
+                    queue.attributes.approximateNumberOfMessagesNotVisible -= _sqsDatabase.ResetMessages(queue.arn, queue.attributes.visibilityTimeout);
                 }
 
                 // Check delays
                 if (queue.attributes.delaySeconds > 0) {
-                    queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
+                    queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.ResetDelayedMessages(queue.url, queue.attributes.delaySeconds);
                 }
 
                 // Save results
@@ -76,31 +75,6 @@ namespace AwsMock::Service {
             }
         }
         log_trace << "SQS reset messages finished, count: " << queueList.size();
-    }
-
-    void SQSServer::SetDlq() const {
-        const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
-        log_trace << "SQS set DLQ task starting, count: " << queueList.size();
-
-        if (queueList.empty()) {
-            return;
-        }
-
-        // Loop over queues and do some maintenance work
-        for (auto &queue: queueList) {
-
-            if (!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
-
-                Database::Entity::SQS::Queue dlq = _sqsDatabase.GetQueueByArn(queue.attributes.redrivePolicy.deadLetterTargetArn);
-                dlq.isDlq = true;
-                dlq.mainQueue = queue.queueArn;
-
-                // Save results
-                dlq = _sqsDatabase.UpdateQueue(dlq);
-                log_trace << "DLQ updated, queueName" << dlq.name;
-            }
-        }
-        log_trace << "SQS DQL finished, count: " << queueList.size();
     }
 
     void SQSServer::SetUrl() const {
@@ -115,7 +89,7 @@ namespace AwsMock::Service {
         // Loop over queues and do some maintenance work
         for (auto &queue: queueList) {
 
-            queue.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.queueArn);
+            queue.url = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.arn);
             queue = _sqsDatabase.UpdateQueue(queue);
             log_trace << "SQS queue updated, queueName" << queue.name;
         }
@@ -167,4 +141,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("sns-delete-messages");
         _scheduler.Shutdown("sns-backup");
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

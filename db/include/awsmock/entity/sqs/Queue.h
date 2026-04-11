@@ -25,7 +25,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Queue /*final : Common::BaseEntity<Queue>*/ {
+    struct Queue final : Common::BaseEntity<Queue> {
 
         /**
          * Region
@@ -50,12 +50,12 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Queue URL
          */
-        std::string queueUrl;
+        std::string url;
 
         /**
          * Queue ARN
          */
-        std::string queueArn;
+        std::string arn;
 
         /**
          * Queue userAttributes
@@ -83,19 +83,9 @@ namespace AwsMock::Database::Entity::SQS {
         long size{};
 
         /**
-         * DLQ flag
-         */
-        bool isDlq{};
-
-        /**
          * Content type
          */
         std::string contentType;
-
-        /**
-         * Main queue for this DLQ
-         */
-        std::string mainQueue;
 
         /**
          * Default message attributes
@@ -117,7 +107,8 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]]
+        view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity

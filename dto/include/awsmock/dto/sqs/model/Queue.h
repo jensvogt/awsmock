@@ -38,15 +38,15 @@ namespace AwsMock::Dto::SQS {
         /**
          * Queue URL
          */
-        std::string queueUrl;
+        std::string url;
 
         /**
          * Queue ARN
          */
-        std::string queueArn;
+        std::string arn;
 
         /**
-         * Queue userAttributes
+         * Queue attributes
          */
         QueueAttribute attributes;
 
@@ -58,17 +58,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Queue size in bytes
          */
-        long size = 0;
-
-        /**
-         * DLQ flag
-         */
-        bool isDlq = false;
-
-        /**
-         * Main queue for this DLQ
-         */
-        std::string mainQueue;
+        long size{};
 
         /**
          * Default message attributes
@@ -91,15 +81,13 @@ namespace AwsMock::Dto::SQS {
             Queue r;
             r.name = Core::Json::GetStringValue(v, "name");
             r.owner = Core::Json::GetStringValue(v, "owner");
-            r.queueUrl = Core::Json::GetStringValue(v, "queueUrl");
-            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.url = Core::Json::GetStringValue(v, "queueUrl");
+            r.arn = Core::Json::GetStringValue(v, "queueArn");
             r.size = Core::Json::GetLongValue(v, "size");
-            r.isDlq = Core::Json::GetBoolValue(v, "isDlq");
-            r.mainQueue = Core::Json::GetStringValue(v, "mainQueue");
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             if (Core::Json::AttributeExists(v, "attributes")) {
-                r.attributes = boost::json::value_to<Dto::SQS::QueueAttribute>(v.at("attributes"));
+                r.attributes = boost::json::value_to<QueueAttribute>(v.at("attributes"));
             }
             if (Core::Json::AttributeExists(v, "defaultMessageAttributes")) {
                 r.defaultMessageAttributes = boost::json::value_to<std::map<std::string, Dto::SQS::MessageAttribute>>(v.at("defaultMessageAttributes"));
@@ -117,11 +105,9 @@ namespace AwsMock::Dto::SQS {
                     {"requestId", obj.requestId},
                     {"name", obj.name},
                     {"owner", obj.owner},
-                    {"queueUrl", obj.queueUrl},
-                    {"queueArn", obj.queueArn},
+                    {"queueUrl", obj.url},
+                    {"queueArn", obj.arn},
                     {"size", obj.size},
-                    {"isDlq", obj.isDlq},
-                    {"mainQueue", obj.mainQueue},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
                     {"attributes", boost::json::value_from(obj.attributes)},

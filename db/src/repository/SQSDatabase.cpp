@@ -45,7 +45,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
             if (!queueUrl.empty()) {
-                query.append(kvp("queueUrl", queueUrl));
+                query.append(kvp("url", queueUrl));
             }
 
             return _queueCollection.count_documents(query.view(), options) > 0;
@@ -65,7 +65,7 @@ namespace AwsMock::Database {
             mongocxx::options::count options;
             options.limit(1);
 
-            return _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)), options) > 0;
+            return _queueCollection.count_documents(make_document(kvp("arn", queueArn)), options) > 0;
         }
         return _memoryDb.QueueArnExists(queueArn);
     }
@@ -92,7 +92,7 @@ namespace AwsMock::Database {
             } catch (mongocxx::exception &e) {
                 session.abort_transaction();
                 log_error << "Collection transaction exception: " << e.what();
-                throw Core::DatabaseException("Insert queue failed, region: " + queue.region + " queueUrl: " + queue.queueUrl + " message: " + e.what());
+                throw Core::DatabaseException("Insert queue failed, region: " + queue.region + " queueUrl: " + queue.url + " message: " + e.what());
             }
         }
         return _memoryDb.CreateQueue(queue);
@@ -132,7 +132,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
 
-            if (const auto mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)))) {
+            if (const auto mResult = _queueCollection.find_one(make_document(kvp("arn", queueArn)))) {
                 Entity::SQS::Queue queue;
                 queue.FromDocument(mResult->view());
                 return queue;
@@ -176,7 +176,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
             if (!queueUrl.empty()) {
-                query.append(kvp("queueUrl", queueUrl));
+                query.append(kvp("url", queueUrl));
             }
             if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
                 log_error << "Queue not found, region: " << region << " queueUrl: " << queueUrl;
@@ -300,7 +300,7 @@ namespace AwsMock::Database {
     void SQSDatabase::ImportQueue(Entity::SQS::Queue &queue) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "import_queues");
 
-        queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
+        queue.url = Core::CreateSQSQueueUrl(queue.name);
         queue.modified = system_clock::now();
         queue.attributes.approximateNumberOfMessages = 0;
         queue.attributes.approximateNumberOfMessagesDelayed = 0;
@@ -348,7 +348,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
+                const auto result = messageCollection.delete_many(make_document(kvp("arn", queueArn)));
                 session.commit_transaction();
                 log_debug << "Purged queue, count: " << result->deleted_count() << " queueArn: " << queueArn;
 
@@ -381,7 +381,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
+                const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("arn", queue.arn)), queue.ToDocument(), opts);
                 session.commit_transaction();
                 log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
@@ -415,7 +415,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queueArn)),
+                const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("arn", queueArn)),
                                                                           make_document(kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(messageNumber)))),
                                                                                         kvp("$inc", make_document(kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(-messageNumber))))));
                 session.commit_transaction();
@@ -435,7 +435,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::CreateOrUpdateQueue(Entity::SQS::Queue &queue) const {
 
-        if (QueueArnExists(queue.queueArn)) {
+        if (QueueArnExists(queue.arn)) {
 
             return UpdateQueue(queue);
         }
@@ -459,7 +459,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("arn", queueArn));
 
                 document setQuery;
                 setQuery.append(kvp("size", static_cast<bsoncxx::types::b_int64>(size)));
@@ -521,7 +521,7 @@ namespace AwsMock::Database {
 
             try {
                 mongocxx::pipeline p{};
-                p.match(make_document(kvp("queueArn", queueArn)));
+                p.match(make_document(kvp("arn", queueArn)));
                 p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
                 if (auto totalSizeCursor = _objectCollection.aggregate(p); !totalSizeCursor.begin()->empty()) {
@@ -551,7 +551,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto result = _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
+                const auto result = _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("url", queue.url)));
                 session.commit_transaction();
                 log_debug << "Queue deleted, count: " << result->deleted_count();
                 deleted = result->deleted_count();
@@ -908,7 +908,7 @@ namespace AwsMock::Database {
                 auto dqlBulk = messageCollection.create_bulk_write();
 
                 // Get the cursor
-                for (auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts); auto message: messageCursor) {
+                for (auto messageCursor = messageCollection.find(make_document(kvp("arn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts); auto message: messageCursor) {
 
                     Entity::SQS::Message result;
                     result.FromDocument(message);
@@ -921,9 +921,9 @@ namespace AwsMock::Database {
                         filterQuery.append(kvp("_id", message["_id"].get_oid()));
 
                         document setQuery;
-                        setQuery.append(kvp("queueArn", dlQueueArn));
-                        setQuery.append(kvp("queueUrl", dlqQueueUrl));
-                        setQuery.append(kvp("queueName", dlqQueueName));
+                        setQuery.append(kvp("arn", dlQueueArn));
+                        setQuery.append(kvp("url", dlqQueueUrl));
+                        setQuery.append(kvp("name", dlqQueueName));
                         setQuery.append(kvp("receiptHandle", ""));
                         setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
 
@@ -1000,7 +1000,7 @@ namespace AwsMock::Database {
             try {
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("arn", queueArn));
                 filterQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)));
                 filterQuery.append(kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
 
@@ -1044,14 +1044,14 @@ namespace AwsMock::Database {
                 std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(redrivePolicy.deadLetterTargetArn);
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("arn", queueArn));
                 filterQuery.append(kvp("retries", make_document(kvp("$gt", static_cast<bsoncxx::types::b_int64>(redrivePolicy.maxReceiveCount)))));
 
                 document setQuery;
                 setQuery.append(kvp("retries", 0));
-                setQuery.append(kvp("queueArn", redrivePolicy.deadLetterTargetArn));
-                setQuery.append(kvp("queueUrl", dlqQueueUrl));
-                setQuery.append(kvp("queueName", dlqQueueName));
+                setQuery.append(kvp("arn", redrivePolicy.deadLetterTargetArn));
+                setQuery.append(kvp("url", dlqQueueUrl));
+                setQuery.append(kvp("name", dlqQueueName));
                 setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
 
                 document updateQuery;
@@ -1087,7 +1087,7 @@ namespace AwsMock::Database {
                 const auto now = system_clock::now();
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("arn", queueArn));
                 filterQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)));
                 filterQuery.append(kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(now)))));
 
@@ -1127,13 +1127,13 @@ namespace AwsMock::Database {
             try {
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", dlqQueue.queueArn));
+                filterQuery.append(kvp("arn", dlqQueue.arn));
                 filterQuery.append(kvp("messageId", messageId));
 
                 document setQuery;
-                setQuery.append(kvp("queueArn", originalQueue.queueArn));
-                setQuery.append(kvp("queueUrl", originalQueue.queueUrl));
-                setQuery.append(kvp("queueName", originalQueue.name));
+                setQuery.append(kvp("arn", originalQueue.arn));
+                setQuery.append(kvp("url", originalQueue.url));
+                setQuery.append(kvp("name", originalQueue.name));
                 setQuery.append(kvp("retries", 0));
                 setQuery.append(kvp("reset", bsoncxx::types::b_date(newReset)));
                 setQuery.append(kvp("receiptHandle", ""));
@@ -1145,7 +1145,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
                 session.commit_transaction();
-                log_trace << "Message redrive, arn: " << dlqQueue.queueArn << ", messageId: " << messageId << ", updated: " << result->modified_count();
+                log_trace << "Message redrive, arn: " << dlqQueue.arn << ", messageId: " << messageId << ", updated: " << result->modified_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -1171,12 +1171,12 @@ namespace AwsMock::Database {
             try {
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", dlqQueue.queueArn));
+                filterQuery.append(kvp("arn", dlqQueue.arn));
 
                 document setQuery;
-                setQuery.append(kvp("queueArn", originalQueue.queueArn));
-                setQuery.append(kvp("queueUrl", originalQueue.queueUrl));
-                setQuery.append(kvp("queueName", originalQueue.name));
+                setQuery.append(kvp("arn", originalQueue.arn));
+                setQuery.append(kvp("url", originalQueue.url));
+                setQuery.append(kvp("name", originalQueue.name));
                 setQuery.append(kvp("retries", 0));
                 setQuery.append(kvp("reset", bsoncxx::types::b_date(newReset)));
                 setQuery.append(kvp("receiptHandle", ""));
@@ -1188,7 +1188,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
                 session.commit_transaction();
-                log_trace << "Message re-drive, arn: " << dlqQueue.queueArn << " updated: " << result->modified_count();
+                log_trace << "Message re-drive, arn: " << dlqQueue.arn << " updated: " << result->modified_count();
 
                 updated = result->modified_count();
 
@@ -1218,7 +1218,7 @@ namespace AwsMock::Database {
             try {
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("arn", queueArn));
                 filterQuery.append(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset)))));
 
                 session.start_transaction();
@@ -1249,7 +1249,7 @@ namespace AwsMock::Database {
 
             document query = {};
             if (!queueArn.empty()) {
-                query.append(kvp("queueArn", queueArn));
+                query.append(kvp("arn", queueArn));
             }
             if (!prefix.empty()) {
                 query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
@@ -1273,7 +1273,7 @@ namespace AwsMock::Database {
 
             mongocxx::pipeline p{};
             if (!queueArn.empty()) {
-                p.match(make_document(kvp("queueArn", queueArn)));
+                p.match(make_document(kvp("arn", queueArn)));
             }
             p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
             p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
@@ -1298,7 +1298,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 auto messageCollection = client->database(_databaseName)[_messageCollectionName];
 
-                const long count = messageCollection.count_documents(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(status))));
+                const long count = messageCollection.count_documents(make_document(kvp("arn", queueArn), kvp("status", MessageStatusToString(status))));
                 log_trace << "Count resources by status, status: " << MessageStatusToString(status) << " result: " << count;
                 return count;
 
@@ -1330,7 +1330,7 @@ namespace AwsMock::Database {
                     system_clock::time_point firstTimestamp = system_clock::now();
                     system_clock::time_point lastTimestamp = system_clock::now();
 
-                    if (const auto first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts)) {
+                    if (const auto first = messageCollection.find_one(make_document(kvp("arn", queue.arn)), opts)) {
                         Entity::SQS::Message firstMessage;
                         firstMessage.FromDocument(first->view());
                         firstTimestamp = firstMessage.created;
@@ -1338,7 +1338,7 @@ namespace AwsMock::Database {
 
                     opts.sort(make_document(kvp("created", 1)));
 
-                    if (auto last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts); last.has_value()) {
+                    if (auto last = messageCollection.find_one(make_document(kvp("arn", queue.arn)), opts); last.has_value()) {
                         Entity::SQS::Message lastMessage;
                         lastMessage.FromDocument(last->view());
                         lastTimestamp = lastMessage.created;
@@ -1373,7 +1373,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
+                const auto result = messageCollection.delete_many(make_document(kvp("arn", queueArn)));
                 session.commit_transaction();
                 log_debug << "Messages deleted, queueArn: " << queueArn << " count: " << result->deleted_count();
                 deleted = result->deleted_count();
@@ -1506,7 +1506,7 @@ namespace AwsMock::Database {
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
-                                       kvp("queueArn", "$_id"),
+                                       kvp("arn", "$_id"),
                                        kvp("total", 1),
                                        kvp("initial", 1),
                                        kvp("invisible", 1),
@@ -1527,14 +1527,14 @@ namespace AwsMock::Database {
                 auto bulk = queueCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                     bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("queueArn", Core::Bson::BsonUtils::GetStringValue(t, "queueArn"))),
+                            make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "arn"))),
                             make_document(kvp("$set", make_document(
                                                               kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
                                                               kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
                                                               kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
                                                               kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
 
-                    log_debug << "Queue: " << Core::Bson::BsonUtils::GetStringValue(t, "queueArn")
+                    log_debug << "Queue: " << Core::Bson::BsonUtils::GetStringValue(t, "arn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
                               << ", visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial")
                               << ", invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible")

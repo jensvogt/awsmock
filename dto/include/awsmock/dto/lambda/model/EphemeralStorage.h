@@ -12,7 +12,6 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-// TODO: Split into header code
 namespace AwsMock::Dto::Lambda {
 
     struct EphemeralStorage final : Common::BaseCounter<EphemeralStorage> {

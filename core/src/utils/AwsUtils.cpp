@@ -51,7 +51,7 @@ namespace AwsMock::Core {
 
             return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
         }
-        log_error << "Neither Url nor ARN";
+        log_error << "Neither Url nor ARN, input: " << input;
         return {};
     }
 

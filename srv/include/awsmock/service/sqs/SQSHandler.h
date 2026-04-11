@@ -65,7 +65,7 @@ namespace AwsMock::Service {
          * @param payload HTTP body
          * @return list of queue userAttributes
          */
-        static std::vector<Dto::SQS::QueueAttribute> GetQueueAttributes(const std::string &payload);
+        static Dto::SQS::QueueAttribute GetQueueAttributes(const std::string &payload);
 
         /**
          * Get the queue tags.

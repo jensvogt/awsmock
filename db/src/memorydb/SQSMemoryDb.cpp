@@ -21,14 +21,14 @@ namespace AwsMock::Database {
 
         return std::ranges::find_if(_queues,
                                     [region, queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                                        return queue.second.region == region && queue.second.queueUrl == queueUrl;
+                                        return queue.second.region == region && queue.second.url == queueUrl;
                                     }) != _queues.end();
     }
 
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                   return queue.second.queueArn == queueArn;
+                   return queue.second.arn == queueArn;
                }) != _queues.end();
     }
 
@@ -57,7 +57,7 @@ namespace AwsMock::Database {
     Entity::SQS::Queue SQSMemoryDb::GetQueueByArn(const std::string &queueArn) {
 
         const auto it = std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-            return queue.second.queueArn == queueArn;
+            return queue.second.arn == queueArn;
         });
 
         if (it != _queues.end()) {
@@ -72,7 +72,7 @@ namespace AwsMock::Database {
         Entity::SQS::Queue result;
         const auto it =
                 std::ranges::find_if(_queues, [queueUrl](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                    return queue.second.queueUrl == queueUrl;
+                    return queue.second.url == queueUrl;
                 });
 
         if (it != _queues.end()) {
@@ -203,7 +203,7 @@ namespace AwsMock::Database {
 
         const auto it = std::ranges::find_if(_queues,
                                              [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                                                 return queue.second.queueArn == queueArn;
+                                                 return queue.second.arn == queueArn;
                                              });
         if (it != _queues.end()) {
             it->second.modified = system_clock::now();
@@ -217,7 +217,7 @@ namespace AwsMock::Database {
 
         const auto it = std::ranges::find_if(_queues,
                                              [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                                                 return queue.second.queueArn == queueArn;
+                                                 return queue.second.arn == queueArn;
                                              });
         if (it != _queues.end()) {
             it->second.size = size;
@@ -239,26 +239,26 @@ namespace AwsMock::Database {
         return q.count();
     }
 
-    long SQSMemoryDb::GetQueueSize(const std::string &queueArn) const {
+    long SQSMemoryDb::GetQueueSize(const std::string &arn) const {
         return std::accumulate(_queues.begin(), _queues.end(), 0L,
-                               [queueArn](long sum, const auto &item) {
-                                   return item.second.queueArn == queueArn ? sum + item.second.size : sum;
+                               [arn](long sum, const auto &item) {
+                                   return item.second.arn == arn ? sum + item.second.size : sum;
                                });
     }
 
     long SQSMemoryDb::DeleteQueue(const Entity::SQS::Queue &queue) {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
         const auto count = std::erase_if(_queues, [queue](const auto &item) {
-            return item.second.region == queue.region && item.second.queueUrl == queue.queueUrl;
+            return item.second.region == queue.region && item.second.url == queue.url;
         });
         log_debug << "Queues deleted, count: " << count;
-        return count;
+        return static_cast<long>(count);
     }
 
     long SQSMemoryDb::DeleteAllQueues() {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
-        const long deleted = _queues.size();
+        const long deleted = static_cast<long>(_queues.size());
         log_debug << "All queues deleted, count: " << _queues.size();
         _queues.clear();
         return deleted;
@@ -462,10 +462,10 @@ namespace AwsMock::Database {
         long count = 0;
         for (auto [fst, snd]: _messages) {
 
-            if (snd.queueArn == dlqQueue.queueArn) {
+            if (snd.queueArn == dlqQueue.arn) {
 
                 snd.retries = 0;
-                snd.queueArn = originalQueue.queueArn;
+                snd.queueArn = originalQueue.arn;
                 snd.queueName = originalQueue.name;
                 snd.status = Entity::SQS::MessageStatus::INITIAL;
                 _messages[fst] = snd;
@@ -473,7 +473,7 @@ namespace AwsMock::Database {
                 count++;
             }
         }
-        log_trace << "Message redrive, arn: " << dlqQueue.queueArn << " updated: " << count;
+        log_trace << "Message redrive, arn: " << dlqQueue.arn << " updated: " << count;
         return count;
     }
 
@@ -482,16 +482,16 @@ namespace AwsMock::Database {
 
         for (auto [fst, snd]: _messages) {
 
-            if (snd.queueArn == dlqQueue.queueArn && snd.messageId == messageId) {
+            if (snd.queueArn == dlqQueue.arn && snd.messageId == messageId) {
 
                 snd.retries = 0;
-                snd.queueArn = originalQueue.queueArn;
+                snd.queueArn = originalQueue.arn;
                 snd.queueName = originalQueue.name;
                 snd.status = Entity::SQS::MessageStatus::INITIAL;
                 _messages[fst] = snd;
             }
         }
-        log_trace << "Message redrive, arn: " << dlqQueue.queueArn << ", messageId: " << messageId;
+        log_trace << "Message redrive, arn: " << dlqQueue.arn << ", messageId: " << messageId;
     }
 
     long SQSMemoryDb::MessageRetention(const std::string &queueArn, const long retentionPeriod) {
@@ -535,7 +535,7 @@ namespace AwsMock::Database {
             std::ranges::transform(_messages,
                                    std::back_inserter(filtered),
                                    [queue](auto &kv) {
-                                       if (kv.second.queueArn == queue.queueArn) {
+                                       if (kv.second.queueArn == queue.arn) {
                                            return kv.second;
                                        }
                                        return Entity::SQS::Message();
@@ -598,9 +598,9 @@ namespace AwsMock::Database {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         for (const auto &queue: _queues | std::views::values) {
-            _queues[queue.oid].attributes.approximateNumberOfMessages = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
-            _queues[queue.oid].attributes.approximateNumberOfMessagesNotVisible = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INVISIBLE);
-            _queues[queue.oid].attributes.approximateNumberOfMessagesDelayed = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED);
+            _queues[queue.oid].attributes.approximateNumberOfMessages = CountMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::INITIAL);
+            _queues[queue.oid].attributes.approximateNumberOfMessagesNotVisible = CountMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::INVISIBLE);
+            _queues[queue.oid].attributes.approximateNumberOfMessagesDelayed = CountMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::DELAYED);
         }
         log_debug << "All message counters updated, count: " << _queues.size();
     }
