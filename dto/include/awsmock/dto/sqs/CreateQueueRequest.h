@@ -24,21 +24,6 @@ namespace AwsMock::Dto::SQS {
         std::string queueName;
 
         /**
-         * Queue URL
-         */
-        std::string queueUrl;
-
-        /**
-         * Queue ARN
-         */
-        std::string queueArn;
-
-        /**
-         * Owner
-         */
-        std::string owner;
-
-        /**
          * Attributes
          */
         std::map<std::string, std::string> attributes;
@@ -53,9 +38,6 @@ namespace AwsMock::Dto::SQS {
         friend CreateQueueRequest tag_invoke(boost::json::value_to_tag<CreateQueueRequest>, boost::json::value const &v) {
             CreateQueueRequest r;
             r.queueName = Core::Json::GetStringValue(v, "QueueName");
-            r.queueUrl = Core::CreateSQSQueueUrl(Core::Json::GetStringValue(v, "QueueName"));
-            r.queueArn = Core::CreateSQSQueueArn(Core::Json::GetStringValue(v, "QueueName"));
-            r.owner = Core::Json::GetStringValue(v, "Owner");
             if (Core::Json::AttributeExists(v, "Attributes")) {
                 r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("Attributes"));
             }
@@ -71,8 +53,6 @@ namespace AwsMock::Dto::SQS {
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"QueueName", obj.queueName},
-                    {"QueueUrl", obj.queueUrl},
-                    {"QueueArn", obj.queueArn},
                     {"Attributes", boost::json::value_from(obj.attributes)},
                     {"Tags", boost::json::value_from(obj.tags)},
             };

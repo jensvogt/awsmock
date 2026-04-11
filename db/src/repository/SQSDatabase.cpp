@@ -897,18 +897,11 @@ namespace AwsMock::Database {
                     opts.limit(maxResult);
                 }
 
-                std::string dlqQueueUrl;
-                std::string dlqQueueName;
-                if (!dlQueueArn.empty()) {
-                    dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
-                    dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
-                }
-
                 auto queueBulk = messageCollection.create_bulk_write();
                 auto dqlBulk = messageCollection.create_bulk_write();
 
                 // Get the cursor
-                for (auto messageCursor = messageCollection.find(make_document(kvp("arn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts); auto message: messageCursor) {
+                for (auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts); auto message: messageCursor) {
 
                     Entity::SQS::Message result;
                     result.FromDocument(message);
@@ -921,9 +914,8 @@ namespace AwsMock::Database {
                         filterQuery.append(kvp("_id", message["_id"].get_oid()));
 
                         document setQuery;
-                        setQuery.append(kvp("arn", dlQueueArn));
-                        setQuery.append(kvp("url", dlqQueueUrl));
-                        setQuery.append(kvp("name", dlqQueueName));
+                        setQuery.append(kvp("queueArn", dlQueueArn));
+                        setQuery.append(kvp("queueName", dlQueueArn));
                         setQuery.append(kvp("receiptHandle", ""));
                         setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
 
@@ -956,7 +948,7 @@ namespace AwsMock::Database {
                     }
                 }
 
-                // Update dql
+                // Update dqls
                 if (!dqlBulk.empty()) {
                     session.start_transaction();
                     auto result = dqlBulk.execute();

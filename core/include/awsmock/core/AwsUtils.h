@@ -147,6 +147,24 @@ namespace AwsMock::Core {
         static std::string CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName);
 
         /**
+         * @brief Creates a queue URL
+         *
+         * @param region AWS region
+         * @param accountId AWS account ID
+         * @param queueName name of the queue
+         * @return AWS resource ARN
+         */
+        //static std::string CreateSQSQueueUrl(const std::string &region, const std::string &accountId, const std::string &queueName);
+
+        /**
+         * @brief Creates a queue URL
+         *
+         * @param queueName name of the queue
+         * @return AWS resource ARN
+         */
+        //static std::string CreateSQSQueueUrl(const std::string &queueName);
+
+        /**
          * @brief Creates an API key ID
          *
          * @return API key ID

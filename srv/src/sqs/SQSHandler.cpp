@@ -191,7 +191,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::ReceiveMessageRequest sqsRequest = Dto::SQS::ReceiveMessageRequest::FromJson(clientCommand);
                     Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
-                    log_trace << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
+                    log_info << "Receive message, count: " << sqsResponse.messageList.size() << " queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
                     return SendResponse(request, http::status::ok, sqsResponse.ToJson());
                 }
 

@@ -13,77 +13,21 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
 
-        // Get queue ARN
-        const std::string queueArn = Core::CreateSQSQueueArn(request.region, request.queueName);
-
         // Check existence. In case the queue exists already return the existing queue.
-        if (_sqsDatabase.QueueArnExists(queueArn)) {
-            log_warning << "Queue exists already, region: " << request.region << " queueUrl: " << request.queueUrl;
+        if (const std::string queueArn = Core::CreateSQSQueueArn(request.region, request.queueName); _sqsDatabase.QueueArnExists(queueArn)) {
+            log_warning << "Queue exists already, region: " << request.region << ", name: " << request.queueName;
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
-            Dto::SQS::CreateQueueResponse response;
-            response.region = queue.region;
-            response.queueName = queue.name;
-            response.owner = queue.owner;
-            response.queueUrl = queue.url;
-            response.queueArn = queue.arn;
-            return response;
+            return Dto::SQS::CreateQueueResponseMapper::toDto(queue);
         }
 
         try {
-            // Get queue URL
-            const std::string queueUrl = Core::CreateSQSQueueUrl(request.queueName);
 
-            Database::Entity::SQS::QueueAttribute attributes;
-            attributes.approximateNumberOfMessages = 0;
-            if (request.attributes.contains("DelaySeconds")) {
-                attributes.delaySeconds = std::stoi(request.attributes.at("DelaySeconds"));
-            }
-            if (request.attributes.contains("MaximumMessageSize")) {
-                attributes.maxMessageSize = std::stoi(request.attributes.at("MaximumMessageSize"));
-            }
-            if (request.attributes.contains("MessageRetentionPeriod")) {
-                attributes.messageRetentionPeriod = std::stoi(request.attributes.at("MessageRetentionPeriod"));
-            }
-            if (request.attributes.contains("VisibilityTimeout")) {
-                attributes.visibilityTimeout = std::stoi(request.attributes.at("VisibilityTimeout"));
-            }
-            if (request.attributes.contains("ReceiveMessageWaitTimeSeconds")) {
-                attributes.receiveMessageWaitTime = std::stoi(request.attributes.at("ReceiveMessageWaitTimeSeconds"));
-            }
-            if (request.attributes.contains("Policy")) {
-                attributes.policy = request.attributes.at("Policy");
-            }
-            if (request.attributes.contains("RedrivePolicy")) {
-                attributes.redrivePolicy.deadLetterTargetArn = request.attributes.at("RedrivePolicy");
-            }
-            if (request.attributes.contains("RedriveAllowPolicy")) {
-                attributes.redriveAllowPolicy = request.attributes.at("RedriveAllowPolicy");
-            }
-            if (request.attributes.contains("QueueArn")) {
-                attributes.queueArn = request.attributes.at("QueueArn");
-            }
-
-            // TODO:: Use mapper
             // Update database
-            Database::Entity::SQS::Queue queue;
-            queue.region = request.region;
-            queue.name = request.queueName;
-            queue.owner = request.owner;
-            queue.url = queueUrl;
-            queue.arn = queueArn;
-            queue.attributes = attributes;
-            queue.tags = request.tags;
+            Database::Entity::SQS::Queue queue = Dto::SQS::CreateQueueRequestMapper::toEntity(request);
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
-            // TODO:: Use mapper
-            Dto::SQS::CreateQueueResponse response;
-            response.region = queue.region;
-            response.queueName = queue.name;
-            response.queueUrl = queue.url;
-            response.queueArn = queue.arn;
-            response.owner = queue.owner;
-            return response;
+            return Dto::SQS::CreateQueueResponseMapper::toDto(queue);
 
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
