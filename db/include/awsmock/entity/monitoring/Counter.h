@@ -51,7 +51,7 @@ namespace AwsMock::Database::Entity::Monitoring {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+        static Counter FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -59,24 +59,8 @@ namespace AwsMock::Database::Entity::Monitoring {
          * @return entity as MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param counter counter entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Counter &counter);
     };
 
-};// namespace AwsMock::Database::Entity::Monitoring
+}; // namespace AwsMock::Database::Entity::Monitoring
 
 #endif//AWSMOCK_DB_ENTITY_COUNTER_H

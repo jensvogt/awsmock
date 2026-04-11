@@ -15,7 +15,7 @@ namespace AwsMock::Service {
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.backup.cron");
 
         // Start S3 monitoring counters updates
-        _scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
+        _scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, 0);
 
         // Start synchronization of objects
         _scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod, _syncPeriod);
@@ -52,8 +52,8 @@ namespace AwsMock::Service {
             while (!objects.empty()) {
                 for (const auto &object: objects) {
                     if (!Core::FileUtils::FileExists(s3DataDir + Core::FileUtils::separator() + object.internalName)) {
-                        _s3Database.DeleteObject(object);
-                        log_debug << "Object deleted, internalName: " << object.internalName;
+                        const long deleted = _s3Database.DeleteObject(object);
+                        log_debug << "Object deleted, internalName: " << object.internalName << ", count: " << deleted;
                         objectsDeleted++;
                     }
                 }
@@ -78,12 +78,10 @@ namespace AwsMock::Service {
 
         log_trace << "S3 Monitoring starting";
 
-        long totalKeys = 0;
-        long totalSize = 0;
-
         // Reload the counters first
         _s3Database.AdjustObjectCounters();
 
+        long totalKeys = 0, totalSize = 0;
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         for (const auto &bucket: buckets) {
 
@@ -110,4 +108,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("s3-sync-objects");
         _scheduler.Shutdown("s3-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -40,9 +40,9 @@ namespace AwsMock::Database::Entity::S3 {
     };
 
     static std::map<BucketVersionStatus, std::string> BucketVersionStatusNames{
-            {ENABLED, "enabled"},
-            {SUSPENDED, "suspended"},
-            {DISABLED, "disabled"},
+        {ENABLED, "enabled"},
+        {SUSPENDED, "suspended"},
+        {DISABLED, "disabled"},
     };
 
     [[maybe_unused]] static std::string BucketVersionStatusToString(const BucketVersionStatus bucketVersionStatus) {
@@ -103,32 +103,32 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * Bucket notifications
          */
-        std::vector<BucketNotification> notifications;
+        //std::vector<BucketNotification> notifications{};
 
         /**
          * Queue notification configurations
          */
-        std::vector<QueueNotification> queueNotifications;
+        std::vector<QueueNotification> queueNotifications{};
 
         /**
          * Topic notification configurations
          */
-        std::vector<TopicNotification> topicNotifications;
+        std::vector<TopicNotification> topicNotifications{};
 
         /**
          * Lambda notification configurations
          */
-        std::vector<LambdaNotification> lambdaNotifications;
+        std::vector<LambdaNotification> lambdaNotifications{};
 
         /**
          * Default metadata
          */
-        std::map<std::string, std::string> defaultMetadata;
+        std::map<std::string, std::string> defaultMetadata{};
 
         /**
          * S3 lifecycle configurations
          */
-        std::vector<LifecycleConfiguration> lifecycleConfigurations;
+        std::vector<LifecycleConfiguration> lifecycleConfigurations{};
 
         /**
          * Bucket versioning state
@@ -157,7 +157,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @return true if notification with the given event name exists.
          * @deprecated use HasQueueNotification,HasTopicNotification, HasLambdaNotification
          */
-        bool HasNotification(const std::string &eventName);
+        //bool HasNotification(const std::string &eventName);
 
         /**
          * @brief Checks whether a notification with the given ID exists.
@@ -274,10 +274,10 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Returns a given lambda notification by function arn
          *
-         * @param arn function ARN
+         * @param bucketArn function ARN
          * @return found notification or notifications.end().
          */
-        LambdaNotification GetLambdaNotificationByArn(const std::string &arn);
+        LambdaNotification GetLambdaNotificationByArn(const std::string &bucketArn);
 
         /**
          * @brief Returns a boolean indicating the versioning state
@@ -295,12 +295,13 @@ namespace AwsMock::Database::Entity::S3 {
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
+         * @return bucket object
          */
-        [[maybe_unused]] void FromDocument(std::optional<view> mResult);
+        static Bucket FromDocument(const std::optional<view> &mResult);
     };
 
     typedef std::vector<Bucket> BucketList;
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_BUCKET_H

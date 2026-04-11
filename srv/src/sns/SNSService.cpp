@@ -96,7 +96,7 @@ namespace AwsMock::Service {
 
         try {
 
-            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns), request.region);
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns), request.region);
             Dto::SNS::ListTopicCountersResponse listTopicResponse = Dto::SNS::Mapper::map(request, topicList);
             listTopicResponse.total = _snsDatabase.CountTopics(request.region, request.prefix);
             log_trace << "SNS list topic counters response: " << listTopicResponse.ToJson();
@@ -904,7 +904,7 @@ namespace AwsMock::Service {
 
         try {
 
-            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.topicArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.topicArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             Dto::SNS::ListMessageCountersResponse listMessageCountersResponse = Dto::SNS::Mapper::map(request, messageList);
             listMessageCountersResponse.total = _snsDatabase.CountMessages(request.topicArn);
             log_trace << "SNS list messages, response: " << listMessageCountersResponse.ToJson();

@@ -1,5 +1,111 @@
 # Changelog
 
+## [1.16.35](https://github.com/jensvogt/awsmock/compare/v1.16.34...v1.16.35) (2026-04-10)
+
+
+### Bug Fixes
+
+* fix windows github action ([bd6f5b0](https://github.com/jensvogt/awsmock/commit/bd6f5b0501751046a7e6f15c5d62eaf0ca465f74))
+* fix windows github action ([bf0c32c](https://github.com/jensvogt/awsmock/commit/bf0c32c67d0ac849a7572c3e3eb028ca09c3fccb))
+
+## [1.16.34](https://github.com/jensvogt/awsmock/compare/v1.16.33...v1.16.34) (2026-04-10)
+
+
+### Bug Fixes
+
+* fix windows github action ([5123944](https://github.com/jensvogt/awsmock/commit/5123944f104e61f22a8dae99e219ceca8b57e33c))
+
+## [1.16.33](https://github.com/jensvogt/awsmock/compare/v1.16.32...v1.16.33) (2026-04-10)
+
+
+### Bug Fixes
+
+* fix windows github action ([16643ae](https://github.com/jensvogt/awsmock/commit/16643aecdd1d4b0008ef63142b501a43b6cfed7d))
+
+## [1.16.32](https://github.com/jensvogt/awsmock/compare/v1.16.31...v1.16.32) (2026-04-09)
+
+
+### Bug Fixes
+
+* release github actions ([c1d5c1d](https://github.com/jensvogt/awsmock/commit/c1d5c1d551f7701c57c884addda1ae4924b39656))
+
+## [1.16.31](https://github.com/jensvogt/awsmock/compare/v1.16.30...v1.16.31) (2026-04-09)
+
+
+### Bug Fixes
+
+* release github actions ([279e900](https://github.com/jensvogt/awsmock/commit/279e900a1ce2b5fdfff33eeec8ea2e2e29277dda))
+
+## [1.16.30](https://github.com/jensvogt/awsmock/compare/v1.16.29...v1.16.30) (2026-04-09)
+
+
+### Bug Fixes
+
+* release github actions ([b67302b](https://github.com/jensvogt/awsmock/commit/b67302bd5558e5981e2fc092d7e4241bd5197a77))
+
+## [1.16.29](https://github.com/jensvogt/awsmock/compare/v1.16.28...v1.16.29) (2026-04-09)
+
+
+### Bug Fixes
+
+* release github actions ([1518154](https://github.com/jensvogt/awsmock/commit/15181546c1f548cf1596757c178193a7b10fc8e6))
+* release github actions ([fe3ef29](https://github.com/jensvogt/awsmock/commit/fe3ef294aa97a0335ef563c1c445c19e1bf144c7))
+
+## [1.16.28](https://github.com/jensvogt/awsmock/compare/v1.16.27...v1.16.28) (2026-04-09)
+
+
+### Bug Fixes
+
+* release github actions ([5defdc9](https://github.com/jensvogt/awsmock/commit/5defdc902970fdc6cfc6e8f47d313ae92c8dfc4c))
+
+## [1.16.27](https://github.com/jensvogt/awsmock/compare/v1.16.26...v1.16.27) (2026-04-09)
+
+
+### Bug Fixes
+
+* docker cpu/memory stats on Windows ([d9e47f3](https://github.com/jensvogt/awsmock/commit/d9e47f39aa420dc2d5cc49a62f09c21b5baa9981))
+* docker cpu/memory stats on Windows ([e908d49](https://github.com/jensvogt/awsmock/commit/e908d49d7a4df05cc59dc53b10b791d7d4306f2a))
+* release github actions ([6a6107a](https://github.com/jensvogt/awsmock/commit/6a6107ab96ea91a6b14fb91c552edb445d612678))
+
+## [1.16.26](https://github.com/jensvogt/awsmock/compare/v1.16.25...v1.16.26) (2026-04-09)
+
+
+### Bug Fixes
+
+* S3/Dynamodb tests ([9e6953c](https://github.com/jensvogt/awsmock/commit/9e6953c2534af0f581a599a74302f3006826554d))
+
+## [1.16.25](https://github.com/jensvogt/awsmock/compare/v1.16.24...v1.16.25) (2026-04-09)
+
+
+### Bug Fixes
+
+* S3/Dynamodb tests ([9d5a857](https://github.com/jensvogt/awsmock/commit/9d5a8573fc455b000c42913993279c4208f432b6))
+
+## [1.16.24](https://github.com/jensvogt/awsmock/compare/v1.16.23...v1.16.24) (2026-04-08)
+
+
+### Bug Fixes
+
+* S3/Dynamodb tests ([18d39fb](https://github.com/jensvogt/awsmock/commit/18d39fb7551e981055e8074f42813792716ccf77))
+* S3/Dynamodb tests ([da926dc](https://github.com/jensvogt/awsmock/commit/da926dc21d07cc5c75619024638a2927b6c3dd3b))
+
+## [1.16.23](https://github.com/jensvogt/awsmock/compare/v1.16.22...v1.16.23) (2026-04-08)
+
+
+### Bug Fixes
+
+* S3/Dynamodb tests ([c56e43f](https://github.com/jensvogt/awsmock/commit/c56e43f7de79d8743c510f02007e808ae5790610))
+
+## [1.16.22](https://github.com/jensvogt/awsmock/compare/v1.16.21...v1.16.22) (2026-04-08)
+
+
+### Bug Fixes
+
+* memory db for SQS/SNS ([120fd8f](https://github.com/jensvogt/awsmock/commit/120fd8f687afdbe39208da55a647e688f8d3158c))
+* rearrange dynamodb items ([0762bd2](https://github.com/jensvogt/awsmock/commit/0762bd2bbf778d1e5e83238684e8ce6a0283c0a2))
+* S3/Dynamodb tests ([a280398](https://github.com/jensvogt/awsmock/commit/a2803987de42b465430a7381e730aa7acfa97163))
+* S3/Dynamodb tests ([46c0baa](https://github.com/jensvogt/awsmock/commit/46c0baad0c9fa77da2d440295626629cde59fd1c))
+
 ## [1.16.21](https://github.com/jensvogt/awsmock/compare/v1.16.20...v1.16.21) (2026-04-07)
 
 

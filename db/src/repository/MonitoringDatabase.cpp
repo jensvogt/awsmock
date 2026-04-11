@@ -5,6 +5,8 @@
 
 #include <awsmock/repository/MonitoringDatabase.h>
 
+#include "awsmock/dto/monitoring/Counter.h"
+
 namespace AwsMock::Database {
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {
@@ -89,7 +91,7 @@ namespace AwsMock::Database {
                 std::vector<Entity::Monitoring::Counter> result;
                 for (auto cursor = _monitoringCollection.find(document.extract()); auto it: cursor) {
                     Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
-                    result.emplace_back(counter);
+                    result.emplace_back(Entity::Monitoring::Counter::FromDocument(it));
                 }
                 log_debug << "Counters, name: " << name << ", count: " << result.size() << ", start:" << startUtc << ", end: " << endUtc;
                 return result;
@@ -117,9 +119,9 @@ namespace AwsMock::Database {
                 for (auto &[key, val]: values) {
 
                     // Prepare insert query
-                    document insertQuery;
                     std::string name, labelName, labelValue;
                     GetIdValues(key, name, labelName, labelValue);
+                    document insertQuery;
                     insertQuery.append(kvp("name", name));
                     insertQuery.append(kvp("labelName", labelName));
                     insertQuery.append(kvp("labelValue", labelValue));
@@ -171,4 +173,4 @@ namespace AwsMock::Database {
         return 0;
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

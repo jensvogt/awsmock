@@ -134,9 +134,9 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(const std::optional<view> &mResult);
+        static Object FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::S3
+} // namespace AwsMock::Database::Entity::S3
 
 #endif//AWSMOCK_DB_ENTITY_S3_OBJECT_H

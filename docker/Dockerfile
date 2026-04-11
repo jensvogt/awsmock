@@ -7,7 +7,8 @@ FROM alpine:latest AS build
 #    rm -rf /var/lib/apt/lists/*
 RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
      autoconf-archive automake libtool m4 make gettext-dev patch pkgconf ncurses-dev ncurses-terminfo-base doxygen pandoc \
-     pkgconfig coreutils bash perl
+     pkgconfig coreutils bash perl openssl-dev zlib-dev bzip2-dev readline-dev sqlite-dev xz-dev libffi-dev ncurses-dev \
+     util-linux-dev
 
 # vcpkg needs this
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
@@ -21,8 +22,8 @@ WORKDIR /usr/local/vcpkg
 RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
 
-RUN mkdir -p /usr/local/vcpkg/downloads
-COPY ./libssh-0.11.3.tar.xz /usr/local/vcpkg/downloads
+# libssh workaround
+ENV X_VCPKG_ASSET_SOURCES="clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
 
 # Create build environment
 RUN mkdir -p /usr/src

@@ -123,7 +123,7 @@ namespace AwsMock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             const long count = _lambdaDatabase.LambdaCount(request.region);
 
             Dto::Lambda::ListFunctionCountersResponse response = Dto::Lambda::Mapper::map(lambdas);
@@ -881,7 +881,7 @@ namespace AwsMock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase.ListLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase.ListLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             const long count = _lambdaDatabase.LambdaResultsCount(request.lambdaArn);
 
             Dto::Lambda::ListLambdaResultCountersResponse response = Dto::Lambda::Mapper::map(lambdaResults);

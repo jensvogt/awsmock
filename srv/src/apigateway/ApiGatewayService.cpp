@@ -2,7 +2,7 @@
 // Created by vogje01 on 9/2/25.
 //
 
-#include "awsmock/dto/common/mapper/Mapper.h"
+#include "awsmock/dto/common/mapper/SortColumnMapper.h"
 
 
 #include <awsmock/service/apigateway/ApiGatewayService.h>
@@ -133,7 +133,7 @@ namespace AwsMock::Service {
         try {
 
             // Get the list of API keys
-            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase.ListApiKeyCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase.ListApiKeyCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             const long total = _apiGatewayDatabase.CountApiKeys();
 
             log_trace << "Get API keys, count: " << keys.size();
@@ -201,7 +201,7 @@ namespace AwsMock::Service {
         try {
 
             // Get the list of REST APIs
-            const std::vector<Database::Entity::ApiGateway::RestApi> restApis = _apiGatewayDatabase.ListRestApiCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::ApiGateway::RestApi> restApis = _apiGatewayDatabase.ListRestApiCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             const long total = _apiGatewayDatabase.CountApiKeys();
 
             log_trace << "Get REST APIs, count: " << restApis.size();

@@ -11,7 +11,9 @@ namespace AwsMock::Service {
 
         try {
             switch (clientCommand.command) {
+
                 case Dto::Common::S3CommandType::LIST_BUCKETS: {
+
                     Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
                     log_info << "List buckets, count: " << s3Response.total;
                     log_trace << s3Response;
@@ -795,16 +797,16 @@ namespace AwsMock::Service {
         clientCommand.FromRequest(request, region, user);
 
         try {
-            Dto::S3::GetMetadataResponse s3Response;
+            Dto::S3::GetObjectMetadataResponse s3Response;
             if (clientCommand.key.empty()) {
                 // Bucket metadata
-                Dto::S3::GetMetadataRequest s3Request;
+                Dto::S3::GetObjectMetadataRequest s3Request;
                 s3Request.region = clientCommand.region;
                 s3Request.bucket = clientCommand.bucket;
                 s3Response = _s3Service.GetBucketMetadata(s3Request);
             } else {
                 // Object metadata
-                Dto::S3::GetMetadataRequest s3Request;
+                Dto::S3::GetObjectMetadataRequest s3Request;
                 s3Request.region = clientCommand.region;
                 s3Request.bucket = clientCommand.bucket;
                 s3Request.key = clientCommand.key;

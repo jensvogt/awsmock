@@ -64,10 +64,10 @@ namespace AwsMock::Service {
         long totalSize = 0;
         for (auto const &table: tables) {
 
-            totalItems += table.itemCount;
+            totalItems += table.items;
             totalSize += table.size;
 
-            Core::EventBus::instance().sigMetricGauge(DYNAMODB_ITEMS_BY_TABLE, "table", table.name, table.itemCount);
+            Core::EventBus::instance().sigMetricGauge(DYNAMODB_ITEMS_BY_TABLE, "table", table.name, table.items);
             Core::EventBus::instance().sigMetricGauge(DYNAMODB_SIZE_BY_TABLE, "table", table.name, table.size);
         }
         Core::EventBus::instance().sigMetricGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables.size()));
@@ -88,4 +88,4 @@ namespace AwsMock::Service {
         log_info << "DynamoDB server stopped";
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

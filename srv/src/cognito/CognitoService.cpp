@@ -93,7 +93,7 @@ namespace AwsMock::Service {
 
         try {
             const long total = _database.CountUserPools(request.region);
-            const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             log_trace << "Got user pool list counters, count: " << userPools.size();
             Dto::Cognito::ListUserPoolCountersResponse response;
             response.userPoolCounters = Dto::Cognito::Mapper::mapCounter(userPools);
@@ -571,7 +571,7 @@ namespace AwsMock::Service {
 
         try {
             const long total = _database.CountUsers(request.region, request.userPoolId);
-            const std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             log_trace << "Got user list counters, count: " << users.size();
             Dto::Cognito::ListUserCountersResponse response;
             response.users = Dto::Cognito::Mapper::mapCounter(users);

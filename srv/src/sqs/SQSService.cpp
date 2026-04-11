@@ -148,7 +148,7 @@ namespace AwsMock::Service {
         try {
 
             // Get the queue list and the total number
-            const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns), request.region);
+            const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns), request.region);
             const long total = _sqsDatabase.CountQueues(request.prefix, request.region);
 
             log_trace << "SQS create queue counters list, count: " << total;
@@ -1182,7 +1182,7 @@ namespace AwsMock::Service {
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn);
 
-            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, {}, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, {}, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
 
             Dto::SQS::ListMessagesResponse listMessagesResponse;
             listMessagesResponse.total = total;
@@ -1213,7 +1213,7 @@ namespace AwsMock::Service {
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
-            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             log_trace << "List message counters request, queueArn: " << request.queueArn << ", count: " << messages.size();
             return Dto::SQS::Mapper::map(messages, total);
 

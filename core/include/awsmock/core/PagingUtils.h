@@ -10,6 +10,7 @@
 #include <vector>
 
 namespace AwsMock::Core {
+
     template<class S, class P>
     std::map<S, P> PageMap(std::map<S, P> map, const long pageSize, const long pageIndex) {
         std::map<S, P> page;
@@ -43,5 +44,5 @@ namespace AwsMock::Core {
         return std::vector(vec.begin() + pageSize * pageIndex, endArray);
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 #endif// AWSMOCK_CORE_PAGING_UTILS_H
