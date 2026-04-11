@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.38](https://github.com/jensvogt/awsmock/compare/v1.16.37...v1.16.38) (2026-04-11)
+
+
+### Bug Fixes
+
+* SQL receive messages ([278db29](https://github.com/jensvogt/awsmock/commit/278db29d4e57ba42ac445467328e107b3d49738d))
+
 ## [1.16.37](https://github.com/jensvogt/awsmock/compare/v1.16.36...v1.16.37) (2026-04-11)
 
 
