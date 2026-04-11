@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.16.36](https://github.com/jensvogt/awsmock/compare/v1.16.35...v1.16.36) (2026-04-10)
+
+
+### Bug Fixes
+
+* S3 DTO/Entity mapping ([485ff6d](https://github.com/jensvogt/awsmock/commit/485ff6d37775ac7660f24f3f3cf99d24370d1bee))
+* S3 DTO/Entity mapping ([dc9c00c](https://github.com/jensvogt/awsmock/commit/dc9c00cd6270eebd5be6eb1b4b142d9310024b07))
+* S3 DTO/Entity mapping ([a41d2c1](https://github.com/jensvogt/awsmock/commit/a41d2c173dcfdd3daf3c1157854362d60ed3a2ee))
+* S3 DTO/Entity mapping ([ce81580](https://github.com/jensvogt/awsmock/commit/ce815805c451f058e5fb57fa87a726de44407520))
+* S3 DTO/Entity mapping ([f32eeb7](https://github.com/jensvogt/awsmock/commit/f32eeb76236ab4cd7706b4401a981b857d2d29df))
+
 ## [1.16.35](https://github.com/jensvogt/awsmock/compare/v1.16.34...v1.16.35) (2026-04-10)
 
 
