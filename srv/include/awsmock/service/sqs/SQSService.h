@@ -10,10 +10,9 @@
 #include <thread>
 
 // AwsMock includes
-#include "awsmock/dto/sqs/internal/GetMessageCountersResponse.h"
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/MagicDetector.h>
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
@@ -57,6 +56,7 @@
 #include <awsmock/dto/sqs/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sqs/internal/GetMessageCountersRequest.h>
+#include <awsmock/dto/sqs/internal/GetMessageCountersResponse.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/internal/ImportMessagesRequest.h>
@@ -104,12 +104,13 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
-        };
+                                                            };
 
         /**
          * @brief Creates a new queue.
@@ -493,7 +494,8 @@ namespace AwsMock::Service {
          */
         void ReloadAllCounters() const;
 
-    private:
+      private:
+
         /**
          * @brief Send a lambda invocation request for a message.
          *
@@ -510,6 +512,18 @@ namespace AwsMock::Service {
          * @param eventSourceArn event source ARN
          */
         void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
+
+        /**
+         * @brief Sanitize the content type
+         *
+         * @par
+         * In case the content is empty or 'applicaiton/octet-stream, try to determine the content type from the message body.
+         *
+         * @param contentType input content type
+         * @param body message body
+         * @return content type
+         */
+        static std::string SanitizeContentType(const std::string &contentType, const std::string &body);
 
         /**
          * @brief Checks the attributes for an entry with 'all'. The search is case-insensitive.
@@ -536,6 +550,6 @@ namespace AwsMock::Service {
 
         static boost::mutex _subscriptionMutex;
     };
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVICE_H

@@ -340,7 +340,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::GetMessageCountersRequest sqsRequest = Dto::SQS::GetMessageCountersRequest::FromJson(clientCommand);
                     Dto::SQS::GetMessageCountersResponse sqsResponse = _sqsService.GetMessageCounters(sqsRequest);
-                    log_info << "Get message, messageId: " << sqsRequest.messageId;
+                    log_info << "Get message, messageId: " << sqsRequest.messageId << ", json: " << sqsResponse.ToJson();
                     return SendResponse(request, http::status::ok, sqsResponse.ToJson());
                 }
 

@@ -1,4 +1,4 @@
-
+//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -34,10 +34,8 @@ namespace AwsMock::Service {
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambda = _lambdaDatabase.CreateOrUpdateLambda(lambda);
 
-        // Find idle instance
-        Database::Entity::Lambda::Instance instance;
-
         // Create instance
+        Database::Entity::Lambda::Instance instance;
         std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
         // Create lambda
@@ -1313,7 +1311,9 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::CreateResourceNotification(const Dto::Lambda::AddEventSourceRequest &request) const {
+
         if (request.type == "S3") {
+
             if (!_s3Database.BucketExists(request.eventSourceArn)) {
                 log_error << "S3 bucket does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("S3 bucket does not exist: " + request.eventSourceArn);
@@ -1340,8 +1340,11 @@ namespace AwsMock::Service {
 
             // Send S3 put notification request
             bucket.lambdaNotifications.emplace_back(lambdaNotification);
-            _s3Database.CreateOrUpdateBucket(bucket);
+            bucket = _s3Database.CreateOrUpdateBucket(bucket);
+            log_debug << "Bucket updated, name: " << bucket.name;
+
         } else if (request.type == "SQS") {
+
             if (!_sqsDatabase.QueueArnExists(request.eventSourceArn)) {
                 log_error << "SQS queue does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
@@ -1363,8 +1366,11 @@ namespace AwsMock::Service {
             lambdaNotification.filterRules = filterRules;
 
             // Send S3 put notification request
-            _sqsDatabase.CreateOrUpdateQueue(queue);
+            queue = _sqsDatabase.CreateOrUpdateQueue(queue);
+            log_debug << "Queue updated, name: " << queue.name;
+
         } else if (request.type == "SNS") {
+
             if (!_snsDatabase.TopicExists(request.eventSourceArn)) {
                 log_error << "SNS topic does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
@@ -1386,7 +1392,8 @@ namespace AwsMock::Service {
             lambdaNotification.filterRules = filterRules;
 
             // Send S3 put notification request
-            _snsDatabase.CreateOrUpdateTopic(topic);
+            topic = _snsDatabase.CreateOrUpdateTopic(topic);
+            log_debug << "Topic updated, name: " << topic.topicName;
         }
     }
 

@@ -280,7 +280,7 @@ namespace AwsMock::Core {
          * @param path absolute file path
          * @return content type, as mime type
          */
-        static std::string GetContentTypeMagicFile(const std::string &path);
+        //static std::string GetContentTypeMagicFile(const std::string &path);
 
         /**
          * @brief Get the Mime type by extension
@@ -289,7 +289,7 @@ namespace AwsMock::Core {
          * @param realPath real file path
          * @return content type, as mime type
          */
-        static std::string GetContentType(const std::string &path, const std::string &realPath);
+        //static std::string GetContentType(const std::string &path, const std::string &realPath);
 
         /**
          * @brief Get the Mime type using libmagic from a string
@@ -297,7 +297,7 @@ namespace AwsMock::Core {
          * @param content content string
          * @return content type, as mime type
          */
-        static std::string GetContentTypeMagicString(const std::string &content);
+        //static std::string GetContentTypeMagicString(const std::string &content);
 
         /**
          * @brief Checks whether the file is base64 encoded.
@@ -400,7 +400,7 @@ namespace AwsMock::Core {
          * @param path The path to normalize.
          * @return The normalized path as a wide string.
          */
-        static std::wstring NormalizePathForLongPaths(const std::wstring& path);
+        static std::wstring NormalizePathForLongPaths(const std::wstring &path);
 #endif
 
         /**

@@ -5,7 +5,6 @@
 #include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {
-
     Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "create_topic");
         log_trace << "Create topic request: " << request.ToString();
@@ -19,9 +18,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-                    response.topicName = topic.topicName,
-                    response.owner = topic.owner,
-                    response.topicArn = topic.topicArn;
+            response.topicName = topic.topicName,
+            response.owner = topic.owner,
+            response.topicArn = topic.topicArn;
             return response;
         }
 
@@ -35,9 +34,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-                    response.topicName = topic.topicName,
-                    response.owner = topic.owner,
-                    response.topicArn = topic.topicArn;
+            response.topicName = topic.topicName,
+            response.owner = topic.owner,
+            response.topicArn = topic.topicArn;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -230,15 +229,17 @@ namespace AwsMock::Service {
             // Update database
             //message = Dto::SNS::Mapper::map(request, topic);
             Database::Entity::SNS::Message message = {
-                .region = request.region,
-                .topicArn = request.topicArn,
-                .targetArn = request.targetArn,
-                .message = request.message,
-                .messageId = Core::AwsUtils::CreateMessageId(),
-                .contentType = request.contentType,
-                .size = static_cast<long>(request.message.length())
-            };
+                    .region = request.region,
+                    .topicArn = request.topicArn,
+                    .targetArn = request.targetArn,
+                    .message = request.message,
+                    .messageId = Core::AwsUtils::CreateMessageId(),
+                    .contentType = request.contentType,
+                    .size = static_cast<long>(request.message.length())};
 
+            // Content type
+            message.contentType = SanitizeContentType(request.contentType, request.message);
+            
             // Attributes
             if (!request.messageAttributes.empty()) {
                 for (const auto &[fst, snd]: request.messageAttributes) {
@@ -928,8 +929,8 @@ namespace AwsMock::Service {
 
         try {
 
-            _snsDatabase.DeleteMessage(request.messageId);
-            log_trace << "SNS message deleted, messageId: " << request.messageId;
+            const long deleted = _snsDatabase.DeleteMessage(request.messageId);
+            log_trace << "SNS message deleted, messageId: " << request.messageId << ", count: " << deleted;
 
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             log_trace << "SNS topic counter adjusted, topicArn: " << request.topicArn;
@@ -947,4 +948,11 @@ namespace AwsMock::Service {
         log_debug << "Topic counters updated, queue: " << topic.topicArn;
     }
 
-} // namespace AwsMock::Service
+    std::string SNSService::SanitizeContentType(const std::string &contentType, const std::string &body) {
+        if (contentType.empty() || contentType == "application/octet-stream" || contentType == "binary/octet-stream") {
+            return Core::MagicDetector::instance().fromContent(body);
+        }
+        return contentType;
+    }
+
+}// namespace AwsMock::Service

@@ -406,91 +406,91 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string FileUtils::GetContentType(const std::string &path, const std::string &realPath) {
-        if (const std::string extension = boost::filesystem::path(realPath).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
-            return MimeTypes.at(extension);
-        }
-        return GetContentTypeMagicFile(path);
-    }
-
-    std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
-
-        if (!FileExists(path)) {
-            log_error << "Target path not found, path: " << path;
-            return DEFAULT_MIME_TYPE;
-        }
-
-        const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
-
-        if (!FileExists(magicFile)) {
-            log_error << "Magic database not found, path: " << magicFile;
-            return DEFAULT_MIME_TYPE;
-        }
-
-        // Allocate magic cookie
-        magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
-        if (magic == nullptr) {
-            log_error << "Could not open libmagic";
-            return DEFAULT_MIME_TYPE;
-        }
-
-        // Load the default magic database (indicated by nullptr)
-        if (magic_load(magic, magicFile.c_str()) != 0) {
-            log_error << "Could not load libmagic mime types, fileName: " << magicFile << ", error: " << magic_error(magic);
-            return DEFAULT_MIME_TYPE;
-        }
-
-        // Get a description of the filename argument
-        const char *mime = magic_file(magic, path.c_str());
-        if (mime == nullptr) {
-            log_error << "Could not get mime type";
-            mime = DEFAULT_MIME_TYPE;
-        } else {
-            log_debug << "Found content-type: " << mime;
-        }
-        std::string result = {mime};
-
-        // Free magic cookie and mime
-        magic_close(magic);
-        return result;
-    }
-
-    std::string FileUtils::GetContentTypeMagicString(const std::string &content) {
-
-        if (content.empty()) {
-            return DEFAULT_MIME_TYPE;
-        }
-
-        const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
-
-        // Allocate magic cookie
-        magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
-        if (magic == nullptr) {
-            log_error << "Could not open libmagic";
-            return DEFAULT_MIME_TYPE;
-        }
-
-        // Load the default magic database (indicated by nullptr)
-        if (magic_load(magic, magicFile.c_str()) != 0) {
-            log_error << "Could not load libmagic mime types, fileName: " << magicFile;
-            return DEFAULT_MIME_TYPE;
-        }
-
-        // Get the description of the filename argument
-        const char *mime = magic_buffer(magic, content.data(), content.size());
-        if (mime == nullptr) {
-            log_error << "Could not get mime type";
-            mime = DEFAULT_MIME_TYPE;
-        } else {
-            log_debug << "Found content-type: " << mime;
-        }
-        std::string result = {mime};
-
-        // Free magic cookie and mime
-        magic_close(magic);
-
-        return result;
-    }
+    // std::string FileUtils::GetContentType(const std::string &path, const std::string &realPath) {
+    //     if (const std::string extension = boost::filesystem::path(realPath).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
+    //         return MimeTypes.at(extension);
+    //     }
+    //     return GetContentTypeMagicFile(path);
+    // }
+    //
+    // std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
+    //
+    //     if (!FileExists(path)) {
+    //         log_error << "Target path not found, path: " << path;
+    //         return DEFAULT_MIME_TYPE;
+    //     }
+    //
+    //     const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
+    //
+    //     if (!FileExists(magicFile)) {
+    //         log_error << "Magic database not found, path: " << magicFile;
+    //         return DEFAULT_MIME_TYPE;
+    //     }
+    //
+    //     // Allocate magic cookie
+    //     magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
+    //     if (magic == nullptr) {
+    //         log_error << "Could not open libmagic";
+    //         return DEFAULT_MIME_TYPE;
+    //     }
+    //
+    //     // Load the default magic database (indicated by nullptr)
+    //     if (magic_load(magic, magicFile.c_str()) != 0) {
+    //         log_error << "Could not load libmagic mime types, fileName: " << magicFile << ", error: " << magic_error(magic);
+    //         return DEFAULT_MIME_TYPE;
+    //     }
+    //
+    //     // Get a description of the filename argument
+    //     const char *mime = magic_file(magic, path.c_str());
+    //     if (mime == nullptr) {
+    //         log_error << "Could not get mime type";
+    //         mime = DEFAULT_MIME_TYPE;
+    //     } else {
+    //         log_debug << "Found content-type: " << mime;
+    //     }
+    //     std::string result = {mime};
+    //
+    //     // Free magic cookie and mime
+    //     magic_close(magic);
+    //     return result;
+    // }
+    //
+    // std::string FileUtils::GetContentTypeMagicString(const std::string &content) {
+    //
+    //     if (content.empty()) {
+    //         return DEFAULT_MIME_TYPE;
+    //     }
+    //
+    //     const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
+    //
+    //     // Allocate magic cookie
+    //     magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
+    //     if (magic == nullptr) {
+    //         log_error << "Could not open libmagic";
+    //         return DEFAULT_MIME_TYPE;
+    //     }
+    //
+    //     // Load the default magic database (indicated by nullptr)
+    //     if (magic_load(magic, magicFile.c_str()) != 0) {
+    //         log_error << "Could not load libmagic mime types, fileName: " << magicFile;
+    //         return DEFAULT_MIME_TYPE;
+    //     }
+    //
+    //     // Get the description of the filename argument
+    //     const char *mime = magic_buffer(magic, content.data(), content.size());
+    //     if (mime == nullptr) {
+    //         log_error << "Could not get mime type";
+    //         mime = DEFAULT_MIME_TYPE;
+    //     } else {
+    //         log_debug << "Found content-type: " << mime;
+    //     }
+    //     std::string result = {mime};
+    //
+    //     // Free magic cookie and mime
+    //     magic_close(magic);
+    //
+    //     return result;
+    // }
 
     void FileUtils::StripChunkSignature(const std::string &path) {
 

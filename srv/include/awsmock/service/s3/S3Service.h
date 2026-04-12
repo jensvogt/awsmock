@@ -17,6 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonConverter.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/MagicDetector.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -564,9 +565,8 @@ namespace AwsMock::Service {
          *
          * @param contentType content type from AWS S3.
          * @param filePath file path
-         * @param s3Key S3 key
          */
-        static std::string SanitizeContentType(const std::string &contentType, const std::string &filePath, const std::string &s3Key);
+        static std::string SanitizeContentType(const std::string &contentType, const std::string &filePath);
 
         /**
          * @brief Add the event source mapping to the lambda function

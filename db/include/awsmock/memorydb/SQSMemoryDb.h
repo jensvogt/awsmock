@@ -171,6 +171,15 @@ namespace AwsMock::Database {
         Entity::SQS::Queue GetQueueByDlq(const std::string &dlqQueueArn);
 
         /**
+         * @brief Checks whether a queue ARN is a dead letter queue
+         *
+         * @param queueArn queue ARN
+         * @return true if queue is a dead letter queue
+         */
+        [[nodiscard]]
+        bool IsDlq(const std::string &queueArn);
+
+        /**
          * @brief Purge a given queueUrl.
          *
          * @param queueArn queue ARN
@@ -340,7 +349,7 @@ namespace AwsMock::Database {
          * @param dlqQueue DLQ queue
          * @param messageId message ID
          */
-        void RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId);
+        long RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId);
 
         /**
          * @brief Redrive messages

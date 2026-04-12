@@ -16,6 +16,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/MagicDetector.h>
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -46,10 +47,10 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
-#include <awsmock/dto/sns/internal/GetMessageCountersRequest.h>
-#include <awsmock/dto/sns/internal/GetMessageCountersResponse.h>
 #include <awsmock/dto/sns/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sns/internal/GetEventSourceResponse.h>
+#include <awsmock/dto/sns/internal/GetMessageCountersRequest.h>
+#include <awsmock/dto/sns/internal/GetMessageCountersResponse.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
@@ -65,6 +66,7 @@
 #include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
 #include <awsmock/dto/sns/mapper/Mapper.h>
+#include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 #include <awsmock/dto/sns/model/EventNotification.h>
 #include <awsmock/dto/sns/model/EventRecord.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
@@ -73,7 +75,6 @@
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/utils/SqsUtils.h>
-#include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 
 #define SQS_PROTOCOL "sqs"
 #define HTTP_PROTOCOL "http"
@@ -90,7 +91,7 @@ namespace AwsMock::Service {
      */
     class SNSService /*: public std::enable_shared_from_this<SNSService>*/ {
 
-    public:
+      public:
 
         /**
          * @brief Constructor
@@ -318,7 +319,7 @@ namespace AwsMock::Service {
          */
         void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
-    private:
+      private:
 
         /**
          * @brief Checks the subscriptions.
@@ -346,6 +347,7 @@ namespace AwsMock::Service {
          * @param topic SNS topic entity
          */
         void AdjustTopicCounters(Database::Entity::SNS::Topic &topic) const;
+        static std::string SanitizeContentType(const std::string &contentType, const std::string &body);
 
         /**
          * @brief Send an SNS message to an HTTP endpoint.

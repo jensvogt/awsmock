@@ -429,7 +429,7 @@ namespace AwsMock::Service {
             object.size = fileSize;
             object.md5sum = md5sum;
             object.internalName = filename;
-            object.contentType = Core::FileUtils::GetContentType(outFile, request.key);
+            object.contentType = Core::MagicDetector::instance().fromFile(outFile);
             object = _database.UpdateObject(object);
 
             // Calculate the hashes asynchronously
@@ -586,7 +586,7 @@ namespace AwsMock::Service {
         request.bucket = transferBucket;
         request.owner = username;
         request.key = Core::StringUtils::StripBeginning(filename, userHomeDir + Core::FileUtils::separator());
-        request.contentType = Core::FileUtils::GetContentType(filename, request.key);
+        request.contentType = Core::MagicDetector::instance().fromFile(filename);
         request.contentLength = Core::FileUtils::FileSize(filename);
         request.metadata = metadata;
 
@@ -928,7 +928,7 @@ namespace AwsMock::Service {
             log_debug << "File copied, count: " << data.size();
 
             // Get content type
-            std::string contentType = SanitizeContentType(request.contentType, filePath, request.objectKey);
+            std::string contentType = SanitizeContentType(request.contentType, filePath);
 
             // Create entity
             Database::Entity::S3::Object object;
@@ -1476,7 +1476,7 @@ namespace AwsMock::Service {
         }
 
         // Get content type
-        std::string contentType = SanitizeContentType(request.contentType, filePath, request.key);
+        std::string contentType = SanitizeContentType(request.contentType, filePath);
 
         // Create entity
         Database::Entity::S3::Object object;
@@ -1633,12 +1633,11 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string S3Service::SanitizeContentType(const std::string &contentType, const std::string &filePath, const std::string &s3Key) {
-        std::string sContentType = contentType;
+    std::string S3Service::SanitizeContentType(const std::string &contentType, const std::string &filePath) {
         if (contentType.empty() || contentType == "application/octet-stream" || contentType == "binary/octet-stream") {
-            sContentType = Core::FileUtils::GetContentType(filePath, s3Key);
+            return Core::MagicDetector::instance().fromFile(filePath);
         }
-        return sContentType;
+        return contentType;
     }
 
     void S3Service::AddLambdaEventSource(const Database::Entity::S3::Bucket &bucket, const Dto::S3::LambdaConfiguration &lambdaConfiguration) const {

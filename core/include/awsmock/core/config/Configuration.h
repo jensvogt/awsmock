@@ -40,7 +40,7 @@ namespace AwsMock::Core {
      */
     class Configuration {
 
-    public:
+      public:
 
         /**
          * @brief Constructor
@@ -153,6 +153,13 @@ namespace AwsMock::Core {
         static std::string GetVersion();
 
         /**
+         * @brief Returns the account ID from the configurcation file
+         *
+         * @return account id
+         */
+        std::string GetAccountId() const;
+
+        /**
          * @brief Writes the current configuration the given file
          *
          * @param filename name of the configuration file
@@ -171,7 +178,7 @@ namespace AwsMock::Core {
          */
         void Dump() const;
 
-    private:
+      private:
 
         /**
          * @brief Initialize the base properties
