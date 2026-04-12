@@ -9,11 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/sqs/model/MessageAttribute.h>
+#include <awsmock/dto/sqs/model/MessageCounter.h>
 
 namespace AwsMock::Dto::SQS {
+
     /**
      * @brief Get a message request
      *
@@ -29,13 +29,13 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message
          */
-        Message message;
+        MessageCounter message;
 
-    private:
+      private:
 
         friend GetMessageCountersResponse tag_invoke(boost::json::value_to_tag<GetMessageCountersResponse>, boost::json::value const &v) {
             GetMessageCountersResponse r;
-            r.message = boost::json::value_to<Message>(v.at("message"));
+            r.message = boost::json::value_to<MessageCounter>(v.at("message"));
             return r;
         }
 
@@ -48,6 +48,7 @@ namespace AwsMock::Dto::SQS {
             };
         }
     };
+
 }// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_GET_MESSAGE_COUNTERS_RESPONSE_H

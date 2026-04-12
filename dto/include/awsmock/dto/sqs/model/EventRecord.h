@@ -62,7 +62,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attributes
          */
-        std::map<std::string, EventMessageAttribute> messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
       private:
 
@@ -78,7 +78,7 @@ namespace AwsMock::Dto::SQS {
                 r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
             }
             if (Core::Json::AttributeExists(v, "messageAttributes")) {
-                r.messageAttributes = boost::json::value_to<std::map<std::string, EventMessageAttribute>>(v.at("messageAttributes"));
+                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
             }
             return r;
         }
@@ -96,6 +96,7 @@ namespace AwsMock::Dto::SQS {
             };
         }
     };
+
 }// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_EVENT_RECORD_H

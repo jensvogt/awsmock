@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/sqs/SQSService.h>
-#include <boost/container/map.hpp>
 
 namespace AwsMock::Service {
 
@@ -43,19 +42,23 @@ namespace AwsMock::Service {
             Dto::SQS::ListQueuesResponse listQueueResponse;
             listQueueResponse.total = _sqsDatabase.CountQueues(request.region);
             if (request.maxResults > 0) {
+
                 // Get the total number
                 const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
                 const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
-                listQueueResponse.queueUrls = Dto::SQS::Mapper::mapUrls(queueList);
+
+                listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
                 listQueueResponse.nextToken = nextToken;
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
                 return listQueueResponse;
             }
+
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
-            listQueueResponse.queueUrls = Dto::SQS::Mapper::mapUrls(queueList);
+            listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
 
             log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
+
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
@@ -91,7 +94,10 @@ namespace AwsMock::Service {
             const long total = _sqsDatabase.CountQueues(request.prefix, request.region);
 
             log_trace << "SQS create queue counters list, count: " << total;
-            return Dto::SQS::Mapper::map(queueList, total);
+            Dto::SQS::ListQueueCountersResponse response;
+            response.total = total;
+            response.queueCounters = Dto::SQS::QueueCounterMapper::toDtoList(queueList);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
@@ -361,10 +367,18 @@ namespace AwsMock::Service {
 
         try {
             // Update message
-            const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
-            const Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
-            _sqsDatabase.RedriveMessage(originalQueue, dqlQueue, request.messageId);
-            log_debug << "SQS redrive message, queueArn: " << request.queueArn;
+            long count{};
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            if (_sqsDatabase.IsDlq(request.queueArn)) {
+                const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
+                count = _sqsDatabase.RedriveMessage(originalQueue, queue, request.messageId);
+            } else {
+                count = _sqsDatabase.ResetMessages(queue.arn, queue.attributes.visibilityTimeout);
+            }
+            log_debug << "SQS queue messages reset, queueArn: " << request.queueArn << ", count: " << count;
+
+            // Update monitoring counter
+            _sqsDatabase.AdjustMessageCounters();
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -384,9 +398,14 @@ namespace AwsMock::Service {
 
         try {
             // Update messages
-            const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
-            const Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
-            const long count = _sqsDatabase.RedriveMessages(originalQueue, dqlQueue);
+            long count{};
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            if (_sqsDatabase.IsDlq(request.queueArn)) {
+                const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
+                count = _sqsDatabase.RedriveMessages(originalQueue, queue);
+            } else {
+                count = _sqsDatabase.ResetMessages(queue.arn, queue.attributes.visibilityTimeout);
+            }
             log_debug << "SQS redrive messages, queueArn: " << request.queueArn << " count: " << count;
 
             // Update monitoring counter
@@ -698,7 +717,7 @@ namespace AwsMock::Service {
 
             Dto::SQS::ListDefaultMessageAttributeCountersResponse response;
             response.total = static_cast<long>(queue.defaultMessageAttributes.size());
-            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+            response.attributeCounters = Dto::SQS::MessageAttributeMapper::toDtoMap(queue.defaultMessageAttributes);
             response.attributeCounters = Core::PageMap<std::string, Dto::SQS::MessageAttribute>(response.attributeCounters, request.pageSize, request.pageIndex);
             return response;
 
@@ -729,7 +748,7 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.UpdateQueue(queue);
 
             response.total = static_cast<long>(queue.defaultMessageAttributes.size());
-            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+            response.attributeCounters = Dto::SQS::MessageAttributeMapper::toDtoMap(queue.defaultMessageAttributes);
 
             log_debug << "Default message attribute added, queueArn: " << queue.arn << ", name: " << request.name;
 
@@ -759,7 +778,7 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.UpdateQueue(queue);
 
             response.total = static_cast<long>(queue.defaultMessageAttributes.size());
-            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+            response.attributeCounters = Dto::SQS::MessageAttributeMapper::toDtoMap(queue.defaultMessageAttributes);
 
             log_debug << "Default message attribute updated, queueArn: " << queue.arn << ", name: " << request.name;
 
@@ -788,7 +807,7 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.UpdateQueue(queue);
 
             response.total = static_cast<long>(queue.defaultMessageAttributes.size());
-            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+            response.attributeCounters = Dto::SQS::MessageAttributeMapper::toDtoMap(queue.defaultMessageAttributes);
 
             log_debug << "Default message attribute deleted, queueArn: " << queue.arn << ", name: " << request.name;
 
@@ -945,7 +964,7 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
 
             // Entity
-            Database::Entity::SQS::Message message = Dto::SQS::Mapper::map(request);
+            Database::Entity::SQS::Message message = Dto::SQS::SendMessageRequestMapper::toEntity(request);
 
             // System attributes
             message.attributes["SentTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()));
@@ -975,7 +994,7 @@ namespace AwsMock::Service {
             // Set parameters
             message.queueArn = queue.arn;
             message.queueName = queue.name;
-            message.contentType = request.contentType;
+            message.contentType = SanitizeContentType(request.contentType, request.body);
             message.size = static_cast<long>(request.body.size());
             message.created = system_clock::now();
             message.modified = system_clock::now();
@@ -991,7 +1010,7 @@ namespace AwsMock::Service {
             // Find Lambdas with this as an event source
             CheckLambdaNotifications(queue.arn, message);
             log_debug << "Send message, queueArn: " << queue.arn;
-            return Dto::SQS::Mapper::map(request, message);
+            return Dto::SQS::SendMessageResponseMapper::toDto(message);
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -1100,13 +1119,7 @@ namespace AwsMock::Service {
             // Prepare response
             Dto::SQS::ReceiveMessageResponse response;
             response.requestId = request.requestId;
-            if (!messageList.empty()) {
-
-                // Adjust queue attributes
-                _sqsDatabase.UpdateQueueReceiveNumbers(queueArn, messageList.size());
-
-                response.messageList = Dto::SQS::Mapper::map(messageList);
-            }
+            response.messageList = Dto::SQS::MessageMapper::toDtoList(messageList);
             log_debug << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
             return response;
 
@@ -1154,9 +1167,12 @@ namespace AwsMock::Service {
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
-            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             log_trace << "List message counters request, queueArn: " << request.queueArn << ", count: " << messages.size();
-            return Dto::SQS::Mapper::map(messages, total);
+            Dto::SQS::ListMessageCountersResponse response;
+            response.total = total;
+            response.messages = Dto::SQS::MessageCounterMapper::toDtoList(messages);
+            return response;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -1177,7 +1193,7 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
             log_debug << "Got message , messageId: " << request.messageId;
             Dto::SQS::GetMessageCountersResponse response;
-            response.message = Dto::SQS::Mapper::map(message);
+            response.message = Dto::SQS::MessageCounterMapper::toDto(message);
             response.region = request.region;
             return response;
 
@@ -1198,7 +1214,7 @@ namespace AwsMock::Service {
 
         try {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
-            message.messageAttributes = Dto::SQS::Mapper::map(request.messageAttributes);
+            message.messageAttributes = Dto::SQS::MessageAttributeMapper::toEntityMap(request.messageAttributes);
 
             // Delete from database
             message = _sqsDatabase.UpdateMessage(message);
@@ -1257,7 +1273,7 @@ namespace AwsMock::Service {
 
             Dto::SQS::ListMessageAttributeCountersResponse response;
             response.total = static_cast<long>(message.messageAttributes.size());
-            response.messageAttributeCounters = Dto::SQS::Mapper::map(message.messageAttributes);
+            response.messageAttributeCounters = Dto::SQS::MessageAttributeMapper::toDtoMap(message.messageAttributes);
             response.messageAttributeCounters = Core::PageMap<std::string, Dto::SQS::MessageAttribute>(response.messageAttributeCounters, request.pageSize, request.pageIndex);
             return response;
 
@@ -1420,7 +1436,7 @@ namespace AwsMock::Service {
         record.receiptHandle = message.receiptHandle;
         record.body = message.body;
         record.attributes = message.attributes;
-        record.messageAttributes = Dto::SQS::Mapper::mapEventMessageAttributes(message.messageAttributes);
+        record.messageAttributes = Dto::SQS::MessageAttributeMapper::toDtoMap(message.messageAttributes);
         record.md5Sum = message.md5Body;
         record.eventSource = "aws:sqs";
         record.eventSourceArn = eventSourceArn;
@@ -1433,4 +1449,12 @@ namespace AwsMock::Service {
         Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", sourceArn: " << eventSourceArn << ", result: " << result;
     }
+
+    std::string SQSService::SanitizeContentType(const std::string &contentType, const std::string &body) {
+        if (contentType.empty() || contentType == "application/octet-stream" || contentType == "binary/octet-stream") {
+            return Core::MagicDetector::instance().fromContent(body);
+        }
+        return contentType;
+    }
+
 }// namespace AwsMock::Service

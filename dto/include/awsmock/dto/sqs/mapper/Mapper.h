@@ -18,6 +18,7 @@
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/dto/sqs/model/Queue.h>
+#include <awsmock/entity/sns/MessageAttribute.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/utils/SqsUtils.h>
@@ -156,129 +157,140 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-    /**
-     * @brief Maps an entity to the corresponding DTO
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    class Mapper {
+    class QueueCounterMapper : public StaticMapper<QueueCounterMapper, Database::Entity::SQS::Queue, QueueCounter> {
 
       public:
 
-        /**
-         * @brief Maps a SQS message DTO list to a SQS message entity
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param request request struct
-         * @return ListObjectVersionsResponse
-         * @see ListObjectVersionsResponse
-         */
-        static Database::Entity::SQS::Message map(const SendMessageRequest &request);
+        static QueueCounter toDto(const Database::Entity::SQS::Queue &e) {
+            QueueCounter d;
+            d.region = e.region;
+            d.queueName = e.name;
+            d.queueArn = e.arn;
+            d.queueUrl = e.url;
+            d.size = e.size;
+            d.available = e.attributes.approximateNumberOfMessages;
+            d.invisible = e.attributes.approximateNumberOfMessagesNotVisible;
+            d.delayed = e.attributes.approximateNumberOfMessagesDelayed;
+            d.visibilityTimeout = e.attributes.visibilityTimeout;
+            d.maxMessageSize = e.attributes.maxMessageSize;
+            d.delay = e.attributes.delaySeconds;
+            d.retentionPeriod = e.attributes.messageRetentionPeriod;
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+    };
 
-        /**
-         * @brief Maps a SQS queue entity list to a SQS queue DTO
-         *
-         * @param queueEntity queue entity
-         * @return queue DTO
-         * @see Queue
-         */
-        //static Queue map(const Database::Entity::SQS::Queue &queueEntity);
+    class MessageAttributeMapper : public StaticMapper<MessageAttributeMapper, Database::Entity::SQS::MessageAttribute, MessageAttribute> {
+      public:
 
-        /**
-         * @brief Maps a list of SQS queue entity to a list of SQS queue DTO
-         *
-         * @param queueEntities list of queue entity
-         * @return queue DTO
-         * @see Queue
-         */
-        //static std::vector<Queue> map(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
+        static MessageAttribute toDto(const Database::Entity::SQS::MessageAttribute &e) {
+            MessageAttribute messageAttribute;
+            messageAttribute.dataType = MessageAttributeDataTypeFromString(Database::Entity::SQS::MessageAttributeTypeToString(e.dataType));
+            messageAttribute.stringValue = e.stringValue;
+            messageAttribute.stringListValues = e.stringListValues;
+            return messageAttribute;
+        }
 
-        /**
-         * @brief Maps a list of SQS queue entity to a list of SQS queue URLs
-         *
-         * @param queueEntities list of queue entity
-         * @return queue URLs
-         * @see Queue
-         */
-        static std::vector<std::string> mapUrls(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
+        static Database::Entity::SQS::MessageAttribute toEntity(const MessageAttribute &d) {
+            Database::Entity::SQS::MessageAttribute messageAttribute;
+            messageAttribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(d.dataType));
+            messageAttribute.stringValue = d.stringValue;
+            messageAttribute.stringListValues = d.stringListValues;
+            return messageAttribute;
+        }
+    };
 
-        /**
-         * @brief Maps a SQS message entity to a SQS send message response DTO
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param request request struct
-         * @param messageEntity message entity
-         * @return ListObjectVersionsResponse
-         * @see ListObjectVersionsResponse
-         */
-        static SendMessageResponse map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity);
+    class MessageMapper : public StaticMapper<MessageMapper, Database::Entity::SQS::Message, Message> {
 
-        /**
-         * @brief Maps a SQS message entity to a SQS send message response DTO
-         *
-         * @param messages message counter list
-         * @param total total number of messages
-         * @return ListMessageCountersResponse
-         * @see ListMessageCountersResponse
-         */
-        static ListMessageCountersResponse map(const Database::Entity::SQS::MessageList &messages, long total);
+      public:
 
-        /**
-         * @brief Maps a list of SQS queue entity to a ListQueueCounterResponse
-         *
-         * @param queues queue counter list
-         * @param total total number of queues
-         * @return ListQueueCountersResponse
-         * @see ListQueueCountersResponse
-         */
-        static ListQueueCountersResponse map(const Database::Entity::SQS::QueueList &queues, long total);
+        static Message toDto(const Database::Entity::SQS::Message &e) {
+            Message d;
+            d.queueName = e.queueName;
+            d.queueArn = e.queueArn;
+            d.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(e.queueArn);
+            d.messageId = e.messageId;
+            d.receiptHandle = e.receiptHandle;
+            d.body = e.body;
+            d.size = e.size;
+            d.attributes = e.attributes;
+            d.messageAttributes = MessageAttributeMapper::toDtoMap(e.messageAttributes);
+            d.md5OfBody = Database::SqsUtils::CreateMd5OfMessageBody(e.body);
+            d.md5OfMessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(e.messageAttributes);
+            return d;
+        }
 
-        /**
-         * @brief Maps a SQS message entity to a SQS message DTO
-         *
-         * @param messageEntity message entity
-         * @return SQS message DTO
-         * @see Message
-         */
-        static Message map(const Database::Entity::SQS::Message &messageEntity);
+        static Database::Entity::SQS::Message toEntity(const Message &d) {
+            Database::Entity::SQS::Message e;
+            e.queueName = d.queueName;
+            e.queueArn = d.queueArn;
+            e.messageId = d.messageId;
+            e.receiptHandle = d.receiptHandle;
+            e.body = d.body;
+            e.size = d.size;
+            e.attributes = d.attributes;
+            e.messageAttributes = MessageAttributeMapper::toEntityMap(d.messageAttributes);
+            return e;
+        }
+    };
 
-        /**
-         * @brief Maps a SQS message entity to a SQS message DTO
-         *
-         * @param messageEntities list of message entity
-         * @return list of SQS message DTOs
-         * @see Message
-         */
-        static std::vector<Message> map(const std::vector<Database::Entity::SQS::Message> &messageEntities);
+    class MessageCounterMapper : public StaticMapper<MessageCounterMapper, Database::Entity::SQS::Message, MessageCounter> {
 
-        /**
-         * @brief Maps a SQS attribute DTO to a attribute entity
-         *
-         * @param messageAttributes list of message attributes
-         * @return MessageAttributeList
-         * @see Database::Entity::SQS::MessageAttributeList
-         */
-        static Database::Entity::SQS::MessageAttributeList map(const MessageAttributeList &messageAttributes);
+      public:
 
-        /**
-         * @brief Maps a SQS attribute entity to an attribute DTO
-         *
-         * @param messageAttributes list of message attributes
-         * @return MessageAttributeList
-         * @see Database::Entity::SQS::MessageAttributeList
-         */
-        static std::map<std::string, MessageAttribute> map(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes);
+        static MessageCounter toDto(const Database::Entity::SQS::Message &e) {
+            MessageCounter d;
+            d.queueName = e.queueName;
+            d.queueArn = e.queueArn;
+            d.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(e.queueArn);
+            d.messageId = e.messageId;
+            d.receiptHandle = e.receiptHandle;
+            d.contentType = e.contentType;
+            d.body = e.body;
+            d.size = e.size;
+            d.attributes = e.attributes;
+            d.md5OfBody = e.md5Body;
+            d.md5OfMessageAttributes = e.md5MessageAttributes;
+            d.md5OfSystemAttributes = e.md5MessageSystemAttributes;
+            d.created = e.created;
+            d.modified = e.modified;
+            d.messageAttributes = MessageAttributeMapper::toDtoMap(e.messageAttributes);
+            return d;
+        }
+        static Database::Entity::SQS::Message toEntity(const MessageCounter &d) = delete;
+    };
 
-        /**
-         * @brief Maps a SQS attribute entity to an event message attribute DTO
-         *
-         * @param messageAttributes list of message attributes
-         * @return EventMessageAttributeList
-         * @see Database::Entity::SQS::EventMessageAttributeList
-         */
-        static std::map<std::string, EventMessageAttribute> mapEventMessageAttributes(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes);
+    class SendMessageRequestMapper : public StaticMapper<SendMessageRequestMapper, Database::Entity::SQS::Message, Message> {
+      public:
+
+        static Database::Entity::SQS::Message toEntity(const SendMessageRequest &d) {
+            Database::Entity::SQS::Message e;
+            e.queueName = Core::AwsUtils::ConvertSQSQueueUrlToName(d.queueUrl);
+            e.queueArn = Core::AwsUtils::CreateSQSQueueArn(d.region, Core::Configuration::instance().GetAccountId(), e.queueName);
+            e.body = d.body;
+            e.attributes = d.attributes;
+            e.messageAttributes = MessageAttributeMapper::toEntityMap(d.messageAttributes);
+            e.md5Body = Database::SqsUtils::CreateMd5OfMessageBody(d.body);
+            e.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(e.messageAttributes);
+            e.md5MessageSystemAttributes = Database::SqsUtils::CreateMd5OfMessageSystemAttributes(d.attributes);
+            return e;
+        }
+        static Database::Entity::SQS::Message toDto(const SendMessageRequest &d) = delete;
+    };
+
+    class SendMessageResponseMapper : public StaticMapper<SendMessageResponseMapper, Database::Entity::SQS::Message, SendMessageResponse> {
+      public:
+
+        static SendMessageResponse toDto(const Database::Entity::SQS::Message &e) {
+            SendMessageResponse d;
+            d.messageId = Core::AwsUtils::ConvertSQSQueueUrlToName(e.messageId);
+            d.md5Body = Database::SqsUtils::CreateMd5OfMessageBody(e.body);
+            d.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(e.messageAttributes);
+            d.md5MessageSystemAttributes = Database::SqsUtils::CreateMd5OfMessageSystemAttributes(e.attributes);
+            return d;
+        }
+        static Database::Entity::SQS::Message toEntity(const SendMessageResponse &d) = delete;
     };
 
 }// namespace AwsMock::Dto::SQS

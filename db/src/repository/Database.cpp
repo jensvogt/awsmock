@@ -11,7 +11,7 @@ namespace AwsMock::Database {
             {"sqs_message_idx1", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"reset", 1}}, false}},
             {"sqs_message_idx2", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"retries", 1}}, false}},
             {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}, false}},
-            {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}}, false}},
+            {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}, {"size", 1}}, false}},
             {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}, false}},
             // SQS queues
             {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}, true}},

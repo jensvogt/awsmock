@@ -112,6 +112,13 @@ namespace AwsMock::Database {
         return {};
     }
 
+    bool SQSMemoryDb::IsDlq(const std::string &queueArn) {
+
+        return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                   return queue.second.attributes.redrivePolicy.deadLetterTargetArn == queueArn;
+               }) != _queues.end();
+    }
+
     Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) {
 
         auto q = Core::from(_queues | std::views::values | std::ranges::to<std::vector>());
@@ -477,9 +484,10 @@ namespace AwsMock::Database {
         return count;
     }
 
-    void SQSMemoryDb::RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) {
+    long SQSMemoryDb::RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
+        long count{};
         for (auto [fst, snd]: _messages) {
 
             if (snd.queueArn == dlqQueue.arn && snd.messageId == messageId) {
@@ -489,9 +497,11 @@ namespace AwsMock::Database {
                 snd.queueName = originalQueue.name;
                 snd.status = Entity::SQS::MessageStatus::INITIAL;
                 _messages[fst] = snd;
+                count++;
             }
         }
         log_trace << "Message redrive, arn: " << dlqQueue.arn << ", messageId: " << messageId;
+        return count;
     }
 
     long SQSMemoryDb::MessageRetention(const std::string &queueArn, const long retentionPeriod) {

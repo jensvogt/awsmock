@@ -72,9 +72,19 @@ namespace AwsMock::Dto::SQS {
         std::map<std::string, MessageAttribute> messageAttributes;
 
         /**
-         * MD5 sum
+         * MD5 message body
          */
-        std::string md5Sum;
+        std::string md5OfBody;
+
+        /**
+         * MD5 message attributes
+         */
+        std::string md5OfMessageAttributes;
+
+        /**
+         * MD5 system attributes
+         */
+        std::string md5OfSystemAttributes;
 
         /**
          * Content type
@@ -84,12 +94,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message size
          */
-        long size = 0;
+        long size{};
 
         /**
          * Message retries
          */
-        long retries = 0;
+        long retries{};
 
         /**
          * Created time stamp
@@ -115,7 +125,9 @@ namespace AwsMock::Dto::SQS {
             r.id = v.at("id").as_string();
             r.receiptHandle = v.at("receiptHandle").as_string();
             r.body = v.at("body").as_string();
-            r.md5Sum = v.at("md5Sum").as_string();
+            r.md5OfBody = v.at("md5OfBody").as_string();
+            r.md5OfMessageAttributes = v.at("md5OfMessageAttributes").as_string();
+            r.md5OfSystemAttributes = v.at("md5OfSystemAttributes").as_string();
             r.size = v.at("size").as_int64();
             r.retries = v.at("retries").as_int64();
             r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
@@ -138,7 +150,9 @@ namespace AwsMock::Dto::SQS {
                     {"id", obj.id},
                     {"receiptHandle", obj.receiptHandle},
                     {"body", obj.body},
-                    {"md5Sum", obj.md5Sum},
+                    {"md5OfBody", obj.md5OfBody},
+                    {"md5OfMessageAttributes", obj.md5OfMessageAttributes},
+                    {"md5OfSystemAttributes", obj.md5OfSystemAttributes},
                     {"size", obj.size},
                     {"retries", obj.retries},
                     {"attributes", boost::json::value_from(obj.attributes)},

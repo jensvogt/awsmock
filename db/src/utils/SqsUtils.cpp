@@ -10,6 +10,41 @@ namespace AwsMock::Database {
         return Core::Crypto::GetMd5FromString(messageBody);
     }
 
+    std::string SqsUtils::CreateMd5OfMessageSystemAttributes(const std::map<std::string, std::string> &attributes) {
+
+        EVP_MD_CTX *context = EVP_MD_CTX_new();
+        const EVP_MD *md = EVP_md5();
+        unsigned char md_value[EVP_MAX_MD_SIZE];
+        unsigned int md_len;
+        auto *bytes = new unsigned char[1];
+
+        EVP_DigestInit(context, md);
+        for (const auto &[fst, snd]: attributes) {
+
+            log_debug << "MD5sum, attribute: " << fst;
+
+            // Encoded name
+            UpdateLengthAndBytes(context, fst);
+
+            // Encoded data type
+            UpdateLengthAndBytes(context, "String");
+
+            // Encoded value
+            if (!snd.empty()) {
+                bytes[0] = 1;
+                EVP_DigestUpdate(context, bytes, 1);
+
+                // Url decode the attribute
+                UpdateLengthAndBytes(context, Core::StringUtils::UrlDecode(snd));
+            }
+        }
+        EVP_DigestFinal(context, md_value, &md_len);
+        EVP_MD_CTX_free(context);
+        delete[] bytes;
+
+        return Core::Crypto::HexEncode(md_value, static_cast<int>(md_len));
+    }
+
     std::string SqsUtils::CreateMd5OfMessageAttributes(const std::map<std::string, Entity::SQS::MessageAttribute> &messageAttributes) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
@@ -44,7 +79,6 @@ namespace AwsMock::Database {
 
         return Core::Crypto::HexEncode(md_value, static_cast<int>(md_len));
     }
-
 
     void SqsUtils::GetIntAsByteArray(const size_t n, unsigned char *bytes) {
         if (bytes) {

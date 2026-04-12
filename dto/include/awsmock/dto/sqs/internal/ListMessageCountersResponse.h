@@ -21,7 +21,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Total number of messages
          */
-        long total = 0;
+        long total{};
 
       private:
 

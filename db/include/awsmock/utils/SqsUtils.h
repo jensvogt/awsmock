@@ -28,6 +28,14 @@ namespace AwsMock::Database {
         static std::string CreateMd5OfMessageBody(const std::string &messageBody);
 
         /**
+         * @brief Calculates the MD5 of the message system attributes
+         *
+         * @param attributes system attribute
+         * @return MD5 sum of message body
+         */
+        static std::string CreateMd5OfMessageSystemAttributes(const std::map<std::string, std::string> &attributes);
+
+        /**
          * @brief Calculates the MD5 of the message attributes
          *
          * @param messageAttributes list of message attributes

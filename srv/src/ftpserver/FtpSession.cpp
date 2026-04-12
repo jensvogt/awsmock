@@ -1,6 +1,8 @@
 
 #include <awsmock/ftpserver/FtpSession.h>
 
+#include "awsmock/core/MagicDetector.h"
+
 namespace AwsMock::FtpServer {
     FtpSession::FtpSession(boost::asio::io_context &awsIoc, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler)
         : _completion_handler(completion_handler), _user_database(user_database), _io_service(awsIoc),
@@ -1498,7 +1500,7 @@ namespace AwsMock::FtpServer {
         metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
 
         // Get content type
-        const std::string contentType = Core::FileUtils::GetContentType(fileName, key);
+        const std::string contentType = Core::MagicDetector::instance().fromFile(fileName);
         const long contentLength = Core::FileUtils::FileSize(fileName);
 
         Dto::S3::PutObjectRequest request;

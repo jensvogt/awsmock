@@ -330,6 +330,10 @@ namespace AwsMock::Core {
         return APP_VERSION;
     }
 
+    std::string Configuration::GetAccountId() const {
+        return GetValue<std::string>("awsmock.access.account-id");
+    }
+
     std::string Configuration::ToString() const {
         std::stringstream ss;
         ss << *this;

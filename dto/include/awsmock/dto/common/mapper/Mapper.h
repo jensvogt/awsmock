@@ -15,8 +15,8 @@
 #include <optional>
 #include <ranges>
 #include <stdexcept>
-#include <typeindex>
 #include <type_traits>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
@@ -84,7 +84,8 @@ namespace AwsMock::Dto {
 
     template<Mappable Entity, Mappable Dto>
     class Mapper {
-    public:
+      public:
+
         virtual ~Mapper() = default;
 
         // -----------------------------------------------------------------------
@@ -119,8 +120,8 @@ namespace AwsMock::Dto {
         template<Mappable NE, Mappable ND>
         [[nodiscard]]
         static std::optional<ND> mapNestedOpt(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::optional<NE> &opt) {
+                const Mapper<NE, ND> &nestedMapper,
+                const std::optional<NE> &opt) {
             if (!opt) return std::nullopt;
             return nestedMapper.toDto(*opt);
         }
@@ -128,8 +129,8 @@ namespace AwsMock::Dto {
         template<Mappable NE, Mappable ND>
         [[nodiscard]]
         static std::optional<NE> mapNestedOptReverse(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::optional<ND> &opt) {
+                const Mapper<NE, ND> &nestedMapper,
+                const std::optional<ND> &opt) {
             if (!opt) return std::nullopt;
             return nestedMapper.toEntity(*opt);
         }
@@ -138,8 +139,8 @@ namespace AwsMock::Dto {
         template<Mappable NE, Mappable ND>
         [[nodiscard]]
         static std::vector<ND> mapNestedList(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::vector<NE> &entities) {
+                const Mapper<NE, ND> &nestedMapper,
+                const std::vector<NE> &entities) {
             std::vector<ND> out;
             out.reserve(entities.size());
             std::ranges::transform(entities, std::back_inserter(out),
@@ -150,8 +151,8 @@ namespace AwsMock::Dto {
         template<Mappable NE, Mappable ND>
         [[nodiscard]]
         static std::vector<NE> mapNestedListReverse(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::vector<ND> &dtos) {
+                const Mapper<NE, ND> &nestedMapper,
+                const std::vector<ND> &dtos) {
             std::vector<NE> out;
             out.reserve(dtos.size());
             std::ranges::transform(dtos, std::back_inserter(out),
@@ -176,8 +177,8 @@ namespace AwsMock::Dto {
         template<typename K, Mappable NE, Mappable ND>
         [[nodiscard]]
         static std::map<K, ND> mapNestedMap(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::map<K, NE> &in) {
+                const Mapper<NE, ND> &nestedMapper,
+                const std::map<K, NE> &in) {
             std::map<K, ND> out;
             for (const auto &[k, v]: in)
                 out.emplace(k, nestedMapper.toDto(v));
@@ -188,8 +189,8 @@ namespace AwsMock::Dto {
         template<typename K, Mappable NE, Mappable ND>
         [[nodiscard]]
         static std::map<K, NE> mapNestedMapReverse(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::map<K, ND> &in) {
+                const Mapper<NE, ND> &nestedMapper,
+                const std::map<K, ND> &in) {
             std::map<K, NE> out;
             for (const auto &[k, v]: in)
                 out.emplace(k, nestedMapper.toEntity(v));
@@ -200,9 +201,9 @@ namespace AwsMock::Dto {
         template<typename KE, typename KD, Mappable NE, Mappable ND, typename KeyFn>
         [[nodiscard]]
         static std::map<KD, ND> mapNestedMapWithKey(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::map<KE, NE> &in,
-            KeyFn &&keyFn) // callable: KE -> KD
+                const Mapper<NE, ND> &nestedMapper,
+                const std::map<KE, NE> &in,
+                KeyFn &&keyFn)// callable: KE -> KD
         {
             std::map<KD, ND> out;
             for (const auto &[k, v]: in)
@@ -214,9 +215,9 @@ namespace AwsMock::Dto {
         template<typename KD, typename KE, Mappable ND, Mappable NE, typename KeyFn>
         [[nodiscard]]
         static std::map<KE, NE> mapNestedMapWithKeyReverse(
-            const Mapper<NE, ND> &nestedMapper,
-            const std::map<KD, ND> &in,
-            KeyFn &&keyFn) // callable: KD -> KE
+                const Mapper<NE, ND> &nestedMapper,
+                const std::map<KD, ND> &in,
+                KeyFn &&keyFn)// callable: KD -> KE
         {
             std::map<KE, NE> out;
             for (const auto &[k, v]: in)
@@ -287,7 +288,8 @@ namespace AwsMock::Dto {
 
     template<typename Derived, Mappable Entity, Mappable Dto>
     class StaticMapper {
-    public:
+      public:
+
         // Derived must provide:
         //   static Dto    toDto   (const Entity&);
         //   static Entity toEntity(const Dto&);
@@ -369,11 +371,11 @@ namespace AwsMock::Dto {
 
         // map<KE, NE> → map<KD, ND>  (key and value both transformed)
         template<typename NestedDerived, typename KE, typename KD,
-            Mappable NE, Mappable ND, typename KeyFn>
+                 Mappable NE, Mappable ND, typename KeyFn>
         [[nodiscard]]
         static std::map<KD, ND> mapNestedMapWithKey(
-            const std::map<KE, NE> &in,
-            KeyFn &&keyFn) // callable: KE -> KD
+                const std::map<KE, NE> &in,
+                KeyFn &&keyFn)// callable: KE -> KD
         {
             std::map<KD, ND> out;
             for (const auto &[k, v]: in)
@@ -383,11 +385,11 @@ namespace AwsMock::Dto {
 
         // map<KD, ND> → map<KE, NE>  (key and value both transformed)
         template<typename NestedDerived, typename KD, typename KE,
-            Mappable ND, Mappable NE, typename KeyFn>
+                 Mappable ND, Mappable NE, typename KeyFn>
         [[nodiscard]]
         static std::map<KE, NE> mapNestedMapWithKeyReverse(
-            const std::map<KD, ND> &in,
-            KeyFn &&keyFn) // callable: KD -> KE
+                const std::map<KD, ND> &in,
+                KeyFn &&keyFn)// callable: KD -> KE
         {
             std::map<KE, NE> out;
             for (const auto &[k, v]: in)
@@ -446,8 +448,48 @@ namespace AwsMock::Dto {
             if (!opt) return std::nullopt;
             return Derived::toEntity(*opt);
         }
+        // map<K, Entity> → map<K, Dto>
+        template<typename K>
+        [[nodiscard]]
+        static std::map<K, Dto> toDtoMap(const std::map<K, Entity> &in) {
+            std::map<K, Dto> out;
+            for (const auto &[k, v]: in)
+                out.emplace(k, Derived::toDto(v));
+            return out;
+        }
 
-    protected:
+        // map<K, Dto> → map<K, Entity>
+        template<typename K>
+        [[nodiscard]]
+        static std::map<K, Entity> toEntityMap(const std::map<K, Dto> &in) {
+            std::map<K, Entity> out;
+            for (const auto &[k, v]: in)
+                out.emplace(k, Derived::toEntity(v));
+            return out;
+        }
+
+        // map<KE, Entity> → map<KD, Dto>  (key also transformed)
+        template<typename KE, typename KD, typename KeyFn>
+        [[nodiscard]]
+        static std::map<KD, Dto> toDtoMapWithKey(const std::map<KE, Entity> &in, KeyFn &&keyFn) {
+            std::map<KD, Dto> out;
+            for (const auto &[k, v]: in)
+                out.emplace(std::invoke(keyFn, k), Derived::toDto(v));
+            return out;
+        }
+
+        // map<KD, Dto> → map<KE, Entity>  (key also transformed)
+        template<typename KD, typename KE, typename KeyFn>
+        [[nodiscard]]
+        static std::map<KE, Entity> toEntityMapWithKey(const std::map<KD, Dto> &in, KeyFn &&keyFn) {
+            std::map<KE, Entity> out;
+            for (const auto &[k, v]: in)
+                out.emplace(std::invoke(keyFn, k), Derived::toEntity(v));
+            return out;
+        }
+
+      protected:
+
         ~StaticMapper() = default;
     };
 
@@ -470,9 +512,10 @@ namespace AwsMock::Dto {
     // ===========================================================================
 
     class MapperRegistry {
-    public:
+      public:
+
         template<Mappable Entity, Mappable Dto>
-        void add(std::shared_ptr<Mapper<Entity, Dto> > mapper) {
+        void add(std::shared_ptr<Mapper<Entity, Dto>> mapper) {
             store_[key<Entity, Dto>()] = std::move(mapper);
         }
 
@@ -482,11 +525,12 @@ namespace AwsMock::Dto {
             auto it = store_.find(key<Entity, Dto>());
             if (it == store_.end())
                 throw std::runtime_error(
-                    "MapperRegistry: no mapper registered for the requested types");
-            return *std::static_pointer_cast<Mapper<Entity, Dto> >(it->second);
+                        "MapperRegistry: no mapper registered for the requested types");
+            return *std::static_pointer_cast<Mapper<Entity, Dto>>(it->second);
         }
 
-    private:
+      private:
+
         using Key = std::pair<std::type_index, std::type_index>;
 
         struct KeyHash {
@@ -504,6 +548,6 @@ namespace AwsMock::Dto {
 
         std::unordered_map<Key, std::shared_ptr<void>, KeyHash> store_;
     };
-} // namespace AwsMock::Dto
+}// namespace AwsMock::Dto
 
-#endif //AWSMOCK_DTO_MAPPER_H
+#endif//AWSMOCK_DTO_MAPPER_H
