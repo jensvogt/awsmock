@@ -212,6 +212,7 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.modules.application.runtime.java17", "AWSMOCK_MODULES_APPLICATION_JAVA17", "openjdk:17-jdk-alpine");
         DefineProperty<std::string>("awsmock.modules.application.runtime.java21", "AWSMOCK_MODULES_APPLICATION_JAVA21", "alpine/java:21-jdk");
         DefineProperty<std::string>("awsmock.modules.application.runtime.java25", "AWSMOCK_MODULES_APPLICATION_JAVA25", "alpine/java:25-jdk");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.java26", "AWSMOCK_MODULES_APPLICATION_JAVA26", "alpine/java:26-jdk");
         DefineProperty<std::string>("awsmock.modules.application.runtime.python3-9", "AWSMOCK_MODULES_APPLICATION_PYTHON39", "python:3.9");
         DefineProperty<std::string>("awsmock.modules.application.runtime.python3-10", "AWSMOCK_MODULES_APPLICATION_PYTHON310", "python:3.10");
         DefineProperty<std::string>("awsmock.modules.application.runtime.python3-11", "AWSMOCK_MODULES_APPLICATION_PYTHON311", "python:3.11");
@@ -407,4 +408,4 @@ namespace AwsMock::Core {
         os << "Configuration=" << oss.str();
         return os;
     }
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

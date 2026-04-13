@@ -90,6 +90,7 @@ namespace AwsMock::Service {
         for (auto &queue: queueList) {
 
             queue.url = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.arn);
+            queue.attributes.queueArn = queue.arn;
             queue = _sqsDatabase.UpdateQueue(queue);
             log_trace << "SQS queue updated, queueName" << queue.name;
         }
@@ -141,4 +142,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("sns-delete-messages");
         _scheduler.Shutdown("sns-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
