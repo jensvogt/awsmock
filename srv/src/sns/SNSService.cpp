@@ -96,10 +96,11 @@ namespace AwsMock::Service {
         try {
 
             const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns), request.region);
-            Dto::SNS::ListTopicCountersResponse listTopicResponse = Dto::SNS::Mapper::map(request, topicList);
-            listTopicResponse.total = _snsDatabase.CountTopics(request.region, request.prefix);
-            log_trace << "SNS list topic counters response: " << listTopicResponse.ToJson();
-            return listTopicResponse;
+            Dto::SNS::ListTopicCountersResponse response;
+            response.total = _snsDatabase.CountTopics(request.region, request.prefix);
+            response.topicCounters = Dto::SNS::TopicCounterMapper::toDtoList(topicList);
+            log_trace << "SNS list topic counters response: " << response.topicCounters.size();
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << ex.what();
@@ -226,31 +227,16 @@ namespace AwsMock::Service {
             // Get the topic by topic ARN or target ARN
             const Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
 
-            // Update database
-            //message = Dto::SNS::Mapper::map(request, topic);
-            Database::Entity::SNS::Message message = {
-                    .region = request.region,
-                    .topicArn = request.topicArn,
-                    .targetArn = request.targetArn,
-                    .message = request.message,
-                    .messageId = Core::AwsUtils::CreateMessageId(),
-                    .contentType = request.contentType,
-                    .size = static_cast<long>(request.message.length())};
+            // Create entity
+            Database::Entity::SNS::Message message = Dto::SNS::PublishRequestMapper::toEntity(request);
 
             // Content type
             message.contentType = SanitizeContentType(request.contentType, request.message);
-            
-            // Attributes
-            if (!request.messageAttributes.empty()) {
-                for (const auto &[fst, snd]: request.messageAttributes) {
-                    const Database::Entity::SNS::MessageAttribute attribute = {.stringValue = snd.stringValue, .dataType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType))};
-                    message.messageAttributes[fst] = attribute;
-                }
-            }
 
             // Save message
             message = _snsDatabase.CreateMessage(message);
 
+            // Check subscriptions
             CheckSubscriptions(request, topic, message);
 
             Dto::SNS::PublishResponse response;
@@ -634,7 +620,7 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Message message = _snsDatabase.GetMessageByMessageId(request.messageId);
             log_debug << "Got message , messageId: " << request.messageId;
             Dto::SNS::GetMessageCountersResponse response;
-            response.message = Dto::SNS::Mapper::map(message);
+            response.message = Dto::SNS::MessageMapper::toDto(message);
             return response;
 
         } catch (Core::DatabaseException &ex) {
@@ -863,7 +849,7 @@ namespace AwsMock::Service {
         record.messageId = message.messageId;
         record.receiptHandle = Core::AwsUtils::CreateSnsReceiptHandler();
         record.body = message.message;
-        record.messageAttributes = Dto::SNS::Mapper::map(message.messageAttributes);
+        record.messageAttributes = Dto::SNS::MessageAttributeMapper::toDtoMap(message.messageAttributes);
         record.md5Sum = Database::SqsUtils::CreateMd5OfMessageBody(message.message);
         record.eventSource = "aws:sns";
         record.eventSourceArn = eventSourceArn;
@@ -883,15 +869,17 @@ namespace AwsMock::Service {
 
         try {
 
+            // Get database values
             const long total = _snsDatabase.CountMessages(request.topicArn);
-
             const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex);
 
-            Dto::SNS::ListMessagesResponse listMessageResponse = Dto::SNS::Mapper::map(request, messageList);
-            listMessageResponse.total = total;
-            log_trace << "SNS list messages, response: " << listMessageResponse.ToJson();
+            // Prepare response
+            Dto::SNS::ListMessagesResponse response;
+            response.total = total;
+            response.messages = Dto::SNS::MessageMapper::toDtoList(messageList);
+            log_trace << "SNS list messages, count: " << response.messages.size();
 
-            return listMessageResponse;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS list topics request failed, message: " << ex.what();
@@ -906,11 +894,12 @@ namespace AwsMock::Service {
         try {
 
             const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.topicArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            Dto::SNS::ListMessageCountersResponse listMessageCountersResponse = Dto::SNS::Mapper::map(request, messageList);
-            listMessageCountersResponse.total = _snsDatabase.CountMessages(request.topicArn);
-            log_trace << "SNS list messages, response: " << listMessageCountersResponse.ToJson();
+            Dto::SNS::ListMessageCountersResponse response;
+            response.total = _snsDatabase.CountMessages(request.topicArn);
+            response.messages = Dto::SNS::MessageCounterMapper::toDtoList(messageList);
+            log_trace << "SNS list messages, count: " << response.messages.size();
 
-            return listMessageCountersResponse;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS list topics request failed, message: " << ex.what();

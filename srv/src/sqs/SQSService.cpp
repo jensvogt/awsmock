@@ -6,8 +6,6 @@
 
 namespace AwsMock::Service {
 
-    boost::mutex SQSService::_subscriptionMutex;
-
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
@@ -25,7 +23,6 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Queue queue = Dto::SQS::CreateQueueRequestMapper::toEntity(request);
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
-
             return Dto::SQS::CreateQueueResponseMapper::toDto(queue);
 
         } catch (Core::DatabaseException &exc) {
