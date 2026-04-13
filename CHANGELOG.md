@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.40](https://github.com/jensvogt/awsmock/compare/v1.16.39...v1.16.40) (2026-04-13)
+
+
+### Bug Fixes
+
+* add java25 support for applications and lambdas ([305e4c5](https://github.com/jensvogt/awsmock/commit/305e4c5cbe6bbd15794f819efff3cd55dd6444aa))
+* add java25 support for applications and lambdas ([d186bb7](https://github.com/jensvogt/awsmock/commit/d186bb7372985bf361aee0a77b4c454965880970))
+
 ## [1.16.39](https://github.com/jensvogt/awsmock/compare/v1.16.38...v1.16.39) (2026-04-12)
 
 
