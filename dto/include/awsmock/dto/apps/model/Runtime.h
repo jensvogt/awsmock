@@ -20,6 +20,8 @@ namespace AwsMock::Dto::Apps {
         JAVA11,
         JAVA17,
         JAVA21,
+        JAVA25,
+        JAVA26,
         PYTHON39,
         PYTHON310,
         PYTHON311,
@@ -29,15 +31,17 @@ namespace AwsMock::Dto::Apps {
     };
 
     static std::map<AppsRuntimeType, std::string> AppsRuntimeTypeNames{
-            {AppsRuntimeType::JAVA11, "JAVA11"},
-            {AppsRuntimeType::JAVA17, "JAVA17"},
-            {AppsRuntimeType::JAVA21, "JAVA21"},
-            {AppsRuntimeType::PYTHON39, "python3-9"},
-            {AppsRuntimeType::PYTHON310, "python3-10"},
-            {AppsRuntimeType::PYTHON311, "python3-11"},
-            {AppsRuntimeType::PYTHON312, "python3-12"},
-            {AppsRuntimeType::PYTHON313, "python3-13"},
-            {AppsRuntimeType::UNKNOWN, "UNKNOWN"},
+        {AppsRuntimeType::JAVA11, "JAVA11"},
+        {AppsRuntimeType::JAVA17, "JAVA17"},
+        {AppsRuntimeType::JAVA21, "JAVA21"},
+        {AppsRuntimeType::JAVA25, "JAVA25"},
+        {AppsRuntimeType::JAVA26, "JAVA26"},
+        {AppsRuntimeType::PYTHON39, "python3-9"},
+        {AppsRuntimeType::PYTHON310, "python3-10"},
+        {AppsRuntimeType::PYTHON311, "python3-11"},
+        {AppsRuntimeType::PYTHON312, "python3-12"},
+        {AppsRuntimeType::PYTHON313, "python3-13"},
+        {AppsRuntimeType::UNKNOWN, "UNKNOWN"},
     };
 
     [[maybe_unused]] static std::string AppsRuntimeTypeToString(const AppsRuntimeType &runtimeType) {
@@ -53,6 +57,6 @@ namespace AwsMock::Dto::Apps {
         return AppsRuntimeType::UNKNOWN;
     }
 
-}// namespace AwsMock::Dto::Apps
+} // namespace AwsMock::Dto::Apps
 
 #endif//AWSMOCK_DTO_APPS_RUNTIME_H
