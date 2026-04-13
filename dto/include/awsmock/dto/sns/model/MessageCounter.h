@@ -69,14 +69,7 @@ namespace AwsMock::Dto::SNS {
          */
         system_clock::time_point modified;
 
-        /**
-         * @brief Converts the DTO to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-    private:
+      private:
 
         friend MessageCounter tag_invoke(boost::json::value_to_tag<MessageCounter>, boost::json::value const &v) {
             MessageCounter r;
@@ -86,7 +79,7 @@ namespace AwsMock::Dto::SNS {
             r.contentType = Core::Json::GetStringValue(v, "contentType");
             r.size = Core::Json::GetLongValue(v, "size");
             r.messageStatus = MessageStatusFromString(v.at("messageStatus").as_string().data());
-            r.messageAttributes = boost::json::value_to<std::vector<MessageAttributeCounter> >(v.at("messageAttributes"));
+            r.messageAttributes = boost::json::value_to<std::vector<MessageAttributeCounter>>(v.at("messageAttributes"));
             r.lastSend = Core::DateTimeUtils::FromISO8601(v.at("lastSend").as_string().data());
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());

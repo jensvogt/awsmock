@@ -109,8 +109,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
-                                                            };
+        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {}
 
         /**
          * @brief Creates a new queue.
@@ -517,7 +516,7 @@ namespace AwsMock::Service {
          * @brief Sanitize the content type
          *
          * @par
-         * In case the content is empty or 'applicaiton/octet-stream, try to determine the content type from the message body.
+         * In case the content is empty or 'application/octet-stream', try to determine the content type from the message body.
          *
          * @param contentType input content type
          * @param body message body
@@ -547,8 +546,6 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
-
-        static boost::mutex _subscriptionMutex;
     };
 }// namespace AwsMock::Service
 

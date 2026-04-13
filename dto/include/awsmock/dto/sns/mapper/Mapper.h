@@ -6,6 +6,8 @@
 #define AWSMOCK_DTO_SNS_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListMessagesRequest.h>
@@ -13,122 +15,195 @@
 #include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
 #include <awsmock/dto/sns/model/Message.h>
+#include <awsmock/dto/sns/model/TagCounter.h>
+#include <awsmock/dto/sns/model/Topic.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 
-
 namespace AwsMock::Dto::SNS {
 
-    /**
-     * @brief Maps an entity to the corresponding DTO
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    class Mapper {
+    class TopicMapper : public StaticMapper<TopicMapper, Database::Entity::SNS::Topic, Topic> {
 
       public:
 
-        /**
-         * @brief Maps an SNS message entity list to a list messages response
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param request request struct
-         * @param messageEntities SNS message entity list
-         * @return ListMessagesResponse
-         * @see ListMessagesResponse
-         * @see ListMessagesRequest
-         */
-        static ListMessagesResponse map(const ListMessagesRequest &request, const std::vector<Database::Entity::SNS::Message> &messageEntities);
+        static Topic toDto(const Database::Entity::SNS::Topic &e) {
+            Topic d;
+            d.region = e.region;
+            d.topicArn = e.topicArn;
+            d.topicName = e.topicName;
+            d.messages = e.messages;
+            d.targetArn = e.targetArn;
+            d.size = e.size;
+            //d.messageAttributes = MessageAttributeMapper::toDtoMap(e.messageAttributes);
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
 
-        /**
-         * @brief Maps an SNS message entity list to a list messages response
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param request original request
-         * @param topicEntities SNS topic entity list
-         * @return ListMessagesResponse
-         * @see ListMessagesResponse
-         * @see ListMessagesRequest
-         */
-        static ListTopicCountersResponse map(const ListTopicCountersRequest &request, const std::vector<Database::Entity::SNS::Topic> &topicEntities);
+        static Database::Entity::SNS::Topic toEntity(const Topic &d) {
+            Database::Entity::SNS::Topic e;
+            e.region = d.region;
+            e.topicArn = d.topicArn;
+            e.topicName = d.topicName;
+            e.messages = d.messages;
+            e.targetArn = d.targetArn;
+            e.size = d.size;
+            e.created = d.created;
+            e.modified = d.modified;
+            return e;
+        }
+    };
 
-        /**
-         * @brief Maps an SNS message entity list to a list messages response
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param request original request
-         * @param messageEntities SNS message entity list
-         * @return ListMessagesResponse
-         * @see ListMessagesResponse
-         * @see ListMessagesRequest
-         */
-        static ListMessageCountersResponse map(const ListMessageCountersRequest &request, const std::vector<Database::Entity::SNS::Message> &messageEntities);
+    class TopicCounterMapper : public StaticMapper<TopicCounterMapper, Database::Entity::SNS::Topic, TopicCounter> {
 
-        /**
-         * @brief Maps an SNS message entity list to a message DTO
-         *
-         * Some values will be pulled over from the request.
-         *
-         * @param messageEntity message entity
-         * @return Message DTO
-         * @see Database::Entity::SNS::Message
-         * @see Message
-         */
-        static Message map(const Database::Entity::SNS::Message &messageEntity);
+      public:
 
-        /**
-         * @brief Maps an SNS message DTO list to message entity
-         *
-         * @param messageDto message DTO
-         * @return Message entity
-         * @see Database::Entity::SNS::Message
-         * @see Message
-         */
-        static Database::Entity::SNS::Message map(const Message &messageDto);
+        static TopicCounter toDto(const Database::Entity::SNS::Topic &e) {
+            TopicCounter d;
+            d.region = e.region;
+            d.topicArn = e.topicArn;
+            d.topicName = e.topicName;
+            d.messages = e.messages;
+            d.messagesSend = e.messagesSend;
+            d.messagesResend = e.messagesResend;
+            d.size = e.size;
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
 
-        /**
-         * @brief Maps a single SNS message attribute DTO to a message attribute entity
-         *
-         * @param messageAttribute SNS message attribute DTO list
-         * @return MessageAttribute entity
-         * @see SQS::MessageAttributeList
-         * @see Database::Entity::SQS::MessageAttributeList
-         */
-        static Database::Entity::SNS::MessageAttribute map(const MessageAttribute &messageAttribute);
+        static Database::Entity::SNS::Topic toEntity(const TopicCounter &d) {
+            Database::Entity::SNS::Topic e;
+            e.region = d.region;
+            e.topicArn = d.topicArn;
+            e.topicName = d.topicName;
+            e.messages = d.messages;
+            e.messagesSend = d.messagesSend;
+            e.messagesResend = d.messagesResend;
+            e.size = d.size;
+            e.created = d.created;
+            e.modified = d.modified;
+            return e;
+        }
+    };
 
-        /**
-         * @brief Maps an SNS message attribute DTO to a message attribute entity
-         *
-         * @param messageAttributes SNS message attribute DTO list
-         * @return MessageAttributeList
-         * @see SQS::MessageAttributeList
-         * @see Database::Entity::SQS::MessageAttributeList
-         */
-        static std::map<std::string, Database::Entity::SNS::MessageAttribute> map(const std::map<std::string, MessageAttribute> &messageAttributes);
+    class MessageAttributeMapper : public StaticMapper<MessageAttributeMapper, Database::Entity::SNS::MessageAttribute, MessageAttribute> {
 
-        /**
-         * @brief Maps a single SNS message attribute entity to a message attribute DTO
-         *
-         * @param messageAttributeEntity SNS message attribute entities list
-         * @return MessageAttribute DTo
-         * @see SQS::MessageAttribute
-         * @see Database::Entity::SQS::MessageAttribute
-         */
-        static MessageAttribute map(const Database::Entity::SNS::MessageAttribute &messageAttributeEntity);
+      public:
 
-        /**
-         * @brief Maps an SNS message attribute DTO to a message attribute entity
-         *
-         * @param messageAttributesEntities SNS message attribute entities list
-         * @return MessageAttributeList DTos
-         * @see SQS::MessageAttributeList
-         * @see Database::Entity::SQS::MessageAttributeList
-         */
-        static std::map<std::string, MessageAttribute> map(const std::map<std::string, Database::Entity::SNS::MessageAttribute> &messageAttributesEntities);
+        static MessageAttribute toDto(const Database::Entity::SNS::MessageAttribute &e) {
+            MessageAttribute messageAttribute;
+            messageAttribute.dataType = MessageAttributeDataTypeFromString(Database::Entity::SNS::MessageAttributeTypeToString(e.dataType));
+            messageAttribute.stringValue = e.stringValue;
+            return messageAttribute;
+        }
+
+        static Database::Entity::SNS::MessageAttribute toEntity(const MessageAttribute &d) {
+            Database::Entity::SNS::MessageAttribute messageAttribute;
+            messageAttribute.dataType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(d.dataType));
+            messageAttribute.stringValue = d.stringValue;
+            return messageAttribute;
+        }
+    };
+
+    class MessageAttributeCounterMapper : public StaticMapper<MessageAttributeCounterMapper, Database::Entity::SNS::MessageAttribute, MessageAttributeCounter> {
+
+      public:
+
+        static MessageAttributeCounter toDto(const Database::Entity::SNS::MessageAttribute &e) {
+            MessageAttributeCounter messageAttribute;
+            messageAttribute.type = MessageAttributeDataTypeFromString(Database::Entity::SNS::MessageAttributeTypeToString(e.dataType));
+            messageAttribute.stringValue = e.stringValue;
+            return messageAttribute;
+        }
+
+        static Database::Entity::SNS::MessageAttribute toEntity(const MessageAttributeCounter &d) {
+            Database::Entity::SNS::MessageAttribute messageAttribute;
+            messageAttribute.dataType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(d.type));
+            messageAttribute.stringValue = d.stringValue;
+            return messageAttribute;
+        }
+    };
+
+    class MessageMapper : public StaticMapper<MessageMapper, Database::Entity::SNS::Message, Message> {
+
+      public:
+
+        static Message toDto(const Database::Entity::SNS::Message &e) {
+            Message d;
+            d.region = e.region;
+            d.topicArn = e.topicArn;
+            d.targetArn = e.targetArn;
+            d.contentType = e.contentType;
+            d.messageId = e.messageId;
+            d.message = e.message;
+            d.size = e.size;
+            d.messageAttributes = MessageAttributeMapper::toDtoMap(e.messageAttributes);
+            d.created = e.created;
+            d.modified = e.modified;
+            return d;
+        }
+
+        static Database::Entity::SNS::Message toEntity(const Message &d) {
+            Database::Entity::SNS::Message e;
+            e.region = d.region;
+            e.topicArn = d.topicArn;
+            e.targetArn = d.targetArn;
+            e.contentType = d.contentType;
+            e.messageId = d.messageId;
+            e.message = d.message;
+            e.size = d.size;
+            e.messageAttributes = MessageAttributeMapper::toEntityMap(d.messageAttributes);
+            e.created = d.created;
+            e.modified = d.modified;
+            return e;
+        }
+    };
+
+    class MessageCounterMapper : public StaticMapper<MessageCounterMapper, Database::Entity::SNS::Message, MessageCounter> {
+
+      public:
+
+        static MessageCounter toDto(const Database::Entity::SNS::Message &e) {
+            MessageCounter d;
+            d.region = e.region;
+            d.topicArn = e.topicArn;
+            d.contentType = e.contentType;
+            d.messageId = e.messageId;
+            d.message = e.message;
+            d.size = e.size;
+            d.created = e.created;
+            d.modified = e.modified;
+            for (const auto &[key, value]: e.messageAttributes) {
+                MessageAttributeCounter messageAttribute;
+                messageAttribute.name = key;
+                messageAttribute.type = MessageAttributeDataTypeFromString(Database::Entity::SNS::MessageAttributeTypeToString(value.dataType));
+                messageAttribute.stringValue = value.stringValue;
+                d.messageAttributes.emplace_back(messageAttribute);
+            }
+            return d;
+        }
+
+        static Database::Entity::SNS::Message toEntity(const Message &d) = delete;
+    };
+
+    class PublishRequestMapper : public StaticMapper<PublishRequestMapper, Database::Entity::SNS::Message, PublishRequest> {
+
+      public:
+
+        static Message toDto(const Database::Entity::SNS::Message &e) = delete;
+
+        static Database::Entity::SNS::Message toEntity(const PublishRequest &d) {
+            Database::Entity::SNS::Message e;
+            e.region = d.region;
+            e.topicArn = d.topicArn;
+            e.targetArn = d.targetArn;
+            e.contentType = d.contentType;
+            e.message = d.message;
+            e.messageAttributes = MessageAttributeMapper::toEntityMap(d.messageAttributes);
+            return e;
+        }
     };
 
 }// namespace AwsMock::Dto::SNS
