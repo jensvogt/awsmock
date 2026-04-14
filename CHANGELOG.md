@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.41](https://github.com/jensvogt/awsmock/compare/v1.16.40...v1.16.41) (2026-04-14)
+
+
+### Bug Fixes
+
+* docker container management ([755bc53](https://github.com/jensvogt/awsmock/commit/755bc53617804745895a3e8ab15476dbe46669f0))
+* SQL cleanup, new libmagic singleton instance ([fb371d3](https://github.com/jensvogt/awsmock/commit/fb371d30001dbfd29032bf1011ea64796aa50ccf))
+
 ## [1.16.40](https://github.com/jensvogt/awsmock/compare/v1.16.39...v1.16.40) (2026-04-13)
 
 
