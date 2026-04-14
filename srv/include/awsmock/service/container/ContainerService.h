@@ -96,8 +96,7 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -166,16 +165,6 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] std::string BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, long privatePort,
                                                         const std::map<std::string, std::string> &environment) const;
-
-        /**
-         * @brief Build a docker image from a docker file
-         *
-         * @param name lambda function name, used as image name
-         * @param tag image tags
-         * @param dockerFile docker file
-         * @return file size in bytes
-         */
-        [[nodiscard]] std::string BuildDynamoDbImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
 
         /**
          * @brief Delete an image by name/tags.
@@ -455,8 +444,7 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-      private:
-
+    private:
         /**
          * @brief Write the lambda docker file.
          *
@@ -564,6 +552,6 @@ namespace AwsMock::Service {
         // std::shared_ptr<Core::DomainSocket> _domainSocket;
         // mutable std::mutex _socketMutex;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_DOCKER_SERVICE_H
