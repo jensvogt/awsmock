@@ -103,28 +103,6 @@ namespace AwsMock::Service {
         return dockerFile;
     }
 
-    std::string ContainerService::BuildDynamoDbImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const {
-        log_debug << "Build image request, name: " << name << ", tags: " << tag;
-
-        // Write the docker file
-        const std::string codeDir = Core::DirUtils::CreateTempDir();
-        const std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
-        std::ofstream ofs(fileName);
-        ofs << dockerFile;
-        ofs.close();
-
-        // Create TAR file name
-        std::string tarFileName = name;
-        Core::StringUtils::Replace(tarFileName, "/", "-");
-        Core::StringUtils::Replace(tarFileName, ".", "-");
-        const std::string imageFile = BuildImageFile(codeDir, tarFileName);
-
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
-            log_error << "Build image failed, statusCode: " << statusCode << ", body: " << body;
-        }
-        return dockerFile;
-    }
-
     std::vector<Dto::Docker::Image> ContainerService::ListImagesByName(const std::string &name, const std::string &tag) const {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/images/json?all=true");
         if (statusCode != http::status::ok) {
@@ -138,14 +116,11 @@ namespace AwsMock::Service {
             return {};
         }
 
-        std::vector<Dto::Docker::Image> images;
-        for (const auto &image: response.imageList) {
-            if (tag.empty() && std::ranges::find(image.repoTags, name) != image.repoTags.end()) {
-                images.push_back(image);
-            } else if (std::ranges::find(image.repoTags, name + ":" + tag) != image.repoTags.end()) {
-                images.push_back(image);
-            }
-        }
+        const std::string target = tag.empty() ? name : name + ":" + tag;
+        auto hasTag = [&](const auto &image) {
+            return std::ranges::contains(image.repoTags, target);
+        };
+        auto images = response.imageList | std::views::filter(hasTag) | std::ranges::to<std::vector>();
         log_info << "Images found, name: " << name << ", count: " << images.size();
         return images;
     }
@@ -262,13 +237,11 @@ namespace AwsMock::Service {
         }
 
         // Docker API does not work as expected, therefore, we filter ourselves
-        std::vector<Dto::Docker::Container> containers;
-        const std::string containerName = tag.empty() ? name : name + ":" + tag;
-        for (const auto &container: response.containerList) {
-            if (Core::StringUtils::Contains(container.image, name)) {
-                containers.push_back(container);
-            }
-        }
+        const std::string target = tag.empty() ? name : name + ":" + tag;
+        auto containers = response.containerList | std::views::filter([&](const auto &c) {
+                              return c.image == target;
+                          })
+                          | std::ranges::to<std::vector>();
 
         // Check number of containers found
         if (containers.empty()) {
@@ -430,13 +403,13 @@ namespace AwsMock::Service {
                 log_warning << "List container stats failed, statusCode: " << statusCode << " body " << body;
                 return {};
             }
-            Dto::Docker::ContainerStat containerStat = containerStat.FromJson(body);
+            Dto::Docker::ContainerStat containerStat = Dto::Docker::ContainerStat::FromJson(body);
             containerStat.containerId = container.id;
             containerStat.state = container.state;
             containerStat.name = container.GetContainerName();
             response.containerStats.emplace_back(containerStat);
         }
-        response.total = listResponse.containerList.size();
+        response.total = static_cast<long>(listResponse.containerList.size());
         return response;
     }
 
@@ -506,7 +479,7 @@ namespace AwsMock::Service {
 
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
             log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
-            response.FromJson(body);
+            response = Dto::Docker::CreateNetworkResponse::FromJson(body);
         } else {
             log_error << "Docker network create failed, statusCode: " << statusCode;
         }
@@ -524,7 +497,7 @@ namespace AwsMock::Service {
     bool ContainerService::IsContainerRunning(const std::string &containerId) const {
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json"); statusCode == http::status::ok) {
             log_debug << "Container running, statusCode: " << statusCode;
-            const Dto::Docker::InspectContainerResponse response = response.FromJson(body);
+            const Dto::Docker::InspectContainerResponse response = Dto::Docker::InspectContainerResponse::FromJson(body);
             log_debug << "Docker container state, id: " << containerId << " state: " << std::boolalpha << response.state.running;
             return response.state.running;
         }
@@ -629,8 +602,7 @@ namespace AwsMock::Service {
             return;
         }
 
-        const Dto::Docker::PruneContainerResponse response;
-        response.FromJson(body);
+        const Dto::Docker::PruneContainerResponse response = Dto::Docker::PruneContainerResponse::FromJson(body);
 
         log_debug << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed;
     }
@@ -845,4 +817,4 @@ namespace AwsMock::Service {
         ofs << "ENV " << "AWS_SECRET_ACCESS_KEY=\"none\"" << std::endl;
         ofs << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

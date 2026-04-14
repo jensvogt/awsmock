@@ -44,11 +44,13 @@ namespace AwsMock::Dto::Apps {
         {AppsRuntimeType::UNKNOWN, "UNKNOWN"},
     };
 
-    [[maybe_unused]] static std::string AppsRuntimeTypeToString(const AppsRuntimeType &runtimeType) {
+    [[maybe_unused]]
+    static std::string AppsRuntimeTypeToString(const AppsRuntimeType &runtimeType) {
         return AppsRuntimeTypeNames[runtimeType];
     }
 
-    [[maybe_unused]] static AppsRuntimeType AppsRuntimeTypeFromString(const std::string &runtimeType) {
+    [[maybe_unused]]
+    static AppsRuntimeType AppsRuntimeTypeFromString(const std::string &runtimeType) {
         for (auto &[fst, snd]: AppsRuntimeTypeNames) {
             if (snd == runtimeType) {
                 return fst;
