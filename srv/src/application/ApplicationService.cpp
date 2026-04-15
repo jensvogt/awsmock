@@ -279,7 +279,8 @@ namespace AwsMock::Service {
         std::string fullBase64File = Core::FileUtils::appendPath(dataDir, "/", application.name, "-", application.version, ".b64");
         if (!Core::FileUtils::FileExists(fullBase64File)) {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-            log_error << "Application Base64 image does not exist, name: " << application.name;
+            application = _database.UpdateApplication(application);
+            log_error << "Application Base64 image does not exist, name: " << fullBase64File;
             return;
         }
 
@@ -599,4 +600,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
