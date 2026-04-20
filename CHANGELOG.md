@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.43](https://github.com/jensvogt/awsmock/compare/v1.16.42...v1.16.43) (2026-04-20)
+
+
+### Bug Fixes
+
+* add dual stack add  SNS-&gt;SQS subscriptions ([9771569](https://github.com/jensvogt/awsmock/commit/9771569129b16e61a79424cbd3b76ca05a78c460))
+
 ## [1.16.42](https://github.com/jensvogt/awsmock/compare/v1.16.41...v1.16.42) (2026-04-20)
 
 
