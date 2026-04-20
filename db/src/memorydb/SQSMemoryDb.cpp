@@ -28,8 +28,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                   return queue.second.arn == queueArn;
-               }) != _queues.end();
+            return queue.second.arn == queueArn;
+        }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -115,8 +115,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::IsDlq(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                   return queue.second.attributes.redrivePolicy.deadLetterTargetArn == queueArn;
-               }) != _queues.end();
+            return queue.second.attributes.redrivePolicy.deadLetterTargetArn == queueArn;
+        }) != _queues.end();
     }
 
     Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) {
@@ -243,14 +243,7 @@ namespace AwsMock::Database {
         if (!region.empty()) {
             q = q.where([prefix](const Entity::SQS::Queue &item) { return Core::StringUtils::StartsWith(item.name, prefix); });
         }
-        return q.count();
-    }
-
-    long SQSMemoryDb::GetQueueSize(const std::string &arn) const {
-        return std::accumulate(_queues.begin(), _queues.end(), 0L,
-                               [arn](long sum, const auto &item) {
-                                   return item.second.arn == arn ? sum + item.second.size : sum;
-                               });
+        return static_cast<long>(q.count());
     }
 
     long SQSMemoryDb::DeleteQueue(const Entity::SQS::Queue &queue) {
@@ -615,4 +608,4 @@ namespace AwsMock::Database {
         log_debug << "All message counters updated, count: " << _queues.size();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

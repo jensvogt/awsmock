@@ -51,6 +51,8 @@
 #include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
+#include <awsmock/dto/sns/internal/ListDefaultMessageAttributeCountersRequest.h>
+#include <awsmock/dto/sns/internal/ListDefaultMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListMessagesRequest.h>
 #include <awsmock/dto/sns/internal/ListMessagesResponse.h>
@@ -83,12 +85,13 @@ namespace AwsMock::Service {
      */
     class SNSService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc), _ioc(ioc) {}
+        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc),
+                                                            _ioc(ioc) {
+        }
 
         /**
          * @brief Creates a new topic
@@ -253,6 +256,16 @@ namespace AwsMock::Service {
         Dto::SNS::ListAttributeCountersResponse ListAttributeCounters(const Dto::SNS::ListAttributeCountersRequest &request) const;
 
         /**
+         * @brief Returns a list of all default message attribute counters
+         *
+         * @param request list default message attribute counters request
+         * @return ListDefaultMessageAttributeCountersResponse
+         * @see ListDefaultMessageAttributeCountersRequest
+         * @see ListDefaultMessageAttributeCountersResponse
+         */
+        [[nodiscard]] Dto::SNS::ListDefaultMessageAttributeCountersResponse ListDefaultMessageAttributeCounters(const Dto::SNS::ListDefaultMessageAttributeCountersRequest &request) const;
+
+        /**
          * @brief Purge a topic
          *
          * @param request purge topic request
@@ -333,8 +346,7 @@ namespace AwsMock::Service {
          */
         void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Checks the subscriptions.
          *
@@ -361,6 +373,7 @@ namespace AwsMock::Service {
          * @param topic SNS topic entity
          */
         void AdjustTopicCounters(Database::Entity::SNS::Topic &topic) const;
+
         static std::string SanitizeContentType(const std::string &contentType, const std::string &body);
 
         /**
@@ -420,6 +433,6 @@ namespace AwsMock::Service {
         boost::asio::io_context &_ioc;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SNS_SERVICE_H

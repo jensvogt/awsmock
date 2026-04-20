@@ -140,7 +140,7 @@ namespace AwsMock::Service {
         // Check code length
         if (request.applicationCode.empty()) {
             log_warning << "Application code is empty, name: " << request.applicationName;
-            throw Core::ServiceException("Lambda function code is empty, name: " + request.applicationName);
+            throw Core::ServiceException("Application code is empty, name: " + request.applicationName);
         }
 
         // Get application
@@ -276,7 +276,7 @@ namespace AwsMock::Service {
 
         // Get code base64 file name
         auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
-        std::string fullBase64File = Core::FileUtils::appendPath(dataDir, "/", application.name, "-", application.version, ".b64");
+        std::string fullBase64File = Core::FileUtils::appendPath(dataDir, Core::FileUtils::separator(), application.name, "-", application.version, ".b64");
         if (!Core::FileUtils::FileExists(fullBase64File)) {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
             application = _database.UpdateApplication(application);

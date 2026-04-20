@@ -11,8 +11,8 @@ namespace AwsMock::Database::Entity::SQS {
 
     bool Message::HasAttribute(const std::string &key) {
         return std::ranges::find_if(attributes, [key](const std::pair<std::string, std::string> &attribute) {
-                   return attribute.first == key;
-               }) != attributes.end();
+            return attribute.first == key;
+        }) != attributes.end();
     }
 
     int Message::GetIntAttribute(const std::string &key) {
@@ -49,6 +49,7 @@ namespace AwsMock::Database::Entity::SQS {
         messageDoc.append(kvp("queueArn", queueArn));
         messageDoc.append(kvp("queueName", queueName));
         messageDoc.append(kvp("body", body));
+        messageDoc.append(kvp("type", type));
         messageDoc.append(kvp("status", MessageStatusToString(status)));
         messageDoc.append(kvp("retries", bsoncxx::types::b_int64(retries)));
         messageDoc.append(kvp("size", bsoncxx::types::b_int64(size)));
@@ -75,6 +76,7 @@ namespace AwsMock::Database::Entity::SQS {
             queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
             queueName = Core::Bson::BsonUtils::GetStringValue(mResult, "queueName");
             body = Core::Bson::BsonUtils::GetStringValue(mResult, "body");
+            type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
             status = MessageStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
             retries = Core::Bson::BsonUtils::GetIntValue(mResult, "retries");
             messageId = Core::Bson::BsonUtils::GetStringValue(mResult, "messageId");
@@ -115,4 +117,4 @@ namespace AwsMock::Database::Entity::SQS {
         }
     }
 
-}// namespace AwsMock::Database::Entity::SQS
+} // namespace AwsMock::Database::Entity::SQS

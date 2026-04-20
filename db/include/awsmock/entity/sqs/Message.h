@@ -65,12 +65,12 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Send retries
          */
-        long retries = 0;
+        long retries{};
 
         /**
          * Message size
          */
-        long size = 0;
+        long size{};
 
         /**
          * Visibility timeout
@@ -131,6 +131,10 @@ namespace AwsMock::Database::Entity::SQS {
         std::string contentType;
 
         /**
+         * Type
+         */
+        std::string type = "Message";
+ /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -181,6 +185,6 @@ namespace AwsMock::Database::Entity::SQS {
 
     typedef std::vector<Message> MessageList;
 
-}// namespace AwsMock::Database::Entity::SQS
+} // namespace AwsMock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_H

@@ -6,7 +6,8 @@
 
 namespace AwsMock::Database {
 
-    SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {}
+    SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
+    }
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) const {
         Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "exists_topic");
@@ -142,7 +143,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
                 if (const auto mResult = _topicCollection.find_one(
-                            make_document(kvp("targetArn", targetArn)));
+                        make_document(kvp("targetArn", targetArn)));
                     !mResult->empty()) {
                     Entity::SNS::Topic result;
                     result.FromDocument(mResult->view());
@@ -165,7 +166,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
                 if (const auto mResult = _topicCollection.find_one(
-                            make_document(kvp("region", region), kvp("topicName", topicName)));
+                        make_document(kvp("region", region), kvp("topicName", topicName)));
                     !mResult->empty()) {
                     Entity::SNS::Topic result;
                     result.FromDocument(mResult->view());
@@ -340,7 +341,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 topic.modified = system_clock::now();
                 const auto mResult = _topicCollection.find_one_and_update(make_document(kvp("region", topic.region), kvp("topicArn", topic.topicArn)), topic.ToDocument(), opts);
-                log_trace << "Topic updated: " << topic.ToString();
+                log_trace << "Topic updated: " << topic.ToJson();
                 session.commit_transaction();
 
                 if (mResult) {
@@ -979,13 +980,13 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.group(make_document(
-                        kvp("_id", "$topicArn"),
-                        kvp("size", make_document(kvp("$sum", "$size"))),
-                        kvp("total", make_document(kvp("$sum", 1))),
-                        kvp("send", make_document(kvp("$sum",
-                                                      make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
-                        kvp("resend", make_document(kvp("$sum",
-                                                        make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::RESEND)))), 1, 0))))))));
+                    kvp("_id", "$topicArn"),
+                    kvp("size", make_document(kvp("$sum", "$size"))),
+                    kvp("total", make_document(kvp("$sum", 1))),
+                    kvp("send", make_document(kvp("$sum",
+                                                  make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
+                    kvp("resend", make_document(kvp("$sum",
+                                                    make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::RESEND)))), 1, 0))))))));
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
@@ -1000,19 +1001,19 @@ namespace AwsMock::Database {
 
                 // Initialize all topics with zero message counts
                 topicCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                                  kvp("size", bsoncxx::types::b_int64()),
-                                                                                  kvp("messages", bsoncxx::types::b_int64()),
-                                                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
-                                                                                  kvp("messagesResend", bsoncxx::types::b_int64())))));
+                                                                      kvp("size", bsoncxx::types::b_int64()),
+                                                                      kvp("messages", bsoncxx::types::b_int64()),
+                                                                      kvp("messagesSend", bsoncxx::types::b_int64()),
+                                                                      kvp("messagesResend", bsoncxx::types::b_int64())))));
 
                 auto bulk = topicCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                     bulk.append(mongocxx::model::update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "topicArn"))),
                                                             make_document(kvp("$set", make_document(
-                                                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
-                                                                                              kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
-                                                                                              kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
+                                                                                  kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                  kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
+                                                                                  kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
+                                                                                  kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
                     log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "topicArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
                               << ", messages: " << Core::Bson::BsonUtils::GetLongValue(t, "total")
@@ -1041,4 +1042,4 @@ namespace AwsMock::Database {
         }
         _memoryDb.AdjustMessageCounters();
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

@@ -115,101 +115,100 @@ namespace AwsMock::Dto::SQS {
          *
          * @return DTO as string
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+        // [[nodiscard]] view_or_value<view, value> ToDocument() const {
+        //
+        //     try {
+        //         document rootDocument;
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "id", id);
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "messageId", messageId);
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "receiptHandle", receiptHandle);
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "body", body);
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5OfBody", md5Body);
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5MessageAttributes", md5MessageAttributes);
+        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5SystemAttributes", md5SystemAttributes);
+        //         Core::Bson::BsonUtils::SetIntValue(rootDocument, "retries", retries);
+        //         Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+        //         Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+        //         Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
+        //
+        //         // Message attributes
+        //         if (!messageAttributes.empty()) {
+        //             array jsonMessageAttributeArray;
+        //             for (const auto &[fst, snd]: messageAttributes) {
+        //                 document jsonAttribute;
+        //                 jsonAttribute.append(kvp(fst, snd.ToDocument()));
+        //                 jsonMessageAttributeArray.append(jsonAttribute);
+        //             }
+        //             rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
+        //         }
+        //
+        //         // System attributes
+        //         if (!attributes.empty()) {
+        //             array jsonAttributeArray;
+        //             for (const auto &[fst, snd]: attributes) {
+        //                 document jsonAttribute;
+        //                 jsonAttribute.append(kvp(fst, snd));
+        //                 jsonAttributeArray.append(jsonAttribute);
+        //             }
+        //             rootDocument.append(kvp("attributes", jsonAttributeArray));
+        //         }
+        //         return rootDocument.extract();
+        //
+        //     } catch (bsoncxx::exception &exc) {
+        //         log_error << exc.what();
+        //         throw Core::JsonException(exc.what());
+        //     }
+        // }
+        //
+        // /**
+        //  * @brief Converts a JSON representation to a DTO.
+        //  *
+        //  * @param object JSON object.
+        //  */
+        // void FromDocument(const view_or_value<view, value> &object) {
+        //
+        //     try {
+        //         region = Core::Bson::BsonUtils::GetStringValue(object, "region");
+        //         id = Core::Bson::BsonUtils::GetStringValue(object, "id");
+        //         body = Core::Bson::BsonUtils::GetStringValue(object, "body");
+        //         messageId = Core::Bson::BsonUtils::GetStringValue(object, "messageId");
+        //         md5Body = Core::Bson::BsonUtils::GetStringValue(object, "md5Body");
+        //         md5MessageAttributes = Core::Bson::BsonUtils::GetStringValue(object, "md5MessageAttributes");
+        //         md5SystemAttributes = Core::Bson::BsonUtils::GetStringValue(object, "md5SystemAttributes");
+        //         receiptHandle = Core::Bson::BsonUtils::GetStringValue(object, "receiptHandle");
+        //         size = Core::Bson::BsonUtils::GetLongValue(object, "size");
+        //         retries = Core::Bson::BsonUtils::GetLongValue(object, "retries");
+        //         created = Core::Bson::BsonUtils::GetDateValue(object, "created");
+        //         modified = Core::Bson::BsonUtils::GetDateValue(object, "modified");
+        //
+        //         // Attributes
+        //         if (object.view().find("messageAttributes") != object.view().end()) {
+        //             for (const bsoncxx::array::view attributesView{object.view()["messageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+        //                 MessageAttribute attribute;
+        //                 std::string key = bsoncxx::string::to_string(attributeElement.key());
+        //                 attribute.FromDocument(attributeElement.get_document().value);
+        //                 messageAttributes[key] = attribute;
+        //             }
+        //         }
+        //
+        //         // System attributes
+        //         if (object.view().find("messageSystemAttributes") != object.view().end()) {
+        //             for (const bsoncxx::array::view attributesView{object.view()["messageSystemAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+        //                 MessageAttribute attribute;
+        //                 std::string key = bsoncxx::string::to_string(attributeElement.key());
+        //                 attribute.FromDocument(attributeElement.get_document().value);
+        //                 messageAttributes[key] = attribute;
+        //             }
+        //         }
+        //
+        //     } catch (bsoncxx::exception &exc) {
+        //         log_error << exc.what();
+        //         throw Core::JsonException(exc.what());
+        //     }
+        // }
 
-            try {
-                document rootDocument;
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "id", id);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "messageId", messageId);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "receiptHandle", receiptHandle);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "body", body);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5OfBody", md5Body);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5MessageAttributes", md5MessageAttributes);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5SystemAttributes", md5SystemAttributes);
-                Core::Bson::BsonUtils::SetIntValue(rootDocument, "retries", retries);
-                Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
-                Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
-                Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
-
-                // Message attributes
-                if (!messageAttributes.empty()) {
-                    array jsonMessageAttributeArray;
-                    for (const auto &[fst, snd]: messageAttributes) {
-                        document jsonAttribute;
-                        jsonAttribute.append(kvp(fst, snd.ToDocument()));
-                        jsonMessageAttributeArray.append(jsonAttribute);
-                    }
-                    rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
-                }
-
-                // System attributes
-                if (!attributes.empty()) {
-                    array jsonAttributeArray;
-                    for (const auto &[fst, snd]: attributes) {
-                        document jsonAttribute;
-                        jsonAttribute.append(kvp(fst, snd));
-                        jsonAttributeArray.append(jsonAttribute);
-                    }
-                    rootDocument.append(kvp("attributes", jsonAttributeArray));
-                }
-                return rootDocument.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts a JSON representation to a DTO.
-         *
-         * @param object JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &object) {
-
-            try {
-                region = Core::Bson::BsonUtils::GetStringValue(object, "region");
-                id = Core::Bson::BsonUtils::GetStringValue(object, "id");
-                body = Core::Bson::BsonUtils::GetStringValue(object, "body");
-                messageId = Core::Bson::BsonUtils::GetStringValue(object, "messageId");
-                md5Body = Core::Bson::BsonUtils::GetStringValue(object, "md5Body");
-                md5MessageAttributes = Core::Bson::BsonUtils::GetStringValue(object, "md5MessageAttributes");
-                md5SystemAttributes = Core::Bson::BsonUtils::GetStringValue(object, "md5SystemAttributes");
-                receiptHandle = Core::Bson::BsonUtils::GetStringValue(object, "receiptHandle");
-                size = Core::Bson::BsonUtils::GetLongValue(object, "size");
-                retries = Core::Bson::BsonUtils::GetLongValue(object, "retries");
-                created = Core::Bson::BsonUtils::GetDateValue(object, "created");
-                modified = Core::Bson::BsonUtils::GetDateValue(object, "modified");
-
-                // Attributes
-                if (object.view().find("messageAttributes") != object.view().end()) {
-                    for (const bsoncxx::array::view attributesView{object.view()["messageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
-                        MessageAttribute attribute;
-                        std::string key = bsoncxx::string::to_string(attributeElement.key());
-                        attribute.FromDocument(attributeElement.get_document().value);
-                        messageAttributes[key] = attribute;
-                    }
-                }
-
-                // System attributes
-                if (object.view().find("messageSystemAttributes") != object.view().end()) {
-                    for (const bsoncxx::array::view attributesView{object.view()["messageSystemAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
-                        MessageAttribute attribute;
-                        std::string key = bsoncxx::string::to_string(attributeElement.key());
-                        attribute.FromDocument(attributeElement.get_document().value);
-                        messageAttributes[key] = attribute;
-                    }
-                }
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-      private:
-
+    private:
         friend MessageEntry tag_invoke(boost::json::value_to_tag<MessageEntry>, boost::json::value const &v) {
             MessageEntry r;
             r.messageId = Core::Json::GetStringValue(v, "MessageId");
@@ -224,33 +223,33 @@ namespace AwsMock::Dto::SQS {
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "Created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "Modified"));
             if (Core::Json::AttributeExists(v, "Attributes")) {
-                r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("Attributes"));
+                r.attributes = boost::json::value_to<std::map<std::string, std::string> >(v.at("Attributes"));
             }
             if (Core::Json::AttributeExists(v, "MessageAttributes")) {
-                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
+                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute> >(v.at("MessageAttributes"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageEntry const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
-                    {"MessageId", obj.messageId},
-                    {"Id", obj.id},
-                    {"MessageBody", obj.body},
-                    {"Md5OfBody", obj.md5Body},
-                    {"Retries", obj.retries},
-                    {"Size", obj.size},
-                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-                    {"Attributes", boost::json::value_from(obj.attributes)},
-                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
+                {"Region", obj.region},
+                {"User", obj.user},
+                {"RequestId", obj.requestId},
+                {"MessageId", obj.messageId},
+                {"Id", obj.id},
+                {"MessageBody", obj.body},
+                {"Md5OfBody", obj.md5Body},
+                {"Retries", obj.retries},
+                {"Size", obj.size},
+                {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                {"Attributes", boost::json::value_from(obj.attributes)},
+                {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MESSAGE_ENTRY_H

@@ -178,6 +178,9 @@ namespace AwsMock::Service {
                 version = parts[1];
             } else if (parts.size() == 1) {
                 name = parts[0];
+            } else {
+                log_error << "Invalid container name: " << container.image;
+                continue;
             }
             if (_applicationDatabase.ApplicationExists(region, name)) {
                 Database::Entity::Apps::Application application = _applicationDatabase.GetApplication(region, name);
@@ -207,4 +210,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

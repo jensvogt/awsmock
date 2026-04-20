@@ -46,8 +46,7 @@ namespace AwsMock::Database {
      */
     class SQSDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -264,21 +263,12 @@ namespace AwsMock::Database {
         /**
          * @brief Count the number of queues for a given region.
          *
-         * @param prefix queue name prefix
          * @param region AWS region
+         * @param prefix queue name prefix
          * @return number of queues in the given region.
          */
         [[nodiscard]]
-        long CountQueues(const std::string &prefix = {}, const std::string &region = {}) const;
-
-        /**
-         * @brief Calculates the total size of all messages in the queue
-         *
-         * @param queueArn AWS queue ARN
-         * @return total size of the queue
-         */
-        [[nodiscard]]
-        long GetQueueSize(const std::string &queueArn) const;
+        long CountQueues(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Deletes a queue.
@@ -561,8 +551,7 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters() const;
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -584,6 +573,6 @@ namespace AwsMock::Database {
         SQSMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SQS_DATABASE_H

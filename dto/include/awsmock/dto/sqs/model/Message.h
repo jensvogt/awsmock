@@ -80,7 +80,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Size of the message
          */
-        long size;
+        long size{};
 
         /**
          * MD5 sum of message attributes
@@ -98,7 +98,6 @@ namespace AwsMock::Dto::SQS {
         system_clock::time_point modified;
 
     private:
-
         friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
             Message r;
             r.id = v.at("id").as_string();
@@ -120,26 +119,26 @@ namespace AwsMock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Message const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
-                    {"QueueName", obj.queueName},
-                    {"QueueUrl", obj.queueUrl},
-                    {"QueueArn", obj.queueArn},
-                    {"Id", obj.id},
-                    {"MessageId", obj.messageId},
-                    {"ReceiptHandle", obj.receiptHandle},
-                    {"Body", obj.body},
-                    {"Attributes", boost::json::value_from(obj.attributes)},
-                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
-                    {"MD5OfBody", obj.md5OfBody},
-                    {"MD5OfMessageAttributes", obj.md5OfMessageAttributes},
-                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                {"Region", obj.region},
+                {"User", obj.user},
+                {"RequestId", obj.requestId},
+                {"QueueName", obj.queueName},
+                {"QueueUrl", obj.queueUrl},
+                {"QueueArn", obj.queueArn},
+                {"Id", obj.id},
+                {"MessageId", obj.messageId},
+                {"ReceiptHandle", obj.receiptHandle},
+                {"Body", obj.body},
+                {"Attributes", boost::json::value_from(obj.attributes)},
+                {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
+                {"MD5OfBody", obj.md5OfBody},
+                {"MD5OfMessageAttributes", obj.md5OfMessageAttributes},
+                {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MESSAGE_H

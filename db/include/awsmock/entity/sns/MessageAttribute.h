@@ -21,10 +21,11 @@ namespace AwsMock::Database::Entity::SNS {
         NUMBER,
         BINARY
     };
+
     static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
-            {STRING, "String"},
-            {NUMBER, "Number"},
-            {BINARY, "Binary"},
+        {STRING, "String"},
+        {NUMBER, "Number"},
+        {BINARY, "Binary"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeTypeToString(MessageAttributeType messageAttributeType) {
@@ -48,9 +49,24 @@ namespace AwsMock::Database::Entity::SNS {
     struct MessageAttribute {
 
         /**
-         * MessageAttribute value
+         * Attribute string value
          */
         std::string stringValue;
+
+        /**
+         * Attribute string list values
+         */
+        std::vector<std::string> stringListValues;
+
+        /**
+         * Attribute binary value
+         */
+        std::vector<uint8_t> binaryValue;
+
+        /**
+         * Attribute binary list values
+         */
+        std::vector<std::vector<uint8_t> > binaryListValues;
 
         /**
          * Message attribute type
@@ -78,7 +94,6 @@ namespace AwsMock::Database::Entity::SNS {
          */
         [[nodiscard]] std::string ToJson() const;
 
-
         /**
          * @brief Converts the DTO to a string representation.
          *
@@ -96,6 +111,6 @@ namespace AwsMock::Database::Entity::SNS {
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
     };
 
-}// namespace AwsMock::Database::Entity::SNS
+} // namespace AwsMock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H

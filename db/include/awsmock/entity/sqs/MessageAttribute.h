@@ -19,6 +19,8 @@ namespace AwsMock::Database::Entity::SQS {
     enum MessageAttributeType {
         STRING,
         STRING_LIST,
+        NUMBER,
+        NUMBER_LIST,
         BINARY,
         BINARY_LIST,
         UNKNOWN
@@ -27,6 +29,8 @@ namespace AwsMock::Database::Entity::SQS {
     static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
         {STRING, "String"},
         {STRING_LIST, "StringList"},
+        {NUMBER, "Number"},
+        {NUMBER_LIST, "NumberList"},
         {BINARY, "Binary"},
         {BINARY_LIST, "BinaryList"},
         {UNKNOWN, "Unknown"},
@@ -61,6 +65,16 @@ namespace AwsMock::Database::Entity::SQS {
          * Attribute string list values
          */
         std::vector<std::string> stringListValues;
+
+        /**
+         * Attribute binary value
+         */
+        std::vector<uint8_t> binaryValue;
+
+        /**
+         * Attribute binary list values
+         */
+        std::vector<std::vector<uint8_t> > binaryListValues;
 
         /**
          * Message attribute value

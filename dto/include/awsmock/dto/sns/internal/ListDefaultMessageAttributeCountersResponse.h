@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SQS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_SNS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <string>
@@ -11,10 +11,9 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/sqs/model/AttributeCounter.h>
-#include <awsmock/dto/sqs/model/MessageAttribute.h>
+#include <awsmock/dto/sns/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SNS {
 
     struct ListDefaultMessageAttributeCountersResponse final : Common::BaseCounter<ListDefaultMessageAttributeCountersResponse> {
 
@@ -49,6 +48,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-} // namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SQS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H

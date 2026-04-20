@@ -18,9 +18,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-            response.topicName = topic.topicName,
-            response.owner = topic.owner,
-            response.topicArn = topic.topicArn;
+                    response.topicName = topic.topicName,
+                    response.owner = topic.owner,
+                    response.topicArn = topic.topicArn;
             return response;
         }
 
@@ -30,12 +30,12 @@ namespace AwsMock::Service {
             const std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = {.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn};
             topic = _snsDatabase.CreateTopic(topic);
-            log_trace << "SNS topic created: " << topic.ToString();
+            log_trace << "SNS topic created: " << topic.ToJson();
 
             Dto::SNS::CreateTopicResponse response;
-            response.region = topic.region,
-            response.topicName = topic.topicName,
-            response.owner = topic.owner,
+            response.region = topic.region;
+            response.topicName = topic.topicName;
+            response.owner = topic.owner;
             response.topicArn = topic.topicArn;
             return response;
 
@@ -281,7 +281,7 @@ namespace AwsMock::Service {
 
                 // Save to the database
                 topic = _snsDatabase.UpdateTopic(topic);
-                log_debug << "Subscription added, topic: " << topic.ToString();
+                log_debug << "Subscription added, topic: " << topic.ToJson();
             }
 
             Dto::SNS::SubscribeResponse response;
@@ -330,7 +330,7 @@ namespace AwsMock::Service {
 
             // Save to the database
             topic = _snsDatabase.UpdateTopic(topic);
-            log_debug << "Subscription updated, topic: " << topic.ToString();
+            log_debug << "Subscription updated, topic: " << topic.ToJson();
 
             Dto::SNS::UpdateSubscriptionResponse response;
             response.requestId = request.requestId;
@@ -368,7 +368,7 @@ namespace AwsMock::Service {
 
                 // Save to the database
                 topic = _snsDatabase.UpdateTopic(topic);
-                log_debug << "Subscription added, topic: " << topic.ToString();
+                log_debug << "Subscription added, topic: " << topic.ToJson();
             }
             Dto::SNS::UnsubscribeResponse response;
             response.requestId = request.requestId;
@@ -728,6 +728,30 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::ListDefaultMessageAttributeCountersResponse SNSService::ListDefaultMessageAttributeCounters(const Dto::SNS::ListDefaultMessageAttributeCountersRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "list_default_message_attribute_counters");
+        log_trace << "List message counters request";
+
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "Topic does not exist, topicArn: " << request.topicArn;
+            throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
+        }
+
+        try {
+            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            Dto::SNS::ListDefaultMessageAttributeCountersResponse response;
+            response.total = static_cast<long>(topic.defaultMessageAttributes.size());
+            response.attributeCounters = Dto::SNS::MessageAttributeMapper::toDtoMap(topic.defaultMessageAttributes);
+            response.attributeCounters = Core::PageMap<std::string, Dto::SNS::MessageAttribute>(response.attributeCounters, request.pageSize, request.pageIndex);
+            return response;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
@@ -744,7 +768,8 @@ namespace AwsMock::Service {
         sqsNotificationRequest.messageId = Core::AwsUtils::CreateMessageId();
         sqsNotificationRequest.topicArn = request.topicArn;
         sqsNotificationRequest.message = request.message;
-        sqsNotificationRequest.timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now());
+        sqsNotificationRequest.timestamp = system_clock::now();
+        sqsNotificationRequest.messageAttributes = request.messageAttributes;
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest;
@@ -754,16 +779,8 @@ namespace AwsMock::Service {
         sendMessageRequest.contentType = "application/json";
         sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
-        for (const auto &[fst, snd]: request.messageAttributes) {
-            Dto::SQS::MessageAttribute messageAttribute;
-            messageAttribute.stringValue = snd.stringValue;
-            messageAttribute.binaryValue = snd.binaryValue;
-            messageAttribute.dataType = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
-            sendMessageRequest.messageAttributes[fst] = messageAttribute;
-        }
-
-        const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
-        log_trace << "SNS SendMessage response: " << response.ToString();
+        const Dto::SQS::SendMessageResponse response = _sqsService.SendNotification(sendMessageRequest);
+        log_info << "SNS SendMessage response: " << sendMessageRequest.ToJson();
     }
 
     void SNSService::SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
@@ -944,4 +961,4 @@ namespace AwsMock::Service {
         return contentType;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
