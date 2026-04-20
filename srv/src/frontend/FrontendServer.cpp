@@ -20,34 +20,56 @@ namespace AwsMock::Service::Frontend {
     // Listener: accepts new connections, spawns sessions
     //--------------------------------------------------------------------
     class listener : public std::enable_shared_from_this<listener> {
-        net::io_context &ioc_;
-        tcp::acceptor acceptor_;
+        net::io_context &_ioc;
+        tcp::acceptor _acceptor;
 
-      public:
-
-        listener(net::io_context &ioc, tcp::endpoint endpoint)
-            : ioc_(ioc), acceptor_(boost::asio::make_strand(ioc)) {
+    public:
+        listener(net::io_context &ioc, const tcp::endpoint &endpoint)
+            : _ioc(ioc), _acceptor(boost::asio::make_strand(ioc)) {
             beast::error_code ec;
 
-            acceptor_.open(endpoint.protocol(), ec);
-            acceptor_.set_option(net::socket_base::reuse_address(true), ec);
-            acceptor_.bind(endpoint, ec);
-            acceptor_.listen(net::socket_base::max_listen_connections, ec);
+            ec = _acceptor.open(endpoint.protocol(), ec);
+            if (ec) {
+                log_error << ec.message();
+                return;
+            }
 
-            if (ec) throw beast::system_error(ec);
+            ec = _acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
+            if (ec) {
+                log_error << ec.message();
+                return;
+            }
+
+            // Dual-stack: also accept IPv4-mapped connections on the IPv6 socket
+            ec = _acceptor.set_option(boost::asio::ip::v6_only(false), ec);
+            if (ec) {
+                log_error << ec.message();
+                return;
+            }
+
+            ec = _acceptor.bind(endpoint, ec);
+            if (ec) {
+                log_error << ec.message();
+                return;
+            }
+
+            ec = _acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
+            if (ec) {
+                log_error << ec.message();
+                return;
+            }
         }
 
         void run() {
             do_accept();
         }
 
-      private:
-
+    private:
         void do_accept() {
-            acceptor_.async_accept(
-                    boost::asio::make_strand(ioc_),
-                    beast::bind_front_handler(&listener::on_accept,
-                                              shared_from_this()));
+            _acceptor.async_accept(
+                boost::asio::make_strand(_ioc),
+                beast::bind_front_handler(&listener::on_accept,
+                                          shared_from_this()));
         }
 
         void on_accept(const beast::error_code &ec, tcp::socket socket) {
@@ -67,7 +89,7 @@ namespace AwsMock::Service::Frontend {
         try {
             _running = true;
 
-            auto const address = net::ip::make_address(Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.address"));
+            auto const address = Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.address");
             const unsigned short port = Core::Configuration::instance().GetValue<int>("awsmock.frontend.port");
             auto doc_root = Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.doc-root");
             const int num_workers = Core::Configuration::instance().GetValue<int>("awsmock.frontend.workers");
@@ -85,8 +107,7 @@ namespace AwsMock::Service::Frontend {
             });
             log_info << "Frontend signal handler installed";
 
-            tcp::endpoint endpoint{tcp::v4(), port};
-
+            auto endpoint = tcp::endpoint(boost::asio::ip::make_address(address), port);
             std::make_shared<listener>(ioc, endpoint)->run();
 
             // thread pool
@@ -129,4 +150,4 @@ namespace AwsMock::Service::Frontend {
         }
     }
 
-}// namespace AwsMock::Service::Frontend
+} // namespace AwsMock::Service::Frontend

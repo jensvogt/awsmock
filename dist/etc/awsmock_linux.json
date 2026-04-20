@@ -274,7 +274,7 @@
     },
     "frontend": {
       "active": true,
-      "address": "0.0.0.0",
+      "address": "::",
       "port": 4567,
       "workers": 20,
       "timeout": 900,

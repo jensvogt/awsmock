@@ -36,34 +36,27 @@ namespace AwsMock::Service::Frontend {
     }
 
     void FrontendWorker::ReadRequest() {
-        auto self = shared_from_this();// MUST succeed
+        auto self = shared_from_this(); // MUST succeed
 
         // Create parser in unique_ptr
-        auto p = std::make_unique<parser_type>(
-                std::piecewise_construct,
-                std::make_tuple(),       // request message args
-                std::make_tuple(_alloc));// fields allocator
+        auto p = std::make_unique<parser_type>(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         p->body_limit(boost::none);
 
         // Keep raw pointer for async_read
         parser_type *p_raw = p.get();
 
         // move parser into lambda
-        http::async_read(
-                _socket,
-                _buffer,
-                *p_raw,
-                [self, p = std::move(p)](beast::error_code ec, std::size_t) mutable {
-                    if (ec) {
-                        self->Accept();
-                        return;
-                    }
+        http::async_read(_socket, _buffer, *p_raw, [self, p = std::move(p)](beast::error_code ec, std::size_t) mutable {
+            if (ec) {
+                self->Accept();
+                return;
+            }
 
-                    self->ProcessRequest(p->get());
-                });
+            self->ProcessRequest(p->get());
+        });
     }
 
-    void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
+    void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t> > const &req) {
 
         switch (req.method()) {
 
@@ -166,7 +159,7 @@ namespace AwsMock::Service::Frontend {
             _socket.close();
 
             // Sleep indefinitely until we're given a new deadline.
-            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max) ());
+            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max)());
         }
 
         _requestDeadline.async_wait([this](beast::error_code) {
@@ -174,7 +167,7 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void FrontendWorker::HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
+    void FrontendWorker::HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request) {
 
         // Prepare the response message
         _stringResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
@@ -204,4 +197,4 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-};// namespace AwsMock::Service::Frontend
+}; // namespace AwsMock::Service::Frontend
