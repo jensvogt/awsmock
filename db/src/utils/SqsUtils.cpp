@@ -4,6 +4,8 @@
 
 #include <awsmock/utils/SqsUtils.h>
 
+#include "awsmock/entity/sns/MessageAttribute.h"
+
 namespace AwsMock::Database {
 
     std::string SqsUtils::CreateMd5OfMessageBody(const std::string &messageBody) {
@@ -45,37 +47,44 @@ namespace AwsMock::Database {
         return Core::Crypto::HexEncode(md_value, static_cast<int>(md_len));
     }
 
-    std::string SqsUtils::CreateMd5OfMessageAttributes(const std::map<std::string, Entity::SQS::MessageAttribute> &messageAttributes) {
+    std::string SqsUtils::CreateMd5OfMessageAttributes(
+        const std::map<std::string, Entity::SQS::MessageAttribute> &messageAttributes) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
-        const EVP_MD *md = EVP_md5();
-        unsigned char md_value[EVP_MAX_MD_SIZE];
-        unsigned int md_len;
-        auto *bytes = new unsigned char[1];
+        EVP_DigestInit(context, EVP_md5());
 
-        EVP_DigestInit(context, md);
-        for (const auto &[fst, snd]: messageAttributes) {
+        for (const auto &[name, attr]: messageAttributes) {
 
-            log_debug << "MD5sum, attribute: " << fst;
+            log_debug << "MD5sum, attribute: " << name;
 
-            // Encoded name
-            UpdateLengthAndBytes(context, fst);
+            // 1. Encode name
+            UpdateLengthAndBytes(context, name);
 
-            // Encoded data type
-            UpdateLengthAndBytes(context, MessageAttributeTypeToString(snd.dataType));
+            // 2. Encode data type (e.g. "String", "Number", "Binary")
+            const std::string dataType = MessageAttributeTypeToString(attr.dataType);
+            UpdateLengthAndBytes(context, dataType);
 
-            // Encoded value
-            if (!snd.stringValue.empty()) {
-                bytes[0] = 1;
-                EVP_DigestUpdate(context, bytes, 1);
+            // 3. Transport type byte + value
+            if (attr.dataType == Entity::SQS::STRING || attr.dataType == Entity::SQS::NUMBER) {
+                uint8_t transportType = 0x01;
+                EVP_DigestUpdate(context, &transportType, 1);
+                UpdateLengthAndBytes(context, attr.stringValue);
 
-                // Url decode the attribute
-                UpdateLengthAndBytes(context, Core::StringUtils::UrlDecode(snd.stringValue));
+            } else if (attr.dataType == Entity::SQS::BINARY) {
+                // Binary: transport type = 0x02
+                uint8_t transportType = 0x02;
+                EVP_DigestUpdate(context, &transportType, 1);
+                // binary value: length + raw bytes
+                uint32_t len = htonl(static_cast<uint32_t>(attr.binaryValue.size()));
+                EVP_DigestUpdate(context, &len, sizeof(len));
+                EVP_DigestUpdate(context, attr.binaryValue.data(), attr.binaryValue.size());
             }
         }
+
+        unsigned char md_value[EVP_MAX_MD_SIZE];
+        unsigned int md_len;
         EVP_DigestFinal(context, md_value, &md_len);
         EVP_MD_CTX_free(context);
-        delete[] bytes;
 
         return Core::Crypto::HexEncode(md_value, static_cast<int>(md_len));
     }
@@ -97,4 +106,4 @@ namespace AwsMock::Database {
         free(bytes);
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

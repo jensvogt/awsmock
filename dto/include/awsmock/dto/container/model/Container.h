@@ -59,8 +59,7 @@ namespace AwsMock::Dto::Docker {
          */
         std::string type;
 
-      private:
-
+    private:
         friend ContainerPort tag_invoke(boost::json::value_to_tag<ContainerPort>, boost::json::value const &v) {
             ContainerPort r;
             r.ipAddress = Core::Json::GetStringValue(v, "IP");
@@ -72,10 +71,10 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ContainerPort const &obj) {
             jv = {
-                    {"IP", obj.ipAddress},
-                    {"PrivatePort", obj.privatePort},
-                    {"PublicPort", obj.publicPort},
-                    {"Type", obj.type},
+                {"IP", obj.ipAddress},
+                {"PrivatePort", obj.privatePort},
+                {"PublicPort", obj.publicPort},
+                {"Type", obj.type},
             };
         }
     };
@@ -228,8 +227,7 @@ namespace AwsMock::Dto::Docker {
             return -1;
         }
 
-      private:
-
+    private:
         friend Container tag_invoke(boost::json::value_to_tag<Container>, boost::json::value const &v) {
             Container r;
             r.id = Core::Json::GetStringValue(v, "Id");
@@ -247,30 +245,30 @@ namespace AwsMock::Dto::Docker {
                 }
             }
             if (Core::Json::AttributeExists(v, "Names")) {
-                r.names = boost::json::value_to<std::vector<std::string>>(v.at("Names"));
+                r.names = boost::json::value_to<std::vector<std::string> >(v.at("Names"));
             }
             if (Core::Json::AttributeExists(v, "Ports") && v.at("Ports").is_array()) {
-                r.ports = boost::json::value_to<std::vector<ContainerPort>>(v.at("Ports"));
+                r.ports = boost::json::value_to<std::vector<ContainerPort> >(v.at("Ports"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Container const &obj) {
             jv = {
-                    {"Id", obj.id},
-                    {"Image", obj.imageId},
-                    {"ImageID", obj.imageId},
-                    {"Command", obj.command},
-                    {"State", boost::json::value_from(obj.state)},
-                    {"Status", obj.status},
-                    {"SizeRw", obj.sizeRw},
-                    {"SizeRootFs", obj.sizeRootFs},
-                    {"Names", boost::json::value_from(obj.names)},
-                    {"Ports", boost::json::value_from(obj.ports)},
+                {"Id", obj.id},
+                {"Image", obj.image},
+                {"ImageID", obj.imageId},
+                {"Command", obj.command},
+                {"State", boost::json::value_from(obj.state)},
+                {"Status", obj.status},
+                {"SizeRw", obj.sizeRw},
+                {"SizeRootFs", obj.sizeRootFs},
+                {"Names", boost::json::value_from(obj.names)},
+                {"Ports", boost::json::value_from(obj.ports)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+} // namespace AwsMock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_CONTAINER_H

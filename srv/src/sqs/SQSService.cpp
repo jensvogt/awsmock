@@ -321,6 +321,7 @@ namespace AwsMock::Service {
 
             // Update queue counter
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+            queue.size = 0;
             queue.attributes.approximateNumberOfMessages = 0;
             queue.attributes.approximateNumberOfMessagesDelayed = 0;
             queue.attributes.approximateNumberOfMessagesNotVisible = 0;
@@ -997,6 +998,81 @@ namespace AwsMock::Service {
             message.modified = system_clock::now();
             message.messageId = Core::AwsUtils::CreateMessageId();
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+            message.messageAttributes = Dto::SQS::MessageAttributeMapper::toEntityMap(request.messageAttributes);
+            message.md5Body = Core::Crypto::GetMd5FromString(request.body);
+            message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
+
+            // Update database
+            message = _sqsDatabase.CreateMessage(message);
+            log_debug << "Message send, queueName: " << queue.name;
+
+            // Find Lambdas with this as an event source
+            CheckLambdaNotifications(queue.arn, message);
+            log_debug << "Send message, queueArn: " << queue.arn;
+            return Dto::SQS::SendMessageResponseMapper::toDto(message);
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::SendMessageResponse SQSService::SendNotification(const Dto::SQS::SendMessageRequest &request) const {
+        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "send_message");
+        log_trace << "Sending message request, queueUrl: " << request.queueUrl;
+
+        // Queue URL contains the host name and is therefore not reliable
+        const std::string queueArn = Core::AwsUtils::ConvertToArn(request.region, request.queueUrl);
+
+        if (queueArn.empty() && !_sqsDatabase.QueueArnExists(queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + queueArn);
+        }
+
+        try {
+
+            // Get queue by ARN
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
+
+            // Entity
+            Database::Entity::SQS::Message message = Dto::SQS::SendMessageRequestMapper::toEntity(request);
+
+            // System attributes
+            message.attributes["SentTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()));
+            message.attributes["ApproximateFirstReceivedTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()));
+            message.attributes["ApproximateReceivedCount"] = std::to_string(1);
+            message.attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
+            message.attributes["SenderId"] = request.user;
+            message.attributes["MessageGroupId"] = request.messageGroupId;
+            message.attributes["MessageDeduplicationId"] = request.messageDeduplicationId;
+
+            // Default message attributes
+            if (!queue.defaultMessageAttributes.empty()) {
+                message.messageAttributes.insert(queue.defaultMessageAttributes.begin(), queue.defaultMessageAttributes.end());
+            }
+            queue.attributes.approximateNumberOfMessages++;
+
+            // Set delay
+            if (queue.attributes.delaySeconds > 0) {
+                message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.delaySeconds);
+                message.status = Database::Entity::SQS::MessageStatus::DELAYED;
+                queue.attributes.approximateNumberOfMessagesDelayed++;
+            } else {
+                message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
+            }
+            queue = _sqsDatabase.UpdateQueue(queue);
+
+            // Set parameters
+            message.type = "Notification";
+            message.queueArn = queue.arn;
+            message.queueName = queue.name;
+            message.contentType = SanitizeContentType(request.contentType, request.body);
+            message.size = static_cast<long>(request.body.size());
+            message.created = system_clock::now();
+            message.modified = system_clock::now();
+            message.messageId = Core::AwsUtils::CreateMessageId();
+            message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
+            message.messageAttributes = Dto::SQS::MessageAttributeMapper::toEntityMap(request.messageAttributes);
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
             message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
 
@@ -1105,11 +1181,14 @@ namespace AwsMock::Service {
                     _sqsDatabase.ReceiveMessages(queue.arn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                     log_trace << "Messages in list, url: " << queue.url << " count: " << messageList.size();
 
+                    if (request.queueUrl == "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/l2000-export-katalogdaten-input-queue") {
+                        log_error << "Queue messages: " << messageList.size();
+                    }
                     if (!messageList.empty()) {
                         break;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(pollPeriod));
-                    elapsed = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count();
+                    elapsed = static_cast<long>(std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count());
                 }
             }
 

@@ -8,14 +8,14 @@ namespace AwsMock::Database::Entity::SNS {
 
     bool Topic::HasSubscription(const Subscription &subscription) {
         return std::ranges::find_if(subscriptions, [subscription](const Subscription &s) {
-                   return s.protocol == subscription.protocol && s.endpoint == subscription.endpoint;
-               }) != subscriptions.end();
+            return s.protocol == subscription.protocol && s.endpoint == subscription.endpoint;
+        }) != subscriptions.end();
     }
 
     bool Topic::HasSubscription(const std::string &subscriptionArn) {
         return std::ranges::find_if(subscriptions, [subscriptionArn](const Subscription &s) {
-                   return s.subscriptionArn == subscriptionArn;
-               }) != subscriptions.end();
+            return s.subscriptionArn == subscriptionArn;
+        }) != subscriptions.end();
     }
 
     int Topic::GetSubscriptionIndex(const std::string &subscriptionArn) {
@@ -44,6 +44,13 @@ namespace AwsMock::Database::Entity::SNS {
             }
         }
 
+        auto defaultMessageAttributeDoc = document{};
+        if (!defaultMessageAttributes.empty()) {
+            for (const auto &[fst, snd]: defaultMessageAttributes) {
+                defaultMessageAttributeDoc.append(kvp(fst, snd.ToDocument()));
+            }
+        }
+
         document topicDoc;
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "region", region);
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicName", topicName);
@@ -53,6 +60,7 @@ namespace AwsMock::Database::Entity::SNS {
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "messagesSend", messagesSend);
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "messagesResend", messagesResend);
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "size", size);
+        Core::Bson::BsonUtils::SetDocumentValue(topicDoc, "defaultMessageAttributes", defaultMessageAttributeDoc);
         Core::Bson::BsonUtils::SetDateValue(topicDoc, "created", created);
         Core::Bson::BsonUtils::SetDateValue(topicDoc, "modified", modified);
 
@@ -89,9 +97,10 @@ namespace AwsMock::Database::Entity::SNS {
                 subscriptions.clear();
                 for (const bsoncxx::array::view subscriptionsView{mResult.view()["subscriptions"].get_array().value}; const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
                     Subscription subscription{
-                            .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
-                            .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
-                            .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
+                        .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+                        .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
+                        .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)
+                    };
                     subscriptions.emplace_back(subscription);
                 }
             }
@@ -105,6 +114,16 @@ namespace AwsMock::Database::Entity::SNS {
                 }
             }
 
+            // Get default message attributes
+            if (mResult.view().find("defaultMessageAttributes") != mResult.view().end()) {
+                for (const view defaultMessageAttributeView = mResult.view()["defaultMessageAttributes"].get_document().value; const bsoncxx::document::element &element: defaultMessageAttributeView) {
+                    MessageAttribute attribute;
+                    std::string key = bsoncxx::string::to_string(element.key());
+                    attribute.FromDocument(defaultMessageAttributeView[key].get_document().value);
+                    defaultMessageAttributes[key] = attribute;
+                }
+            }
+
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -114,16 +133,5 @@ namespace AwsMock::Database::Entity::SNS {
     std::string Topic::ToJson() const {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
-
-    std::string Topic::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Topic &t) {
-        os << "Topic=" << to_json(t.ToDocument());
-        return os;
-    }
-
-}// namespace AwsMock::Database::Entity::SNS
+    
+} // namespace AwsMock::Database::Entity::SNS

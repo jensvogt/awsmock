@@ -63,24 +63,23 @@ namespace AwsMock::Dto::SQS {
          */
         [[nodiscard]] std::string ToXml() const;
 
-      private:
-
+    private:
         friend ReceiveMessageResponse tag_invoke(boost::json::value_to_tag<ReceiveMessageResponse>, boost::json::value const &v) {
             ReceiveMessageResponse r;
-            r.messageList = boost::json::value_to<std::vector<Message>>(v.at("messageList"));
+            r.messageList = boost::json::value_to<std::vector<Message> >(v.at("Messages"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ReceiveMessageResponse const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
-                    {"Messages", boost::json::value_from(obj.messageList)},
+                {"Region", obj.region},
+                {"User", obj.user},
+                {"RequestId", obj.requestId},
+                {"Messages", boost::json::value_from(obj.messageList)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_RESPONSE_H

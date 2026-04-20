@@ -19,6 +19,10 @@ namespace AwsMock::Database::Entity::SQS {
             }
             messageAttributeDoc.append(kvp("stringListValues", stringListValuesDoc));
         }
+
+        if (!binaryValue.empty()) {
+            messageAttributeDoc.append(kvp("binaryValue", bsoncxx::types::b_binary{bsoncxx::binary_sub_type::k_binary, static_cast<uint32_t>(binaryValue.size()), binaryValue.data()}));
+        }
         return messageAttributeDoc.extract();
     }
 
@@ -29,16 +33,21 @@ namespace AwsMock::Database::Entity::SQS {
             stringValue = Core::Bson::BsonUtils::GetStringValue(object, "stringValue");
             dataType = MessageAttributeTypeFromString(Core::Bson::BsonUtils::GetStringValue(object, "dataType"));
 
-            // String list values
             if (object.view().find("stringListValues") != object.view().end()) {
                 for (const auto &stringListValue: object.view()["stringListValues"].get_array().value) {
                     stringListValues.emplace_back(stringListValue.get_string().value);
                 }
             }
+
+            if (object.view().find("binaryValue") != object.view().end()) {
+                const auto bin = object.view()["binaryValue"].get_binary();
+                binaryValue.assign(bin.bytes, bin.bytes + bin.size);
+            }
+            
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
     }
 
-}// namespace AwsMock::Database::Entity::SQS
+} // namespace AwsMock::Database::Entity::SQS

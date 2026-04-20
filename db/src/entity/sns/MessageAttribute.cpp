@@ -8,19 +8,42 @@ namespace AwsMock::Database::Entity::SNS {
 
     view_or_value<view, value> MessageAttribute::ToDocument() const {
 
-        view_or_value<view, value> messageAttributeDoc = make_document(
-                kvp("stringValue", stringValue),
-                kvp("dataType", MessageAttributeTypeToString(dataType)));
+        document messageAttributeDoc;
+        messageAttributeDoc.append(kvp("stringValue", stringValue));
+        messageAttributeDoc.append(kvp("dataType", MessageAttributeTypeToString(dataType)));
 
-        return messageAttributeDoc;
+        if (!stringListValues.empty()) {
+            array stringListValuesDoc{};
+            for (const auto &stringListValue: stringListValues) {
+                stringListValuesDoc.append(stringListValue);
+            }
+            messageAttributeDoc.append(kvp("stringListValues", stringListValuesDoc));
+        }
+
+        if (!binaryValue.empty()) {
+            messageAttributeDoc.append(kvp("binaryValue", bsoncxx::types::b_binary{bsoncxx::binary_sub_type::k_binary, static_cast<uint32_t>(binaryValue.size()), binaryValue.data()}));
+        }
+        return messageAttributeDoc.extract();
     }
 
     void MessageAttribute::FromDocument(const view_or_value<view, value> &object) {
 
         try {
 
+
             stringValue = Core::Bson::BsonUtils::GetStringValue(object, "stringValue");
             dataType = MessageAttributeTypeFromString(Core::Bson::BsonUtils::GetStringValue(object, "dataType"));
+
+            if (object.view().find("stringListValues") != object.view().end()) {
+                for (const auto &stringListValue: object.view()["stringListValues"].get_array().value) {
+                    stringListValues.emplace_back(stringListValue.get_string().value);
+                }
+            }
+
+            if (object.view().find("binaryValue") != object.view().end()) {
+                const auto bin = object.view()["binaryValue"].get_binary();
+                binaryValue.assign(bin.bytes, bin.bytes + bin.size);
+            }
 
         } catch (std::exception &exc) {
             log_error << exc.what();
@@ -43,4 +66,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-}// namespace AwsMock::Database::Entity::SNS
+} // namespace AwsMock::Database::Entity::SNS

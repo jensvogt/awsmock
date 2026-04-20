@@ -56,6 +56,10 @@ namespace AwsMock::Dto::Common {
         GET_EVENT_SOURCE,
         GET_MESSAGE_COUNTERS,
         PUBLISH_COUNTER,
+        LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS,
+        ADD_DEFAULT_MESSAGE_ATTRIBUTE,
+        UPDATE_DEFAULT_MESSAGE_ATTRIBUTE,
+        DELETE_DEFAULT_MESSAGE_ATTRIBUTE,
         UNKNOWN
     };
 
@@ -86,6 +90,10 @@ namespace AwsMock::Dto::Common {
         {SNSCommandType::GET_EVENT_SOURCE, "get-event-source"},
         {SNSCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
         {SNSCommandType::PUBLISH_COUNTER, "publish-counter"},
+        {SNSCommandType::LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS, "list-default-message-attribute-counters"},
+        {SNSCommandType::ADD_DEFAULT_MESSAGE_ATTRIBUTE, "add-default-message-attribute-counter"},
+        {SNSCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE, "update-default-message-attribute-counter"},
+        {SNSCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {

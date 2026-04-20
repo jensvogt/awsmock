@@ -349,6 +349,8 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
 
+        Dto::SQS::SendMessageResponse SendNotification(const Dto::SQS::SendMessageRequest &request) const;
+
         /**
          * @brief Creates a new queue
          *

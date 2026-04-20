@@ -12,6 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/sns/MessageAttribute.h>
 #include <awsmock/entity/sns/Subscription.h>
 #include <awsmock/entity/sns/TopicAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
@@ -74,6 +75,11 @@ namespace AwsMock::Database::Entity::SNS {
          * Topic tags
          */
         std::map<std::string, std::string> tags;
+
+        /**
+         * Default message attributes
+         */
+        std::map<std::string, MessageAttribute> defaultMessageAttributes;
 
         /**
          * Total size of all messages in bytes
@@ -149,24 +155,10 @@ namespace AwsMock::Database::Entity::SNS {
          * @return DTO as JSON string
          */
         [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Topic &q);
     };
 
     typedef std::vector<Topic> TopicList;
 
-}// namespace AwsMock::Database::Entity::SNS
+} // namespace AwsMock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_TOPIC_H

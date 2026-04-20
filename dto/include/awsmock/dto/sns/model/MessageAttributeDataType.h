@@ -13,14 +13,20 @@ namespace AwsMock::Dto::SNS {
 
     enum MessageAttributeDataType {
         STRING,
+        STRING_LIST,
         NUMBER,
-        BINARY
+        NUMBER_LIST,
+        BINARY,
+        BINARY_LIST
     };
 
     static std::map<MessageAttributeDataType, std::string> MessageAttributeDataTypeNames{
-            {STRING, "String"},
-            {NUMBER, "Number"},
-            {BINARY, "Binary"},
+        {STRING, "String"},
+        {STRING_LIST, "StringList"},
+        {NUMBER, "Number"},
+        {NUMBER_LIST, "NumberList"},
+        {BINARY, "Binary"},
+        {BINARY_LIST, "BinaryList"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeDataTypeToString(const MessageAttributeDataType messageAttributeDataType) {
@@ -36,6 +42,6 @@ namespace AwsMock::Dto::SNS {
         return STRING;
     }
 
-}// namespace AwsMock::Dto::SNS
+} // namespace AwsMock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_MESSAGE_ATTRIBUTE_DATA_TYPE_H

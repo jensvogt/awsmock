@@ -115,33 +115,42 @@ namespace AwsMock::Core {
     }
 
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, std::string &output, std::string &error) {
-
         log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
+
+        boost::filesystem::path awsExe = boost::process::v2::environment::find_executable("aws");
+        log_debug << "Running shell command, cmd: " << awsExe << ", args: " << StringUtils::Join(args);
+
         boost::asio::io_context ctx;
         boost::asio::readable_pipe outPipe{ctx};
         boost::asio::readable_pipe errPipe{ctx};
-        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{{}, outPipe, errPipe});
-        boost::system::error_code ec;
-        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
-        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
+
+#ifdef _WIN32
+        boost::process::process proc(ctx, awsExe.string(), args, boost::process::process_stdio{{}, outPipe, errPipe});
+#else
+        boost::process::process proc(ctx, awsExe, args, boost::process::process_stdio{{}, outPipe, errPipe});
+#endif
+
+        boost::system::error_code outEc, errEc;
+        boost::asio::async_read(outPipe, boost::asio::dynamic_buffer(output), [&](const boost::system::error_code &ec, std::size_t) { outEc = ec; });
+        boost::asio::async_read(errPipe, boost::asio::dynamic_buffer(error), [&](const boost::system::error_code &ec, std::size_t) { errEc = ec; });
+
+        ctx.run();
         proc.wait();
+
+        // Helper: both EOF and broken_pipe are normal pipe-closed signals
+        auto isPipeClose = [](const boost::system::error_code &ec) {
+            return !ec || ec == boost::asio::error::eof || ec == boost::asio::error::broken_pipe
+#ifdef _WIN32
+                   || ec == boost::system::error_code(109, boost::system::system_category()) // ERROR_BROKEN_PIPE
+#endif
+                    ;
+        };
+
+        if (!isPipeClose(outEc))
+            log_error << "stdout read error: " << outEc.message() << " (" << outEc.value() << ")";
+        if (!isPipeClose(errEc))
+            log_error << "stderr read error: " << errEc.message() << " (" << errEc.value() << ")";
     }
-    /*
-    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
-        log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
-        boost::asio::io_context ctx;
-        boost::asio::readable_pipe inPipe{ctx};
-        boost::asio::readable_pipe outPipe{ctx};
-        boost::asio::readable_pipe errPipe{ctx};
-        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{inPipe, outPipe, errPipe});
-        boost::system::error_code ec;
-        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
-        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
-        proc.wait();
-    }*/
-}// namespace AwsMock::Core
+} // namespace Awsmock::Core
+

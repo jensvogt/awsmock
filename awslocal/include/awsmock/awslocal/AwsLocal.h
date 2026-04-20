@@ -29,7 +29,7 @@
 #ifdef _WIN32
 #define AWS_CMD "C:/Program Files/Amazon/AWSCLIV2/aws.exe"
 #else
-#define AWS_CMD "/usr/local/bin/aws"
+#define AWS_CMD "/usr/bin/aws"
 #endif
 namespace AwsMock::AwsLocal {
 
@@ -37,14 +37,13 @@ namespace AwsMock::AwsLocal {
      * @brief AWS local command
      *
      * @par
-     * AwsLocal sends a AWS command to the AwsMock hosted on the local machine.
+     * AwsLocal sends an AWS command to the AwsMock hosted on the local machine.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     class AwsLocal {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -64,8 +63,7 @@ namespace AwsMock::AwsLocal {
          */
         void Run(std::vector<std::string> &command) const;
 
-      private:
-
+    private:
         /**
          * @brief Read the AWS config file
          *
@@ -100,6 +98,6 @@ namespace AwsMock::AwsLocal {
         std::string _profile;
     };
 
-}// namespace AwsMock::AwsLocal
+} // namespace AwsMock::AwsLocal
 
 #endif// AWSMOCK_AWSLOCAL_H
