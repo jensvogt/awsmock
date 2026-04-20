@@ -10,19 +10,22 @@
 #include <string>
 
 // Boost includes
+#include <boost/asio/signal_set.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/v6_only.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/service/frontend/FrontendSession.h>
 #include <awsmock/service/frontend/FrontendWorker.h>
 
 namespace AwsMock::Service::Frontend {
 
     class FrontendServer {
 
-      public:
-
+    public:
         /**
          * Constructor
          */
@@ -38,14 +41,13 @@ namespace AwsMock::Service::Frontend {
          */
         void operator()(bool isService);
 
-      private:
-
+    private:
         /**
          * Running flag
          */
         bool _running = false;
     };
 
-}// namespace AwsMock::Service::Frontend
+} // namespace AwsMock::Service::Frontend
 
 #endif// AWSMOCK_SERVICE_FRONTEND_HTTP_SERVER_H

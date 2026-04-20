@@ -3,12 +3,8 @@
 //
 
 // AwsMock includes
-#include "awsmock/service/frontend/FrontendSession.h"
-
 
 #include <awsmock/service/frontend/FrontendServer.h>
-#include <boost/asio/signal_set.hpp>
-#include <boost/asio/strand.hpp>
 
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
