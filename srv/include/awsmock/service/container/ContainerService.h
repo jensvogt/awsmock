@@ -466,6 +466,10 @@ namespace AwsMock::Service {
          * For Python applications the file containing the main routine must be called '<application-name>.py'.
          * The application is then started using the docker CMD 'python -u <application-name>.py'.
          *
+         * @par
+         * If the container has DNS name resolution problems set the JAVA_TOOL_OPTIONS=-Dsun.net.inetaddr.ttl=60 -Djava.net.preferIPv4Stack=true". This happens sometimes
+         * on the corretto Java distros.
+         *
          * @param codeDir code directory
          * @param mainFile file containing the main method
          * @param archive application archive

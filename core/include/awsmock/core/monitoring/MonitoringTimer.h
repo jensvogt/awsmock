@@ -37,7 +37,10 @@ namespace AwsMock::Monitoring {
          *
          * @param name name of the underlying timer
          */
-        explicit MonitoringTimer(std::string name) : /*_monitoringCollector(Core::MonitoringCollector::instance()),*/ _timerName(std::move(name)), _start(system_clock::now()) {
+        explicit MonitoringTimer(std::string name) : _timerName(std::move(name)), _start(system_clock::now()) {
+            // for (const auto &e: Core::Configuration::instance().GetValueArray<std::string>("awsmock.monitoring.exclusions")) {
+            //     _exclusions.push_back(e);
+            // }
         }
 
         /**
@@ -50,9 +53,10 @@ namespace AwsMock::Monitoring {
          * @param labelName label name of the underlying timer
          * @param labelValue label value of the underlying timer
          */
-        explicit MonitoringTimer(std::string name, std::string labelName, std::string labelValue) : /*_monitoringCollector(Core::MonitoringCollector::instance()),*/ _timerName(std::move(name)),
-                                                                                                                                                                     _labelName(std::move(labelName)), _labelValue(std::move(labelValue)),
-                                                                                                                                                                     _start(system_clock::now()) {
+        explicit MonitoringTimer(std::string name, std::string labelName, std::string labelValue) : _timerName(std::move(name)), _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {
+            // for (const auto &e: Core::Configuration::instance().GetValueArray<std::string>("awsmock.monitoring.exclusions")) {
+            //     _exclusions.push_back(e);
+            // }
         }
 
         /**
@@ -66,9 +70,8 @@ namespace AwsMock::Monitoring {
          * @param labelName label name of the underlying timer
          * @param labelValue label value of the underlying timer
          */
-        explicit MonitoringTimer(std::string timerName, std::string counterName, std::string labelName, std::string labelValue) : /*_monitoringCollector(Core::MonitoringCollector::instance()),*/
-            _timerName(std::move(timerName)), _counterName(std::move(counterName)),
-            _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {
+        explicit MonitoringTimer(std::string timerName, std::string counterName, std::string labelName, std::string labelValue) : _timerName(std::move(timerName)), _counterName(std::move(counterName)), _labelName(std::move(labelName)),
+                                                                                                                                  _labelValue(std::move(labelValue)), _start(system_clock::now()) {
         }
 
         /**
@@ -78,9 +81,6 @@ namespace AwsMock::Monitoring {
          * Stop the timer and reports the execution to the metric service.
          */
         ~MonitoringTimer() {
-            // if (!_counterName.empty()) {
-            //     _monitoringCollector.IncCountPerSec(_counterName, _labelName, _labelValue, 1.0);
-            // }
             Core::EventBus::instance().sigMetricGauge(_counterName, _labelName, _labelValue, 1.0);
             Core::EventBus::instance().sigMetricGauge(_timerName, _labelName, _labelValue, static_cast<double>(TIME_DIFF));
         }
@@ -101,11 +101,6 @@ namespace AwsMock::Monitoring {
         MonitoringTimer &operator=(const MonitoringTimer &) = delete;
 
     private:
-        /**
-         * Metric module
-         */
-        //Core::MonitoringCollector &_monitoringCollector;
-
         /**
          * Name of the timer
          */
@@ -130,6 +125,11 @@ namespace AwsMock::Monitoring {
          * Timer start time point
          */
         system_clock::time_point _start;
+
+        /**
+         * Exclusion list
+         */
+        std::vector<std::string> _exclusions;
     };
 
 } // namespace AwsMock::Monitoring

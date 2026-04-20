@@ -29,6 +29,91 @@
 
 namespace AwsMock::Core {
 
+    struct AccessConfig {
+        /**
+         * @brief AWS key id
+         */
+        std::string keyId = "none";
+
+        /**
+         * @brief AWS account-id
+         */
+        std::string accountId = "000000000000";
+
+        /**
+         * @brief AWS client ID
+         */
+        std::string clientId = "00000000";
+
+        /**
+         * @brief AWS secret access key
+         */
+        std::string secretAccessKey = "none";
+
+        /**
+         * @brief AWS signature verification
+         */
+        bool verifySignature = false;
+    };
+
+    struct AwsmockConfig {
+
+        /**
+         * @brief AWS region
+         */
+        std::string region = "eu-central-1";
+
+        /**
+         * @brief AWS user
+         */
+        std::string user = "none";
+
+        /**
+         * @brief AWS password
+         */
+        std::string password = "none";
+
+        /**
+         * @brief AWS access
+         */
+        AccessConfig access;
+    };
+
+    struct JsonConfig {
+        /**
+         * @brief JSON pretty print flag
+         */
+        bool prettyPrint = false;
+    };
+
+    struct ConfigurationTree {
+
+        /**
+         * @brief Awsmock root object
+         */
+        AwsmockConfig awsmock;
+
+        /**
+         * @brief Data directory
+         */
+        std::string dataDir;
+
+        /**
+         * @brief Temporary data directory
+         */
+        std::string tempDir;
+
+        /**
+         * @brief Backup directory
+         */
+        std::string backupDir;
+
+        /**
+         * @brief JSON configuration
+         */
+        JsonConfig jsonConfig;
+    };
+
     /**
      * @brief Configuration handler.
      *
@@ -40,8 +125,7 @@ namespace AwsMock::Core {
      */
     class Configuration {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -178,8 +262,7 @@ namespace AwsMock::Core {
          */
         void Dump() const;
 
-      private:
-
+    private:
         /**
          * @brief Initialize the base properties
          */
@@ -321,6 +404,6 @@ namespace AwsMock::Core {
         return r;
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #endif// AWSMOCK_CORE_JSON_CONFIGURATION_H

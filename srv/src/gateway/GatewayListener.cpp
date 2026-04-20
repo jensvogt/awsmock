@@ -11,28 +11,31 @@ namespace AwsMock::Service {
 
         boost::beast::error_code ec;
 
-        // Open the acceptor
         ec = _acceptor.open(endpoint.protocol(), ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
-        // Allow address reuse
         ec = _acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
-        // Bind to the server address
+        // Dual-stack: also accept IPv4-mapped connections on the IPv6 socket
+        ec = _acceptor.set_option(ip::v6_only(false), ec);
+        if (ec) {
+            log_error << ec.message();
+            return;
+        }
+
         ec = _acceptor.bind(endpoint, ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
-        // Start listening for connections
         ec = _acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
         if (ec) {
             log_error << ec.message();
@@ -60,4 +63,4 @@ namespace AwsMock::Service {
         DoAccept();
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
