@@ -24,7 +24,7 @@ namespace AwsMock::Service {
         }
 
         // Dual-stack: also accept IPv4-mapped connections on the IPv6 socket
-        ec = _acceptor.set_option(ip::v6_only(false), ec);
+        ec = _acceptor.set_option(boost::asio::ip::v6_only(false), ec);
         if (ec) {
             log_error << ec.message();
             return;

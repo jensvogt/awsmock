@@ -2,8 +2,7 @@ FROM alpine:latest AS build
 
 RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
      autoconf-archive automake libtool m4 make gettext-dev patch pkgconf ncurses-dev ncurses-terminfo-base doxygen pandoc \
-     pkgconfig coreutils bash perl openssl-dev zlib-dev bzip2-dev readline-dev sqlite-dev xz-dev libffi-dev ncurses-dev \
-     util-linux-dev
+     coreutils openssl-dev zlib-dev bzip2-dev readline-dev sqlite-dev xz-dev libffi-dev util-linux-dev
 
 # vcpkg needs this
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
@@ -11,6 +10,7 @@ ENV VCPKG_ROOT=/usr/local/vcpkg
 ENV VCPKG_MAX_CONCURRENCY=4
 ENV CMAKE_BUILD_PARALLEL_LEVEL=4
 ENV ACLOCAL_PATH=/usr/share/aclocal
+RUN mkdir -p /usr/share/aclocal
 
 WORKDIR /usr/local/vcpkg
 
@@ -47,7 +47,7 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM alpine:latest
 
-RUN apk update && apk upgrade && apk add --no-cache unzip libssh libarchive libmagic curl aws-cli unbound
+RUN apk update && apk upgrade && apk add --no-cache libstdc++ libgcc unzip libssh libarchive libmagic curl aws-cli unbound
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -83,8 +83,8 @@ RUN ln -s /usr/local/awsmock/bin/awslocal /usr/bin/awslocal || true
 RUN ln -s /usr/local/awsmock/bin/awsmockctl /usr/bin/awsmockctl || true
 RUN ln -s /usr/local/awsmock/bin/awsmockmgr /usr/bin/awsmockmgr || true
 
-# Expose manager/awslocal vcpkg-ports
-EXPOSE 4566-4567 4566-4567
+# Expose manager/awslocal websocket-ports
+EXPOSE 4566-4569
 # Prometheus vcpkg-ports
 EXPOSE 9091 9091
 # FTP server vcpkg-ports
@@ -93,7 +93,5 @@ EXPOSE 2121 2121
 EXPOSE 2222 2222
 # FTP passive mode vcpkg-ports
 EXPOSE 6000-6100 6000-6100
-
-VOLUME /var/run/docker.sock /var/run/docker.sock
 
 CMD ["/usr/local/awsmock/bin/awsmockmgr"]
