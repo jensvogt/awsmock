@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.16.42](https://github.com/jensvogt/awsmock/compare/v1.16.41...v1.16.42) (2026-04-20)
+
+
+### Bug Fixes
+
+* add dual stack IPv4/v6 support ([8b823bc](https://github.com/jensvogt/awsmock/commit/8b823bced66051db9240e082e5f4de254391f393))
+* add dual stack IPv4/v6 support ([ad9e5eb](https://github.com/jensvogt/awsmock/commit/ad9e5ebe636130a6900905fae375055381695a60))
+* add dual stack IPv4/v6 support ([3b169de](https://github.com/jensvogt/awsmock/commit/3b169dedada847469dde274701773ae469d4d4c3))
+* add dual stack IPv4/v6 support ([e31a638](https://github.com/jensvogt/awsmock/commit/e31a638654607fd685addc295a75d8fe7cd3938a))
+* add dual stack IPv4/v6 support ([ea6159d](https://github.com/jensvogt/awsmock/commit/ea6159d5c65943b69feddec82ac687c466ca5fa2))
+* docker container management ([530da02](https://github.com/jensvogt/awsmock/commit/530da02217508cd5f67cbae46d5f1d0cf14d3634))
+* docker container management ([66785cd](https://github.com/jensvogt/awsmock/commit/66785cd42638b1dbe9a720594a3cf9227d829ae3))
+
 ## [1.16.41](https://github.com/jensvogt/awsmock/compare/v1.16.40...v1.16.41) (2026-04-14)
 
 
