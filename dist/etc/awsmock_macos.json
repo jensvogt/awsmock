@@ -30,7 +30,7 @@
       "active": true,
       "http": {
         "host": "localhost",
-        "address": "0.0.0.0",
+        "address": "::",
         "port": 4566,
         "max-queue": 8,
         "max-thread": 64,

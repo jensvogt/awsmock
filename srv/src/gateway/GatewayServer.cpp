@@ -22,15 +22,16 @@ namespace AwsMock::Service {
         // Set running
         SetRunning();
 
-        // Create and launch a listening port
-        const auto listener = std::make_shared<GatewayListener>(_ios, ip::tcp::endpoint{ip::make_address(_address), _port});
+        // Create and launch a listening port, dual stack IPv4/v6
+        const auto listener = std::make_shared<GatewayListener>(_ios, ip::tcp::endpoint(ip::make_address(_address), _port));
         listener->Run();
 
+        // Log endpoint
         log_info << "Gateway server started, endpoint: " << _address << " port: " << _port;
     }
 
-    void GatewayServer::Shutdown(){
+    void GatewayServer::Shutdown() {
         _ios.stop();
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

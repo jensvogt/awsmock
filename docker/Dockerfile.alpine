@@ -1,16 +1,9 @@
-FROM debian:trixie-slim AS builder
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates git curl build-essential gcc-14 g++-14 \
-    cmake ninja-build zip curl unzip tar autoconf autoconf-archive automake libtool pkg-config wget m4 \
-    libffi-dev libssl-dev zlib1g-dev libbz2-dev libsqlite3-dev libreadline-dev doxygen pandoc && rm -rf /var/lib/apt/lists/*
+FROM alpine:latest AS build
 
-# Set as default
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14 \
-    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14 \
-    && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 14 \
-    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 14
-
-# Verify
-RUN gcc --version && g++ --version
+RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
+     autoconf-archive automake libtool m4 make gettext-dev patch pkgconf ncurses-dev ncurses-terminfo-base doxygen pandoc \
+     pkgconfig coreutils bash perl openssl-dev zlib-dev bzip2-dev readline-dev sqlite-dev xz-dev libffi-dev ncurses-dev \
+     util-linux-dev
 
 # vcpkg needs this
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
@@ -39,9 +32,9 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     -DVCPKG_OVERLAY_TRIPLETS=./dist/vcpkg -DVCPKG_TARGET_TRIPLET=x64-linux-release -DCMAKE_BUILD_TYPE=Release -Wno-dev && \
     cmake --build build
 
-FROM node:24-bookworm AS buildfrontend
+FROM node:24-alpine AS buildfrontend
 
-RUN apt update && apt install -y git curl zip unzip tar
+RUN apk update && apk upgrade && apk add --no-cache git
 
 # Build aws-mock-ui
 WORKDIR /usr/src
@@ -51,11 +44,10 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     npm install --force && \
     npm run build --prod
 
-FROM debian:trixie-slim
+# Stick to alpine:latest
+FROM alpine:latest
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libstdc++6 libgcc-s1 ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade && apk add --no-cache unzip libssh libarchive libmagic curl aws-cli unbound
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -78,12 +70,12 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
 # Install aws-mock
-COPY --from=builder /usr/src/awsmock/build/awsmockmgr /usr/local/awsmock/bin
-COPY --from=builder /usr/src/awsmock/build/awsmockctl /usr/local/awsmock/bin
-COPY --from=builder /usr/src/awsmock/build/awslocal /usr/local/awsmock/bin
-COPY --from=builder /usr/src/awsmock/dist/etc/magic.mgc /usr/local/awsmock/etc
-COPY --from=builder /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
-COPY --from=builder /usr/src/awsmock/dist/etc/ssh_host_key /usr/local/awsmock/etc/ssh_host_key
+COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/awsmock/bin
+COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/awsmock/bin
+COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/awsmock/bin
+COPY --from=build /usr/src/awsmock/dist/etc/magic.mgc /usr/local/awsmock/etc
+COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
+COPY --from=build /usr/src/awsmock/dist/etc/ssh_host_key /usr/local/awsmock/etc/ssh_host_key
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/lib

@@ -44,14 +44,14 @@ namespace AwsMock::Service {
                 const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
                 const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
 
-                listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
+                listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string> >();
                 listQueueResponse.nextToken = nextToken;
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
                 return listQueueResponse;
             }
 
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
-            listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
+            listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string> >();
 
             log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
@@ -188,7 +188,7 @@ namespace AwsMock::Service {
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "approximateNumberOfMessagesNotVisible",
-            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
+                    attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "deadLetterTargetArn";
@@ -232,8 +232,8 @@ namespace AwsMock::Service {
                     endArray = response.attributeCounters.end();
                 }
                 response.attributeCounters = std::vector(
-                        response.attributeCounters.begin() + request.pageSize * request.pageIndex,
-                        endArray);
+                    response.attributeCounters.begin() + request.pageSize * request.pageIndex,
+                    endArray);
             }
             return response;
         } catch (Core::DatabaseException &ex) {
@@ -533,7 +533,7 @@ namespace AwsMock::Service {
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -918,7 +918,7 @@ namespace AwsMock::Service {
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -1058,7 +1058,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const {
-        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "receive_messages");
+        //        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "receive_messages");
         log_trace << "Receive message request: " << request.ToString();
 
         // Queue URL contains the host name and is therefore not reliable
@@ -1407,8 +1407,8 @@ namespace AwsMock::Service {
 
     bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
         return std::ranges::find_if(attributes, [&value](const std::string &attribute) {
-                   return Core::StringUtils::EqualsIgnoreCase(attribute, value);
-               }) != attributes.end();
+            return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+        }) != attributes.end();
     }
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
@@ -1454,4 +1454,4 @@ namespace AwsMock::Service {
         return contentType;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
