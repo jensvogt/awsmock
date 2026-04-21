@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.44](https://github.com/jensvogt/awsmock/compare/v1.16.43...v1.16.44) (2026-04-21)
+
+
+### Bug Fixes
+
+* SNS-&gt;SQS notifications ([7392d28](https://github.com/jensvogt/awsmock/commit/7392d28a006e85f4d8d0e94cb7534829acc9645c))
+
 ## [1.16.43](https://github.com/jensvogt/awsmock/compare/v1.16.42...v1.16.43) (2026-04-20)
 
 
