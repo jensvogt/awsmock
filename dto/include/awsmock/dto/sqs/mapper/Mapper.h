@@ -294,6 +294,32 @@ namespace AwsMock::Dto::SQS {
         static Database::Entity::SQS::Message toDto(const SendMessageRequest &d) = delete;
     };
 
+    // class SendNotificationMessageRequestMapper : public StaticMapper<SendMessageRequestMapper, Database::Entity::SQS::Message, SendNotificationMessageRequest> {
+    // public:
+    //     static Database::Entity::SQS::Message toEntity(const SendNotificationMessageRequest &d) {
+    //         Database::Entity::SQS::Message e;
+    //         e.queueName = Core::AwsUtils::ConvertSQSQueueUrlToName(d.queueUrl);
+    //         e.queueArn = Core::AwsUtils::CreateSQSQueueArn(d.region, Core::Configuration::instance().GetAccountId(), e.queueName);
+    //         e.body = d.body;
+    //         e.attributes = d.attributes;
+    //         e.md5Body = Database::SqsUtils::CreateMd5OfMessageBody(d.body);
+    //         e.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(e.messageAttributes);
+    //         e.md5MessageSystemAttributes = Database::SqsUtils::CreateMd5OfMessageSystemAttributes(d.attributes);
+    //         for (const auto &a: d.messageAttributes) {
+    //             Database::Entity::SQS::MessageAttribute messageAttribute;
+    //             messageAttribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(a.second.dataType));
+    //             if (messageAttribute.dataType == Database::Entity::SQS::STRING) {
+    //                 messageAttribute.stringValue = a.second.stringValue;
+    //             } else if (messageAttribute.dataType == Database::Entity::SQS::BINARY) {
+    //                 messageAttribute.binaryValue = a.second.binaryValue;
+    //             }
+    //         }
+    //         return e;
+    //     }
+    //
+    //     static Database::Entity::SQS::Message toDto(const SendMessageRequest &d) = delete;
+    // };
+
     class SendMessageResponseMapper : public StaticMapper<SendMessageResponseMapper, Database::Entity::SQS::Message, SendMessageResponse> {
     public:
         static SendMessageResponse toDto(const Database::Entity::SQS::Message &e) {

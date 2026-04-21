@@ -285,6 +285,11 @@ namespace AwsMock::Service {
         long PurgeAllTopics() const;
 
         /**
+         * @brief Update all message counters
+         */
+        [[nodiscard]] void ReloadAllCounters() const;
+
+        /**
          * @brief Returns an event source as a lambda configuration
          *
          * @param request get event source request

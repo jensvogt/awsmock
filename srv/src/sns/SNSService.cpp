@@ -17,10 +17,10 @@ namespace AwsMock::Service {
             log_debug << "Got topic: " << topic.topicArn;
 
             Dto::SNS::CreateTopicResponse response;
-            response.region = topic.region,
-                    response.topicName = topic.topicName,
-                    response.owner = topic.owner,
-                    response.topicArn = topic.topicArn;
+            response.region = topic.region;
+            response.topicName = topic.topicName;
+            response.owner = topic.owner;
+            response.topicArn = topic.topicArn;
             return response;
         }
 
@@ -180,6 +180,19 @@ namespace AwsMock::Service {
         }
     }
 
+    void SNSService::ReloadAllCounters() const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "reload_all_counters");
+        log_trace << "Reload all counters";
+
+        try {
+            _snsDatabase.AdjustMessageCounters();
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const Dto::SNS::DeleteTopicRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_topic");
         log_trace << "Delete topic request, region: " << request.region << " topicArn: " << request.topicArn;
@@ -230,8 +243,9 @@ namespace AwsMock::Service {
             // Create entity
             Database::Entity::SNS::Message message = Dto::SNS::PublishRequestMapper::toEntity(request);
 
-            // Content type
+            // Content type and messageId
             message.contentType = SanitizeContentType(request.contentType, request.message);
+            message.messageId = Core::AwsUtils::CreateMessageId();
 
             // Save message
             message = _snsDatabase.CreateMessage(message);
@@ -769,7 +783,15 @@ namespace AwsMock::Service {
         sqsNotificationRequest.topicArn = request.topicArn;
         sqsNotificationRequest.message = request.message;
         sqsNotificationRequest.timestamp = system_clock::now();
-        sqsNotificationRequest.messageAttributes = request.messageAttributes;
+        sqsNotificationRequest.requestId = request.requestId;
+
+        // Message attribute
+        for (const auto &[k,v]: request.messageAttributes) {
+            Dto::SNS::NotificationMessageAttribute messageAttribute;
+            messageAttribute.type = Dto::SNS::MessageAttributeDataTypeToString(v.dataType);
+            messageAttribute.value = messageAttribute.type == "Binary" ? Core::Crypto::Base64EncodeRaw(v.binaryValue) : v.stringValue;
+            sqsNotificationRequest.messageAttributes[k] = messageAttribute;
+        }
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest;
@@ -779,7 +801,7 @@ namespace AwsMock::Service {
         sendMessageRequest.contentType = "application/json";
         sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
-        const Dto::SQS::SendMessageResponse response = _sqsService.SendNotification(sendMessageRequest);
+        const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
         log_info << "SNS SendMessage response: " << sendMessageRequest.ToJson();
     }
 

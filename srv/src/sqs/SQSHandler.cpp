@@ -279,7 +279,8 @@ namespace AwsMock::Service {
                     Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.UpdateMessage(sqsRequest);
-                        log_info << "Update message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                        log_info << "Update message, messageId: " << sqsRequest.messageId;
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -290,7 +291,8 @@ namespace AwsMock::Service {
                     Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ResendMessage(sqsRequest);
-                        log_info << "Resend message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                        log_info << "Resend message, messageId: " << sqsRequest.messageId;
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -357,18 +359,8 @@ namespace AwsMock::Service {
                     Dto::SQS::ImportMessagesRequest sqsRequest = Dto::SQS::ImportMessagesRequest::FromJson(clientCommand.payload);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ImportMessages(sqsRequest);
-                        log_info << "Import messages"; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
-                    return SendResponse(request, http::status::ok);
-                }
-
-                case Dto::Common::SqsCommandType::RELOAD_COUNTERS: {
-
-                    Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
-                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
-                        _sqsService.ReloadCounters(sqsRequest);
-                        log_info << "Reload counters"; }, boost::asio::detached);
+                        log_info << "Import messages";
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -376,7 +368,6 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::RELOAD_ALL_COUNTERS: {
 
-                    Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
                     _sqsService.ReloadAllCounters();
                     return SendResponse(request, http::status::ok);
                 }
@@ -471,4 +462,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

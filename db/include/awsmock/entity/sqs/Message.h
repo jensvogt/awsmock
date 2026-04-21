@@ -46,8 +46,7 @@ namespace AwsMock::Database::Entity::SQS {
          * Queue name
          */
         std::string queueName;
-
-        /**
+ /**
          * Message body
          */
         std::string body;
@@ -134,7 +133,8 @@ namespace AwsMock::Database::Entity::SQS {
          * Type
          */
         std::string type = "Message";
- /**
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
