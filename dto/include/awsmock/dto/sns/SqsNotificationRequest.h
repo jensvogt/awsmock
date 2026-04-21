@@ -15,6 +15,34 @@
 
 namespace AwsMock::Dto::SNS {
 
+    struct NotificationMessageAttribute : Common::BaseCounter<NotificationMessageAttribute> {
+
+        /**
+         * @brief Message attribute type
+         */
+        std::string type;
+
+        /**
+         * @brief Message attribute value
+         */
+        std::string value;
+
+    private:
+        friend NotificationMessageAttribute tag_invoke(boost::json::value_to_tag<NotificationMessageAttribute>, boost::json::value const &v) {
+            NotificationMessageAttribute r;
+            r.type = Core::Json::GetStringValue(v, "Type");
+            r.value = Core::Json::GetStringValue(v, "Value");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, NotificationMessageAttribute const &obj) {
+            jv = {
+                {"Type", obj.type},
+                {"Value", obj.value},
+            };
+        }
+    };
+
     /**
      * SQS notification request, used to send a notification from an SNS topic to a SQS queue
      *
@@ -89,7 +117,7 @@ namespace AwsMock::Dto::SNS {
         /**
          * Attributes
          */
-        std::map<std::string, MessageAttribute> messageAttributes;
+        std::map<std::string, NotificationMessageAttribute> messageAttributes;
 
     private:
         friend SqsNotificationRequest tag_invoke(boost::json::value_to_tag<SqsNotificationRequest>, boost::json::value const &v) {
@@ -103,7 +131,7 @@ namespace AwsMock::Dto::SNS {
             r.signingCertURL = Core::Json::GetStringValue(v, "SigningCertURL");
             r.unsubscribeURL = Core::Json::GetStringValue(v, "UnsubscribeURL");
             if (Core::Json::AttributeExists(v, "MessageAttributes")) {
-                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute> >(v.at("MessageAttributes"));
+                r.messageAttributes = boost::json::value_to<std::map<std::string, NotificationMessageAttribute> >(v.at("MessageAttributes"));
             }
             return r;
         }

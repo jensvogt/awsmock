@@ -38,7 +38,8 @@ namespace AwsMock::Core {
          *
          * @param delimiter delimiter character
          */
-        explicit SubstringCompare(const std::string &delimiter) : _delimiter(delimiter) {}
+        explicit SubstringCompare(const std::string &delimiter) : _delimiter(delimiter) {
+        }
 
         /**
          * @brief Comparison
@@ -47,7 +48,9 @@ namespace AwsMock::Core {
          * @param b comparison value
          */
         bool operator()(std::string const &a, std::string const &b) const {
-
+            if (!a.contains(_delimiter) || !b.contains(_delimiter)) {
+                return false;
+            }
             const std::string sa = StringUtils::Split(a, _delimiter)[1];
             const std::string sb = StringUtils::Split(b, _delimiter)[1];
 
@@ -62,8 +65,7 @@ namespace AwsMock::Core {
      */
     class DirUtils {
 
-      public:
-
+    public:
         /**
          * @brief Returns a thread safe temp directory name.
          *
@@ -191,6 +193,6 @@ namespace AwsMock::Core {
         static void DeleteFilesInDirectory(const std::string &dirName);
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #endif// AWSMOCK_CORE_DIRECTORY_UTILS_H

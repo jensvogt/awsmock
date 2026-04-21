@@ -79,7 +79,6 @@
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagsRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagsResponse.h>
-#include <awsmock/dto/sqs/internal/ReloadCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ResendMessageRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDqlRequest.h>
@@ -93,7 +92,6 @@
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
-#include <awsmock/utils/SqsUtils.h>
 
 namespace AwsMock::Service {
     using std::chrono::system_clock;
@@ -104,12 +102,12 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {}
+        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
+        }
 
         /**
          * @brief Creates a new queue.
@@ -349,8 +347,6 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
 
-        Dto::SQS::SendMessageResponse SendNotification(const Dto::SQS::SendMessageRequest &request) const;
-
         /**
          * @brief Creates a new queue
          *
@@ -484,19 +480,11 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
 
         /**
-         * @brief Reload the SQS queue counters
-         *
-         * @param request reload counters request
-         */
-        void ReloadCounters(const Dto::SQS::ReloadCountersRequest &request) const;
-
-        /**
          * @brief Reload all SQS queue counters
          */
         void ReloadAllCounters() const;
 
-      private:
-
+    private:
         /**
          * @brief Send a lambda invocation request for a message.
          *
@@ -549,6 +537,6 @@ namespace AwsMock::Service {
          */
         LambdaService _lambdaService;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVICE_H

@@ -229,6 +229,7 @@ namespace AwsMock::Core {
 
         return HexEncode(hash.data(), static_cast<int>(hashLen));
     }
+
     std::string Crypto::GetHmacSha256FromString(const std::array<unsigned char, CRYPTO_HMAC256_BLOCK_SIZE> &key, const std::string &content) {
 
         std::array<unsigned char, EVP_MAX_MD_SIZE> hash{};
@@ -477,6 +478,47 @@ namespace AwsMock::Core {
         return dst;
     }
 
+    std::string Crypto::Base64EncodeRaw(const std::vector<uint8_t> &data) {
+        if (data.empty()) return {};
+
+        // Calculate output length: 4 * ceil(n/3) + null terminator
+        const int encodedLen = 4 * ((static_cast<int>(data.size()) + 2) / 3);
+        std::string result(encodedLen, '\0');
+
+        const int actualLen = EVP_EncodeBlock(
+            reinterpret_cast<unsigned char *>(result.data()),
+            data.data(),
+            static_cast<int>(data.size())
+        );
+
+        result.resize(actualLen);
+        return result;
+    }
+
+    std::vector<uint8_t> Crypto::Base64DecodeRaw(const std::string &encoded) {
+        if (encoded.empty()) return {};
+
+        const int decodedLen = 3 * (static_cast<int>(encoded.size()) / 4);
+        std::vector<uint8_t> result(decodedLen);
+
+        const int actualLen = EVP_DecodeBlock(
+            result.data(),
+            reinterpret_cast<const unsigned char *>(encoded.data()),
+            static_cast<int>(encoded.size())
+        );
+
+        if (actualLen < 0) return {}; // decode error
+
+        // EVP_DecodeBlock pads with zeros for '=' padding — trim them
+        int padding = 0;
+        if (encoded.size() >= 2) {
+            if (encoded[encoded.size() - 1] == '=') padding++;
+            if (encoded[encoded.size() - 2] == '=') padding++;
+        }
+        result.resize(actualLen - padding);
+        return result;
+    }
+
 #ifdef _WIN32
     void Crypto::Base64Decode(const std::string &encodedString, const std::string &filename) {
         typedef std::basic_ofstream<unsigned char> uofstream;
@@ -520,12 +562,14 @@ namespace AwsMock::Core {
 #endif
     bool Crypto::IsBase64(const std::string &inputString) {
         if (inputString.length() % 4 == 0 && std::ranges::all_of(inputString,
-                                                                 [](const char c) { return ((c >= 'a' && c <= 'z') ||
-                                                                                            (c >= 'A' && c <= 'Z') ||
-                                                                                            (c >= '0' && c <= '9') ||
-                                                                                            c == '/' ||
-                                                                                            c == '+' ||
-                                                                                            c == '='); })) {
+                                                                 [](const char c) {
+                                                                     return ((c >= 'a' && c <= 'z') ||
+                                                                             (c >= 'A' && c <= 'Z') ||
+                                                                             (c >= '0' && c <= '9') ||
+                                                                             c == '/' ||
+                                                                             c == '+' ||
+                                                                             c == '=');
+                                                                 })) {
             // filter by the location of '=' sign.
             if (const auto pos = inputString.find("==="); pos != std::string_view::npos) {
                 if (pos < inputString.length() - 3) return false;
@@ -682,4 +726,4 @@ namespace AwsMock::Core {
         return {reinterpret_cast<char *>(decrypt), outLen};
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

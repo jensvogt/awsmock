@@ -124,7 +124,7 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * @brief Number of available messages
          */
-        long availableMessages = 0;
+        long availableMessages{};
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -157,6 +157,6 @@ namespace AwsMock::Database::Entity::SNS {
         friend std::ostream &operator<<(std::ostream &os, const TopicAttribute &r);
     };
 
-}// namespace AwsMock::Database::Entity::SNS
+} // namespace AwsMock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_TOPIC_ATTRIBUTE_H

@@ -40,14 +40,14 @@ namespace AwsMock::Core {
     long DirUtils::DirectoryCountFiles(const std::string &dirName, const bool recursive) {
         if (recursive) {
             return std::count_if(
-                    boost::filesystem::recursive_directory_iterator(dirName),
-                    boost::filesystem::recursive_directory_iterator(),
-                    static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+                boost::filesystem::recursive_directory_iterator(dirName),
+                boost::filesystem::recursive_directory_iterator(),
+                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
         }
         return std::count_if(
-                boost::filesystem::directory_iterator(dirName),
-                boost::filesystem::directory_iterator(),
-                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+            boost::filesystem::directory_iterator(dirName),
+            boost::filesystem::directory_iterator(),
+            static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
     }
 
     bool DirUtils::DirectoryEmpty(const std::string &dirName) {
@@ -89,7 +89,9 @@ namespace AwsMock::Core {
         std::vector<std::string> fileNames;
         for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
             if (is_regular_file(entry) && StringUtils::StartsWith(entry.path().string(), dirName + FileUtils::separator() + prefix)) {
-                fileNames.emplace_back(entry.path().string());
+                if (!entry.path().string().empty()) {
+                    fileNames.emplace_back(entry.path().string());
+                }
             }
         }
 
@@ -153,4 +155,4 @@ namespace AwsMock::Core {
             }
         }
     }
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

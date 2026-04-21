@@ -310,6 +310,12 @@ namespace AwsMock::Service {
                     // return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
+                case Dto::Common::SNSCommandType::RELOAD_ALL_COUNTERS: {
+
+                    _snsService.ReloadAllCounters();
+                    return SendResponse(request, http::status::ok);
+                }
+
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";

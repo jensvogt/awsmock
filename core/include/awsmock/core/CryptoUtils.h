@@ -81,8 +81,7 @@ namespace AwsMock::Core {
      */
     class Crypto {
 
-      public:
-
+    public:
         /**
          * @brief Returns the MD5 hash of a string.
          *
@@ -269,6 +268,23 @@ namespace AwsMock::Core {
          */
         static std::string Base64Decode(const std::string &encodedString);
 
+        /**
+         * @brief Base64 encoding.
+         *
+         * @param data input data
+         * @return base64 encoded string
+         */
+        static std::string Base64EncodeRaw(const std::vector<uint8_t> &data);
+
+        static std::vector<uint8_t> Base64DecodeRaw(const std::string &encoded);
+
+        /**
+         * @brief Base64 decoding.
+         *
+         * @param encodedString encoded input string
+         * @param filename input file
+         * @return BASE64 decoded string.
+         */
         static void Base64Decode(const std::string &encodedString, const std::string &filename);
 
         /**
@@ -377,8 +393,7 @@ namespace AwsMock::Core {
          */
         static std::string RsaDecrypt(EVP_PKEY *keyPair, const std::string &in);
 
-      private:
-
+    private:
         /**
          * @brief Create a 256 bit key and IV using the supplied key_data. salt can be added for taste.
          *
@@ -414,6 +429,6 @@ namespace AwsMock::Core {
         static unsigned char _iv[16];
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #endif
