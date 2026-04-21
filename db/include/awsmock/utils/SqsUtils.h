@@ -12,13 +12,13 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
+#include <mongocxx/pipeline.hpp>
 
 namespace AwsMock::Database {
 
     class SqsUtils {
 
-      public:
-
+    public:
         /**
          * @brief Calculates the MD5 of the message body
          *
@@ -43,8 +43,14 @@ namespace AwsMock::Database {
          */
         static std::string CreateMd5OfMessageAttributes(const std::map<std::string, Entity::SQS::MessageAttribute> &messageAttributes);
 
-      private:
+        /**
+         * @brief Shows the BSON representation of a mongodb aggregation pipline
+         *
+         * @param p mongodb pipeline
+         */
+        static std::string ShowPipelineJson(const mongocxx::pipeline &p);
 
+    private:
         /**
          * @brief Converts an integer to a byte array
          *
@@ -62,6 +68,6 @@ namespace AwsMock::Database {
         static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif//AWSMOCK_DB_SQS_UTILS_H

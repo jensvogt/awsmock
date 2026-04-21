@@ -69,6 +69,8 @@
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/sqs/SQSService.h>
+#include <awsmock/dto/sns/internal/AddDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sns/internal/DeleteDefaultMessageAttributeRequest.h>
 
 #define SQS_PROTOCOL "sqs"
 #define HTTP_PROTOCOL "http"
@@ -263,7 +265,28 @@ namespace AwsMock::Service {
          * @see ListDefaultMessageAttributeCountersRequest
          * @see ListDefaultMessageAttributeCountersResponse
          */
-        [[nodiscard]] Dto::SNS::ListDefaultMessageAttributeCountersResponse ListDefaultMessageAttributeCounters(const Dto::SNS::ListDefaultMessageAttributeCountersRequest &request) const;
+        [[nodiscard]]
+        Dto::SNS::ListDefaultMessageAttributeCountersResponse ListDefaultMessageAttributeCounters(const Dto::SNS::ListDefaultMessageAttributeCountersRequest &request) const;
+
+        /**
+         * @brief Adds a default attribute
+         *
+         * @param request add default attribute request
+         * @return updated message attribute counters response
+         * @throws ServiceException
+         */
+        [[nodiscard]]
+        Dto::SNS::ListDefaultMessageAttributeCountersResponse AddDefaultMessageAttribute(const Dto::SNS::AddDefaultMessageAttributeRequest &request) const;
+
+        /**
+         * @brief Deletes a default attribute
+         *
+         * @param request delete default attribute request
+         * @return updated message attribute counters response
+         * @throws ServiceException
+         */
+        [[nodiscard]]
+        Dto::SNS::ListDefaultMessageAttributeCountersResponse DeleteDefaultMessageAttribute(const Dto::SNS::DeleteDefaultMessageAttributeRequest &request) const;
 
         /**
          * @brief Purge a topic
@@ -287,7 +310,7 @@ namespace AwsMock::Service {
         /**
          * @brief Update all message counters
          */
-        [[nodiscard]] void ReloadAllCounters() const;
+        void ReloadAllCounters() const;
 
         /**
          * @brief Returns an event source as a lambda configuration

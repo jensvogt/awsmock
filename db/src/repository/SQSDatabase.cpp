@@ -1428,7 +1428,6 @@ namespace AwsMock::Database {
                                        kvp("size", 1));
                 p.project(projectDocument.extract());
 
-
                 session.start_transaction();
 
                 // Get all queue ARNs from the aggregation result
@@ -1438,7 +1437,7 @@ namespace AwsMock::Database {
                     const auto queueArn = Core::Bson::BsonUtils::GetStringValue(t, "queueArn");
                     queuesWithMessages.insert(queueArn);
                     bulk.append(mongocxx::model::update_one(
-                        make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "queueArn"))),
+                        make_document(kvp("arn", queueArn)),
                         make_document(kvp("$set", make_document(
                                               kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
                                               kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
@@ -1448,7 +1447,7 @@ namespace AwsMock::Database {
 
                 // Zero out queues with no messages
                 for (auto queueCursor = queueCollection.find({}); const auto &q: queueCursor) {
-                    if (const auto arn = Core::Bson::BsonUtils::GetStringValue(q, "arn"); !queuesWithMessages.contains(arn)) {
+                    if (const auto arn = Core::Bson::BsonUtils::GetStringValue(q, "queueArn"); !queuesWithMessages.contains(arn)) {
                         bulk.append(mongocxx::model::update_one(
                             make_document(kvp("arn", arn)),
                             make_document(kvp("$set", make_document(

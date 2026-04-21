@@ -4,6 +4,8 @@
 
 #include <awsmock/repository/SNSDatabase.h>
 
+#include "awsmock/utils/SqsUtils.h"
+
 namespace AwsMock::Database {
 
     SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
@@ -979,57 +981,73 @@ namespace AwsMock::Database {
 
             try {
                 mongocxx::pipeline p{};
+
+                // Start from topics
+                p.lookup(make_document(
+                    kvp("from", "sns_messages"),
+                    kvp("localField", "topicArn"),
+                    kvp("foreignField", "topicArn"),
+                    kvp("as", "messages")
+                ));
+
+                // Unwind with preserveNullAndEmptyArrays to keep topics with no messages
+                p.unwind(make_document(
+                    kvp("path", "$messages"),
+                    kvp("preserveNullAndEmptyArrays", true)
+                ));
+
+                // Group back
                 p.group(make_document(
                     kvp("_id", "$topicArn"),
-                    kvp("size", make_document(kvp("$sum", "$size"))),
-                    kvp("total", make_document(kvp("$sum", 1))),
-                    kvp("send", make_document(kvp("$sum",
-                                                  make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
-                    kvp("resend", make_document(kvp("$sum",
-                                                    make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::RESEND)))), 1, 0))))))));
+                    kvp("size", make_document(kvp("$sum", "$messages.size"))),
+                    kvp("total", make_document(kvp("$sum", make_document(kvp("$cond", make_array(
+                                                                                 make_document(kvp("$ifNull", make_array("$messages", false))), 0, 1)))))),
+                    kvp("send", make_document(kvp("$sum", make_document(kvp("$cond", make_array(
+                                                                                make_document(kvp("$eq", make_array("$messages.status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
+                    kvp("resend", make_document(kvp("$sum", make_document(kvp("$cond", make_array(
+                                                                                  make_document(kvp("$eq", make_array("$messages.status", MessageStatusToString(Entity::SNS::MessageStatus::RESEND)))), 1, 0))))))
+                ));
 
+                // Project
                 document projectDocument;
-                projectDocument.append(kvp("_id", 0),
-                                       kvp("topicArn", "$_id"),
-                                       kvp("total", 1),
-                                       kvp("send", 1),
-                                       kvp("resend", 1),
-                                       kvp("size", 1));
+                projectDocument.append(kvp("_id", 0), kvp("topicArn", "$_id"), kvp("total", 1), kvp("send", 1), kvp("resend", 1), kvp("size", 1));
+
                 p.project(projectDocument.extract());
+                //log_info << SqsUtils::ShowPipelineJson(p);
 
                 session.start_transaction();
 
-                // Initialize all topics with zero message counts
-                topicCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                      kvp("size", bsoncxx::types::b_int64()),
-                                                                      kvp("messages", bsoncxx::types::b_int64()),
-                                                                      kvp("messagesSend", bsoncxx::types::b_int64()),
-                                                                      kvp("messagesResend", bsoncxx::types::b_int64())))));
-
+                // Get all queue ARNs from the aggregation result
+                std::set<std::string> queuesWithMessages;
                 auto bulk = topicCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
-                    bulk.append(mongocxx::model::update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "topicArn"))),
-                                                            make_document(kvp("$set", make_document(
-                                                                                  kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                                                  kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
-                                                                                  kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
-                                                                                  kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
-                    log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "topicArn")
-                              << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
-                              << ", messages: " << Core::Bson::BsonUtils::GetLongValue(t, "total")
-                              << ", messagesSend: " << Core::Bson::BsonUtils::GetLongValue(t, "send")
-                              << ", messagesResend: " << Core::Bson::BsonUtils::GetLongValue(t, "resend");
+                    const auto topicArn = Core::Bson::BsonUtils::GetStringValue(t, "$topicArn");
+                    queuesWithMessages.insert(topicArn);
+                    bulk.append(mongocxx::model::update_one(
+                        make_document(kvp("topicArn", topicArn)),
+                        make_document(kvp("$set", make_document(
+                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
+                                              kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
+                                              kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
                 }
 
-                // Bul updates
-                if (!bulk.empty()) {
-                    try {
-                        auto result = bulk.execute();
-                        log_debug << "Bulk write result: " << result->modified_count();
-                    } catch (const mongocxx::exception &exc) {
-                        log_error << "Bulk write failed: " << exc.what();
-                        throw Core::DatabaseException(exc.what());
+                // Zero out queues with no messages
+                for (auto queueCursor = topicCollection.find({}); const auto &q: queueCursor) {
+                    if (const auto topicArn = Core::Bson::BsonUtils::GetStringValue(q, "$topicArn"); !queuesWithMessages.contains(topicArn)) {
+                        bulk.append(mongocxx::model::update_one(
+                            make_document(kvp("topicArn", topicArn)),
+                            make_document(kvp("$set", make_document(
+                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                  kvp("messages", bsoncxx::types::b_int64()),
+                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
+                                                  kvp("messagesResend", bsoncxx::types::b_int64()))))));
                     }
+                }
+
+                if (!bulk.empty()) {
+                    auto result = bulk.execute();
+                    log_debug << "Bulk write result: " << result->modified_count();
                 }
                 session.commit_transaction();
                 return;
