@@ -1086,9 +1086,6 @@ namespace AwsMock::Service {
                     _sqsDatabase.ReceiveMessages(queue.arn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                     log_trace << "Messages in list, url: " << queue.url << " count: " << messageList.size();
 
-                    if (request.queueUrl == "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/l2000-export-katalogdaten-input-queue") {
-                        log_error << "Queue messages: " << messageList.size();
-                    }
                     if (!messageList.empty()) {
                         break;
                     }

@@ -287,15 +287,15 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::ADD_DEFAULT_MESSAGE_ATTRIBUTE: {
-                    //
-                    // Dto::SNS::AddDefaultMessageAttributeRequest snsRequest = Dto::SNS::AddDefaultMessageAttributeRequest::FromJson(clientCommand);
-                    // Dto::SNS::ListDefaultMessageAttributeCountersResponse snsResponse = _snsService.AddDefaultMessageAttribute(snsRequest);
-                    // log_info << "Add default message attribute, queueArn: " << snsRequest.queueArn;
-                    // return SendResponse(request, http::status::ok, snsResponse.ToJson());
+
+                    Dto::SNS::AddDefaultMessageAttributeRequest snsRequest = Dto::SNS::AddDefaultMessageAttributeRequest::FromJson(clientCommand);
+                    Dto::SNS::ListDefaultMessageAttributeCountersResponse snsResponse = _snsService.AddDefaultMessageAttribute(snsRequest);
+                    log_info << "Add default message attribute, topicArn: " << snsRequest.topicArn;
+                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
                 case Dto::Common::SNSCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE: {
-                    //
+
                     // Dto::SNS::UpdateDefaultMessageAttributeRequest snsRequest = Dto::SNS::UpdateDefaultMessageAttributeRequest::FromJson(clientCommand);
                     // Dto::SNS::ListDefaultMessageAttributeCountersResponse snsResponse = _snsService.UpdateDefaultMessageAttribute(snsRequest);
                     // log_info << "Default message attribute updated, queueArn: " << snsRequest.queueArn;
@@ -303,11 +303,11 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE: {
-                    //
-                    // Dto::SNS::DeleteDefaultMessageAttributeRequest snsRequest = Dto::SNS::DeleteDefaultMessageAttributeRequest::FromJson(clientCommand);
-                    // Dto::SNS::ListDefaultMessageAttributeCountersResponse snsResponse = _snsService.DeleteDefaultMessageAttribute(snsRequest);
-                    // log_info << "Delete default message attribute, queueArn: " << snsRequest.queueArn;
-                    // return SendResponse(request, http::status::ok, snsResponse.ToJson());
+
+                    Dto::SNS::DeleteDefaultMessageAttributeRequest snsRequest = Dto::SNS::DeleteDefaultMessageAttributeRequest::FromJson(clientCommand);
+                    Dto::SNS::ListDefaultMessageAttributeCountersResponse snsResponse = _snsService.DeleteDefaultMessageAttribute(snsRequest);
+                    log_info << "Delete default message attribute, topicArn: " << snsRequest.topicArn;
+                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
                 case Dto::Common::SNSCommandType::RELOAD_ALL_COUNTERS: {

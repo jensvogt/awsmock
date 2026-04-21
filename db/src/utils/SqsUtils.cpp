@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/utils/SqsUtils.h>
+#include <mongocxx/pipeline-fwd.hpp>
 
 #include "awsmock/entity/sns/MessageAttribute.h"
 
@@ -104,6 +105,10 @@ namespace AwsMock::Database {
         EVP_DigestUpdate(context, bytes, 4);
         EVP_DigestUpdate(context, str.c_str(), str.length());
         free(bytes);
+    }
+
+    std::string SqsUtils::ShowPipelineJson(const mongocxx::pipeline &p) {
+        return bsoncxx::to_json(p.view_array());
     }
 
 } // namespace AwsMock::Database
