@@ -74,7 +74,7 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * Message size
          */
-        long size;
+        long size{};
 
         /**
          * Last send datetime
@@ -132,6 +132,6 @@ namespace AwsMock::Database::Entity::SNS {
     typedef Message Message;
     typedef std::vector<Message> MessageList;
 
-}// namespace AwsMock::Database::Entity::SNS
+} // namespace AwsMock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_H

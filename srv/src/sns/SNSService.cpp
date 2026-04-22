@@ -798,6 +798,36 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::SNS::ListDefaultMessageAttributeCountersResponse SNSService::UpdateDefaultMessageAttribute(const Dto::SNS::UpdateDefaultMessageAttributeRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "update_default_message_attribute");
+        log_trace << "Update default message attribute request, topicArn: " << request.topicArn;
+
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "Topic does not exist, topicArn: " << request.topicArn;
+            throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
+        }
+
+        Dto::SNS::ListDefaultMessageAttributeCountersResponse response;
+        try {
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            // Delete a default message attributes
+            topic.defaultMessageAttributes[request.name].stringValue = request.value;
+            topic.defaultMessageAttributes[request.name].dataType = Database::Entity::SNS::MessageAttributeTypeFromString(request.dataType);
+            topic = _snsDatabase.UpdateTopic(topic);
+
+            response.total = static_cast<long>(topic.defaultMessageAttributes.size());
+            response.attributeCounters = Dto::SNS::MessageAttributeMapper::toDtoMap(topic.defaultMessageAttributes);
+
+            log_debug << "Default message attribute updated, topicArn: " << topic.topicArn << ", name: " << request.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+        return response;
+    }
+
     Dto::SNS::ListDefaultMessageAttributeCountersResponse SNSService::DeleteDefaultMessageAttribute(const Dto::SNS::DeleteDefaultMessageAttributeRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_default_message_attribute");
         log_trace << "Delete default message attribute request, topicArn: " << request.topicArn;
@@ -863,7 +893,7 @@ namespace AwsMock::Service {
         sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
         const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
-        log_info << "SNS SendMessage response: " << sendMessageRequest.ToJson();
+        log_trace << "SNS SendMessage response: " << sendMessageRequest.ToJson();
     }
 
     void SNSService::SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {

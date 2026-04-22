@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SNS_MESSAGESTATUS_H
-#define AWSMOCK_DB_ENTITY_SNS_MESSAGESTATUS_H
+#ifndef AWSMOCK_DB_ENTITY_SNS_MESSAGE_STATUS_H
+#define AWSMOCK_DB_ENTITY_SNS_MESSAGE_STATUS_H
 
 // C++ includes
 #include <map>
@@ -12,7 +12,7 @@
 namespace AwsMock::Database::Entity::SNS {
 
     /**
-     * SNS message attribute entity
+     * @brief SNS message attribute entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -21,25 +21,24 @@ namespace AwsMock::Database::Entity::SNS {
         SEND,
         RESEND
     };
+
     static std::map<MessageStatus, std::string> MessageStatusNames{
-            {INITIAL, "INITIAL"},
-            {SEND, "SEND"},
-            {RESEND, "RESEND"},
+        {INITIAL, "INITIAL"},
+        {SEND, "SEND"},
+        {RESEND, "RESEND"},
     };
 
-    [[maybe_unused]] static std::string MessageStatusToString(const MessageStatus &messageStatus) {
+    [[maybe_unused]]
+    static std::string MessageStatusToString(const MessageStatus &messageStatus) {
         return MessageStatusNames[messageStatus];
     }
 
-    [[maybe_unused]] static MessageStatus MessageStatusFromString(const std::string &messageStatusString) {
-        for (auto &[fst, snd]: MessageStatusNames) {
-            if (snd == messageStatusString) {
-                return fst;
-            }
-        }
-        return INITIAL;
+    [[maybe_unused]]
+    static MessageStatus MessageStatusFromString(const std::string &s) {
+        const auto it = std::ranges::find_if(MessageStatusNames, [&](const auto &p) { return p.second == s; });
+        return it != MessageStatusNames.end() ? it->first : INITIAL;
     }
 
-}// namespace AwsMock::Database::Entity::SNS
+} // namespace AwsMock::Database::Entity::SNS
 
-#endif// AWSMOCK_DB_ENTITY_SNS_MESSAGESTATUS_H
+#endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_STATUS_H
