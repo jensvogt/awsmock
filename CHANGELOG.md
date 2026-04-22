@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.46](https://github.com/jensvogt/awsmock/compare/v1.16.45...v1.16.46) (2026-04-22)
+
+
+### Bug Fixes
+
+* SNS default attribute delete ([4efc058](https://github.com/jensvogt/awsmock/commit/4efc058b0c7b1fdda23478eb3d76fc384aa78b0b))
+* SNS default attribute delete ([59e415a](https://github.com/jensvogt/awsmock/commit/59e415a8a1c5fad1555f8d32b7952de0d437f288))
+
 ## [1.16.45](https://github.com/jensvogt/awsmock/compare/v1.16.44...v1.16.45) (2026-04-21)
 
 
