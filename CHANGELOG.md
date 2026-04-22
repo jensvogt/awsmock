@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.47](https://github.com/jensvogt/awsmock/compare/v1.16.46...v1.16.47) (2026-04-22)
+
+
+### Bug Fixes
+
+* fix SNS message size ([cd1fd1b](https://github.com/jensvogt/awsmock/commit/cd1fd1bf9640551e43b30a7a4992c68b4a87e2df))
+
 ## [1.16.46](https://github.com/jensvogt/awsmock/compare/v1.16.45...v1.16.46) (2026-04-22)
 
 
