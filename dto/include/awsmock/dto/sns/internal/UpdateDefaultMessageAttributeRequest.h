@@ -2,23 +2,24 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_UPDATE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H
-#define AWSMOCK_DTO_SQS_UPDATE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H
+#ifndef AWSMOCK_DTO_SNS_UPDATE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H
+#define AWSMOCK_DTO_SNS_UPDATE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SNS {
 
     struct UpdateDefaultMessageAttributeRequest final : Common::BaseCounter<UpdateDefaultMessageAttributeRequest> {
 
         /**
-         * Queue ARN
+         * Topic ARN
          */
-        std::string queueArn;
+        std::string topicArn;
 
         /**
          * Name
@@ -38,7 +39,7 @@ namespace AwsMock::Dto::SQS {
     private:
         friend UpdateDefaultMessageAttributeRequest tag_invoke(boost::json::value_to_tag<UpdateDefaultMessageAttributeRequest>, boost::json::value const &v) {
             UpdateDefaultMessageAttributeRequest r;
-            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
             r.name = Core::Json::GetStringValue(v, "name");
             r.value = Core::Json::GetStringValue(v, "value");
             r.dataType = Core::Json::GetStringValue(v, "dataType");
@@ -50,7 +51,7 @@ namespace AwsMock::Dto::SQS {
                 {"region", obj.region},
                 {"user", obj.user},
                 {"requestId", obj.requestId},
-                {"queueArn", obj.queueArn},
+                {"topicArn", obj.topicArn},
                 {"name", obj.name},
                 {"value", obj.value},
                 {"dataType", obj.dataType},
@@ -58,6 +59,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-} // namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SQS_UPDATE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H
+#endif// AWSMOCK_DTO_SNS_UPDATE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H

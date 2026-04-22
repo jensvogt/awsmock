@@ -62,6 +62,7 @@
 #include <awsmock/dto/sns/internal/ListTagCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
+#include <awsmock/dto/sns/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sns/mapper/Mapper.h>
 #include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 #include <awsmock/dto/sns/model/EventNotification.h>
@@ -277,6 +278,15 @@ namespace AwsMock::Service {
          */
         [[nodiscard]]
         Dto::SNS::ListDefaultMessageAttributeCountersResponse AddDefaultMessageAttribute(const Dto::SNS::AddDefaultMessageAttributeRequest &request) const;
+
+        /**
+         * @brief Updates a default attribute
+         *
+         * @param request update default attribute request
+         * @return updated message attribute counters response
+         * @throws ServiceException
+         */
+        [[nodiscard]] Dto::SNS::ListDefaultMessageAttributeCountersResponse UpdateDefaultMessageAttribute(const Dto::SNS::UpdateDefaultMessageAttributeRequest &request) const;
 
         /**
          * @brief Deletes a default attribute

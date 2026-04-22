@@ -19,7 +19,7 @@ namespace AwsMock::Service {
         // Start application background threads
         _scheduler.AddTask("application-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
+        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod/*, _watchdogPeriod*/);
 
         // Start backup
         if (_backupActive) {
@@ -155,13 +155,11 @@ namespace AwsMock::Service {
                 continue;
             }
 
-            if (!application.containerName.empty()) {
-                if (Dto::Docker::Container response = ContainerService::instance().GetContainerByName(application.containerName); response.id.empty()) {
-                    application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                    application.containerId = "";
-                    application.containerName = "";
-                    application = _applicationDatabase.UpdateApplication(application);
-                }
+            if (Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version); container.id.empty()) {
+                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application.containerId = "";
+                application.containerName = "";
+                application = _applicationDatabase.UpdateApplication(application);
             }
         }
     }

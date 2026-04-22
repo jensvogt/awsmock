@@ -176,7 +176,7 @@ int main(const int argc, char *argv[]) {
     // Check command
     bool found = false;
     const std::string &action = commands.front();
-    if (const std::vector<std::string> availableCommands = AwsMock::Controller::CommandTypeList(); std::ranges::contains(availableCommands, action)) {
+    if (const std::vector<std::string> availableCommands = AwsMock::Controller::CommandTypeList(); !std::ranges::contains(availableCommands, action)) {
         std::cerr << std::endl << "Unknown command: " << action << std::endl;
         ShowHelp(desc);
         return EXIT_FAILURE;

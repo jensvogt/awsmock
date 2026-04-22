@@ -296,10 +296,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE: {
 
-                    // Dto::SNS::UpdateDefaultMessageAttributeRequest snsRequest = Dto::SNS::UpdateDefaultMessageAttributeRequest::FromJson(clientCommand);
-                    // Dto::SNS::ListDefaultMessageAttributeCountersResponse snsResponse = _snsService.UpdateDefaultMessageAttribute(snsRequest);
-                    // log_info << "Default message attribute updated, queueArn: " << snsRequest.queueArn;
-                    // return SendResponse(request, http::status::ok, snsResponse.ToJson());
+                    Dto::SNS::UpdateDefaultMessageAttributeRequest snsRequest = Dto::SNS::UpdateDefaultMessageAttributeRequest::FromJson(clientCommand);
+                    Dto::SNS::ListDefaultMessageAttributeCountersResponse snsResponse = _snsService.UpdateDefaultMessageAttribute(snsRequest);
+                    log_info << "Default message attribute updated, topicArn: " << snsRequest.topicArn;
+                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
                 case Dto::Common::SNSCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE: {
