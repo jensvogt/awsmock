@@ -239,8 +239,8 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_LAMBDA) {
                 Dto::Lambda::UpdateLambdaRequest lambdaRequest = Dto::Lambda::UpdateLambdaRequest::FromJson(clientCommand);
+                _lambdaService.UpdateLambda(lambdaRequest);
                 log_info << "Starting update lambda function, functionArn: " << lambdaRequest.functionArn;
-                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.UpdateLambda(lambdaRequest); });
                 return SendResponse(request, http::status::ok);
             }
 
@@ -505,4 +505,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

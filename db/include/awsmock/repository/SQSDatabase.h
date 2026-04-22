@@ -34,6 +34,7 @@
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/MongoUtils.h>
 #include <awsmock/utils/SortColumn.h>
+#include <awsmock/utils/SqsUtils.h>
 
 namespace AwsMock::Database {
 
