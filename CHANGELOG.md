@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.48](https://github.com/jensvogt/awsmock/compare/v1.16.47...v1.16.48) (2026-04-22)
+
+
+### Bug Fixes
+
+* fix lambda updates ([75fa80e](https://github.com/jensvogt/awsmock/commit/75fa80ebda1785f55a1803043d6424d04291c469))
+
 ## [1.16.47](https://github.com/jensvogt/awsmock/compare/v1.16.46...v1.16.47) (2026-04-22)
 
 
