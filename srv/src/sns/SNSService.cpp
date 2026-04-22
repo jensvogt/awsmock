@@ -246,6 +246,7 @@ namespace AwsMock::Service {
             // Content type and messageId
             message.contentType = SanitizeContentType(request.contentType, request.message);
             message.messageId = Core::AwsUtils::CreateMessageId();
+            message.size = static_cast<long>(request.message.size());
 
             // Save message
             message = _snsDatabase.CreateMessage(message);
