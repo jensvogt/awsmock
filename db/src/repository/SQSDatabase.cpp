@@ -1447,9 +1447,9 @@ namespace AwsMock::Database {
 
                 // Zero out queues with no messages
                 for (auto queueCursor = queueCollection.find({}); const auto &q: queueCursor) {
-                    if (const auto arn = Core::Bson::BsonUtils::GetStringValue(q, "queueArn"); !queuesWithMessages.contains(arn)) {
+                    if (const auto queueArn = Core::Bson::BsonUtils::GetStringValue(q, "queueArn"); !queuesWithMessages.contains(queueArn)) {
                         bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("arn", arn)),
+                            make_document(kvp("arn", queueArn)),
                             make_document(kvp("$set", make_document(
                                                   kvp("size", bsoncxx::types::b_int64()),
                                                   kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
