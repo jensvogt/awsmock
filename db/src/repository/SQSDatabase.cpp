@@ -4,8 +4,6 @@
 
 #include <awsmock/repository/SQSDatabase.h>
 
-#include <bsoncxx/builder/stream/helpers.hpp>
-
 namespace AwsMock::Database {
 
     SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {
@@ -1428,6 +1426,8 @@ namespace AwsMock::Database {
                                        kvp("size", 1));
                 p.project(projectDocument.extract());
 
+                //log_info << SqsUtils::ShowPipelineJson(p);
+
                 session.start_transaction();
 
                 // Get all queue ARNs from the aggregation result
@@ -1447,7 +1447,7 @@ namespace AwsMock::Database {
 
                 // Zero out queues with no messages
                 for (auto queueCursor = queueCollection.find({}); const auto &q: queueCursor) {
-                    if (const auto queueArn = Core::Bson::BsonUtils::GetStringValue(q, "queueArn"); !queuesWithMessages.contains(queueArn)) {
+                    if (const auto queueArn = Core::Bson::BsonUtils::GetStringValue(q, "arn"); !queuesWithMessages.contains(queueArn)) {
                         bulk.append(mongocxx::model::update_one(
                             make_document(kvp("arn", queueArn)),
                             make_document(kvp("$set", make_document(

@@ -8,8 +8,8 @@ namespace AwsMock::Database::Entity::Lambda {
 
     bool Lambda::HasEventSource(const std::string &eventSourceArn) const {
         return std::ranges::find_if(eventSources, [eventSourceArn](const EventSourceMapping &e) {
-                   return e.eventSourceArn == eventSourceArn;
-               }) != eventSources.end();
+            return e.eventSourceArn == eventSourceArn;
+        }) != eventSources.end();
     }
 
     EventSourceMapping Lambda::GetEventSource(const std::string &eventSourceArn) const {
@@ -24,8 +24,8 @@ namespace AwsMock::Database::Entity::Lambda {
 
     bool Lambda::HasTag(const std::string &key) const {
         return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
-                   return t.first == key;
-               }) != tags.end();
+            return t.first == key;
+        }) != tags.end();
     }
 
     std::string Lambda::GetTagValue(const std::string &key) const {
@@ -87,8 +87,8 @@ namespace AwsMock::Database::Entity::Lambda {
         instances.erase(std::ranges::remove_if(instances, [instanceId](const Instance &i) { return instanceId == i.instanceId; }).begin(), instances.end());
     }
 
-    void Lambda::RemoveInstanceByContainerId(const std::string &containerId) {
-        instances.erase(std::ranges::remove_if(instances, [containerId](const Instance &i) { return containerId == i.containerId; }).begin(), instances.end());
+    void Lambda::RemoveInstanceByContainerId(const std::string &containerID) {
+        instances.erase(std::ranges::remove_if(instances, [containerID](const Instance &i) { return containerID == i.containerId; }).begin(), instances.end());
     }
 
     view_or_value<view, value> Lambda::ToDocument() const {
@@ -247,4 +247,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "Lambda=" << to_json(l.ToDocument());
         return os;
     }
-}// namespace AwsMock::Database::Entity::Lambda
+} // namespace AwsMock::Database::Entity::Lambda

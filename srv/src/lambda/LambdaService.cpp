@@ -5,7 +5,7 @@
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
-    std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_instanceMutex;
+    std::map<std::string, std::shared_ptr<boost::mutex> > LambdaService::_instanceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string>> environments;
+            std::vector<std::pair<std::string, std::string> > environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -445,7 +445,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string>> tags;
+            std::vector<std::pair<std::string, std::string> > tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -610,12 +610,12 @@ namespace AwsMock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-            function.handler = lambda.handler,
-            function.runtime = lambda.runtime,
-            function.lastUpdateStatus = "Successful",
-            function.state = LambdaStateToString(lambda.state),
-            function.stateReason = lambda.stateReason,
-            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+                    function.handler = lambda.handler,
+                    function.runtime = lambda.runtime,
+                    function.lastUpdateStatus = "Successful",
+                    function.state = LambdaStateToString(lambda.state),
+                    function.stateReason = lambda.stateReason,
+                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -1057,6 +1057,7 @@ namespace AwsMock::Service {
 
         // Update state
         lambda.state = Database::Entity::Lambda::Inactive;
+        lambda.instances.clear();
         lambda = _lambdaDatabase.UpdateLambda(lambda);
 
         // Prune containers
@@ -1407,4 +1408,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
