@@ -422,15 +422,6 @@ namespace AwsMock::Database {
         [[nodiscard]] long ResetMessages(const std::string &queueArn, long visibility) const;
 
         /**
-         * @brief Redrive expired resources.
-         *
-         * @param queueArn ARN of the queue
-         * @param redrivePolicy redrive policy
-         * @return number of message sendto DLQ
-         */
-        [[nodiscard]] long RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const;
-
-        /**
          * @brief Any message that has a DELAYED state is reset when the delay period is over.
          *
          * @param queueArn queue ARN.

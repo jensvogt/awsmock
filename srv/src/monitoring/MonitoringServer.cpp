@@ -5,9 +5,7 @@
 #include <awsmock/service/monitoring/MonitoringServer.h>
 
 namespace AwsMock::Service {
-
     MonitoringServer::MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("monitoring"), _scheduler(scheduler), _monitoringCollector(ioc) {
-
         const int systemPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.system-period");
         const int retentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.retention");
 
@@ -16,11 +14,16 @@ namespace AwsMock::Service {
         log_debug << "System collector started";
 
         _scheduler.AddTask("monitoring-docker-collector", [this] { _metricDockerCollector.CollectDockerCounter(); }, systemPeriod);
-        log_debug << "System collector started";
+        log_debug << "Docker collector started";
 
         // Start the database cleanup worker thread every day
         _scheduler.AddTask("monitoring-cleanup-database", [this] { DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
         log_debug << "Cleanup started";
+
+        // Load exclusions
+        for (const auto &e: Core::Configuration::instance().GetValueArray<std::string>("awsmock.monitoring.exclusions")) {
+            _exclusions.push_back(e);
+        }
 
         // Connect stop signal
         Core::EventBus::instance().sigShutdown.connect([this]() {
@@ -29,7 +32,9 @@ namespace AwsMock::Service {
 
         // Connect monitoring signal
         Core::EventBus::instance().sigMetricGauge.connect([this](const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {
-            this->_monitoringCollector.SetGauge(name, labelName, labelValue, value);
+            if (CheckExclusions(name, labelName, labelValue)) {
+                this->_monitoringCollector.SetGauge(name, labelName, labelValue, value);
+            }
         });
 
         log_debug << "Monitoring module initialized";
@@ -49,9 +54,15 @@ namespace AwsMock::Service {
         log_debug << "Monitoring server shutdown";
         _scheduler.Shutdown("monitoring-system-collector");
         _scheduler.Shutdown("monitoring-docker-collector");
-        _scheduler.Shutdown("monitoring-collector");
         _scheduler.Shutdown("monitoring-cleanup-database");
         log_info << "Monitoring server stopped";
     }
 
-}// namespace AwsMock::Service
+    bool MonitoringServer::CheckExclusions(const std::string &name, const std::string &labelName, const std::string &labelValue) const {
+        if (_exclusions.size() == 0) {
+            return true;
+        }
+        return std::ranges::find(_exclusions, name + "::" + labelName + "::" + labelValue) == _exclusions.end();
+    }
+
+} // namespace AwsMock::Service

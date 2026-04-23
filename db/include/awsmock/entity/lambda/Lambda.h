@@ -339,9 +339,9 @@ namespace AwsMock::Database::Entity::Lambda {
          * @par
          * The instance is identified by the containerId.
          *
-         * @param containerId ID of the instance container
+         * @param containerID ID of the instance container
          */
-        void RemoveInstanceByContainerId(const std::string &containerId);
+        void RemoveInstanceByContainerId(const std::string &containerID);
 
         /**
          * @brief Checks for any lambda instance with the state 'inactive'.

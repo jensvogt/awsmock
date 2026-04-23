@@ -38,9 +38,6 @@ namespace AwsMock::Monitoring {
          * @param name name of the underlying timer
          */
         explicit MonitoringTimer(std::string name) : _timerName(std::move(name)), _start(system_clock::now()) {
-            // for (const auto &e: Core::Configuration::instance().GetValueArray<std::string>("awsmock.monitoring.exclusions")) {
-            //     _exclusions.push_back(e);
-            // }
         }
 
         /**
@@ -54,9 +51,6 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the underlying timer
          */
         explicit MonitoringTimer(std::string name, std::string labelName, std::string labelValue) : _timerName(std::move(name)), _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {
-            // for (const auto &e: Core::Configuration::instance().GetValueArray<std::string>("awsmock.monitoring.exclusions")) {
-            //     _exclusions.push_back(e);
-            // }
         }
 
         /**
@@ -125,11 +119,6 @@ namespace AwsMock::Monitoring {
          * Timer start time point
          */
         system_clock::time_point _start;
-
-        /**
-         * Exclusion list
-         */
-        std::vector<std::string> _exclusions;
     };
 
 } // namespace AwsMock::Monitoring
