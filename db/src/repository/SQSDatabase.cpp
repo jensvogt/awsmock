@@ -983,49 +983,6 @@ namespace AwsMock::Database {
         return _memoryDb.ResetMessages(queueArn, visibility);
     }
 
-    long SQSDatabase::RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const {
-        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "relocate_messages");
-
-        if (HasDatabase()) {
-
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
-
-            try {
-                std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
-                std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(redrivePolicy.deadLetterTargetArn);
-
-                document filterQuery;
-                filterQuery.append(kvp("queueArn", queueArn));
-                filterQuery.append(kvp("retries", make_document(kvp("$gt", static_cast<bsoncxx::types::b_int64>(redrivePolicy.maxReceiveCount)))));
-
-                document setQuery;
-                setQuery.append(kvp("retries", 0));
-                setQuery.append(kvp("queueArn", redrivePolicy.deadLetterTargetArn));
-                setQuery.append(kvp("queueUrl", dlqQueueUrl));
-                setQuery.append(kvp("name", dlqQueueName));
-                setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
-
-                document updateQuery;
-                updateQuery.append(kvp("$set", setQuery));
-
-                session.start_transaction();
-                const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
-                session.commit_transaction();
-                log_trace << "Message re-drive, arn: " << redrivePolicy.deadLetterTargetArn << " updated: " << result->modified_count() << " queueArn: " << queueArn;
-
-                return result->modified_count();
-
-            } catch (mongocxx::exception &e) {
-                log_error << "Collection transaction exception: " << e.what();
-                session.abort_transaction();
-                throw Core::DatabaseException(e.what());
-            }
-        }
-        return _memoryDb.RelocateToDlqMessages(queueArn, redrivePolicy);
-    }
-
     long SQSDatabase::ResetDelayedMessages(const std::string &queueArn, const long delay) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "reset_delayed_messages");
 
@@ -1040,7 +997,7 @@ namespace AwsMock::Database {
                 const auto now = system_clock::now();
 
                 document filterQuery;
-                filterQuery.append(kvp("queueArn", queueArn));
+                filterQuery.append(kvp("arn", queueArn));
                 filterQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)));
                 filterQuery.append(kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(now)))));
 

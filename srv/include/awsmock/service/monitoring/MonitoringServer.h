@@ -25,8 +25,7 @@ namespace AwsMock::Service {
      */
     class MonitoringServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
@@ -43,44 +42,57 @@ namespace AwsMock::Service {
          */
         [[maybe_unused]] void DeleteMonitoringData() const;
 
-      private:
-
         /**
          * @brief Shutdown the server
          */
         void Shutdown() override;
 
+    private:
         /**
-         * Docker counter collector
+         * @brief Checks monitoring exclusions.
+         *
+         * @param name metric name
+         * @param labelName metric label name
+         * @param labelValue metric label value
+         * @return true if supplied values are not in exclusion list
          */
-        static void CollectDockerCounter();
+        bool CheckExclusions(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
         /**
-         * Asynchronous task scheduler
+         * @brief Asynchronous task scheduler
          */
         Core::Scheduler &_scheduler;
 
         /**
-         * Monitoring system collector
+         * @brief Monitoring system collector
          */
         Monitoring::MetricSystemCollector _metricSystemCollector;
 
         /**
-         * Monitoring docker collector
+         * @brief Monitoring docker collector
          */
         Monitoring::MetricDockerCollector _metricDockerCollector;
 
         /**
-         * Database connection
+         * @brief Database connection
          */
         Database::MonitoringDatabase &_monitoringDatabase = Database::MonitoringDatabase::instance();
 
         /**
-         * Database connection
+         * @brief Database connection
          */
         Monitoring::MonitoringCollector _monitoringCollector;
+
+        /**
+         * @brief Exclusion list
+         *
+         * @par
+         * The exclusion list is a vector of string in format name::labelName::labelValue.
+         */
+        std::vector<std::string> _exclusions;
+
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVER_H
