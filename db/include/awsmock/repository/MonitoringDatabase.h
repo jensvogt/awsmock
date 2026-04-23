@@ -25,8 +25,7 @@ namespace AwsMock::Database {
      */
     class MonitoringDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -68,9 +67,12 @@ namespace AwsMock::Database {
          * @param name monitoring feature name
          * @param labelName label name
          * @param limit total number of labels
+         * @param start start timestamp
+         * @param end end timestamp
          * @return list of label values
          */
-        [[nodiscard]] std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit = -1) const;
+        [[nodiscard]]
+        std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit, system_clock::time_point start, system_clock::time_point end) const;
 
         /**
          * @brief Deletes old monitoring data
@@ -80,8 +82,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -117,6 +118,6 @@ namespace AwsMock::Database {
             labelValue = std::move(keys[2]);
         }
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif//AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H

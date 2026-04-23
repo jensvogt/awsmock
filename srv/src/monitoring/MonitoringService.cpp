@@ -31,10 +31,10 @@ namespace AwsMock::Service {
             Dto::Monitoring::GetMultiCountersResponse response;
 
             // Get counters from the database
-            for (const std::vector<std::string> series = _database.GetDistinctLabelValues(request.name, request.labelName, request.limit); const auto &labelValue: series) {
-                response.counters[labelValue] = Dto::Monitoring::Mapper::map(_database.GetMonitoringValues(request.name, request.start, request.end, request.step, request.labelName, labelValue));
+            for (const std::vector<std::string> series = _database.GetDistinctLabelValues(request.name, request.labelName, request.limit, request.start, request.end); const auto &seria: series) {
+                response.counters[seria] = Dto::Monitoring::Mapper::map(_database.GetMonitoringValues(request.name, request.start, request.end, request.step, request.labelName, seria));
             }
-            log_debug << "Monitoring get counter, name: " << request.name << ", series: " << request.labelName <<", count: " << response.counters.size();
+            log_debug << "Monitoring get counter, name: " << request.name << ", series: " << request.labelName << ", count: " << response.counters.size();
             return response;
 
         } catch (std::exception &exc) {
@@ -42,4 +42,4 @@ namespace AwsMock::Service {
             throw Core::ServiceException(exc.what());
         }
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -14,6 +14,7 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/count.hpp>
 
 namespace AwsMock::Monitoring {
 
@@ -32,11 +33,26 @@ namespace AwsMock::Monitoring {
         // This is the "Push" entry point called by the signal
         void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {
             std::lock_guard lock(_monitoringMutex);
-            _collectorMap[GetId(name, labelName, labelValue)](value);
+            auto &[accumulator, isRate] = _collectorMap[GetId(name, labelName, labelValue)];
+            isRate = false;
+            accumulator(value);
+        }
+
+        void Increment(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+            std::lock_guard lock(_monitoringMutex);
+            auto &[accumulator, isRate] = _collectorMap[GetId(name, labelName, labelValue)];
+            isRate = true;
+            accumulator(1.0); // Increment by 1
         }
 
     private:
-        std::map<std::string, boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean> > > _collectorMap;
+        // Update the private map to include count and a type flag
+        struct MetricEntry {
+            boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean, boost::accumulators::tag::count> > accumulator;
+            bool isRate = false;
+        };
+
+        std::map<std::string, MetricEntry> _collectorMap;
         boost::asio::steady_timer timer_;
         std::mutex _monitoringMutex;
 
@@ -52,14 +68,26 @@ namespace AwsMock::Monitoring {
 
         void ProcessAndSend() {
             std::map<std::string, double> values;
-            for (auto &[fst, snd]: _collectorMap) {
+            {
                 std::lock_guard lock(_monitoringMutex);
-                if (boost::accumulators::count(snd) > 0) {
-                    values[fst] = boost::accumulators::mean(snd);
-                    snd = {};
+                for (auto &[id, entry]: _collectorMap) {
+                    if (const auto cnt = boost::accumulators::count(entry.accumulator); cnt > 0) {
+                        if (entry.isRate) {
+                            // Calculate Rate: Total increments / seconds in period
+                            values[id] = static_cast<double>(cnt) / _period;
+                        } else {
+                            // Calculate Average (Gauge)
+                            values[id] = boost::accumulators::mean(entry.accumulator);
+                        }
+                        // Reset the accumulator for the next cycle
+                        entry.accumulator = {};
+                    }
                 }
+            } // Mutex releases here
+
+            if (!values.empty()) {
+                Core::EventBus::instance().sigCollector(values);
             }
-            Core::EventBus::instance().sigCollector(values);
         }
 
         /**

@@ -36,6 +36,11 @@ namespace AwsMock::Service {
                 this->_monitoringCollector.SetGauge(name, labelName, labelValue, value);
             }
         });
+        Core::EventBus::instance().sigMetricRate.connect([this](const std::string &name, const std::string &labelName, const std::string &labelValue) {
+            if (CheckExclusions(name, labelName, labelValue)) {
+                this->_monitoringCollector.Increment(name, labelName, labelValue);
+            }
+        });
 
         log_debug << "Monitoring module initialized";
     }
@@ -59,7 +64,7 @@ namespace AwsMock::Service {
     }
 
     bool MonitoringServer::CheckExclusions(const std::string &name, const std::string &labelName, const std::string &labelValue) const {
-        if (_exclusions.size() == 0) {
+        if (_exclusions.empty()) {
             return true;
         }
         return std::ranges::find(_exclusions, name + "::" + labelName + "::" + labelValue) == _exclusions.end();

@@ -27,30 +27,29 @@ namespace AwsMock::Dto::Docker {
         /**
          * Maximal usage in bytes
          */
-        long maxUsage{};
+        long long maxUsage{};
 
         /**
          * Current usage in bytes
          */
-        long usage{};
+        long long usage{};
 
         /**
          * Limit in bytes
          */
-        long limit{};
+        long long limit{};
 
         /**
          * Stats
          */
         MemoryStats stats;
 
-      private:
-
+    private:
         friend MemoryStat tag_invoke(boost::json::value_to_tag<MemoryStat>, boost::json::value const &v) {
             MemoryStat r;
-            r.maxUsage = Core::Json::GetLongValue(v, "max_usage");
-            r.usage = Core::Json::GetLongValue(v, "usage");
-            r.limit = Core::Json::GetLongValue(v, "limit");
+            r.maxUsage = Core::Json::GetLongLongValue(v, "max_usage");
+            r.usage = Core::Json::GetLongLongValue(v, "usage");
+            r.limit = Core::Json::GetLongLongValue(v, "limit");
             if (Core::Json::AttributeExists(v, "stats")) {
                 r.stats = boost::json::value_to<MemoryStats>(v.at("stats"));
             }
@@ -59,14 +58,14 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MemoryStat const &obj) {
             jv = {
-                    {"max_usage", obj.maxUsage},
-                    {"usage", obj.usage},
-                    {"limit", obj.limit},
-                    {"stats", boost::json::value_from(obj.stats)},
+                {"max_usage", obj.maxUsage},
+                {"usage", obj.usage},
+                {"limit", obj.limit},
+                {"stats", boost::json::value_from(obj.stats)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+} // namespace AwsMock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_CONTAINER_H

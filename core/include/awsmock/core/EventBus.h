@@ -52,6 +52,11 @@ namespace AwsMock::Core {
         /**
          * @brief Signal monitoring system
          */
+        boost::signals2::signal<void(std::string, std::string, std::string)> sigMetricRate;
+
+        /**
+         * @brief Signal monitoring system
+         */
         boost::signals2::signal<void(std::map<std::string, double>)> sigCollector;
     };
 
