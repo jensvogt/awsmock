@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.49](https://github.com/jensvogt/awsmock/compare/v1.16.48...v1.16.49) (2026-04-23)
+
+
+### Bug Fixes
+
+* monitoring exclusion list ([f0251c2](https://github.com/jensvogt/awsmock/commit/f0251c2ace6f1d1e0f59edfcdc0252c5bf2fe3e6))
+
 ## [1.16.48](https://github.com/jensvogt/awsmock/compare/v1.16.47...v1.16.48) (2026-04-22)
 
 
