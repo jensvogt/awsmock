@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.50](https://github.com/jensvogt/awsmock/compare/v1.16.49...v1.16.50) (2026-04-23)
+
+
+### Bug Fixes
+
+* monitoring graphs zoom, limit, scale ([97aef10](https://github.com/jensvogt/awsmock/commit/97aef10a3900a0e6845ce52eade9334f5abcd986))
+
 ## [1.16.49](https://github.com/jensvogt/awsmock/compare/v1.16.48...v1.16.49) (2026-04-23)
 
 
