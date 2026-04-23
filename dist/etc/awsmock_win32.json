@@ -259,7 +259,11 @@
       "retention": 3,
       "smooth": false,
       "system-period": 60,
-      "average-period": 300
+      "average-period": 300,
+      "exclusions": [
+        "sqs_service_timer::action::receive_messages",
+        "gateway_http_timer::method::POST"
+      ]
     },
     "mongodb": {
       "active": true,

@@ -15,7 +15,7 @@ namespace AwsMock::Database {
         });
     }
 
-    std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit) const {
+    std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit, const system_clock::time_point start, const system_clock::time_point end) const {
         log_trace << "Get distinct label values, labelName: " << labelName;
 
         if (HasDatabase()) {
@@ -31,7 +31,8 @@ namespace AwsMock::Database {
 
                 if (limit > 0) {
                     mongocxx::pipeline p{};
-                    p.match(make_document(kvp("name", name), kvp("labelName", labelName)));
+                    p.match(make_document(kvp("name", name), kvp("labelName", labelName),
+                                          kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end))))));
                     p.group(make_document(kvp("_id", "$labelValue"), kvp("totalSize", make_document(kvp("$sum", "$value")))));
                     p.sort(make_document(kvp("totalSize", -1)));
                     p.limit(static_cast<std::int32_t>(limit));
@@ -67,19 +68,9 @@ namespace AwsMock::Database {
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
 
             try {
-                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
-#ifdef __APPLE__
-                const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
-                auto startUtc = bsoncxx::types::b_date(system_clock::time_point(startTime.time_since_epoch()));
-                const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::microseconds>(end);
-                auto endUtc = bsoncxx::types::b_date(system_clock::time_point(endTime.time_since_epoch()));
-#else
-                auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
-                auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));
-#endif
                 document document;
                 document.append(kvp("name", name));
-                document.append(kvp("created", make_document(kvp("$gte", startUtc))), kvp("created", make_document(kvp("$lte", endUtc))));
+                document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end)))));
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
                 }
@@ -93,16 +84,23 @@ namespace AwsMock::Database {
                     Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
                     result.emplace_back(Entity::Monitoring::Counter::FromDocument(it));
                 }
-                log_debug << "Counters, name: " << name << ", count: " << result.size() << ", start:" << startUtc << ", end: " << endUtc;
+                log_debug << "Counters, name: " << name << ", count: " << result.size() << ", start:" << start << ", end: " << end;
                 return result;
 
-            } catch (const mongocxx::exception &exc) {
+            } catch
+            (const mongocxx::exception &
+                exc
+            ) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         }
-        log_trace << "Performance counter not available if you running the memory DB";
-        return {};
+
+        log_trace
+    <<
+    "Performance counter not available if you running the memory DB";
+        return
+                {};
     }
 
     void MonitoringDatabase::UpdateMonitoringCounters(const std::map<std::string, double> &values) const {

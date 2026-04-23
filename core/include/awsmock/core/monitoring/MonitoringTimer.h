@@ -75,7 +75,7 @@ namespace AwsMock::Monitoring {
          * Stop the timer and reports the execution to the metric service.
          */
         ~MonitoringTimer() {
-            Core::EventBus::instance().sigMetricGauge(_counterName, _labelName, _labelValue, 1.0);
+            Core::EventBus::instance().sigMetricRate(_counterName, _labelName, _labelValue);
             Core::EventBus::instance().sigMetricGauge(_timerName, _labelName, _labelValue, static_cast<double>(TIME_DIFF));
         }
 
