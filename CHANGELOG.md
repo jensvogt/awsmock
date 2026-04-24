@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.51](https://github.com/jensvogt/awsmock/compare/v1.16.50...v1.16.51) (2026-04-24)
+
+
+### Bug Fixes
+
+* message attribute serialization ([d625002](https://github.com/jensvogt/awsmock/commit/d625002ce09efa857a1a02aa89b69e9abd695153))
+* message attribute serialization ([c80bb0d](https://github.com/jensvogt/awsmock/commit/c80bb0dc5d4ae32bb9f304cac81dc8e1befd95d0))
+
 ## [1.16.50](https://github.com/jensvogt/awsmock/compare/v1.16.49...v1.16.50) (2026-04-23)
 
 
