@@ -42,44 +42,6 @@ namespace AwsMock::Dto::SNS {
          * Logical data type
          */
         MessageAttributeDataType dataType = STRING;
-        //
-        // /**
-        //  * @brief Convert from a BSON string
-        //  *
-        //  * @param jsonObject BSON attribute object
-        //  */
-        // void FromDocument(const view_or_value<view, value> &jsonObject) {
-        //
-        //     try {
-        //         stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
-        //         if (!stringValue.empty()) {
-        //             dataType = STRING;
-        //         }
-        //         dataType = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
-        //     } catch (bsoncxx::exception &e) {
-        //         log_error << e.what();
-        //         throw Core::JsonException(e.what());
-        //     }
-        // }
-        //
-        // /**
-        //  * @brief Convert from a BSON object
-        //  *
-        //  * @return BSON object
-        //  */
-        // [[nodiscard]] view_or_value<view, value> ToDocument() const {
-        //
-        //     try {
-        //         document rootDocument;
-        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "StringValue", stringValue);
-        //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "DataType", MessageAttributeDataTypeToString(dataType));
-        //         return rootDocument.extract();
-        //
-        //     } catch (bsoncxx::exception &e) {
-        //         log_error << e.what();
-        //         throw Core::JsonException(e.what());
-        //     }
-        // }
 
     private:
         friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
@@ -99,13 +61,36 @@ namespace AwsMock::Dto::SNS {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
-            jv = {
-                {"StringValue", obj.stringValue},
-                {"StringListValues", boost::json::value_from(obj.stringValue)},
-                {"BinaryValue", boost::json::value_from(obj.binaryValue)},
-                {"BinaryListValues", boost::json::value_from(obj.binaryValue)},
-                {"DataType", MessageAttributeDataTypeToString(obj.dataType)},
-            };
+            boost::json::object o;
+
+            // -------------------------------------------------
+            // DataType (always required)
+            // -------------------------------------------------
+            o["DataType"] = MessageAttributeDataTypeToString(obj.dataType);
+
+            // -------------------------------------------------
+            // String type
+            // -------------------------------------------------
+            if (obj.dataType == STRING) {
+                if (!obj.stringValue.empty())
+                    o["StringValue"] = obj.stringValue;
+
+                if (!obj.stringListValues.empty())
+                    o["StringListValues"] = boost::json::value_from(obj.stringListValues);
+            }
+
+            // -------------------------------------------------
+            // Binary type
+            // -------------------------------------------------
+            if (obj.dataType == BINARY) {
+                if (!obj.binaryValue.empty())
+                    o["BinaryValue"] = boost::json::value_from(obj.binaryValue);
+
+                if (!obj.binaryListValues.empty())
+                    o["BinaryListValues"] = boost::json::value_from(obj.binaryListValues);
+            }
+
+            jv = std::move(o);
         }
     };
 
