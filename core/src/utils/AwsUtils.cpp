@@ -19,6 +19,10 @@ namespace AwsMock::Core {
     }
 
     std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &input) {
+        if (input.empty()) {
+            log_error << "Empty input, input: '" << input << "'";
+            return {};
+        }
         if (IsUrl(input)) {
             return input;
         }
@@ -84,6 +88,7 @@ namespace AwsMock::Core {
     std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
         return CreateArn("sqs", region, accountId, queueName);
     }
+
     //
     // std::string AwsUtils::CreateSQSQueueUrl(const std::string &region, const std::string &accountId, const std::string &queueName) {
     //     const std::string hostName = SystemUtils::GetHostName();
@@ -230,15 +235,16 @@ namespace AwsMock::Core {
         const std::string scope = dateString + "/" + region + "/" + module + "/" + requestVersion;
 
         const AuthorizationHeaderKeys authorizationHeaderKeys = {
-                .signingVersion = "AWS4-HMAC-SHA256",
-                .secretAccessKey = secretAccessKey,
-                .dateTime = dateString,
-                .isoDateTime = GetISODateString(),
-                .scope = scope,
-                .region = region,
-                .module = module,
-                .requestVersion = requestVersion,
-                .signedHeaders = signedHeaders};
+            .signingVersion = "AWS4-HMAC-SHA256",
+            .secretAccessKey = secretAccessKey,
+            .dateTime = dateString,
+            .isoDateTime = GetISODateString(),
+            .scope = scope,
+            .region = region,
+            .module = module,
+            .requestVersion = requestVersion,
+            .signedHeaders = signedHeaders
+        };
         const std::string canonicalRequest = GetCanonicalRequest(request, authorizationHeaderKeys);
         const std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
         const std::string signature = GetSignature(authorizationHeaderKeys, stringToSign);
@@ -247,7 +253,8 @@ namespace AwsMock::Core {
         request.set(http::field::authorization, authorization);
     }
 
-    void AwsUtils::AddAuthorizationHeader(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
+    void AwsUtils::AddAuthorizationHeader(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &module, const std::string &contentType, const std::string &signedHeaders,
+                                          const std::string &payload) {
         // TODO: check again
         const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
         const std::string accessKeyId = Configuration::instance().GetValue<std::string>("awsmock.access.key-id");
@@ -269,15 +276,16 @@ namespace AwsMock::Core {
         const std::string scope = dateString + "/" + region + "/" + module + "/" + requestVersion;
 
         const AuthorizationHeaderKeys authorizationHeaderKeys = {
-                .signingVersion = "AWS4-HMAC-SHA256",
-                .secretAccessKey = secretAccessKey,
-                .dateTime = dateString,
-                .isoDateTime = GetISODateString(),
-                .scope = scope,
-                .region = region,
-                .module = module,
-                .requestVersion = requestVersion,
-                .signedHeaders = signedHeaders};
+            .signingVersion = "AWS4-HMAC-SHA256",
+            .secretAccessKey = secretAccessKey,
+            .dateTime = dateString,
+            .isoDateTime = GetISODateString(),
+            .scope = scope,
+            .region = region,
+            .module = module,
+            .requestVersion = requestVersion,
+            .signedHeaders = signedHeaders
+        };
         const std::string canonicalRequest = GetCanonicalRequest(method, path, headers, payload, authorizationHeaderKeys);
         const std::string stringToSign = GetStringToSign(canonicalRequest, authorizationHeaderKeys);
         const std::string signature = GetSignature(authorizationHeaderKeys, stringToSign);
@@ -300,7 +308,7 @@ namespace AwsMock::Core {
         return true;
     }
 
-    bool AwsUtils::VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
+    bool AwsUtils::VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &secretAccessKey) {
 
         const AuthorizationHeaderKeys authorizationHeaderKeys = GetAuthorizationKeys(request, secretAccessKey);
 
@@ -325,7 +333,7 @@ namespace AwsMock::Core {
         return canonicalRequest.str();
     }
 
-    std::string AwsUtils::GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+    std::string AwsUtils::GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalRequest;
         canonicalRequest << request.method() << '\n';
         canonicalRequest << StringUtils::UrlEncode(request.target()) << '\n';
@@ -385,7 +393,7 @@ namespace AwsMock::Core {
         return canonicalHeaders.str();
     }
 
-    std::string AwsUtils::GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+    std::string AwsUtils::GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalHeaders;
 
         // Get header
@@ -442,7 +450,7 @@ namespace AwsMock::Core {
         return {};
     }
 
-    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
+    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &secretAccessKey) {
         const std::string authorizationHeader = request["Authorization"];
 
         // Get signing version
@@ -513,4 +521,4 @@ namespace AwsMock::Core {
         static const std::regex urlPattern(R"(^https?:\/\/.*$)", std::regex::optimize);
         return std::regex_match(value, urlPattern);
     }
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
