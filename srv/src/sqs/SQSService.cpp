@@ -930,7 +930,7 @@ namespace AwsMock::Service {
         // Queue URL contains the host name and is therefore not reliable
         const std::string queueArn = Core::AwsUtils::ConvertToArn(request.region, request.queueUrl);
 
-        if (queueArn.empty() && !_sqsDatabase.QueueArnExists(queueArn)) {
+        if (!queueArn.empty() && !_sqsDatabase.QueueArnExists(queueArn)) {
             log_error << "Queue does not exist, queueArn: " << queueArn;
             throw Core::ServiceException("Queue does not exist, queueArn: " + queueArn);
         }
