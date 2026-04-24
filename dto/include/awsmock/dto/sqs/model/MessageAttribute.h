@@ -56,13 +56,36 @@ namespace AwsMock::Dto::SQS {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
-            jv = {
-                {"StringValue", obj.stringValue},
-                {"StringListValues", boost::json::value_from(obj.stringListValues)},
-                {"BinaryValue", boost::json::value_from(obj.binaryListValues)},
-                {"BinaryListValues", boost::json::value_from(obj.binaryListValues)},
-                {"DataType", MessageAttributeDataTypeToString(obj.dataType)},
-            };
+            boost::json::object o;
+
+            // -------------------------------------------------
+            // DataType (always required)
+            // -------------------------------------------------
+            o["DataType"] = MessageAttributeDataTypeToString(obj.dataType);
+
+            // -------------------------------------------------
+            // String type
+            // -------------------------------------------------
+            if (obj.dataType == STRING) {
+                if (!obj.stringValue.empty())
+                    o["StringValue"] = obj.stringValue;
+
+                if (!obj.stringListValues.empty())
+                    o["StringListValues"] = boost::json::value_from(obj.stringListValues);
+            }
+
+            // -------------------------------------------------
+            // Binary type
+            // -------------------------------------------------
+            if (obj.dataType == BINARY) {
+                if (!obj.binaryValue.empty())
+                    o["BinaryValue"] = boost::json::value_from(obj.binaryValue);
+
+                if (!obj.binaryListValues.empty())
+                    o["BinaryListValues"] = boost::json::value_from(obj.binaryListValues);
+            }
+
+            jv = std::move(o);
         }
     };
 
