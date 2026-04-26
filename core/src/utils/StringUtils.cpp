@@ -353,37 +353,4 @@ namespace AwsMock::Core {
     }
 #endif
 
-    void StringUtils::ReplaceTagInFile(const std::string &filePath, const std::string &tag, const std::string &replacement) {
-        std::ifstream inFile(filePath);
-        if (!inFile) {
-            log_error << "Could not open source file!";
-            return;
-        }
-
-        std::string tempPath = filePath + ".tmp";
-        std::ofstream outFile(tempPath);
-        if (!outFile) {
-            log_error << "Could not create temporary file!";
-            return;
-        }
-
-        std::string line;
-        while (std::getline(inFile, line)) {
-            size_t pos = 0;
-            // Search and replace all occurrences of the tag in the current line
-            while ((pos = line.find(tag, pos)) != std::string::npos) {
-                line.replace(pos, tag.length(), replacement);
-                pos += replacement.length(); // Move past the replaced part
-            }
-            outFile << line << "\n";
-        }
-
-        inFile.close();
-        outFile.close();
-
-        // Swap the temporary file with the original
-        std::filesystem::remove(filePath);
-        std::filesystem::rename(tempPath, filePath);
-    }
-
 } // namespace AwsMock::Core
