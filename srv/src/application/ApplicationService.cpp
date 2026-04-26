@@ -154,6 +154,8 @@ namespace AwsMock::Service {
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
         application.version = request.version;
         application.archive = request.archive;
+        application.created = system_clock::now();
+        application.modified = system_clock::now();
         application = _database.UpdateApplication(application);
 
         // Delete container and image

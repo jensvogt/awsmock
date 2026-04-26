@@ -124,6 +124,11 @@ namespace AwsMock::Database::Entity::Apps {
         std::string imageMd5;
 
         /**
+         * Docker file
+         */
+        std::string dockerFile;
+
+        /**
          * Last start time
          */
         system_clock::time_point lastStarted;
@@ -153,6 +158,6 @@ namespace AwsMock::Database::Entity::Apps {
         void FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::Apps
+} // namespace AwsMock::Database::Entity::Apps
 
 #endif// AWSMOCK_DB_ENTITY_APPS_APPLICATION_H
