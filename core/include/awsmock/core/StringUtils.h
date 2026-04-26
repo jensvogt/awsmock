@@ -443,15 +443,6 @@ namespace AwsMock::Core {
          */
         static std::string ConvertToNarrowString(const std::wstring &input);
 
-        /**
-         * @brief Replace a tag by a string in a file.
-         *
-         * @param filePath input file path
-         * @param tag tag value
-         * @param replacement replacement string
-         */
-        static void ReplaceTagInFile(const std::string &filePath, const std::string &tag, const std::string &replacement);
-
 #endif
     };
 
