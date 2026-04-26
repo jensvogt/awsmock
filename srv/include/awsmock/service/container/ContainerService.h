@@ -47,6 +47,8 @@
 #include <awsmock/dto/container/VersionResponse.h>
 #include <awsmock/dto/container/model/ContainerStat.h>
 
+#include "awsmock/entity/apps/Application.h"
+
 #ifdef _WIN32
 #include <awsmock/core/WindowsSocket.h>
 #endif
@@ -158,17 +160,11 @@ namespace AwsMock::Service {
          * @brief Build a docker image for an application
          *
          * @param codeDir code directory
-         * @param name application name
-         * @param tag application version
-         * @param runtime application runtime
-         * @param archive application archive
-         * @param privatePort docker container private port
-         * @param environment runtime environment
+         * @param applicationEntity application entity
          * @return file size in bytes
          */
         [[nodiscard]]
-        std::string BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, long privatePort,
-                                          const std::map<std::string, std::string> &environment) const;
+        std::string BuildApplicationImage(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity) const;
 
         /**
          * @brief Delete an image by name/tags.
@@ -498,14 +494,11 @@ namespace AwsMock::Service {
          * on the corretto Java distros.
          *
          * @param codeDir code directory
-         * @param mainFile file containing the main method
-         * @param archive application archive
-         * @param privatePort docker container internal port
-         * @param runtime docker image runtime
-         * @param environment runtime environment
+         * @param applicationEntity
+         * @param applicationEntity
          * @return return docker file path
          */
-        static std::string WriteApplicationDockerFile(const std::string &codeDir, const std::string &mainFile, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment);
+        static std::string WriteApplicationDockerFile(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity);
 
         /**
          * @brief Write the compressed docker image file.
@@ -538,10 +531,9 @@ namespace AwsMock::Service {
         /**
          * @brief Add environment variables to the Dockerfile
          *
-         * @param ofs output stream
          * @param environment environment variables
          */
-        static void AddEnvironment(std::ofstream &ofs, const std::map<std::string, std::string> &environment);
+        static std::string AddEnvironment(const std::map<std::string, std::string> &environment);
 
         /**
          * @brief Guarded domain socket helper

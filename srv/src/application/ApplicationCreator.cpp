@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         }
 
         // Build the docker image using the docker module
-        const std::string imageFile = ContainerService::instance().BuildApplicationImage(codeDir, applicationEntity.name, dockerTag, applicationEntity.runtime, applicationEntity.archive, applicationEntity.privatePort, applicationEntity.environment);
+        const std::string imageFile = ContainerService::instance().BuildApplicationImage(codeDir, applicationEntity);
 
         // Get the image struct
         const Dto::Docker::Image image = ContainerService::instance().GetImageByName(applicationEntity.name, dockerTag);
@@ -175,8 +175,8 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
