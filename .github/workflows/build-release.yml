@@ -50,7 +50,7 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
-      X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
+    #      X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
