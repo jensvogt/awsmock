@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.54](https://github.com/jensvogt/awsmock/compare/v1.16.53...v1.16.54) (2026-04-26)
+
+
+### Bug Fixes
+
+* application startup ([80368d6](https://github.com/jensvogt/awsmock/commit/80368d6af771e299cedbcf4cfbd556070098e78d))
+
 ## [1.16.53](https://github.com/jensvogt/awsmock/compare/v1.16.52...v1.16.53) (2026-04-26)
 
 
