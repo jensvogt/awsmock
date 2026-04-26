@@ -18,7 +18,7 @@ RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
 
 # libssh workaround
-ENV X_VCPKG_ASSET_SOURCES="clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
+#ENV X_VCPKG_ASSET_SOURCES="clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
 
 # Create build environment
 RUN mkdir -p /usr/src
