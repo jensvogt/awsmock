@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.16.53](https://github.com/jensvogt/awsmock/compare/v1.16.52...v1.16.53) (2026-04-26)
+
+
+### Bug Fixes
+
+* docker file for applications ([a729e48](https://github.com/jensvogt/awsmock/commit/a729e4845494af87084e5b2878d169877b75199c))
+* docker file for applications ([3542743](https://github.com/jensvogt/awsmock/commit/3542743a3db1c0f4a2065b0d78c0acedcf0f1930))
+
 ## [1.16.52](https://github.com/jensvogt/awsmock/compare/v1.16.51...v1.16.52) (2026-04-24)
 
 
