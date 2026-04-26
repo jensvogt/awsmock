@@ -25,6 +25,7 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("imageSize", bsoncxx::types::b_int64(imageSize)));
         applicationDocument.append(kvp("imageMd5", imageMd5));
         applicationDocument.append(kvp("imageName", imageName));
+        applicationDocument.append(kvp("dockerFile", dockerFile));
         applicationDocument.append(kvp("description", description));
         applicationDocument.append(kvp("lastStarted", bsoncxx::types::b_date(lastStarted)));
         applicationDocument.append(kvp("created", bsoncxx::types::b_date(created)));
@@ -79,6 +80,7 @@ namespace AwsMock::Database::Entity::Apps {
         imageSize = Core::Bson::BsonUtils::GetLongValue(mResult, "imageSize");
         imageMd5 = Core::Bson::BsonUtils::GetStringValue(mResult, "imageMd5");
         imageName = Core::Bson::BsonUtils::GetStringValue(mResult, "imageName");
+        dockerFile = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerFile");
         description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
         lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStarted");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
@@ -113,4 +115,4 @@ namespace AwsMock::Database::Entity::Apps {
         }
     }
 
-}// namespace AwsMock::Database::Entity::Apps
+} // namespace AwsMock::Database::Entity::Apps

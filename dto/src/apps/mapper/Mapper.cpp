@@ -21,6 +21,7 @@ namespace AwsMock::Dto::Apps {
         applicationDto.containerName = applicationEntity.containerName;
         applicationDto.status = AppsStatusTypeFromString(applicationEntity.status);
         applicationDto.enabled = applicationEntity.enabled;
+        applicationDto.dockerFile = applicationEntity.dockerFile;
         applicationDto.description = applicationEntity.description;
         applicationDto.lastStarted = applicationEntity.lastStarted;
         applicationDto.created = applicationEntity.created;
@@ -54,6 +55,7 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.containerName = applicationDto.containerName;
         applicationEntity.status = AppsStatusTypeToString(applicationDto.status);
         applicationEntity.enabled = applicationDto.enabled;
+        applicationEntity.dockerFile = applicationDto.dockerFile;
         applicationEntity.description = applicationDto.description;
         applicationEntity.lastStarted = applicationDto.lastStarted;
         applicationEntity.created = applicationDto.created;
