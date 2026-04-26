@@ -4,6 +4,8 @@
 
 #include <awsmock/service/container/ContainerService.h>
 
+#include "awsmock/entity/common/BaseEntity.h"
+
 namespace AwsMock::Service {
 
     thread_local std::shared_ptr<Core::DomainSocket> ContainerService::_domainSocket;
@@ -88,18 +90,17 @@ namespace AwsMock::Service {
         return imageFile;
     }
 
-    std::string ContainerService::BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, const long privatePort,
-                                                        const std::map<std::string, std::string> &environment) const {
-        log_debug << "Build image request, name: " << name << ", tags: " << tag;
+    std::string ContainerService::BuildApplicationImage(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity) const {
+        log_debug << "Build image request, name: " << applicationEntity << ", tags: " << applicationEntity.version;
 
         // Write the docker file
-        std::string dockerFile = WriteApplicationDockerFile(codeDir, name, archive, privatePort, runtime, environment);
-        const std::string imageFile = BuildImageFile(codeDir, name);
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
-            log_error << "Build image failed, image: " << name << ":" << tag << ", statusCode: " << statusCode << ", body: " << body;
+        std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
+        const std::string imageFile = BuildImageFile(codeDir, applicationEntity.name);
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {}); statusCode != http::status::ok) {
+            log_error << "Build image failed, image: " << applicationEntity.name << ":" << applicationEntity.version << ", statusCode: " << statusCode << ", body: " << body;
             return dockerFile;
         }
-        log_info << "Build image successful, name: " << name << ":" << tag;
+        log_info << "Build image successful, name: " << applicationEntity.name << ":" << applicationEntity.version;
         return dockerFile;
     }
 
@@ -636,7 +637,7 @@ namespace AwsMock::Service {
         std::ofstream ofs(dockerFilename);
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
+            AddEnvironment(environment);
             ofs << "RUN mkdir -p /root/.aws" << std::endl;
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;
@@ -644,11 +645,11 @@ namespace AwsMock::Service {
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "postgres")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
+            AddEnvironment(environment);
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
+            AddEnvironment(environment);
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
@@ -662,7 +663,7 @@ namespace AwsMock::Service {
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
+            AddEnvironment(environment);
             ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}/" << std::endl;
             ofs << "RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt" << std::endl;
             ofs << "RUN mkdir -p /root/.aws" << std::endl;
@@ -673,20 +674,20 @@ namespace AwsMock::Service {
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
             std::string handlerFile = GetHandlerFileNodeJs22(handler);
             ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
+            AddEnvironment(environment);
             ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/dist" << std::endl;
             ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
             ofs << "COPY " << handlerFile << " ${LAMBDA_TASK_ROOT}/dist" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
+            AddEnvironment(environment);
             ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
             ofs << "COPY index.js ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
+            AddEnvironment(environment);
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
@@ -697,86 +698,19 @@ namespace AwsMock::Service {
         return dockerFilename;
     }
 
-    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const std::string &mainFile, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment) {
+    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity) {
+
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
-        std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
-        Core::StringUtils::Replace(providedRuntime, ".", "-");
-        auto supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.runtime." + providedRuntime);
-        auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        log_debug << "Using supported runtime, runtime: " << supportedRuntime;
-
         std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
-        std::ofstream awsOfs(awsConfig);
-        awsOfs << "[default]" << std::endl;
-        awsOfs << "region=" << region << std::endl;
-        awsOfs << "output=json" << std::endl;
-        awsOfs.close();
 
-        std::string awsCredentials = codeDir + Core::FileUtils::separator() + "credentials";
-        std::ofstream awsCredOfs(awsCredentials);
-        awsCredOfs << "[default]" << std::endl;
-        awsCredOfs << "region=" << region << std::endl;
-        awsCredOfs << "aws_access_key_id=none" << std::endl;
-        awsCredOfs << "aws_secret_access_key=none" << std::endl;
-        awsCredOfs << "aws_session_token=none" << std::endl;
-        awsCredOfs << "retry_mode=standard" << std::endl;
-        awsCredOfs << "max_attempts=1" << std::endl;
-        awsCredOfs.close();
+        // Replace variables
+        std::string dockerFileContent = applicationEntity.dockerFile;;
+        Core::StringUtils::Replace(dockerFileContent, "$$ENV$$", AddEnvironment(applicationEntity.environment));
+        Core::StringUtils::Replace(dockerFileContent, "$$PORT$$", std::to_string(applicationEntity.publicPort) + ":" + std::to_string(applicationEntity.privatePort));
+        Core::StringUtils::Replace(dockerFileContent, "$$ARCHIVE$$", applicationEntity.archive);
 
         std::ofstream ofs(dockerFilename);
-        if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
-            ofs << "WORKDIR /app" << std::endl;
-            ofs << "COPY " << archive << " app.jar" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws/" << std::endl;
-            ofs << "COPY credentials /root/.aws/" << std::endl;
-            ofs << "EXPOSE " << privatePort << std::endl;
-            ofs << R"(ENTRYPOINT ["java", "-jar", "app.jar"])" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
-            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
-            ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
-            ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
-            ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
-            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/lib" << std::endl;
-            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/bin" << std::endl;
-            //ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "RUN mkdir -p /root/app" << std::endl;
-            ofs << "COPY config /root/.aws/" << std::endl;
-            ofs << "COPY credentials /root/.aws/" << std::endl;
-            ofs << "COPY *.py /root/app/" << std::endl;
-            ofs << "COPY requirements.txt /root/app" << std::endl;
-            ofs << "WORKDIR /root/app/" << std::endl;
-            ofs << "RUN pip install -r requirements.txt" << std::endl;
-            ofs << R"(CMD ["python", "-u", ")" + mainFile + ".py\"]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/dist" << std::endl;
-            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
-            //ofs << "CMD [\"" + handler + "\"]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
-            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
-            ofs << "COPY index.js ${LAMBDA_TASK_ROOT}" << std::endl;
-            //ofs << "CMD [\"" + handler + "\"]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(ofs, environment);
-            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
-            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
-            //ofs << "CMD [\"" + handler + "\"]" << std::endl;
-        }
+        ofs << dockerFileContent << std::endl;
         ofs.close();
         log_debug << "Dockerfile written, filename: " << dockerFilename;
 
@@ -808,13 +742,15 @@ namespace AwsMock::Service {
         return prefix + ".mjs";
     }
 
-    void ContainerService::AddEnvironment(std::ofstream &ofs, const std::map<std::string, std::string> &environment) {
+    std::string ContainerService::AddEnvironment(const std::map<std::string, std::string> &environment) {
+        std::stringstream ss;
         for (const auto &[fst, snd]: environment) {
-            ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
+            ss << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
         }
-        ofs << "ENV " << "AWS_REGION=\"eu-central-1\"" << std::endl;
-        ofs << "ENV " << "AWS_ACCESS_KEY_ID=\"none\"" << std::endl;
-        ofs << "ENV " << "AWS_SECRET_ACCESS_KEY=\"none\"" << std::endl;
-        ofs << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
+        ss << "ENV " << "AWS_REGION=\"eu-central-1\"" << std::endl;
+        ss << "ENV " << "AWS_ACCESS_KEY_ID=\"none\"" << std::endl;
+        ss << "ENV " << "AWS_SECRET_ACCESS_KEY=\"none\"" << std::endl;
+        ss << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
+        return ss.str();
     }
 } // namespace AwsMock::Service

@@ -42,8 +42,7 @@ namespace AwsMock::Core {
      */
     class StringUtils {
 
-      public:
-
+    public:
         /**
          * @brief Generates a random string with the given length.
          *
@@ -164,7 +163,7 @@ namespace AwsMock::Core {
          * @param s string to split
          * @return string having all line endings removed
          */
-        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> s);
+        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char> > s);
 
         /**
          * @brief Strip beginning of string
@@ -443,6 +442,16 @@ namespace AwsMock::Core {
          * @retur wide string
          */
         static std::string ConvertToNarrowString(const std::wstring &input);
+
+        /**
+         * @brief Replace a tag by a string in a file.
+         *
+         * @param filePath input file path
+         * @param tag tag value
+         * @param replacement replacement string
+         */
+        static void ReplaceTagInFile(const std::string &filePath, const std::string &tag, const std::string &replacement);
+
 #endif
     };
 
@@ -454,6 +463,6 @@ namespace AwsMock::Core {
         return boost::algorithm::to_upper_copy(input);
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #endif// AWSMOCK_CORE_STRING_UTILS_H
