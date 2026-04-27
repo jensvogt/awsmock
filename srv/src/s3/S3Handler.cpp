@@ -686,6 +686,12 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, s3Response.ToJson());
                 }
 
+                case Dto::Common::S3CommandType::RELOAD_ALL_COUNTERS: {
+                    log_info << "Reload all counters request";
+                    _s3Service.ReloadAllCounters();
+                    return SendResponse(request, http::status::no_content);
+                }
+
                 case Dto::Common::S3CommandType::DELETE_ALL_OBJECTS: {
                     // Build request
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);

@@ -95,13 +95,12 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {
-                                                           };
+        };
 
         /**
          * @brief Checks whether a bucket exists
@@ -391,6 +390,11 @@ namespace AwsMock::Service {
         void PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) const;
 
         /**
+         * @brief reload all objects counters from database.
+         */
+        void ReloadAllCounters() const;
+
+        /**
          * @brief Returns a list object versions
          *
          * @param request list object versions request
@@ -407,8 +411,7 @@ namespace AwsMock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
@@ -592,6 +595,6 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context _ioc;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H
