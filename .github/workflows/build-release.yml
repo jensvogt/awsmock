@@ -260,7 +260,7 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-deb"
       BUILD_DIR: "${{ github.workspace }}/build-deb"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+      #VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
       #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout

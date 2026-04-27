@@ -1083,38 +1083,33 @@ namespace AwsMock::Database {
                                        kvp("keys", 1));
                 p.project(projectDocument.extract());
 
-                session.start_transaction();
-
-                // Initialize all topics with zero message counts
-                bucketCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                       kvp("size", bsoncxx::types::b_int64()),
-                                                                       kvp("keys", bsoncxx::types::b_int64())))));
-
+                std::set<std::string> bucketsWithObjects;
                 auto bulk = bucketCollection.create_bulk_write();
                 for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
+                    bucketsWithObjects.insert(Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"));
                     bulk.append(mongocxx::model::update_one(
                         make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
                         make_document(kvp("$set", make_document(
                                               kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
                                               kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys"))))))));
-                    log_debug << "Bucket: " << Core::Bson::BsonUtils::GetStringValue(t, "bucketArn")
-                              << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
-                              << ", keys: " << Core::Bson::BsonUtils::GetLongValue(t, "keys");
                 }
-
-                // Bulk updates
-                if (!bulk.empty()) {
-                    try {
-                        auto result = bulk.execute();
-                        log_debug << "Bulk write result: " << result->modified_count();
-                    } catch (const mongocxx::exception &exc) {
-                        log_error << "Bulk write failed: " << exc.what();
-                        throw Core::DatabaseException(exc.what());
+                for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
+                    if (const auto bucketArn = Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"); !bucketsWithObjects.contains(bucketArn)) {
+                        bulk.append(mongocxx::model::update_one(
+                            make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
+                            make_document(kvp("$set", make_document(
+                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                  kvp("keys", bsoncxx::types::b_int64()))))));
                     }
                 }
-                session.commit_transaction();
-                return;
-
+                // Bulk updates
+                if (!bulk.empty()) {
+                    session.start_transaction();
+                    auto result = bulk.execute();
+                    log_debug << "Bulk write result: " << result->modified_count();
+                    session.commit_transaction();
+                    return;
+                }
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();

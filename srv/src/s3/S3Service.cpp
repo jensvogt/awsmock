@@ -1338,6 +1338,10 @@ namespace AwsMock::Service {
         return tempDir + Core::FileUtils::separator() + uploadId;
     }
 
+    void S3Service::ReloadAllCounters() const {
+        _database.AdjustObjectCounters();
+    }
+
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_object");
 
@@ -1652,4 +1656,4 @@ namespace AwsMock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
