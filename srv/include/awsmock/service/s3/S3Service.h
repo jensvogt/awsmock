@@ -595,6 +595,7 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context _ioc;
     };
+    
 } // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H
