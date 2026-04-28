@@ -4,8 +4,6 @@
 
 #include <awsmock/service/container/ContainerService.h>
 
-#include "awsmock/entity/common/BaseEntity.h"
-
 namespace AwsMock::Service {
 
     thread_local std::shared_ptr<Core::DomainSocket> ContainerService::_domainSocket;
@@ -21,7 +19,6 @@ namespace AwsMock::Service {
         _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
 #else
         _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket") : Core::Configuration::instance().GetValue<std::string>("awsmock.podman.socket");
-        //_domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
 #endif
     }
 
@@ -706,7 +703,7 @@ namespace AwsMock::Service {
         // Replace variables
         std::string dockerFileContent = applicationEntity.dockerFile;;
         Core::StringUtils::Replace(dockerFileContent, "$$ENV$$", AddEnvironment(applicationEntity.environment));
-        Core::StringUtils::Replace(dockerFileContent, "$$PORT$$", std::to_string(applicationEntity.publicPort) + ":" + std::to_string(applicationEntity.privatePort));
+        Core::StringUtils::Replace(dockerFileContent, "$$PORT$$", std::to_string(applicationEntity.privatePort));
         Core::StringUtils::Replace(dockerFileContent, "$$ARCHIVE$$", applicationEntity.archive);
 
         std::ofstream ofs(dockerFilename);
