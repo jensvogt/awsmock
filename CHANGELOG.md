@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/jensvogt/awsmock/compare/v1.17.0...v1.18.0) (2026-04-28)
+
+
+### Features
+
+* container expose port ([4391e3e](https://github.com/jensvogt/awsmock/commit/4391e3ef06aeb77fc905baee640f90728d6582f8))
+
 ## [1.17.0](https://github.com/jensvogt/awsmock/compare/v1.16.56...v1.17.0) (2026-04-27)
 
 
