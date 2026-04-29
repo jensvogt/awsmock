@@ -42,17 +42,23 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
+#include <awsmock/dto/sns/internal/AddDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sns/internal/DeleteDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sns/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sns/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sns/internal/GetMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/GetMessageCountersResponse.h>
+#include <awsmock/dto/sns/internal/AddSubscriptionCounterRequest.h>
+#include <awsmock/dto/sns/internal/DeleteSubscriptionCounterRequest.h>
+#include <awsmock/dto/sns/internal/GetSubscriptionCounterRequest.h>
+#include <awsmock/dto/sns/internal/GetSubscriptionCounterResponse.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersResponse.h>
-#include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListDefaultMessageAttributeCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListDefaultMessageAttributeCountersResponse.h>
+#include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListMessagesRequest.h>
 #include <awsmock/dto/sns/internal/ListMessagesResponse.h>
@@ -70,8 +76,6 @@
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/sqs/SQSService.h>
-#include <awsmock/dto/sns/internal/AddDefaultMessageAttributeRequest.h>
-#include <awsmock/dto/sns/internal/DeleteDefaultMessageAttributeRequest.h>
 
 #define SQS_PROTOCOL "sqs"
 #define HTTP_PROTOCOL "http"
@@ -297,6 +301,32 @@ namespace AwsMock::Service {
          */
         [[nodiscard]]
         Dto::SNS::ListDefaultMessageAttributeCountersResponse DeleteDefaultMessageAttribute(const Dto::SNS::DeleteDefaultMessageAttributeRequest &request) const;
+
+        /**
+         * @brief Add a subscription to a SNS topic
+         *
+         * @param request add subscription request
+         * @throws ServiceException
+         */
+        void AddSubscriptionCounter(const Dto::SNS::AddSubscriptionCounterRequest &request) const;
+
+        /**
+         * @brief Get a subscription by ID
+         *
+         * @param request subscription request
+         * @return subscription counter
+         * @throws ServiceException
+         */
+        [[nodiscard]]
+        Dto::SNS::GetSubscriptionCounterResponse GetSubscriptionCounter(const Dto::SNS::GetSubscriptionCounterRequest &request) const;
+
+        /**
+         * @brief Delete a subscription from an SNS topic
+         *
+         * @param request delete subscription request
+         * @throws ServiceException
+         */
+        void DeleteSubscriptionCounter(const Dto::SNS::DeleteSubscriptionCounterRequest &request) const;
 
         /**
          * @brief Purge a topic
