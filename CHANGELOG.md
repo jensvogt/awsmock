@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.1](https://github.com/jensvogt/awsmock/compare/v1.18.0...v1.18.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* SQL cleanup, new libmagic singleton instance ([747496c](https://github.com/jensvogt/awsmock/commit/747496c4a7fc7372b8773e6c0aaa19be50681d63))
+* SQL cleanup, new libmagic singleton instance ([fa313a5](https://github.com/jensvogt/awsmock/commit/fa313a58e945fdec4de1359e8f371b9a0c380276))
+
 ## [1.18.0](https://github.com/jensvogt/awsmock/compare/v1.17.0...v1.18.0) (2026-04-29)
 
 
