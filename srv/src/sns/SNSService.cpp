@@ -858,6 +858,89 @@ namespace AwsMock::Service {
         return response;
     }
 
+    void SNSService::AddSubscriptionCounter(const Dto::SNS::AddSubscriptionCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "add_subscription_counter");
+        log_trace << "Get subscription request, topicArn: " << request.topicArn;
+
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "Topic does not exist, topicArn: " << request.topicArn;
+            throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
+        }
+
+        try {
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            Database::Entity::SNS::Subscription subscription;
+            subscription.endpoint = request.endpoint;
+            subscription.protocol = request.protocol;
+            subscription.subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, Core::Configuration::instance().GetAccountId(), request.topicArn);
+            topic.subscriptions.emplace_back(subscription);
+            topic = _snsDatabase.UpdateTopic(topic);
+            log_debug << "Add subscription to topic: " << request.topicArn << ", subscriptionArn: " << subscription.subscriptionArn;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SNS::GetSubscriptionCounterResponse SNSService::GetSubscriptionCounter(const Dto::SNS::GetSubscriptionCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "get_subscription_counter");
+        log_trace << "Get subscription request, topicArn: " << request.topicArn << ", subscriptionArn: " << request.subscriptionArn;
+
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "Topic does not exist, topicArn: " << request.topicArn;
+            throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
+        }
+
+        try {
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            const auto it = std::ranges::find_if(topic.subscriptions, [request](const Database::Entity::SNS::Subscription &s) {
+                return s.subscriptionArn == request.subscriptionArn;
+            });
+
+            if (it != topic.subscriptions.end()) {
+                Dto::SNS::GetSubscriptionCounterResponse response;
+                response.subscriptionCounter.subscriptionArn = it->subscriptionArn;
+                response.subscriptionCounter.protocol = it->protocol;
+                response.subscriptionCounter.endpoint = it->endpoint;
+                response.subscriptionCounter.topicArn = request.topicArn;
+                log_debug << "SNS topic subscription, topicArn: " << topic.topicArn << ", subscriptionArn: " << it->subscriptionArn;
+                return response;
+            }
+            return {};
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SNSService::DeleteSubscriptionCounter(const Dto::SNS::DeleteSubscriptionCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_subscription_counter");
+        log_trace << "Delete subscription request, topicArn: " << request.topicArn << ", subscriptionArn: " << request.subscriptionArn;
+
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "Topic does not exist, topicArn: " << request.topicArn;
+            throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
+        }
+
+        try {
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            std::erase_if(topic.subscriptions, [request](const Database::Entity::SNS::Subscription &s) {
+                return s.subscriptionArn == request.subscriptionArn;
+            });
+            topic = _snsDatabase.UpdateTopic(topic);
+            log_debug << "SNS topic subscription deleted, topicArn: " << topic.topicArn << ", subscriptionArn: " << request.subscriptionArn;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 

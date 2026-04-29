@@ -250,6 +250,34 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
+                case Dto::Common::SNSCommandType::ADD_SUBSCRIPTION_COUNTER: {
+                    Dto::SNS::AddSubscriptionCounterRequest snsRequest = Dto::SNS::AddSubscriptionCounterRequest::FromJson(clientCommand);
+                    _snsService.AddSubscriptionCounter(snsRequest);
+                    log_debug << "Add subscription counters, topicArn: " << snsRequest.topicArn;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::SNSCommandType::GET_SUBSCRIPTION_COUNTER: {
+                    Dto::SNS::GetSubscriptionCounterRequest snsRequest = Dto::SNS::GetSubscriptionCounterRequest::FromJson(clientCommand);
+                    Dto::SNS::GetSubscriptionCounterResponse snsResponse = _snsService.GetSubscriptionCounter(snsRequest);
+                    log_debug << "Get subscription counters, topicArn: " << snsRequest.topicArn << ", subscriptionArn: " << snsRequest.subscriptionArn;
+                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
+                }
+
+                case Dto::Common::SNSCommandType::UPDATE_SUBSCRIPTION_COUNTER: {
+                    Dto::SNS::GetSubscriptionCounterRequest snsRequest = Dto::SNS::GetSubscriptionCounterRequest::FromJson(clientCommand);
+                    Dto::SNS::GetSubscriptionCounterResponse snsResponse = _snsService.GetSubscriptionCounter(snsRequest);
+                    log_debug << "Update subscription counters, topicArn: " << snsRequest.topicArn << ", subscriptionArn: " << snsRequest.subscriptionArn;
+                    return SendResponse(request, http::status::ok, snsResponse.ToJson());
+                }
+
+                case Dto::Common::SNSCommandType::DELETE_SUBSCRIPTION_COUNTER: {
+                    Dto::SNS::DeleteSubscriptionCounterRequest snsRequest = Dto::SNS::DeleteSubscriptionCounterRequest::FromJson(clientCommand);
+                    _snsService.DeleteSubscriptionCounter(snsRequest);
+                    log_debug << "Delete subscription counters, topicArn: " << snsRequest.topicArn << ", subscriptionArn: " << snsRequest.subscriptionArn;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::SNSCommandType::LIST_ATTRIBUTE_COUNTERS: {
                     Dto::SNS::ListAttributeCountersRequest snsRequest = Dto::SNS::ListAttributeCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListAttributeCountersResponse snsResponse = _snsService.ListAttributeCounters(snsRequest);
