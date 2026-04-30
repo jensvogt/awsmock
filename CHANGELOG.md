@@ -1,5 +1,70 @@
 # Changelog
 
+## [1.18.1](https://github.com/jensvogt/awsmock/compare/v1.18.0...v1.18.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* SQL cleanup, new libmagic singleton instance ([747496c](https://github.com/jensvogt/awsmock/commit/747496c4a7fc7372b8773e6c0aaa19be50681d63))
+* SQL cleanup, new libmagic singleton instance ([fa313a5](https://github.com/jensvogt/awsmock/commit/fa313a58e945fdec4de1359e8f371b9a0c380276))
+
+## [1.18.0](https://github.com/jensvogt/awsmock/compare/v1.17.0...v1.18.0) (2026-04-29)
+
+
+### Features
+
+* container expose port ([4391e3e](https://github.com/jensvogt/awsmock/commit/4391e3ef06aeb77fc905baee640f90728d6582f8))
+
+
+### Bug Fixes
+
+* add SNS subscription ([7befb31](https://github.com/jensvogt/awsmock/commit/7befb31baf9b21338e9cc620123f640c497b13ea))
+
+## [1.17.0](https://github.com/jensvogt/awsmock/compare/v1.16.56...v1.17.0) (2026-04-27)
+
+
+### Features
+
+* s3 object counters ([fda852c](https://github.com/jensvogt/awsmock/commit/fda852cfb74432cc525973eb4e20c93a9784df19))
+* s3 object counters ([3ac8b37](https://github.com/jensvogt/awsmock/commit/3ac8b37d43d4690c6618d7eb8cb425bd5c6e216e))
+
+
+### Bug Fixes
+
+* s3 object counters ([a7864b5](https://github.com/jensvogt/awsmock/commit/a7864b5f0729255e2aaf3b9e782f42d3f9c1c478))
+
+## [1.16.56](https://github.com/jensvogt/awsmock/compare/v1.16.55...v1.16.56) (2026-04-26)
+
+
+### Bug Fixes
+
+* application startup ([c7c4466](https://github.com/jensvogt/awsmock/commit/c7c4466daa6913449c4dad95e90e735369db9820))
+* application startup ([56df7b5](https://github.com/jensvogt/awsmock/commit/56df7b539b60e5b3df4ba6de003624b29382c41c))
+
+## [1.16.55](https://github.com/jensvogt/awsmock/compare/v1.16.54...v1.16.55) (2026-04-26)
+
+
+### Bug Fixes
+
+* application startup ([dfd7acc](https://github.com/jensvogt/awsmock/commit/dfd7acc1d4693e1efd4e607e17cc3badae608a7c))
+* application startup ([0118e92](https://github.com/jensvogt/awsmock/commit/0118e926c1ec55445127425a57f58c763e0acab1))
+* application startup ([ca9d155](https://github.com/jensvogt/awsmock/commit/ca9d155d3cfe1f9ae9a31508823c5d0c51f793f2))
+
+## [1.16.54](https://github.com/jensvogt/awsmock/compare/v1.16.53...v1.16.54) (2026-04-26)
+
+
+### Bug Fixes
+
+* application startup ([80368d6](https://github.com/jensvogt/awsmock/commit/80368d6af771e299cedbcf4cfbd556070098e78d))
+
+## [1.16.53](https://github.com/jensvogt/awsmock/compare/v1.16.52...v1.16.53) (2026-04-26)
+
+
+### Bug Fixes
+
+* docker file for applications ([a729e48](https://github.com/jensvogt/awsmock/commit/a729e4845494af87084e5b2878d169877b75199c))
+* docker file for applications ([3542743](https://github.com/jensvogt/awsmock/commit/3542743a3db1c0f4a2065b0d78c0acedcf0f1930))
+
 ## [1.16.52](https://github.com/jensvogt/awsmock/compare/v1.16.51...v1.16.52) (2026-04-24)
 
 
