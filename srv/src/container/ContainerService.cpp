@@ -39,7 +39,7 @@ namespace AwsMock::Service {
             log_debug << "Docker image found, name: " << name << ":" << tag;
             return true;
         }
-        log_warning << "Image does not exists, name: " << name << ":" << tag << ", httpStatus: " << result.statusCode;
+        log_info << "Image does not exists, name: " << name << ":" << tag << ", httpStatus: " << result.statusCode;
         return false;
     }
 
@@ -137,14 +137,14 @@ namespace AwsMock::Service {
             log_debug << "Docker container found, name: " << containerName;
             return true;
         }
-        log_warning << "Docker container exists failed, name: " << containerName << ", statusCode: " << statusCode;
+        log_info << "Docker container exists failed, name: " << containerName << ", statusCode: " << statusCode;
         return false;
     }
 
     bool ContainerService::ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const {
         if (const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); containers.empty()) {
             std::string containerName = tag.empty() ? imageName : imageName + ":" + tag;
-            log_warning << "Docker container not found, name: " << containerName;
+            log_info << "Docker container not found, name: " << containerName;
             return false;
         }
         return true;
@@ -153,12 +153,12 @@ namespace AwsMock::Service {
     Dto::Docker::Container ContainerService::GetFirstContainerByImageName(const std::string &name, const std::string &tag) const {
         const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(name, tag);
         if (containers.empty()) {
-            log_warning << "Docker container not found, name: " << name << ":" << tag;
+            log_info << "Docker container not found, name: " << name << ":" << tag;
             return {};
         }
 
         if (containers.size() > 1) {
-            log_warning << "More than one docker container found, name: " << name << ":" << tag << " count: " << containers.size();
+            log_info << "More than one docker container found, name: " << name << ":" << tag << " count: " << containers.size();
         }
 
         log_debug << "Docker container found, name: " << name << ":" << tag;
@@ -168,7 +168,7 @@ namespace AwsMock::Service {
     Dto::Docker::Container ContainerService::GetContainerById(const std::string &containerId) const {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json");
         if (statusCode != http::status::ok) {
-            log_warning << "Get docker container by ID failed, statusCode: " << statusCode;
+            log_info << "Get docker container by ID failed, statusCode: " << statusCode;
             return {};
         }
 
@@ -180,7 +180,7 @@ namespace AwsMock::Service {
     Dto::Docker::Container ContainerService::GetContainerByName(const std::string &name) const {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + name + "/json");
         if (statusCode != http::status::ok) {
-            log_warning << "Get container by name failed, name: " << name << ", statusCode: " << statusCode;
+            log_info << "Get container by name failed, name: " << name << ", statusCode: " << statusCode;
             return {};
         }
 
@@ -194,7 +194,7 @@ namespace AwsMock::Service {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         if (statusCode != http::status::ok) {
             inspectContainerResponse.status = statusCode;
-            log_warning << "Inspect container failed, containerId: " << Core::StringUtils::Continuation(containerId, 16) << ", statusCode: " << statusCode;
+            log_info << "Inspect container failed, containerId: " << Core::StringUtils::Continuation(containerId, 16) << ", statusCode: " << statusCode;
             return inspectContainerResponse;
         }
 
@@ -207,7 +207,7 @@ namespace AwsMock::Service {
     Dto::Docker::ListContainerResponse ContainerService::ListContainers() const {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
-            log_warning << "List docker containers failed, state: " << statusCode;
+            log_info << "List docker containers failed, state: " << statusCode;
             return {};
         }
 
@@ -224,7 +224,7 @@ namespace AwsMock::Service {
         // Send request
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
-            log_warning << "List docker container by image name failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
+            log_info << "List docker container by image name failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
             return {};
         }
 
@@ -243,7 +243,7 @@ namespace AwsMock::Service {
 
         // Check number of containers found
         if (containers.empty()) {
-            log_warning << "Docker container not found, name: " << name << ":" << tag;
+            log_info << "Docker container not found, name: " << name << ":" << tag;
         } else {
             log_info << "Docker container found, name: " << name << ":" << tag;
         }

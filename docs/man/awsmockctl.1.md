@@ -50,6 +50,9 @@ sets the name of the manager host.
 ```--port <port>```:  
 sets the port for the awsmock manager application.
 
+```--file <filename>```:  
+sets the filename for the deployment command.
+
 ```--help```    
 shows the usage screen and exists
 
@@ -124,6 +127,10 @@ import the infrastructure from stdin in JSON format.
 cleans the infrastructure. This means all SQS queues plus messages, SNS topics plus messages, S3 buckets with all
 objects, transfer servers, and lambda functions will be deleted. ALl modules will be still running, but all AwsMock
 objects will be emptied.
+
+```deploy```
+deploys an application or lambda function package. Depending on the runtime of the application/lambda, the
+```filename``` must be a JAR or ZIP file.
 
 ## EXAMPLES
 
@@ -216,6 +223,18 @@ Export the S3 and SQS infrastructure to a file ```infrastructure.json```:
 
 ```
 $$root:> awsmockctl export s3 sqs > infrastructure.json
+```
+
+Deploy an application
+
+```
+$$root:> awsmockctl deploy application --file test-app-1.0.0.jar
+```
+
+Deploy a lambda function
+
+```
+$$root:> awsmockctl deploy lambda --file test-lambda-1.0.0.jar
 ```
 
 ## AUTHOR
