@@ -3,82 +3,82 @@
 namespace AwsMock::Core {
 
     const std::map<std::string, std::string> FileUtils::MimeTypes = {
-            {".aac", "audio/aac"},
-            {".abw", "application/x-abiword"},
-            {".apng", "application/apng"},
-            {".aec", "application/x-freearc"},
-            {".avif", "image/avif"},
-            {".avi", "video/x-msvideo"},
-            {".azw", "application/vnd.amazon.ebook"},
-            {".bin", "application/octet-stream"},
-            {".bmp", "application/bmp"},
-            {".bz", "application/x-bzip"},
-            {".bz2", "application/x-bzip"},
-            {".cda", "application/x-cdf"},
-            {".csh", "application/x-csh"},
-            {".css", "text/css"},
-            {".csv", "text/csv"},
-            {".doc", "application/ms-word"},
-            {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-            {".eot", "application/vnd.ms-fontobject"},
-            {".epub", "application/epub+zip"},
-            {".gz", "application/gzip"},
-            {".gif", "image/gif"},
-            {".ico", "image/vnd.microsoft.icon"},
-            {".ics", "text/calendar"},
-            {".html", "test/html"},
-            {".html", "test/html"},
-            {".jar", "application/java-archive"},
-            {".jpg", "image/jpeg"},
-            {".jpeg", "image/jpeg"},
-            {".js", "application/javascript"},
-            {".json", "application/json"},
-            {".jsonld", "application/ld+json"},
-            {".mid", "audio/midi"},
-            {".midi", "audio/midi"},
-            {".mjs", "text/javascript"},
-            {".mp3", "audio/mpeg"},
-            {".mp4", "video/mp4"},
-            {".mpeg", "video/mpeg"},
-            {".mpkg", "application/vnd.apple.installer+xml"},
-            {".odp", "application/vnd.oasis.opendocument.presentation"},
-            {".ods", "application/vnd.oasis.opendocument.spreadsheet"},
-            {".oga", "audio/ogg"},
-            {".ogv", "video/ogg"},
-            {".ogx", "application/ogg"},
-            {".opus", "audio/ogg"},
-            {".otf", "font/otf"},
-            {".pdf", "application/pdf"},
-            {".png", "image/png"},
-            {".php", "application/x-httpd-php"},
-            {".ppt", "application/vnd.ms-powerpoint"},
-            {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
-            {".rar", "application/vnd.rar"},
-            {".rtf", "application/rtf"},
-            {".sh", "application/x-sh"},
-            {".svg", "image/svg+xml"},
-            {".tar", "application/x-tar"},
-            {".tif", "image/tiff"},
-            {".tiff", "image/tiff"},
-            {".ts", "video/mp2t"},
-            {".ttf", "font/ttf"},
-            {".txt", "text/plain"},
-            {".vsd", "application/vnd.visio"},
-            {".wav", "audio/wav"},
-            {".weba", "audio/webm"},
-            {".webm", "video/webm"},
-            {".webp", "image/webp"},
-            {".woff", "font/woff"},
-            {".woff2", "font/woff2"},
-            {".xhtml", "application/xhtml+xml"},
-            {".xls", "application/vnd.ms-excel"},
-            {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-            {".xml", "application/xml"},
-            {".xul", "application/vnd.mozilla.xul+xml"},
-            {".zip", "application/zip"},
-            {".3gp", "video/3gpp"},
-            {".3g2", "video/3gpp2"},
-            {".7z", "application/x-7z-compressed"},
+        {".aac", "audio/aac"},
+        {".abw", "application/x-abiword"},
+        {".apng", "application/apng"},
+        {".aec", "application/x-freearc"},
+        {".avif", "image/avif"},
+        {".avi", "video/x-msvideo"},
+        {".azw", "application/vnd.amazon.ebook"},
+        {".bin", "application/octet-stream"},
+        {".bmp", "application/bmp"},
+        {".bz", "application/x-bzip"},
+        {".bz2", "application/x-bzip"},
+        {".cda", "application/x-cdf"},
+        {".csh", "application/x-csh"},
+        {".css", "text/css"},
+        {".csv", "text/csv"},
+        {".doc", "application/ms-word"},
+        {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+        {".eot", "application/vnd.ms-fontobject"},
+        {".epub", "application/epub+zip"},
+        {".gz", "application/gzip"},
+        {".gif", "image/gif"},
+        {".ico", "image/vnd.microsoft.icon"},
+        {".ics", "text/calendar"},
+        {".html", "test/html"},
+        {".html", "test/html"},
+        {".jar", "application/java-archive"},
+        {".jpg", "image/jpeg"},
+        {".jpeg", "image/jpeg"},
+        {".js", "application/javascript"},
+        {".json", "application/json"},
+        {".jsonld", "application/ld+json"},
+        {".mid", "audio/midi"},
+        {".midi", "audio/midi"},
+        {".mjs", "text/javascript"},
+        {".mp3", "audio/mpeg"},
+        {".mp4", "video/mp4"},
+        {".mpeg", "video/mpeg"},
+        {".mpkg", "application/vnd.apple.installer+xml"},
+        {".odp", "application/vnd.oasis.opendocument.presentation"},
+        {".ods", "application/vnd.oasis.opendocument.spreadsheet"},
+        {".oga", "audio/ogg"},
+        {".ogv", "video/ogg"},
+        {".ogx", "application/ogg"},
+        {".opus", "audio/ogg"},
+        {".otf", "font/otf"},
+        {".pdf", "application/pdf"},
+        {".png", "image/png"},
+        {".php", "application/x-httpd-php"},
+        {".ppt", "application/vnd.ms-powerpoint"},
+        {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+        {".rar", "application/vnd.rar"},
+        {".rtf", "application/rtf"},
+        {".sh", "application/x-sh"},
+        {".svg", "image/svg+xml"},
+        {".tar", "application/x-tar"},
+        {".tif", "image/tiff"},
+        {".tiff", "image/tiff"},
+        {".ts", "video/mp2t"},
+        {".ttf", "font/ttf"},
+        {".txt", "text/plain"},
+        {".vsd", "application/vnd.visio"},
+        {".wav", "audio/wav"},
+        {".weba", "audio/webm"},
+        {".webm", "video/webm"},
+        {".webp", "image/webp"},
+        {".woff", "font/woff"},
+        {".woff2", "font/woff2"},
+        {".xhtml", "application/xhtml+xml"},
+        {".xls", "application/vnd.ms-excel"},
+        {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+        {".xml", "application/xml"},
+        {".xul", "application/vnd.mozilla.xul+xml"},
+        {".zip", "application/zip"},
+        {".3gp", "video/3gpp"},
+        {".3g2", "video/3gpp2"},
+        {".7z", "application/x-7z-compressed"},
     };
 
     std::string FileUtils::GetBasename(const std::string &fileName) {
@@ -253,10 +253,6 @@ namespace AwsMock::Core {
         return tempFilename;
     }
 
-    /*bool FileUtils::FileExists(const std::string &fileName) {
-        return std::filesystem::exists(fileName) && std::filesystem::is_regular_file(fileName);
-    }*/
-
     std::string FileUtils::StripBasePath(const std::string &fileName) {
         return GetBasename(fileName) + "." + GetExtension(fileName);
     }
@@ -405,92 +401,6 @@ namespace AwsMock::Core {
 
         return result;
     }
-
-    // std::string FileUtils::GetContentType(const std::string &path, const std::string &realPath) {
-    //     if (const std::string extension = boost::filesystem::path(realPath).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
-    //         return MimeTypes.at(extension);
-    //     }
-    //     return GetContentTypeMagicFile(path);
-    // }
-    //
-    // std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
-    //
-    //     if (!FileExists(path)) {
-    //         log_error << "Target path not found, path: " << path;
-    //         return DEFAULT_MIME_TYPE;
-    //     }
-    //
-    //     const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
-    //
-    //     if (!FileExists(magicFile)) {
-    //         log_error << "Magic database not found, path: " << magicFile;
-    //         return DEFAULT_MIME_TYPE;
-    //     }
-    //
-    //     // Allocate magic cookie
-    //     magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
-    //     if (magic == nullptr) {
-    //         log_error << "Could not open libmagic";
-    //         return DEFAULT_MIME_TYPE;
-    //     }
-    //
-    //     // Load the default magic database (indicated by nullptr)
-    //     if (magic_load(magic, magicFile.c_str()) != 0) {
-    //         log_error << "Could not load libmagic mime types, fileName: " << magicFile << ", error: " << magic_error(magic);
-    //         return DEFAULT_MIME_TYPE;
-    //     }
-    //
-    //     // Get a description of the filename argument
-    //     const char *mime = magic_file(magic, path.c_str());
-    //     if (mime == nullptr) {
-    //         log_error << "Could not get mime type";
-    //         mime = DEFAULT_MIME_TYPE;
-    //     } else {
-    //         log_debug << "Found content-type: " << mime;
-    //     }
-    //     std::string result = {mime};
-    //
-    //     // Free magic cookie and mime
-    //     magic_close(magic);
-    //     return result;
-    // }
-    //
-    // std::string FileUtils::GetContentTypeMagicString(const std::string &content) {
-    //
-    //     if (content.empty()) {
-    //         return DEFAULT_MIME_TYPE;
-    //     }
-    //
-    //     const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
-    //
-    //     // Allocate magic cookie
-    //     magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
-    //     if (magic == nullptr) {
-    //         log_error << "Could not open libmagic";
-    //         return DEFAULT_MIME_TYPE;
-    //     }
-    //
-    //     // Load the default magic database (indicated by nullptr)
-    //     if (magic_load(magic, magicFile.c_str()) != 0) {
-    //         log_error << "Could not load libmagic mime types, fileName: " << magicFile;
-    //         return DEFAULT_MIME_TYPE;
-    //     }
-    //
-    //     // Get the description of the filename argument
-    //     const char *mime = magic_buffer(magic, content.data(), content.size());
-    //     if (mime == nullptr) {
-    //         log_error << "Could not get mime type";
-    //         mime = DEFAULT_MIME_TYPE;
-    //     } else {
-    //         log_debug << "Found content-type: " << mime;
-    //     }
-    //     std::string result = {mime};
-    //
-    //     // Free magic cookie and mime
-    //     magic_close(magic);
-    //
-    //     return result;
-    // }
 
     void FileUtils::StripChunkSignature(const std::string &path) {
 
@@ -653,4 +563,13 @@ namespace AwsMock::Core {
     }
 #endif
 
-}// namespace AwsMock::Core
+    std::string FileUtils::ExtractVersionFromFileName(const std::string &filename) {
+        static const std::regex versionRegex(R"(^.*-([0-9]+\.[0-9]+\.[0-9]+)(-SNAPSHOT)?\.(tar\.gz|jar|zip|tar)$)");
+
+        if (std::smatch match; std::regex_match(filename, match, versionRegex)) {
+            return match[1].str();
+        }
+        return "latest";
+    }
+
+} // namespace AwsMock::Core

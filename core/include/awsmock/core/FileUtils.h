@@ -67,8 +67,7 @@ namespace AwsMock::Core {
      */
     class FileUtils {
 
-      public:
-
+    public:
         /**
          * @brief Extracts the base name (without extension) from the given file name.
          *
@@ -401,6 +400,15 @@ namespace AwsMock::Core {
          * @return The normalized path as a wide string.
          */
         static std::wstring NormalizePathForLongPaths(const std::wstring &path);
+
+        /**
+         * @brief Extract the version from a filename string
+         *
+         * @param filename file name
+         * @return version string
+         */
+        static std::string ExtractVersionFromFileName(const std::string &filename);
+        
 #endif
 
         /**
@@ -416,7 +424,7 @@ namespace AwsMock::Core {
         const static std::map<std::string, std::string> MimeTypes;
 
         template<typename... Ts>
-        static std::string appendPath(Ts &&...args) {
+        static std::string appendPath(Ts &&... args) {
             std::ostringstream oss;
             (oss << ... << std::forward<Ts>(args));
             return oss.str();
@@ -437,6 +445,6 @@ namespace AwsMock::Core {
     }
 
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_FILE_UTILS_H

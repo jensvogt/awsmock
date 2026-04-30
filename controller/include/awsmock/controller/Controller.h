@@ -37,6 +37,7 @@
 #include <awsmock/dto/apps/internal/StartApplicationRequest.h>
 #include <awsmock/dto/apps/internal/StopAllApplicationsRequest.h>
 #include <awsmock/dto/apps/internal/StopApplicationRequest.h>
+#include <awsmock/dto/apps/internal/UploadApplicationCodeRequest.h>
 #include <awsmock/dto/apps/model/Application.h>
 #include <awsmock/dto/lambda/internal/DisableAllLambdasRequest.h>
 #include <awsmock/dto/lambda/internal/DisableLambdaRequest.h>
@@ -49,6 +50,7 @@
 #include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/StopAllLambdasRequest.h>
 #include <awsmock/dto/lambda/internal/StopLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
@@ -68,19 +70,28 @@ namespace AwsMock::Controller {
      */
     enum class CommandType {
         CONFIG,
+        STATUS,
         SET_LOG_LEVEL,
         GET_LOG_LEVEL,
         LIST,
-        STATUS,
-        ENABLE,
-        DISABLE,
-        START,
-        RESTART,
-        STOP,
+        LIST_APPLICATIONS,
+        LIST_LAMBDAS,
+        ENABLE_APPLICATIONS,
+        ENABLE_LAMBDAS,
+        DISABLE_APPLICATIONS,
+        DISABLE_LAMBDAS,
+        START_APPLICATIONS,
+        START_LAMBDAS,
+        RESTART_APPLICATIONS,
+        RESTART_LAMBDAS,
+        STOP_APPLICATIONS,
+        STOP_LAMBDAS,
         IMPORT,
         EXPORT,
         CLEAN,
         CLEAN_OBJECTS,
+        DEPLOY_APPLICATION,
+        DEPLOY_LAMBDA,
         LOGS,
         PING,
         UNKNOWN
@@ -88,18 +99,27 @@ namespace AwsMock::Controller {
 
     static std::map<CommandType, std::string> CommandTypeNames{
         {CommandType::CONFIG, "config"},
+        {CommandType::STATUS, "status"},
         {CommandType::SET_LOG_LEVEL, "set-loglevel"},
         {CommandType::GET_LOG_LEVEL, "get-loglevel"},
         {CommandType::LIST, "list"},
-        {CommandType::STATUS, "status"},
-        {CommandType::ENABLE, "enable"},
-        {CommandType::DISABLE, "disable"},
-        {CommandType::START, "start"},
-        {CommandType::RESTART, "restart"},
-        {CommandType::STOP, "stop"},
+        {CommandType::LIST_APPLICATIONS, "list-applications"},
+        {CommandType::LIST_LAMBDAS, "list-lambdas"},
+        {CommandType::ENABLE_APPLICATIONS, "enable-applications"},
+        {CommandType::ENABLE_LAMBDAS, "enable-lambdas"},
+        {CommandType::DISABLE_APPLICATIONS, "disable-applications"},
+        {CommandType::DISABLE_APPLICATIONS, "disable-lambdas"},
+        {CommandType::START_APPLICATIONS, "start-applications"},
+        {CommandType::START_LAMBDAS, "start-lambdas"},
+        {CommandType::RESTART_APPLICATIONS, "restart-applications"},
+        {CommandType::RESTART_LAMBDAS, "restart-lambdas"},
+        {CommandType::STOP_APPLICATIONS, "stop-applications"},
+        {CommandType::STOP_LAMBDAS, "stop-lambdas"},
         {CommandType::IMPORT, "import"},
         {CommandType::EXPORT, "export"},
         {CommandType::CLEAN, "clean"},
+        {CommandType::DEPLOY_APPLICATION, "deploy-application"},
+        {CommandType::DEPLOY_LAMBDA, "deploy-lambda"},
         {CommandType::CLEAN_OBJECTS, "clean-objects"},
         {CommandType::PING, "ping"},
         {CommandType::UNKNOWN, "unknown"},
@@ -272,6 +292,10 @@ namespace AwsMock::Controller {
          */
         void StopAllLambdas() const;
 
+        void DeployApplication(const std::string &applicationName, const std::string &filename) const;
+
+        void DeployLambda(const std::string &functionName, const std::string &filename) const;
+
 #ifdef HAS_SYSTEMD
         /**
          * @brief Show the logs
@@ -426,6 +450,11 @@ namespace AwsMock::Controller {
          * Client ID
          */
         std::string _clientId;
+
+        /**
+         * Account ID
+         */
+        std::string _accountId;
 
         /**
          * AWS region

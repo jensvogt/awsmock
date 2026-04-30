@@ -55,18 +55,22 @@ void ShowHelp(const boost::program_options::options_description &desc) {
             << std::left << std::setw(leftIndent) << "  --port" << ": use 'port' for the manager connection" << std::endl
             << std::endl
             << "Commands: " << std::endl
-            << std::left << std::setw(leftIndent) << "  status: shows the status of all available applications and lambdas." << std::endl
-            << std::left << std::setw(leftIndent) << "  list [applications|lambdas]" << ": list all available applications or lambdas. If no argument is given, both are listed." << std::endl
-            << std::left << std::setw(leftIndent) << "  enable [applications|lambdas|<applications...>|<lambda...>]" <<
-            ": enable the given application(s) or lambda(s). If no argument is given, enables all applications and lambdas. Several applications should be separated by spaces." << std::endl
-            << std::left << std::setw(leftIndent) << "  disable [applications|lambdas|<applications...>|<lambda...>]" <<
-            ": disable the given application(s) or lambda(s). If no argument is given, disables all applications and lambdas. Several applications should be separated by spaces." << std::endl
-            << std::left << std::setw(leftIndent) << "  start [applications|lambdas|<applications...>|<lambda...>]" <<
-            ": starts the given application(s) or lambda(s). If no argument is given, starts all applications and lambdas. Several applications should be separated by spaces." << std::endl
-            << std::left << std::setw(leftIndent) << "  stop [applications|lambdas|<applications...>|<lambda...>]" <<
-            ": stops the given application(s) or lambda(s). If no argument is given, stops all applications and lambdas. Several applications should be separated by spaces." << std::endl
-            << std::left << std::setw(leftIndent) << "  restart [applications|lambdas|<applications...>|<lambda...>]" <<
-            ": restarts the given application(s) or lambda(s). If no argument is given, restarts all applications and lambdas. Several applications should be separated by spaces." << std::endl;
+            << std::left << std::setw(leftIndent) << "  status" << ": shows the status of all available applications and lambdas." << std::endl
+            << std::left << std::setw(leftIndent) << "  list" << ": list all available applications and lambdas." << std::endl
+            << std::left << std::setw(leftIndent) << "  list-applications" << ": list all available applications." << std::endl
+            << std::left << std::setw(leftIndent) << "  list-lambdas" << ": list all available lambda functions." << std::endl
+            << std::left << std::setw(leftIndent) << "  enable-applications [<applications...>]" << ": enable the given application(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  enable-lambdas [<lambdas...>]" << ": enable the given lambda(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  disable-applications [<applications...>]" << ": disable the given application(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  disable-lambdas [<lambdas...>]" << ": disable the given lambda(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  start-applications [<applications...>]" << ": starts the given application(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  start-lambdas [<lambdas...>]" << ": starts the given lambda(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  stop-applications [<applications...>]" << ": stops the given application(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  stop-lambdas [<lambdas...>]" << ": stops the given lambda(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  restart-applications [<applications...>]" << ": restarts the given application(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  restart-lambdas [<lambdas...>]" << ": restarts the given lambda(s)." << std::endl
+            << std::left << std::setw(leftIndent) << "  deploy-application <application name> <application package>" << ": deploys the given application. Depending on the runtime the application should be supplied as JAR or ZIP file" << std::endl
+            << std::left << std::setw(leftIndent) << "  deploy-lambda <lambda name> <lambda package>" << ": deploys the given lambda function. Depending on the runtime the lambda function should be supplied as JAR or ZIP file" << std::endl;
 #ifdef HAS_SYSTEMD
     std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
 #endif
@@ -81,7 +85,10 @@ void ShowHelp(const boost::program_options::options_description &desc) {
             << "\nExport options:\n"
             << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
             << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl
-            << "\nValid log levels are: fatal, error, warning, info, debug, verbose." << std::endl
+            << "\nLog levels:" << std::endl
+            << "  fatal, error, warning, info, debug, verbose." << std::endl
+            << "\nNotes:" << std::endl
+            << "  All command support list of applications or lambdas. If no argument is given, the corresponding command will use all applications/lambdas. Several applications/lambdas should be separated by spaces."
             << std::endl;
 }
 
@@ -105,6 +112,7 @@ int main(const int argc, char *argv[]) {
     desc.add_options()("help", "produce help message");
     desc.add_options()("version", "application version");
     desc.add_options()("config", boost::program_options::value<std::string>(), "set configuration file");
+    desc.add_options()("file", boost::program_options::value<std::string>(), "set deployment file");
     desc.add_options()("loglevel", boost::program_options::value<std::string>(), "set log level");
     desc.add_options()("logfile", boost::program_options::value<std::string>(), "set log file");
     desc.add_options()("host", boost::program_options::value<std::string>(), "awsmock host name");
