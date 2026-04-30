@@ -701,7 +701,7 @@ namespace AwsMock::Service {
         std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
 
         // Replace variables
-        std::string dockerFileContent = applicationEntity.dockerFile;;
+        std::string dockerFileContent = applicationEntity.dockerFile;
         Core::StringUtils::Replace(dockerFileContent, "$$ENV$$", AddEnvironment(applicationEntity.environment));
         Core::StringUtils::Replace(dockerFileContent, "$$PORT$$", std::to_string(applicationEntity.privatePort));
         Core::StringUtils::Replace(dockerFileContent, "$$ARCHIVE$$", applicationEntity.archive);
