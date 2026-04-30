@@ -73,7 +73,9 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"   # ← must match env
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: true
 
       - name: Build (Backend)
         shell: cmd
