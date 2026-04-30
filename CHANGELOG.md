@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.4](https://github.com/jensvogt/awsmock/compare/v1.18.3...v1.18.4) (2026-04-30)
+
+
+### Bug Fixes
+
+* file utils ([cbc69b6](https://github.com/jensvogt/awsmock/commit/cbc69b6c03c637bfd32c773bb7ddc2047dd13b14))
+
 ## [1.18.3](https://github.com/jensvogt/awsmock/compare/1.18.2...v1.18.3) (2026-04-30)
 
 
