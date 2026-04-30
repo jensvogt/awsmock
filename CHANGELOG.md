@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.3](https://github.com/jensvogt/awsmock/compare/1.18.2...v1.18.3) (2026-04-30)
+
+
+### Bug Fixes
+
+* stream line awsmock controller ([c0c828a](https://github.com/jensvogt/awsmock/commit/c0c828a37949294f47cfdd11b5ef2ccea47dd5e0))
+* stream line awsmock controller ([3e94529](https://github.com/jensvogt/awsmock/commit/3e94529e159f8dfa03de227e5883cb49a0a197a2))
+
 ## [1.18.2](https://github.com/jensvogt/awsmock/compare/v1.18.1...v1.18.2) (2026-04-30)
 
 
