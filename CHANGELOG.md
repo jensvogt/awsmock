@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.2](https://github.com/jensvogt/awsmock/compare/v1.18.1...v1.18.2) (2026-04-30)
+
+
+### Bug Fixes
+
+* windows build ([e405735](https://github.com/jensvogt/awsmock/commit/e405735161de74e6990165df40c23a223c03e518))
+
 ## [1.18.1](https://github.com/jensvogt/awsmock/compare/v1.18.0...v1.18.1) (2026-04-29)
 
 
