@@ -401,6 +401,8 @@ namespace AwsMock::Core {
          */
         static std::wstring NormalizePathForLongPaths(const std::wstring &path);
 
+#endif
+
         /**
          * @brief Extract the version from a filename string
          *
@@ -408,8 +410,6 @@ namespace AwsMock::Core {
          * @return version string
          */
         static std::string ExtractVersionFromFileName(const std::string &filename);
-        
-#endif
 
         /**
          * @brief File path separator
