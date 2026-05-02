@@ -16,9 +16,6 @@ namespace AwsMock::Service {
         _scheduler.AddTask("monitoring-docker-collector", [] { Monitoring::MetricDockerCollector::CollectDockerCounter(); }, systemPeriod);
         log_debug << "Docker collector started";
 
-        _scheduler.AddTask("monitoring-valgrind", [this] { ValgrindCollector(); }, 60);
-        log_debug << "Docker collector started";
-
         // Start the database cleanup worker thread every day
         _scheduler.AddTask("monitoring-cleanup-database", [this] { DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
         log_debug << "Cleanup started";
@@ -46,10 +43,6 @@ namespace AwsMock::Service {
         });
 
         log_debug << "Monitoring module initialized";
-    }
-
-    void MonitoringServer::ValgrindCollector() {
-        VALGRIND_DO_LEAK_CHECK;
     }
 
     void MonitoringServer::DeleteMonitoringData() const {

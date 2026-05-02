@@ -36,11 +36,6 @@ namespace AwsMock::Service {
         explicit MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
         /**
-         * @brief Valgrind memory collector
-         */
-        static void ValgrindCollector();
-
-        /**
          * @brief Delete monitoring data older than the retention period.
          *
          * @par
