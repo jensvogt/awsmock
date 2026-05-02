@@ -30,11 +30,11 @@ namespace AwsMock::Database::Entity::Lambda {
     };
 
     static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
-            {InstanceIdle, "Idle"},
-            {InstanceRunning, "Running"},
-            {InstanceSuccess, "Success"},
-            {InstanceFailed, "Failed"},
-            {InstanceUnknown, "Unknown"},
+        {InstanceIdle, "Idle"},
+        {InstanceRunning, "Running"},
+        {InstanceSuccess, "Success"},
+        {InstanceFailed, "Failed"},
+        {InstanceUnknown, "Unknown"},
     };
 
     [[maybe_unused]] static std::string LambdaInstanceStatusToString(const LambdaInstanceStatus &lambdaInstanceStatus) {
@@ -54,8 +54,10 @@ namespace AwsMock::Database::Entity::Lambda {
      * @brief Lambda instance entity
      *
      * @par
-     * A instance is a invocation of the lambda function. Each invocation (until max. concurrency) will start a new instance of the lambda function. The status will be
-     * set 'RUNNING'. Default status is 'IDLE'.
+     * An instance is an invocation of the lambda function. Each invocation (until max. concurrency) will start a new instance of the lambda function. The status will be
+     * set 'RUNNING'. Default status is 'IDLE'. Each lambda runs in its own docker container having a distinguished name like 'lambda-function-s7654d'. Private ports are
+     * always the same (usually 8080), whereas the public port will be a random integer between 32.768 and 65.535. The public port is chosen between this two numbers taken
+     * into account that the port must be free on the local machine. Otherwise, a new random number is selected in the given range.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -111,16 +113,18 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+        [[maybe_unused]]
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
+        [[nodiscard]]
+        view_or_value<view, value> ToDocument() const override;
     };
 
-}// namespace AwsMock::Database::Entity::Lambda
+} // namespace AwsMock::Database::Entity::Lambda
 
 #endif// AWSMOCK_DB_ENTITY_LAMBDA_INSTANCE_H
