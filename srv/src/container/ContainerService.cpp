@@ -238,8 +238,8 @@ namespace AwsMock::Service {
         const std::string target = tag.empty() ? name : name + ":" + tag;
         auto containers = response.containerList | std::views::filter([&](const auto &c) {
                               return c.image == target;
-                          })
-                          | std::ranges::to<std::vector>();
+                          }) |
+                          std::ranges::to<std::vector>();
 
         // Check number of containers found
         if (containers.empty()) {
@@ -484,9 +484,9 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void ContainerService::StartContainer(const std::string &containerId) const {
+    void ContainerService::StartContainer(const std::string &containerId, const std::string &containerName) const {
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
-            log_warning << "Start container failed, id: " << containerId << ", statusCode: " << statusCode;
+            log_warning << "Start container failed, name: " << containerName << ", id: " << containerId.substr(0, 12) << ", statusCode: " << statusCode;
             return;
         }
         log_debug << "Docker container started, id: " << containerId;
@@ -750,4 +750,4 @@ namespace AwsMock::Service {
         ss << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
         return ss.str();
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

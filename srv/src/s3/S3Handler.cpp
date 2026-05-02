@@ -588,7 +588,7 @@ namespace AwsMock::Service {
                     log_debug << "S3 get bucket request";
 
                     // Build request
-                    Dto::S3::GetBucketRequest s3Request = Dto::S3::GetBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+                    Dto::S3::GetBucketRequest s3Request = Dto::S3::GetBucketRequest::FromJson(clientCommand.payload, clientCommand.region, clientCommand.user, clientCommand.requestId);
                     Dto::S3::GetBucketResponse s3Response = _s3Service.GetBucket(s3Request);
 
                     log_info << "Get bucket, name: " << s3Request.bucketName;
@@ -599,10 +599,10 @@ namespace AwsMock::Service {
                     log_debug << "S3 purge bucket request, bucket: " << clientCommand.bucket;
 
                     // Build request
-                    Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+                    Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(clientCommand.payload, clientCommand.region, clientCommand.user, clientCommand.requestId);
                     const long deleted = _s3Service.PurgeBucket(s3Request);
                     log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: " << deleted;
-                    return SendResponse(request, http::status::ok, {});
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::S3CommandType::UPDATE_BUCKET: {
@@ -615,7 +615,7 @@ namespace AwsMock::Service {
                     _s3Service.UpdateBucket(s3Request);
 
                     log_info << "Update bucket, name: " << s3Request.bucket;
-                    return SendResponse(request, http::status::ok, {});
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::S3CommandType::GET_OBJECT_COUNTER: {
@@ -918,4 +918,4 @@ namespace AwsMock::Service {
         key = Core::StringUtils::SubStringAfter(path, "/");
         log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

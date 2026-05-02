@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Module {
 
         // DynamoDb
         Core::Bson::ToBsonArray(document, "dynamodb-tables", dynamoDbTables);
-        //Core::Bson::ToBsonArray(document, "dynamodb-items", dynamoDbItems);
+        Core::Bson::ToBsonArray(document, "dynamodb-items", dynamoDbItems);
 
         // Secrets manager
         Core::Bson::ToBsonArray(document, "secretsmanager-secrets", secrets);
@@ -103,4 +103,4 @@ namespace AwsMock::Dto::Module {
         Core::Bson::FromBsonArray(document, "api-gateway-keys", &apiKeys);
     }
 
-} // namespace AwsMock::Dto::Module
+}// namespace AwsMock::Dto::Module

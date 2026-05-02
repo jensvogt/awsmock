@@ -403,7 +403,7 @@ namespace AwsMock::Service {
 
         // Get all file parts
         if (const std::string uploadDir = GetMultipartUploadDirectory(request.uploadId); Core::DirUtils::DirectoryExists(uploadDir)) {
-            const std::vector<std::string> files = Core::DirUtils::ListFilesByPrefix(uploadDir, request.uploadId);
+            std::vector<std::filesystem::path> files = Core::DirUtils::ListFilesByPrefix(uploadDir, request.uploadId);
 
             // Output file
             const std::string filename = Core::AwsUtils::CreateS3FileName();
@@ -413,7 +413,7 @@ namespace AwsMock::Service {
             // Append all parts to the output file
             long fileSize = 0;
             try {
-                fileSize = Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
+                fileSize = Core::FileUtils::AppendBinaryFiles(outFile, files);
                 log_debug << "Input files appended to outfile, outFile: " << outFile << " size: " << fileSize;
             } catch (Core::JsonException &exc) {
                 log_error << "Append to binary file failed, error: " << exc.message();
@@ -483,8 +483,9 @@ namespace AwsMock::Service {
             log_debug << "Bucket returned, bucket: " << bucket.name;
 
             Dto::S3::GetEventSourceResponse response;
-            Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotification(request.functionArn);
-            response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
+            // TODO: fix, as it is now a vector, what to do with a vector?
+            //Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotifications(request.functionArn);
+            //response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
             return response;
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get event source failed, message: " << ex.what();
@@ -1202,88 +1203,104 @@ namespace AwsMock::Service {
         Dto::S3::Bucket s3Bucket;
         s3Bucket.bucketName = bucketEntity.name;
 
+        // Check notifications
         if (bucketEntity.HasQueueNotificationEvent(event)) {
-            if (Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event); notification.CheckFilter(key)) {
-                // Create the event record
-                Dto::S3::NotificationBucket notificationBucket;
-                notificationBucket.name = s3Bucket.bucketName;
-                notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
-                Dto::S3::S3 s3;
-                s3.configurationId = notification.id;
-                s3.bucket = notificationBucket;
-                s3.object = s3Object;
 
-                Dto::S3::Record record;
-                record.region = region;
-                record.eventName = event;
-                record.s3 = s3;
-                Dto::S3::EventNotification eventNotification;
+            // Loop over all notifications found
+            for (auto &notification: bucketEntity.GetQueueNotifications(event)) {
 
-                eventNotification.records.push_back(record);
-                log_debug << "Found notification records, count: " << eventNotification.records.size();
+                // Check notification
+                if (notification.CheckFilter(key)) {
+                    // Create the event record
+                    Dto::S3::NotificationBucket notificationBucket;
+                    notificationBucket.name = s3Bucket.bucketName;
+                    notificationBucket.arn = s3Bucket.arn;
+                    notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                    Dto::S3::S3 s3;
+                    s3.configurationId = notification.id;
+                    s3.bucket = notificationBucket;
+                    s3.object = s3Object;
 
-                // Queue notification
-                SendQueueNotificationRequest(eventNotification, notification);
-                log_trace << "SQS message created, eventNotification: " + eventNotification.ToString();
-                log_debug << "SQS message created, queueArn: " << notification.queueArn;
+                    Dto::S3::Record record;
+                    record.region = region;
+                    record.eventName = event;
+                    record.s3 = s3;
+                    Dto::S3::EventNotification eventNotification;
+
+                    eventNotification.records.push_back(record);
+                    log_debug << "Found notification records, count: " << eventNotification.records.size();
+
+                    // Queue notification
+                    SendQueueNotificationRequest(eventNotification, notification);
+                    log_trace << "SQS message created, eventNotification: " + eventNotification.ToString();
+                    log_debug << "SQS message created, queueArn: " << notification.queueArn;
+                }
             }
         }
 
         if (bucketEntity.HasTopicNotificationEvent(event)) {
-            if (Database::Entity::S3::TopicNotification notification = bucketEntity.GetTopicNotification(event); notification.CheckFilter(key)) {
-                // Create the event record
-                Dto::S3::NotificationBucket notificationBucket;
-                notificationBucket.name = s3Bucket.bucketName;
-                notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
-                Dto::S3::S3 s3;
-                s3.configurationId = notification.id;
-                s3.bucket = notificationBucket;
-                s3.object = s3Object;
 
-                Dto::S3::Record record;
-                record.region = region;
-                record.eventName = event;
-                record.s3 = s3;
+            // Loop over all notifications found
+            for (auto &notification: bucketEntity.GetTopicNotifications(event)) {
 
-                Dto::S3::EventNotification eventNotification;
+                if (notification.CheckFilter(key)) {
+                    // Create the event record
+                    Dto::S3::NotificationBucket notificationBucket;
+                    notificationBucket.name = s3Bucket.bucketName;
+                    notificationBucket.arn = s3Bucket.arn;
+                    notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                    Dto::S3::S3 s3;
+                    s3.configurationId = notification.id;
+                    s3.bucket = notificationBucket;
+                    s3.object = s3Object;
 
-                eventNotification.records.push_back(record);
-                log_debug << "Found notification records, count: " << eventNotification.records.size();
+                    Dto::S3::Record record;
+                    record.region = region;
+                    record.eventName = event;
+                    record.s3 = s3;
 
-                // Queue notification
-                SendTopicNotificationRequest(eventNotification, notification);
-                log_trace << "SNS message created, eventNotification: " + eventNotification.ToString();
-                log_debug << "SNS message created, topicArn: " << notification.topicArn;
+                    Dto::S3::EventNotification eventNotification;
+
+                    eventNotification.records.push_back(record);
+                    log_debug << "Found notification records, count: " << eventNotification.records.size();
+
+                    // Queue notification
+                    SendTopicNotificationRequest(eventNotification, notification);
+                    log_trace << "SNS message created, eventNotification: " + eventNotification.ToString();
+                    log_debug << "SNS message created, topicArn: " << notification.topicArn;
+                }
             }
         }
-
         if (bucketEntity.HasLambdaNotificationEvent(event)) {
-            if (Database::Entity::S3::LambdaNotification notification = bucketEntity.GetLambdaNotification(event); notification.CheckFilter(key)) {
-                // Create the event record
-                Dto::S3::NotificationBucket notificationBucket;
-                notificationBucket.name = s3Bucket.bucketName;
-                notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
-                Dto::S3::S3 s3;
-                s3.configurationId = notification.id;
-                s3.bucket = notificationBucket;
-                s3.object = s3Object;
 
-                Dto::S3::Record record;
-                record.region = region;
-                record.eventName = event;
-                record.s3 = s3;
-                Dto::S3::EventNotification eventNotification;
+            // Loop over all notifications found
+            for (auto &notification: bucketEntity.GetLambdaNotifications(event)) {
 
-                eventNotification.records.push_back(record);
-                log_debug << "Found notification records, count: " << eventNotification.records.size();
+                if (notification.CheckFilter(key)) {
+                    // Create the event record
+                    Dto::S3::NotificationBucket notificationBucket;
+                    notificationBucket.name = s3Bucket.bucketName;
+                    notificationBucket.arn = s3Bucket.arn;
+                    notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                    Dto::S3::S3 s3;
+                    s3.configurationId = notification.id;
+                    s3.bucket = notificationBucket;
+                    s3.object = s3Object;
 
-                // Lambda notification
-                SendLambdaInvocationRequest(eventNotification, notification);
-                log_trace << "Lambda function invoked, eventNotification: " + eventNotification.ToString();
-                log_debug << "Lambda function invoked, lambdaArn:" << notification.lambdaArn;
+                    Dto::S3::Record record;
+                    record.region = region;
+                    record.eventName = event;
+                    record.s3 = s3;
+                    Dto::S3::EventNotification eventNotification;
+
+                    eventNotification.records.push_back(record);
+                    log_debug << "Found notification records, count: " << eventNotification.records.size();
+
+                    // Lambda notification
+                    SendLambdaInvocationRequest(eventNotification, notification);
+                    log_trace << "Lambda function invoked, eventNotification: " + eventNotification.ToString();
+                    log_debug << "Lambda function invoked, lambdaArn:" << notification.lambdaArn;
+                }
             }
         }
     }
@@ -1656,4 +1673,4 @@ namespace AwsMock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

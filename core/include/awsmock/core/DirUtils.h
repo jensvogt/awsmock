@@ -19,6 +19,7 @@
 
 // Boost includes
 #include <boost/filesystem.hpp>
+#include <utility>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
@@ -38,7 +39,7 @@ namespace AwsMock::Core {
          *
          * @param delimiter delimiter character
          */
-        explicit SubstringCompare(const std::string &delimiter) : _delimiter(delimiter) {
+        explicit SubstringCompare(std::string delimiter) : _delimiter(std::move(delimiter)) {
         }
 
         /**
@@ -65,7 +66,8 @@ namespace AwsMock::Core {
      */
     class DirUtils {
 
-    public:
+      public:
+
         /**
          * @brief Returns a thread safe temp directory name.
          *
@@ -155,7 +157,7 @@ namespace AwsMock::Core {
          * @param prefix file name prefix
          * @return vector of file names
          */
-        static std::vector<std::string> ListFilesByPrefix(const std::string &dirName, const std::string &prefix);
+        static std::vector<std::filesystem::path> ListFilesByPrefix(const std::string &dirName, const std::string &prefix);
 
         /**
          * @brief Get a sorted list of files with the given extension.
@@ -191,8 +193,18 @@ namespace AwsMock::Core {
          * @param dirName directory name.
          */
         static void DeleteFilesInDirectory(const std::string &dirName);
+
+      private:
+
+        /**
+         * @brief Extract the number from a file named: abc-nn
+         *
+         * @param filename input file name
+         * @return subpplied number
+         */
+        static long ExtractNumber(const std::string &filename);
     };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
 #endif// AWSMOCK_CORE_DIRECTORY_UTILS_H

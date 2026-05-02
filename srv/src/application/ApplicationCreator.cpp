@@ -47,7 +47,7 @@ namespace AwsMock::Service {
 
         // Start the docker container, in case it is not already running.
         if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
-            ContainerService::instance().StartContainer(inspectContainerResponse.id);
+            ContainerService::instance().StartContainer(inspectContainerResponse.id, inspectContainerResponse.GetContainerName());
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             log_info << "Application docker container started, name: " << applicationEntity.name << ", containerId: " << Core::StringUtils::Continuation(inspectContainerResponse.id, 16);
         }
@@ -175,8 +175,8 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

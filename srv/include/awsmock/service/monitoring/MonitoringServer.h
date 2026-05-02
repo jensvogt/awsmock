@@ -25,7 +25,8 @@ namespace AwsMock::Service {
      */
     class MonitoringServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -33,6 +34,11 @@ namespace AwsMock::Service {
          * @param ioc boost io context boost periodic scheduler
          */
         explicit MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
+
+        /**
+         * @brief Valgrind memory collector
+         */
+        static void ValgrindCollector();
 
         /**
          * @brief Delete monitoring data older than the retention period.
@@ -47,7 +53,8 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
         /**
          * @brief Checks monitoring exclusions.
          *
@@ -90,9 +97,8 @@ namespace AwsMock::Service {
          * The exclusion list is a vector of string in format name::labelName::labelValue.
          */
         std::vector<std::string> _exclusions;
-
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVER_H

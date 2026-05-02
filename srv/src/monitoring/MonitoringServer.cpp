@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/monitoring/MonitoringServer.h>
+#include <valgrind/memcheck.h>
 
 namespace AwsMock::Service {
     MonitoringServer::MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("monitoring"), _scheduler(scheduler), _monitoringCollector(ioc) {
@@ -13,7 +14,10 @@ namespace AwsMock::Service {
         _scheduler.AddTask("monitoring-system-collector", [this] { _metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
-        _scheduler.AddTask("monitoring-docker-collector", [this] { _metricDockerCollector.CollectDockerCounter(); }, systemPeriod);
+        _scheduler.AddTask("monitoring-docker-collector", [] { Monitoring::MetricDockerCollector::CollectDockerCounter(); }, systemPeriod);
+        log_debug << "Docker collector started";
+
+        _scheduler.AddTask("monitoring-valgrind", [this] { ValgrindCollector(); }, 60);
         log_debug << "Docker collector started";
 
         // Start the database cleanup worker thread every day
@@ -45,6 +49,10 @@ namespace AwsMock::Service {
         log_debug << "Monitoring module initialized";
     }
 
+    void MonitoringServer::ValgrindCollector() {
+        VALGRIND_DO_LEAK_CHECK;
+    }
+
     void MonitoringServer::DeleteMonitoringData() const {
 
         log_trace << "Monitoring worker starting";
@@ -70,4 +78,4 @@ namespace AwsMock::Service {
         return std::ranges::find(_exclusions, name + "::" + labelName + "::" + labelValue) == _exclusions.end();
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

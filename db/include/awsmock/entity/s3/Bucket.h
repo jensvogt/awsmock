@@ -230,37 +230,28 @@ namespace AwsMock::Database::Entity::S3 {
         [[nodiscard]] bool HasEncryption() const;
 
         /**
-         * @brief Returns a given notification by name
+         * @brief Return all queue notification which have a given event
          *
-         * @param eventName name of the event
-         * @return found notification or notifications.end().
-         * @deprecated use GetQueueNotification,GetTopicNotification, GetLambdaNotification
+         * @param eventName event name
+         * @return vector of queue notifications
          */
-        BucketNotification GetNotification(const std::string &eventName);
-
-        /**
-         * @brief Returns a given SQS queue notification by name
-         *
-         * @param eventName name of the event
-         * @return found notification or notifications.end().
-         */
-        QueueNotification GetQueueNotification(const std::string &eventName);
+        std::vector<QueueNotification> GetQueueNotifications(const std::string &eventName);
 
         /**
          * @brief Returns a given SNS queue notification by name
          *
          * @param eventName name of the event
-         * @return found notification or notifications.end().
+         * @return vector of topic notifications.
          */
-        TopicNotification GetTopicNotification(const std::string &eventName);
+        std::vector<TopicNotification> GetTopicNotifications(const std::string &eventName);
 
         /**
          * @brief Returns a given lambda notification by name
          *
          * @param eventName name of the event
-         * @return found notification or notifications.end().
+         * @return vector of lambda notifications.
          */
-        LambdaNotification GetLambdaNotification(const std::string &eventName);
+        std::vector<LambdaNotification> GetLambdaNotifications(const std::string &eventName);
 
         /**
          * @brief Returns a given lambda notification by function arn

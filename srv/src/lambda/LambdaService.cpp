@@ -5,7 +5,7 @@
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
-    std::map<std::string, std::shared_ptr<boost::mutex> > LambdaService::_instanceMutex;
+    std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_instanceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string> > environments;
+            std::vector<std::pair<std::string, std::string>> environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -445,7 +445,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string> > tags;
+            std::vector<std::pair<std::string, std::string>> tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -610,12 +610,12 @@ namespace AwsMock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-                    function.handler = lambda.handler,
-                    function.runtime = lambda.runtime,
-                    function.lastUpdateStatus = "Successful",
-                    function.state = LambdaStateToString(lambda.state),
-                    function.stateReason = lambda.stateReason,
-                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+            function.handler = lambda.handler,
+            function.runtime = lambda.runtime,
+            function.lastUpdateStatus = "Successful",
+            function.state = LambdaStateToString(lambda.state),
+            function.stateReason = lambda.stateReason,
+            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -692,8 +692,10 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto accountId = Core::Configuration::instance().GetAccountId();
         const auto lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
+        int maxInvocationRetries = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.max-invocation-count");
+        int invocationInterval = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.invocation-timeout");
 
         // Get the lambda entity
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
@@ -712,13 +714,14 @@ namespace AwsMock::Service {
 
         // Execution depending on the invocation type
         Dto::Lambda::LambdaResult result{};
-        if (invocationType == Dto::Lambda::REQUEST_RESPONSE) {
+        for (int i = 0; i < maxInvocationRetries; i++) {
             Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
-        } else if (invocationType == Dto::Lambda::EVENT) {
-            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance, payload);
-            result = Dto::Lambda::Mapper::mapResult(lambdaResult);
-            log_debug << "Lambda result, lambda: " << result.functionArn << ", result: " << result.status;
+            if (result.status == 200) {
+                break;
+            }
+            log_info << "Lambda result: " << result.functionArn << ", invocation failed: " << i << ", error: " << result.status;
+            std::this_thread::sleep_for(std::chrono::seconds(invocationInterval));
         }
         return result;
     }
@@ -1253,17 +1256,22 @@ namespace AwsMock::Service {
 
         // Check existing instances
         if (lambda.HasIdleInstance()) {
+
             instance = lambda.GetIdleInstance();
+
         } else if (lambda.instances.size() < lambda.concurrency) {
-            // Create instance
+
+            // Create new instance ID
             std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
-            // Create lambda
+            // Create new lambda instance
             const LambdaCreator lambdaCreator;
             lambda = lambdaCreator.CreateLambda(lambda, instanceId);
             log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
             instance = lambda.GetInstance(instanceId);
+
         } else {
+
             // Wait for an idle instance
             instance = WaitForIdleInstance(lambda);
         }
@@ -1408,4 +1416,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

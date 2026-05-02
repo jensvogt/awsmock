@@ -167,7 +167,7 @@ namespace AwsMock::Database {
                     opts.sort(sort.extract());
                 }
 
-                for (auto tableCursor = _tableCollection.find(query.extract(), opts); auto table: tableCursor) {
+                for (auto tableCursor = _tableCollection.find(query.view(), opts); auto table: tableCursor) {
                     Entity::DynamoDb::Table result;
                     result.FromDocument(table);
                     tables.push_back(result);
@@ -600,8 +600,8 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto doc = item.ToDocument(); // owned document
-                const auto view = doc.view(); // non-owning view into doc
+                const auto doc = item.ToDocument();// owned document
+                const auto view = doc.view();      // non-owning view into doc
                 item.size = static_cast<long>(view.length()) + sizeof(long);
                 const auto itemResult = _itemCollection.insert_one(view);
                 session.commit_transaction();
@@ -654,12 +654,12 @@ namespace AwsMock::Database {
                 query.append(kvp("_id", bsoncxx::oid(dbItem.oid)));
 
                 const auto view = dbItem.ToDocument().view();
-                dbItem.size = static_cast<long>(view.length()) + sizeof(long);
+                dbItem.size = static_cast<long>(view.length() + sizeof(long));
 
                 const auto result = _itemCollection.find_one_and_update(query.extract(), dbItem.ToDocument(), opts);
                 session.commit_transaction();
                 if (result.has_value()) {
-                    item = Entity::DynamoDb::Item().FromDocument(result->view());
+                    item.FromDocument(result->view());
                     log_debug << "DynamoDb item updated, oid: " << item.oid;
                     return item;
                 }
@@ -818,12 +818,13 @@ namespace AwsMock::Database {
     std::vector<Entity::DynamoDb::Item> DynamoDbDatabase::GetItems(const std::string &region, const std::string &tableName) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "get_items");
 
+        std::vector<Entity::DynamoDb::Item> items{};
         if (HasDatabase()) {
 
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
+                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
 
                 document query;
                 if (!region.empty()) {
@@ -832,13 +833,14 @@ namespace AwsMock::Database {
                 if (!tableName.empty()) {
                     query.append(kvp("tableName", tableName));
                 }
-                std::vector<Entity::DynamoDb::Item> items;
-                for (auto cursor = _itemCollection.find(query.view()); auto &&doc: cursor) {
+
+                for (auto cursor = _itemCollection.find(query.view()); const view &doc: cursor) {
                     Entity::DynamoDb::Item item;
                     item.FromDocument(doc);
-                    items.push_back(item);
+                    items.emplace_back(std::move(item));
                 }
-                log_debug << "DynamoDB items exported";
+
+                log_debug << "DynamoDB items exported, count: " << items.size();
                 return items;
 
             } catch (const mongocxx::exception &exc) {
@@ -846,8 +848,7 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
         }
-        //  return _memoryDb.GetItems(region, tableName);
-        return {};
+        return _memoryDb.GetItems(region, tableName);
     }
 
     std::vector<Entity::DynamoDb::Item> DynamoDbDatabase::ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, const bool scanIndexForward, const int limit) const {
@@ -922,21 +923,21 @@ namespace AwsMock::Database {
 
             // Calculate bsonSize of each document
             p.add_fields(make_document(
-                kvp("bsonSize", make_document(
-                        kvp("$bsonSize", "$$ROOT")))));
+                    kvp("bsonSize", make_document(
+                                            kvp("$bsonSize", "$$ROOT")))));
 
             // Group by tableName, sum sizes and count items
             p.group(make_document(
-                kvp("_id", "$tableName"),
-                kvp("size", make_document(kvp("$sum", "$bsonSize"))),
-                kvp("items", make_document(kvp("$sum", 1)))));
+                    kvp("_id", "$tableName"),
+                    kvp("size", make_document(kvp("$sum", "$bsonSize"))),
+                    kvp("items", make_document(kvp("$sum", 1)))));
 
             // Reshape output
             p.project(make_document(
-                kvp("_id", 0),
-                kvp("tableName", "$_id"),
-                kvp("size", 1),
-                kvp("items", 1)));
+                    kvp("_id", 0),
+                    kvp("tableName", "$_id"),
+                    kvp("size", 1),
+                    kvp("items", 1)));
 
             auto session = client->start_session();
             session.start_transaction();
@@ -944,10 +945,10 @@ namespace AwsMock::Database {
             try {
                 // Reset all tables to zero
                 tableCollection.update_many(
-                    {},
-                    make_document(kvp("$set", make_document(
-                                          kvp("size", bsoncxx::types::b_int64{0}),
-                                          kvp("items", bsoncxx::types::b_int64{0})))));
+                        {},
+                        make_document(kvp("$set", make_document(
+                                                          kvp("size", bsoncxx::types::b_int64{0}),
+                                                          kvp("items", bsoncxx::types::b_int64{0})))));
 
                 auto bulk = tableCollection.create_bulk_write();
 
@@ -958,10 +959,10 @@ namespace AwsMock::Database {
                     const auto items = Core::Bson::BsonUtils::GetLongValue(t, "items");
 
                     bulk.append(mongocxx::model::update_one(
-                        make_document(kvp("name", tableName)),
-                        make_document(kvp("$set", make_document(
-                                              kvp("size", bsoncxx::types::b_int64{size}),
-                                              kvp("items", bsoncxx::types::b_int64{items}))))));
+                            make_document(kvp("name", tableName)),
+                            make_document(kvp("$set", make_document(
+                                                              kvp("size", bsoncxx::types::b_int64{size}),
+                                                              kvp("items", bsoncxx::types::b_int64{items}))))));
 
                     log_info << "Table stats updated: " << tableName << ", size: " << size << " bytes" << ", items: " << items;
                 }
@@ -986,18 +987,18 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::KeyValue DynamoDbDatabase::DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const {
         return std::visit([]<typename T0>(const T0 &val) -> Entity::DynamoDb::KeyValue {
-                              using T = std::decay_t<T0>;
+            using T = std::decay_t<T0>;
 
-                              if constexpr (std::is_same_v<T, std::string>) {
-                                  return val;
-                              } else if constexpr (std::is_same_v<T, double>) {
-                                  return val;
-                              } else if constexpr (std::is_same_v<T, std::vector<uint8_t> >) {
-                                  return val;
-                              } else {
-                                  throw Core::DatabaseException("DynamoValue type is not a valid KeyValue (S, N, or B)");
-                              }
-                          },
+            if constexpr (std::is_same_v<T, std::string>) {
+                return val;
+            } else if constexpr (std::is_same_v<T, double>) {
+                return val;
+            } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
+                return val;
+            } else {
+                throw Core::DatabaseException("DynamoValue type is not a valid KeyValue (S, N, or B)");
+            }
+        },
                           variant);
     }
 
@@ -1006,28 +1007,28 @@ namespace AwsMock::Database {
         std::string tmp1 = table.GetSortKeyName();
         auto debugVariant = [](const Entity::DynamoDb::DynamoValue::DynamoVariant &variant, const std::string &name) {
             std::visit([&name, variant]<typename T0>(const T0 &val) {
-                           using T = std::decay_t<T0>;
-                           if constexpr (std::is_same_v<T, std::string>)
-                               std::cerr << name << " type: string, value: " << val << "\n";
-                           else if constexpr (std::is_same_v<T, double>)
-                               std::cerr << name << " type: double, value: " << val << "\n";
-                           else if constexpr (std::is_same_v<T, std::vector<uint8_t> >)
-                               std::cerr << name << " type: binary\n";
-                           else if constexpr (std::is_same_v<T, bool>)
-                               std::cerr << name << " type: bool, value: " << val << "\n";
-                           else if constexpr (std::is_same_v<T, std::nullptr_t>)
-                               std::cerr << name << " type: null\n";
-                           else if constexpr (std::is_same_v<T, std::set<std::string> >)
-                               std::cerr << name << " type: SS\n";
-                           else if constexpr (std::is_same_v<T, std::set<double> >)
-                               std::cerr << name << " type: NS\n";
-                           else
-                               std::cerr << name << " type: unknown index: " << variant.index() << "\n";
-                       },
+                using T = std::decay_t<T0>;
+                if constexpr (std::is_same_v<T, std::string>)
+                    std::cerr << name << " type: string, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, double>)
+                    std::cerr << name << " type: double, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, std::vector<uint8_t>>)
+                    std::cerr << name << " type: binary\n";
+                else if constexpr (std::is_same_v<T, bool>)
+                    std::cerr << name << " type: bool, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, std::nullptr_t>)
+                    std::cerr << name << " type: null\n";
+                else if constexpr (std::is_same_v<T, std::set<std::string>>)
+                    std::cerr << name << " type: SS\n";
+                else if constexpr (std::is_same_v<T, std::set<double>>)
+                    std::cerr << name << " type: NS\n";
+                else
+                    std::cerr << name << " type: unknown index: " << variant.index() << "\n";
+            },
                        variant);
         };
 
         debugVariant(item.attributes[table.GetPartitionKeyName()].value, "partitionKey");
         debugVariant(item.attributes[table.GetSortKeyName()].value, "sortKey");
     }
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
