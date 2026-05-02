@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.7](https://github.com/jensvogt/awsmock/compare/v1.18.6...v1.18.7) (2026-05-02)
+
+
+### Bug Fixes
+
+* dynamodb item export ([8a32ce0](https://github.com/jensvogt/awsmock/commit/8a32ce0f249a619c091b5c54942b0683cf9be0d1))
+
 ## [1.18.6](https://github.com/jensvogt/awsmock/compare/v1.18.5...v1.18.6) (2026-05-02)
 
 
