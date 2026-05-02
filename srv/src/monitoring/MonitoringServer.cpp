@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/monitoring/MonitoringServer.h>
-#include <valgrind/memcheck.h>
 
 namespace AwsMock::Service {
     MonitoringServer::MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("monitoring"), _scheduler(scheduler), _monitoringCollector(ioc) {
