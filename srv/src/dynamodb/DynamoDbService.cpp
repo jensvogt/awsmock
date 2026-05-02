@@ -637,4 +637,4 @@ namespace AwsMock::Service {
         return attr;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

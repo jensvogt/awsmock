@@ -871,7 +871,7 @@ namespace AwsMock::Database {
                     query.append(kvp("userPoolId", userPoolId));
                 }
 
-                for (auto groupCursor = _groupCollection.find(query.extract()); auto group: groupCursor) {
+                for (auto groupCursor = _groupCollection.find(query.view()); auto group: groupCursor) {
                     Entity::Cognito::Group result;
                     result.FromDocument(group);
                     groups.push_back(result);

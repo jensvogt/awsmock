@@ -12,10 +12,9 @@
 
 namespace AwsMock::Database {
 
-    std::map<std::string, std::vector<std::string> > S3Database::allowedEventTypes = {
-        {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
-        {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
-    };
+    std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
+            {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
+            {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
     S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {
     }
@@ -323,7 +322,7 @@ namespace AwsMock::Database {
 
                 if (mResult) {
                     log_debug << "Bucket purged, name: " << bucket.name << " deleted: " << mResult->deleted_count();
-                    purged = mResult.value().deleted_count();
+                    return mResult.value().deleted_count();
                 }
 
             } catch (const mongocxx::exception &exc) {
@@ -331,11 +330,8 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-            purged = _memoryDb.PurgeBucket(bucket);
         }
-        return purged;
+        return _memoryDb.PurgeBucket(bucket);
     }
 
     Entity::S3::Bucket S3Database::UpdateBucket(Entity::S3::Bucket &bucket) const {
@@ -436,7 +432,7 @@ namespace AwsMock::Database {
             }
 
             std::vector<Entity::S3::Object> objectList;
-            for (auto objectCursor = _objectCollection.find(query.extract()); auto object: objectCursor) {
+            for (auto objectCursor = _objectCollection.find(query.view()); auto object: objectCursor) {
                 objectList.push_back(Entity::S3::Object::FromDocument(object));
             }
             return objectList;
@@ -793,7 +789,7 @@ namespace AwsMock::Database {
                 query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
             }
 
-            for (auto objectCursor = _objectCollection.find(query.extract()); const auto &object: objectCursor) {
+            for (auto objectCursor = _objectCollection.find(query.view()); const auto &object: objectCursor) {
                 objectList.push_back(Entity::S3::Object::FromDocument(object));
             }
             log_trace << "Got versioned list, size:" << objectList.size();
@@ -907,7 +903,6 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
         }
         return _memoryDb.DeleteObject(object);
     }
@@ -1072,9 +1067,9 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.group(make_document(
-                    kvp("_id", "$bucketArn"),
-                    kvp("size", make_document(kvp("$sum", "$size"))),
-                    kvp("keys", make_document(kvp("$sum", 1)))));
+                        kvp("_id", "$bucketArn"),
+                        kvp("size", make_document(kvp("$sum", "$size"))),
+                        kvp("keys", make_document(kvp("$sum", 1)))));
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
@@ -1088,18 +1083,18 @@ namespace AwsMock::Database {
                 for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
                     bucketsWithObjects.insert(Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"));
                     bulk.append(mongocxx::model::update_one(
-                        make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
-                        make_document(kvp("$set", make_document(
-                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                              kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys"))))))));
-                }
-                for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
-                    if (const auto bucketArn = Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"); !bucketsWithObjects.contains(bucketArn)) {
-                        bulk.append(mongocxx::model::update_one(
                             make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
                             make_document(kvp("$set", make_document(
-                                                  kvp("size", bsoncxx::types::b_int64()),
-                                                  kvp("keys", bsoncxx::types::b_int64()))))));
+                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                              kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys"))))))));
+                }
+                for (auto bucketCursor = bucketCollection.find({}); const auto &b: bucketCursor) {
+                    if (const auto bucketArn = Core::Bson::BsonUtils::GetStringValue(b, "arn"); !bucketsWithObjects.contains(bucketArn)) {
+                        bulk.append(mongocxx::model::update_one(
+                                make_document(kvp("arn", bucketArn)),
+                                make_document(kvp("$set", make_document(
+                                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                                  kvp("keys", bsoncxx::types::b_int64()))))));
                     }
                 }
                 // Bulk updates
@@ -1119,4 +1114,4 @@ namespace AwsMock::Database {
         _memoryDb.AdjustObjectCounters();
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

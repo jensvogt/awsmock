@@ -59,7 +59,7 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * Message ID
          */
-        MessageStatus status;
+        MessageStatus status = INITIAL;
 
         /**
          * List of sqs
@@ -132,6 +132,6 @@ namespace AwsMock::Database::Entity::SNS {
     typedef Message Message;
     typedef std::vector<Message> MessageList;
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace AwsMock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_H

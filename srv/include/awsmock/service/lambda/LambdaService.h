@@ -622,37 +622,37 @@ namespace AwsMock::Service {
         static void WriteBase64File(const std::string &base64File, const std::string &content);
 
         /**
-         * Lambda database connection
+         * @brief Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
 
         /**
-         * S3 database connection
+         * @brief S3 database connection
          */
         Database::S3Database &_s3Database;
 
         /**
-         * SQS database connection
+         * @brief SQS database connection
          */
         Database::SQSDatabase &_sqsDatabase;
 
         /**
-         * SQS database connection
+         * @brief SQS database connection
          */
         Database::SNSDatabase &_snsDatabase;
 
         /**
-         * Boost IO context
+         * @brief Boost IO context
          */
         boost::asio::io_context &_ioc;
 
         /**
-         * Lambda executor
+         * @brief Lambda executor
          */
         LambdaExecutor lambdaExecutor;
 
         /**
-         * Function mutexes
+         * @brief Function mutexes
          */
         static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };

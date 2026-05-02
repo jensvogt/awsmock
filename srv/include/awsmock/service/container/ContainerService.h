@@ -393,8 +393,9 @@ namespace AwsMock::Service {
          * @brief Start the container
          *
          * @param containerId container ID
+         * @param containerName
          */
-        void StartContainer(const std::string &containerId) const;
+        void StartContainer(const std::string &containerId, const std::string &containerName) const;
 
         /**
          * @brief Restart the container

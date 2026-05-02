@@ -3,82 +3,82 @@
 namespace AwsMock::Core {
 
     const std::map<std::string, std::string> FileUtils::MimeTypes = {
-        {".aac", "audio/aac"},
-        {".abw", "application/x-abiword"},
-        {".apng", "application/apng"},
-        {".aec", "application/x-freearc"},
-        {".avif", "image/avif"},
-        {".avi", "video/x-msvideo"},
-        {".azw", "application/vnd.amazon.ebook"},
-        {".bin", "application/octet-stream"},
-        {".bmp", "application/bmp"},
-        {".bz", "application/x-bzip"},
-        {".bz2", "application/x-bzip"},
-        {".cda", "application/x-cdf"},
-        {".csh", "application/x-csh"},
-        {".css", "text/css"},
-        {".csv", "text/csv"},
-        {".doc", "application/ms-word"},
-        {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-        {".eot", "application/vnd.ms-fontobject"},
-        {".epub", "application/epub+zip"},
-        {".gz", "application/gzip"},
-        {".gif", "image/gif"},
-        {".ico", "image/vnd.microsoft.icon"},
-        {".ics", "text/calendar"},
-        {".html", "test/html"},
-        {".html", "test/html"},
-        {".jar", "application/java-archive"},
-        {".jpg", "image/jpeg"},
-        {".jpeg", "image/jpeg"},
-        {".js", "application/javascript"},
-        {".json", "application/json"},
-        {".jsonld", "application/ld+json"},
-        {".mid", "audio/midi"},
-        {".midi", "audio/midi"},
-        {".mjs", "text/javascript"},
-        {".mp3", "audio/mpeg"},
-        {".mp4", "video/mp4"},
-        {".mpeg", "video/mpeg"},
-        {".mpkg", "application/vnd.apple.installer+xml"},
-        {".odp", "application/vnd.oasis.opendocument.presentation"},
-        {".ods", "application/vnd.oasis.opendocument.spreadsheet"},
-        {".oga", "audio/ogg"},
-        {".ogv", "video/ogg"},
-        {".ogx", "application/ogg"},
-        {".opus", "audio/ogg"},
-        {".otf", "font/otf"},
-        {".pdf", "application/pdf"},
-        {".png", "image/png"},
-        {".php", "application/x-httpd-php"},
-        {".ppt", "application/vnd.ms-powerpoint"},
-        {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
-        {".rar", "application/vnd.rar"},
-        {".rtf", "application/rtf"},
-        {".sh", "application/x-sh"},
-        {".svg", "image/svg+xml"},
-        {".tar", "application/x-tar"},
-        {".tif", "image/tiff"},
-        {".tiff", "image/tiff"},
-        {".ts", "video/mp2t"},
-        {".ttf", "font/ttf"},
-        {".txt", "text/plain"},
-        {".vsd", "application/vnd.visio"},
-        {".wav", "audio/wav"},
-        {".weba", "audio/webm"},
-        {".webm", "video/webm"},
-        {".webp", "image/webp"},
-        {".woff", "font/woff"},
-        {".woff2", "font/woff2"},
-        {".xhtml", "application/xhtml+xml"},
-        {".xls", "application/vnd.ms-excel"},
-        {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-        {".xml", "application/xml"},
-        {".xul", "application/vnd.mozilla.xul+xml"},
-        {".zip", "application/zip"},
-        {".3gp", "video/3gpp"},
-        {".3g2", "video/3gpp2"},
-        {".7z", "application/x-7z-compressed"},
+            {".aac", "audio/aac"},
+            {".abw", "application/x-abiword"},
+            {".apng", "application/apng"},
+            {".aec", "application/x-freearc"},
+            {".avif", "image/avif"},
+            {".avi", "video/x-msvideo"},
+            {".azw", "application/vnd.amazon.ebook"},
+            {".bin", "application/octet-stream"},
+            {".bmp", "application/bmp"},
+            {".bz", "application/x-bzip"},
+            {".bz2", "application/x-bzip"},
+            {".cda", "application/x-cdf"},
+            {".csh", "application/x-csh"},
+            {".css", "text/css"},
+            {".csv", "text/csv"},
+            {".doc", "application/ms-word"},
+            {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+            {".eot", "application/vnd.ms-fontobject"},
+            {".epub", "application/epub+zip"},
+            {".gz", "application/gzip"},
+            {".gif", "image/gif"},
+            {".ico", "image/vnd.microsoft.icon"},
+            {".ics", "text/calendar"},
+            {".html", "test/html"},
+            {".html", "test/html"},
+            {".jar", "application/java-archive"},
+            {".jpg", "image/jpeg"},
+            {".jpeg", "image/jpeg"},
+            {".js", "application/javascript"},
+            {".json", "application/json"},
+            {".jsonld", "application/ld+json"},
+            {".mid", "audio/midi"},
+            {".midi", "audio/midi"},
+            {".mjs", "text/javascript"},
+            {".mp3", "audio/mpeg"},
+            {".mp4", "video/mp4"},
+            {".mpeg", "video/mpeg"},
+            {".mpkg", "application/vnd.apple.installer+xml"},
+            {".odp", "application/vnd.oasis.opendocument.presentation"},
+            {".ods", "application/vnd.oasis.opendocument.spreadsheet"},
+            {".oga", "audio/ogg"},
+            {".ogv", "video/ogg"},
+            {".ogx", "application/ogg"},
+            {".opus", "audio/ogg"},
+            {".otf", "font/otf"},
+            {".pdf", "application/pdf"},
+            {".png", "image/png"},
+            {".php", "application/x-httpd-php"},
+            {".ppt", "application/vnd.ms-powerpoint"},
+            {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+            {".rar", "application/vnd.rar"},
+            {".rtf", "application/rtf"},
+            {".sh", "application/x-sh"},
+            {".svg", "image/svg+xml"},
+            {".tar", "application/x-tar"},
+            {".tif", "image/tiff"},
+            {".tiff", "image/tiff"},
+            {".ts", "video/mp2t"},
+            {".ttf", "font/ttf"},
+            {".txt", "text/plain"},
+            {".vsd", "application/vnd.visio"},
+            {".wav", "audio/wav"},
+            {".weba", "audio/webm"},
+            {".webm", "video/webm"},
+            {".webp", "image/webp"},
+            {".woff", "font/woff"},
+            {".woff2", "font/woff2"},
+            {".xhtml", "application/xhtml+xml"},
+            {".xls", "application/vnd.ms-excel"},
+            {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            {".xml", "application/xml"},
+            {".xul", "application/vnd.mozilla.xul+xml"},
+            {".zip", "application/zip"},
+            {".3gp", "video/3gpp"},
+            {".3g2", "video/3gpp2"},
+            {".7z", "application/x-7z-compressed"},
     };
 
     std::string FileUtils::GetBasename(const std::string &fileName) {
@@ -158,49 +158,36 @@ namespace AwsMock::Core {
         copy_file(boost::filesystem::path(sourceFileName), boost::filesystem::path(targetFileName), boost::filesystem::copy_options::overwrite_existing);
     }
 
-    long FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
+    long FileUtils::AppendBinaryFiles(const std::string &outFile, std::vector<std::filesystem::path> &files) {
+        size_t totalCopied = 0;
 
-        size_t copied = 0;
+        // Open destination in binary mode. ios::app appends if file exists.
+        // Use ios::trunc instead of ios::app if you want to overwrite outFile first.
+        std::ofstream dest(outFile, std::ios::binary | std::ios::out | std::ios::trunc);
 
-#if __APPLE__
-        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
-        for (auto &it: files) {
-            const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source{};
-            fstat(source, &stat_source);
-            copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
-
-            close(source);
+        if (!dest.is_open()) {
+            return -1;// Or handle error appropriately
         }
-        close(dest);
-#elif __linux__
-        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
-        for (auto &it: files) {
-            const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source{};
-            fstat(source, &stat_source);
-            copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
-            close(source);
-        }
-        close(dest);
-#else
-        FILE *dest = fopen(outFile.c_str(), "wb");
-        for (auto &it: files) {
-            char buffer[BUFFER_LEN];
-            FILE *src = fopen(it.c_str(), "rb");
+        for (const auto &filePath: files) {
+            // Open source file in binary mode
 
-            size_t n;
-            while ((n = fread(buffer, 1, BUFFER_LEN, src)) > 0) {
-                fwrite(buffer, 1, n, dest);
-                copied += n;
+            if (std::ifstream src(filePath, std::ios::binary); src.is_open()) {
+                // This is a highly optimized way to pipe one stream into another
+                dest << src.rdbuf();
+
+                // Calculate how much was copied for this specific file
+                // Note: tellg/seekg is a bit slower, but accurate for tracking bytes
+                src.clear();
+                src.seekg(0, std::ios::end);
+                totalCopied += static_cast<size_t>(src.tellg());
+
+                src.close();
             }
-
-            fclose(src);
         }
-        fclose(dest);
-#endif
-        return static_cast<long>(copied);
+
+        dest.close();
+        return static_cast<long>(totalCopied);
     }
 
     long FileUtils::AppendTextFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
@@ -572,4 +559,4 @@ namespace AwsMock::Core {
         return "latest";
     }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

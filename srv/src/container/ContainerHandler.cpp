@@ -12,8 +12,8 @@ namespace AwsMock::Service {
             switch (clientCommand.command) {
                 case Dto::Common::ContainerCommandType::START_CONTAINER: {
                     Dto::Docker::StartContainerRequest containerRequest = Dto::Docker::StartContainerRequest::FromJson(clientCommand);
-                    _containerService.StartContainer(containerRequest.containerId);
-                    log_info << "Start container, containerId: " << containerRequest.containerId;
+                    _containerService.StartContainer(containerRequest.containerId, "none");
+                    log_info << "Start container, containerId: " << containerRequest.containerId.substr(0, 12);
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -34,8 +34,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ContainerCommandType::RESTART_CONTAINER: {
                     Dto::Docker::KillContainerRequest containerRequest = Dto::Docker::KillContainerRequest::FromJson(clientCommand);
                     _containerService.KillContainer(containerRequest.containerId);
-                    _containerService.StartContainer(containerRequest.containerId);
-                    log_info << "Restart container, containerId: " << containerRequest.containerId;
+                    _containerService.StartContainer(containerRequest.containerId, "none");
+                    log_info << "Restart container, containerId: " << containerRequest.containerId.substr(0, 12);
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -75,4 +75,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.message());
         }
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

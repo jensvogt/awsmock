@@ -236,8 +236,8 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
                                              make_document(kvp("$set", make_document(
-                                                                   kvp("instances.$.status", LambdaInstanceStatusToString(status)),
-                                                                   kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
+                                                                               kvp("instances.$.status", LambdaInstanceStatusToString(status)),
+                                                                               kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
                 session.commit_transaction();
             } catch (mongocxx::exception::system_error &e) {
                 session.abort_transaction();
@@ -280,7 +280,7 @@ namespace AwsMock::Database {
                     query.append(kvp("region", region));
                 }
 
-                for (auto lambdaCursor = _lambdaCollection.find(query.extract()); auto lambda: lambdaCursor) {
+                for (auto lambdaCursor = _lambdaCollection.find(query.view()); auto lambda: lambdaCursor) {
                     Entity::Lambda::Lambda result;
                     result.FromDocument(lambda);
                     lambdas.push_back(result);
@@ -363,7 +363,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-                for (auto lambdaCursor = _lambdaCollection.find(query.extract()); auto lambda: lambdaCursor) {
+                for (auto lambdaCursor = _lambdaCollection.find(query.view()); auto lambda: lambdaCursor) {
                     Entity::Lambda::Lambda result;
                     result.FromDocument(lambda);
                     lambdas.push_back(result);
@@ -597,4 +597,4 @@ namespace AwsMock::Database {
         }
         return _memoryDb.DeleteAllLambdas();
     }
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

@@ -40,14 +40,14 @@ namespace AwsMock::Core {
     long DirUtils::DirectoryCountFiles(const std::string &dirName, const bool recursive) {
         if (recursive) {
             return std::count_if(
-                boost::filesystem::recursive_directory_iterator(dirName),
-                boost::filesystem::recursive_directory_iterator(),
-                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+                    boost::filesystem::recursive_directory_iterator(dirName),
+                    boost::filesystem::recursive_directory_iterator(),
+                    static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
         }
         return std::count_if(
-            boost::filesystem::directory_iterator(dirName),
-            boost::filesystem::directory_iterator(),
-            static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+                boost::filesystem::directory_iterator(dirName),
+                boost::filesystem::directory_iterator(),
+                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
     }
 
     bool DirUtils::DirectoryEmpty(const std::string &dirName) {
@@ -84,22 +84,34 @@ namespace AwsMock::Core {
         return fileNames;
     }
 
-    std::vector<std::string> DirUtils::ListFilesByPrefix(const std::string &dirName, const std::string &prefix) {
+    // Helper to extract the number after the last '-'
+    long DirUtils::ExtractNumber(const std::string &filename) {
+        const size_t lastDash = filename.find_last_of('-');
+        if (lastDash == std::string::npos) return 0;
+        try {
+            return std::stol(filename.substr(lastDash + 1));
+        } catch (...) {
+            return 0;
+        }
+    }
 
-        std::vector<std::string> fileNames;
-        for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
-            if (is_regular_file(entry) && StringUtils::StartsWith(entry.path().string(), dirName + FileUtils::separator() + prefix)) {
-                if (!entry.path().string().empty()) {
-                    fileNames.emplace_back(entry.path().string());
+    std::vector<std::filesystem::path> DirUtils::ListFilesByPrefix(const std::string &dirName, const std::string &prefix) {
+        std::vector<std::filesystem::path> files;
+
+        if (const std::filesystem::path p(dirName); std::filesystem::exists(p) && std::filesystem::is_directory(p)) {
+            for (auto &entry: std::filesystem::directory_iterator(p)) {
+                if (std::filesystem::is_regular_file(entry) && entry.path().string().find(prefix) != std::string::npos) {
+                    files.push_back(entry.path());
                 }
             }
         }
 
-        // start at position 6, comparing 6 characters
-        if (!fileNames.empty()) {
-            std::ranges::sort(fileNames, SubstringCompare("-."));
-        }
-        return fileNames;
+        // Custom sort based on the numeric suffix
+        std::ranges::sort(files, [](const std::filesystem::path &a, const std::filesystem::path &b) {
+            return ExtractNumber(a.filename().string()) < ExtractNumber(b.filename().string());
+        });
+
+        return files;
     }
 
     std::vector<std::string> DirUtils::ListFilesByExtension(const std::string &dirName, const std::string &extension, const bool sorting) {
@@ -155,4 +167,4 @@ namespace AwsMock::Core {
             }
         }
     }
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

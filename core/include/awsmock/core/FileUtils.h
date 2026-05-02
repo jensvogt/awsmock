@@ -67,7 +67,8 @@ namespace AwsMock::Core {
      */
     class FileUtils {
 
-    public:
+      public:
+
         /**
          * @brief Extracts the base name (without extension) from the given file name.
          *
@@ -212,10 +213,9 @@ namespace AwsMock::Core {
          * <p>The out file will be truncated, before its used </p>
          *
          * @param outFile output file name
-         * @param inDir input directory
          * @param files string vector of binary files to append to output file
          */
-        static long AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files);
+        static long AppendBinaryFiles(const std::string &outFile, std::vector<std::filesystem::path> &files);
 
         /**
          * @brief Append several text files to a single output file.
@@ -424,7 +424,7 @@ namespace AwsMock::Core {
         const static std::map<std::string, std::string> MimeTypes;
 
         template<typename... Ts>
-        static std::string appendPath(Ts &&... args) {
+        static std::string appendPath(Ts &&...args) {
             std::ostringstream oss;
             (oss << ... << std::forward<Ts>(args));
             return oss.str();
@@ -445,6 +445,6 @@ namespace AwsMock::Core {
     }
 
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_FILE_UTILS_H

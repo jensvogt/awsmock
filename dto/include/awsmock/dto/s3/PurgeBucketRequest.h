@@ -24,6 +24,11 @@ namespace AwsMock::Dto::S3 {
     struct PurgeBucketRequest final : Common::BaseCounter<PurgeBucketRequest> {
 
         /**
+         * Aws region
+         */
+        std::string region;
+
+        /**
          * Bucket name
          */
         std::string bucketName;
@@ -32,6 +37,7 @@ namespace AwsMock::Dto::S3 {
 
         friend PurgeBucketRequest tag_invoke(boost::json::value_to_tag<PurgeBucketRequest>, boost::json::value const &v) {
             PurgeBucketRequest r;
+            r.region = Core::Json::GetStringValue(v, "region");
             r.bucketName = Core::Json::GetStringValue(v, "bucketName");
             return r;
         }

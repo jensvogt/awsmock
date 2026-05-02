@@ -216,7 +216,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return attributes;
     }
 
-    Item Item::FromDocument(const view_or_value<view, value> &mResult) {
+    void Item::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
 
@@ -230,7 +230,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
             partitionKey = KeyValueFromBson(mResult.view()["partitionKey"].get_value());
             sortKey = KeyValueFromBson(mResult.view()["sortKey"].get_value());
             attributes = AttributesFromBson(mResult.view()["attributes"].get_document().value);
-            return *this;
 
         } catch (const std::exception &exc) {
             log_error << exc.what();
