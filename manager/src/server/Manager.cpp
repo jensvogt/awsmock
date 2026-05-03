@@ -2,8 +2,8 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#include <awsmock/server/Manager.h>
 #include <awsmock/core/EventBus.h>
+#include <awsmock/server/Manager.h>
 
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
@@ -39,7 +39,7 @@ namespace AwsMock::Manager {
             _pool.Configure();
 
             // Create database indexes in a background thread
-            boost::asio::post(_ioc, [] {
+            boost::asio::post(Service::GatewayServer::WorkerPool(), [] {
                 Database::ModuleDatabase::instance().CreateIndexes();
             });
 
@@ -251,4 +251,4 @@ namespace AwsMock::Manager {
 #endif
     }
 
-} // namespace AwsMock::Manager
+}// namespace AwsMock::Manager

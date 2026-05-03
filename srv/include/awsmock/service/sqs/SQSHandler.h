@@ -40,11 +40,12 @@ namespace AwsMock::Service {
      */
     class SQSHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit SQSHandler(boost::asio::io_context &ioc) : AbstractHandler("sqs-handler", ioc), _sqsService(ioc) {
+        explicit SQSHandler(boost::asio::io_context &ioc) : AbstractHandler("sqs-handler", ioc) {
         }
 
         /**
@@ -58,7 +59,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         /**
          * Get the queue userAttributes.
          *
@@ -97,6 +99,6 @@ namespace AwsMock::Service {
         SQSService _sqsService;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_HANDLER_H

@@ -119,7 +119,7 @@ namespace AwsMock::Core::Bson {
         if (FindBsonObject(viewDocument.value(), name)) {
             std::map<std::string, std::string> valueMap;
             for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element
-                 &tagElement: tagsView) {
+                                                                                                &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 valueMap.emplace(key, value);
@@ -381,13 +381,17 @@ namespace AwsMock::Core::Bson {
 
             switch (element.type()) {
                 case bsoncxx::type::k_null:
-                    return system_clock::now();
-                case bsoncxx::type::k_date:
-                    return bsoncxx::types::b_date(element.get_date());
-                case bsoncxx::type::k_timestamp:
-                    return std::chrono::time_point<system_clock, std::chrono::milliseconds>{
-                        std::chrono::milliseconds{element.get_timestamp().timestamp}
-                    };
+                    return {};
+                case bsoncxx::type::k_date: {
+                    // b_date stores milliseconds since epoch
+                    const auto millis = std::chrono::milliseconds{element.get_date().value};
+                    return system_clock::time_point{millis};
+                }
+                case bsoncxx::type::k_timestamp: {
+                    // BSON timestamp .timestamp is SECONDS since epoch
+                    const auto secs = std::chrono::seconds{element.get_timestamp().timestamp};
+                    return system_clock::time_point{secs};
+                }
                 default:
                     break;
             }
@@ -461,6 +465,6 @@ namespace AwsMock::Core::Bson {
         }
     };
 
-} // namespace AwsMock::Core::Bson
+}// namespace AwsMock::Core::Bson
 
 #endif// AWS_MOCK_CORE_BSON_UTILS_H

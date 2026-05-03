@@ -234,22 +234,22 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Last invocation
          */
-        system_clock::time_point lastInvocation;
+        std::optional<system_clock::time_point> lastInvocation{};
 
         /**
          * Last started
          */
-        system_clock::time_point lastStarted;
+        std::optional<system_clock::time_point> lastStarted{};
 
         /**
          * Creation date
          */
-        system_clock::time_point created = system_clock::now();
+        std::optional<system_clock::time_point> created = system_clock::now();
 
         /**
          * Last modification date
          */
-        system_clock::time_point modified = system_clock::now();
+        std::optional<system_clock::time_point> modified = system_clock::now();
 
       private:
 
@@ -275,42 +275,58 @@ namespace AwsMock::Dto::Lambda {
             r.state = Core::Json::GetStringValue(v, "state");
             r.environment = boost::json::value_to<std::map<std::string, std::string>>(v.at("environment"));
             r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
-            r.lastInvocation = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastInvocation"));
-            r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
-            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
-            r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
+            if (Core::Json::AttributeExists(v, "lastInvocation")) {
+                r.lastInvocation = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastInvocation"));
+            }
+            if (Core::Json::AttributeExists(v, "lastStarted")) {
+                r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
+            }
+            if (Core::Json::AttributeExists(v, "created")) {
+                r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            }
+            if (Core::Json::AttributeExists(v, "modified")) {
+                r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
+            }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetFunctionCountersResponse const &obj) {
-            jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"id", obj.id},
-                    {"functionArn", obj.functionArn},
-                    {"functionName", obj.functionName},
-                    {"role", obj.role},
-                    {"handler", obj.handler},
-                    {"runtime", obj.runtime},
-                    {"version", obj.version},
-                    {"zipFile", obj.zipFile},
-                    {"s3Bucket", obj.s3Bucket},
-                    {"s3Key", obj.s3Key},
-                    {"s3ObjectVersion", obj.s3ObjectVersion},
-                    {"size", obj.size},
-                    {"concurrency", obj.concurrency},
-                    {"instances", obj.instances},
-                    {"invocations", obj.invocations},
-                    {"averageRuntime", obj.averageRuntime},
-                    {"enabled", obj.enabled},
-                    {"state", obj.state},
-                    {"environment", boost::json::value_from(obj.environment)},
-                    {"tags", boost::json::value_from(obj.tags)},
-                    {"lastInvocation", Core::DateTimeUtils::ToISO8601(obj.lastInvocation)},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-            };
+            boost::json::object o;
+            o["region"] = obj.region;
+            o["user"] = obj.user;
+            o["id"] = obj.id;
+            o["functionArn"] = obj.functionArn;
+            o["functionName"] = obj.functionName;
+            o["role"] = obj.role;
+            o["handler"] = obj.handler;
+            o["runtime"] = obj.runtime;
+            o["version"] = obj.version;
+            o["zipFile"] = obj.zipFile;
+            o["s3Bucket"] = obj.s3Bucket;
+            o["s3Key"] = obj.s3Key;
+            o["s3ObjectVersion"] = obj.s3ObjectVersion;
+            o["size"] = obj.size;
+            o["concurrency"] = obj.concurrency;
+            o["instances"] = obj.instances;
+            o["invocations"] = obj.invocations;
+            o["averageRuntime"] = obj.averageRuntime;
+            o["enabled"] = obj.enabled;
+            o["state"] = obj.state;
+            o["environment"] = boost::json::value_from(obj.environment);
+            o["tags"] = boost::json::value_from(obj.tags);
+            if (obj.lastInvocation.has_value()) {
+                o["lastStarted"] = Core::DateTimeUtils::ToISO8601(obj.lastInvocation.value());
+            }
+            if (obj.lastStarted.has_value()) {
+                o["lastStarted"] = Core::DateTimeUtils::ToISO8601(obj.lastStarted.value());
+            }
+            if (obj.created.has_value()) {
+                o["created"] = Core::DateTimeUtils::ToISO8601(obj.created.value());
+            }
+            if (obj.modified.has_value()) {
+                o["modified"] = Core::DateTimeUtils::ToISO8601(obj.modified.value());
+            }
+            jv = o;
         }
     };
 

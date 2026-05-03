@@ -2,6 +2,8 @@
 
 #include <awsmock/service/sqs/SQSHandler.h>
 
+#include "awsmock/service/gateway/GatewayServer.h"
+
 namespace AwsMock::Service {
     http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SQS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -47,9 +49,13 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
 
                     Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, sqsRequest] {
-                        _sqsService.SetQueueAttributes(sqsRequest);
-                        log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
+                    boost::asio::post(GatewayServer::WorkerPool(), [sqsRequest]() {
+                        try {
+                            SQSService{}.SetQueueAttributes(sqsRequest);
+                            log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
+                        } catch (const std::exception &e) {
+                            log_error << "Setting queue attributes failed: " << e.what();
+                        }
                     });
                     return SendResponse(request, http::status::ok);
                 }
@@ -279,8 +285,7 @@ namespace AwsMock::Service {
                     Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.UpdateMessage(sqsRequest);
-                        log_info << "Update message, messageId: " << sqsRequest.messageId;
-                    }, boost::asio::detached);
+                        log_info << "Update message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -291,8 +296,7 @@ namespace AwsMock::Service {
                     Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ResendMessage(sqsRequest);
-                        log_info << "Resend message, messageId: " << sqsRequest.messageId;
-                    }, boost::asio::detached);
+                        log_info << "Resend message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -359,8 +363,7 @@ namespace AwsMock::Service {
                     Dto::SQS::ImportMessagesRequest sqsRequest = Dto::SQS::ImportMessagesRequest::FromJson(clientCommand.payload);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ImportMessages(sqsRequest);
-                        log_info << "Import messages";
-                    }, boost::asio::detached);
+                        log_info << "Import messages"; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -462,4 +465,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

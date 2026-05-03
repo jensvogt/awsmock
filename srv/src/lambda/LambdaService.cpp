@@ -994,8 +994,8 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
 
         // Check state
-        if (lambda.state == Database::Entity::Lambda::Active) {
-            log_info << "Lambda function already running, functionArn: " << request.functionArn;
+        if (lambda.state == Database::Entity::Lambda::Active && lambda.instances.size() > lambda.concurrency) {
+            log_warning << "Maximal number of instances exceeded, functionArn: " << request.functionArn << ", concurrency: " << lambda.concurrency;
             return;
         }
 

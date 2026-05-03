@@ -100,7 +100,7 @@ namespace AwsMock::Service {
     // Return a response for the given request. The concrete type of the response message (which depends on the request)
     // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -114,15 +114,14 @@ namespace AwsMock::Service {
             return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
-        std::shared_ptr<AbstractHandler> handler;
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            handler = GatewayRouter::GetHandler(target, _ioc);
-            if (!handler) {
+            _handler = GatewayRouter::GetHandler(target, _ioc);
+            if (!_handler) {
                 log_error << "Handler not found, target: " << target;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
             }
-            log_trace << "Handler found, name: " << handler->name();
+            log_trace << "Handler found, name: " << _handler->name();
         } else {
             // Verify AWS signature
             if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
@@ -134,35 +133,35 @@ namespace AwsMock::Service {
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
             _region = authKey.region;
-            handler = GatewayRouter::GetHandler(authKey.module, _ioc);
-            if (!handler) {
+            _handler = GatewayRouter::GetHandler(authKey.module, _ioc);
+            if (!_handler) {
                 log_error << "Handler not found, target: " << authKey.module;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
             }
-            log_trace << "Handler found, name: " << handler->name();
+            log_trace << "Handler found, name: " << _handler->name();
         }
 
-        if (handler) {
+        if (_handler) {
             switch (request.method()) {
                 case http::verb::get: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "GET"};
-                    return handler->HandleGetRequest(request, _region, _user);
+                    return _handler->HandleGetRequest(request, _region, _user);
                 }
                 case http::verb::put: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "PUT"};
-                    return handler->HandlePutRequest(request, _region, _user);
+                    return _handler->HandlePutRequest(request, _region, _user);
                 }
                 case http::verb::post: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "POST"};
-                    return handler->HandlePostRequest(request, _region, _user);
+                    return _handler->HandlePostRequest(request, _region, _user);
                 }
                 case http::verb::delete_: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "DELETE"};
-                    return handler->HandleDeleteRequest(request, _region, _user);
+                    return _handler->HandleDeleteRequest(request, _region, _user);
                 }
                 case http::verb::head: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "HEAD"};
-                    return handler->HandleHeadRequest(request, _region, _user);
+                    return _handler->HandleHeadRequest(request, _region, _user);
                 }
                 default:
                     return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
@@ -271,4 +270,4 @@ namespace AwsMock::Service {
         QueueWrite(std::move(response));
         log_debug << "Options request answered";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

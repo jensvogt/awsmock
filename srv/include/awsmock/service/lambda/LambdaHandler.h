@@ -9,9 +9,6 @@
 #include <memory>
 
 // AwsMock includes
-#include "awsmock/service/module/ModuleService.h"
-
-
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
@@ -21,7 +18,9 @@
 #include <awsmock/dto/lambda/internal/DisableLambdaRequest.h>
 #include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/lambda/LambdaService.h>
+#include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Service {
 
@@ -33,16 +32,17 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaHandler final : public AbstractHandler, std::enable_shared_from_this<LambdaHandler> {
+    class LambdaHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc), _lambdaService(ioc), _ioc(ioc) {
+        explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc) {
             _moduleService = std::make_shared<ModuleService>();
             _lambdaService.sigLambdaCodeUpdated.connect(
-                boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService) // This is the 'magic' that prevents crashes!
+                    boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService)// This is the 'magic' that prevents crashes!
             );
         }
 
@@ -90,20 +90,19 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         /**
-         * Lambda module
+         * @brief Lambda module
          */
         LambdaService _lambdaService;
 
-        std::shared_ptr<ModuleService> _moduleService;
-
         /**
-         * Boost IO context
+         * @brief module service
          */
-        boost::asio::io_context &_ioc;
+        std::shared_ptr<ModuleService> _moduleService;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_HANDLER_H

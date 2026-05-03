@@ -5,7 +5,7 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc), _scheduler(scheduler) {
+    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(), _scheduler(scheduler) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.GetValue<std::string>("awsmock.region");

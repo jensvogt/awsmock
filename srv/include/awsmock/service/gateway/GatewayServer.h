@@ -10,6 +10,7 @@
 
 // Boost includes
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/thread_pool.hpp>
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
@@ -48,6 +49,14 @@ namespace AwsMock::Service {
          * @brief Gracefully shutdown the server
          */
         void Shutdown() override;
+
+        /**
+         * @brief Global worker pool for long-running tasks
+         */
+        static boost::asio::thread_pool &WorkerPool() {
+            static boost::asio::thread_pool pool(std::max(2u, std::thread::hardware_concurrency()));
+            return pool;
+        }
 
       private:
 

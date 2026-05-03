@@ -127,8 +127,8 @@ namespace AwsMock::Service {
          *
          * @param ioc boost asio IO context
          */
-        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()),
-                                                               _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()),
+                                   _snsDatabase(Database::SNSDatabase::instance()) {
         }
 
         /**
@@ -644,7 +644,7 @@ namespace AwsMock::Service {
         /**
          * @brief Boost IO context
          */
-        boost::asio::io_context &_ioc;
+        //boost::asio::io_context &_ioc;
 
         /**
          * @brief Lambda executor

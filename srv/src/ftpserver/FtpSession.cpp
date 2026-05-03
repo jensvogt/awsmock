@@ -16,7 +16,7 @@ namespace AwsMock::FtpServer {
         _transferDir = configuration.GetValue<std::string>("awsmock.modules.transfer.data-dir");
 
         // S3 service
-        _s3Service = std::make_shared<Service::S3Service>(_awsIoc);
+        _s3Service = std::make_shared<Service::S3Service>();
     }
 
     FtpSession::~FtpSession() {
