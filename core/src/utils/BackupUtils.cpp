@@ -5,6 +5,7 @@
 #include <awsmock/core/BackupUtils.h>
 
 namespace AwsMock::Core {
+    
     std::string BackupUtils::GetBackupFilename(const std::string &module) {
         const auto backupDir = Configuration::instance().GetValue<std::string>("awsmock.backup-dir");
         DirUtils::EnsureDirectory(backupDir);
@@ -12,11 +13,8 @@ namespace AwsMock::Core {
     }
 
     std::string BackupUtils::GetTimestamp() {
-        const std::time_t now = std::time(nullptr);
-        const tm *temp = localtime(&now);
-        char buffer[15];
-        strftime(buffer, sizeof(buffer), "%Y%m%d%H%M", temp);
-        return {buffer};
+        const auto now = system_clock::now();
+        return std::format("{:%Y%m%d%H%M}", std::chrono::floor<std::chrono::minutes>(now));
     }
 
     std::vector<std::string> BackupUtils::GetBackupFiles(const std::string &module, const int retention) {

@@ -4,7 +4,7 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/jensvogt/awsmock)
 ![License](https://img.shields.io/github/license/jensvogt/awsmock)
 ![Language](https://img.shields.io/github/languages/top/jensvogt/awsmock)
-![CI](https://img.shields.io/github/actions/workflow/status/jensvogt/awsmock/cmake.yml)
+![CI](https://img.shields.io/github/actions/workflow/status/jensvogt/awsmock/build-release.yml)
 
 > Run AWS services locally — no cloud account, no costs, no latency.  
 > A high-performance C++ alternative to LocalStack that starts in under a second.
