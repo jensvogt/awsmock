@@ -8,7 +8,8 @@ on:
 env:
   APP_NAME: "awsmock"
   INSTALLER_ID: "de.jensvogt.awsmock"
-
+  VCPKG_BUILD_TYPE: release
+  
 permissions:
   contents: write
   pull-requests: write

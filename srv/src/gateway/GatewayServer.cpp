@@ -31,7 +31,8 @@ namespace AwsMock::Service {
     }
 
     void GatewayServer::Shutdown() {
+        WorkerPool().join();
         _ios.stop();
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

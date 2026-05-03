@@ -1,6 +1,8 @@
 
 #include <awsmock/service/sns/SNSHandler.h>
 
+#include "awsmock/service/gateway/GatewayServer.h"
+
 namespace AwsMock::Service {
     http::response<http::dynamic_body> SNSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SNS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -176,16 +178,25 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
                     Dto::SNS::PurgeTopicRequest snsRequest = Dto::SNS::PurgeTopicRequest::FromJson(clientCommand.payload);
-                    long deleted = _snsService.PurgeTopic(snsRequest);
-
-                    log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
+                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                        try {
+                            const long deleted = SNSService{}.PurgeTopic(snsRequest);
+                            log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
+                        } catch (const std::exception &e) {
+                            log_error << "Purging topic failed: " << e.what();
+                        }
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
-                    boost::asio::post(_ioc, [self = shared_from_this()] {
-                        const long purged = self->_snsService.PurgeAllTopics();
-                        log_info << "All topic purged, count: " << purged;
+                    boost::asio::post(GatewayServer::WorkerPool(), []() {
+                        try {
+                            const long purged = SNSService{}.PurgeAllTopics();
+                            log_info << "All topic purged, count: " << purged;
+                        } catch (const std::exception &e) {
+                            log_error << "Purging all topic failed: " << e.what();
+                        }
                     });
                     return SendResponse(request, http::status::ok);
                 }
@@ -222,9 +233,13 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
                     Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
-                    boost::asio::post(_ioc, [snsRequest, self = shared_from_this()] {
-                        self->_snsService.DeleteMessage(snsRequest);
-                        log_info << "Message deleted, messageId: " << snsRequest.messageId;
+                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                        try {
+                            SNSService{}.DeleteMessage(snsRequest);
+                            log_info << "Message deleted, messageId: " << snsRequest.messageId;
+                        } catch (const std::exception &e) {
+                            log_error << "Deleting message failed: " << e.what();
+                        }
                     });
                     return SendResponse(request, http::status::ok);
                 }
@@ -402,4 +417,4 @@ namespace AwsMock::Service {
         return tags;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

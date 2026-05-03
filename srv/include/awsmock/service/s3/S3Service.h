@@ -95,12 +95,13 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {
-        };
+        explicit S3Service() : _database(Database::S3Database::instance()) {
+        }
 
         /**
          * @brief Checks whether a bucket exists
@@ -411,14 +412,15 @@ namespace AwsMock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
          * @param eventNotification S3 event notification.
          * @param queueNotification queue notification.
          */
-        void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
+        static void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
 
         /**
          * @brief Sends a message to the corresponding SNS topic.
@@ -426,7 +428,7 @@ namespace AwsMock::Service {
          * @param eventNotification S3 event notification.
          * @param topicNotification topic notification.
          */
-        void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification);
+        static void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification);
 
         /**
          * @brief Send lambda function invocation request to lambda module.
@@ -589,14 +591,8 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
-
-        /**
-         * IO context
-         */
-        boost::asio::io_context _ioc;
-        
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H

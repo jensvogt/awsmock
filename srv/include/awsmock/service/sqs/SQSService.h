@@ -102,11 +102,12 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
         }
 
         /**
@@ -484,7 +485,8 @@ namespace AwsMock::Service {
          */
         void ReloadAllCounters() const;
 
-    private:
+      private:
+
         /**
          * @brief Send a lambda invocation request for a message.
          *
@@ -537,6 +539,6 @@ namespace AwsMock::Service {
          */
         LambdaService _lambdaService;
     };
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVICE_H

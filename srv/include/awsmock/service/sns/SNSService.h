@@ -43,13 +43,13 @@
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
 #include <awsmock/dto/sns/internal/AddDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sns/internal/AddSubscriptionCounterRequest.h>
 #include <awsmock/dto/sns/internal/DeleteDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sns/internal/DeleteSubscriptionCounterRequest.h>
 #include <awsmock/dto/sns/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sns/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sns/internal/GetMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/GetMessageCountersResponse.h>
-#include <awsmock/dto/sns/internal/AddSubscriptionCounterRequest.h>
-#include <awsmock/dto/sns/internal/DeleteSubscriptionCounterRequest.h>
 #include <awsmock/dto/sns/internal/GetSubscriptionCounterRequest.h>
 #include <awsmock/dto/sns/internal/GetSubscriptionCounterResponse.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
@@ -92,12 +92,12 @@ namespace AwsMock::Service {
      */
     class SNSService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc),
-                                                            _ioc(ioc) {
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
         }
 
         /**
@@ -414,7 +414,8 @@ namespace AwsMock::Service {
          */
         void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Checks the subscriptions.
          *
@@ -442,6 +443,13 @@ namespace AwsMock::Service {
          */
         void AdjustTopicCounters(Database::Entity::SNS::Topic &topic) const;
 
+        /**
+         * @brief Sanitize content type
+         *
+         * @param contentType content type
+         * @param body request body
+         * @return sanitized content type
+         */
         static std::string SanitizeContentType(const std::string &contentType, const std::string &body);
 
         /**
@@ -494,13 +502,8 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
-
-        /**
-         * Boost asio IO context
-         */
-        boost::asio::io_context &_ioc;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SNS_SERVICE_H

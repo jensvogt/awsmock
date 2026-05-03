@@ -1,6 +1,8 @@
 
 #include <awsmock/service/s3/S3Handler.h>
 
+#include "awsmock/service/gateway/GatewayServer.h"
+
 namespace AwsMock::Service {
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "S3 GET request, URI: " << request.target() << " region: " << region << " user: " + user;
@@ -645,8 +647,13 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, s3Request] {
-                        _s3Service.TouchObject(s3Request);
+                    boost::asio::post(GatewayServer::WorkerPool(), [s3Request]() {
+                        try {
+                            S3Service{}.TouchObject(s3Request);
+                            log_info << "Touched all S3 object, region: " << s3Request.region;
+                        } catch (const std::exception &e) {
+                            log_error << "Disable all lambdas failed: " << e.what();
+                        }
                     });
                     return SendResponse(request, http::status::ok);
                 }
@@ -656,8 +663,13 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, s3Request] {
-                        _s3Service.UpdateObject(s3Request);
+                    boost::asio::post(GatewayServer::WorkerPool(), [s3Request]() {
+                        try {
+                            S3Service{}.UpdateObject(s3Request);
+                            log_info << "Updated S3 object, region: " << s3Request.region;
+                        } catch (const std::exception &e) {
+                            log_error << "Update object failed: " << e.what();
+                        }
                     });
                     return SendResponse(request, http::status::ok);
                 }
@@ -695,10 +707,14 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::DELETE_ALL_OBJECTS: {
                     // Build request
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
-                    //                    boost::asio::post(_ioc, [this, s3Request] {
-                    const auto s3response = _s3Service.DeleteObjects(s3Request);
-                    log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
-                    //                    });
+                    boost::asio::post(GatewayServer::WorkerPool(), [s3Request]() {
+                        try {
+                            const auto s3response = S3Service{}.DeleteObjects(s3Request);
+                            log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
+                        } catch (const std::exception &e) {
+                            log_error << "Update object failed: " << e.what();
+                        }
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 

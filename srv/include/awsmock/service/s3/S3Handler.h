@@ -27,11 +27,12 @@ namespace AwsMock::Service {
      */
     class S3Handler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit S3Handler(boost::asio::io_context &ioc) : AbstractHandler("s3-handler", ioc), _s3Service(ioc) {
+        explicit S3Handler(boost::asio::io_context &ioc) : AbstractHandler("s3-handler", ioc) {
         }
 
         /**
@@ -89,7 +90,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         /**
          * @brief Get the range for a range request
          *
@@ -136,6 +138,6 @@ namespace AwsMock::Service {
         S3Service _s3Service;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_HANDLER_H
