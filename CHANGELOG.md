@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.9](https://github.com/jensvogt/awsmock/compare/1.18.8...v1.18.9) (2026-05-03)
+
+
+### Bug Fixes
+
+* asynchronous handler methods ([9bbd674](https://github.com/jensvogt/awsmock/commit/9bbd674be9128e3687cc6f3b6a7e5d9e5d769d52))
+* dynamodb item export ([ed85b11](https://github.com/jensvogt/awsmock/commit/ed85b11d1853614c664050fa958d59799757f532))
+
 ## [1.18.8](https://github.com/jensvogt/awsmock/compare/v1.18.7...v1.18.8) (2026-05-02)
 
 
