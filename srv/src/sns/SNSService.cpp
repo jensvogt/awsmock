@@ -232,6 +232,52 @@ namespace AwsMock::Service {
         }
     }
 
+    void SNSService::ResendMessage(const Dto::SNS::ResendMessageRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "resend_message");
+        log_trace << "Resend message request, region: " << request.region << " topicArn: " << request.topicArn << ", messageId: " << request.messageId;
+
+        // Check topic existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_warning << "Topic does not exist, arn: " << request.topicArn;
+            throw Core::NotFoundException("Topic does not exist");
+        }
+
+        // Check message existence
+        if (!_snsDatabase.MessageExists(request.messageId)) {
+            log_warning << "Message does not exist, messageId: " << request.messageId;
+            throw Core::NotFoundException("Message does not exist, messageId: " + request.messageId);
+        }
+
+        try {
+
+            // Get topic
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            // Get message
+            Database::Entity::SNS::Message message = _snsDatabase.GetMessageByMessageId(request.messageId);
+
+            // Resend messages
+
+            // Create publish request
+            Dto::SNS::PublishRequest publishRequest;
+            publishRequest.region = request.region;
+            publishRequest.user = request.user;
+            publishRequest.requestId = request.requestId;
+            publishRequest.topicArn = message.topicArn;
+            publishRequest.targetArn = message.targetArn;
+            publishRequest.message = message.message;
+            publishRequest.messageAttributes = Dto::SNS::MessageAttributeMapper::toDtoMap(message.messageAttributes);
+
+            // Check subscriptions
+            CheckSubscriptions(publishRequest, topic, message);
+            log_debug << "SNS publish response: " << message.messageId;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS resend topic failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const Dto::SNS::DeleteTopicRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_topic");
         log_trace << "Delete topic request, region: " << request.region << " topicArn: " << request.topicArn;
