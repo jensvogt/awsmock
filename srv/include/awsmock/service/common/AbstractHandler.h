@@ -46,7 +46,6 @@ namespace AwsMock::Service {
          */
         explicit AbstractHandler(const std::string &name, boost::asio::io_context &ioc) : _ioc(ioc), _name(std::move(name)) {
                                                                                           };
-
         /**
          * @brief Handles the HTTP method GET.
          *

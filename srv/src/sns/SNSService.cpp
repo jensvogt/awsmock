@@ -193,6 +193,45 @@ namespace AwsMock::Service {
         }
     }
 
+    void SNSService::ResendTopic(const Dto::SNS::ResendTopicRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "resend_topic");
+        log_trace << "Resend topic request, region: " << request.region << " topicArn: " << request.topicArn;
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_warning << "Topic does not exist, arn: " << request.topicArn;
+            throw Core::NotFoundException("Topic does not exist");
+        }
+
+        try {
+
+            // Get topic
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+
+            // Resend messages
+            for (const auto &message: _snsDatabase.ListMessages(request.topicArn)) {
+
+                // Create publish request
+                Dto::SNS::PublishRequest publishRequest;
+                publishRequest.region = request.region;
+                publishRequest.user = request.user;
+                publishRequest.requestId = request.requestId;
+                publishRequest.topicArn = message.topicArn;
+                publishRequest.targetArn = message.targetArn;
+                publishRequest.message = message.message;
+                publishRequest.messageAttributes = Dto::SNS::MessageAttributeMapper::toDtoMap(message.messageAttributes);
+
+                // Check subscriptions
+                CheckSubscriptions(publishRequest, topic, message);
+                log_debug << "SNS publish response: " << message.messageId;
+            }
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS resend topic failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const Dto::SNS::DeleteTopicRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_topic");
         log_trace << "Delete topic request, region: " << request.region << " topicArn: " << request.topicArn;
@@ -961,7 +1000,7 @@ namespace AwsMock::Service {
         sqsNotificationRequest.requestId = request.requestId;
 
         // Message attribute
-        for (const auto &[k,v]: request.messageAttributes) {
+        for (const auto &[k, v]: request.messageAttributes) {
             Dto::SNS::NotificationMessageAttribute messageAttribute;
             messageAttribute.type = Dto::SNS::MessageAttributeDataTypeToString(v.dataType);
             messageAttribute.value = messageAttribute.type == "Binary" ? Core::Crypto::Base64EncodeRaw(v.binaryValue) : v.stringValue;
@@ -1158,4 +1197,4 @@ namespace AwsMock::Service {
         return contentType;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
