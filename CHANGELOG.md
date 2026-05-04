@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.11](https://github.com/jensvogt/awsmock/compare/v1.18.10...v1.18.11) (2026-05-04)
+
+
+### Bug Fixes
+
+* resend single SNS messages ([a0832db](https://github.com/jensvogt/awsmock/commit/a0832db32f018cbff52147d1df37ebce485dad67))
+
 ## [1.18.10](https://github.com/jensvogt/awsmock/compare/1.18.9...v1.18.10) (2026-05-04)
 
 
