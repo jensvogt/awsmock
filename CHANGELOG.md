@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.12](https://github.com/jensvogt/awsmock/compare/1.18.11...v1.18.12) (2026-05-04)
+
+
+### Bug Fixes
+
+* purge SQS queues ([ae4bb44](https://github.com/jensvogt/awsmock/commit/ae4bb444761ba50111e9c7d087f3b9d5c1648a65))
+* purge SQS queues ([24912d7](https://github.com/jensvogt/awsmock/commit/24912d767f07f1d1cf1ca087b1c892177e5a5264))
+
 ## [1.18.11](https://github.com/jensvogt/awsmock/compare/v1.18.10...v1.18.11) (2026-05-04)
 
 
