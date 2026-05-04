@@ -24,17 +24,28 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
-
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
-                    const long purged = _sqsService.PurgeQueue(sqsRequest);
-                    log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged;
+                    boost::asio::post(GatewayServer::WorkerPool(), [sqsRequest]() {
+                        try {
+                            const long purged = SQSService{}.PurgeQueue(sqsRequest);
+                            log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged;
+                        } catch (const std::exception &e) {
+                            log_error << "Purge queue failed: " << e.what();
+                        }
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_ALL_QUEUES: {
 
-                    const long purged = _sqsService.PurgeAllQueues();
-                    log_info << "Purge all queues, count: " << purged;
+                    boost::asio::post(GatewayServer::WorkerPool(), []() {
+                        try {
+                            const long purged = SQSService{}.PurgeAllQueues();
+                            log_info << "Purge all queues, count: " << purged;
+                        } catch (const std::exception &e) {
+                            log_error << "Purge all queue failed: " << e.what();
+                        }
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -285,7 +296,8 @@ namespace AwsMock::Service {
                     Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.UpdateMessage(sqsRequest);
-                        log_info << "Update message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                        log_info << "Update message, messageId: " << sqsRequest.messageId;
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -296,7 +308,8 @@ namespace AwsMock::Service {
                     Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ResendMessage(sqsRequest);
-                        log_info << "Resend message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                        log_info << "Resend message, messageId: " << sqsRequest.messageId;
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -363,7 +376,8 @@ namespace AwsMock::Service {
                     Dto::SQS::ImportMessagesRequest sqsRequest = Dto::SQS::ImportMessagesRequest::FromJson(clientCommand.payload);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ImportMessages(sqsRequest);
-                        log_info << "Import messages"; }, boost::asio::detached);
+                        log_info << "Import messages";
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendResponse(request, http::status::ok);
@@ -465,4 +479,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
