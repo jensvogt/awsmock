@@ -66,6 +66,7 @@ namespace AwsMock::Dto::Common {
         DELETE_DEFAULT_MESSAGE_ATTRIBUTE,
         RELOAD_ALL_COUNTERS,
         RESEND_TOPIC,
+        RESEND_MESSAGE,
         UNKNOWN
     };
 
@@ -106,6 +107,7 @@ namespace AwsMock::Dto::Common {
             {SNSCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
             {SNSCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
             {SNSCommandType::RESEND_TOPIC, "resend-topic"},
+            {SNSCommandType::RESEND_MESSAGE, "resend-message"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {

@@ -68,6 +68,7 @@
 #include <awsmock/dto/sns/internal/ListTagCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
+#include <awsmock/dto/sns/internal/ResendMessageRequest.h>
 #include <awsmock/dto/sns/internal/ResendTopicRequest.h>
 #include <awsmock/dto/sns/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sns/mapper/Mapper.h>
@@ -354,11 +355,18 @@ namespace AwsMock::Service {
         void ReloadAllCounters() const;
 
         /**
-         * @brief Resend all messages in the queue
+         * @brief Resend all messages available in the topic
          *
          * @param request resend request
          */
         void ResendTopic(const Dto::SNS::ResendTopicRequest &request) const;
+
+        /**
+         * @brief Resend a single message
+         *
+         * @param request resend request
+         */
+        void ResendMessage(const Dto::SNS::ResendMessageRequest &request) const;
 
         /**
          * @brief Returns an event source as a lambda configuration

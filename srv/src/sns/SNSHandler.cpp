@@ -371,6 +371,20 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::SNSCommandType::RESEND_MESSAGE: {
+
+                    Dto::SNS::ResendMessageRequest snsRequest = Dto::SNS::ResendMessageRequest::FromJson(clientCommand);
+                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                        try {
+                            SNSService{}.ResendMessage(snsRequest);
+                            log_info << "Message resend, topicArn: " << snsRequest.topicArn;
+                        } catch (const std::exception &e) {
+                            log_error << "Resending message failed: " << e.what();
+                        }
+                    });
+                    return SendResponse(request, http::status::ok);
+                }
+
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";
