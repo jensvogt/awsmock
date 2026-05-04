@@ -68,6 +68,7 @@
 #include <awsmock/dto/sns/internal/ListTagCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
+#include <awsmock/dto/sns/internal/ResendTopicRequest.h>
 #include <awsmock/dto/sns/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sns/mapper/Mapper.h>
 #include <awsmock/dto/sns/model/DeleteTopicRequest.h>
@@ -353,6 +354,13 @@ namespace AwsMock::Service {
         void ReloadAllCounters() const;
 
         /**
+         * @brief Resend all messages in the queue
+         *
+         * @param request resend request
+         */
+        void ResendTopic(const Dto::SNS::ResendTopicRequest &request) const;
+
+        /**
          * @brief Returns an event source as a lambda configuration
          *
          * @param request get event source request
@@ -368,7 +376,8 @@ namespace AwsMock::Service {
          * @return DeleteTopicResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SNS::DeleteTopicResponse DeleteTopic(const Dto::SNS::DeleteTopicRequest &request) const;
+        [[nodiscard]]
+        Dto::SNS::DeleteTopicResponse DeleteTopic(const Dto::SNS::DeleteTopicRequest &request) const;
 
         /**
          * @brief List messages

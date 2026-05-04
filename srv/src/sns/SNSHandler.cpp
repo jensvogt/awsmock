@@ -1,8 +1,6 @@
 
 #include <awsmock/service/sns/SNSHandler.h>
 
-#include "awsmock/service/gateway/GatewayServer.h"
-
 namespace AwsMock::Service {
     http::response<http::dynamic_body> SNSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SNS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -356,6 +354,20 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::RELOAD_ALL_COUNTERS: {
 
                     _snsService.ReloadAllCounters();
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::SNSCommandType::RESEND_TOPIC: {
+
+                    Dto::SNS::ResendTopicRequest snsRequest = Dto::SNS::ResendTopicRequest::FromJson(clientCommand);
+                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                        try {
+                            SNSService{}.ResendTopic(snsRequest);
+                            log_info << "Message resend, topicArn: " << snsRequest.topicArn;
+                        } catch (const std::exception &e) {
+                            log_error << "Resending messages failed: " << e.what();
+                        }
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 

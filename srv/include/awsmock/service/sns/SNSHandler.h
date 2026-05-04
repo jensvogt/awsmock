@@ -9,6 +9,7 @@
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/sns/SNSService.h>
 
 #define FORMAT_XML 0
