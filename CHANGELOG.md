@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.14](https://github.com/jensvogt/awsmock/compare/1.18.13...v1.18.14) (2026-05-12)
+
+
+### Bug Fixes
+
+* SQS queue tagging ([#2294](https://github.com/jensvogt/awsmock/issues/2294)) ([737b0d8](https://github.com/jensvogt/awsmock/commit/737b0d858dfe06cd8621efff870ae71506b8e41c))
+
 ## [1.18.13](https://github.com/jensvogt/awsmock/compare/1.18.12...v1.18.13) (2026-05-12)
 
 
