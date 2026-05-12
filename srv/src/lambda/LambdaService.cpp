@@ -1103,10 +1103,10 @@ namespace AwsMock::Service {
         const ContainerService &dockerService = ContainerService::instance();
         for (const auto &instance: lambda.instances) {
             if (instance.instanceId == request.instanceId && dockerService.ContainerExists(instance.containerId)) {
-                Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
-                dockerService.StopContainer(container.id);
-                dockerService.DeleteContainer(container);
-                log_debug << "Docker container stopped and deleted, containerId: " + container.id;
+                const Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
+                dockerService.KillContainer(container.id);
+                log_debug << "Docker container stopped, containerId: " + container.id;
+                break;
             }
         }
 

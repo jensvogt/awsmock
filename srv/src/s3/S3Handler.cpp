@@ -607,6 +607,21 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::S3CommandType::PURGE_ALL_BUCKETS: {
+                    log_debug << "S3 purge all buckets request";
+
+                    // Build request
+                    boost::asio::post(GatewayServer::WorkerPool(), []() {
+                        try {
+                            const long deleted = S3Service{}.PurgeAllBuckets();
+                            log_info << "Purge all buckets, deleted: " << deleted;
+                        } catch (const std::exception &e) {
+                            log_error << "Purge all buckets failed: " << e.what();
+                        }
+                    });
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::S3CommandType::UPDATE_BUCKET: {
                     log_debug << "S3 update bucket request";
 
