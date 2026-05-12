@@ -503,16 +503,17 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
 
-            document query = {};
+            auto builder = bsoncxx::builder::basic::document{};
+
             if (!prefix.empty()) {
-                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+                builder.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
 
             if (!region.empty()) {
-                query.append(kvp("region", region));
+                builder.append(kvp("region", region));
             }
 
-            return static_cast<long>(_queueCollection.count_documents(query.view()));
+            return _queueCollection.count_documents(builder.view());
         }
         return _memoryDb.CountQueues(region, prefix);
     }
