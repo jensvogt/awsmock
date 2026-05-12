@@ -117,6 +117,30 @@ namespace AwsMock::Service {
         }
     }
 
+    long S3Service::PurgeAllBuckets() const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "purge_all_buckets");
+        log_trace << "Purge all buckets request";
+
+        try {
+            // Get bucket
+            const std::vector<Database::Entity::S3::Bucket> buckets = _database.ListBuckets();
+
+            // Purge bucket
+            long deleted{};
+            for (const auto &bucket: buckets) {
+                Dto::S3::PurgeBucketRequest request;
+                request.region = bucket.region;
+                request.bucketName = bucket.name;
+                deleted += PurgeBucket(request);
+            }
+            return deleted;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "S3 purge bucket failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     void S3Service::UpdateBucket(const Dto::S3::UpdateBucketRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "update_bucket");
         log_trace << "Update bucket request, body: " << request.ToString();

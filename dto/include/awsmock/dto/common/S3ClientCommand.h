@@ -37,6 +37,7 @@ namespace AwsMock::Dto::Common {
         LIST_BUCKET_ARNS,
         GET_BUCKET,
         PURGE_BUCKET,
+        PURGE_ALL_BUCKETS,
         UPDATE_BUCKET,
         DELETE_BUCKET,
         LIST_OBJECTS,
@@ -75,46 +76,47 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<S3CommandType, std::string> S3CommandTypeNames{
-        {S3CommandType::CREATE_BUCKET, "CreateBucket"},
-        {S3CommandType::LIST_BUCKETS, "ListBuckets"},
-        {S3CommandType::LIST_BUCKET_COUNTERS, "ListBucketCounters"},
-        {S3CommandType::LIST_BUCKET_ARNS, "ListBucketArns"},
-        {S3CommandType::GET_BUCKET, "GetBucket"},
-        {S3CommandType::PURGE_BUCKET, "PurgeBucket"},
-        {S3CommandType::UPDATE_BUCKET, "UpdateBucket"},
-        {S3CommandType::DELETE_BUCKET, "DeleteBucket"},
-        {S3CommandType::LIST_OBJECTS, "ListObjects"},
-        {S3CommandType::LIST_OBJECT_COUNTERS, "ListObjectCounters"},
-        {S3CommandType::PUT_OBJECT, "PutObject"},
-        {S3CommandType::GET_OBJECT, "GetObject"},
-        {S3CommandType::GET_OBJECT_RANGE, "GetObjectRange"},
-        {S3CommandType::COPY_OBJECT, "CopyObject"},
-        {S3CommandType::MOVE_OBJECT, "MoveObject"},
-        {S3CommandType::DELETE_OBJECT, "DeleteObject"},
-        {S3CommandType::DELETE_OBJECTS, "DeleteObjects"},
-        {S3CommandType::CREATE_MULTIPART_UPLOAD, "CreateMultipartUpload"},
-        {S3CommandType::UPLOAD_PART, "PartMultipartUpload"},
-        {S3CommandType::UPLOAD_PART_COPY, "PartMultipartUploadCopy"},
-        {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
-        {S3CommandType::ABORT_MULTIPART_UPLOAD, "AbortMultipartUpload"},
-        {S3CommandType::LIST_OBJECT_VERSIONS, "ListObjectVersions"},
-        {S3CommandType::BUCKET_NOTIFICATION, "BucketNotification"},
-        {S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION, "PutBucketNotificationConfiguration"},
-        {S3CommandType::PUT_BUCKET_ENCRYPTION, "PurBucketEncryption"},
-        {S3CommandType::PUT_BUCKET_VERSIONING, "PutBucketVersioning"},
-        {S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION, "PutBucketLifecycleConfiguration"},
-        {S3CommandType::GET_BUCKET_LIFECYCLE_CONFIGURATION, "GetBucketLifecycleConfiguration"},
-        {S3CommandType::DELETE_BUCKET_LIFECYCLE, "DeleteBucketLifecycle"},
-        {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
-        {S3CommandType::UPLOAD_OBJECT_COUNTER, "UploadObjectCounter"},
-        {S3CommandType::GET_EVENT_SOURCE, "GetEventSource"},
-        {S3CommandType::TOUCH_OBJECT, "TouchObject"},
-        {S3CommandType::ADD_BUCKET_COUNTER, "AddBucketCounter"},
-        {S3CommandType::DELETE_BUCKET_COUNTER, "DeleteBucketCounter"},
-        {S3CommandType::DELETE_OBJECT_COUNTER, "DeleteObjectCounter"},
-        {S3CommandType::DELETE_ALL_OBJECTS, "DeleteAllObjects"},
-        {S3CommandType::RELOAD_ALL_COUNTERS, "ReloadAllCounters"},
-        {S3CommandType::UPDATE_OBJECT, "UpdateObject"},
+            {S3CommandType::CREATE_BUCKET, "CreateBucket"},
+            {S3CommandType::LIST_BUCKETS, "ListBuckets"},
+            {S3CommandType::LIST_BUCKET_COUNTERS, "ListBucketCounters"},
+            {S3CommandType::LIST_BUCKET_ARNS, "ListBucketArns"},
+            {S3CommandType::GET_BUCKET, "GetBucket"},
+            {S3CommandType::PURGE_BUCKET, "PurgeBucket"},
+            {S3CommandType::PURGE_ALL_BUCKETS, "PurgeAllBuckets"},
+            {S3CommandType::UPDATE_BUCKET, "UpdateBucket"},
+            {S3CommandType::DELETE_BUCKET, "DeleteBucket"},
+            {S3CommandType::LIST_OBJECTS, "ListObjects"},
+            {S3CommandType::LIST_OBJECT_COUNTERS, "ListObjectCounters"},
+            {S3CommandType::PUT_OBJECT, "PutObject"},
+            {S3CommandType::GET_OBJECT, "GetObject"},
+            {S3CommandType::GET_OBJECT_RANGE, "GetObjectRange"},
+            {S3CommandType::COPY_OBJECT, "CopyObject"},
+            {S3CommandType::MOVE_OBJECT, "MoveObject"},
+            {S3CommandType::DELETE_OBJECT, "DeleteObject"},
+            {S3CommandType::DELETE_OBJECTS, "DeleteObjects"},
+            {S3CommandType::CREATE_MULTIPART_UPLOAD, "CreateMultipartUpload"},
+            {S3CommandType::UPLOAD_PART, "PartMultipartUpload"},
+            {S3CommandType::UPLOAD_PART_COPY, "PartMultipartUploadCopy"},
+            {S3CommandType::COMPLETE_MULTIPART_UPLOAD, "CompleteMultipartUpload"},
+            {S3CommandType::ABORT_MULTIPART_UPLOAD, "AbortMultipartUpload"},
+            {S3CommandType::LIST_OBJECT_VERSIONS, "ListObjectVersions"},
+            {S3CommandType::BUCKET_NOTIFICATION, "BucketNotification"},
+            {S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION, "PutBucketNotificationConfiguration"},
+            {S3CommandType::PUT_BUCKET_ENCRYPTION, "PurBucketEncryption"},
+            {S3CommandType::PUT_BUCKET_VERSIONING, "PutBucketVersioning"},
+            {S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION, "PutBucketLifecycleConfiguration"},
+            {S3CommandType::GET_BUCKET_LIFECYCLE_CONFIGURATION, "GetBucketLifecycleConfiguration"},
+            {S3CommandType::DELETE_BUCKET_LIFECYCLE, "DeleteBucketLifecycle"},
+            {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
+            {S3CommandType::UPLOAD_OBJECT_COUNTER, "UploadObjectCounter"},
+            {S3CommandType::GET_EVENT_SOURCE, "GetEventSource"},
+            {S3CommandType::TOUCH_OBJECT, "TouchObject"},
+            {S3CommandType::ADD_BUCKET_COUNTER, "AddBucketCounter"},
+            {S3CommandType::DELETE_BUCKET_COUNTER, "DeleteBucketCounter"},
+            {S3CommandType::DELETE_OBJECT_COUNTER, "DeleteObjectCounter"},
+            {S3CommandType::DELETE_ALL_OBJECTS, "DeleteAllObjects"},
+            {S3CommandType::RELOAD_ALL_COUNTERS, "ReloadAllCounters"},
+            {S3CommandType::UPDATE_OBJECT, "UpdateObject"},
     };
 
     [[maybe_unused]] static std::string S3CommandTypeToString(const S3CommandType &commandType) {
@@ -252,21 +254,7 @@ namespace AwsMock::Dto::Common {
          * @param user AWS user
          */
         void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const S3ClientCommand &i);
     };
-} // namespace AwsMock::Dto::Common
+}// namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_S3_CLIENT_COMMAND_H
