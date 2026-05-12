@@ -44,14 +44,14 @@ namespace AwsMock::Service {
                 const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
                 const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
 
-                listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string> >();
+                listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
                 listQueueResponse.nextToken = nextToken;
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
                 return listQueueResponse;
             }
 
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
-            listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string> >();
+            listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
 
             log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
 
             // Get the queue list and the total number
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns), request.region);
-            const long total = _sqsDatabase.CountQueues(request.prefix, request.region);
+            const long total = _sqsDatabase.CountQueues(request.region, request.prefix);
 
             log_trace << "SQS create queue counters list, count: " << total;
             Dto::SQS::ListQueueCountersResponse response;
@@ -116,7 +116,6 @@ namespace AwsMock::Service {
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
 
             Dto::SQS::GetQueueDetailsResponse sqsResponse;
-            sqsResponse.messageCount = _sqsDatabase.CountMessages(request.queueArn);
             sqsResponse.queueName = queue.name;
             sqsResponse.queueArn = queue.arn;
             sqsResponse.queueUrl = queue.url;
@@ -188,7 +187,7 @@ namespace AwsMock::Service {
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "approximateNumberOfMessagesNotVisible",
-                    attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
+            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "deadLetterTargetArn";
@@ -232,8 +231,8 @@ namespace AwsMock::Service {
                     endArray = response.attributeCounters.end();
                 }
                 response.attributeCounters = std::vector(
-                    response.attributeCounters.begin() + request.pageSize * request.pageIndex,
-                    endArray);
+                        response.attributeCounters.begin() + request.pageSize * request.pageIndex,
+                        endArray);
             }
             return response;
         } catch (Core::DatabaseException &ex) {
@@ -534,7 +533,7 @@ namespace AwsMock::Service {
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -898,7 +897,7 @@ namespace AwsMock::Service {
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -1388,8 +1387,8 @@ namespace AwsMock::Service {
 
     bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
         return std::ranges::find_if(attributes, [&value](const std::string &attribute) {
-            return Core::StringUtils::EqualsIgnoreCase(attribute, value);
-        }) != attributes.end();
+                   return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+               }) != attributes.end();
     }
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
@@ -1435,4 +1434,4 @@ namespace AwsMock::Service {
         return contentType;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

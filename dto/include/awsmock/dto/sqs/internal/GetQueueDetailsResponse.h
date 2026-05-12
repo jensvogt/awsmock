@@ -41,11 +41,6 @@ namespace AwsMock::Dto::SQS {
         std::string queueArn;
 
         /**
-         * Number of messages
-         */
-        long messageCount{};
-
-        /**
          * Retention period
          */
         long retentionPeriod{};
@@ -120,12 +115,12 @@ namespace AwsMock::Dto::SQS {
             r.owner = Core::Json::GetStringValue(v, "owner");
             r.dlqArn = Core::Json::GetStringValue(v, "dlqArn");
             r.dlqMaxReceive = Core::Json::GetLongValue(v, "dlqMaxReceive");
-            r.messageCount = Core::Json::GetLongValue(v, "messageCount");
             r.retentionPeriod = Core::Json::GetLongValue(v, "retentionPeriod");
             r.maxMessageSize = Core::Json::GetLongValue(v, "maxMessageSize");
             r.visibilityTimeout = Core::Json::GetLongValue(v, "visibilityTimeout");
             r.size = Core::Json::GetLongValue(v, "size");
             r.delay = Core::Json::GetLongValue(v, "delay");
+            r.available = Core::Json::GetLongValue(v, "available");
             r.invisible = Core::Json::GetLongValue(v, "invisible");
             r.delayed = Core::Json::GetLongValue(v, "delayed");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
@@ -144,12 +139,12 @@ namespace AwsMock::Dto::SQS {
                     {"owner", obj.owner},
                     {"dlqArn", obj.dlqArn},
                     {"dlqMaxReceive", obj.dlqMaxReceive},
-                    {"messageCount", obj.messageCount},
                     {"retentionPeriod", obj.retentionPeriod},
                     {"maxMessageSize", obj.maxMessageSize},
                     {"visibilityTimeout", obj.visibilityTimeout},
                     {"size", obj.size},
                     {"delay", obj.delay},
+                    {"available", obj.available},
                     {"invisible", obj.invisible},
                     {"delayed", obj.delayed},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
