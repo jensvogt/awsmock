@@ -122,15 +122,18 @@ namespace AwsMock::Dto::DynamoDb {
             } else if (obj.type == "SS") {
                 jv = {{"SS", boost::json::value_from(obj.stringSetValue)}};
             } else if (obj.type == "NS") {
-                jv = {{"SS", boost::json::value_from(obj.numberSetValue)}};
+                jv = {{"NS", boost::json::value_from(obj.numberSetValue)}};
             } else if (obj.type == "L") {
                 jv = {{"L", boost::json::value_from(obj.listValue)}};
             } else if (obj.type == "M") {
                 jv = {{"M", boost::json::value_from(obj.mapValue)}};
-            } else if (obj.type == "BOOL" && obj.boolValue) {
+            } else if (obj.type == "BOOL") {
                 jv = {{"BOOL", obj.boolValue}};
-            } else if (obj.type == "NULL" && obj.nullValue) {
-                jv = {{"NULL", *obj.nullValue}};
+            } else if (obj.type == "NULL") {
+                jv = {{"NULL", obj.nullValue ? *obj.nullValue : true}};
+            } else {
+                // Fallback — emit an explicit NULL so the SDK never gets an empty AttributeValue
+                jv = {{"NULL", true}};
             }
         }
     };
