@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.15](https://github.com/jensvogt/awsmock/compare/1.18.14...v1.18.15) (2026-05-15)
+
+
+### Bug Fixes
+
+* dynamodb attributes null values ([886a2a5](https://github.com/jensvogt/awsmock/commit/886a2a55791ed7c5049f07d100cac195e67cb6ee))
+
 ## [1.18.14](https://github.com/jensvogt/awsmock/compare/1.18.13...v1.18.14) (2026-05-12)
 
 
