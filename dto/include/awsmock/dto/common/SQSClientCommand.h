@@ -77,6 +77,7 @@ namespace AwsMock::Dto::Common {
         IMPORT_MESSAGES,
         RELOAD_COUNTERS,
         RELOAD_ALL_COUNTERS,
+        IS_DLQ,
         UNKNOWN
     };
 
@@ -129,13 +130,16 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
             {SqsCommandType::RELOAD_COUNTERS, "reload-counters"},
             {SqsCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
+            {SqsCommandType::IS_DLQ, "is-dlq"},
     };
 
-    [[maybe_unused]] static std::string SqsCommandTypeToString(const SqsCommandType &commandType) {
+    [[maybe_unused]]
+    static std::string SqsCommandTypeToString(const SqsCommandType &commandType) {
         return SqsCommandTypeNames[commandType];
     }
 
-    [[maybe_unused]] static SqsCommandType SqsCommandTypeFromString(const std::string &commandType) {
+    [[maybe_unused]]
+    static SqsCommandType SqsCommandTypeFromString(const std::string &commandType) {
         for (auto &[fst, snd]: SqsCommandTypeNames) {
             if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
                 return fst;
@@ -164,7 +168,8 @@ namespace AwsMock::Dto::Common {
          * @param request HTTP request
          * @return command string
          */
-        [[nodiscard]] std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
+        [[nodiscard]]
+        std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
 
         /**
          * @brief Gets the value from the user-agent string
@@ -180,14 +185,16 @@ namespace AwsMock::Dto::Common {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]]
+        std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]]
+        std::string ToString() const;
 
         /**
          * @brief Stream provider.

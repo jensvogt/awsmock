@@ -32,7 +32,8 @@ namespace AwsMock::Service {
      */
     class LambdaServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -42,8 +43,10 @@ namespace AwsMock::Service {
          * @brief Shutdown server
          */
         void Shutdown() override;
+        void Initialize();
 
-    private:
+      private:
+
         /**
          * @brief Delete dangling, stopped containers
          */
@@ -122,7 +125,7 @@ namespace AwsMock::Service {
          * @par
          * If true, backup tables and items based on cron expression
          */
-        bool _backupActive;
+        bool _backupActive{};
 
         /**
          * @brief Dynamo DB backup cron schedule.
@@ -147,17 +150,22 @@ namespace AwsMock::Service {
         /**
          * Counter period in seconds
          */
-        int _counterPeriod;
+        int _counterPeriod{};
 
         /**
          * Remove period in seconds
          */
-        int _lifetime;
+        int _lifetime{};
+
+        /**
+         * Lifetime check interval
+         */
+        int _removePeriod{};
 
         /**
          * Log retention period in days
          */
-        int _logRetentionPeriod;
+        int _logRetentionPeriod{};
 
         /**
          * Asynchronous task scheduler
@@ -165,6 +173,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVER_H

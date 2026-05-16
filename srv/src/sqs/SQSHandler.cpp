@@ -386,6 +386,14 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::SqsCommandType::IS_DLQ: {
+
+                    Dto::SQS::IsDlqRequest sqsRequest = Dto::SQS::IsDlqRequest::FromJson(clientCommand.payload);
+                    Dto::SQS::IsDlqResponse sqsResponse = _sqsService.IsDlq(sqsRequest);
+                    log_info << "Is DLQ, queueArn: " << sqsRequest.queueArn << ", isDlq: " << sqsResponse.isDlq << ", mainQueues:" << sqsResponse.mainQueues.size();
+                    return SendResponse(request, http::status::ok, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::UNKNOWN: {
 
                     log_error << "Unknown method";

@@ -84,7 +84,7 @@
         },
         "lifetime": 3600,
         "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\lambda",
-        "remove-period": 3600,
+        "remove-period": 300,
         "counter-period": 300,
         "log-retention-period": 1,
         "private-port": 8080,

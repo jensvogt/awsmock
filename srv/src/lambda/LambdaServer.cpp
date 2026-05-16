@@ -4,45 +4,37 @@
 
 #include <awsmock/service/lambda/LambdaServer.h>
 
+#include "awsmock/core/scheduler/OneTimeTask.h"
+
 namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(), _scheduler(scheduler) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.GetValue<std::string>("awsmock.region");
         _lifetime = configuration.GetValue<int>("awsmock.modules.lambda.lifetime");
+        _removePeriod = configuration.GetValue<int>("awsmock.modules.lambda.remove-period");
         _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
         _logRetentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.log-retention-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.lambda.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.backup.cron");
-        log_debug << "Lambda remove period: " << _lifetime << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
-
-        // Directories
         _lambdaDir = configuration.GetValue<std::string>("awsmock.modules.lambda.data-dir");
-        Core::DirUtils::EnsureDirectory(_lambdaDir);
-        log_debug << "Lambda directory: " << _lambdaDir;
+        log_debug << "Lambda lifetime period: " << _lifetime << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
 
-        // Cleanup instances
-        CleanupInstances();
-
-        // Cleanup container
-        CleanupDocker();
-
-        // Create a local network if it does not exist yet
-        CreateLocalNetwork();
-
-        // Start the lambdas, this will build the containers, if not already existing
-        CreateContainers();
+        // Startup task
+        _scheduler.AddTask("lambda-initialization", [this] { Initialize(); });
+        log_debug << "Lambda initialization started, name: initialization";
 
         // Start lambda monitoring update counters
-        _scheduler.AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
+        _scheduler.AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
         // Start the delete old lambda task
-        _scheduler.AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _lifetime);
-        log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _lifetime;
+        _scheduler.AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _removePeriod, _removePeriod);
+        log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
 
         // Start the delete old lambda logs
-        _scheduler.AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
+        const long interval = _logRetentionPeriod * 24 * 60 * 60;
+        _scheduler.AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, interval, interval);
         log_debug << "Lambda task started, name remove-lambda-logs, period: " << _logRetentionPeriod;
 
         // Start backup
@@ -77,6 +69,25 @@ namespace AwsMock::Service {
             log_info << "Lambda stopped, name: " << lambda.function;
         }
         log_info << "Lambda server stopped";
+    }
+
+    void LambdaServer::Initialize() {
+
+        // Directories
+        Core::DirUtils::EnsureDirectory(_lambdaDir);
+        log_debug << "Lambda directory: " << _lambdaDir;
+
+        // Cleanup instances
+        CleanupInstances();
+
+        // Cleanup container
+        CleanupDocker();
+
+        // Create a local network if it does not exist yet
+        CreateLocalNetwork();
+
+        // Start the lambdas, this will build the containers, if not already existing
+        CreateContainers();
     }
 
     void LambdaServer::CleanupDocker() const {
@@ -124,7 +135,7 @@ namespace AwsMock::Service {
         }
         log_debug << "Lambda lifetime starting, count: " << lambdaList.size();
 
-        // Get lifetime from configuration
+        // Get expiration time
         const auto expired = system_clock::now() - std::chrono::seconds(_lifetime);
 
         // Loop over lambdas and remove expired instances
@@ -148,7 +159,6 @@ namespace AwsMock::Service {
             if (count > 0) {
                 lambda = _lambdaDatabase.UpdateLambda(lambda);
                 log_debug << "Lambda updated, function" << lambda.function << " removed: " << count;
-                _dockerService.PruneContainers();
             }
         }
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
