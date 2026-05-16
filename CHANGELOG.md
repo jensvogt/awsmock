@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.16](https://github.com/jensvogt/awsmock/compare/1.18.15...v1.18.16) (2026-05-16)
+
+
+### Bug Fixes
+
+* lambda failures ([5747dfb](https://github.com/jensvogt/awsmock/commit/5747dfb01e0dc6ee8005f709432f653cbea9bafb))
+* startup time ([4c1345c](https://github.com/jensvogt/awsmock/commit/4c1345ce029042561cdabdfb48204b060cf4f048))
+
 ## [1.18.15](https://github.com/jensvogt/awsmock/compare/1.18.14...v1.18.15) (2026-05-15)
 
 
