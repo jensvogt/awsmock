@@ -161,19 +161,27 @@ namespace AwsMock::Database {
         return _memoryDb.GetQueueByDlq(dlqQueueArn);
     }
 
-    bool SQSDatabase::IsDlq(const std::string &queueArn) const {
+    std::vector<Entity::SQS::Queue> SQSDatabase::IsDlq(const std::string &queueArn) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "is_dlq");
 
         if (HasDatabase()) {
-            Entity::SQS::Queue result;
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
 
-            mongocxx::options::count opts;
-            opts.limit(1);
 
-            return _queueCollection.count_documents(make_document(kvp("attributes.redrivePolicy.deadLetterTargetArn", queueArn)), opts) > 0;
+            document query = {};
+            if (!queueArn.empty()) {
+                query.append(kvp("attributes.redrivePolicy.deadLetterTargetArn", queueArn));
+            }
+
+            Entity::SQS::QueueList queueList;
+            for (auto queueCursor = _queueCollection.find(query.view()); auto queue: queueCursor) {
+                Entity::SQS::Queue result;
+                result.FromDocument(queue);
+                queueList.push_back(result);
+            }
+            return queueList;
         }
         return _memoryDb.IsDlq(queueArn);
     }

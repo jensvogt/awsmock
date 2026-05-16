@@ -366,9 +366,10 @@ namespace AwsMock::Service {
             // Update message
             long count{};
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
-            if (_sqsDatabase.IsDlq(request.queueArn)) {
-                const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
-                count = _sqsDatabase.RedriveMessage(originalQueue, queue, request.messageId);
+            if (const std::vector<Database::Entity::SQS::Queue> mainQueues = _sqsDatabase.IsDlq(request.queueArn); !mainQueues.empty()) {
+                for (const auto &mainQueue: mainQueues) {
+                    count = _sqsDatabase.RedriveMessage(mainQueue, queue, request.messageId);
+                }
             } else {
                 count = _sqsDatabase.ResetMessages(queue.arn, queue.attributes.visibilityTimeout);
             }
@@ -397,9 +398,10 @@ namespace AwsMock::Service {
             // Update messages
             long count{};
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
-            if (_sqsDatabase.IsDlq(request.queueArn)) {
-                const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
-                count = _sqsDatabase.RedriveMessages(originalQueue, queue);
+            if (const std::vector<Database::Entity::SQS::Queue> mainQueues = _sqsDatabase.IsDlq(request.queueArn); !mainQueues.empty()) {
+                for (const auto &mainQueue: mainQueues) {
+                    count += _sqsDatabase.RedriveMessages(mainQueue, queue);
+                }
             } else {
                 count = _sqsDatabase.ResetMessages(queue.arn, queue.attributes.visibilityTimeout);
             }
@@ -842,6 +844,26 @@ namespace AwsMock::Service {
             // Update queue
             queue = _sqsDatabase.UpdateQueue(queue);
             log_debug << "Queue DQL subscription updated, queueArn: " << request.queueArn;
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::IsDlqResponse SQSService::IsDlq(const Dto::SQS::IsDlqRequest &request) const {
+        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "is_dlq");
+        log_trace << "Is DLQ request, queueArn: " << request.queueArn;
+
+        try {
+
+            const std::vector<Database::Entity::SQS::Queue> mainQueues = _sqsDatabase.IsDlq(request.queueArn);
+            Dto::SQS::IsDlqResponse response;
+            response.isDlq = mainQueues.size() > 0;
+            for (const auto &mainQueue: mainQueues) {
+                response.mainQueues.emplace_back(mainQueue.arn);
+            }
+            return response;
+            
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());

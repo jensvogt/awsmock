@@ -37,7 +37,8 @@ namespace AwsMock::Database {
      */
     class SQSMemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -173,10 +174,10 @@ namespace AwsMock::Database {
          * @brief Checks whether a queue ARN is a dead letter queue
          *
          * @param queueArn queue ARN
-         * @return true if queue is a dead letter queue
+         * @return list of queues
          */
         [[nodiscard]]
-        bool IsDlq(const std::string &queueArn);
+        std::vector<Entity::SQS::Queue> IsDlq(const std::string &queueArn);
 
         /**
          * @brief Purge a given queueUrl.
@@ -445,7 +446,8 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters();
 
-    private:
+      private:
+
         /**
          * SQS queue vector, when running without database
          */
@@ -467,6 +469,6 @@ namespace AwsMock::Database {
         static boost::mutex _sqsMessageMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_SQS_MEMORYDB_H

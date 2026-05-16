@@ -44,7 +44,7 @@ namespace AwsMock::Core {
          * @param interval interval in seconds
          * @param delay start delay in seconds
          */
-        void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval, int delay = 0);
+        void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval = 0, int delay = 0);
 
         /**
          * @brief Add a cron task to the scheduler

@@ -28,8 +28,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-            return queue.second.arn == queueArn;
-        }) != _queues.end();
+                   return queue.second.arn == queueArn;
+               }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -112,11 +112,13 @@ namespace AwsMock::Database {
         return {};
     }
 
-    bool SQSMemoryDb::IsDlq(const std::string &queueArn) {
+    std::vector<Entity::SQS::Queue> SQSMemoryDb::IsDlq(const std::string &queueArn) {
 
-        return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-            return queue.second.attributes.redrivePolicy.deadLetterTargetArn == queueArn;
-        }) != _queues.end();
+        auto q = Core::from(_queues | std::views::values | std::ranges::to<std::vector>());
+        if (!queueArn.empty()) {
+            q = q.where([queueArn](const Entity::SQS::Queue &item) { return item.attributes.redrivePolicy.deadLetterTargetArn == queueArn; });
+        }
+        return q.to_vector();
     }
 
     Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) {
@@ -608,4 +610,4 @@ namespace AwsMock::Database {
         log_debug << "All message counters updated, count: " << _queues.size();
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

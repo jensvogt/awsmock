@@ -60,6 +60,8 @@
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/internal/ImportMessagesRequest.h>
+#include <awsmock/dto/sqs/internal/IsDlqRequest.h>
+#include <awsmock/dto/sqs/internal/IsDlqResponse.h>
 #include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersRequest.h>
@@ -448,6 +450,19 @@ namespace AwsMock::Service {
         void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
 
         /**
+         * @brief Return DLQ flag
+         *
+         * @param request is DLQ request
+         * @return is DLQ response
+         */
+        Dto::SQS::IsDlqResponse IsDlq(const Dto::SQS::IsDlqRequest &request) const;
+
+        /**
+         * @brief Reload all SQS queue counters
+         */
+        void ReloadAllCounters() const;
+
+        /**
         * @brief Deletes a message
         *
         * @param request delete message request DTO
@@ -479,11 +494,6 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         [[nodiscard]] Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
-
-        /**
-         * @brief Reload all SQS queue counters
-         */
-        void ReloadAllCounters() const;
 
       private:
 
