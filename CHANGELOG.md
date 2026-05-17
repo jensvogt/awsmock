@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.17](https://github.com/jensvogt/awsmock/compare/v1.18.16...v1.18.17) (2026-05-17)
+
+
+### Bug Fixes
+
+* lambda failures ([8e71c4a](https://github.com/jensvogt/awsmock/commit/8e71c4a18ef39e9d6aece4748a5022c598e9cfa7))
+* windows exec installation ([f14d5e0](https://github.com/jensvogt/awsmock/commit/f14d5e04b9a354234b72b7df4c1d8ea7ebaa513c))
+* windows exec installation ([74eb232](https://github.com/jensvogt/awsmock/commit/74eb2324d9603f6a2b1867b6a1bf99f994a2e719))
+
 ## [1.18.16](https://github.com/jensvogt/awsmock/compare/1.18.15...v1.18.16) (2026-05-16)
 
 
