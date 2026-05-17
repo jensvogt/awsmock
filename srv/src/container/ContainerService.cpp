@@ -695,16 +695,17 @@ namespace AwsMock::Service {
         return dockerFilename;
     }
 
-    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity) {
+    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity) {
 
+        // Name of the docker file
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
-        std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
 
         // Replace variables
         std::string dockerFileContent = applicationEntity.dockerFile;
         Core::StringUtils::Replace(dockerFileContent, "$$ENV$$", AddEnvironment(applicationEntity.environment));
         Core::StringUtils::Replace(dockerFileContent, "$$PORT$$", std::to_string(applicationEntity.privatePort));
         Core::StringUtils::Replace(dockerFileContent, "$$ARCHIVE$$", applicationEntity.archive);
+        Core::StringUtils::Replace(dockerFileContent, "$$CREDENTIALS$$", AddCredentials(codeDir, applicationEntity.region));
 
         std::ofstream ofs(dockerFilename);
         ofs << dockerFileContent << std::endl;
@@ -749,5 +750,25 @@ namespace AwsMock::Service {
         ss << "ENV " << "AWS_SECRET_ACCESS_KEY=\"none\"" << std::endl;
         ss << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
         return ss.str();
+    }
+
+    std::string ContainerService::AddCredentials(const std::string &codeDir, const std::string &region) {
+        std::string awsCredentials = codeDir + Core::FileUtils::separator() + "credentials";
+        std::ofstream awsCredOfs(awsCredentials);
+        awsCredOfs << "[default]" << std::endl;
+        awsCredOfs << "region=" << region << std::endl;
+        awsCredOfs << "aws_access_key_id=none" << std::endl;
+        awsCredOfs << "aws_secret_access_key=none" << std::endl;
+        awsCredOfs << "aws_session_token=none" << std::endl;
+        awsCredOfs << "retry_mode=standard" << std::endl;
+        awsCredOfs << "max_attempts=1" << std::endl;
+        awsCredOfs.close();
+        std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
+        std::ofstream awsOfs(awsConfig);
+        awsOfs << "[default]" << std::endl;
+        awsOfs << "region=" << region << std::endl;
+        awsOfs << "output=json" << std::endl;
+        awsOfs.close();
+        return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 } // namespace AwsMock::Service

@@ -229,26 +229,47 @@ namespace AwsMock::Manager {
 #ifdef _WIN32
         if (isService) {
 
-            // Wait for Windows service signal
-            while (true) {
+            // Work guard prevents ioc from stopping when idle
+            auto workGuard = boost::asio::make_work_guard(_ioc);
 
-                _ioc.run_for(std::chrono::seconds(1));
-                if (WaitForSingleObject(g_ServiceStopEvent, 0) == WAIT_OBJECT_0) {
-                    break;
-                }
+            // Separate thread watches the stop event and stops ioc when signaled
+            std::thread stopWatcher([&]() {
+                log_info << "Stop watcher thread started.";
+                WaitForSingleObject(g_ServiceStopEvent, INFINITE);
+                log_info << "Stop event received, stopping io_context.";
+                workGuard.reset();
+                _ioc.stop();
+            });
+
+            // Run io_context normally — blocks until ioc.stop() is called
+            try {
+                _ioc.run();
+            } catch (const std::exception &e) {
+                log_error << "io_context exception: " << e.what();
             }
 
-            // Stop io context
-            _ioc.stop();
-            log_info << "Backend stopped";
+            // Wait for watcher thread to finish
+            if (stopWatcher.joinable()) {
+                stopWatcher.join();
+            }
+            log_info << "Backend stopped.";
 
         } else {
 
-            _ioc.run();
+            // Console mode — run until Ctrl+C
+            try {
+                _ioc.run();
+            } catch (const std::exception &e) {
+                log_error << "io_context exception: " << e.what();
+            }
         }
 #else
         _ioc.run();
 #endif
     }
 
+    void Manager::Stop() const {
+        log_info << "Manager::Stop() called.";
+        _ioc.stop();
+    }
 } // namespace AwsMock::Manager

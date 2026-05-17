@@ -5,15 +5,23 @@
 #ifdef _WIN32
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/service/frontend/FrontendServer.h>
-#include <awsmock/server/Manager.h>
 #include <awsmock/WindowsService.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/server/Manager.h>
+#include <awsmock/service/frontend/FrontendServer.h>
 
 HANDLE g_hEventSource = nullptr;
 HANDLE g_ServiceStopEvent = nullptr;
 SERVICE_STATUS_HANDLE statusHandle = nullptr;
 SERVICE_STATUS serviceStatus = {};
+
+void LogWindowsEvent(const std::string &message, const WORD type = EVENTLOG_ERROR_TYPE) {
+    if (const HANDLE hEventLog = RegisterEventSourceA(nullptr, DEFAULT_SERVICE_NAME)) {
+        const char *msgs[] = {message.c_str()};
+        ReportEventA(hEventLog, type, 0, 0, nullptr, 1, 0, msgs, nullptr);
+        DeregisterEventSource(hEventLog);
+    }
+}
 
 void InstallService(const std::string &exePath, const std::string &serviceName, const std::string &displayName) {
 
@@ -25,15 +33,15 @@ void InstallService(const std::string &exePath, const std::string &serviceName, 
     }
 
     const SC_HANDLE service = CreateService(
-            scm,
-            serviceName.empty() ? DEFAULT_SERVICE_NAME : serviceName.c_str(),
-            displayName.empty() ? DEFAULT_SERVICE_DISPLAY_NAME : displayName.c_str(),
-            SERVICE_ALL_ACCESS,
-            SERVICE_WIN32_OWN_PROCESS,
-            SERVICE_AUTO_START,
-            SERVICE_ERROR_NORMAL,
-            exePath.c_str(),
-            nullptr, nullptr, nullptr, nullptr, nullptr);
+        scm,
+        serviceName.empty() ? DEFAULT_SERVICE_NAME : serviceName.c_str(),
+        displayName.empty() ? DEFAULT_SERVICE_DISPLAY_NAME : displayName.c_str(),
+        SERVICE_ALL_ACCESS,
+        SERVICE_WIN32_OWN_PROCESS,
+        SERVICE_AUTO_START,
+        SERVICE_ERROR_NORMAL,
+        exePath.c_str(),
+        nullptr, nullptr, nullptr, nullptr, nullptr);
 
     if (service) {
         log_info << "Service installed";
@@ -65,21 +73,29 @@ void UninstallService(const std::string &serviceName) {
 }
 
 void ReportServiceStatus(const DWORD currentState, const DWORD win32ExitCode, const DWORD waitHint) {
+    static DWORD dwCheckPoint = 1;
     serviceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     serviceStatus.dwCurrentState = currentState;
     serviceStatus.dwWin32ExitCode = win32ExitCode;
     serviceStatus.dwWaitHint = waitHint;
+
+    if (currentState == SERVICE_RUNNING || currentState == SERVICE_STOPPED) {
+        serviceStatus.dwCheckPoint = 0; // reset when stable
+    } else {
+        serviceStatus.dwCheckPoint = dwCheckPoint++; // increment while pending
+    }
+
     if (currentState == SERVICE_START_PENDING) {
         serviceStatus.dwControlsAccepted = 0;
     } else {
-        serviceStatus.dwControlsAccepted= SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_POWEREVENT | SERVICE_ACCEPT_SESSIONCHANGE | SERVICE_ACCEPT_SHUTDOWN;
+        serviceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_POWEREVENT | SERVICE_ACCEPT_SESSIONCHANGE | SERVICE_ACCEPT_SHUTDOWN;
     }
     SetServiceStatus(statusHandle, &serviceStatus);
 }
 
 DWORD WINAPI ServiceCtrlHandler(const DWORD CtrlCode, DWORD eventType, LPVOID eventData, LPVOID context) {
 
-    log_info << "Received service control request, code:"<< CtrlCode;
+    log_info << "Received service control request, code:" << CtrlCode;
 
     switch (CtrlCode) {
         case SERVICE_CONTROL_STOP:
@@ -112,28 +128,40 @@ DWORD WINAPI ServiceCtrlHandler(const DWORD CtrlCode, DWORD eventType, LPVOID ev
 
         default:
             // Unhandled control request.
-            log_warning<<"Unhandled control request, code: "<< CtrlCode;
+            log_warning << "Unhandled control request, code: " << CtrlCode;
             break;
     }
     return 0;
 }
 
-DWORD WINAPI RunService(LPWORD lpParam) {
+DWORD WINAPI RunService(LPVOID lpParam) {
 
-    // Run the detached frontend server thread
-    AwsMock::Service::Frontend::FrontendServer server;
-    auto frontendThread = boost::thread{boost::ref(server), true};
-    frontendThread.detach();
-    log_info << "Frontend server started.";
+    try {
 
-    // Start manager
-    boost::asio::io_context ioc;
-    AwsMock::Manager::Manager awsMockManager{ioc};
-    awsMockManager.Initialize();
-    log_info << "Backend server started.";
-    awsMockManager.Run(true);
-    log_info << "Backend server stopped.";
-    exit(0);
+        AwsMock::Service::Frontend::FrontendServer server;
+        boost::thread{boost::ref(server), true}.detach();
+        log_info << "Frontend server started.";
+
+        boost::asio::io_context ioc;
+        AwsMock::Manager::Manager awsMockManager{ioc};
+        awsMockManager.Initialize();
+        log_info << "Backend server started.";
+
+        // Wait for stop signal from SCM
+        WaitForSingleObject(g_ServiceStopEvent, INFINITE);
+        log_info << "Stop event received.";
+
+        awsMockManager.Stop();
+        log_info << "Backend server stopped.";
+
+    } catch (const std::exception &e) {
+        LogWindowsEvent(std::string("RunService exception: ") + e.what());
+        log_error << "RunService exception: " << e.what();
+        return 1;
+    } catch (...) {
+        log_error << "RunService unknown exception";
+        return 1;
+    }
     return 0;
 }
 
@@ -141,41 +169,39 @@ void WINAPI ServiceMain(DWORD, LPTSTR *) {
 
     statusHandle = RegisterServiceCtrlHandlerEx(DEFAULT_SERVICE_NAME, ServiceCtrlHandler, nullptr);
     if (!statusHandle) {
-        log_error << "Registering service handle failed, error: " << std::to_string(GetLastError());
+        log_error << "RegisterServiceCtrlHandlerEx failed: " << GetLastError();
         return;
     }
-    log_info << "Registering service handler";
 
-    // Set status pending
     ReportServiceStatus(SERVICE_START_PENDING, NO_ERROR, 3000);
 
-    // Create an event that the worker thread can wait on to know when to stop.
     g_ServiceStopEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-    if (g_ServiceStopEvent == nullptr){
-        log_error << "CreateEvent failed, error: "<< GetLastError();
+    if (!g_ServiceStopEvent) {
         ReportServiceStatus(SERVICE_STOPPED, GetLastError(), 0);
         return;
     }
-    log_info << "Created stop event";
 
-    const HANDLE hThread = CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(RunService), nullptr, 0, nullptr);
-    if (hThread == nullptr){
-        log_error << "CreateThread failed, error: "<< GetLastError();
+    // No cast needed — signature matches exactly
+    const HANDLE hThread = CreateThread(nullptr, 0, RunService, nullptr, 0, nullptr);
+    if (!hThread) {
+        LogWindowsEvent("Failed to create worker thread");
         ReportServiceStatus(SERVICE_STOPPED, GetLastError(), 0);
         return;
     }
-    log_info << "Created worker thread";
 
     ReportServiceStatus(SERVICE_RUNNING, NO_ERROR, 0);
 
-    // Wait for the worker thread to terminate (either by stopping itself or an error).
+    // Block until RunService returns
     WaitForSingleObject(hThread, INFINITE);
 
-    // Clean up
+    DWORD exitCode = 0;
+    GetExitCodeThread(hThread, &exitCode);
+    if (exitCode != 0) {
+        log_error << "Worker thread exited with error code: " << exitCode;
+    }
+
     CloseHandle(hThread);
     CloseHandle(g_ServiceStopEvent);
-
-    // 6. Report final status (SERVICE_STOPPED).
     ReportServiceStatus(SERVICE_STOPPED, NO_ERROR, 0);
 }
 #endif
