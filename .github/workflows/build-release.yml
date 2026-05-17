@@ -190,23 +190,11 @@ jobs:
           npm install
           npm run build
 
-      # Install WiX Toolset
-      - name: Install WiX
-        run: |
-          dotnet tool install --global wix
-          wix extension add WixToolset.UI.wixext
+      - name: Install NSIS
+        run: choco install nsis
 
-      # Build the MSI
-      - name: Build MSI
-        run: |
-          wix build dist/msi/product.wxs -d BuildDir=build/Release -o ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.msi
-
-      # Sign the MSI (optional, needs certificate)
-      - name: Sign MSI
-        if: ${{ secrets.CERT_PFX != '' }}
-        run: |
-          echo "${{ secrets.CERT_PFX }}" | base64 -d > cert.pfx
-          signtool sign /f cert.pfx /p "${{ secrets.CERT_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.msi
+      - name: Build installer
+        run: makensis dist/nsis/product.nsi
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4

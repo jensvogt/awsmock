@@ -197,7 +197,7 @@ namespace AwsMock::Manager {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ioc));
             }
         }
-        log_info << "Module started, count: " << Service::ModuleMap::instance().GetSize();
+        log_info << "Modules started, count: " << Service::ModuleMap::instance().GetSize();
 
         // Start listener threads
         auto const maxThreads = std::thread::hardware_concurrency();
@@ -251,4 +251,4 @@ namespace AwsMock::Manager {
 #endif
     }
 
-}// namespace AwsMock::Manager
+} // namespace AwsMock::Manager

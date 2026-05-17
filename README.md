@@ -180,8 +180,8 @@ tar -xzf awsmock-<version>-macos.tgz
 ### Windows
 
 ```bash
-wget https://jensvogt.github.io/awsmock/awsmock-<version>-amd64.zip
-unzip awsmock-<version>-amd64.zip
+wget https://jensvogt.github.io/awsmock/awsmock-<version>-amd64.exe
+awsmock-<version>-amd64.exe
 ```
 
 ### Build from source

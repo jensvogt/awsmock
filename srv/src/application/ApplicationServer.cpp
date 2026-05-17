@@ -94,12 +94,16 @@ namespace AwsMock::Service {
             }
         }
 
-        // Start actual application
-        Dto::Apps::StartApplicationRequest request;
-        request.application = Dto::Apps::Mapper::map(application);
-        request.region = application.region;
-        _applicationService.StartApplication(request);
-        log_info << "Application started, name: " << request.application.name;
+        try {
+            // Start actual application
+            Dto::Apps::StartApplicationRequest request;
+            request.application = Dto::Apps::Mapper::map(application);
+            request.region = application.region;
+            _applicationService.StartApplication(request);
+            log_info << "Application started, name: " << request.application.name;
+        } catch (Core::CoreException &e) {
+            log_error << e.what();
+        }
     }
 
     auto ApplicationServer::StopApplication(const Database::Entity::Apps::Application &application) const -> void {

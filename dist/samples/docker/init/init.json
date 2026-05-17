@@ -5,9 +5,9 @@
     "s3-buckets": [
       {
         "region": "eu-central-1",
-        "name": "file-delivery",
+        "name": "test-bucket-1",
         "owner": "none",
-        "arn": "arn:aws:s3:eu-central-1:000000000000:file-delivery",
+        "arn": "arn:aws:s3:eu-central-1:000000000000:test-bucket-1",
         "size": 0,
         "keys": 0,
         "notifications": [],
@@ -16,7 +16,7 @@
         "lambdaConfigurations": [
           {
             "id": "1234567890124",
-            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:file-distribution-lambda",
+            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:test-bucket-1-lambda",
             "events": [
               "ObjectCreated"
             ],
@@ -48,7 +48,7 @@
         "lambdaConfigurations": [
           {
             "id": "1234567890124",
-            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:file-copy-lambda",
+            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:transfer-server",
             "events": [
               "ObjectCreated"
             ],
@@ -71,9 +71,9 @@
     "sqs-queues": [
       {
         "region": "eu-central-1",
-        "name": "file-distribution-image-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-image-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue",
+        "name": "test-1-dlqueue",
+        "url": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/test-1-dlqueue",
+        "arn": "arn:aws:sqs:eu-central-1:000000000000:test-1-dlqueue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -88,13 +88,11 @@
           "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue"
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:test-1-dlqueue"
         },
         "tags": {},
         "defaultMessageAttributes": {},
         "size": 0,
-        "isDlq": true,
-        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue",
         "created": {
           "$date": 1757259499948
         },
@@ -104,9 +102,9 @@
       },
       {
         "region": "eu-central-1",
-        "name": "file-distribution-image-queue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-image-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue",
+        "name": "test-1-queue",
+        "url": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/test-1-queue",
+        "arn": "arn:aws:sqs:eu-central-1:000000000000:test-1-queue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -115,14 +113,14 @@
           "receiveMessageWaitTime": 20,
           "visibilityTimeout": 30,
           "redrivePolicy": {
-            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue",
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:test-1-dlqueue",
             "maxReceiveCount": 3
           },
           "redriveAllowPolicy": "",
           "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue"
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:test-1-queue"
         },
         "tags": {},
         "defaultMessageAttributes": {},
@@ -137,9 +135,9 @@
       },
       {
         "region": "eu-central-1",
-        "name": "file-distribution-json-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-json-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue",
+        "name": "test-2-dlqueue",
+        "url": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/test-2-dlqueue",
+        "arn": "arn:aws:sqs:eu-central-1:000000000000:test-2-dlqueue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -154,13 +152,11 @@
           "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue"
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:test-2-dlqueue"
         },
         "tags": {},
         "defaultMessageAttributes": {},
         "size": 0,
-        "isDlq": true,
-        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue",
         "created": {
           "$date": 1757259499948
         },
@@ -170,9 +166,9 @@
       },
       {
         "region": "eu-central-1",
-        "name": "file-distribution-json-queue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-json-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue",
+        "name": "test-2-queue",
+        "url": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/test-2-queue",
+        "arn": "arn:aws:sqs:eu-central-1:000000000000:test-2-queue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -181,184 +177,31 @@
           "receiveMessageWaitTime": 20,
           "visibilityTimeout": 30,
           "redrivePolicy": {
-            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue",
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:test-2-dlqueue",
             "maxReceiveCount": 3
           },
           "redriveAllowPolicy": "",
           "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue"
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:test-2-queue"
         },
         "tags": {},
         "defaultMessageAttributes": {},
         "size": 0,
-        "isDlq": false,
         "created": {
           "$date": 1757259526956
         },
         "modified": {
           "$date": 1757415364043
         }
-      },
-      {
-        "region": "eu-central-1",
-        "name": "file-distribution-xml-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-xml-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue",
-        "attributes": {
-          "delaySeconds": 0,
-          "maxMessageSize": 262144,
-          "messageRetentionPeriod": 345600,
-          "policy": "",
-          "receiveMessageWaitTime": 20,
-          "visibilityTimeout": 30,
-          "redrivePolicy": {
-            "maxReceiveCount": 0
-          },
-          "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 4,
-          "approximateNumberOfMessagesDelayed": 0,
-          "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue"
-        },
-        "tags": {},
-        "defaultMessageAttributes": {},
-        "size": 60,
-        "isDlq": true,
-        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue",
-        "created": {
-          "$date": 1757259499948
-        },
-        "modified": {
-          "$date": 1757415424043
-        }
-      },
-      {
-        "region": "eu-central-1",
-        "name": "file-distribution-xml-queue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-xml-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue",
-        "attributes": {
-          "delaySeconds": 0,
-          "maxMessageSize": 262144,
-          "messageRetentionPeriod": 345600,
-          "policy": "",
-          "receiveMessageWaitTime": 20,
-          "visibilityTimeout": 30,
-          "redrivePolicy": {
-            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue",
-            "maxReceiveCount": 3
-          },
-          "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 0,
-          "approximateNumberOfMessagesDelayed": 0,
-          "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue"
-        },
-        "tags": {},
-        "defaultMessageAttributes": {},
-        "size": 0,
-        "isDlq": false,
-        "created": {
-          "$date": 1757259508476
-        },
-        "modified": {
-          "$date": 1757415364044
-        }
-      },
-      {
-        "region": "eu-central-1",
-        "owner": "none",
-        "name": "protocolizing-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-dlqueue",
-        "attributes": {
-          "delaySeconds": 0,
-          "maxMessageSize": 262144,
-          "messageRetentionPeriod": 345600,
-          "policy": "",
-          "receiveMessageWaitTime": 10,
-          "visibilityTimeout": 30,
-          "redrivePolicy": {
-            "maxReceiveCount": 0
-          },
-          "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 7,
-          "approximateNumberOfMessagesDelayed": 0,
-          "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": ""
-        },
-        "tags": {},
-        "defaultMessageAttributes": {
-          "file_origin": {
-            "stringValue": "FTP_UPLOAD",
-            "dataType": "String"
-          },
-          "file_type": {
-            "stringValue": "XML",
-            "dataType": "String"
-          }
-        },
-        "size": 2105,
-        "isDlq": true,
-        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-queue",
-        "created": {
-          "$date": 1736341533071
-        },
-        "modified": {
-          "$date": 1757415424043
-        }
-      },
-      {
-        "region": "eu-central-1",
-        "owner": "none",
-        "name": "protocolizing-queue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-queue",
-        "attributes": {
-          "delaySeconds": 0,
-          "maxMessageSize": 262144,
-          "messageRetentionPeriod": 345600,
-          "policy": "",
-          "receiveMessageWaitTime": 10,
-          "visibilityTimeout": 30,
-          "redrivePolicy": {
-            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-dlqueue",
-            "maxReceiveCount": 3
-          },
-          "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 0,
-          "approximateNumberOfMessagesDelayed": 0,
-          "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": ""
-        },
-        "tags": {},
-        "defaultMessageAttributes": {
-          "file_origin": {
-            "stringValue": "FTP_UPLOAD",
-            "dataType": "String"
-          },
-          "file_type": {
-            "stringValue": "XML",
-            "dataType": "String"
-          }
-        },
-        "size": 0,
-        "isDlq": false,
-        "created": {
-          "$date": 1736341533071
-        },
-        "modified": {
-          "$date": 1757415364044
-        }
       }
     ],
     "sns-topics": [
       {
         "region": "eu-central-1",
-        "topicName": "protocolizing-topic",
-        "topicArn": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic",
+        "topicName": "test-topic",
+        "topicArn": "arn:aws:sns:eu-central-1:000000000000:test-topic",
         "messages": 10,
         "messagesSend": 10,
         "messagesResend": 0,
@@ -372,8 +215,8 @@
         "subscriptions": [
           {
             "protocol": "sqs",
-            "endpoint": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-queue",
-            "subscriptionArn": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic:ec3bbd11-00fb-4dea-971a-4e09da5729c7"
+            "endpoint": "arn:aws:sqs:eu-central-1:000000000000:test-2-queue",
+            "subscriptionArn": "arn:aws:sns:eu-central-1:000000000000:test-topic:ec3bbd11-00fb-4dea-971a-4e09da5729c7"
           }
         ],
         "attributes": {

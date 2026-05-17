@@ -1,4 +1,3 @@
-
 //
 // Created by vogje01 on 5/27/24.
 //
@@ -9,7 +8,7 @@ namespace AwsMock::Service {
 
     GatewayListener::GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(make_strand(ioc)) {
 
-        boost::beast::error_code ec;
+        beast::error_code ec;
 
         ec = _acceptor.open(endpoint.protocol(), ec);
         if (ec) {
@@ -24,7 +23,7 @@ namespace AwsMock::Service {
         }
 
         // Dual-stack: also accept IPv4-mapped connections on the IPv6 socket
-        ec = _acceptor.set_option(boost::asio::ip::v6_only(false), ec);
+        ec = _acceptor.set_option(ip::v6_only(false), ec);
         if (ec) {
             log_error << ec.message();
             return;
@@ -51,7 +50,7 @@ namespace AwsMock::Service {
         _acceptor.async_accept(make_strand(_ioc), boost::beast::bind_front_handler(&GatewayListener::OnAccept, shared_from_this()));
     }
 
-    void GatewayListener::OnAccept(const boost::beast::error_code &ec, ip::tcp::socket socket) {
+    void GatewayListener::OnAccept(const beast::error_code &ec, ip::tcp::socket socket) {
         if (ec) {
             log_error << ec.message();
         } else {

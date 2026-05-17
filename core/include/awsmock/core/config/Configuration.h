@@ -22,7 +22,7 @@
 #include <awsmock/core/logging/LogStream.h>
 
 #ifdef _WIN32
-#define DEFAULT_MAGIC_FILE "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc"
+#define DEFAULT_MAGIC_FILE "C:\\Program Files\\awsmock\\etc\\magic.mgc"
 #else
 #define DEFAULT_MAGIC_FILE "/usr/local/awsmock/etc/magic.mgc"
 #endif
@@ -205,7 +205,8 @@ namespace AwsMock::Core {
          *
          * @return file name of the configuration file.
          */
-        [[nodiscard]] std::string GetFilename() const;
+        [[nodiscard]]
+        std::string GetFilename() const;
 
         /**
          * @brief Sets the file name of the configuration file.
@@ -220,7 +221,8 @@ namespace AwsMock::Core {
          * @param key configuration key
          * @return true if value exists
          */
-        [[nodiscard]] bool HasValue(const std::string &key) const;
+        [[nodiscard]]
+        bool HasValue(const std::string &key) const;
 
         /**
          * @brief Returns the application name
@@ -241,6 +243,7 @@ namespace AwsMock::Core {
          *
          * @return account id
          */
+        [[nodiscard]]
         std::string GetAccountId() const;
 
         /**
@@ -255,7 +258,8 @@ namespace AwsMock::Core {
          *
          * @return DTO as string
          */
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]]
+        std::string ToString() const;
 
         /**
          * @brief Dumps the configuration to std::err

@@ -22,6 +22,7 @@ enable_testing()
 # Current version
 # -------------------------------------------------------------------------
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/core/include/awsmock/core/Version.h)
+configure_file(${CMAKE_SOURCE_DIR}/dist/msi/product.nsi.in ${CMAKE_SOURCE_DIR}/dist/msi/product.nsi @ONLY)
 
 # -------------------------------------------------------------------------
 # Global link flags (Windows)
@@ -79,6 +80,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/include/awsmock/core/BsonCursorRange.h
         dto/include/awsmock/dto/common/mapper/Mapper.h
         core/include/awsmock/core/MagicDetector.h
+        core/src/exception/ContainerException.cpp
 )
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
@@ -229,7 +231,7 @@ target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_st
 #target_link_options(awsmockmgr PRIVATE -fsanitize=address)
 if (WIN32)
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockmgr PUBLIC Boost::system pcre2-posix pcre2-8 crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+    target_link_libraries(awsmockmgr PUBLIC Boost::system pcre2-posix pcre2-8 crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib dbghelp.lib)
 endif ()
 
 # -------------------------------------------------------------------------

@@ -278,7 +278,7 @@ namespace AwsMock::Core {
         // Logging
         DefineProperty<std::string>("awsmock.logging.level", "AWSMOCK_LOG_LEVEL", "info");
 #ifdef _WIN32
-        DefineProperty<std::string>("awsmock.logging.dir", "AWSMOCK_LOG_DIR_NAME", "C:/Program Files (x86)/awsmock/log");
+        DefineProperty<std::string>("awsmock.logging.dir", "AWSMOCK_LOG_DIR_NAME", "C:/Program Files/awsmock/log");
 #else
         DefineProperty<std::string>("awsmock.logging.dir", "AWSMOCK_LOG_DIR_NAME", "/usr/local/awsmock/log");
 #endif

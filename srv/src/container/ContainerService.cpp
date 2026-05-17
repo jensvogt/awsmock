@@ -245,7 +245,7 @@ namespace AwsMock::Service {
         if (containers.empty()) {
             log_info << "Docker container not found, name: " << name << ":" << tag;
         } else {
-            log_info << "Docker container found, name: " << name << ":" << tag;
+            log_debug << "Docker container found, name: " << name << ":" << tag << ", count: " << containers.size();
         }
         return containers;
     }
@@ -750,4 +750,4 @@ namespace AwsMock::Service {
         ss << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
         return ss.str();
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

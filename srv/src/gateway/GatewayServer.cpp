@@ -11,7 +11,7 @@ namespace AwsMock::Service {
         // Get HTTP configuration values
         _port = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.port");
         _address = Core::Configuration::instance().GetValue<std::string>("awsmock.gateway.http.address");
-        log_debug << "Gateway server initialized";
+        log_debug << "Gateway server initialized, address: " << _address << ", port: " << _port;
 
         // Check module active
         if (!IsActive("gateway")) {
@@ -23,7 +23,7 @@ namespace AwsMock::Service {
         SetRunning();
 
         // Create and launch a listening port, dual stack IPv4/v6
-        const auto listener = std::make_shared<GatewayListener>(_ios, ip::tcp::endpoint(ip::make_address(_address), _port));
+        const auto listener = std::make_shared<GatewayListener>(_ios, tcp::endpoint(tcp::v6(), _port));
         listener->Run();
 
         // Log endpoint
@@ -35,4 +35,4 @@ namespace AwsMock::Service {
         _ios.stop();
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
