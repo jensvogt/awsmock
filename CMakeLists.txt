@@ -44,9 +44,8 @@ find_package(mongocxx CONFIG REQUIRED)
 find_package(Boost CONFIG REQUIRED COMPONENTS filesystem thread process date_time program_options json url chrono log log_setup unit_test_framework locale)
 find_package(jwt-cpp CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
-
-
 find_package(libssh CONFIG REQUIRED)
+
 if (WIN32)
     set(EXTERNAL_INC_DIR ${CMAKE_SOURCE_DIR}/extern/win32/include)
     set(EXTERNAL_LIB_DIR ${CMAKE_SOURCE_DIR}/extern/win32/lib)
@@ -204,7 +203,7 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
 add_library(awsmocksrv STATIC ${SRV_SOURCES})
 target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
         ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
-target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
+target_link_libraries(awsmocksrv PRIVATE awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono
         LibArchive::LibArchive ssh)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
@@ -217,21 +216,18 @@ endif ()
 # AWSMock Manager (main program)
 # -------------------------------------------------------------------------
 
-add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/WindowsService.cpp
-        manager/src/main.cpp)
+add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/WindowsService.cpp manager/src/main.cpp)
 target_include_directories(awsmockmgr PRIVATE ${CMAKE_SOURCE_DIR}/manager/include ${CMAKE_SOURCE_DIR}/core/include
         ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
-target_link_libraries(awsmockmgr PUBLIC awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
+target_link_libraries(awsmockmgr PRIVATE awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url
-        Boost::program_options Boost::chrono LibArchive::LibArchive ssh magic)
+        Boost::program_options Boost::chrono LibArchive::LibArchive magic)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-# Memory debugging
-#target_compile_options(awsmockmgr PRIVATE -fsanitize=address -fno-omit-frame-pointer)
-#target_link_options(awsmockmgr PRIVATE -fsanitize=address)
+
 if (WIN32)
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockmgr PUBLIC Boost::system pcre2-posix pcre2-8 crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib dbghelp.lib)
+    target_link_libraries(awsmockmgr PUBLIC Boost::system pcre2-posix pcre2-8 crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -270,3 +266,12 @@ endif ()
 # Build documentation
 # -------------------------------------------------------------------------
 add_subdirectory(docs)
+
+if (WIN32)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+    # Apply to all targets
+    foreach (target awsmockcore awsmockdb awsmockdto awsmocksrv awsmockmgr awsmockctl awslocal)
+        set_property(TARGET ${target} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    endforeach ()
+endif ()

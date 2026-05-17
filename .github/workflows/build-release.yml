@@ -40,7 +40,7 @@ jobs:
           CLEAN="${TAG#v}"   # remove leading 'v'
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
-  build-windows:
+  build-windows-zip:
     name: Build & Package (Windows ZIP)
     runs-on: windows-latest
     needs: release-please
@@ -75,7 +75,7 @@ jobs:
         with:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"   # ← must match env
           vcpkgJsonGlob: '**/vcpkg.json'
-          runVcpkgInstall: true
+          runVcpkgInstall: false
 
       - name: Build (Backend)
         shell: cmd
@@ -171,9 +171,9 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgDirectory: "${{ github.workspace }}/vcpkg"   # ← must match env
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgJsonGlob: '**/vcpkg.json'
-          runVcpkgInstall: true
+          runVcpkgInstall: false
 
       - name: Build (Backend)
         shell: cmd
@@ -193,11 +193,11 @@ jobs:
       - name: Install NSIS
         run: choco install nsis --no-progress -y
 
-      - name: Install SimpleSC Plugin
+      - name: Install NSIS plugins
         run: |
-          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/e/ef/NSIS_Simple_Service_Plugin_1.30.zip" -OutFile "$env:TEMP\SimpleSC.zip"
-          Expand-Archive "$env:TEMP\SimpleSC.zip" -DestinationPath "$env:TEMP\SimpleSC"
-          Copy-Item "$env:TEMP\SimpleSC\*.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\"
+          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\inetc.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\inetc.dll"
+          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\nsJSON.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\nsJSON.dll"
+          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\SimpleSC.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\SimpleSC.dll"
 
       - name: Build NSIS installer
         run: makensis dist/nsis/product.nsi
@@ -333,8 +333,6 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-deb"
       BUILD_DIR: "${{ github.workspace }}/build-deb"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-      #VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-      #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -632,7 +630,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows ]
+    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows-zip, build-windows-msi ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
