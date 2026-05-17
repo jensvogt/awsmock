@@ -5,6 +5,8 @@
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
 !include "x64.nsh"
+!include "WordFunc.nsh"
+!include "StrFunc.nsh"
 
 ; =====================================================
 ; General Settings
@@ -37,6 +39,7 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 ; =====================================================
 ; Source directory variable
 ; =====================================================
+!define VERSION "@PROJECT_VERSION@"
 !define SRCDIR "C:\work\private\awsmock"
 
 ; =====================================================
@@ -52,6 +55,51 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !insertmacro MUI_UNPAGE_INSTFILES
 
 !insertmacro MUI_LANGUAGE "English"
+
+; =====================================================
+; Update check on startup
+; =====================================================
+Function CheckForUpdates
+
+  inetc::get /SILENT \
+    "https://api.github.com/repos/jensvogt/awsmock/releases/latest" \
+    "$TEMP\awsmock_release.json" /END
+  Pop $0
+
+  ${If} $0 == "OK"
+
+    ; Parse JSON properly with nsJSON
+    nsJSON::Set /file "$TEMP\awsmock_release.json"
+    Pop $0
+    ${If} $0 == "ok"
+      nsJSON::Get "tag_name" /end
+      Pop $R0  ; $R0 = "v1.18.17"
+
+      ; Strip leading "v"
+      StrCpy $R1 $R0 "" 1  ; $R1 = "1.18.17"
+
+      ${VersionCompare} $R1 "${VERSION}" $R2
+      ${If} $R2 == 1
+        MessageBox MB_YESNO \
+          "Version $R1 is available.$\nOpen download page?" \
+          IDYES open_browser IDNO done
+        open_browser:
+          ExecShell "open" "https://github.com/jensvogt/awsmock/releases/latest"
+          Quit
+        done:
+      ${EndIf}
+    ${EndIf}
+
+  ${EndIf}
+
+  Delete "$TEMP\awsmock_release.json"
+
+FunctionEnd
+
+; Called automatically before installer UI shows
+Function .onInit
+  Call CheckForUpdates
+FunctionEnd
 
 ; =====================================================
 ; Installer Sections

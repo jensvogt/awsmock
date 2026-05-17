@@ -2,8 +2,9 @@
 // Created by vogje01 on 3/30/25.
 //
 
-#include "awsmock/repository/CognitoDatabase.h"
+#include <openssl/bn.h>
 
+#include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/sftpserver/SftpServer.h>
 #include <awsmock/sftpserver/SftpUser.h>
@@ -89,6 +90,24 @@ void sftp_set_error(const sftp_session sftp, int errnum) {
 #else
 extern void sftp_set_error(const sftp_session sftp, int errnum);
 #endif
+
+
+// Replace 'bignum' type with BIGNUM*
+// Replace ssh_make_bignum_string with this:
+static ssh_string openssl_make_bignum_string(const BIGNUM *bn) {
+    const int len = BN_num_bytes(bn);
+    // SSH bignum strings need a leading zero byte if high bit is set
+    const int extra = (BN_num_bits(bn) % 8 == 0) ? 1 : 0;
+    const int total = len + extra;
+
+    ssh_string str = ssh_string_new(total);
+    if (str == nullptr) return nullptr;
+
+    auto *data = static_cast<uint8_t *>(ssh_string_data(str));
+    if (extra) data[0] = 0x00;
+    BN_bn2bin(bn, data + extra);
+    return str;
+}
 
 static const char *ssh_str_error(int u_errno) {
     switch (u_errno) {
@@ -576,41 +595,41 @@ static int ssh_buffer_pack_allocate_va(ssh_buffer_struct *buffer, const char *fo
 }
 
 
-ssh_string ssh_make_bignum_string(bignum num) {
-    ssh_string ptr = nullptr;
-    size_t pad = 0;
-    size_t len = bignum_num_bytes(num);
-    size_t bits = bignum_num_bits(num);
-
-    if (len == 0) {
-        return nullptr;
-    }
-
-    /* If the first bit is set we have a negative number */
-    if (!(bits % 8) && bignum_is_bit_set(num, bits - 1)) {
-        pad++;
-    }
-
-#ifdef DEBUG_CRYPTO
-    SSH_LOG(SSH_LOG_TRACE,
-            "%zu bits, %zu bytes, %zu padding",
-            bits, len, pad);
-#endif /* DEBUG_CRYPTO */
-
-    ptr = ssh_string_new(len + pad);
-    if (ptr == nullptr) {
-        return nullptr;
-    }
-
-    // We have a negative number so we need a leading zero
-    if (pad) {
-        ptr->data[0] = 0;
-    }
-
-    bignum_bn2bin(num, len, ptr->data + pad);
-
-    return ptr;
-}
+// ssh_string ssh_make_bignum_string(bignum num) {
+//     ssh_string ptr = nullptr;
+//     size_t pad = 0;
+//     size_t len = bignum_num_bytes(num);
+//     size_t bits = bignum_num_bits(num);
+//
+//     if (len == 0) {
+//         return nullptr;
+//     }
+//
+//     /* If the first bit is set we have a negative number */
+//     if (!(bits % 8) && bignum_is_bit_set(num, bits - 1)) {
+//         pad++;
+//     }
+//
+// #ifdef DEBUG_CRYPTO
+//     SSH_LOG(SSH_LOG_TRACE,
+//             "%zu bits, %zu bytes, %zu padding",
+//             bits, len, pad);
+// #endif /* DEBUG_CRYPTO */
+//
+//     ptr = ssh_string_new(len + pad);
+//     if (ptr == nullptr) {
+//         return nullptr;
+//     }
+//
+//     // We have a negative number so we need a leading zero
+//     if (pad) {
+//         ptr->data[0] = 0;
+//     }
+//
+//     bignum_bn2bin(num, len, ptr->data + pad);
+//
+//     return ptr;
+// }
 
 /**
  * @brief Add multiple values in a buffer on a single function call
@@ -690,16 +709,17 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
                 rc = ssh_buffer_add_data(buffer, o.data, len);
                 o.data = nullptr;
                 break;
-            case 'B':
-                b = va_arg(ap, bignum);
-                o.string = ssh_make_bignum_string(b);
+            case 'B': {
+                const BIGNUM *bn = va_arg(ap, const BIGNUM*);
+                o.string = openssl_make_bignum_string(bn);
                 if (o.string == nullptr) {
                     rc = SSH_ERROR;
                     break;
                 }
                 rc = awsmock_ssh_buffer_add_ssh_string(buffer, o.string);
-                SAFE_FREE(o.string);
+                ssh_string_free(o.string);
                 break;
+            }
             case 't':
                 cstring = va_arg(ap, char *);
                 len = strlen(cstring);
@@ -2883,20 +2903,20 @@ uint32_t awsmock_ssh_buffer_get_u8(struct ssh_buffer_struct *buffer, uint8_t *da
     return ssh_buffer_get_data(buffer, data, sizeof(uint8_t));
 }
 
-bignum ssh_make_string_bn(ssh_string string) {
-    bignum bn = nullptr;
-    size_t len = ssh_string_len(string);
-
-#ifdef DEBUG_CRYPTO
-    SSH_LOG(SSH_LOG_TRACE,
-            "Importing a %zu bits, %zu bytes object ...",
-            len * 8, len);
-#endif /* DEBUG_CRYPTO */
-
-    bignum_bin2bn(string->data, len, &bn);
-
-    return bn;
-}
+// bignum ssh_make_string_bn(ssh_string string) {
+//     bignum bn = nullptr;
+//     size_t len = ssh_string_len(string);
+//
+// #ifdef DEBUG_CRYPTO
+//     SSH_LOG(SSH_LOG_TRACE,
+//             "Importing a %zu bits, %zu bytes object ...",
+//             len * 8, len);
+// #endif /* DEBUG_CRYPTO */
+//
+//     bignum_bin2bn(string->data, len, &bn);
+//
+//     return bn;
+// }
 
 /** @internal
  * @brief Get multiple values from a buffer on a single function call
