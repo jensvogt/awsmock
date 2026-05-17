@@ -69,6 +69,8 @@ namespace AwsMock::Manager {
          */
         void Run(bool isService);
 
+        void Stop() const;
+
         /**
          * @brief Stop processing-
          */

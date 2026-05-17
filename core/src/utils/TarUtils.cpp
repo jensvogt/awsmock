@@ -40,10 +40,7 @@ namespace AwsMock::Core {
 
         log_debug << "Creating archive: " << output_filename_w;
 
-        const boost::filesystem::recursive_directory_iterator dir(directory);
-        const boost::filesystem::recursive_directory_iterator end;
         int count = 0;
-
         try {
 
             // Use recursive_directory_iterator for deep traversal
@@ -138,31 +135,37 @@ namespace AwsMock::Core {
 
     void TarUtils::TarDirectory(const std::string &tarFile, const std::string &directory) {
 
-        int err = 0;
         log_trace << "Create gzipped tarfile, tarFile: " << tarFile << ", directory: " << directory;
+
         archive *a = archive_write_new();
-        // Windows does not support compression
         archive_write_add_filter_gzip(a);
         archive_write_set_format_gnutar(a);
-        err = archive_write_open_filename(a, tarFile.c_str());
-        if (err != ARCHIVE_OK) {
-            log_error << "Could not open tar file, path: " << tarFile << ", directory: " << directory << ", error: " << archive_error_string(a);
+
+        if (const int err = archive_write_open_filename(a, tarFile.c_str()); err != ARCHIVE_OK) {
+            log_error << "Could not open tar file, path: " << tarFile << ", error: " << archive_error_string(a);
+            archive_write_free(a);
             return;
         }
 
-        boost::filesystem::recursive_directory_iterator dir(directory);
-        const boost::filesystem::recursive_directory_iterator end;
         int count = 0;
-        while (dir != end) {
-            if (dir->path() != tarFile) {
-                std::string filename = dir->path().string();
-                WriteFile(a, filename, directory, dir->is_directory(), dir->is_symlink());
+        try {
+            for (const auto &entry: std::filesystem::recursive_directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied)) {
+
+                if (entry.path().string() == tarFile) {
+                    continue;
+                }
+
+                std::string filename = entry.path().string();
+                WriteFile(a, filename, directory, entry.is_directory(), entry.is_symlink());
                 count++;
             }
-            ++dir;
+        } catch (const std::filesystem::filesystem_error &ex) {
+            log_error << "Filesystem error during traversal: " << ex.what();
         }
+
         archive_write_close(a);
         archive_write_free(a);
+        log_info << "Successfully archived, name: " << tarFile << ", count: " << count;
     }
 
     void TarUtils::WriteFile(archive *archive, std::string &fileName, const std::string &directory, const bool isDir, const bool isLink) {
@@ -206,14 +209,10 @@ namespace AwsMock::Core {
             return;
         }
         log_trace << "Wrote header";
-#ifdef _WIN32
-        const int fd = open(fileName.c_str(), O_RDONLY | O_BINARY);
-#else
         const int fd = open(fileName.c_str(), O_RDONLY);
-#endif
         if (fd >= 0) {
             char buff[8192];
-            long len = read(fd, buff, sizeof(buff));
+            ssize_t len = read(fd, buff, sizeof(buff));
             while (len > 0) {
                 archive_write_data(archive, buff, len);
                 len = read(fd, buff, sizeof(buff));
@@ -256,4 +255,4 @@ namespace AwsMock::Core {
     }
 #endif
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

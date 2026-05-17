@@ -499,7 +499,7 @@ namespace AwsMock::Service {
          * @param applicationEntity
          * @return return docker file path
          */
-        static std::string WriteApplicationDockerFile(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity);
+        static std::string WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity);
 
         /**
          * @brief Write the compressed docker image file.
@@ -535,6 +535,15 @@ namespace AwsMock::Service {
          * @param environment environment variables
          */
         static std::string AddEnvironment(const std::map<std::string, std::string> &environment);
+
+        /**
+         * @brief Write AWS credentials
+         *
+         * @param codeDir base directory
+         * @param region AWS region, default: eu-central-1
+         * @return credentials string
+         */
+        static std::string AddCredentials(const std::string &codeDir, const std::string &region = "eu-central-1");
 
         /**
          * @brief Guarded domain socket helper

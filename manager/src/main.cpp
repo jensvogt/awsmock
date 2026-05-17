@@ -77,7 +77,7 @@ int main(const int argc, char *argv[]) {
     notify(vm);
 
     // Show usage
-    if (vm.find("help") != vm.end()) {
+    if (vm.contains("help")) {
         std::cout << std::endl
                 << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                 << std::endl
@@ -89,7 +89,7 @@ int main(const int argc, char *argv[]) {
     }
 
     // Show the version
-    if (vm.find("version") != vm.end()) {
+    if (vm.contains("version")) {
         std::cout << std::endl
                 << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                 << std::endl;
@@ -98,7 +98,7 @@ int main(const int argc, char *argv[]) {
 
 #ifdef WIN32
     // Install Windows service
-    if (vm.find("install") != vm.end()) {
+    if (vm.contains("install")) {
         if (vm["name"].as<std::string>().empty()) {
             std::cerr << "Service name is required" << std::endl;
             return 1;
@@ -108,7 +108,7 @@ int main(const int argc, char *argv[]) {
     }
 
     // Uninstall Windows service
-    if (vm.find("uninstall") != vm.end()) {
+    if (vm.contains("uninstall")) {
         if (vm["name"].as<std::string>().empty()) {
             std::cerr << "Service name is required" << std::endl;
             return 1;
@@ -119,13 +119,13 @@ int main(const int argc, char *argv[]) {
 #endif
 
     // Read configuration, log to stderr, as we do not have logging yet
-    if (vm.find("config") != vm.end()) {
+    if (vm.contains("config")) {
         const std::string configFilename = vm["config"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetFilename(configFilename);
     }
 
     // Set the log level
-    if (vm.find("loglevel") != vm.end()) {
+    if (vm.contains("loglevel")) {
         auto value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
@@ -146,7 +146,8 @@ int main(const int argc, char *argv[]) {
 #ifdef WIN32
 
     // Run as a foreground process on windows
-    if (vm.find("foreground") != vm.end()) {
+    if (vm.contains("foreground")) {
+        
         // Run the detached frontend server thread
         boost::thread frontendThread;
         AwsMock::Service::Frontend::FrontendServer server;

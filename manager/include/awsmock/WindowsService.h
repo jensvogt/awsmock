@@ -6,6 +6,8 @@
 #define AWS_MOCK_WINDOWS_SERVICE_H
 
 #ifdef _WIN32
+#include "awsmock/service/common/AbstractHandler.h"
+
 void WINAPI ServiceMain(DWORD, LPTSTR *);
 
 void WINAPI InstallService(const std::string &exePath, const std::string &ServiceName, const std::string &displayName);

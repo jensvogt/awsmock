@@ -41,7 +41,7 @@ jobs:
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
   build-windows:
-    name: Build & Package (Windows)
+    name: Build & Package (Windows ZIP)
     runs-on: windows-latest
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
@@ -191,9 +191,15 @@ jobs:
           npm run build
 
       - name: Install NSIS
-        run: choco install nsis
+        run: choco install nsis --no-progress -y
 
-      - name: Build installer
+      - name: Install SimpleSC Plugin
+        run: |
+          Invoke-WebRequest -Uri "https://nsis.sourceforge.io/mediawiki/images/e/ef/NSIS_Simple_Service_Plugin_1.30.zip" -OutFile "$env:TEMP\SimpleSC.zip"
+          Expand-Archive "$env:TEMP\SimpleSC.zip" -DestinationPath "$env:TEMP\SimpleSC"
+          Copy-Item "$env:TEMP\SimpleSC\*.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\"
+
+      - name: Build NSIS installer
         run: makensis dist/nsis/product.nsi
 
       - name: Upload Windows installer
