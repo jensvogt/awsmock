@@ -283,7 +283,7 @@ namespace AwsMock::Service {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
             application = _database.UpdateApplication(application);
             log_error << "Application Base64 image does not exist, name: " << fullBase64File;
-            return;
+            throw Core::CoreException("Application Base64 image does not exist, name: " + fullBase64File);
         }
 
         // Update status
@@ -341,11 +341,16 @@ namespace AwsMock::Service {
         long count = 0;
         for (auto &application: _database.ListApplications()) {
             if (application.enabled) {
+
                 Dto::Apps::StartApplicationRequest startRequest;
                 startRequest.application = Dto::Apps::Mapper::map(application);
                 startRequest.region = application.region;
-                StartApplication(startRequest);
-                count++;
+                try {
+                    StartApplication(startRequest);
+                    count++;
+                } catch (Core::CoreException &e) {
+                    log_error << "Could not start application: " << e.what();
+                }
             }
         }
         return count;
@@ -602,4 +607,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

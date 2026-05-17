@@ -8,9 +8,9 @@
       "client-id": "00000000",
       "secret-access-key": "none"
     },
-    "data-dir": "C:\\Program Files (x86)\\awsmock\\data",
-    "temp-dir": "C:\\Program Files (x86)\\awsmock\\data\\tmp",
-    "backup-dir": "C:\\Program Files (x86)\\awsmock\\data\\backup",
+    "data-dir": "C:\\Program Files\\awsmock\\data",
+    "temp-dir": "C:\\Program Files\\awsmock\\data\\tmp",
+    "backup-dir": "C:\\Program Files\\awsmock\\data\\backup",
     "json": {
       "pretty": false
     },
@@ -20,11 +20,11 @@
       }
     },
     "dockerized": false,
-    "magic-file": "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc",
+    "magic-file": "C:\\Program Files\\awsmock\\etc\\magic.mgc",
     "autoload": {
       "active": true,
-      "file": "C:\\Program Files (x86)\\awsmock\\init\\01_init.json",
-      "dir": "C:\\Program Files (x86)\\awsmock\\init"
+      "file": "C:\\Program Files\\awsmock\\init\\01_init.json",
+      "dir": "C:\\Program Files\\awsmock\\init"
     },
     "gateway": {
       "active": true,
@@ -46,7 +46,7 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\s3",
+        "data-dir": "C:\\Program Files\\awsmock\\data\\s3",
         "counter-period": 60,
         "sync-period": 3600,
         "archive-timeout": 300
@@ -83,7 +83,7 @@
           "count": 5
         },
         "lifetime": 3600,
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\lambda",
+        "data-dir": "C:\\Program Files\\awsmock\\data\\lambda",
         "remove-period": 300,
         "counter-period": 300,
         "log-retention-period": 1,
@@ -118,7 +118,7 @@
           "count": 5
         },
         "bucket": "transfer-server",
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\transfer",
+        "data-dir": "C:\\Program Files\\awsmock\\data\\transfer",
         "user-pool-id": "eu-central-1_oGsr6fJ8F",
         "monitoring-period": 300,
         "directories": [
@@ -133,7 +133,7 @@
           "address": "0.0.0.0"
         },
         "sftp": {
-          "host-key": "C:\\Program Files (x86)\\awsmock\\etc\\ssh_host_key",
+          "host-key": "C:\\Program Files\\awsmock\\etc\\ssh_host_key",
           "pasv-min": 6000,
           "pasv-max": 6100,
           "port": 2222,
@@ -156,7 +156,7 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\dynamodb",
+        "data-dir": "C:\\Program Files\\awsmock\\data\\dynamodb",
         "monitoring-period": 300,
         "worker-period": 300
       },
@@ -193,7 +193,7 @@
       },
       "application": {
         "active": true,
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\application",
+        "data-dir": "C:\\Program Files\\awsmock\\data\\application",
         "runtime": {
           "java11": "alpine/java:11.0.22-jdk",
           "java17": "openjdk:17-jdk-alpine",
@@ -282,7 +282,7 @@
       "port": 4567,
       "workers": 10,
       "timeout": 900,
-      "doc-root": "C:\\Program Files (x86)\\awsmock\\frontend"
+      "doc-root": "C:\\Program Files\\awsmock\\frontend"
     },
     "logging": {
       "file-active": true,
@@ -290,7 +290,7 @@
       "websocket-active": true,
       "websocket-port": 4569,
       "level": "info",
-      "dir": "C:\\Program Files (x86)\\awsmock\\log",
+      "dir": "C:\\Program Files\\awsmock\\log",
       "prefix": "awsmock",
       "file-size": 10485760,
       "file-count": 5

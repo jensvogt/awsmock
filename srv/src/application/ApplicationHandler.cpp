@@ -70,7 +70,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         const ApplicationService service{_ioc};
                         service.RebuildApplication(serviceRequest);
-                        log_info << "Applications rebuild, region: " << serviceRequest.region; });
+                        log_info << "Applications rebuild, region: " << serviceRequest.region;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -80,7 +81,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         const ApplicationService service{_ioc};
                         service.EnableApplication(serviceRequest);
-                        log_info << "Application enabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                        log_info << "Application enabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -90,7 +92,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         const ApplicationService service{_ioc};
                         service.EnableAllApplications(serviceRequest);
-                        log_info << "Application enabled, region: " << serviceRequest.region; });
+                        log_info << "Application enabled, region: " << serviceRequest.region;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -100,7 +103,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         const ApplicationService service{_ioc};
                         service.DisableApplication(serviceRequest);
-                        log_info << "Application disabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                        log_info << "Application disabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -110,7 +114,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         const ApplicationService service{_ioc};
                         service.DisableAllApplications(serviceRequest);
-                        log_info << "Application disabled, region: " << serviceRequest.region; });
+                        log_info << "Application disabled, region: " << serviceRequest.region;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -130,7 +135,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this] {
                         const ApplicationService service{_ioc};
                         const long count = service.StartAllApplications();
-                        log_info << "All applications started, count: " << count; });
+                        log_info << "All applications started, count: " << count;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -140,7 +146,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         const ApplicationService service{_ioc};
                         service.RestartApplication(serviceRequest);
-                        log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                        log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -149,7 +156,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this] {
                         const ApplicationService service{_ioc};
                         const long count = service.RestartAllApplications();
-                        log_info << "All applications restarted, count: " << count; });
+                        log_info << "All applications restarted, count: " << count;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -159,7 +167,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         const ApplicationService service{_ioc};
                         service.StopApplication(serviceRequest);
-                        log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                        log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -168,7 +177,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this] {
                         const ApplicationService service{_ioc};
                         const long count = service.StopAllApplications();
-                        log_info << "All applications stopped, count: " << count; });
+                        log_info << "All applications stopped, count: " << count;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -196,7 +206,10 @@ namespace AwsMock::Service {
         } catch (Core::NotFoundException &exc) {
             log_error << exc.what();
             return SendResponse(request, http::status::internal_server_error, exc.what());
+        } catch (Core::CoreException &exc) {
+            log_error << exc.what();
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

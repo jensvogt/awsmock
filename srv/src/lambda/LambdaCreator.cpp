@@ -9,20 +9,26 @@ namespace AwsMock::Service {
     Database::Entity::Lambda::Lambda LambdaCreator::CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const {
         log_debug << "Start creating lambda function, instanceId: " << instanceId;
 
-        // Create a new instance
-        const std::string containerId = CreateInstance(instanceId, lambda, lambda.code.zipFile);
+        try {
+            // Create a new instance
+            const std::string containerId = CreateInstance(instanceId, lambda, lambda.code.zipFile);
 
-        // Update database
-        lambda.averageRuntime = 0;
-        lambda.invocations = 0;
-        lambda.lastStarted = system_clock::now();
-        lambda.state = Database::Entity::Lambda::LambdaState::Active;
-        lambda.stateReason = "Activated";
-        lambda.codeSize = static_cast<long>(lambda.code.zipFile.size());
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+            // Update database
+            lambda.averageRuntime = 0;
+            lambda.invocations = 0;
+            lambda.lastStarted = system_clock::now();
+            lambda.state = Database::Entity::Lambda::LambdaState::Active;
+            lambda.stateReason = "Activated";
+            lambda.codeSize = static_cast<long>(lambda.code.zipFile.size());
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
 
-        log_info << "Lambda function instance created: " << lambda.function << " instanceId: " << instanceId << ", instances: " << lambda.instances.size();
-        return lambda;
+            log_info << "Lambda function instance created: " << lambda.function << " instanceId: " << instanceId << ", instances: " << lambda.instances.size();
+            return lambda;
+
+        } catch (const Core::ContainerException &e) {
+            log_error << "Error creating lambda function: " << e.what();
+        }
+        return {};
     }
 
     std::string LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode) const {
@@ -145,7 +151,7 @@ namespace AwsMock::Service {
         const std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + zipFile;
         if (!Core::FileUtils::FileExists(base64FullFile)) {
             log_error << "Base64 file does not exist, path: " << base64FullFile;
-            return;
+            throw Core::ContainerException("Base64 file does not exist, path: " + base64FullFile);
         }
 
         // Read the function code
@@ -250,7 +256,7 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
@@ -311,4 +317,4 @@ namespace AwsMock::Service {
         lambda.code.zipFile = base64File;
         return base64FullFile;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
