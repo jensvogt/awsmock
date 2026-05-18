@@ -22,7 +22,7 @@ namespace AwsMock::Core {
         const system_clock::time_point utcTime = DateTimeUtils::ConvertToUtc(localTime);
 
         // assert
-        BOOST_CHECK_EQUAL(3600, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
+        BOOST_CHECK_EQUAL(7200, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
     }
 
     BOOST_AUTO_TEST_CASE(UtcOffsetTest) {
