@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Creates the transfer server bucket
          */
-        void CreateTransferBucket() const;
+        static void CreateTransferBucket();
 
         /**
          * @brief Creates the transfer server default directories

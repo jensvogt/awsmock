@@ -82,7 +82,7 @@ jobs:
         run: |
           mkdir "${{ env.BUILD_DIR }}"
           cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
-          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
+          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel -A x64 -T host=x64
 
       - name: Build (Frontend)
         shell: pwsh
@@ -180,7 +180,7 @@ jobs:
         run: |
           mkdir "${{ env.BUILD_DIR }}"
           cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
-          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
+          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel -A x64 -T host=x64
 
       - name: Build (Frontend)
         shell: pwsh
