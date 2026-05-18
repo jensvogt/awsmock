@@ -96,9 +96,43 @@ Function CheckForUpdates
 
 FunctionEnd
 
-; Called automatically before installer UI shows
+
+; =====================================================
+; Helper: Stop service if running
+; =====================================================
+Function StopAwsMockService
+
+  ; Check if service exists
+  SimpleSC::ExistsService "awsmock"
+  Pop $0
+  ${If} $0 == 0
+
+    ; Service exists — check if running
+    SimpleSC::GetServiceStatus "awsmock"
+    Pop $0  ; return code
+    Pop $1  ; status code
+
+    ${If} $1 == 4  ; 4 = SERVICE_RUNNING
+      DetailPrint "Stopping awsmock service..."
+      SimpleSC::StopService "awsmock" 1 30
+      Pop $0
+      ${If} $0 != 0
+        MessageBox MB_OK "Warning: Could not stop awsmock service. Error: $0"
+      ${Else}
+        DetailPrint "Service stopped successfully."
+      ${EndIf}
+    ${EndIf}
+
+  ${EndIf}
+
+FunctionEnd
+
+; =====================================================
+; Called before installation starts
+; =====================================================
 Function .onInit
   Call CheckForUpdates
+  Call StopAwsMockService
 FunctionEnd
 
 ; =====================================================
@@ -113,6 +147,8 @@ Section "Main Application" SecMain
 
   SetOutPath "$INSTDIR\etc"
   File "/oname=awsmock.json" "${SRCDIR}\dist\etc\awsmock_win32.json"
+  File "${SRCDIR}\dist\etc\magic.mgc"
+  File "${SRCDIR}\dist\etc\ssh_host_key"
 
   SetOutPath "$INSTDIR\init"
   File "${SRCDIR}\dist\msi\init.json"

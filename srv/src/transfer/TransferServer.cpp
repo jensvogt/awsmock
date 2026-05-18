@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         log_info << "Transfer server initialized";
     }
 
-    void TransferServer::CreateTransferBucket() const {
+    void TransferServer::CreateTransferBucket() {
         Dto::S3::CreateBucketRequest request;
         request.owner = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
         request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
@@ -172,4 +172,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("ssm-backup");
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
