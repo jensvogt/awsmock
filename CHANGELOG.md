@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.22](https://github.com/jensvogt/awsmock/compare/v1.18.21...v1.18.22) (2026-05-18)
+
+
+### Bug Fixes
+
+* windows service crash ([b2688db](https://github.com/jensvogt/awsmock/commit/b2688db91a66754695b22b69aa50b5717888a67f))
+* windows service crash ([6580fc2](https://github.com/jensvogt/awsmock/commit/6580fc28a1d767421cf186ebd396e3c5d55017f8))
+
 ## [1.18.21](https://github.com/jensvogt/awsmock/compare/v1.18.20...v1.18.21) (2026-05-18)
 
 
