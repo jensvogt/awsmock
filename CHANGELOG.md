@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.21](https://github.com/jensvogt/awsmock/compare/v1.18.20...v1.18.21) (2026-05-18)
+
+
+### Bug Fixes
+
+* lambda failures ([3c2418d](https://github.com/jensvogt/awsmock/commit/3c2418d858a47b27ebf041c5536ad7c9b8fb3259))
+* lambda failures ([ee89bdd](https://github.com/jensvogt/awsmock/commit/ee89bdd696e21cc87f4dad2d3f8b184220445ec3))
+* lambda failures ([4dd82fa](https://github.com/jensvogt/awsmock/commit/4dd82fa2e3843f57e5b84fa3b99e444b6cc0456c))
+
 ## [1.18.20](https://github.com/jensvogt/awsmock/compare/v1.18.19...v1.18.20) (2026-05-18)
 
 
