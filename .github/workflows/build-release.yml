@@ -195,9 +195,9 @@ jobs:
 
       - name: Install NSIS plugins
         run: |
-          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\inetc.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\inetc.dll"
-          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\nsJSON.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\nsJSON.dll"
-          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\SimpleSC.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\SimpleSC.dll"
+          Copy-Item "${{ github.workspace }}\dist\msi\nsis\plugins\inetc.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\inetc.dll"
+          Copy-Item "${{ github.workspace }}\dist\msi\nsis\plugins\nsJSON.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\nsJSON.dll"
+          Copy-Item "${{ github.workspace }}\dist\msi\nsis\plugins\SimpleSC.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\SimpleSC.dll"
 
       - name: Build NSIS installer
         run: makensis dist/nsis/product.nsi
