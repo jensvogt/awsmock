@@ -166,7 +166,7 @@ namespace AwsMock::Core {
      * x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
      * x-amz-date: 20130524T000000Z
      */
-    BOOST_AUTO_TEST_CASE(VerifySignatureTest, *boost::unit_test::disabled()) {
+    BOOST_AUTO_TEST_CASE(VerifySignatureTest) {
 
         // arrange
         http::request<http::dynamic_body> request;

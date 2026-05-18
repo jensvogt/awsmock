@@ -11,8 +11,8 @@
 ; =====================================================
 ; General Settings
 ; =====================================================
-Name "AwsMock 1.18.16"
-OutFile "AwsMock-1.18.16-amd64.exe"
+Name "AwsMock 1.18.20"
+OutFile "AwsMock-1.18.20-amd64.exe"
 InstallDir "$PROGRAMFILES64\awsmock"
 InstallDirRegKey HKLM "Software\AwsMock" "InstallDir"
 RequestExecutionLevel admin
@@ -21,12 +21,12 @@ SetCompressor /SOLID lzma
 ; =====================================================
 ; Version Info
 ; =====================================================
-VIProductVersion "1.18.16.0"
+VIProductVersion "1.18.20.0"
 VIAddVersionKey "ProductName"     "AWS Mock"
 VIAddVersionKey "CompanyName"     "Jens Vogt"
 VIAddVersionKey "FileDescription" "AWS Cloud Service Simulator"
-VIAddVersionKey "FileVersion"     "1.18.16"
-VIAddVersionKey "ProductVersion"  "1.18.16"
+VIAddVersionKey "FileVersion"     "1.18.20"
+VIAddVersionKey "ProductVersion"  "1.18.20"
 VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 
 ; =====================================================
@@ -39,7 +39,7 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 ; =====================================================
 ; Source directory variable
 ; =====================================================
-!define VERSION "1.18.16"
+!define VERSION "1.18.20"
 !define SRCDIR "C:\work\private\awsmock"
 
 ; =====================================================
@@ -146,7 +146,7 @@ Section "Main Application" SecMain
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
     "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
-    "DisplayVersion" "1.18.16"
+    "DisplayVersion" "1.18.20"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
     "Publisher" "Jens Vogt"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
