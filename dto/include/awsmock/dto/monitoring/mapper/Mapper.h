@@ -47,10 +47,10 @@ namespace AwsMock::Dto::Monitoring {
         /**
          * @brief Maps a monitoring counter DTO list to a counter-entity
          *
-         * @param counterDto monitoring counter-entity
+         * @param counterEntity monitoring counter-entity
          * @return monitoring counter-entity
          */
-        static std::vector<Database::Entity::Monitoring::Counter> map(const std::vector<Counter> &counterDto);
+        static std::vector<Database::Entity::Monitoring::Counter> map(const std::vector<Counter> &counterEntity);
     };
 
 }// namespace AwsMock::Dto::Monitoring
