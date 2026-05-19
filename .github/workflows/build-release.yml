@@ -191,13 +191,16 @@ jobs:
           npm run build
 
       - name: Install NSIS
-        run: choco install nsis --no-progress -y
+        run: |
+          choco install nsis --no-progress -y
+          echo "C:\Program Files (x86)\NSIS" >> $env:GITHUB_PATH
 
       - name: Install NSIS plugins
         run: |
-          Copy-Item "${{ github.workspace }}\dist\msi\nsis\inetc.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\inetc.dll"
-          Copy-Item "${{ github.workspace }}\dist\msi\nsis\nsJSON.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\nsJSON.dll"
-          Copy-Item "${{ github.workspace }}\dist\msi\nsis\SimpleSC.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\SimpleSC.dll"
+          $pluginDir = "C:\Program Files (x86)\NSIS\Plugins\x86-unicode"
+          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\inetc.dll" "$pluginDir\"
+          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\nsJSON.dll" "$pluginDir\"
+          Copy-Item "${{ github.workspace }}\dist\nsis\plugins\SimpleSC.dll" "$pluginDir\"
 
       - name: Build NSIS installer
         run: makensis dist/nsis/product.nsi
