@@ -203,7 +203,7 @@ jobs:
           Copy-Item "${{ github.workspace }}\dist\msi\nsis\SimpleSC.dll" "$pluginDir\"
 
       - name: Build NSIS installer
-        run: makensis dist/nsis/product.nsi
+        run: makensis dist\msi\product.nsi
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
