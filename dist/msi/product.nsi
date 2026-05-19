@@ -40,7 +40,9 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 ; Source directory variable
 ; =====================================================
 !define VERSION "1.18.21"
-!define SRCDIR "C:\work\private\awsmock"
+!ifndef SRCDIR
+  !define SRCDIR "./"
+!endif
 
 ; =====================================================
 ; Pages
