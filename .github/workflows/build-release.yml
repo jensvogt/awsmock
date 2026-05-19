@@ -205,7 +205,7 @@ jobs:
       - name: Build NSIS installer
         env:
           SRCDIR: ${{ github.workspace }}
-        run: makensis /SRCDIR=${{ github.workspace }} dist\msi\product.nsi
+        run: makensis /DSRCDIR=${{ github.workspace }} dist\msi\product.nsi
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
@@ -224,7 +224,6 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
       SERVICE_NAME: de.jensvogt.awsmock
-      #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
