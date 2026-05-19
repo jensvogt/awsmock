@@ -41,7 +41,7 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 ; =====================================================
 !define VERSION "1.18.21"
 !ifndef SRCDIR
-  !define SRCDIR "./"
+  !define SRCDIR ".\"
 !endif
 
 ; =====================================================
@@ -52,10 +52,8 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
-
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
-
 !insertmacro MUI_LANGUAGE "English"
 
 ; =====================================================
