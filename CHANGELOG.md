@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.27](https://github.com/jensvogt/awsmock/compare/v1.18.26...v1.18.27) (2026-05-19)
+
+
+### Bug Fixes
+
+* windows service crash ([9cc410a](https://github.com/jensvogt/awsmock/commit/9cc410adae103e451561069d86d7f54762fdfd75))
+
 ## [1.18.26](https://github.com/jensvogt/awsmock/compare/v1.18.25...v1.18.26) (2026-05-19)
 
 
