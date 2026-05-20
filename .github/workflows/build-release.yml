@@ -77,6 +77,14 @@ jobs:
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
 
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: "${{ github.workspace }}/vcpkg"
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
       - name: Build (Backend)
         shell: cmd
         run: |
@@ -175,6 +183,14 @@ jobs:
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
 
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: "${{ github.workspace }}/vcpkg"
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
       - name: Build (Backend)
         shell: cmd
         run: |
@@ -205,7 +221,7 @@ jobs:
       - name: Build NSIS installer
         env:
           SRCDIR: ${{ github.workspace }}
-        run: makensis /DSRCDIR=${{ github.workspace }} /DBUILDDIR="${{ env.BUILD_DIR }}" dist\msi\product.nsi
+        run: makensis /DSRCDIR=${{ github.workspace }} /DBUILDDIR="${{ env.BUILD_DIR }}" /DVERSION=${{ env.SEMVER }} dist\msi\product.nsi
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4

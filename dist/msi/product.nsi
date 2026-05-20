@@ -9,10 +9,23 @@
 !include "StrFunc.nsh"
 
 ; =====================================================
+; Environment variables
+; =====================================================
+!ifndef SRCDIR
+  !define SRCDIR ".\"
+!endif
+!ifndef BUILDDIR
+  !define BUILDDIR ".\cmake-build-release"
+!endif
+!ifndef VERSION
+  !define VERSION "1.0.0"
+!endif
+
+; =====================================================
 ; General Settings
 ; =====================================================
-Name "AwsMock 1.18.21"
-OutFile "awsmockAwsMock-1.18.21-amd64.exe"
+Name "AwsMock ${VERSION}"
+OutFile "${SRCDIR}\awsmock-${VERSION}-amd64.exe"
 InstallDir "$PROGRAMFILES64\awsmock"
 InstallDirRegKey HKLM "Software\AwsMock" "InstallDir"
 RequestExecutionLevel admin
@@ -21,12 +34,12 @@ SetCompressor /SOLID lzma
 ; =====================================================
 ; Version Info
 ; =====================================================
-VIProductVersion "1.18.21.0"
+VIProductVersion "${VERSION}.0"
 VIAddVersionKey "ProductName"     "AWS Mock"
 VIAddVersionKey "CompanyName"     "Jens Vogt"
 VIAddVersionKey "FileDescription" "AWS Cloud Service Simulator"
-VIAddVersionKey "FileVersion"     "1.18.21"
-VIAddVersionKey "ProductVersion"  "1.18.21"
+VIAddVersionKey "FileVersion"     "${VERSION}"
+VIAddVersionKey "ProductVersion"  "${VERSION}"
 VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 
 ; =====================================================
@@ -35,17 +48,6 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !define MUI_ABORTWARNING
 !define MUI_ICON   "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-
-; =====================================================
-; Environment variables
-; =====================================================
-!define VERSION "1.18.21"
-!ifndef SRCDIR
-  !define SRCDIR ".\"
-!endif
-!ifndef BUILDDIR
-  !define BUILDDIR ".\cmake-build-release"
-!endif
 
 ; =====================================================
 ; Pages
@@ -76,10 +78,10 @@ Function CheckForUpdates
     Pop $0
     ${If} $0 == "ok"
       nsJSON::Get "tag_name" /end
-      Pop $R0  ; $R0 = "v1.18.17"
+      Pop $R0  ; $R0 = "v${VERSION}"
 
       ; Strip leading "v"
-      StrCpy $R1 $R0 "" 1  ; $R1 = "1.18.17"
+      StrCpy $R1 $R0 "" 1  ; $R1 = "${VERSION}"
 
       ${VersionCompare} $R1 "${VERSION}" $R2
       ${If} $R2 == 1
@@ -185,7 +187,7 @@ Section "Main Application" SecMain
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
     "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
-    "DisplayVersion" "1.18.21"
+    "DisplayVersion" "${VERSION}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
     "Publisher" "Jens Vogt"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
