@@ -12,7 +12,7 @@
 ; General Settings
 ; =====================================================
 Name "AwsMock 1.18.21"
-OutFile "AwsMock-1.18.21-amd64.exe"
+OutFile "awsmockAwsMock-1.18.21-amd64.exe"
 InstallDir "$PROGRAMFILES64\awsmock"
 InstallDirRegKey HKLM "Software\AwsMock" "InstallDir"
 RequestExecutionLevel admin
