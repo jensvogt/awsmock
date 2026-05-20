@@ -137,22 +137,24 @@ DWORD WINAPI ServiceCtrlHandler(const DWORD CtrlCode, DWORD eventType, LPVOID ev
 DWORD WINAPI RunService(LPVOID lpParam) {
 
     try {
-
+        
         AwsMock::Service::Frontend::FrontendServer server;
         boost::thread{boost::ref(server), true}.detach();
         log_info << "Frontend server started.";
-
         boost::asio::io_context ioc;
         AwsMock::Manager::Manager awsMockManager{ioc};
+
+        // Set up endpoints, handlers, and the stop watcher
         awsMockManager.Initialize();
-        log_info << "Backend server started.";
+        log_info << "Backend server initialized.";
 
-        // Wait for stop signal from SCM
-        WaitForSingleObject(g_ServiceStopEvent, INFINITE);
-        log_info << "Stop event received.";
+        // This call will block natively until your stopWatcher calls _ioc.stop()
+        awsMockManager.Run(true);
+        log_info << "Backend execution loop finished.";
 
+        // Clean up any remaining allocations
         awsMockManager.Stop();
-        log_info << "Backend server stopped.";
+        log_info << "Backend server stopped gracefully.";
 
     } catch (const std::exception &e) {
         LogWindowsEvent(std::string("RunService exception: ") + e.what());
