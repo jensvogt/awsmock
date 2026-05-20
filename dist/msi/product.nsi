@@ -37,11 +37,14 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; =====================================================
-; Source directory variable
+; Environment variables
 ; =====================================================
 !define VERSION "1.18.21"
 !ifndef SRCDIR
   !define SRCDIR ".\"
+!endif
+!ifndef BUILDDIR
+  !define BUILDDIR ".\cmake-build-release"
 !endif
 
 ; =====================================================
@@ -141,9 +144,9 @@ FunctionEnd
 Section "Main Application" SecMain
 
   SetOutPath "$INSTDIR\bin"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockmgr.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awslocal.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockctl.exe"
+  File "${BUILDDIR}\Release\awsmockmgr.exe"
+  File "${BUILDDIR}\Release\awslocal.exe"
+  File "${BUILDDIR}\Release\awsmockctl.exe"
 
   SetOutPath "$INSTDIR\etc"
   File "/oname=awsmock.json" "${SRCDIR}\dist\etc\awsmock_win32.json"
