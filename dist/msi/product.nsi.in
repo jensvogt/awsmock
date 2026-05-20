@@ -141,9 +141,9 @@ FunctionEnd
 Section "Main Application" SecMain
 
   SetOutPath "$INSTDIR\bin"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockmgr.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awslocal.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockctl.exe"
+  File "${SRCDIR}\build-windows\Release\awsmockmgr.exe"
+  File "${SRCDIR}\build-windows\Release\awslocal.exe"
+  File "${SRCDIR}\build-windows\Release\awsmockctl.exe"
 
   SetOutPath "$INSTDIR\etc"
   File "/oname=awsmock.json" "${SRCDIR}\dist\etc\awsmock_win32.json"
