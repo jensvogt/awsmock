@@ -134,7 +134,7 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: installer-windows
+          name: zip-windows
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
           overwrite: true
 
@@ -145,7 +145,7 @@ jobs:
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
-      BUILD_DIR: "${{ github.workspace }}/build-windows"
+      BUILD_DIR: "${{ github.workspace }}/cmake-build-release"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
@@ -205,13 +205,13 @@ jobs:
       - name: Build NSIS installer
         env:
           SRCDIR: ${{ github.workspace }}
-        run: makensis /DSRCDIR=${{ github.workspace }} dist\msi\product.nsi
+        run: makensis /DSRCDIR=${{ github.workspace }} /DBUILDDIR="${{ env.BUILD_DIR }}" dist\msi\product.nsi
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: installer-windows
-          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
           overwrite: true
 
   build-macos:
@@ -650,6 +650,12 @@ jobs:
           name: installer-windows
           path: artifacts/windows
 
+      - name: Download Windows ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: zip-windows
+          path: artifacts/windows
+
       - name: Download macOS installer
         uses: actions/download-artifact@v4
         with:
@@ -673,6 +679,7 @@ jobs:
         with:
           files: |
             artifacts/windows/*.zip
+            artifacts/windows/*.exe
             artifacts/macos/*.tgz
             artifacts/linux/*.deb
             artifacts/linux/*.rpm
