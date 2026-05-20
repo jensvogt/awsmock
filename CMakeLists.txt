@@ -22,7 +22,7 @@ enable_testing()
 # Current version
 # -------------------------------------------------------------------------
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/core/include/awsmock/core/Version.h)
-configure_file(${CMAKE_SOURCE_DIR}/dist/msi/product.nsi.in ${CMAKE_SOURCE_DIR}/dist/msi/product.nsi @ONLY)
+#configure_file(${CMAKE_SOURCE_DIR}/dist/msi/product.nsi.in ${CMAKE_SOURCE_DIR}/dist/msi/product.nsi @ONLY)
 
 # -------------------------------------------------------------------------
 # Global link flags (Windows)
