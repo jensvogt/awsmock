@@ -156,9 +156,11 @@ Section "Main Application" SecMain
   File "${SRCDIR}\dist\etc\ssh_host_key"
 
   SetOutPath "$INSTDIR\init"
+  IfFileExists "$INSTDIR\etc\awsmock.json" skip_config
   File "${SRCDIR}\dist\msi\init.json"
 
   ; Create empty directories
+  skip_config:
   CreateDirectory "$INSTDIR\log"
   CreateDirectory "$INSTDIR\tmp"
   CreateDirectory "$INSTDIR\data"
