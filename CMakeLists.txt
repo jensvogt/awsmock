@@ -80,6 +80,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         dto/include/awsmock/dto/common/mapper/Mapper.h
         core/include/awsmock/core/MagicDetector.h
         core/src/exception/ContainerException.cpp
+        db/tst/mongodb/S3DbTest.cpp
 )
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
@@ -154,7 +155,8 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp
         db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp db/src/repository/Database.cpp
         db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp db/src/entity/dynamodb/KeySchema.cpp
-        db/src/entity/dynamodb/Tag.cpp)
+        db/src/entity/dynamodb/Tag.cpp
+        db/tst/mongodb/S3DbTest.cpp)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
