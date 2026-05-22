@@ -40,103 +40,111 @@ jobs:
           CLEAN="${TAG#v}"   # remove leading 'v'
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
-  build-windows-zip:
-    name: Build & Package (Windows ZIP)
-    runs-on: windows-latest
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    env:
-      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
-      BUILD_DIR: "${{ github.workspace }}/build-windows"
-      PACKAGE_DIR: "${{ github.workspace }}/package-windows"
-      SEMVER: ${{ needs.release-please.outputs.tag_name }}
-      VCPKG_DEFAULT_TRIPLET: x64-windows-static
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Setup MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgDirectory: "${{ github.workspace }}/vcpkg"   # ← must match env
-          vcpkgJsonGlob: '**/vcpkg.json'
-          runVcpkgInstall: false
-
-      - name: Build (Backend)
-        shell: cmd
-        run: |
-          mkdir "${{ env.BUILD_DIR }}"
-          cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
-          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
-
-      - name: Build (Frontend)
-        shell: pwsh
-        run: |
-          git clone https://github.com/jensvogt/awsmock-ui
-          cd awsmock-ui
-          npm install
-          npm run build
-
-      - name: Create package structure
-        shell: pwsh
-        run: |
-          New-Item -Path "${{ env.PACKAGE_DIR }}\bin" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\etc" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\log" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\s3" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sns" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\lambda" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\transfer" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\application" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\backup" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
-          New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
-
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
-          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
-          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
-          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
-          Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
-
-      - name: Create ZIP archive (PowerShell)
-        shell: pwsh
-        run: |
-          $source = "${{ env.PACKAGE_DIR }}"
-          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
-
-          if (Test-Path $zip) {
-            Remove-Item $zip -Force
-          }
-
-          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
-          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
-
-      - name: Upload Windows installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: installer-windows
-          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
-          overwrite: true
+  #  build-windows-zip:
+  #    name: Build & Package (Windows ZIP)
+  #    runs-on: windows-latest
+  #    needs: release-please
+  #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+  #    env:
+  #      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+  #      BUILD_DIR: "${{ github.workspace }}/build-windows"
+  #      PACKAGE_DIR: "${{ github.workspace }}/package-windows"
+  #      SEMVER: ${{ needs.release-please.outputs.tag_name }}
+  #      VCPKG_DEFAULT_TRIPLET: x64-windows-static
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v4.2.2
+  #        with:
+  #          fetch-depth: 0
+  #          submodules: recursive
+  #
+  #      - name: Setup MSVC environment
+  #        uses: step-security/msvc-dev-cmd@v1
+  #        with:
+  #          arch: x64
+  #
+  #      - name: Export GitHub Actions cache environment variables
+  #        uses: actions/github-script@v7
+  #        with:
+  #          script: |
+  #            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+  #            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+  #
+  #      - name: Setup vcpkg
+  #        uses: lukka/run-vcpkg@v11
+  #        with:
+  #          vcpkgDirectory: "${{ github.workspace }}/vcpkg"   # ← must match env
+  #          vcpkgJsonGlob: '**/vcpkg.json'
+  #          runVcpkgInstall: false
+  #
+  #      - name: Cache vcpkg
+  #        uses: actions/cache@v4.2.3
+  #        with:
+  #          path: "${{ github.workspace }}/vcpkg"
+  #          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+  #          restore-keys: |
+  #            ${{ runner.os }}-vcpkg-
+  #
+  #      - name: Build (Backend)
+  #        shell: cmd
+  #        run: |
+  #          mkdir "${{ env.BUILD_DIR }}"
+  #          cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
+  #          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
+  #
+  #      - name: Build (Frontend)
+  #        shell: pwsh
+  #        run: |
+  #          git clone https://github.com/jensvogt/awsmock-ui
+  #          cd awsmock-ui
+  #          npm install
+  #          npm run build
+  #
+  #      - name: Create package structure
+  #        shell: pwsh
+  #        run: |
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\bin" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\etc" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\log" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\s3" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sns" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\lambda" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\transfer" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\application" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\backup" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
+  #
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
+  #          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
+  #          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
+  #          Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
+  #
+  #      - name: Create ZIP archive (PowerShell)
+  #        shell: pwsh
+  #        run: |
+  #          $source = "${{ env.PACKAGE_DIR }}"
+  #          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
+  #
+  #          if (Test-Path $zip) {
+  #            Remove-Item $zip -Force
+  #          }
+  #
+  #          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+  #          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+  #
+  #      - name: Upload Windows installer
+  #        uses: actions/upload-artifact@v4.6.2
+  #        with:
+  #          name: zip-windows
+  #          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+  #          overwrite: true
 
   build-windows-msi:
     name: Build & Package (Windows MSI)
@@ -145,19 +153,19 @@ jobs:
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
-      BUILD_DIR: "${{ github.workspace }}/build-windows"
+      BUILD_DIR: "${{ github.workspace }}/cmake-build-release"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
           submodules: recursive
 
       - name: Setup MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: step-security/msvc-dev-cmd@v1
         with:
           arch: x64
 
@@ -175,12 +183,20 @@ jobs:
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
 
+      - name: Cache vcpkg
+        uses: actions/cache@v4.2.3
+        with:
+          path: "${{ github.workspace }}/vcpkg"
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
       - name: Build (Backend)
         shell: cmd
         run: |
           mkdir "${{ env.BUILD_DIR }}"
           cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
-          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
+          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel 
 
       - name: Build (Frontend)
         shell: pwsh
@@ -191,22 +207,27 @@ jobs:
           npm run build
 
       - name: Install NSIS
-        run: choco install nsis --no-progress -y
+        run: |
+          choco install nsis --no-progress -y
+          echo "C:\Program Files (x86)\NSIS" >> $env:GITHUB_PATH
 
       - name: Install NSIS plugins
         run: |
-          Copy-Item "${{ github.workspace }}\dist\msi\nsis\plugins\inetc.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\inetc.dll"
-          Copy-Item "${{ github.workspace }}\dist\msi\nsis\plugins\nsJSON.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\nsJSON.dll"
-          Copy-Item "${{ github.workspace }}\dist\msi\nsis\plugins\SimpleSC.dll" "C:\Program Files (x86)\NSIS\Plugins\x86-unicode\SimpleSC.dll"
+          $pluginDir = "C:\Program Files (x86)\NSIS\Plugins\x86-unicode"
+          Copy-Item "${{ github.workspace }}\dist\msi\nsis\inetc.dll" "$pluginDir\"
+          Copy-Item "${{ github.workspace }}\dist\msi\nsis\nsJSON.dll" "$pluginDir\"
+          Copy-Item "${{ github.workspace }}\dist\msi\nsis\SimpleSC.dll" "$pluginDir\"
 
       - name: Build NSIS installer
-        run: makensis dist/nsis/product.nsi
+        env:
+          SRCDIR: ${{ github.workspace }}
+        run: makensis /DSRCDIR=${{ github.workspace }} /DBUILDDIR="${{ env.BUILD_DIR }}" /DVERSION=${{ env.SEMVER }} dist\msi\product.nsi
 
       - name: Upload Windows installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: installer-windows
-          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
           overwrite: true
 
   build-macos:
@@ -219,10 +240,9 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
       SERVICE_NAME: de.jensvogt.awsmock
-      #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
           submodules: recursive
@@ -316,7 +336,7 @@ jobs:
           tar -czf ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz -C ${{ env.PACKAGE_DIR }} .
 
       - name: Upload macOS ZIP
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: installer-macos
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
@@ -335,7 +355,7 @@ jobs:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
           submodules: recursive
@@ -458,7 +478,7 @@ jobs:
           ${{ env.PACKAGE_DIR }}/=/
 
       - name: Upload .deb
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: deb-package-linux
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
@@ -479,7 +499,7 @@ jobs:
       #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
           submodules: recursive
@@ -589,7 +609,7 @@ jobs:
           ${{ env.PACKAGE_DIR }}/=/
 
       - name: Upload .rpm
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: rpm-package-linux
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
@@ -605,7 +625,7 @@ jobs:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           submodules: recursive
 
@@ -630,12 +650,12 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows-zip, build-windows-msi ]
+    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows-msi ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
           submodules: recursive
@@ -645,6 +665,12 @@ jobs:
         with:
           name: installer-windows
           path: artifacts/windows
+
+      #      - name: Download Windows ZIP
+      #        uses: actions/download-artifact@v4
+      #        with:
+      #          name: zip-windows
+      #          path: artifacts/windows
 
       - name: Download macOS installer
         uses: actions/download-artifact@v4
@@ -669,6 +695,7 @@ jobs:
         with:
           files: |
             artifacts/windows/*.zip
+            artifacts/windows/*.exe
             artifacts/macos/*.tgz
             artifacts/linux/*.deb
             artifacts/linux/*.rpm
@@ -690,7 +717,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -700,7 +727,8 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-          cp ./artifacts/installer-windows/*.zip public/ || true
+          #          cp ./artifacts/zip-windows/*.zip public/ || true
+          cp ./artifacts/installer-windows/*.exe public/ || true
           cp ./artifacts/installer-macos/*.tgz public/ || true
           cp ./artifacts/deb-package-linux/*.deb public/ || true
           cp ./artifacts/rpm-package-linux/*.rpm public/ || true

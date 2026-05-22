@@ -9,10 +9,23 @@
 !include "StrFunc.nsh"
 
 ; =====================================================
+; Environment variables
+; =====================================================
+!ifndef SRCDIR
+  !define SRCDIR ".\"
+!endif
+!ifndef BUILDDIR
+  !define BUILDDIR ".\cmake-build-release"
+!endif
+!ifndef VERSION
+  !define VERSION "1.0.0"
+!endif
+
+; =====================================================
 ; General Settings
 ; =====================================================
-Name "AwsMock 1.18.20"
-OutFile "AwsMock-1.18.20-amd64.exe"
+Name "AwsMock ${VERSION}"
+OutFile "${SRCDIR}\awsmock-${VERSION}-amd64.exe"
 InstallDir "$PROGRAMFILES64\awsmock"
 InstallDirRegKey HKLM "Software\AwsMock" "InstallDir"
 RequestExecutionLevel admin
@@ -21,12 +34,12 @@ SetCompressor /SOLID lzma
 ; =====================================================
 ; Version Info
 ; =====================================================
-VIProductVersion "1.18.20.0"
+VIProductVersion "${VERSION}.0"
 VIAddVersionKey "ProductName"     "AWS Mock"
 VIAddVersionKey "CompanyName"     "Jens Vogt"
 VIAddVersionKey "FileDescription" "AWS Cloud Service Simulator"
-VIAddVersionKey "FileVersion"     "1.18.20"
-VIAddVersionKey "ProductVersion"  "1.18.20"
+VIAddVersionKey "FileVersion"     "${VERSION}"
+VIAddVersionKey "ProductVersion"  "${VERSION}"
 VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 
 ; =====================================================
@@ -37,12 +50,6 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; =====================================================
-; Source directory variable
-; =====================================================
-!define VERSION "1.18.20"
-!define SRCDIR "C:\work\private\awsmock"
-
-; =====================================================
 ; Pages
 ; =====================================================
 !insertmacro MUI_PAGE_WELCOME
@@ -50,10 +57,8 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
-
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
-
 !insertmacro MUI_LANGUAGE "English"
 
 ; =====================================================
@@ -73,10 +78,10 @@ Function CheckForUpdates
     Pop $0
     ${If} $0 == "ok"
       nsJSON::Get "tag_name" /end
-      Pop $R0  ; $R0 = "v1.18.17"
+      Pop $R0  ; $R0 = "v${VERSION}"
 
       ; Strip leading "v"
-      StrCpy $R1 $R0 "" 1  ; $R1 = "1.18.17"
+      StrCpy $R1 $R0 "" 1  ; $R1 = "${VERSION}"
 
       ${VersionCompare} $R1 "${VERSION}" $R2
       ${If} $R2 == 1
@@ -96,9 +101,43 @@ Function CheckForUpdates
 
 FunctionEnd
 
-; Called automatically before installer UI shows
+
+; =====================================================
+; Helper: Stop service if running
+; =====================================================
+Function StopAwsMockService
+
+  ; Check if service exists
+  SimpleSC::ExistsService "awsmock"
+  Pop $0
+  ${If} $0 == 0
+
+    ; Service exists — check if running
+    SimpleSC::GetServiceStatus "awsmock"
+    Pop $0  ; return code
+    Pop $1  ; status code
+
+    ${If} $1 == 4  ; 4 = SERVICE_RUNNING
+      DetailPrint "Stopping awsmock service..."
+      SimpleSC::StopService "awsmock" 1 30
+      Pop $0
+      ${If} $0 != 0
+        MessageBox MB_OK "Warning: Could not stop awsmock service. Error: $0"
+      ${Else}
+        DetailPrint "Service stopped successfully."
+      ${EndIf}
+    ${EndIf}
+
+  ${EndIf}
+
+FunctionEnd
+
+; =====================================================
+; Called before installation starts
+; =====================================================
 Function .onInit
   Call CheckForUpdates
+  Call StopAwsMockService
 FunctionEnd
 
 ; =====================================================
@@ -107,17 +146,21 @@ FunctionEnd
 Section "Main Application" SecMain
 
   SetOutPath "$INSTDIR\bin"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockmgr.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awslocal.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockctl.exe"
+  File "${BUILDDIR}\Release\awsmockmgr.exe"
+  File "${BUILDDIR}\Release\awslocal.exe"
+  File "${BUILDDIR}\Release\awsmockctl.exe"
 
   SetOutPath "$INSTDIR\etc"
   File "/oname=awsmock.json" "${SRCDIR}\dist\etc\awsmock_win32.json"
+  File "${SRCDIR}\dist\etc\magic.mgc"
+  File "${SRCDIR}\dist\etc\ssh_host_key"
 
   SetOutPath "$INSTDIR\init"
+  IfFileExists "$INSTDIR\etc\awsmock.json" skip_config
   File "${SRCDIR}\dist\msi\init.json"
 
   ; Create empty directories
+  skip_config:
   CreateDirectory "$INSTDIR\log"
   CreateDirectory "$INSTDIR\tmp"
   CreateDirectory "$INSTDIR\data"
@@ -146,7 +189,7 @@ Section "Main Application" SecMain
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
     "UninstallString" "$INSTDIR\uninstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
-    "DisplayVersion" "1.18.20"
+    "DisplayVersion" "${VERSION}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \
     "Publisher" "Jens Vogt"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\AwsMock" \

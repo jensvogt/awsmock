@@ -22,12 +22,12 @@ namespace AwsMock::Service {
      */
     class MonitoringService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {};
+        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {
+        };
 
         /**
          * @brief Get counters request
@@ -36,6 +36,7 @@ namespace AwsMock::Service {
          * @return GetCountersResponse
          * @see GetCountersResponse
          */
+        [[nodiscard]]
         Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
         /**
@@ -46,14 +47,13 @@ namespace AwsMock::Service {
          */
         Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
-      private:
-
+    private:
         /**
          * Database connection
          */
         Database::MonitoringDatabase &_database;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVICE_H

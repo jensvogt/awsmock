@@ -12,7 +12,7 @@
 ; General Settings
 ; =====================================================
 Name "AwsMock @PROJECT_VERSION@"
-OutFile "AwsMock-@PROJECT_VERSION@-amd64.exe"
+OutFile "awsmock-@PROJECT_VERSION@-amd64.exe"
 InstallDir "$PROGRAMFILES64\awsmock"
 InstallDirRegKey HKLM "Software\AwsMock" "InstallDir"
 RequestExecutionLevel admin
@@ -37,10 +37,15 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; =====================================================
-; Source directory variable
+; Environment variables
 ; =====================================================
 !define VERSION "@PROJECT_VERSION@"
-!define SRCDIR "C:\work\private\awsmock"
+!ifndef SRCDIR
+  !define SRCDIR ".\"
+!endif
+!ifndef BUILDDIR
+  !define BUILDDIR ".\cmake-build-release"
+!endif
 
 ; =====================================================
 ; Pages
@@ -50,10 +55,8 @@ VIAddVersionKey "LegalCopyright"  "© Jens Vogt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
-
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
-
 !insertmacro MUI_LANGUAGE "English"
 
 ; =====================================================
@@ -96,9 +99,43 @@ Function CheckForUpdates
 
 FunctionEnd
 
-; Called automatically before installer UI shows
+
+; =====================================================
+; Helper: Stop service if running
+; =====================================================
+Function StopAwsMockService
+
+  ; Check if service exists
+  SimpleSC::ExistsService "awsmock"
+  Pop $0
+  ${If} $0 == 0
+
+    ; Service exists — check if running
+    SimpleSC::GetServiceStatus "awsmock"
+    Pop $0  ; return code
+    Pop $1  ; status code
+
+    ${If} $1 == 4  ; 4 = SERVICE_RUNNING
+      DetailPrint "Stopping awsmock service..."
+      SimpleSC::StopService "awsmock" 1 30
+      Pop $0
+      ${If} $0 != 0
+        MessageBox MB_OK "Warning: Could not stop awsmock service. Error: $0"
+      ${Else}
+        DetailPrint "Service stopped successfully."
+      ${EndIf}
+    ${EndIf}
+
+  ${EndIf}
+
+FunctionEnd
+
+; =====================================================
+; Called before installation starts
+; =====================================================
 Function .onInit
   Call CheckForUpdates
+  Call StopAwsMockService
 FunctionEnd
 
 ; =====================================================
@@ -107,12 +144,14 @@ FunctionEnd
 Section "Main Application" SecMain
 
   SetOutPath "$INSTDIR\bin"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockmgr.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awslocal.exe"
-  File "${SRCDIR}\cmake-build-release\Release\awsmockctl.exe"
+  File "${BUILDDIR}\Release\awsmockmgr.exe"
+  File "${BUILDDIR}\Release\awslocal.exe"
+  File "${BUILDDIR}\Release\awsmockctl.exe"
 
   SetOutPath "$INSTDIR\etc"
   File "/oname=awsmock.json" "${SRCDIR}\dist\etc\awsmock_win32.json"
+  File "${SRCDIR}\dist\etc\magic.mgc"
+  File "${SRCDIR}\dist\etc\ssh_host_key"
 
   SetOutPath "$INSTDIR\init"
   File "${SRCDIR}\dist\msi\init.json"

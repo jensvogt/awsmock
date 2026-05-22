@@ -1,5 +1,127 @@
 # Changelog
 
+## [1.18.37](https://github.com/jensvogt/awsmock/compare/1.18.36...v1.18.37) (2026-05-22)
+
+
+### Bug Fixes
+
+* windows service crash ([622ad25](https://github.com/jensvogt/awsmock/commit/622ad25e9158926fc77db3d12ca2baed99d39b9f))
+
+## [1.18.36](https://github.com/jensvogt/awsmock/compare/1.18.35...v1.18.36) (2026-05-21)
+
+
+### Bug Fixes
+
+* windows service crash ([96a8c23](https://github.com/jensvogt/awsmock/commit/96a8c23b8d111cfcc8e2dfb12a8d99834d1b4eb9))
+
+## [1.18.35](https://github.com/jensvogt/awsmock/compare/1.18.34...v1.18.35) (2026-05-20)
+
+
+### Bug Fixes
+
+* windows service crash ([b9d8700](https://github.com/jensvogt/awsmock/commit/b9d8700ac977a602973befb1341aa98cb9c8f70b))
+
+## [1.18.34](https://github.com/jensvogt/awsmock/compare/v1.18.33...v1.18.34) (2026-05-20)
+
+
+### Bug Fixes
+
+* windows service crash ([1c5a2ac](https://github.com/jensvogt/awsmock/commit/1c5a2acd69d97aadb217a17e57c566b663ef8b7a))
+
+## [1.18.33](https://github.com/jensvogt/awsmock/compare/v1.18.32...v1.18.33) (2026-05-20)
+
+
+### Bug Fixes
+
+* windows service crash ([1c54f37](https://github.com/jensvogt/awsmock/commit/1c54f37c577b3039816e25754511d3818e634482))
+
+## [1.18.32](https://github.com/jensvogt/awsmock/compare/v1.18.31...v1.18.32) (2026-05-20)
+
+
+### Bug Fixes
+
+* windows service crash ([5a407cd](https://github.com/jensvogt/awsmock/commit/5a407cda582e97c3ed211e8a34d24603d87ec07b))
+
+## [1.18.31](https://github.com/jensvogt/awsmock/compare/v1.18.30...v1.18.31) (2026-05-20)
+
+
+### Bug Fixes
+
+* windows service crash ([7b8c3fb](https://github.com/jensvogt/awsmock/commit/7b8c3fb05f82443ef3e72c32296cda0a878b5c8f))
+
+## [1.18.30](https://github.com/jensvogt/awsmock/compare/v1.18.29...v1.18.30) (2026-05-19)
+
+
+### Bug Fixes
+
+* windows service crash ([8414fa9](https://github.com/jensvogt/awsmock/commit/8414fa9f1a799a73a8064bdadf690f3c9feca88a))
+
+## [1.18.29](https://github.com/jensvogt/awsmock/compare/v1.18.28...v1.18.29) (2026-05-19)
+
+
+### Bug Fixes
+
+* windows service crash ([b6b3dd2](https://github.com/jensvogt/awsmock/commit/b6b3dd270f8f543ec431a1e98985b35fef1eea3c))
+
+## [1.18.28](https://github.com/jensvogt/awsmock/compare/v1.18.27...v1.18.28) (2026-05-19)
+
+
+### Bug Fixes
+
+* windows service crash ([373b565](https://github.com/jensvogt/awsmock/commit/373b5655d3652ccd7d6c9d65cfa25cdadb3f8424))
+
+## [1.18.27](https://github.com/jensvogt/awsmock/compare/v1.18.26...v1.18.27) (2026-05-19)
+
+
+### Bug Fixes
+
+* windows service crash ([9cc410a](https://github.com/jensvogt/awsmock/commit/9cc410adae103e451561069d86d7f54762fdfd75))
+
+## [1.18.26](https://github.com/jensvogt/awsmock/compare/v1.18.25...v1.18.26) (2026-05-19)
+
+
+### Bug Fixes
+
+* windows service crash ([4326f5f](https://github.com/jensvogt/awsmock/commit/4326f5f8678b94b9035c4783b80f6e5fb94a1283))
+
+## [1.18.25](https://github.com/jensvogt/awsmock/compare/v1.18.24...v1.18.25) (2026-05-18)
+
+
+### Bug Fixes
+
+* windows service crash ([612b2ee](https://github.com/jensvogt/awsmock/commit/612b2ee529697c2790e562123f2a7da973bc633b))
+
+## [1.18.24](https://github.com/jensvogt/awsmock/compare/v1.18.23...v1.18.24) (2026-05-18)
+
+
+### Bug Fixes
+
+* windows service crash ([fb2f532](https://github.com/jensvogt/awsmock/commit/fb2f532c8ba674e9a63153a3e982e92d369ef679))
+
+## [1.18.23](https://github.com/jensvogt/awsmock/compare/v1.18.22...v1.18.23) (2026-05-18)
+
+
+### Bug Fixes
+
+* windows service crash ([c5aa0c5](https://github.com/jensvogt/awsmock/commit/c5aa0c567c10756622eb02dbe3de03de2426c4b0))
+
+## [1.18.22](https://github.com/jensvogt/awsmock/compare/v1.18.21...v1.18.22) (2026-05-18)
+
+
+### Bug Fixes
+
+* windows service crash ([b2688db](https://github.com/jensvogt/awsmock/commit/b2688db91a66754695b22b69aa50b5717888a67f))
+* windows service crash ([6580fc2](https://github.com/jensvogt/awsmock/commit/6580fc28a1d767421cf186ebd396e3c5d55017f8))
+
+## [1.18.21](https://github.com/jensvogt/awsmock/compare/v1.18.20...v1.18.21) (2026-05-18)
+
+
+### Bug Fixes
+
+* lambda failures ([3c2418d](https://github.com/jensvogt/awsmock/commit/3c2418d858a47b27ebf041c5536ad7c9b8fb3259))
+* lambda failures ([ee89bdd](https://github.com/jensvogt/awsmock/commit/ee89bdd696e21cc87f4dad2d3f8b184220445ec3))
+* lambda failures ([4dd82fa](https://github.com/jensvogt/awsmock/commit/4dd82fa2e3843f57e5b84fa3b99e444b6cc0456c))
+
 ## [1.18.20](https://github.com/jensvogt/awsmock/compare/v1.18.19...v1.18.20) (2026-05-18)
 
 
