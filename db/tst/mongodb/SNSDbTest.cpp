@@ -33,9 +33,9 @@ namespace AwsMock::Database {
         return topic;
     }
 
-    struct SnsMemoryDbFixture {
-        SnsMemoryDbFixture() = default;
-        ~SnsMemoryDbFixture() {
+    struct SnsDbFixture {
+        SnsDbFixture() = default;
+        ~SnsDbFixture() {
             const long messageCount = SNSDatabase::instance().DeleteAllMessages();
             log_debug << "Messages deleted " << messageCount;
             const long topicCount = SNSDatabase::instance().DeleteAllTopics();
@@ -43,7 +43,7 @@ namespace AwsMock::Database {
         }
     };
 
-    BOOST_FIXTURE_TEST_SUITE(SnsMemoryDbTests, SnsMemoryDbFixture)
+    BOOST_FIXTURE_TEST_SUITE(SnsDbTests, SnsDbFixture)
 
     BOOST_AUTO_TEST_CASE(CreateTopicTest) {
 

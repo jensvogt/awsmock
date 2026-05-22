@@ -455,7 +455,8 @@ namespace AwsMock::Database {
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
                 auto totalSizeCursor = _objectCollection.aggregate(p);
                 if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
-                    return t["totalSize"].get_int32().value;
+                    std::cerr << bsoncxx::to_json(t) << std::endl;
+                    return t["totalSize"].get_int64().value;
                 }
                 return 0;
             } catch (const mongocxx::exception &exc) {

@@ -562,7 +562,7 @@ namespace AwsMock::Database {
                     query.append(kvp("partitionKey", std::get<std::string>(partitionKey)));
                 }
 
-                if (sortKey.index() == 0) {
+                if (sortKey.index() == 0 && !std::get<std::string>(sortKey).empty()) {
                     query.append(kvp("sortKey", std::get<std::string>(sortKey)));
                 } else if (sortKey.index() == 1) {
                     query.append(kvp("sortKey", std::get<double>(sortKey)));

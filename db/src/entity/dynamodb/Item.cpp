@@ -228,9 +228,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             partitionKey = KeyValueFromBson(mResult.view()["partitionKey"].get_value());
-            sortKey = KeyValueFromBson(mResult.view()["sortKey"].get_value());
+            if (mResult.view()["sortKey"] && mResult.view()["sortKey"].type() != bsoncxx::type::k_null && mResult.view()["sortKey"].type() != bsoncxx::type::k_undefined) {
+                sortKey = KeyValueFromBson(mResult.view()["sortKey"].get_value());
+            }
             attributes = AttributesFromBson(mResult.view()["attributes"].get_document().value);
-
         } catch (const std::exception &exc) {
             log_error << exc.what();
             log_error << bsoncxx::to_json(mResult);
