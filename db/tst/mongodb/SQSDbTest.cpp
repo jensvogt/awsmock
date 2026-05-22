@@ -34,9 +34,9 @@ namespace AwsMock::Database {
         return queue;
     }
 
-    struct SqsMemoryDbFixture {
-        SqsMemoryDbFixture() = default;
-        ~SqsMemoryDbFixture() {
+    struct SqsDbFixture {
+        SqsDbFixture() = default;
+        ~SqsDbFixture() {
             const long messageCount = SQSDatabase::instance().DeleteAllMessages();
             log_debug << "Messages deleted " << messageCount;
             const long queueCount = SQSDatabase::instance().DeleteAllQueues();
@@ -44,7 +44,7 @@ namespace AwsMock::Database {
         }
     };
 
-    BOOST_FIXTURE_TEST_SUITE(SqsMemoryDbTests, SqsMemoryDbFixture)
+    BOOST_FIXTURE_TEST_SUITE(SqsDbTests, SqsDbFixture)
 
     BOOST_AUTO_TEST_CASE(CreateQueueTest) {
 

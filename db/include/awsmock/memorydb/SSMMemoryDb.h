@@ -18,11 +18,11 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/utils/SortColumn.h>
 #include <awsmock/core/Linq.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -130,9 +130,10 @@ namespace AwsMock::Database {
          * @brief Deletes a parameter
          *
          * @param parameter parameter entity
+         * @return number of entities deleted
          * @throws DatabaseException
          */
-        void DeleteParameter(const Entity::SSM::Parameter &parameter);
+        long DeleteParameter(const Entity::SSM::Parameter &parameter);
 
         /**
          * @brief Deletes all parameters

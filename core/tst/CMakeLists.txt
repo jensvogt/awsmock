@@ -1,6 +1,4 @@
 set(BINARY core_tst)
-set(STATIC_LIB awsmockcore)
-set(CMAKE_BUILD_TYPE "Debug")
 
 set(SOURCES Main.cpp CryptoUtilsTest.cpp AwsUtilsTests.cpp ConfigurationTests.cpp CronUtilsTests.cpp DateTimeUtilsTests.cpp)
 

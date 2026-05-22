@@ -229,10 +229,9 @@ namespace AwsMock::Database {
         return CreateParameter(parameter);
     }
 
-    void SSMDatabase::DeleteParameter(const Entity::SSM::Parameter &parameter) const {
+    long SSMDatabase::DeleteParameter(const Entity::SSM::Parameter &parameter) const {
 
         if (HasDatabase()) {
-
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
             auto session = client->start_session();
@@ -242,18 +241,16 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto delete_many_result = _parameterCollection.delete_one(make_document(kvp("name", parameter.parameterName)));
                 session.commit_transaction();
-                log_debug << "ssm parameter deleted, count: " << delete_many_result->deleted_count();
+                log_debug << "SSM parameter deleted, count: " << delete_many_result->deleted_count();
+                return delete_many_result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteParameter(parameter);
         }
+        return _memoryDb.DeleteParameter(parameter);
     }
 
     long SSMDatabase::DeleteAllParameters() const {

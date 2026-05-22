@@ -95,9 +95,9 @@ namespace AwsMock::Database {
 
         // Create page iterators
         if (pageSize > 0) {
-          auto start = result.begin() + pageIndex * pageSize;
-          auto end = (pageIndex + 1) * pageSize < result.size() ? result.begin() + (pageIndex + 1) * pageSize : result.end();
-          return {start, end};
+            auto start = result.begin() + pageIndex * pageSize;
+            auto end = (pageIndex + 1) * pageSize < result.size() ? result.begin() + (pageIndex + 1) * pageSize : result.end();
+            return {start, end};
         }
         return result;
     }
@@ -132,7 +132,7 @@ namespace AwsMock::Database {
         return parameter;
     }
 
-    void SSMMemoryDb::DeleteParameter(const Entity::SSM::Parameter &parameter) {
+    long SSMMemoryDb::DeleteParameter(const Entity::SSM::Parameter &parameter) {
         boost::mutex::scoped_lock lock(_parameterMutex);
 
         std::string oid = parameter.oid;
@@ -141,6 +141,7 @@ namespace AwsMock::Database {
             return k == oid;
         });
         log_debug << "Parameter deleted, count: " << count;
+        return count;
     }
 
     long SSMMemoryDb::DeleteAllParameters() {
