@@ -56,8 +56,7 @@ namespace AwsMock::Service {
      */
     class ApplicationService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -223,10 +222,10 @@ namespace AwsMock::Service {
          * @see Dto::Apps::DeleteApplicationRequest
          * @see Dto::Apps::ListApplicationCountersResponse
          */
-        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
+        [[nodiscard]]
+        Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Saves the Base64 file
          *
@@ -264,6 +263,6 @@ namespace AwsMock::Service {
         ApplicationCreator applicationCreator;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_APPLICATION_SERVICE_H

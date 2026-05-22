@@ -11,7 +11,7 @@ set(DYNAMODB_SOURCES DynamoDbServerJavaTests.cpp DynamoDbServerCliTest.cpp Dynam
 set(KMS_SOURCES KMSServiceTests.cpp KMSServerJavaTests.cpp KMSServiceCliTests.cpp)
 set(SSM_SOURCES SSMServerCliTest.cpp)
 set(TRANSFER_SOURCES TransferServerCliTest.cpp)
-set(MAIN_SOURCES main.cpp ModuleServiceTests.cpp TestBase.cpp)
+set(MAIN_SOURCES ModuleServiceTests.cpp TestBase.cpp)
 
 # Includes
 include_directories(../include ../../core/include ../../db/include ../../dto/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})

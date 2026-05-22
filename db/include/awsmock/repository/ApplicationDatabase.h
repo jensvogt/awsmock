@@ -109,7 +109,8 @@ namespace AwsMock::Database {
          * @return true if, application exists
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteApplication(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        long DeleteApplication(const std::string &region, const std::string &name) const;
 
 
         /**
@@ -118,7 +119,8 @@ namespace AwsMock::Database {
          * @return true if, application exists
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteAllApplications() const;
+        [[nodiscard]]
+        long DeleteAllApplications() const;
 
     private:
         /**
