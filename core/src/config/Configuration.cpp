@@ -236,6 +236,15 @@ namespace AwsMock::Core {
         DefineProperty<int>("awsmock.docker.container.maxWaitTime", "AWSMOCK_DOCKER_CONTAINER_MAX_WAIT_TIME", 5);
         DefineProperty<int>("awsmock.docker.container.checkTime", "AWSMOCK_DOCKER_CONTAINER_CHECK_TIME", 500);
 
+        // Docker TLS
+        DefineProperty<bool>("awsmock.docker.tls.enabled", "AWSMOCK_DOCKER_TLS_ENABLED", false);
+        DefineProperty<std::string>("awsmock.docker.tls.host", "AWSMOCK_DOCKER_TLS_HOST", "localhost");
+        DefineProperty<int>("awsmock.docker.tls.port", "AWSMOCK_DOCKER_TLS_PORT", 2376);
+        DefineProperty<std::string>("awsmock.docker.tls.ca-cert", "AWSMOCK_DOCKER_TLS_CA_CERT", "");
+        DefineProperty<std::string>("awsmock.docker.tls.cert", "AWSMOCK_DOCKER_TLS_CERT", "");
+        DefineProperty<std::string>("awsmock.docker.tls.key", "AWSMOCK_DOCKER_TLS_KEY", "");
+        DefineProperty<bool>("awsmock.docker.tls.verify-peer", "AWSMOCK_DOCKER_TLS_VERIFY_PEER", true);
+
         // Podman
         DefineProperty<bool>("awsmock.podman.active", "AWSMOCK_PODMAN_ACTIVE", false);
         DefineProperty<std::string>("awsmock.podman.network-mode", "AWSMOCK_PODMAN_NETWORK_MODE", "local");

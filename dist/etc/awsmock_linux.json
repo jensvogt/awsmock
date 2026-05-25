@@ -237,7 +237,16 @@
         "maxWaitTime": 5,
         "checkTime": 500
       },
-      "socket": "/var/run/docker.sock"
+      "socket": "/var/run/docker.sock",
+      "tls": {
+        "enabled": false,
+        "host": "localhost",
+        "port": 2376,
+        "ca-cert": "/usr/local/awsmock/etc/ca.pem",
+        "cert": "/usr/local/awsmock/etc/cert.pem",
+        "key": "/usr/local/awsmock/etc/key.pem",
+        "verify-peer": true
+      }
     },
     "podman": {
       "active": false,

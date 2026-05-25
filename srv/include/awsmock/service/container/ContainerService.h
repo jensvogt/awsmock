@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_DOCKER_SERVICE_H
-#define AWSMOCK_SERVICE_DOCKER_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <memory>
@@ -19,13 +18,14 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
-#include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/core/UnixSocket.h>
+#include <awsmock/core/container/DomainSocketResult.h>
+#include <awsmock/core/container/TlsSocket.h>
+#include <awsmock/core/container/UnixSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/internal/WebSocketCommand.h>
@@ -98,7 +98,8 @@ namespace AwsMock::Service {
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -468,7 +469,8 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-    private:
+      private:
+
         /**
          * @brief Write the lambda docker file.
          *
@@ -573,9 +575,44 @@ namespace AwsMock::Service {
         bool _isDocker = false;
 
         /**
-         * Docker listening socket
+         * Docker listening socket (UNIX socket path or Windows TCP URL)
          */
         std::string _containerSocketPath;
+
+        /**
+         * TLS connection is active
+         */
+        bool _tlsEnabled = false;
+
+        /**
+         * Docker daemon TLS hostname
+         */
+        std::string _tlsHost;
+
+        /**
+         * Docker daemon TLS port
+         */
+        int _tlsPort = 2376;
+
+        /**
+         * Path to CA certificate file (PEM)
+         */
+        std::string _tlsCaFile;
+
+        /**
+         * Path to client certificate file (PEM)
+         */
+        std::string _tlsCertFile;
+
+        /**
+         * Path to client private key file (PEM)
+         */
+        std::string _tlsKeyFile;
+
+        /**
+         * Whether to verify the Docker daemon server certificate
+         */
+        bool _tlsVerifyPeer = true;
 
         /**
          * @brief Domain socket pointer
@@ -583,6 +620,4 @@ namespace AwsMock::Service {
         static thread_local std::shared_ptr<Core::DomainSocket> _domainSocket;
     };
 
-} // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_DOCKER_SERVICE_H
+}// namespace AwsMock::Service

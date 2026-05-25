@@ -2,7 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#include <awsmock/core/DomainSocket.h>
+#include <awsmock/core/container/DomainSocket.h>
 
 namespace AwsMock::Core {
 

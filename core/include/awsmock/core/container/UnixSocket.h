@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#ifndef AWSMOCK_CORE_WINDOWS_SOCKET_H
-#define AWSMOCK_CORE_WINDOWS_SOCKET_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -11,13 +10,13 @@
 #include <string>
 
 // Boost includes
+#include <boost/asio/local/stream_protocol.hpp>
 #include <boost/beast.hpp>
-#include <boost/regex/v5/regex.hpp>
-#include <boost/regex/v5/regex_fwd.hpp>
 
 // AwsMock includes
-#include <awsmock/core/DomainSocket.h>
-#include <awsmock/core/DomainSocketResult.h>
+#include <awsmock/core/FileUtils.h>
+#include <awsmock/core/container/DomainSocket.h>
+#include <awsmock/core/container/DomainSocketResult.h>
 #include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
@@ -25,19 +24,16 @@ namespace AwsMock::Core {
     namespace http = boost::beast::http;
 
     /**
-     * @brief Send command over the Windows TCP socker to the docker daemon on localhost:2375.
+     * @brief Send command over the Unix/MacOS TCP socker to the docker daemon on /var/run/docker.sock
      *
      * @par
-     * The Windows URL ist normally tcp://localhost:2375. If you use another port, or a proxy, you can set the URL in the
-     * AwsMock configuration file.
-     *
-     * @par
-     * Currently the Windows port does not support TLS. Therefore, you need to switch off TLS in the docker daemon
-     * configuration.
+     * The Unix/MacOS URL ist normally /var/run/docker.sock. If you run the AwsMock manager as non.root daemon
+     * make sure the AwsMock user has access to the docker daemon REST API. This can be normally done using an
+     * entry in the docker group on Unix/MacOS systems.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class WindowsSocket final : public DomainSocket {
+    class UnixSocket : public DomainSocket {
 
       public:
 
@@ -46,13 +42,13 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit WindowsSocket(const std::string &path) : DomainSocket(path) {};
+        explicit UnixSocket(const std::string &path) : DomainSocket(path) {};
 
         /**
          * @brief Send JSON data
          *
          * @par
-         * This will send a command as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a JSON string as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -66,7 +62,7 @@ namespace AwsMock::Core {
          * @brief Send JSON data
          *
          * @par
-         * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a JSON string as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -96,7 +92,7 @@ namespace AwsMock::Core {
         /**
          * @brief Send binary data
          *
-         * This will send a file as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a file as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -110,7 +106,7 @@ namespace AwsMock::Core {
         /**
          * @brief Send binary data
          *
-         * This will send a file as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a file as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -133,19 +129,6 @@ namespace AwsMock::Core {
          * @see Core::DomainSocketResult
          */
         [[nodiscard]] boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
-
-      private:
-
-        /**
-         * @brief Get the host and port from the supplied URL
-         *
-         * @param url HTTP URL to extract host and port from
-         * @param host HTTP host
-         * @param port HTTP port
-         */
-        static void GetHostPort(const std::string &url, std::string &host, int &port);
     };
 
 }// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_WINDOWS_SOCKET_H
