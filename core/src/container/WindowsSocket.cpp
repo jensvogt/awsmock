@@ -2,7 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#include <awsmock/core/WindowsSocket.h>
+#include <awsmock/core/container/WindowsSocket.h>
 
 namespace AwsMock::Core {
     DomainSocketResult WindowsSocket::SendJson(const verb method, const std::string &path) {

@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#ifndef AWSMOCK_CORE_DOMAIN_SOCKET_RESULT_H
-#define AWSMOCK_CORE_DOMAIN_SOCKET_RESULT_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -34,5 +33,3 @@ namespace AwsMock::Core {
     };
 
 }// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_DOMAIN_SOCKET_RESULT_H

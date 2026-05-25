@@ -11,7 +11,6 @@
 #include <vector>
 
 // Boost includes
-#define BOOST_URL_SOURCE
 #include <boost/beast.hpp>
 #include <boost/url.hpp>
 

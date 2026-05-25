@@ -13,22 +13,38 @@ namespace AwsMock::Service {
         _networkName = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
         _containerPort = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.container.port");
         _isDocker = Core::Configuration::instance().GetValue<bool>("awsmock.docker.active");
-        // Socket path
+
+        // TLS configuration
+        _tlsEnabled = Core::Configuration::instance().GetValue<bool>("awsmock.docker.tls.enabled");
+        if (_tlsEnabled) {
+            _tlsHost = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.host");
+            _tlsPort = Core::Configuration::instance().GetValue<int>("awsmock.docker.tls.port");
+            _tlsCaFile = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.ca-cert");
+            _tlsCertFile = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.cert");
+            _tlsKeyFile = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.key");
+            _tlsVerifyPeer = Core::Configuration::instance().GetValue<bool>("awsmock.docker.tls.verify-peer");
+            log_info << "Docker TLS enabled, host: " << _tlsHost << ", port: " << _tlsPort;
+        } else {
+            // UNIX socket path (Linux/macOS) or Windows TCP URL
 #ifdef WIN32
-        _containerSocketPath = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket");
-        _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
+            _containerSocketPath = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket");
 #else
-        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket") : Core::Configuration::instance().GetValue<std::string>("awsmock.podman.socket");
+            _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket") : Core::Configuration::instance().GetValue<std::string>("awsmock.podman.socket");
 #endif
+        }
     }
 
     std::shared_ptr<Core::DomainSocket> ContainerService::GetSocket() const {
         if (!_domainSocket) {
+            if (_tlsEnabled) {
+                _domainSocket = std::make_shared<Core::TlsSocket>(_tlsHost, _tlsPort, _tlsCaFile, _tlsCertFile, _tlsKeyFile, _tlsVerifyPeer);
+            } else {
 #ifdef WIN32
-            _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
+                _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
 #else
-            _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
+                _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
 #endif
+            }
         }
         return _domainSocket;
     }
@@ -771,4 +787,4 @@ namespace AwsMock::Service {
         awsOfs.close();
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#ifndef AWSMOCK_CORE_UNIX_SOCKET_H
-#define AWSMOCK_CORE_UNIX_SOCKET_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -13,36 +12,28 @@
 // Boost includes
 #include <boost/asio/local/stream_protocol.hpp>
 #include <boost/beast.hpp>
+#include <utility>
 
 // AwsMock includes
-#include <awsmock/core/DomainSocket.h>
-#include <awsmock/core/DomainSocketResult.h>
+#include <awsmock/core/container/DomainSocketResult.h>
 #include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 
     namespace http = boost::beast::http;
 
-    /**
-     * @brief Send command over the Unix/MacOS TCP socker to the docker daemon on /var/run/docker.sock
-     *
-     * @par
-     * The Unix/MacOS URL ist normally /var/run/docker.sock. If you run the AwsMock manager as non.root daemon
-     * make sure the AwsMock user has access to the docker daemon REST API. This can be normally done using an
-     * entry in the docker group on Unix/MacOS systems.
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    class UnixSocket : public DomainSocket {
+    class DomainSocket {
 
       public:
+
+        virtual ~DomainSocket() = default;
 
         /**
          * @brief Constructor
          *
          * @param path domain socket path
          */
-        explicit UnixSocket(const std::string &path) : DomainSocket(path) {};
+        explicit DomainSocket(std::string path) : _basePath(std::move(path)) {};
 
         /**
          * @brief Send JSON data
@@ -56,7 +47,8 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(verb method, const std::string &path) override;
+        [[nodiscard]]
+        virtual DomainSocketResult SendJson(verb method, const std::string &path) = 0;
 
         /**
          * @brief Send JSON data
@@ -71,7 +63,8 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body) override;
+        [[nodiscard]]
+        virtual DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body) = 0;
 
         /**
          * @brief Send JSON data
@@ -87,11 +80,13 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) override;
+        [[nodiscard]]
+        virtual DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) = 0;
 
         /**
-         * @brief Send binary data
+         * @brief Send binary data.
          *
+         * @par
          * This will send a file as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
@@ -101,12 +96,14 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName) override;
+        [[nodiscard]]
+        virtual DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName) = 0;
 
         /**
-         * @brief Send binary data
+         * @brief Send binary data.
          *
-         * This will send a file as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * @par
+         * This will send a file as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -116,7 +113,8 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) override;
+        [[nodiscard]]
+        virtual DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) = 0;
 
         /**
          * @brief Send an attach-container command
@@ -128,9 +126,44 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        [[nodiscard]] boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
+        [[nodiscard]]
+        virtual boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) = 0;
+
+      protected:
+
+        /**
+         * @brief Prepare an HTTP message
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @param body HTTP body
+         * @param headers HTTP headers
+         */
+        static request<string_body> PrepareJsonMessage(verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers);
+
+        /**
+         * @brief Prepare an HTTP message
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @param filename name of the file to send
+         * @param headers HTTP headers
+         */
+        static request<file_body> PrepareBinaryMessage(verb method, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers);
+
+        /**
+         * @brief Prepare HTTP message
+         *
+         * @param response HTTP response
+         * @return response struct
+         * @see Core::DomainSocketResult
+         */
+        static DomainSocketResult PrepareResult(response<string_body> response);
+
+        /**
+         * Domain socket path
+         */
+        std::string _basePath;
     };
 
 }// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_UNIX_SOCKET_H

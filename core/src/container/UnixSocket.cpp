@@ -9,8 +9,7 @@
 #include <boost/json/detail/stream.hpp>
 
 // Awsmock includes
-#include <awsmock/core/FileUtils.h>
-#include <awsmock/core/UnixSocket.h>
+#include <awsmock/core/container/UnixSocket.h>
 
 namespace AwsMock::Core {
 
@@ -166,4 +165,4 @@ namespace AwsMock::Core {
         return socket;
     }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
