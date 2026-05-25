@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.38](https://github.com/jensvogt/awsmock/compare/v1.18.37...v1.18.38) (2026-05-25)
+
+
+### Bug Fixes
+
+* add TLS to docker connection ([014cd45](https://github.com/jensvogt/awsmock/commit/014cd454f1ecebdb1a6f0c17c0687a99e59f7cd4))
+* add TLS to docker connection ([ab065cb](https://github.com/jensvogt/awsmock/commit/ab065cbea42df830807521ccc7bc2806353a9ba2))
+* new vcpkg commit ID ([7fbc17a](https://github.com/jensvogt/awsmock/commit/7fbc17ac9e1b3b0ceb4c465b69f8a92df79f991b))
+
 ## [1.18.37](https://github.com/jensvogt/awsmock/compare/1.18.36...v1.18.37) (2026-05-22)
 
 
