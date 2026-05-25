@@ -7,14 +7,14 @@
 namespace AwsMock::Service {
     GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
-        _bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
-        _timeout = configuration.GetValue<int>("awsmock.gateway.http.timeout");
-        _verifySignature = configuration.GetValue<bool>("awsmock.aws.signature.verify");
+        _queueLimit = configuration.get<int>("awsmock.gateway.http.max-queue");
+        _bodyLimit = configuration.get<int>("awsmock.gateway.http.max-body");
+        _timeout = configuration.get<int>("awsmock.gateway.http.timeout");
+        _verifySignature = configuration.get<bool>("awsmock.aws.signature.verify");
 
         // Defaults for region and user; will be overwritten by authorized requests
-        _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        _user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
+        _region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        _user = Core::Configuration::instance().get<std::string>("awsmock.user");
     };
 
     void GatewaySession::Run() {
@@ -124,7 +124,8 @@ namespace AwsMock::Service {
             log_trace << "Handler found, name: " << _handler->name();
         } else {
             // Verify AWS signature
-            if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
+            const std::string secretKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key");
+            if (_verifySignature && !Core::AwsUtils::VerifySignature(request, secretKey)) {
                 log_warning << "AWS signature could not be verified";
                 return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
             }
@@ -242,7 +243,7 @@ namespace AwsMock::Service {
         } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
-                authKeys.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+                authKeys.region = Core::Configuration::instance().get<std::string>("awsmock.region");
             }
 
             return authKeys;

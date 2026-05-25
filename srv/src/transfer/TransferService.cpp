@@ -24,12 +24,12 @@ namespace AwsMock::Service {
         std::string serverId = "s-" + Core::StringUtils::ToLower(Core::StringUtils::GenerateRandomHexString(20));
 
         Database::Entity::Transfer::Transfer transferEntity;
-        auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
         auto transferArn = Core::AwsUtils::CreateTransferArn(request.region, accountId, serverId);
-        auto listenAddress = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.ftp.address");
+        auto listenAddress = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.ftp.address");
 
         // Create entity
-        int ftpPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.port");
+        int ftpPort = Core::Configuration::instance().get<int>("awsmock.modules.transfer.ftp.port");
         transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .ports = {ftpPort}, .listenAddress = listenAddress};
         transferEntity.protocols.emplace_back(Database::Entity::Transfer::ProtocolFromString(ProtocolTypeToString(request.protocols[0])));
 
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
         }
 
         // Add user
-        auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
         std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
         Database::Entity::Transfer::User user = {
                 .userName = request.userName,

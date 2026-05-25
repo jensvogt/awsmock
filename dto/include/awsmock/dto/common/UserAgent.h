@@ -11,8 +11,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
@@ -46,9 +46,9 @@ namespace AwsMock::Dto::Common {
     }
 
     [[maybe_unused]] static UserAgentType UserAgentTypeFromString(const std::string &userAgentType) {
-        for (auto &it: UserAgentTypeNames) {
-            if (Core::StringUtils::StartsWith(userAgentType, it.second)) {
-                return it.first;
+        for (auto &[fst, snd]: UserAgentTypeNames) {
+            if (Core::StringUtils::StartsWith(userAgentType, snd)) {
+                return fst;
             }
         }
         return UserAgentType::AWS_SDK_UNKNOWN;

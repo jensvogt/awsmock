@@ -83,7 +83,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _accountId(Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id")) {
+        explicit DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _accountId(Core::Configuration::instance().get<std::string>("awsmock.access.account-id")) {
         }
 
         /**

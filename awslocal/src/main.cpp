@@ -46,13 +46,13 @@
  */
 void ShowHelp(const boost::program_options::options_description &desc) {
     std::cout << std::endl
-            << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-            << std::endl
-            << "Usage: " << std::endl
-            << "  awslocal [Options] Commands" << std::endl
-            << std::endl
-            << desc << std::endl
-            << "\nCommands:\nAny AWS command" << std::endl;
+              << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+              << std::endl
+              << "Usage: " << std::endl
+              << "  awslocal [Options] Commands" << std::endl
+              << std::endl
+              << desc << std::endl
+              << "\nCommands:\nAny AWS command" << std::endl;
 }
 
 /**
@@ -90,8 +90,8 @@ int main(const int argc, char *argv[]) {
     // Show the version
     if (vm.find("version") != vm.end()) {
         std::cout << std::endl
-                << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
-                << std::endl;
+                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                  << std::endl;
         return EXIT_SUCCESS;
     }
 
@@ -109,7 +109,7 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        const auto level = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level");
+        const auto level = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.logging.level");
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 

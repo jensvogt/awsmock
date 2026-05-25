@@ -2,11 +2,11 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_APPLICATION_HANDLER_H
-#define AWSMOCK_SERVICE_APPLICATION_HANDLER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/exception/BadRequestException.h>
+#include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/ApplicationClientCommand.h>
 #include <awsmock/service/apps/ApplicationService.h>
@@ -21,7 +21,8 @@ namespace AwsMock::Service {
      */
     class ApplicationHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -39,13 +40,12 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         /**
          * Application service
          */
         ApplicationService _applicationService;
     };
 
-} // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_APPLICATION_HANDLER_H
+}// namespace AwsMock::Service

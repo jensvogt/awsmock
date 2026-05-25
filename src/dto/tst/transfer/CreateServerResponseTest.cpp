@@ -25,7 +25,7 @@ namespace AwsMock::Dto::Transfer {
 
         void SetUp() override {
             // General configuration
-            _region = _configuration.GetValue<std::string>("awsmock.region");
+            _region = _configuration.get<std::string>("awsmock.region");
             Tag tag;
             tag.key = "version";
             tag.value = "1.0";

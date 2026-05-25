@@ -3,8 +3,7 @@
 //
 
 // AwsMock includes
-#ifndef AWSMOCK_SERVICE_FRONTEND_HTTP_SESSION_H
-#define AWSMOCK_SERVICE_FRONTEND_HTTP_SESSION_H
+#pragma once
 
 // C*+ includes
 #include <filesystem>
@@ -23,6 +22,7 @@
 
 // AwsMock include
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Service::Frontend {
 
@@ -96,5 +96,3 @@ namespace AwsMock::Service::Frontend {
     };
 
 }// namespace AwsMock::Service::Frontend
-
-#endif// AWSMOCK_SERVICE_FRONTEND_HTTP_SESSION_H

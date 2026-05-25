@@ -6,15 +6,15 @@
 namespace AwsMock::Controller {
     AwsMockCtl::AwsMockCtl() {
         // Initialize database
-        _host = Core::Configuration::instance().GetValue<std::string>("awsmock.gateway.http.host");
-        _port = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.port");
+        _host = Core::Configuration::instance().get<std::string>("awsmock.gateway.http.host");
+        _port = Core::Configuration::instance().get<int>("awsmock.gateway.http.port");
         _baseUrl = "http://" + _host + ":" + std::to_string(_port);
 
         // Get user/clientId/region
-        _user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
-        _clientId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.client-id");
-        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        _user = Core::Configuration::instance().get<std::string>("awsmock.user");
+        _clientId = Core::Configuration::instance().get<std::string>("awsmock.access.client-id");
+        _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
+        _region = Core::Configuration::instance().get<std::string>("awsmock.region");
     }
 
     void AwsMockCtl::Initialize(const boost::program_options::variables_map &vm, const std::vector<std::string> &commands) {
@@ -45,14 +45,14 @@ namespace AwsMock::Controller {
             case CommandType::STATUS: {
                 std::cout << "Applications: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                        << std::setw(10) << std::left << "Enabled"
-                        << std::setw(10) << std::left << "Status"
-                        << std::setw(12) << std::left << "Ports"
-                        << std::endl;
+                          << std::setw(10) << std::left << "Enabled"
+                          << std::setw(10) << std::left << "Status"
+                          << std::setw(12) << std::left << "Ports"
+                          << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
+                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
                     if (application.enabled) {
                         std::cout << std::setw(12) << std::left << (std::to_string(application.privatePort) + "->" + std::to_string(application.publicPort));
                     }
@@ -60,14 +60,14 @@ namespace AwsMock::Controller {
                 }
                 std::cout << "Lambdas: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                        << std::setw(10) << std::left << "Enabled"
-                        << std::setw(10) << std::left << "Status"
-                        << std::setw(12) << std::left << "Ports"
-                        << std::endl;
+                          << std::setw(10) << std::left << "Enabled"
+                          << std::setw(10) << std::left << "Status"
+                          << std::setw(12) << std::left << "Ports"
+                          << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
+                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
                     if (lambda.enabled) {
                         std::vector<Dto::Lambda::InstanceCounter> instances = GetLambdaInstances(lambda);
                         std::string portStr = "8080->";
@@ -86,14 +86,14 @@ namespace AwsMock::Controller {
                 std::cout << "Applications: " << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
                 }
                 std::cout << "Lambdas: " << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
                 }
                 break;
             }
@@ -102,8 +102,8 @@ namespace AwsMock::Controller {
                 std::cout << "Applications: " << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
                 }
                 break;
             }
@@ -112,8 +112,8 @@ namespace AwsMock::Controller {
                 std::cout << "Lambdas: " << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
                 }
                 break;
             }
@@ -169,142 +169,141 @@ namespace AwsMock::Controller {
                 }
                 break;
 
-            case CommandType::START_LAMBDAS: {
-                if (_commands.empty()) {
-                    return StartAllLambdas();
-                }
-                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
-                    StartLambdas(lambdas);
-                }
-                break;
-            }
-
-            case CommandType::RESTART_APPLICATIONS: {
-                if (_commands.empty()) {
-                    RestartAllApplications();
-                    if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
-                        RestartApplications(applications);
+                case CommandType::START_LAMBDAS: {
+                    if (_commands.empty()) {
+                        return StartAllLambdas();
+                    }
+                    if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                        StartLambdas(lambdas);
                     }
                     break;
                 }
-            }
 
-            case CommandType::RESTART_LAMBDAS: {
-                if (_commands.empty()) {
-                    return RestartAllLambdas();
-                }
-                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
-                    RestartLambdas(lambdas);
-                }
-                break;
-            }
-
-            case CommandType::STOP_APPLICATIONS: {
-                if (_commands.empty()) {
-                    StopAllApplications();
-                }
-                if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
-                    StopApplications(applications);
-                }
-                break;
-            }
-
-            case CommandType::STOP_LAMBDAS: {
-                if (_commands.empty()) {
-                    return StopAllLambdas();
-                }
-                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
-                    StopLambdas(lambdas);
-                }
-                break;
-            }
-
-            case CommandType::DEPLOY_APPLICATION: {
-                if (_commands.empty()) {
-                    std::cerr << "Missing parameters!" << std::endl;
-                    return;
-                }
-                std::string applicationName = _commands[0];
-                if (applicationName.empty()) {
-                    std::cerr << "Deployment commands needs an application name." << std::endl;
-                    return;
-                }
-                std::string filename = _commands[1];
-                if (filename.empty()) {
-                    std::cerr << "Deployment commands needs package filename." << std::endl;
-                    return;
-                }
-                return DeployApplication(applicationName, filename);
-                break;
-            }
-
-            case CommandType::DEPLOY_LAMBDA: {
-                if (_commands.empty()) {
-                    std::cerr << "Missing parameters!" << std::endl;
-                    return;
-                }
-                std::string functionName = _commands[0];
-                if (functionName.empty()) {
-                    std::cerr << "Deployment commands needs an lambda function name." << std::endl;
-                    return;
-                }
-                std::string filename = _commands[1];
-                if (filename.empty()) {
-                    std::cerr << "Deployment commands needs package filename." << std::endl;
-                    return;
-                }
-                return DeployLambda(functionName, filename);
-                break;
-            }
-
-            case CommandType::IMPORT: {
-                ImportInfrastructure();
-                break;
-            }
-
-            case CommandType::EXPORT: {
-                std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
-                if (modules.empty()) {
-                    modules = GetAllModules();
+                case CommandType::RESTART_APPLICATIONS: {
+                    if (_commands.empty()) {
+                        RestartAllApplications();
+                        if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
+                            RestartApplications(applications);
+                        }
+                        break;
+                    }
                 }
 
-                const bool pretty = _vm.contains("pretty");
-                const bool includeObjects = _vm.contains("include-objects");
-
-                ExportInfrastructure(modules, pretty, includeObjects ? Dto::Module::ExportType::BOTH : Dto::Module::ExportType::INFRA_STRUCTURE);
-                break;
-            }
-
-            case CommandType::CLEAN: {
-                std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
-                if (modules.empty()) {
-                    modules = GetAllModules();
+                case CommandType::RESTART_LAMBDAS: {
+                    if (_commands.empty()) {
+                        return RestartAllLambdas();
+                    }
+                    if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                        RestartLambdas(lambdas);
+                    }
+                    break;
                 }
-                CleanInfrastructure(modules);
-                break;
-            }
 
-            case CommandType::CLEAN_OBJECTS: {
-                std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
-                CleanObjects(modules);
-                break;
-            }
+                case CommandType::STOP_APPLICATIONS: {
+                    if (_commands.empty()) {
+                        StopAllApplications();
+                    }
+                    if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
+                        StopApplications(applications);
+                    }
+                    break;
+                }
 
-            case CommandType::PING: {
-                PingManager();
-                break;
-            }
+                case CommandType::STOP_LAMBDAS: {
+                    if (_commands.empty()) {
+                        return StopAllLambdas();
+                    }
+                    if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                        StopLambdas(lambdas);
+                    }
+                    break;
+                }
+
+                case CommandType::DEPLOY_APPLICATION: {
+                    if (_commands.empty()) {
+                        std::cerr << "Missing parameters!" << std::endl;
+                        return;
+                    }
+                    std::string applicationName = _commands[0];
+                    if (applicationName.empty()) {
+                        std::cerr << "Deployment commands needs an application name." << std::endl;
+                        return;
+                    }
+                    std::string filename = _commands[1];
+                    if (filename.empty()) {
+                        std::cerr << "Deployment commands needs package filename." << std::endl;
+                        return;
+                    }
+                    return DeployApplication(applicationName, filename);
+                    break;
+                }
+
+                case CommandType::DEPLOY_LAMBDA: {
+                    if (_commands.empty()) {
+                        std::cerr << "Missing parameters!" << std::endl;
+                        return;
+                    }
+                    std::string functionName = _commands[0];
+                    if (functionName.empty()) {
+                        std::cerr << "Deployment commands needs an lambda function name." << std::endl;
+                        return;
+                    }
+                    std::string filename = _commands[1];
+                    if (filename.empty()) {
+                        std::cerr << "Deployment commands needs package filename." << std::endl;
+                        return;
+                    }
+                    return DeployLambda(functionName, filename);
+                    break;
+                }
+
+                case CommandType::IMPORT: {
+                    ImportInfrastructure();
+                    break;
+                }
+
+                case CommandType::EXPORT: {
+                    std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
+                    if (modules.empty()) {
+                        modules = GetAllModules();
+                    }
+
+                    const bool pretty = _vm.contains("pretty");
+                    const bool includeObjects = _vm.contains("include-objects");
+
+                    ExportInfrastructure(modules, pretty, includeObjects ? Dto::Module::ExportType::BOTH : Dto::Module::ExportType::INFRA_STRUCTURE);
+                    break;
+                }
+
+                case CommandType::CLEAN: {
+                    std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
+                    if (modules.empty()) {
+                        modules = GetAllModules();
+                    }
+                    CleanInfrastructure(modules);
+                    break;
+                }
+
+                case CommandType::CLEAN_OBJECTS: {
+                    std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
+                    CleanObjects(modules);
+                    break;
+                }
+
+                case CommandType::PING: {
+                    PingManager();
+                    break;
+                }
 
 #ifdef HAS_SYSTEMD
-            case CommandType::LOGS: {
-                ShowServiceLogs();
-                break;
-            }
+                case CommandType::LOGS: {
+                    ShowServiceLogs();
+                    break;
+                }
 #endif
 
-            default:
-                std::cout << "Unknown command: " << _commands[0] << std::endl;
-
+                default:
+                    std::cout << "Unknown command: " << _commands[0] << std::endl;
             }
         }
     }
@@ -967,4 +966,4 @@ namespace AwsMock::Controller {
         return modules;
     }
 
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller

@@ -34,7 +34,7 @@ namespace AwsMock::Service::Frontend {
     void FrontendSession::handle_request() {
         namespace fs = std::filesystem;
 
-        auto doc_root = Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.doc-root");
+        auto doc_root = Core::Configuration::instance().get<std::string>("awsmock.frontend.doc-root");
         fs::path root = fs::current_path() / doc_root;
 
         fs::path path;
@@ -73,4 +73,4 @@ namespace AwsMock::Service::Frontend {
         boost::beast::error_code ec;
         socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
     }
-} // namespace AwsMock::Service::Frontend
+}// namespace AwsMock::Service::Frontend

@@ -214,6 +214,21 @@ namespace AwsMock::Core {
         return {};
     }
 
+    std::string StringUtils::AwsUrlEncode(const std::string &input, const bool encodeSlash) {
+        std::ostringstream encoded;
+        encoded << std::uppercase << std::hex << std::setfill('0');
+        for (const unsigned char c: input) {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-' || c == '.' || c == '_' || c == '~') {
+                encoded << static_cast<char>(c);
+            } else if (c == '/' && !encodeSlash) {
+                encoded << '/';
+            } else {
+                encoded << '%' << std::setw(2) << static_cast<int>(c);
+            }
+        }
+        return encoded.str();
+    }
+
     std::string StringUtils::UrlEncode(const std::string &input) {
         boost::urls::encoding_opts opt;
         opt.space_as_plus = true;

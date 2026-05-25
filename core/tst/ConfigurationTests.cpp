@@ -18,8 +18,8 @@ namespace AwsMock::Core {
         // act
 
         // assert
-        BOOST_CHECK_EQUAL(Configuration::instance().GetFilename(), TMP_CONFIGURATION_FILE);
-        BOOST_CHECK_EQUAL(Configuration::instance().GetValue<std::string>("awsmock.logging.level").empty(), false);
+        BOOST_CHECK_EQUAL(Configuration::instance().filePath(), TMP_CONFIGURATION_FILE);
+        BOOST_CHECK_EQUAL(Configuration::instance().get<std::string>("awsmock.logging.level").empty(), false);
     }
 
     BOOST_AUTO_TEST_CASE(EnvironmentTest) {
@@ -30,13 +30,13 @@ namespace AwsMock::Core {
 #else
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
 #endif
-        Configuration configuration;
-        configuration.SetFilename(TMP_CONFIGURATION_FILE);
+        Configuration &configuration = Configuration::instance();
+        configuration.setFilePath(TMP_CONFIGURATION_FILE);
 
         // act
 
         // assert
-        BOOST_CHECK_EQUAL(configuration.GetValue<std::string>("awsmock.logging.level"), "error");
+        BOOST_CHECK_EQUAL(configuration.get<std::string>("awsmock.logging.level"), "error");
     }
 
     BOOST_AUTO_TEST_CASE(JsonConfigurationTest) {
@@ -57,12 +57,12 @@ namespace AwsMock::Core {
                                        "  }\n"
                                        "}";
         const std::string jsonFile = FileUtils::CreateTempFile("json", jsonString);
-        Configuration configuration;
-        configuration.SetFilename(jsonFile);
+        Configuration &configuration = Configuration::instance();
+        configuration.setFilePath(jsonFile);
 
         // act
-        const auto region = configuration.GetValue<std::string>("awsmock.region");
-        const auto keyId = configuration.GetValue<std::string>("awsmock.access.key-id");
+        const auto region = configuration.get<std::string>("awsmock.region");
+        const auto keyId = configuration.get<std::string>("awsmock.access.key-id");
 
         // assert
         BOOST_CHECK_EQUAL(region, "eu-central-1");
@@ -95,14 +95,16 @@ namespace AwsMock::Core {
                                        "  }\n"
                                        "}\n";
         const std::string jsonFile = FileUtils::CreateTempFile("json", jsonString);
-        Configuration configuration;
-        configuration.SetFilename(jsonFile);
+        Configuration &cfg = Configuration::instance();
+        cfg.load(jsonFile);
 
         // act
-        const std::vector<std::string> directories = configuration.GetValueArray<std::string>("awsmock.modules.transfer.directories");
+        const std::vector<std::string> directories = cfg.getArray<std::string>("awsmock.modules.transfer.directories");
 
         // assert
         BOOST_CHECK_EQUAL(2, directories.size());
+        BOOST_CHECK_EQUAL(directories[0], "/incoming/mix");
+        BOOST_CHECK_EQUAL(directories[1], "/feedback");
     }
 
 }// namespace AwsMock::Core

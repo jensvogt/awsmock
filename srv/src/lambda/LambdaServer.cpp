@@ -10,14 +10,14 @@ namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(), _scheduler(scheduler) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _region = configuration.GetValue<std::string>("awsmock.region");
-        _lifetime = configuration.GetValue<int>("awsmock.modules.lambda.lifetime");
-        _removePeriod = configuration.GetValue<int>("awsmock.modules.lambda.remove-period");
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
-        _logRetentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.log-retention-period");
-        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.lambda.backup.active");
-        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.backup.cron");
-        _lambdaDir = configuration.GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        _region = configuration.get<std::string>("awsmock.region");
+        _lifetime = configuration.get<int>("awsmock.modules.lambda.lifetime");
+        _removePeriod = configuration.get<int>("awsmock.modules.lambda.remove-period");
+        _counterPeriod = Core::Configuration::instance().get<int>("awsmock.modules.lambda.counter-period");
+        _logRetentionPeriod = Core::Configuration::instance().get<int>("awsmock.modules.lambda.log-retention-period");
+        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.lambda.backup.active");
+        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.backup.cron");
+        _lambdaDir = configuration.get<std::string>("awsmock.modules.lambda.data-dir");
         log_debug << "Lambda lifetime period: " << _lifetime << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
 
         // Startup task

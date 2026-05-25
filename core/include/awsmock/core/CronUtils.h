@@ -2,8 +2,7 @@
 // Created by vogje01 on 6/10/25.
 //
 
-#ifndef AWS_MOCK_CORE_CRON_UTILS_H
-#define AWS_MOCK_CORE_CRON_UTILS_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -13,6 +12,7 @@
 // Awsmock includes
 #include <awsmock/core/Cron.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 
@@ -38,7 +38,7 @@ namespace AwsMock::Core {
         ~CronUtils() = default;
 
         /**
-         * @brief Get the next cron execution time as timestamp
+         * @brief Get the next cron execution time as a timestamp
          *
          * @param cron cron expression
          * @return timepoint of next execution
@@ -55,5 +55,3 @@ namespace AwsMock::Core {
     };
 
 }// namespace AwsMock::Core
-
-#endif// AWS_MOCK_CORE_CRON_UTILS_H

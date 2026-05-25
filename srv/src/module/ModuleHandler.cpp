@@ -18,12 +18,12 @@ namespace AwsMock::Service {
             if (action == "get-config") {
 
                 Core::Configuration &configuration = Core::Configuration::instance();
-                auto host = configuration.GetValue<std::string>("awsmock.gateway.http.host");
-                auto address = configuration.GetValue<std::string>("awsmock.gateway.http.address");
-                int port = configuration.GetValue<int>("awsmock.gateway.http.port");
+                auto host = configuration.get<std::string>("awsmock.gateway.http.host");
+                auto address = configuration.get<std::string>("awsmock.gateway.http.address");
+                int port = configuration.get<int>("awsmock.gateway.http.port");
                 std::string endpoint = "http://" + host + ":" + std::to_string(port);
                 Dto::Module::GatewayConfig config;
-                config.region = configuration.GetValue<std::string>("awsmock.region");
+                config.region = configuration.get<std::string>("awsmock.region");
                 config.endpoint = endpoint;
                 config.host = host;
                 config.address = address;
@@ -31,12 +31,12 @@ namespace AwsMock::Service {
 #ifndef WIN32
                 config.pid = getppid();
 #endif
-                config.user = configuration.GetValue<std::string>("awsmock.user");
-                config.accessId = configuration.GetValue<std::string>("awsmock.access.account-id");
-                config.clientId = configuration.GetValue<std::string>("awsmock.access.client-id");
-                config.dataDir = configuration.GetValue<std::string>("awsmock.data-dir");
-                config.version = Core::Configuration::GetVersion();
-                config.databaseActive = configuration.GetValue<bool>("awsmock.mongodb.active");
+                config.user = configuration.get<std::string>("awsmock.user");
+                config.accessId = configuration.get<std::string>("awsmock.access.account-id");
+                config.clientId = configuration.get<std::string>("awsmock.access.client-id");
+                config.dataDir = configuration.get<std::string>("awsmock.data-dir");
+                config.version = Core::Configuration::getVersion();
+                config.databaseActive = configuration.get<bool>("awsmock.mongodb.active");
                 return SendResponse(request, http::status::ok, config.ToJson());
             }
             if (action == "list-modules") {
@@ -164,4 +164,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

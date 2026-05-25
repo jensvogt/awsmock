@@ -863,7 +863,7 @@ namespace AwsMock::Service {
                 response.mainQueues.emplace_back(mainQueue.arn);
             }
             return response;
-            
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -1072,7 +1072,7 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Queue does not exist, queueArn: " + queueArn);
         }
 
-        const long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
+        const long pollPeriod = Core::Configuration::instance().get<long>("awsmock.modules.sqs.receive-poll");
         try {
 
             // Get the queue
@@ -1425,8 +1425,8 @@ namespace AwsMock::Service {
     void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
         log_debug << "Invoke lambda function request, function: " << lambda.function;
 
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        const auto user = Core::Configuration::instance().get<std::string>("awsmock.user");
 
         // Create the event record
         Dto::SQS::EventRecord record;

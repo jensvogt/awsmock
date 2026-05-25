@@ -7,6 +7,7 @@
 
 // AwsMock includes
 #include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/sns/model/MessageAttribute.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
@@ -18,7 +19,6 @@
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/dto/sqs/model/Queue.h>
-#include <awsmock/dto/sns/model/MessageAttribute.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/utils/SqsUtils.h>
@@ -26,7 +26,8 @@
 namespace AwsMock::Dto::SQS {
 
     class RedrivePolicyMapper : public StaticMapper<RedrivePolicyMapper, Database::Entity::SQS::RedrivePolicy, RedrivePolicy> {
-    public:
+      public:
+
         static RedrivePolicy toDto(const Database::Entity::SQS::RedrivePolicy &e) {
             RedrivePolicy d;
             d.deadLetterTargetArn = e.deadLetterTargetArn;
@@ -43,7 +44,8 @@ namespace AwsMock::Dto::SQS {
     };
 
     class QueueAttributeMapper : public StaticMapper<QueueAttributeMapper, Database::Entity::SQS::QueueAttribute, QueueAttribute> {
-    public:
+      public:
+
         static QueueAttribute toDto(const Database::Entity::SQS::QueueAttribute &e) {
             QueueAttribute d;
             d.queueArn = e.queueArn;
@@ -81,7 +83,8 @@ namespace AwsMock::Dto::SQS {
 
     class CreateQueueRequestMapper : public StaticMapper<CreateQueueRequestMapper, Database::Entity::SQS::Queue, CreateQueueRequest> {
 
-    public:
+      public:
+
         static Database::Entity::SQS::Queue toEntity(const CreateQueueRequest &d) {
             Database::Entity::SQS::Queue e;
             e.region = d.region;
@@ -106,7 +109,8 @@ namespace AwsMock::Dto::SQS {
 
     class CreateQueueResponseMapper : public StaticMapper<CreateQueueResponseMapper, Database::Entity::SQS::Queue, CreateQueueResponse> {
 
-    public:
+      public:
+
         static CreateQueueResponse toDto(const Database::Entity::SQS::Queue &e) {
             CreateQueueResponse d;
             d.region = e.region;
@@ -120,7 +124,8 @@ namespace AwsMock::Dto::SQS {
 
     class QueueMapper : public StaticMapper<QueueMapper, Database::Entity::SQS::Queue, Queue> {
 
-    public:
+      public:
+
         static Queue toDto(const Database::Entity::SQS::Queue &e) {
             Queue d;
             d.region = e.region;
@@ -154,7 +159,8 @@ namespace AwsMock::Dto::SQS {
 
     class QueueCounterMapper : public StaticMapper<QueueCounterMapper, Database::Entity::SQS::Queue, QueueCounter> {
 
-    public:
+      public:
+
         static QueueCounter toDto(const Database::Entity::SQS::Queue &e) {
             QueueCounter d;
             d.region = e.region;
@@ -176,7 +182,8 @@ namespace AwsMock::Dto::SQS {
     };
 
     class MessageAttributeMapper : public StaticMapper<MessageAttributeMapper, Database::Entity::SQS::MessageAttribute, MessageAttribute> {
-    public:
+      public:
+
         static MessageAttribute toDto(const Database::Entity::SQS::MessageAttribute &e) {
             MessageAttribute messageAttribute;
             messageAttribute.dataType = MessageAttributeDataTypeFromString(Database::Entity::SQS::MessageAttributeTypeToString(e.dataType));
@@ -195,7 +202,8 @@ namespace AwsMock::Dto::SQS {
     };
 
     class SNSMessageAttributeMapper : public StaticMapper<SNSMessageAttributeMapper, SNS::MessageAttribute, MessageAttribute> {
-    public:
+      public:
+
         static MessageAttribute toDto(const SNS::MessageAttribute &e) {
             MessageAttribute messageAttribute;
             messageAttribute.dataType = MessageAttributeDataTypeFromString(SNS::MessageAttributeDataTypeToString(e.dataType));
@@ -219,7 +227,8 @@ namespace AwsMock::Dto::SQS {
 
     class MessageMapper : public StaticMapper<MessageMapper, Database::Entity::SQS::Message, Message> {
 
-    public:
+      public:
+
         static Message toDto(const Database::Entity::SQS::Message &e) {
             Message d;
             d.queueName = e.queueName;
@@ -252,7 +261,8 @@ namespace AwsMock::Dto::SQS {
 
     class MessageCounterMapper : public StaticMapper<MessageCounterMapper, Database::Entity::SQS::Message, MessageCounter> {
 
-    public:
+      public:
+
         static MessageCounter toDto(const Database::Entity::SQS::Message &e) {
             MessageCounter d;
             d.queueName = e.queueName;
@@ -277,11 +287,12 @@ namespace AwsMock::Dto::SQS {
     };
 
     class SendMessageRequestMapper : public StaticMapper<SendMessageRequestMapper, Database::Entity::SQS::Message, Message> {
-    public:
+      public:
+
         static Database::Entity::SQS::Message toEntity(const SendMessageRequest &d) {
             Database::Entity::SQS::Message e;
             e.queueName = Core::AwsUtils::ConvertSQSQueueUrlToName(d.queueUrl);
-            e.queueArn = Core::AwsUtils::CreateSQSQueueArn(d.region, Core::Configuration::instance().GetAccountId(), e.queueName);
+            e.queueArn = Core::AwsUtils::CreateSQSQueueArn(d.region, Core::Configuration::instance().getAccountId(), e.queueName);
             e.body = d.body;
             e.attributes = d.attributes;
             e.messageAttributes = MessageAttributeMapper::toEntityMap(d.messageAttributes);
@@ -321,7 +332,8 @@ namespace AwsMock::Dto::SQS {
     // };
 
     class SendMessageResponseMapper : public StaticMapper<SendMessageResponseMapper, Database::Entity::SQS::Message, SendMessageResponse> {
-    public:
+      public:
+
         static SendMessageResponse toDto(const Database::Entity::SQS::Message &e) {
             SendMessageResponse d;
             d.messageId = Core::AwsUtils::ConvertSQSQueueUrlToName(e.messageId);
@@ -334,6 +346,6 @@ namespace AwsMock::Dto::SQS {
         static Database::Entity::SQS::Message toEntity(const SendMessageResponse &d) = delete;
     };
 
-} // namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MAPPER_H

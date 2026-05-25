@@ -19,7 +19,7 @@ namespace AwsMock::Database {
     struct ModuleDatabaseTest {
 
         ModuleDatabaseTest() {
-            _region = _configuration.GetValue<std::string>("awsmock.region");
+            _region = _configuration.get<std::string>("awsmock.region");
         }
 
         ~ModuleDatabaseTest() {

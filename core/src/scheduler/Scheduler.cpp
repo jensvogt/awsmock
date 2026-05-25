@@ -1,4 +1,6 @@
 
+#include <ranges>
+
 #include <awsmock/core/scheduler/Scheduler.h>
 
 namespace AwsMock::Core {

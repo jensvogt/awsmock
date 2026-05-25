@@ -22,7 +22,7 @@ namespace AwsMock::Core {
                 log_error << "Failed to open libmagic";
                 return;
             }
-            const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
+            const auto magicFile = Configuration::instance().get<std::string>("awsmock.magic-file");
             if (magic_load(_magic, magicFile.c_str()) != 0) {
                 magic_close(_magic);
                 log_error << "Failed to load magic db";

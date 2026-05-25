@@ -2,11 +2,14 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_STRING_UTILS_TEST_H
-#define AWSMOCK_CORE_STRING_UTILS_TEST_H
+// Boost includes
+#include <boost/test/test_tools.hpp>
+#include <boost/test/unit_test_log.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
 // Local includes
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
 
@@ -21,8 +24,8 @@ namespace AwsMock::Core {
         const bool result2 = StringUtils::IsNumeric(value2);
 
         // assert
-        BOOST_CHECK_EQUAL(result1, true);
-        BOOST_CHECK_EQUAL(result2, false);
+        BOOST_CHECK_EQUAL(true, result1);
+        BOOST_CHECK_EQUAL(false, result2);
     }
 
     BOOST_AUTO_TEST_CASE(SplitTest) {
@@ -161,7 +164,7 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::UrlEncode(input);
 
         // assert
-        BOOST_CHECK_EQUAL("/abc/xyz/%0A%20", result.c_str());
+        BOOST_CHECK_EQUAL("%2Fabc%2Fxyz%2F%0A+", result.c_str());
     }
 
     BOOST_AUTO_TEST_CASE(UrlEncodeSpecialCharactersTest) {
@@ -173,7 +176,7 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::UrlEncode(input);
 
         // assert
-        BOOST_CHECK_EQUAL("/abc/xyz/%0A%20%2B", result.c_str());
+        BOOST_CHECK_EQUAL("%2Fabc%2Fxyz%2F%0A+%2B", result.c_str());
     }
 
     BOOST_AUTO_TEST_CASE(StripLineEndingsTest) {
@@ -227,6 +230,54 @@ namespace AwsMock::Core {
         EXPECT_TRUE(result == "some invalid stuff");
     }*/
 
+    BOOST_AUTO_TEST_CASE(AwsUrlEncodeBasicTest) {
+
+        // arrange
+        const std::string input = "Hello World!";
+
+        // act
+        const std::string result = StringUtils::AwsUrlEncode(input);
+
+        // assert
+        BOOST_CHECK_EQUAL("Hello%20World%21", result.c_str());
+    }
+
+    BOOST_AUTO_TEST_CASE(AwsUrlEncodeUnreservedTest) {
+
+        // arrange
+        const std::string input = "Az09-._~";
+
+        // act
+        const std::string result = StringUtils::AwsUrlEncode(input);
+
+        // assert
+        BOOST_CHECK_EQUAL("Az09-._~", result.c_str());
+    }
+
+    BOOST_AUTO_TEST_CASE(AwsUrlEncodeSlashEncodedTest) {
+
+        // arrange
+        const std::string input = "photos/Jan/sample.jpg";
+
+        // act — slash encoded (default, e.g. for query parameters)
+        const std::string result = StringUtils::AwsUrlEncode(input, true);
+
+        // assert
+        BOOST_CHECK_EQUAL("photos%2FJan%2Fsample.jpg", result.c_str());
+    }
+
+    BOOST_AUTO_TEST_CASE(AwsUrlEncodeSlashNotEncodedTest) {
+
+        // arrange
+        const std::string input = "photos/Jan/sample.jpg";
+
+        // act — slash not encoded (for object key names)
+        const std::string result = StringUtils::AwsUrlEncode(input, false);
+
+        // assert
+        BOOST_CHECK_EQUAL("photos/Jan/sample.jpg", result.c_str());
+    }
+
     BOOST_AUTO_TEST_CASE(SnakeCaseTest) {
 
         // arrange
@@ -240,5 +291,3 @@ namespace AwsMock::Core {
     }
 
 }// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_STRING_UTILS_TEST_H

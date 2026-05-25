@@ -20,7 +20,7 @@ namespace AwsMock::Database {
     struct TransferMemoryDbTests {
 
         TransferMemoryDbTests() {
-            _region = _configuration.GetValue<std::string>("awsmock.region");
+            _region = _configuration.get<std::string>("awsmock.region");
         }
 
         ~TransferMemoryDbTests() {

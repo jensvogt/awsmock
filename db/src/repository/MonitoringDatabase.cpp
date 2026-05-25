@@ -9,7 +9,7 @@
 
 namespace AwsMock::Database {
 
-    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {
+    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().get<bool>("awsmock.monitoring.smooth")) {
         Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> &values) {
             this->UpdateMonitoringCounters(values);
         });
@@ -87,20 +87,16 @@ namespace AwsMock::Database {
                 log_debug << "Counters, name: " << name << ", count: " << result.size() << ", start:" << start << ", end: " << end;
                 return result;
 
-            } catch
-            (const mongocxx::exception &
-                exc
-            ) {
+            } catch (const mongocxx::exception &
+                             exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         }
 
         log_trace
-    <<
-    "Performance counter not available if you running the memory DB";
-        return
-                {};
+                << "Performance counter not available if you running the memory DB";
+        return {};
     }
 
     void MonitoringDatabase::UpdateMonitoringCounters(const std::map<std::string, double> &values) const {
@@ -171,4 +167,4 @@ namespace AwsMock::Database {
         return 0;
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

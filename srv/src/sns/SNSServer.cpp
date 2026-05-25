@@ -9,11 +9,11 @@ namespace AwsMock::Service {
     SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _scheduler(scheduler) {
 
         // Configuration
-        _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete-period");
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.counter-period");
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.monitoring-period");
-        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sns.backup.active");
-        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sns.backup.cron");
+        _deletePeriod = Core::Configuration::instance().get<int>("awsmock.modules.sns.delete-period");
+        _counterPeriod = Core::Configuration::instance().get<int>("awsmock.modules.sns.counter-period");
+        _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.sns.monitoring-period");
+        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.sns.backup.active");
+        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.sns.backup.cron");
 
         // Start SNS monitoring update counters
         _scheduler.AddTask("sns-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
     }
 
     void SNSServer::DeleteOldMessages() const {
-        const int messageTimeout = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.timeout");
+        const int messageTimeout = Core::Configuration::instance().get<int>("awsmock.modules.sns.timeout");
         _snsDatabase.DeleteOldMessages(messageTimeout);
     }
 

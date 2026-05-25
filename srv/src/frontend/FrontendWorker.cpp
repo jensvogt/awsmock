@@ -14,7 +14,7 @@ namespace AwsMock::Service::Frontend {
 
     void FrontendWorker::Accept() {
 
-        int timeout = Core::Configuration::instance().GetValue<int>("awsmock.frontend.timeout");
+        int timeout = Core::Configuration::instance().get<int>("awsmock.frontend.timeout");
 
         // Clean up any previous connection.
         beast::error_code ec = _socket.close(ec);
@@ -36,7 +36,7 @@ namespace AwsMock::Service::Frontend {
     }
 
     void FrontendWorker::ReadRequest() {
-        auto self = shared_from_this(); // MUST succeed
+        auto self = shared_from_this();// MUST succeed
 
         // Create parser in unique_ptr
         auto p = std::make_unique<parser_type>(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
@@ -56,7 +56,7 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t> > const &req) {
+    void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
 
         switch (req.method()) {
 
@@ -159,7 +159,7 @@ namespace AwsMock::Service::Frontend {
             _socket.close();
 
             // Sleep indefinitely until we're given a new deadline.
-            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max)());
+            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max) ());
         }
 
         _requestDeadline.async_wait([this](beast::error_code) {
@@ -167,7 +167,7 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void FrontendWorker::HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request) {
+    void FrontendWorker::HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
 
         // Prepare the response message
         _stringResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
@@ -197,4 +197,4 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-}; // namespace AwsMock::Service::Frontend
+};// namespace AwsMock::Service::Frontend

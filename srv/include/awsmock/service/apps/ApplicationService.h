@@ -2,14 +2,17 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_APPLICATION_SERVICE_H
-#define AWSMOCK_SERVICE_APPLICATION_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
 #include <string>
 
+// Boost includes
+#include <boost/asio/strand.hpp>
+
 // AwsMock includes
+#include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
@@ -39,8 +42,6 @@
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/apps/ApplicationCreator.h>
-#include <boost/asio/strand.hpp>
-
 
 namespace AwsMock::Service {
 
@@ -56,7 +57,8 @@ namespace AwsMock::Service {
      */
     class ApplicationService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -65,7 +67,7 @@ namespace AwsMock::Service {
         /**
          * @brief Create a new application
          *
-         * @param request create application request
+         * @param request create an application request
          * @return ListApplicationCountersResponse DTO
          * @see Dto::Apps::CreateApplicationRequest
          * @see Dto::Apps::ListApplicationCountersResponse
@@ -225,7 +227,8 @@ namespace AwsMock::Service {
         [[nodiscard]]
         Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Saves the Base64 file
          *
@@ -263,6 +266,4 @@ namespace AwsMock::Service {
         ApplicationCreator applicationCreator;
     };
 
-} // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_APPLICATION_SERVICE_H
+}// namespace AwsMock::Service

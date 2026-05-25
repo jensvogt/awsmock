@@ -29,7 +29,7 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.GetValue<std::string>("awsmock.region");
+            _region = _configuration.get<std::string>("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
             _configuration.SetValue<int>("awsmock.gateway.http.port", TEST_PORT + 1);

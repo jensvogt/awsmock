@@ -14,9 +14,9 @@ namespace AwsMock::Service {
     void TestBase::StartGateway() {
 
         // Define endpoint. This is the endpoint of the SQS server, not the gateway
-        const auto _port = _configuration.GetValue<std::string>("awsmock.gateway.http.port");
-        const auto _host = _configuration.GetValue<std::string>("awsmock.gateway.http.host");
-        const auto _address = _configuration.GetValue<std::string>("awsmock.gateway.http.address");
+        const auto _port = _configuration.get<std::string>("awsmock.gateway.http.port");
+        const auto _host = _configuration.get<std::string>("awsmock.gateway.http.host");
+        const auto _address = _configuration.get<std::string>("awsmock.gateway.http.address");
 
         // Set test config
         _endpoint = "http://" + _host + ":" + _port;
@@ -82,12 +82,12 @@ namespace AwsMock::Service {
     void TestBase::InitializeDatabase() {
 
         // Get database variables
-        const auto name = Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.name");
-        const auto host = Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.host");
-        const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.user");
-        const auto password = Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.password");
-        const int _port = Core::Configuration::instance().GetValue<int>("awsmock.mongodb.port");
-        const int poolSize = Core::Configuration::instance().GetValue<int>("awsmock.mongodb.pool-size");
+        const auto name = Core::Configuration::instance().get<std::string>("awsmock.mongodb.name");
+        const auto host = Core::Configuration::instance().get<std::string>("awsmock.mongodb.host");
+        const auto user = Core::Configuration::instance().get<std::string>("awsmock.mongodb.user");
+        const auto password = Core::Configuration::instance().get<std::string>("awsmock.mongodb.password");
+        const int _port = Core::Configuration::instance().get<int>("awsmock.mongodb.port");
+        const int poolSize = Core::Configuration::instance().get<int>("awsmock.mongodb.pool-size");
 
         // MongoDB URL
         mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize));
@@ -125,7 +125,7 @@ namespace AwsMock::Service {
         _ios.stop();
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 // entry point:
 int main(const int argc, char *argv[]) {

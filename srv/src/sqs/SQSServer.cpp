@@ -9,11 +9,11 @@
 namespace AwsMock::Service {
     SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _scheduler(scheduler) {
 
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring-period");
-        _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset-period");
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.counter-period");
-        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sqs.backup.active");
-        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sqs.backup.cron");
+        _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.sqs.monitoring-period");
+        _resetPeriod = Core::Configuration::instance().get<int>("awsmock.modules.sqs.reset-period");
+        _counterPeriod = Core::Configuration::instance().get<int>("awsmock.modules.sqs.counter-period");
+        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.sqs.backup.active");
+        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.sqs.backup.cron");
 
         log_info << "SQS server starting";
 
@@ -142,4 +142,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("sns-delete-messages");
         _scheduler.Shutdown("sns-backup");
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

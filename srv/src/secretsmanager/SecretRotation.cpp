@@ -82,7 +82,7 @@ namespace AwsMock::Service {
     void SecretRotation::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body) {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
         // TODO: fix boost asio context
         //LambdaService lambdaService;
         //Dto::Lambda::LambdaResult result = lambdaService.InvokeLambdaFunction(region, lambda.function, body, Dto::Lambda::LambdaInvocationType::EVENT);

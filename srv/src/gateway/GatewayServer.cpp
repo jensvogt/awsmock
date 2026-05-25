@@ -9,8 +9,8 @@ namespace AwsMock::Service {
     GatewayServer::GatewayServer(boost::asio::io_context &ios) : AbstractServer("gateway"), _ios(ios) {
 
         // Get HTTP configuration values
-        _port = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.port");
-        _address = Core::Configuration::instance().GetValue<std::string>("awsmock.gateway.http.address");
+        _port = Core::Configuration::instance().get<int>("awsmock.gateway.http.port");
+        _address = Core::Configuration::instance().get<std::string>("awsmock.gateway.http.address");
         log_debug << "Gateway server initialized, address: " << _address << ", port: " << _port;
 
         // Check module active
@@ -35,4 +35,4 @@ namespace AwsMock::Service {
         _ios.stop();
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
