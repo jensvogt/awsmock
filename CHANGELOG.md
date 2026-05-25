@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.39](https://github.com/jensvogt/awsmock/compare/v1.18.38...v1.18.39) (2026-05-25)
+
+
+### Bug Fixes
+
+* add TLS to docker connection ([db65a21](https://github.com/jensvogt/awsmock/commit/db65a21ad85ed332c7c21070abdc3f2a7c4fc063))
+* add TLS to docker connection ([53d5852](https://github.com/jensvogt/awsmock/commit/53d5852fb7bdd192d1b2d51fbf18e180d68520a6))
+
 ## [1.18.38](https://github.com/jensvogt/awsmock/compare/v1.18.37...v1.18.38) (2026-05-25)
 
 
