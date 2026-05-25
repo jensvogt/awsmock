@@ -46,7 +46,7 @@
  */
 void ShowHelp(const boost::program_options::options_description &desc) {
     std::cout << std::endl
-              << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+              << "AwsMock awslocal v" << AwsMock::Core::Configuration::getVersion() << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awslocal [Options] Commands" << std::endl
@@ -82,31 +82,31 @@ int main(const int argc, char *argv[]) {
     notify(vm);
 
     // Show usage.
-    if (vm.empty() || vm.find("help") != vm.end()) {
+    if (vm.empty() || vm.contains("help")) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show the version
-    if (vm.find("version") != vm.end()) {
+    if (vm.contains("version")) {
         std::cout << std::endl
-                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::getVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
 
     // Read the configuration.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.find("config") != vm.end()) {
-        configuration.SetFilename(vm["config"].as<std::string>());
+    if (vm.contains("config")) {
+        configuration.setFilePath(vm["config"].as<std::string>());
     } else {
-        configuration.SetFilename(DEFAULT_CONFIG_FILE);
+        configuration.setFilePath(DEFAULT_CONFIG_FILE);
     }
 
     // Set the log level
-    if (vm.find("loglevel") != vm.end()) {
+    if (vm.contains("loglevel")) {
         const auto value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
+        AwsMock::Core::Configuration::instance().set<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
         const auto level = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.logging.level");

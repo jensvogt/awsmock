@@ -144,7 +144,7 @@ int main(const int argc, char *argv[]) {
     // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
-                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::getVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
@@ -152,15 +152,15 @@ int main(const int argc, char *argv[]) {
     // Read the configuration file.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
     if (vm.contains("config")) {
-        configuration.SetFilename(vm["config"].as<std::string>());
+        configuration.setFilePath(vm["config"].as<std::string>());
     } else {
-        configuration.SetFilename(DEFAULT_CONFIG_FILE);
+        configuration.setFilePath(DEFAULT_CONFIG_FILE);
     }
 
     // Set the log level.
     if (vm.contains("loglevel")) {
         const std::string value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
+        AwsMock::Core::Configuration::instance().set<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
         AwsMock::Core::LogStream::SetSeverity("warn");
@@ -176,11 +176,11 @@ int main(const int argc, char *argv[]) {
     }
 
     if (vm.contains("host")) {
-        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.gateway.http.host", vm["host"].as<std::string>());
+        AwsMock::Core::Configuration::instance().set<std::string>("awsmock.gateway.http.host", vm["host"].as<std::string>());
     }
 
     if (vm.contains("port")) {
-        AwsMock::Core::Configuration::instance().SetValue<int>("awsmock.gateway.http.port", vm["port"].as<int>());
+        AwsMock::Core::Configuration::instance().set<int>("awsmock.gateway.http.port", vm["port"].as<int>());
     }
 
     // Check command
