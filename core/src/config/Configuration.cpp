@@ -101,7 +101,7 @@ namespace AwsMock::Core {
                 return v.get_bool();
 
             case boost::json::kind::int64:
-                return v.get_int64();
+                return static_cast<long>(v.get_int64());
 
             case boost::json::kind::uint64:
                 return static_cast<long>(v.get_uint64());
@@ -158,13 +158,13 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::vector<std::pair<std::string, std::map<std::string, ConfigValue>>>
+    std::vector<std::pair<std::string, std::map<std::string, ConfigValue> > >
     Configuration::getObjects(const std::string &path) const {
         const auto *node = resolvePath(path);
         if (!node) throw std::runtime_error("Config key not found: " + path);
         if (!node->is_object()) throw std::runtime_error("Config key '" + path + "' is not an object");
 
-        std::vector<std::pair<std::string, std::map<std::string, ConfigValue>>> result;
+        std::vector<std::pair<std::string, std::map<std::string, ConfigValue> > > result;
         const auto &object = node->get_object();
         result.reserve(object.size());
         for (const auto &[key, value]: object) {
@@ -269,4 +269,4 @@ namespace AwsMock::Core {
         return out.str();
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

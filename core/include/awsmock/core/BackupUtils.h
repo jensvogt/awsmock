@@ -6,6 +6,7 @@
 
 // C++ includes
 #include <string>
+#include <ranges>
 
 // Awsmock includes
 #include <awsmock/core/DirUtils.h>
@@ -22,8 +23,7 @@ namespace AwsMock::Core {
      */
     class BackupUtils {
 
-      public:
-
+    public:
         /**
          * Constructor
          */
@@ -51,12 +51,11 @@ namespace AwsMock::Core {
          */
         static std::vector<std::string> GetBackupFiles(const std::string &module, int retention);
 
-      private:
-
+    private:
         /**
          * Returns the current date time as string
          */
         static std::string GetTimestamp();
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
