@@ -33,7 +33,7 @@ namespace AwsMock::Service {
 
     std::string LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode) const {
 
-        const auto privatePort = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.private-port");
+        const auto privatePort = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.private-port");
 
         // Docker tag
         if (lambda.dockerTag.empty()) {
@@ -87,8 +87,8 @@ namespace AwsMock::Service {
 
     void LambdaCreator::UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) const {
 
-        const auto privatePort = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.private-port");
-        const auto dockerized = Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
+        const auto privatePort = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.private-port");
+        const auto dockerized = Core::Configuration::instance().get<bool>("awsmock.dockerized");
 
         // Docker tag
         lambda.dockerTag = newVersion;
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
         log_debug << "Code directory created, codeDir: " << codeDir;
 
         // Check the base64 encoded zip file
-        const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        const auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
         const std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + zipFile;
         if (!Core::FileUtils::FileExists(base64FullFile)) {
             log_error << "Base64 file does not exist, path: " << base64FullFile;
@@ -192,7 +192,7 @@ namespace AwsMock::Service {
 
     std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) {
 
-        const auto tempDir = Core::Configuration::instance().GetValue<std::string>("awsmock.temp-dir");
+        const auto tempDir = Core::Configuration::instance().get<std::string>("awsmock.temp-dir");
 
         // Decode the Base64 file
         const std::string zipFile = tempDir + Core::FileUtils::separator() + Core::StringUtils::GenerateRandomHexString(8) + ".zip";
@@ -256,14 +256,14 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
     std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag) {
 
-        auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-        auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
+        auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
 
         std::string base64File = lambda.function + "-" + dockerTag + ".b64";
         std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
@@ -317,4 +317,4 @@ namespace AwsMock::Service {
         lambda.code.zipFile = base64File;
         return base64FullFile;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

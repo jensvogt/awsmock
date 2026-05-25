@@ -97,6 +97,8 @@ namespace AwsMock::Core {
             localUri = localUri.substr(uri.find('?') + 1);
         }
 
+        if (!localUri.contains("?")) return {};
+
         if (!localUri.contains("&") && !localUri.contains("=")) {
             // Special case: localUri=enabled
             if (localUri.empty()) return {};

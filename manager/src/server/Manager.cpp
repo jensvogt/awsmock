@@ -19,14 +19,14 @@ namespace AwsMock::Manager {
         // Start database
         InitializeDatabase();
 
-        // Write some infos
+        // Write some info
         WriteInfoMessages();
     }
 
     void Manager::InitializeWebsocketLogging() const {
 
-        if (Core::Configuration::instance().GetValue<bool>("awsmock.logging.websocket-active")) {
-            const auto port = Core::Configuration::instance().GetValue<unsigned int>("awsmock.logging.websocket-port");
+        if (Core::Configuration::instance().get<bool>("awsmock.logging.websocket-active")) {
+            const auto port = Core::Configuration::instance().get<unsigned int>("awsmock.logging.websocket-port");
             Core::LogStream::AddLoggingWebSocket(_ioc, port);
         }
     }
@@ -34,7 +34,7 @@ namespace AwsMock::Manager {
     void Manager::InitializeDatabase() const {
 
         // Get database variables
-        if (Core::Configuration::instance().GetValue<bool>("awsmock.mongodb.active")) {
+        if (Core::Configuration::instance().get<bool>("awsmock.mongodb.active")) {
 
             _pool.Configure();
 
@@ -51,21 +51,21 @@ namespace AwsMock::Manager {
     void Manager::WriteInfoMessages() {
         std::string boostVersion = BOOST_LIB_VERSION;
         Core::StringUtils::Replace(boostVersion, "_", ".");
-        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << ", pid: " << Core::SystemUtils::GetPid()
-                 << ", loglevel: " << Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level") << ", boost: " << boostVersion;
-        log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
-        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
+        log_info << "Starting " << Core::Configuration::getAppName() << " " << Core::Configuration::getVersion() << ", pid: " << Core::SystemUtils::GetPid()
+                 << ", loglevel: " << Core::Configuration::instance().get<std::string>("awsmock.logging.level") << ", boost: " << boostVersion;
+        log_info << "Configuration file: " << Core::Configuration::instance().filePath();
+        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().get<bool>("awsmock.dockerized");
     }
 
     void Manager::AutoLoad() {
 
         // Check active flag
-        if (!Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
+        if (!Core::Configuration::instance().get<bool>("awsmock.autoload.active")) {
             return;
         }
 
         // Load by directory has preference over a load by file
-        const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir");
+        const auto autoLoadDir = Core::Configuration::instance().get<std::string>("awsmock.autoload.dir");
         log_info << "Using autoload directory: " << autoLoadDir;
         if (Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
             for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json", true)) {
@@ -85,7 +85,7 @@ namespace AwsMock::Manager {
                     log_info << "Loaded infrastructure, filename: " << file;
                 }
             }
-        } else if (const auto autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
+        } else if (const auto autoLoadFile = Core::Configuration::instance().get<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
             if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
                 Dto::Module::Infrastructure infrastructure;
                 infrastructure.FromJson(jsonString);
@@ -127,18 +127,18 @@ namespace AwsMock::Manager {
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
 
         for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
-            log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.modules." + key + ".active");
+            log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << Core::Configuration::instance().get<bool>("awsmock.modules." + key + ".active");
             EnsureModuleExisting(key);
-            Core::Configuration::instance().GetValue<bool>("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
+            Core::Configuration::instance().get<bool>("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
         }
 
         // Gateway
         EnsureModuleExisting("gateway");
-        moduleDatabase.SetStatus("gateway", Core::Configuration::instance().GetValue<bool>("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase.SetStatus("gateway", Core::Configuration::instance().get<bool>("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
 
         // Monitoring
         EnsureModuleExisting("monitoring");
-        moduleDatabase.SetStatus("monitoring", Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase.SetStatus("monitoring", Core::Configuration::instance().get<bool>("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
     }
 
     void Manager::EnsureModuleExisting(const std::string &key) {
@@ -272,4 +272,4 @@ namespace AwsMock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-} // namespace AwsMock::Manager
+}// namespace AwsMock::Manager

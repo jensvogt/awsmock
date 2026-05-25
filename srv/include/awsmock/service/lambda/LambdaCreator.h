@@ -51,7 +51,8 @@ namespace AwsMock::Service {
      */
     class LambdaCreator {
 
-    public:
+      public:
+
         /**
          * @brief Constructor.
          */
@@ -76,7 +77,8 @@ namespace AwsMock::Service {
          */
         void UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) const;
 
-    private:
+      private:
+
         /**
          * @brief Create a lambda function instance
          *
@@ -168,9 +170,9 @@ namespace AwsMock::Service {
         /**
          * Dockerized flag
          */
-        bool _dockerized = Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
+        bool _dockerized = Core::Configuration::instance().get<bool>("awsmock.dockerized");
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_CREATOR_H

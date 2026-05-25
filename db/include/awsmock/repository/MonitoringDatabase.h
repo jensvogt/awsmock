@@ -2,12 +2,12 @@
 // Created by vogje01 on 10/2/24.
 //
 
-#ifndef AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
-#define AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/EventBus.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
 
@@ -25,7 +25,8 @@ namespace AwsMock::Database {
      */
     class MonitoringDatabase : public DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -82,7 +83,8 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
 
-    private:
+      private:
+
         /**
          * Database name
          */
@@ -118,6 +120,4 @@ namespace AwsMock::Database {
             labelValue = std::move(keys[2]);
         }
     }
-} // namespace AwsMock::Database
-
-#endif//AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
+}// namespace AwsMock::Database

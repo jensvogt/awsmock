@@ -9,24 +9,25 @@
 #include <mutex>
 
 // Boost includes
-#include <boost/signals2.hpp>
-#include <boost/asio.hpp>
 #include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/count.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/asio.hpp>
+#include <boost/signals2.hpp>
 
 namespace AwsMock::Monitoring {
 
     class MonitoringCollector {
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
          * @param io boost IO context
          */
         MonitoringCollector(boost::asio::io_context &io) : timer_(io) {
-            _period = Core::Configuration::instance().GetValue<long>("awsmock.monitoring.average-period");
+            _period = Core::Configuration::instance().get<long>("awsmock.monitoring.average-period");
             StartReportingCycle();
         }
 
@@ -42,13 +43,14 @@ namespace AwsMock::Monitoring {
             std::lock_guard lock(_monitoringMutex);
             auto &[accumulator, isRate] = _collectorMap[GetId(name, labelName, labelValue)];
             isRate = true;
-            accumulator(1.0); // Increment by 1
+            accumulator(1.0);// Increment by 1
         }
 
-    private:
+      private:
+
         // Update the private map to include count and a type flag
         struct MetricEntry {
-            boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean, boost::accumulators::tag::count> > accumulator;
+            boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean, boost::accumulators::tag::count>> accumulator;
             bool isRate = false;
         };
 
@@ -83,7 +85,7 @@ namespace AwsMock::Monitoring {
                         entry.accumulator = {};
                     }
                 }
-            } // Mutex releases here
+            }// Mutex releases here
 
             if (!values.empty()) {
                 Core::EventBus::instance().sigCollector(values);
@@ -113,6 +115,6 @@ namespace AwsMock::Monitoring {
         return name + ":" + labelName + ":" + labelValue;
     }
 
-} // namespace AwsMock::Monitoring
+}// namespace AwsMock::Monitoring
 
-#endif // AWSMOCK_MONITORING_COLLECTOR_H
+#endif// AWSMOCK_MONITORING_COLLECTOR_H

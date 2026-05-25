@@ -26,7 +26,7 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
             const std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = {.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn};
             topic = _snsDatabase.CreateTopic(topic);
@@ -370,7 +370,7 @@ namespace AwsMock::Service {
             }
 
             // Create a new subscription
-            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 
@@ -958,7 +958,7 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Subscription subscription;
             subscription.endpoint = request.endpoint;
             subscription.protocol = request.protocol;
-            subscription.subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, Core::Configuration::instance().GetAccountId(), request.topicArn);
+            subscription.subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, Core::Configuration::instance().getAccountId(), request.topicArn);
             topic.subscriptions.emplace_back(subscription);
             topic = _snsDatabase.UpdateTopic(topic);
             log_debug << "Add subscription to topic: " << request.topicArn << ", subscriptionArn: " << subscription.subscriptionArn;
@@ -1139,8 +1139,8 @@ namespace AwsMock::Service {
     void SNSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SNS::Message &message, const std::string &eventSourceArn) const {
         log_debug << "Invoke lambda function request, function: " << lambda.function;
 
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        const auto user = Core::Configuration::instance().get<std::string>("awsmock.user");
 
         // Create the event record
         Dto::SNS::Record record;

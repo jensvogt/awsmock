@@ -2,14 +2,14 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_APPLICATION_SERVER_H
-#define AWSMOCK_SERVICE_APPLICATION_SERVER_H
+#pragma once
 
 // C++ includes
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
+#include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/apps/model/Status.h>
@@ -28,7 +28,8 @@ namespace AwsMock::Service {
      */
     class ApplicationServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -39,14 +40,15 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
         /**
          * @brief Update counters
          */
         void UpdateCounter() const;
 
         /**
-         * @brief Backup the application objects
+         * @brief Back up the application objects
          */
         static void BackupApplication();
 
@@ -80,7 +82,7 @@ namespace AwsMock::Service {
         void RestartApplications() const;
 
         /**
-         * @brief Synchronize docker containers with database
+         * @brief Synchronize docker containers with the database
          */
         void SyncContainers() const;
 
@@ -146,13 +148,6 @@ namespace AwsMock::Service {
          * Asynchronous task scheduler
          */
         Core::Scheduler &_scheduler;
-
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
     };
 
-} // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_APPLICATION_SERVER_H
+}// namespace AwsMock::Service

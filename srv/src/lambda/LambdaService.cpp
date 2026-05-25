@@ -11,7 +11,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
-        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
 
         // Create an entity and set ARN
         Database::Entity::Lambda::Lambda lambda = {};
@@ -692,10 +692,10 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        const auto accountId = Core::Configuration::instance().GetAccountId();
+        const auto accountId = Core::Configuration::instance().getAccountId();
         const auto lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
-        int maxInvocationRetries = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.max-invocation-count");
-        int invocationInterval = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.invocation-timeout");
+        int maxInvocationRetries = Core::Configuration::instance().get<int>("awsmock.modules.lambda.max-invocation-count");
+        int invocationInterval = Core::Configuration::instance().get<int>("awsmock.modules.lambda.invocation-timeout");
 
         // Get the lambda entity
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
@@ -1291,12 +1291,12 @@ namespace AwsMock::Service {
     }
 
     std::string LambdaService::GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda) {
-        const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        const auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
         return lambdaDir + Core::FileUtils::separator() + lambda.function + "-" + lambda.dockerTag + ".b64";
     }
 
     std::string LambdaService::GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const {
-        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
         const Database::Entity::S3::Object object = _s3Database.GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
         return s3DataDir + Core::FileUtils::separator() + object.internalName;
@@ -1407,7 +1407,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::WriteBase64File(const std::string &base64File, const std::string &content) {
-        auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
         std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
         log_debug << "Using Base64File: " << base64FullFile;
 

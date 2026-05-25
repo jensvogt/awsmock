@@ -6,8 +6,8 @@
 
 namespace AwsMock::Service {
     MonitoringServer::MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("monitoring"), _scheduler(scheduler), _monitoringCollector(ioc) {
-        const int systemPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.system-period");
-        const int retentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.retention");
+        const int systemPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.system-period");
+        const int retentionPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.retention");
 
         // Start monitoring system collector
         _scheduler.AddTask("monitoring-system-collector", [this] { _metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
@@ -21,7 +21,7 @@ namespace AwsMock::Service {
         log_debug << "Cleanup started";
 
         // Load exclusions
-        for (const auto &e: Core::Configuration::instance().GetValueArray<std::string>("awsmock.monitoring.exclusions")) {
+        for (const auto &e: Core::Configuration::instance().getArray<std::string>("awsmock.monitoring.exclusions")) {
             _exclusions.push_back(e);
         }
 
@@ -49,7 +49,7 @@ namespace AwsMock::Service {
 
         log_trace << "Monitoring worker starting";
 
-        const int retentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.retention");
+        const int retentionPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.retention");
         const long deletedCount = _monitoringDatabase.DeleteOldMonitoringData(retentionPeriod);
 
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;

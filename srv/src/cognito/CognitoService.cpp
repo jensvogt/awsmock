@@ -7,7 +7,7 @@
 
 namespace AwsMock::Service {
     CognitoService::CognitoService() : _database(Database::CognitoDatabase::instance()) {
-        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
     }
 
     Dto::Cognito::CreateUserPoolResponse CognitoService::CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) const {

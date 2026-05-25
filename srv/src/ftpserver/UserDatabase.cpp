@@ -1,11 +1,13 @@
 #include "awsmock/ftpserver/UserDatabase.h"
 
+#include "awsmock/core/FileUtils.h"
+
 namespace AwsMock::FtpServer {
 
     UserDatabase::UserDatabase() {
-        _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        _userPoolId = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.user-pool-id");
-        _baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        _region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        _userPoolId = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.user-pool-id");
+        _baseDir = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
     }
 
     bool UserDatabase::addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions) {
@@ -61,8 +63,8 @@ namespace AwsMock::FtpServer {
     }
 
     void UserDatabase::CreateDirectories(const std::string &userName) {
-        const auto basePath = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
-        for (const auto &directory: Core::Configuration::instance().GetValueArray<std::string>("awsmock.modules.transfer.directories")) {
+        const auto basePath = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
+        for (const auto &directory: Core::Configuration::instance().getArray<std::string>("awsmock.modules.transfer.directories")) {
             if (std::string dirPath = basePath + Core::FileUtils::separator() + userName + Core::FileUtils::separator() + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
                 Core::DirUtils::MakeDirectory(dirPath, true);
                 log_debug << "Created directory, path: " << dirPath;

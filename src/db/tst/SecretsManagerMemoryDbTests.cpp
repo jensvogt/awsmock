@@ -18,7 +18,7 @@ namespace AwsMock::Database {
     struct SecretsManagerMemoryDbTest {
 
         SecretsManagerMemoryDbTest() {
-            _region = _configuration.GetValue<std::string>("awsmock.region");
+            _region = _configuration.get<std::string>("awsmock.region");
         }
 
         ~SecretsManagerMemoryDbTest() {

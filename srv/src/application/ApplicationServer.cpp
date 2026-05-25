@@ -9,17 +9,17 @@ namespace AwsMock::Service {
     ApplicationServer::ApplicationServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("application"), _applicationService(ioc), _module("application"), _scheduler(scheduler) {
 
         // Get configuration values
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.monitoring-period");
-        _watchdogPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.watchdog-period");
-        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.backup.active");
-        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.backup.cron");
-        _logServer = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.log-server");
-        _logServerPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.log-server-port");
+        _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.application.monitoring-period");
+        _watchdogPeriod = Core::Configuration::instance().get<int>("awsmock.modules.application.watchdog-period");
+        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.application.backup.active");
+        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.application.backup.cron");
+        _logServer = Core::Configuration::instance().get<bool>("awsmock.modules.application.log-server");
+        _logServerPort = Core::Configuration::instance().get<int>("awsmock.modules.application.log-server-port");
 
         // Start application background threads
         _scheduler.AddTask("application-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod/*, _watchdogPeriod*/);
+        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod /*, _watchdogPeriod*/);
 
         // Start backup
         if (_backupActive) {
@@ -171,7 +171,7 @@ namespace AwsMock::Service {
     void ApplicationServer::SyncContainers() const {
 
         // Sync docker container with the database
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
         for (const auto &container: ContainerService::instance().ListContainers().containerList) {
 
             std::string name{}, version{};
@@ -212,4 +212,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

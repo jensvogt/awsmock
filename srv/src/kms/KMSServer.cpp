@@ -12,10 +12,10 @@ namespace AwsMock::Service {
     KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()), _scheduler((scheduler)) {
 
         // HTTP manager configuration
-        _removePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.kms.remove-period");
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.kms.monitoring-period");
-        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.kms.backup.active");
-        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.kms.backup.cron");
+        _removePeriod = Core::Configuration::instance().get<int>("awsmock.modules.kms.remove-period");
+        _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.kms.monitoring-period");
+        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.kms.backup.active");
+        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.kms.backup.cron");
         log_debug << "KMS server initialized";
 
         // Start lambda monitoring update counters

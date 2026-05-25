@@ -1,6 +1,7 @@
 set(BINARY core_tst)
 
-set(SOURCES Main.cpp CryptoUtilsTest.cpp AwsUtilsTests.cpp ConfigurationTests.cpp CronUtilsTests.cpp DateTimeUtilsTests.cpp)
+set(SOURCES Main.cpp CryptoUtilsTest.cpp AwsUtilsTests.cpp ConfigurationTests.cpp CronUtilsTests.cpp
+        DateTimeUtilsTests.cpp StringUtilsTests.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PUBLIC ${CMAKE_SOURCE_DIR}/core/include)
@@ -9,7 +10,7 @@ target_link_libraries(${BINARY} PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_stat
 target_link_libraries(${BINARY} PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(${BINARY} PRIVATE OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
         Boost::thread Boost::process Boost::date_time Boost::url Boost::unit_test_framework Boost::chrono Boost::locale
-        LibArchive::LibArchive magic)
+        Boost::json LibArchive::LibArchive magic)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 

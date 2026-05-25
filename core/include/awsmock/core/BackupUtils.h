@@ -2,13 +2,13 @@
 // Created by vogje01 on 6/10/25.
 //
 
-#ifndef AWS_MOCK_CORE_BACKUP_UTILS_H
-#define AWS_MOCK_CORE_BACKUP_UTILS_H
+#pragma once
 
 // C++ includes
 #include <string>
 
 // Awsmock includes
+#include <awsmock/core/DirUtils.h>
 #include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
@@ -60,5 +60,3 @@ namespace AwsMock::Core {
     };
 
 }// namespace AwsMock::Core
-
-#endif// AWS_MOCK_CORE_BACKUP_UTILS_H

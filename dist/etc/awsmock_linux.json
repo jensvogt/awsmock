@@ -248,19 +248,6 @@
         "verify-peer": true
       }
     },
-    "podman": {
-      "active": false,
-      "network-mode": "local",
-      "network-name": "local",
-      "default": {
-        "memory-size": 512,
-        "temp-size": 10240
-      },
-      "container": {
-        "port": 8080
-      },
-      "socket": "/run/podman/podman.sock"
-    },
     "monitoring": {
       "active": true,
       "prometheus": false,

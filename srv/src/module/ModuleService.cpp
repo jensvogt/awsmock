@@ -425,7 +425,7 @@ namespace AwsMock::Service {
 
     void ModuleService::ImportLocalS3File(const Database::Entity::S3::Object &object) {
         if (Core::FileUtils::FileExists(object.localName)) {
-            const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+            const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
             const std::string localFilePath = s3DataDir + "/" + object.internalName;
             Core::FileUtils::CopyTo(object.localName, localFilePath);
             log_info << "Local file imported, bucket: " << object.bucket << ", key: " << object.key << ", localName: " << object.localName;
@@ -464,7 +464,7 @@ namespace AwsMock::Service {
     void ModuleService::BackupRetention(const std::string &module) {
 
         // Get the file list
-        const int retention = Core::Configuration::instance().GetValue<int>("awsmock.modules." + module + ".backup.count");
+        const int retention = Core::Configuration::instance().get<int>("awsmock.modules." + module + ".backup.count");
         const std::vector<std::string> backupList = Core::BackupUtils::GetBackupFiles(module, retention);
         log_info << "Cleanup backup files, module: " << module << ", count: " << backupList.size();
         for (const auto &file: backupList) {
@@ -475,10 +475,10 @@ namespace AwsMock::Service {
     // ReSharper disable once CppMemberFunctionMayBeStatic
     void ModuleService::UpdateLambda(const std::string &name) {
         const Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure();
-        const auto filename = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file");
+        const auto filename = Core::Configuration::instance().get<std::string>("awsmock.autoload.file");
         std::ofstream ofs(filename, std::ios::trunc);
         ofs << response.ToJson();
         ofs.close();
         log_info << "Infrastructure exported, file: " << filename;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

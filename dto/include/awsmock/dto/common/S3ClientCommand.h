@@ -157,7 +157,7 @@ namespace AwsMock::Dto::Common {
         std::string key;
 
         /**
-         * Key
+         * Prefix
          */
         std::string prefix;
 

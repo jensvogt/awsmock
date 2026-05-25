@@ -19,7 +19,8 @@ namespace AwsMock::Service::Frontend {
         net::io_context &_ioc;
         tcp::acceptor _acceptor;
 
-    public:
+      public:
+
         listener(net::io_context &ioc, const tcp::endpoint &endpoint)
             : _ioc(ioc), _acceptor(boost::asio::make_strand(ioc)) {
             beast::error_code ec;
@@ -60,12 +61,13 @@ namespace AwsMock::Service::Frontend {
             do_accept();
         }
 
-    private:
+      private:
+
         void do_accept() {
             _acceptor.async_accept(
-                boost::asio::make_strand(_ioc),
-                beast::bind_front_handler(&listener::on_accept,
-                                          shared_from_this()));
+                    boost::asio::make_strand(_ioc),
+                    beast::bind_front_handler(&listener::on_accept,
+                                              shared_from_this()));
         }
 
         void on_accept(const beast::error_code &ec, tcp::socket socket) {
@@ -77,7 +79,7 @@ namespace AwsMock::Service::Frontend {
 
     void FrontendServer::operator()(bool isService) {
 
-        if (!Core::Configuration::instance().GetValue<bool>("awsmock.frontend.active")) {
+        if (!Core::Configuration::instance().get<bool>("awsmock.frontend.active")) {
             log_info << "Frontend server inactive";
             return;
         }
@@ -85,10 +87,10 @@ namespace AwsMock::Service::Frontend {
         try {
             _running = true;
 
-            auto const address = Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.address");
-            const unsigned short port = Core::Configuration::instance().GetValue<int>("awsmock.frontend.port");
-            auto doc_root = Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.doc-root");
-            const int num_workers = Core::Configuration::instance().GetValue<int>("awsmock.frontend.workers");
+            auto const address = Core::Configuration::instance().get<std::string>("awsmock.frontend.address");
+            const unsigned short port = Core::Configuration::instance().get<int>("awsmock.frontend.port");
+            auto doc_root = Core::Configuration::instance().get<std::string>("awsmock.frontend.doc-root");
+            const int num_workers = Core::Configuration::instance().get<int>("awsmock.frontend.workers");
 
             net::io_context ioc{num_workers};
 
@@ -146,4 +148,4 @@ namespace AwsMock::Service::Frontend {
         }
     }
 
-} // namespace AwsMock::Service::Frontend
+}// namespace AwsMock::Service::Frontend

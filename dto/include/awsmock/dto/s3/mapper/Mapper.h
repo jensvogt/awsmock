@@ -202,7 +202,7 @@ namespace AwsMock::Dto::S3 {
       public:
 
         static Database::Entity::S3::Bucket toEntity(const CreateBucketRequest &r) {
-            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
             Database::Entity::S3::Bucket b;
             b.region = r.region;
             b.owner = r.owner;

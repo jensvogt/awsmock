@@ -50,7 +50,7 @@ namespace AwsMock::Service {
         // This queue is used for HTTP pipelining.
         class queue {
             // Maximum number of responses we will queue
-            int limit = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-queue");
+            int limit = Core::Configuration::instance().get<int>("awsmock.gateway.http.max-queue");
 
             // The type-erased, saved work item
             struct work {

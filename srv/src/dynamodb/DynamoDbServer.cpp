@@ -10,12 +10,12 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _backupActive = configuration.GetValue<bool>("awsmock.modules.dynamodb.backup.active");
-        _backupCron = configuration.GetValue<std::string>("awsmock.modules.dynamodb.backup.cron");
-        _workerPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.worker-period");
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.monitoring-period");
-        _region = configuration.GetValue<std::string>("awsmock.region");
-        _dataDir = configuration.GetValue<std::string>("awsmock.modules.dynamodb.data-dir");
+        _backupActive = configuration.get<bool>("awsmock.modules.dynamodb.backup.active");
+        _backupCron = configuration.get<std::string>("awsmock.modules.dynamodb.backup.cron");
+        _workerPeriod = configuration.get<int>("awsmock.modules.dynamodb.worker-period");
+        _monitoringPeriod = configuration.get<int>("awsmock.modules.dynamodb.monitoring-period");
+        _region = configuration.get<std::string>("awsmock.region");
+        _dataDir = configuration.get<std::string>("awsmock.modules.dynamodb.data-dir");
 
         // Create a local network if it is not existing yet
         CreateLocalNetwork();
@@ -88,4 +88,4 @@ namespace AwsMock::Service {
         log_info << "DynamoDB server stopped";
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

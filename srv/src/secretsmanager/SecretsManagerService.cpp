@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     SecretsManagerService::SecretsManagerService(boost::asio::io_context &ioc) : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService() {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
     }
 
     Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const {
@@ -653,7 +653,7 @@ namespace AwsMock::Service {
     void SecretsManagerService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
         std::string payload = body;
         Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function;

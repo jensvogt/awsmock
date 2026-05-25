@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SSM_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_SSM_MEMORYDB_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -19,6 +18,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Linq.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/repository/Database.h>
@@ -157,5 +157,3 @@ namespace AwsMock::Database {
     };
 
 }// namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_KMS_DATABASE_H

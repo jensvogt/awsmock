@@ -12,7 +12,7 @@ namespace AwsMock::Service {
     SSMService::SSMService() : _ssmDatabase(Database::SSMDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
     }
 
     Dto::SSM::PutParameterResponse SSMService::PutParameter(const Dto::SSM::PutParameterRequest &request) const {
@@ -28,17 +28,17 @@ namespace AwsMock::Service {
             // Update database
             const std::string arn = Core::AwsUtils::CreateSSMParameterArn(request.region, _accountId, request.name);
             Database::Entity::SSM::Parameter parameterEntity = {
-                .region = request.region,
-                .parameterName = request.name,
-                .parameterValue = request.parameterValue,
-                .description = request.description,
-                .type = Dto::SSM::ParameterTypeToString(request.type),
-                .version = 1,
-                .arn = arn,
-                .kmsKeyArn = request.kmsKeyArn,
-                .tags = request.tags,
-                .created = system_clock::now(),
-                .modified = system_clock::now(),
+                    .region = request.region,
+                    .parameterName = request.name,
+                    .parameterValue = request.parameterValue,
+                    .description = request.description,
+                    .type = Dto::SSM::ParameterTypeToString(request.type),
+                    .version = 1,
+                    .arn = arn,
+                    .kmsKeyArn = request.kmsKeyArn,
+                    .tags = request.tags,
+                    .created = system_clock::now(),
+                    .modified = system_clock::now(),
             };
 
             // Encrypt if KMS key provided
@@ -78,17 +78,17 @@ namespace AwsMock::Service {
             // Update database
             const std::string arn = Core::AwsUtils::CreateSSMParameterArn(request.region, _accountId, request.name);
             Database::Entity::SSM::Parameter parameterEntity = {
-                .region = request.region,
-                .parameterName = request.name,
-                .parameterValue = request.value,
-                .description = request.description,
-                .type = Dto::SSM::ParameterTypeToString(request.type),
-                .version = 1,
-                .arn = arn,
-                .kmsKeyArn = request.kmsKeyArn,
-                .tags = request.tags,
-                .created = system_clock::now(),
-                .modified = system_clock::now(),
+                    .region = request.region,
+                    .parameterName = request.name,
+                    .parameterValue = request.value,
+                    .description = request.description,
+                    .type = Dto::SSM::ParameterTypeToString(request.type),
+                    .version = 1,
+                    .arn = arn,
+                    .kmsKeyArn = request.kmsKeyArn,
+                    .tags = request.tags,
+                    .created = system_clock::now(),
+                    .modified = system_clock::now(),
             };
 
             // Encrypt if KMS key provided
@@ -322,4 +322,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

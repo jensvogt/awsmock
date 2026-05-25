@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SSM_DATABASE_H
-#define AWSMOCK_REPOSITORY_SSM_DATABASE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -11,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
@@ -137,7 +137,7 @@ namespace AwsMock::Database {
         long DeleteParameter(const Entity::SSM::Parameter &parameter) const;
 
         /**
-         * @brief Delete a all parameters
+         * @brief Delete all parameters
          *
          * @return number of entities deleted
          * @throws DatabaseException
@@ -163,5 +163,3 @@ namespace AwsMock::Database {
     };
 
 }// namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_KMS_DATABASE_H

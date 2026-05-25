@@ -390,7 +390,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "upload_part_copy");
         log_trace << "UploadPart copy request, part: " << request.partNumber << " updateId: " << request.uploadId;
 
-        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
         const std::string sourceFile = s3DataDir + Core::FileUtils::separator() + sourceObject.internalName;
@@ -422,7 +422,7 @@ namespace AwsMock::Service {
         // Get database object
         Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Get all file parts
@@ -520,7 +520,7 @@ namespace AwsMock::Service {
     Dto::S3::GetObjectResponse S3Service::GetObject(const Dto::S3::GetObjectRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object");
         log_trace << "Get object request, s3Request: " << request.ToJson();
-        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
         // Check existence
         CheckBucketExistence(request.region, request.bucket);
@@ -596,9 +596,9 @@ namespace AwsMock::Service {
         log_trace << "Put object request, username: " << username << ", filename: " << filename;
 
         // Get environment
-        auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        auto userHomeDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
-        auto transferBucket = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
+        auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        auto userHomeDir = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
+        auto transferBucket = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.bucket");
 
         // Build metadata
         std::map<std::string, std::string> metadata;
@@ -693,7 +693,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "copy_object");
         log_trace << "Copy object request: " << request.ToString();
 
-        const auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.data-dir");
+        const auto dataDir = Core::Configuration::instance().get<std::string>("awsmock.data-dir");
         const std::string dataS3Dir = dataDir + Core::FileUtils::separator() + "s3";
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
@@ -709,7 +709,7 @@ namespace AwsMock::Service {
         Database::Entity::S3::Object targetObject;
         try {
             // Get account ID for ARN
-            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
 
             // Check the existence of the target bucket
             if (!_database.BucketExists(request.region, request.targetBucket)) {
@@ -776,7 +776,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "move_object");
         log_trace << "Move object request: " << request.ToString();
 
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Check existence
@@ -895,7 +895,7 @@ namespace AwsMock::Service {
             const Database::Entity::S3::Object object = _database.GetObjectById(request.oid);
 
             Dto::S3::GetObjectCounterResponse getObjectCounterResponse;
-            auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+            auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
             std::string body = Core::FileUtils::ReadFile(dataS3Dir + Core::FileUtils::separator() + object.internalName);
 
             Dto::S3::ObjectCounter objectCounter;
@@ -937,8 +937,8 @@ namespace AwsMock::Service {
         }
 
         try {
-            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-            auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+            const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
+            auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
             Core::DirUtils::EnsureDirectory(dataS3Dir);
 
             // Write the file
@@ -1173,7 +1173,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
 
         // Get queue URL
         const std::string queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queueNotification.queueArn);
@@ -1188,7 +1188,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) {
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
 
         SNSService _snsService;
         Dto::SNS::PublishRequest request;
@@ -1200,8 +1200,8 @@ namespace AwsMock::Service {
     }
 
     void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) const {
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        const auto user = Core::Configuration::instance().get<std::string>("awsmock.user");
 
         const std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ":");
         const std::string &functionName = parts[6];
@@ -1330,7 +1330,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object) {
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
         if (bucket.HasEncryption()) {
             const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
@@ -1360,7 +1360,7 @@ namespace AwsMock::Service {
     }
 
     void S3Service::CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile) {
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
         if (bucket.HasEncryption()) {
             const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
@@ -1374,7 +1374,7 @@ namespace AwsMock::Service {
     }
 
     std::string S3Service::GetMultipartUploadDirectory(const std::string &uploadId) {
-        const auto tempDir = Core::Configuration::instance().GetValue<std::string>("awsmock.temp-dir");
+        const auto tempDir = Core::Configuration::instance().get<std::string>("awsmock.temp-dir");
         Core::DirUtils::EnsureDirectory(tempDir);
         return tempDir + Core::FileUtils::separator() + uploadId;
     }
@@ -1386,9 +1386,9 @@ namespace AwsMock::Service {
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_object");
 
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
-        const auto transferDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
-        const auto transferBucket = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
+        const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
+        const auto transferDir = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
+        const auto transferBucket = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.bucket");
 
         if (!internalName.empty()) {
             std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
@@ -1407,7 +1407,7 @@ namespace AwsMock::Service {
     void S3Service::DeleteBucket(const std::string &bucket) {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_bucket");
 
-        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // TODO: List object in bucket und delete each object individually
@@ -1419,8 +1419,8 @@ namespace AwsMock::Service {
 
     Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) {
         // S3 data directory
-        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
+        auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Write the file
@@ -1500,8 +1500,8 @@ namespace AwsMock::Service {
     }
 
     Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) {
-        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
+        auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Write the file

@@ -11,10 +11,10 @@ namespace AwsMock::Service {
     SSMServer::SSMServer(Core::Scheduler &scheduler) : AbstractServer("ssm"), _scheduler(scheduler) {
 
         // HTTP manager configuration
-        _workerPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.ssm.worker-period");
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.ssm.monitoring-period");
-        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.transfer.backup.active");
-        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.backup.cron");
+        _workerPeriod = Core::Configuration::instance().get<int>("awsmock.modules.ssm.worker-period");
+        _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.ssm.monitoring-period");
+        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.transfer.backup.active");
+        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.backup.cron");
         log_debug << "SSM server initialized";
 
         // Start SNS monitoring update counters

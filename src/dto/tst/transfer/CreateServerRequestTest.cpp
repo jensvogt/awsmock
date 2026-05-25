@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Transfer {
 
         void SetUp() override {
             // General configuration
-            _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+            _region = Core::Configuration::instance().get<std::string>("awsmock.region");
             _identityProviderDetails.directoryId = "directoryId";
             _identityProviderDetails.function = "function";
             _identityProviderDetails.invocationRole = "invocationRole";

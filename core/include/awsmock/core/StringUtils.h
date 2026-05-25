@@ -346,6 +346,18 @@ namespace AwsMock::Core {
         static std::string UrlEncode(const std::string &input);
 
         /**
+         * @brief AWS-compliant URI encoding as required by AWS Signature Version 4.
+         *
+         * Encodes every byte except unreserved characters: A-Z, a-z, 0-9, '-', '.', '_', '~'.
+         * Space is encoded as "%20". Hex digits are uppercase.
+         *
+         * @param input input string
+         * @param encodeSlash if true (default), '/' is also encoded; set false for object key names
+         * @return AWS URI encoded string.
+         */
+        static std::string AwsUrlEncode(const std::string &input, bool encodeSlash = true);
+
+        /**
          * @brief Returns a decoded string as plain text.
          *
          * @param input input string

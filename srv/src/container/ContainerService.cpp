@@ -10,26 +10,26 @@ namespace AwsMock::Service {
 
     ContainerService::ContainerService() {
         // Get network mode
-        _networkName = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
-        _containerPort = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.container.port");
-        _isDocker = Core::Configuration::instance().GetValue<bool>("awsmock.docker.active");
+        _networkName = Core::Configuration::instance().get<std::string>("awsmock.docker.network-name");
+        _containerPort = Core::Configuration::instance().get<std::string>("awsmock.docker.container.port");
+        _isDocker = Core::Configuration::instance().get<bool>("awsmock.docker.active");
 
         // TLS configuration
-        _tlsEnabled = Core::Configuration::instance().GetValue<bool>("awsmock.docker.tls.enabled");
+        _tlsEnabled = Core::Configuration::instance().get<bool>("awsmock.docker.tls.enabled");
         if (_tlsEnabled) {
-            _tlsHost = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.host");
-            _tlsPort = Core::Configuration::instance().GetValue<int>("awsmock.docker.tls.port");
-            _tlsCaFile = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.ca-cert");
-            _tlsCertFile = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.cert");
-            _tlsKeyFile = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.tls.key");
-            _tlsVerifyPeer = Core::Configuration::instance().GetValue<bool>("awsmock.docker.tls.verify-peer");
+            _tlsHost = Core::Configuration::instance().get<std::string>("awsmock.docker.tls.host");
+            _tlsPort = Core::Configuration::instance().get<int>("awsmock.docker.tls.port");
+            _tlsCaFile = Core::Configuration::instance().get<std::string>("awsmock.docker.tls.ca-cert");
+            _tlsCertFile = Core::Configuration::instance().get<std::string>("awsmock.docker.tls.cert");
+            _tlsKeyFile = Core::Configuration::instance().get<std::string>("awsmock.docker.tls.key");
+            _tlsVerifyPeer = Core::Configuration::instance().get<bool>("awsmock.docker.tls.verify-peer");
             log_info << "Docker TLS enabled, host: " << _tlsHost << ", port: " << _tlsPort;
         } else {
             // UNIX socket path (Linux/macOS) or Windows TCP URL
 #ifdef WIN32
-            _containerSocketPath = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket");
+            _containerSocketPath = Core::Configuration::instance().get<std::string>("awsmock.docker.socket");
 #else
-            _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket") : Core::Configuration::instance().GetValue<std::string>("awsmock.podman.socket");
+            _containerSocketPath = _isDocker ? Core::Configuration::instance().get<std::string>("awsmock.docker.socket") : Core::Configuration::instance().get<std::string>("awsmock.podman.socket");
 #endif
         }
     }
@@ -520,8 +520,8 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::WaitForContainer(const std::string &containerId) const {
-        const int checkTime = Core::Configuration::instance().GetValue<int>("awsmock.docker.container.checkTime");
-        const int maxWaitTime = Core::Configuration::instance().GetValue<int>("awsmock.docker.container.maxWaitTime");
+        const int checkTime = Core::Configuration::instance().get<int>("awsmock.docker.container.checkTime");
+        const int maxWaitTime = Core::Configuration::instance().get<int>("awsmock.docker.container.maxWaitTime");
         const auto deadline = system_clock::now() + std::chrono::seconds{maxWaitTime};
         while (!IsContainerRunning(containerId) && system_clock::now() < deadline) {
             std::this_thread::sleep_for(std::chrono::milliseconds(checkTime));
@@ -625,8 +625,8 @@ namespace AwsMock::Service {
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
-        auto supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
-        auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        auto supportedRuntime = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
+        auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
@@ -745,10 +745,10 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::GetNetworkName() {
-        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
-            return Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
+        if (Core::Configuration::instance().get<bool>("awsmock.dockerized")) {
+            return Core::Configuration::instance().get<std::string>("awsmock.docker.network-name");
         }
-        return Core::Configuration::instance().GetValue<std::string>("awsmock.podman.network-name");
+        return Core::Configuration::instance().get<std::string>("awsmock.podman.network-name");
     }
 
     std::string ContainerService::GetHandlerFileNodeJs22(const std::string &handler) {

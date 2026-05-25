@@ -8,7 +8,7 @@
 namespace AwsMock::Service {
 
     ApplicationService::ApplicationService(boost::asio::io_context &ioc) : _database(Database::ApplicationDatabase::instance()), _ioc(ioc) {
-        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
     }
 
     Dto::Apps::ListApplicationCountersResponse ApplicationService::CreateApplication(const Dto::Apps::CreateApplicationRequest &request) const {
@@ -189,7 +189,7 @@ namespace AwsMock::Service {
         CleanupDocker(application);
 
         // Get the base64 encoded application code
-        const auto applicationDataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        const auto applicationDataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
         const std::string base64File = application.name + "-" + application.version + ".b64";
         std::string fullBase64File = applicationDataDir + Core::FileUtils::separator() + base64File;
         log_debug << "Using Base64File: " << fullBase64File;
@@ -277,7 +277,7 @@ namespace AwsMock::Service {
         }
 
         // Get code base64 file name
-        auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        auto dataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
         std::string fullBase64File = Core::FileUtils::appendPath(dataDir, Core::FileUtils::separator(), application.name, "-", application.version, ".b64");
         if (!Core::FileUtils::FileExists(fullBase64File)) {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
@@ -383,7 +383,7 @@ namespace AwsMock::Service {
         ContainerService::instance().DeleteContainer(application.containerId);
         log_debug << "Application stopped, name: " << application.name;
 
-        const auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        const auto dataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
         const auto fullBase64File = dataDir + Core::FileUtils::separator() + Core::FileUtils::separator() + application.name + "-" + application.version + ".b64";
 
         // Check whether a container exists already
@@ -560,7 +560,7 @@ namespace AwsMock::Service {
 
     std::string ApplicationService::WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version) {
 
-        auto applicationDataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        auto applicationDataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
 
         std::string base64File = application.name + "-" + version + ".b64";
         std::string base64FullFile = applicationDataDir + Core::FileUtils::separator() + base64File;
@@ -607,4 +607,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

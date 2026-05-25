@@ -125,7 +125,7 @@ namespace AwsMock::Service {
 
     std::string ApplicationCreator::UnpackZipFile(const std::string &codeDir, const std::string &applicationCode, const std::string &runtime) {
 
-        const auto tempDir = Core::Configuration::instance().GetValue<std::string>("awsmock.temp-dir");
+        const auto tempDir = Core::Configuration::instance().get<std::string>("awsmock.temp-dir");
 
         // Decode the Base64 file
         const std::string zipFile = tempDir + Core::FileUtils::separator() + Core::StringUtils::GenerateRandomHexString(8) + ".zip";

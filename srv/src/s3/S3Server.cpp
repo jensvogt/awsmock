@@ -9,10 +9,10 @@ namespace AwsMock::Service {
     S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _scheduler(scheduler) {
 
         // Get HTTP configuration values
-        _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync-period");
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.counter-period");
-        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.s3.backup.active");
-        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.backup.cron");
+        _syncPeriod = Core::Configuration::instance().get<int>("awsmock.modules.s3.sync-period");
+        _counterPeriod = Core::Configuration::instance().get<int>("awsmock.modules.s3.counter-period");
+        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.s3.backup.active");
+        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.backup.cron");
 
         // Start S3 monitoring counters updates
         _scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, 0);
@@ -33,8 +33,8 @@ namespace AwsMock::Service {
 
     void S3Server::SyncObjects() const {
 
-        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
         // Get the bucket list
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
@@ -108,4 +108,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("s3-sync-objects");
         _scheduler.Shutdown("s3-backup");
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
