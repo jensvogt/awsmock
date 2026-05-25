@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
 
 // C++ includes
+#include <ranges>
 #include <string>
 #include <unordered_set>
 

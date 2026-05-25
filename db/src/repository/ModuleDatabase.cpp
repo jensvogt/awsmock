@@ -291,7 +291,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void ModuleDatabase::SetPort(const std::string &name, int port) {
+    void ModuleDatabase::SetModulePort(const std::string &name, int port) {
 
         if (HasDatabase()) {
 
@@ -309,7 +309,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.SetPort(name, port);
+            _memoryDb.SetModulePort(name, port);
         }
     }
 

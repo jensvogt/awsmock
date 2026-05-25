@@ -26,12 +26,12 @@ namespace AwsMock::Database {
      */
     class ModuleDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit ModuleDatabase() : _databaseName(GetDatabaseName()), _moduleCollectionName("module") {}
+        explicit ModuleDatabase() : _databaseName(GetDatabaseName()), _moduleCollectionName("module") {
+        }
 
         /**
          * @brief Singleton instance
@@ -163,7 +163,7 @@ namespace AwsMock::Database {
          * @param name module name
          * @param port module port
          */
-        void SetPort(const std::string &name, int port);
+        void SetModulePort(const std::string &name, int port);
 
         /**
          * @brief Creates or updates a modules
@@ -201,8 +201,7 @@ namespace AwsMock::Database {
          */
         long DeleteAllModules();
 
-      private:
-
+    private:
         /**
          * Database name
          */
@@ -224,6 +223,6 @@ namespace AwsMock::Database {
         static std::map<std::string, Entity::Module::Module> _existingModules;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_REPOSITORY_MODULE_DATABASE_H

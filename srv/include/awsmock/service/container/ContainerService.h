@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <ranges>
 
 // Boost includes
 #include <boost/beast/core.hpp>
@@ -50,7 +51,7 @@
 #include "awsmock/entity/apps/Application.h"
 
 #ifdef _WIN32
-#include <awsmock/core/WindowsSocket.h>
+#include <awsmock/core/container/WindowsSocket.h>
 #endif
 
 #define HOST_PORT_MIN 32768
@@ -98,8 +99,7 @@ namespace AwsMock::Service {
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -469,8 +469,7 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-      private:
-
+    private:
         /**
          * @brief Write the lambda docker file.
          *
@@ -620,4 +619,4 @@ namespace AwsMock::Service {
         static thread_local std::shared_ptr<Core::DomainSocket> _domainSocket;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
