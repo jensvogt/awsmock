@@ -6,8 +6,8 @@
 
 // C++ standard includes
 #include <memory>
+#include <ranges>
 #include <string>
-#include <thread>
 
 // Boost includes
 #include <boost/beast/core.hpp>

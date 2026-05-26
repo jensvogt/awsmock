@@ -2,10 +2,10 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
+#pragma once
 
 // C++ includes
+#include <ranges>
 #include <string>
 #include <unordered_set>
 
@@ -30,7 +30,8 @@ namespace AwsMock::Database {
      */
     class SNSMemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -313,7 +314,8 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters();
 
-    private:
+      private:
+
         /**
          * SNS topic vector when running without a database
          */
@@ -335,6 +337,4 @@ namespace AwsMock::Database {
         static boost::mutex _snsMessageMutex;
     };
 
-} // namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_SNS_MEMORYDB_H
+}// namespace AwsMock::Database

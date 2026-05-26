@@ -40,6 +40,84 @@ jobs:
           CLEAN="${TAG#v}"   # remove leading 'v'
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
+  test:
+    name: Run Tests (core + db)
+    runs-on: ubuntu-latest
+    env:
+      CXX: g++-14
+      CC: gcc-14
+      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      BUILD_DIR: "${{ github.workspace }}/build-test"
+    services:
+      mongodb:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh -u root -p password --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+
+      - name: Set g++-14 as default
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
+          sudo update-alternatives --set g++ /usr/bin/g++-14
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
+
+      - name: Make hostname resolve to localhost (MongoDB service)
+        run: echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts
+
+      - name: Install magic database
+        run: |
+          sudo mkdir -p /usr/local/awsmock/etc
+          sudo cp /usr/share/misc/magic.mgc /usr/local/awsmock/etc/magic.mgc
+
+      - name: Configure
+        run: |
+          mkdir ${{ env.BUILD_DIR }}
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+
+      - name: Build test binaries
+        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst --parallel
+
+      - name: Run core tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure
+
+      - name: Run memory DB tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_memory_tst --output-on-failure
+
+      - name: Run MongoDB tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_mongo_tst --output-on-failure
+
   #  build-windows-zip:
   #    name: Build & Package (Windows ZIP)
   #    runs-on: windows-latest
@@ -149,7 +227,7 @@ jobs:
   build-windows-msi:
     name: Build & Package (Windows MSI)
     runs-on: windows-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
@@ -233,7 +311,7 @@ jobs:
   build-macos:
     name: Build & Package (macOS)
     runs-on: macos-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-macos"
@@ -347,7 +425,7 @@ jobs:
   build-linux-deb:
     name: Build & Package (Linux DEB)
     runs-on: ubuntu-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       CXX: g++-14
@@ -493,7 +571,7 @@ jobs:
   build-linux-rpm:
     name: Build & Package (Linux RPM)
     runs-on: ubuntu-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       CXX: g++-14
@@ -627,7 +705,7 @@ jobs:
   build-docker:
     name: "Build & Package (Docker)"
     runs-on: ubuntu-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       GH_TOKEN: ${{ github.token }}
