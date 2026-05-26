@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/09/2025
 //
 
-#ifndef AWSMOCK_DTO_API_GATEWAY_GET_API_KEYS_RESPONSE_H
-#define AWSMOCK_DTO_API_GATEWAY_GET_API_KEYS_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -39,28 +38,25 @@ namespace AwsMock::Dto::ApiGateway {
          */
         std::vector<std::string> warnings;
 
-      private:
-
+    private:
         friend GetApiKeysResponse tag_invoke(boost::json::value_to_tag<GetApiKeysResponse>, boost::json::value const &v) {
             GetApiKeysResponse r;
-            r.items = boost::json::value_to<std::vector<Key>>(v.at("item"));
+            r.items = boost::json::value_to<std::vector<Key> >(v.at("item"));
             r.position = Core::Json::GetStringValue(v, "position");
-            r.warnings = boost::json::value_to<std::vector<std::string>>(v.at("warnings"));
+            r.warnings = boost::json::value_to<std::vector<std::string> >(v.at("warnings"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetApiKeysResponse const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"item", boost::json::value_from(obj.items)},
-                    {"position", obj.position},
-                    {"warnings", boost::json::value_from(obj.warnings)},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
+                {"item", boost::json::value_from(obj.items)},
+                {"position", obj.position},
+                {"warnings", boost::json::value_from(obj.warnings)},
             };
         }
     };
 
-}// namespace AwsMock::Dto::ApiGateway
-
-#endif// AWSMOCK_DTO_API_GATEWAY_GET_API_KEYS_RESPONSE_H
+} // namespace AwsMock::Dto::ApiGateway
