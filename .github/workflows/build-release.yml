@@ -40,10 +40,194 @@ jobs:
           CLEAN="${TAG#v}"   # remove leading 'v'
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
+  test:
+    name: Run Tests (core + db)
+    runs-on: ubuntu-latest
+    env:
+      CXX: g++-14
+      CC: gcc-14
+      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      BUILD_DIR: "${{ github.workspace }}/build-test"
+    services:
+      mongodb:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh -u root -p password --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+
+      - name: Set g++-14 as default
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
+          sudo update-alternatives --set g++ /usr/bin/g++-14
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
+
+      - name: Make hostname resolve to localhost (MongoDB service)
+        run: echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts
+
+      - name: Install magic database
+        run: |
+          sudo mkdir -p /usr/local/awsmock/etc
+          sudo cp /usr/share/misc/magic.mgc /usr/local/awsmock/etc/magic.mgc
+
+      - name: Configure
+        run: |
+          mkdir ${{ env.BUILD_DIR }}
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+
+      - name: Build test binaries
+        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst --parallel
+
+      - name: Run core tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure
+
+      - name: Run memory DB tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_memory_tst --output-on-failure
+
+      - name: Run MongoDB tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_mongo_tst --output-on-failure
+
+  #  build-windows-zip:
+  #    name: Build & Package (Windows ZIP)
+  #    runs-on: windows-latest
+  #    needs: release-please
+  #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+  #    env:
+  #      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+  #      BUILD_DIR: "${{ github.workspace }}/build-windows"
+  #      PACKAGE_DIR: "${{ github.workspace }}/package-windows"
+  #      SEMVER: ${{ needs.release-please.outputs.tag_name }}
+  #      VCPKG_DEFAULT_TRIPLET: x64-windows-static
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v4.2.2
+  #        with:
+  #          fetch-depth: 0
+  #          submodules: recursive
+  #
+  #      - name: Setup MSVC environment
+  #        uses: step-security/msvc-dev-cmd@v1
+  #        with:
+  #          arch: x64
+  #
+  #      - name: Export GitHub Actions cache environment variables
+  #        uses: actions/github-script@v7
+  #        with:
+  #          script: |
+  #            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+  #            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+  #
+  #      - name: Setup vcpkg
+  #        uses: lukka/run-vcpkg@v11
+  #        with:
+  #          vcpkgDirectory: "${{ github.workspace }}/vcpkg"   # ← must match env
+  #          vcpkgJsonGlob: '**/vcpkg.json'
+  #          runVcpkgInstall: false
+  #
+  #      - name: Cache vcpkg
+  #        uses: actions/cache@v4.2.3
+  #        with:
+  #          path: "${{ github.workspace }}/vcpkg"
+  #          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+  #          restore-keys: |
+  #            ${{ runner.os }}-vcpkg-
+  #
+  #      - name: Build (Backend)
+  #        shell: cmd
+  #        run: |
+  #          mkdir "${{ env.BUILD_DIR }}"
+  #          cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
+  #          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
+  #
+  #      - name: Build (Frontend)
+  #        shell: pwsh
+  #        run: |
+  #          git clone https://github.com/jensvogt/awsmock-ui
+  #          cd awsmock-ui
+  #          npm install
+  #          npm run build
+  #
+  #      - name: Create package structure
+  #        shell: pwsh
+  #        run: |
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\bin" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\etc" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\log" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\init" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sql" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\s3" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\sns" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\lambda" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\transfer" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\application" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\backup" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\data\tmp" -ItemType Directory
+  #          New-Item -Path "${{ env.PACKAGE_DIR }}\frontend" -ItemType Directory
+  #
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockmgr.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awsmockctl.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path '${{ env.BUILD_DIR }}\Release\awslocal.exe' -Destination '${{ env.PACKAGE_DIR }}\bin'
+  #          Copy-Item -Path 'dist\etc\awsmock_win32.json' -Destination '${{ env.PACKAGE_DIR }}\etc\awsmock.json'
+  #          Copy-Item -Path 'dist\etc\magic.mgc' -Destination '${{ env.PACKAGE_DIR }}\etc'
+  #          Copy-Item -Path 'dist\etc\ssh_host_key' -Destination '${{ env.PACKAGE_DIR }}\etc'
+  #          Copy-Item -Path 'awsmock-ui\dist\awsmock-ui\browser\*' -Destination '${{ env.PACKAGE_DIR }}\frontend' -Recurse
+  #
+  #      - name: Create ZIP archive (PowerShell)
+  #        shell: pwsh
+  #        run: |
+  #          $source = "${{ env.PACKAGE_DIR }}"
+  #          $zip = "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip"
+  #
+  #          if (Test-Path $zip) {
+  #            Remove-Item $zip -Force
+  #          }
+  #
+  #          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+  #          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+  #
+  #      - name: Upload Windows installer
+  #        uses: actions/upload-artifact@v4.6.2
+  #        with:
+  #          name: zip-windows
+  #          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.zip
+  #          overwrite: true
+
   build-windows-msi:
     name: Build & Package (Windows MSI)
     runs-on: windows-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
@@ -127,7 +311,7 @@ jobs:
   build-macos:
     name: Build & Package (macOS)
     runs-on: macos-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       BUILD_DIR: "${{ github.workspace }}/build-macos"
@@ -241,7 +425,7 @@ jobs:
   build-linux-deb:
     name: Build & Package (Linux DEB)
     runs-on: ubuntu-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       CXX: g++-14
@@ -274,14 +458,6 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
-
-      - name: Cache vcpkg
-        uses: actions/cache@v4.2.3
-        with:
-          path: "${{ github.workspace }}/vcpkg"
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
 
       - name: Set g++-14 as default
         run: |
@@ -330,9 +506,9 @@ jobs:
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/key.pem
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
           cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
@@ -395,7 +571,7 @@ jobs:
   build-linux-rpm:
     name: Build & Package (Linux RPM)
     runs-on: ubuntu-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       CXX: g++-14
@@ -404,6 +580,7 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-rpm"
       BUILD_DIR: "${{ github.workspace }}/build-rpm"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+      #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -417,25 +594,10 @@ jobs:
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
-
-      - name: Cache vcpkg
-        uses: actions/cache@v4.2.3
-        with:
-          path: "${{ github.workspace }}/vcpkg"
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
 
       - name: Set g++-14 as default
         run: |
@@ -484,9 +646,9 @@ jobs:
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/key.pem
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
           cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
@@ -543,7 +705,7 @@ jobs:
   build-docker:
     name: "Build & Package (Docker)"
     runs-on: ubuntu-latest
-    needs: release-please
+    needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       GH_TOKEN: ${{ github.token }}

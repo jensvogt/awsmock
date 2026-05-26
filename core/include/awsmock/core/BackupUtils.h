@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ includes
+#include <ranges>
 #include <string>
 #include <ranges>
 

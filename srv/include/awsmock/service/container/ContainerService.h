@@ -6,9 +6,8 @@
 
 // C++ standard includes
 #include <memory>
-#include <string>
-#include <thread>
 #include <ranges>
+#include <string>
 
 // Boost includes
 #include <boost/beast/core.hpp>
@@ -51,7 +50,7 @@
 #include "awsmock/entity/apps/Application.h"
 
 #ifdef _WIN32
-#include <awsmock/core/container/WindowsSocket.h>
+#include <awsmock/core/WindowsSocket.h>
 #endif
 
 #define HOST_PORT_MIN 32768
@@ -65,10 +64,10 @@ namespace AwsMock::Service {
      * @brief Controls the connection to the container daemon using a UNIX Domain socket.
      *
      * @par
-     * All docker related commands will be executed by the different methods. This means create, delete, starting, stopping the docker images for DynamoDB, Lambdas etc. Supported
+     * All docker-related commands will be executed by the different methods. This means create, delete, starting, stopping the docker images for DynamoDB, Lambdas etc. Supported
      * are docker container and podman container. Set the appropriate active flag in the configuration file.
      *
-     * In order to run docker container use:
+     * In order to run a docker container, use:
      * @code{.yaml}
      * awsmock:
      * ...
@@ -88,7 +87,7 @@ namespace AwsMock::Service {
      *
      * @par Linux
      * On Linux, the service is using the docker REST API available at the UNIX domain socket. Depending on your Linux distribution, the docker socket is located under
-     * a different directory, normally it is: <i>/var/run/docker.sock</i> (Debian, Ubuntu). If your Linux distribution is using another location, set the full path to the
+     * a different directory; normally it is: <i>/var/run/docker.sock</i> (Debian, Ubuntu). If your Linux distribution is using another location, set the full path to the
      * docker socket in the awsmock configuration file.
      *
      * @par Windows
@@ -99,7 +98,8 @@ namespace AwsMock::Service {
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -187,7 +187,7 @@ namespace AwsMock::Service {
          * @brief Checks whether a container exists by image name.
          *
          * @par
-         * The image name should be given als '<image>:<tag>'.
+         * The image name should be given as '<image>:<tag>'.
          *
          * @param imageName image name including the tag
          * @param tag image tag
@@ -197,10 +197,10 @@ namespace AwsMock::Service {
         bool ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const;
 
         /**
-         * @brief Checks whether a container is in running state
+         * @brief Checks whether a container is in a running state
          *
          * @par
-         * Sends an inspect container request to the docker daemon REST api.
+         * Sends an inspection request to the docker daemon REST api.
          *
          * @param containerId container ID
          * @return true if the container is running, otherwise false
@@ -269,7 +269,8 @@ namespace AwsMock::Service {
          * @param containerPort internal port of the application
          * @return CreateContainerResponse
          */
-        [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort, int containerPort) const;
+        [[nodiscard]]
+        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort, int containerPort) const;
 
         /**
          * @brief Creates a container for a predefined image.
@@ -469,7 +470,8 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-    private:
+      private:
+
         /**
          * @brief Write the lambda docker file.
          *
@@ -547,6 +549,21 @@ namespace AwsMock::Service {
         static std::string AddCredentials(const std::string &codeDir, const std::string &region = "eu-central-1");
 
         /**
+         * @brief Builds and sends a container create request.
+         *
+         * @param imageName image name
+         * @param tag image tag
+         * @param hostName hostname inside the container
+         * @param urlName name used in the create URL
+         * @param containerPortStr container-side port as string (e.g. "8080")
+         * @param hostPort host-side port number
+         * @param environment environment variables
+         * @return CreateContainerResponse
+         */
+        [[nodiscard]]
+        Dto::Docker::CreateContainerResponse SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, int hostPort, const std::vector<std::string> &environment) const;
+
+        /**
          * @brief Guarded domain socket helper
          *
          * @return domain socket
@@ -599,12 +616,12 @@ namespace AwsMock::Service {
         std::string _tlsCaFile;
 
         /**
-         * Path to client certificate file (PEM)
+         * Path to the client certificate file (PEM)
          */
         std::string _tlsCertFile;
 
         /**
-         * Path to client private key file (PEM)
+         * Path to a client private key file (PEM)
          */
         std::string _tlsKeyFile;
 
@@ -619,4 +636,4 @@ namespace AwsMock::Service {
         static thread_local std::shared_ptr<Core::DomainSocket> _domainSocket;
     };
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
