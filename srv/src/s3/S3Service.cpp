@@ -1204,6 +1204,10 @@ namespace AwsMock::Service {
         const auto user = Core::Configuration::instance().get<std::string>("awsmock.user");
 
         const std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ":");
+        if (parts.size() < 7) {
+            log_error << "Invalid Lambda ARN: " << lambdaNotification.lambdaArn;
+            return;
+        }
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
