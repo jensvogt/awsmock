@@ -154,6 +154,9 @@ Section "Main Application" SecMain
   File "/oname=awsmock.json" "${SRCDIR}\dist\etc\awsmock_win32.json"
   File "${SRCDIR}\dist\etc\magic.mgc"
   File "${SRCDIR}\dist\etc\ssh_host_key"
+  File "${SRCDIR}\dist\etc\ca.pem"
+  File "${SRCDIR}\dist\etc\cert.pem"
+  File "${SRCDIR}\dist\etc\key.pem"
 
   SetOutPath "$INSTDIR\init"
   IfFileExists "$INSTDIR\etc\awsmock.json" skip_config

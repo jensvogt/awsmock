@@ -98,6 +98,7 @@ namespace AwsMock::Database {
          * @param module module entity
          * @return updated module
          */
+        [[nodiscard]]
         Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
 
         /**
@@ -110,6 +111,7 @@ namespace AwsMock::Database {
          * @return updated module
          * @see AwsMock::Database::Entity::Module::ModuleState()
          */
+        [[nodiscard]]
         Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
 
         /**
@@ -136,6 +138,7 @@ namespace AwsMock::Database {
          *
          * @return total number of modules
          */
+        [[nodiscard]]
         int ModuleCount() const;
 
         /**
@@ -143,6 +146,7 @@ namespace AwsMock::Database {
          *
          * @return list of all modules
          */
+        [[nodiscard]]
         Entity::Module::ModuleList ListModules() const;
 
         /**
