@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_MANAGER_H
-#define AWSMOCK_MANAGER_H
+#pragma once
 
 // Boost includes
 #include <boost/interprocess/interprocess_fwd.hpp>
@@ -146,5 +145,3 @@ namespace AwsMock::Manager {
     };
 
 } // namespace AwsMock::Manager
-
-#endif//AWSMOCK_MANAGER_H

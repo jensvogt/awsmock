@@ -2,8 +2,7 @@
 // Created by vogje01 on 10/23/23.
 //
 
-#ifndef AWSMOCK_CONTROLLER_CONTROLLER_H
-#define AWSMOCK_CONTROLLER_CONTROLLER_H
+#pragma once
 
 // C includes
 #ifdef HAS_SYSTEMD
@@ -473,5 +472,3 @@ namespace AwsMock::Controller {
     };
 
 } // namespace AwsMock::Controller
-
-#endif// AWSMOCK_CONTROLLER_CONTROLLER_H
