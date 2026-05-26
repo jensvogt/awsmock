@@ -94,6 +94,9 @@ namespace AwsMock::Dto::Common {
                     }
                     break;
 
+                case http::verb::head:
+                    break;
+
                 case http::verb::delete_:
                     if (multipartRequest) {
                         command = S3CommandType::ABORT_MULTIPART_UPLOAD;
@@ -116,25 +119,25 @@ namespace AwsMock::Dto::Common {
 
         // s3api sub-commands map directly to a command type
         static const std::map<std::string, S3CommandType> s3apiCommands{
-                {"list-buckets", S3CommandType::LIST_BUCKETS},
-                {"create-multipart-upload", S3CommandType::CREATE_MULTIPART_UPLOAD},
-                {"upload-part", S3CommandType::UPLOAD_PART},
-                {"complete-multipart-upload", S3CommandType::COMPLETE_MULTIPART_UPLOAD},
-                {"put-bucket-notification-configuration", S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION},
-                {"put-bucket-encryption", S3CommandType::PUT_BUCKET_ENCRYPTION},
-                {"put-bucket-versioning", S3CommandType::PUT_BUCKET_VERSIONING},
-                {"list-object-versions", S3CommandType::LIST_OBJECT_VERSIONS},
-                {"put-bucket-lifecycle-configuration", S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION},
-                {"get-bucket-lifecycle-configuration", S3CommandType::GET_BUCKET_LIFECYCLE_CONFIGURATION},
-                {"delete-bucket-lifecycle", S3CommandType::DELETE_BUCKET_LIFECYCLE},
+            {"list-buckets", S3CommandType::LIST_BUCKETS},
+            {"create-multipart-upload", S3CommandType::CREATE_MULTIPART_UPLOAD},
+            {"upload-part", S3CommandType::UPLOAD_PART},
+            {"complete-multipart-upload", S3CommandType::COMPLETE_MULTIPART_UPLOAD},
+            {"put-bucket-notification-configuration", S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION},
+            {"put-bucket-encryption", S3CommandType::PUT_BUCKET_ENCRYPTION},
+            {"put-bucket-versioning", S3CommandType::PUT_BUCKET_VERSIONING},
+            {"list-object-versions", S3CommandType::LIST_OBJECT_VERSIONS},
+            {"put-bucket-lifecycle-configuration", S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION},
+            {"get-bucket-lifecycle-configuration", S3CommandType::GET_BUCKET_LIFECYCLE_CONFIGURATION},
+            {"delete-bucket-lifecycle", S3CommandType::DELETE_BUCKET_LIFECYCLE},
         };
 
         // s3 high-level commands that map unconditionally
         static const std::map<std::string, S3CommandType> s3SimpleCommands{
-                {"mb", S3CommandType::CREATE_BUCKET},
-                {"rb", S3CommandType::DELETE_BUCKET},
-                {"rm", S3CommandType::DELETE_OBJECT},
-                {"mv", S3CommandType::MOVE_OBJECT},
+            {"mb", S3CommandType::CREATE_BUCKET},
+            {"rb", S3CommandType::DELETE_BUCKET},
+            {"rm", S3CommandType::DELETE_OBJECT},
+            {"mv", S3CommandType::MOVE_OBJECT},
         };
 
         if (userAgent.clientModule == "s3api") {
@@ -190,4 +193,4 @@ namespace AwsMock::Dto::Common {
         }
     }
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common

@@ -1,5 +1,51 @@
 # Changelog
 
+## [1.18.43](https://github.com/jensvogt/awsmock/compare/1.18.42...v1.18.43) (2026-05-26)
+
+
+### Bug Fixes
+
+* windows application support ([7266ab7](https://github.com/jensvogt/awsmock/commit/7266ab7e878ade651fd2d558dfeb0eae649e8617))
+
+## [1.18.42](https://github.com/jensvogt/awsmock/compare/v1.18.41...v1.18.42) (2026-05-26)
+
+
+### Bug Fixes
+
+* windows port ([53fc24a](https://github.com/jensvogt/awsmock/commit/53fc24ab4b366fd218535120d3d2754c86ccf582))
+
+## [1.18.41](https://github.com/jensvogt/awsmock/compare/v1.18.40...v1.18.41) (2026-05-26)
+
+
+### Bug Fixes
+
+* windows port ([ce98715](https://github.com/jensvogt/awsmock/commit/ce987154652b457774f15dd34782004a82f5dd69))
+
+## [1.18.40](https://github.com/jensvogt/awsmock/compare/v1.18.39...v1.18.40) (2026-05-25)
+
+
+### Bug Fixes
+
+* windows port ([2e36519](https://github.com/jensvogt/awsmock/commit/2e36519fc81c24dc2d1013d89d540d22e1618a04))
+* windows port ([11a79a6](https://github.com/jensvogt/awsmock/commit/11a79a65e41c68c745935b4343bbd136afbd6eaa))
+
+## [1.18.39](https://github.com/jensvogt/awsmock/compare/v1.18.38...v1.18.39) (2026-05-25)
+
+
+### Bug Fixes
+
+* add TLS to docker connection ([db65a21](https://github.com/jensvogt/awsmock/commit/db65a21ad85ed332c7c21070abdc3f2a7c4fc063))
+* add TLS to docker connection ([53d5852](https://github.com/jensvogt/awsmock/commit/53d5852fb7bdd192d1b2d51fbf18e180d68520a6))
+
+## [1.18.38](https://github.com/jensvogt/awsmock/compare/v1.18.37...v1.18.38) (2026-05-25)
+
+
+### Bug Fixes
+
+* add TLS to docker connection ([014cd45](https://github.com/jensvogt/awsmock/commit/014cd454f1ecebdb1a6f0c17c0687a99e59f7cd4))
+* add TLS to docker connection ([ab065cb](https://github.com/jensvogt/awsmock/commit/ab065cbea42df830807521ccc7bc2806353a9ba2))
+* new vcpkg commit ID ([7fbc17a](https://github.com/jensvogt/awsmock/commit/7fbc17ac9e1b3b0ceb4c465b69f8a92df79f991b))
+
 ## [1.18.37](https://github.com/jensvogt/awsmock/compare/1.18.36...v1.18.37) (2026-05-22)
 
 

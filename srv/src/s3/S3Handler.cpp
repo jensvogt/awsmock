@@ -348,6 +348,27 @@ namespace AwsMock::Service {
                     log_info << "Move object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                 }
 
+                case Dto::Common::S3CommandType::COPY_OBJECT: {
+                    log_debug << "Object copy request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+
+                    Dto::S3::CopyObjectRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.user = clientCommand.user;
+                    s3Request.targetBucket = clientCommand.bucket;
+                    s3Request.targetKey = clientCommand.key;
+
+                    // Get S3 source bucket/key
+                    GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
+
+                    // Get the user metadata
+                    s3Request.metadata = GetMetadata(request);
+
+                    Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
+
+                    return SendResponse(request, http::status::ok, s3Response.ToXml());
+                    log_info << "Move object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                }
+
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
                     std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
@@ -949,4 +970,4 @@ namespace AwsMock::Service {
         key = Core::StringUtils::SubStringAfter(path, "/");
         log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

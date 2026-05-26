@@ -2,8 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_DYNAMODB_PARSE_EXCEPTION_H
-#define AWSMOCK_CORE_DYNAMODB_PARSE_EXCEPTION_H
+#pragma once
 
 // C*+ includes
 #include <sstream>
@@ -16,8 +15,6 @@
 #include <boost/beast/http/status.hpp>
 #include <utility>
 
-// AwsMock includes
-
 namespace AwsMock::Core {
 
     /**
@@ -27,14 +24,14 @@ namespace AwsMock::Core {
      */
     class DynamoDbParseException final : public std::exception {
 
-      public:
-
+    public:
         /**
          * Constructor.
          *
          * @param code exception code, default: 0
          */
-        explicit DynamoDbParseException(const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code) {}
+        explicit DynamoDbParseException(const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code) {
+        }
 
         /**
          * Constructor.
@@ -42,7 +39,8 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit DynamoDbParseException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code), _message(std::move(msg)) {}
+        explicit DynamoDbParseException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code), _message(std::move(msg)) {
+        }
 
         /**
          * Copy constructor.
@@ -84,8 +82,7 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-      private:
-
+    private:
         /**
          * HTTP status code
          */
@@ -97,6 +94,5 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_DYNAMODB_PARSE_EXCEPTION_H

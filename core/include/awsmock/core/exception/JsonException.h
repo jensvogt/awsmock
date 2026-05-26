@@ -2,8 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_JSON_EXCEPTION_H
-#define AWSMOCK_CORE_JSON_EXCEPTION_H
+#pragma once
 
 // Boost includes
 #include <boost/beast/http.hpp>
@@ -19,8 +18,7 @@ namespace AwsMock::Core {
      */
     class JsonException final : public std::exception {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          *
@@ -86,8 +84,7 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-      private:
-
+    private:
         /**
          * Code
          */
@@ -109,6 +106,4 @@ namespace AwsMock::Core {
         const char *_requestId;
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_JSON_EXCEPTION_H
+} // namespace AwsMock::Core

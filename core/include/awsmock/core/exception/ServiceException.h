@@ -2,13 +2,10 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_SERVICE_EXCEPTION_H
-#define AWSMOCK_CORE_SERVICE_EXCEPTION_H
+#pragma once
 
 // Boost includes
 #include <boost/beast/http.hpp>
-
-// AwsMock includes
 
 namespace AwsMock::Core {
 
@@ -21,8 +18,7 @@ namespace AwsMock::Core {
      */
     class ServiceException final : public std::exception {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          *
@@ -53,24 +49,26 @@ namespace AwsMock::Core {
         /**
          * @brief Returns the exception message.
          */
-        [[nodiscard]] std::string message() const noexcept;
+        [[nodiscard]]
+        std::string message() const noexcept;
 
         /**
          * @brief Returns the exception message.
          */
-        [[nodiscard]] http::status code() const noexcept;
+        [[nodiscard]]
+        http::status code() const noexcept;
 
         /**
          * @brief Overrides the std::exception message
          *
          * @return std::exception what
          */
-        [[nodiscard]] const char *what() const noexcept override {
+        [[nodiscard]]
+        const char *what() const noexcept override {
             return _message.c_str();
         }
 
-      private:
-
+    private:
         /**
          * Code
          */
@@ -82,6 +80,4 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-}// namespace AwsMock::Core
-
-#endif//AWSMOCK_CORE_SERVICE_EXCEPTION_H
+} // namespace AwsMock::Core

@@ -136,7 +136,7 @@ namespace AwsMock::Database {
         _modules[it->first] = it->second;
     }
 
-    void ModuleMemoryDb::SetPort(const std::string &name, int port) {
+    void ModuleMemoryDb::SetModulePort(const std::string &name, int port) {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =

@@ -14,10 +14,8 @@
     "libmagic",
     "libssh",
     "openssl",
-    "mongo-cxx-driver"
+    "mongo-cxx-driver",
+    "pcre2"
   ],
-  "builtin-baseline": "c3867e714dd3a51c272826eea77267876517ed99",
-  "overrides": [
-    { "name": "boost", "version": "1.90.0#1" }
-  ]
+  "builtin-baseline": "c3867e714dd3a51c272826eea77267876517ed99"
 }

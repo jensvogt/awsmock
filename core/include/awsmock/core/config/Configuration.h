@@ -27,7 +27,7 @@ namespace AwsMock::Core {
     struct ConfigObject;
 
     // Recursive variant — supports nested objects
-    using ConfigValue = std::variant<bool, long, double, std::string, std::shared_ptr<ConfigObject>>;
+    using ConfigValue = std::variant<bool, long, double, std::string, std::shared_ptr<ConfigObject> >;
 
     /**
      * @brief Represents a configurable object with properties and behavior.
@@ -125,8 +125,7 @@ namespace AwsMock::Core {
      */
     class Configuration {
 
-      public:
-
+    public:
         /**
          * @brief Provides a singleton instance of the Configuration class
          *
@@ -334,7 +333,7 @@ namespace AwsMock::Core {
          * @throws std::runtime_error if path not found or not an object
          */
         [[nodiscard]]
-        std::vector<std::pair<std::string, std::map<std::string, ConfigValue>>>
+        std::vector<std::pair<std::string, std::map<std::string, ConfigValue> > >
         getObjects(const std::string &path) const;
 
         /**
@@ -408,7 +407,7 @@ namespace AwsMock::Core {
          * @return The unique identifier of the account as a string.
          */
         [[nodiscard]]
-        std::string getAccountId() const { return get<std::string>("awsmock.account_id"); }
+        std::string getAccountId() const { return get<std::string>("awsmock.access.account-id"); }
 
         /**
          * @brief Retrieves the AWS region configured in the system.
@@ -442,8 +441,7 @@ namespace AwsMock::Core {
          */
         static std::string getAppName() { return "awsmockmgr"; }
 
-      private:
-
+    private:
         /**
          * @brief Default constructor for the Configuration class.
          *
@@ -708,4 +706,4 @@ namespace AwsMock::Core {
         return std::nullopt;
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

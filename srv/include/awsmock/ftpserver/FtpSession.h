@@ -23,6 +23,7 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/MagicDetector.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/ftpserver/Filesystem.h>

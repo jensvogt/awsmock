@@ -26,8 +26,7 @@ namespace AwsMock::Database {
      */
     class ModuleMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -99,6 +98,7 @@ namespace AwsMock::Database {
          * @param module module entity
          * @return updated module
          */
+        [[nodiscard]]
         Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
 
         /**
@@ -111,6 +111,7 @@ namespace AwsMock::Database {
          * @return updated module
          * @see AwsMock::Database::Entity::Module::ModuleState()
          */
+        [[nodiscard]]
         Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
 
         /**
@@ -130,13 +131,14 @@ namespace AwsMock::Database {
          * @param name module name
          * @param port module port
          */
-        void SetPort(const std::string &name, int port);
+        void SetModulePort(const std::string &name, int port);
 
         /**
          * @brief Counts the number of modules
          *
          * @return total number of modules
          */
+        [[nodiscard]]
         int ModuleCount() const;
 
         /**
@@ -144,6 +146,7 @@ namespace AwsMock::Database {
          *
          * @return list of all modules
          */
+        [[nodiscard]]
         Entity::Module::ModuleList ListModules() const;
 
         /**
@@ -160,8 +163,7 @@ namespace AwsMock::Database {
          */
         long DeleteAllModules();
 
-      private:
-
+    private:
         /**
          * Modules map
          */
@@ -178,4 +180,4 @@ namespace AwsMock::Database {
         static boost::mutex _moduleMutex;
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
