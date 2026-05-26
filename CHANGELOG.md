@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.18.44](https://github.com/jensvogt/awsmock/compare/v1.18.43...v1.18.44) (2026-05-26)
+
+
+### Bug Fixes
+
+* add tests to github action ([08e4325](https://github.com/jensvogt/awsmock/commit/08e432531fa07d4ddc2232fc7fc8859bb071edbc))
+* add tests to github action ([d88eaef](https://github.com/jensvogt/awsmock/commit/d88eaef78bfbbc0f86073b0e07a301e7b16cbac0))
+* add tests to github action ([de8c9d5](https://github.com/jensvogt/awsmock/commit/de8c9d58f7da21daddeb3b5383cbb4be1b4f2d0a))
+* add tests to github action ([beedb62](https://github.com/jensvogt/awsmock/commit/beedb62d75cbc8a93dc0b0be15a502ca52f89f75))
+* add tests to github action ([7219714](https://github.com/jensvogt/awsmock/commit/7219714b2d1966ad60ac16ec60429d84fa19aab0))
+* add TLS to docker connection ([1609742](https://github.com/jensvogt/awsmock/commit/160974223508c81b78c12f7086ea3ada06eaf42d))
+
 ## [1.18.43](https://github.com/jensvogt/awsmock/compare/1.18.42...v1.18.43) (2026-05-26)
 
 
