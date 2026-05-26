@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.18.42](https://github.com/jensvogt/awsmock/compare/v1.18.41...v1.18.42) (2026-05-26)
+
+
+### Bug Fixes
+
+* windows port ([53fc24a](https://github.com/jensvogt/awsmock/commit/53fc24ab4b366fd218535120d3d2754c86ccf582))
+
+## [1.18.41](https://github.com/jensvogt/awsmock/compare/v1.18.40...v1.18.41) (2026-05-26)
+
+
+### Bug Fixes
+
+* windows port ([ce98715](https://github.com/jensvogt/awsmock/commit/ce987154652b457774f15dd34782004a82f5dd69))
+
+## [1.18.40](https://github.com/jensvogt/awsmock/compare/v1.18.39...v1.18.40) (2026-05-25)
+
+
+### Bug Fixes
+
+* windows port ([2e36519](https://github.com/jensvogt/awsmock/commit/2e36519fc81c24dc2d1013d89d540d22e1618a04))
+* windows port ([11a79a6](https://github.com/jensvogt/awsmock/commit/11a79a65e41c68c745935b4343bbd136afbd6eaa))
+
 ## [1.18.39](https://github.com/jensvogt/awsmock/compare/v1.18.38...v1.18.39) (2026-05-25)
 
 
