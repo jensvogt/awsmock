@@ -48,7 +48,7 @@
         "lambdaConfigurations": [
           {
             "id": "1234567890124",
-            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:transfer-server",
+            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:transfer-server",
             "events": [
               "ObjectCreated"
             ],

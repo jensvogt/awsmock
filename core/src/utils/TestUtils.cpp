@@ -28,7 +28,7 @@ namespace AwsMock::Core {
         Configuration::instance().set<std::string>("awsmock.access.secret-access-key", "none");
         Configuration::instance().set<std::string>("awsmock.temp-dir", "/tmp/awsmock/data/tmp");
         Configuration::instance().set<std::string>("awsmock.data-dir", "/tmp/awsmock/data");
-        Configuration::instance().set<std::string>("awsmock.magic-file", "/usr/local/awsmock/etc/magic.mgc");
+        Configuration::instance().set<std::string>("awsmock.magic-file", "/usr/local/awsmock/etc/magic_linux.mgc");
 
         // Gateway
         Configuration::instance().set<bool>("awsmock.gateway.active", true);
@@ -114,4 +114,4 @@ namespace AwsMock::Core {
         return output;
     }
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

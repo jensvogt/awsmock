@@ -67,8 +67,7 @@ namespace AwsMock::Core {
      */
     class FileUtils {
 
-      public:
-
+    public:
         /**
          * @brief Extracts the base name (without extension) from the given file name.
          *
@@ -321,6 +320,14 @@ namespace AwsMock::Core {
         static std::string SetFileSeparator(std::string &filePath);
 
         /**
+         * @brief Converts a Unix-style path (forward slashes) to a Windows-style path (backslashes).
+         *
+         * @param unixPath Unix path string
+         * @return Windows path string
+         */
+        static std::string toWindowsPath(const std::string &unixPath);
+
+        /**
          * @brief Remove the last n bytes from the file
          *
          * @param filename name of the file
@@ -424,7 +431,7 @@ namespace AwsMock::Core {
         const static std::map<std::string, std::string> MimeTypes;
 
         template<typename... Ts>
-        static std::string appendPath(Ts &&...args) {
+        static std::string appendPath(Ts &&... args) {
             std::ostringstream oss;
             (oss << ... << std::forward<Ts>(args));
             return oss.str();
@@ -436,6 +443,16 @@ namespace AwsMock::Core {
         return filePath;
     }
 
+    inline std::string FileUtils::toWindowsPath(const std::string &unixPath) {
+#ifdef _WIN32
+        std::string result = unixPath;
+        boost::replace_all(result, "/", "\\");
+        return result;
+#else
+        return unixPath;
+#endif
+    }
+
     inline std::string FileUtils::separator() {
 #ifdef _WIN32
         return "\\";
@@ -445,6 +462,6 @@ namespace AwsMock::Core {
     }
 
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_FILE_UTILS_H
