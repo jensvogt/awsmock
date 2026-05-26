@@ -2,14 +2,11 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_FORBIDDEN_H
-#define AWSMOCK_CORE_FORBIDDEN_H
+#pragma once
 
 // Boost includes
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/status.hpp>
-
-// AwsMock includes
 
 namespace AwsMock::Core {
 
@@ -22,8 +19,7 @@ namespace AwsMock::Core {
      */
     class ForbiddenException final : public std::exception {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          *
@@ -70,8 +66,7 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-      private:
-
+    private:
         /**
          * Code
          */
@@ -83,6 +78,4 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_FORBIDDEN_H
+} // namespace AwsMock::Core

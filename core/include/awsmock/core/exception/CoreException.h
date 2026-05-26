@@ -2,8 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWS_MOCK_CORE_CORE_EXCEPTION_H
-#define AWS_MOCK_CORE_CORE_EXCEPTION_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -11,10 +10,6 @@
 
 // Boost includes
 #include <boost/beast/http.hpp>
-
-
-// AwsMock includes
-
 
 namespace AwsMock::Core {
 
@@ -27,14 +22,14 @@ namespace AwsMock::Core {
      */
     class CoreException final : public std::exception {
 
-      public:
-
+    public:
         /**
          * Constructor.
          *
          * @param code exception code, default: 0
          */
-        explicit CoreException(const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code) {}
+        explicit CoreException(const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code) {
+        }
 
         /**
          * Constructor.
@@ -42,7 +37,8 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit CoreException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code), _message(std::move(msg)) {}
+        explicit CoreException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code), _message(std::move(msg)) {
+        }
 
         /**
          * Copy constructor.
@@ -75,8 +71,7 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-      private:
-
+    private:
         /**
          * Return code
          */
@@ -94,6 +89,4 @@ namespace AwsMock::Core {
         ;
     };
 
-}// namespace AwsMock::Core
-
-#endif//AWS_MOCK_CORE_CORE_EXCEPTION_H
+} // namespace AwsMock::Core

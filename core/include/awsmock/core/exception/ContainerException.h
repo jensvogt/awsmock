@@ -2,8 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWS_MOCK_CORE_CONTAINER_EXCEPTION_H
-#define AWS_MOCK_CORE_CONTAINER_EXCEPTION_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -93,5 +92,3 @@ namespace AwsMock::Core {
     };
 
 } // namespace AwsMock::Core
-
-#endif//AWS_MOCK_CORE_CONTAINER_EXCEPTION_H

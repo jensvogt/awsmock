@@ -10,9 +10,9 @@
 #include <string>
 
 // Boost includes
-#include <boost/asio/local/stream_protocol.hpp>
-#include <boost/beast.hpp>
 #include <utility>
+#include <boost/beast.hpp>
+#include <boost/asio/local/stream_protocol.hpp>
 
 // AwsMock includes
 #include <awsmock/core/container/DomainSocketResult.h>
@@ -24,8 +24,7 @@ namespace AwsMock::Core {
 
     class DomainSocket {
 
-      public:
-
+    public:
         virtual ~DomainSocket() = default;
 
         /**
@@ -33,7 +32,8 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit DomainSocket(std::string path) : _basePath(std::move(path)) {};
+        explicit DomainSocket(std::string path) : _basePath(std::move(path)) {
+        };
 
         /**
          * @brief Send JSON data
@@ -129,8 +129,7 @@ namespace AwsMock::Core {
         [[nodiscard]]
         virtual boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) = 0;
 
-      protected:
-
+    protected:
         /**
          * @brief Prepare an HTTP message
          *
@@ -166,4 +165,4 @@ namespace AwsMock::Core {
         std::string _basePath;
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

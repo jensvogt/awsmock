@@ -2,8 +2,7 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWSMOCK_CORE_BAD_REQUEST_EXCEPTION_H
-#define AWSMOCK_CORE_BAD_REQUEST_EXCEPTION_H
+#pragma once
 
 // C*+ includes
 #include <sstream>
@@ -27,14 +26,14 @@ namespace AwsMock::Core {
      */
     class BadRequestException final : public std::exception {
 
-      public:
-
+    public:
         /**
          * Constructor.
          *
          * @param code exception code, default: 0
          */
-        explicit BadRequestException(const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code) {}
+        explicit BadRequestException(const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code) {
+        }
 
         /**
          * Constructor.
@@ -42,7 +41,8 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit BadRequestException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code), _message(std::move(msg)) {}
+        explicit BadRequestException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code), _message(std::move(msg)) {
+        }
 
         /**
          * Copy constructor.
@@ -84,8 +84,7 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-      private:
-
+    private:
         /**
          * HTTP status code
          */
@@ -97,6 +96,4 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_BAD_REQUEST_EXCEPTION_H
+} // namespace AwsMock::Core

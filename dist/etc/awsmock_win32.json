@@ -243,9 +243,9 @@
         "enabled": false,
         "host": "localhost",
         "port": 2376,
-        "ca-cert": "/usr/local/awsmock/etc/ca.pem",
-        "cert": "/usr/local/awsmock/etc/cert.pem",
-        "key": "/usr/local/awsmock/etc/key.pem",
+        "ca-cert": "C:\\Program Files\\awsmock\\etc\\ca.pem",
+        "cert": "C:\\Program Files\\awsmock\\etc\\cert.pem",
+        "key": "C:\\Program Files\\awsmock\\etc\\key.pem",
         "verify-peer": true
       }
     },
