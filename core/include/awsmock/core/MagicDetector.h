@@ -14,7 +14,8 @@ namespace AwsMock::Core {
 
     class MagicDetector {
 
-    public:
+      public:
+
         MagicDetector() : _magic(magic_open(MAGIC_MIME_TYPE)) {
             if (!_magic) {
                 log_error << "Failed to open libmagic";
@@ -64,32 +65,10 @@ namespace AwsMock::Core {
             return result ? result : "application/octet-stream";
         }
 
-#ifdef _WIN32
-        static std::string detectMimeTypeWin(const std::string &filePath) {
-            // Windows fallback — extension-based detection
-            // libmagic is unreliable on Windows without correct .mgc
-            static const std::unordered_map<std::string, std::string> mimeMap = {
-                {".jpg", "image/jpeg"},
-                {".jpeg", "image/jpeg"},
-                {".png", "image/png"},
-                {".pdf", "application/pdf"},
-                {".json", "application/json"},
-                {".xml", "application/xml"},
-                {".txt", "text/plain"},
-                {".zip", "application/zip"},
-                {".gz", "application/gzip"},
-            };
-            const std::filesystem::path p(filePath);
-            std::string ext = p.extension().string();
-            std::ranges::transform(ext, ext.begin(), tolower);
-            const auto it = mimeMap.find(ext);
-            return it != mimeMap.end() ? it->second : "application/octet-stream";
-#endif
-        }
+      private:
 
-    private:
         magic_t _magic;
         mutable std::mutex _mutex;
     };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
