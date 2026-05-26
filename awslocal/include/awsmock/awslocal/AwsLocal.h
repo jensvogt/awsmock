@@ -1,9 +1,7 @@
 //
 // Created by vogje01 on 10/23/23.
 //
-
-#ifndef AWSMOCK_AWSLOCAL_H
-#define AWSMOCK_AWSLOCAL_H
+#pragma once
 
 // C++ includes
 #include <cstdlib>
@@ -99,5 +97,3 @@ namespace AwsMock::AwsLocal {
     };
 
 } // namespace AwsMock::AwsLocal
-
-#endif// AWSMOCK_AWSLOCAL_H
