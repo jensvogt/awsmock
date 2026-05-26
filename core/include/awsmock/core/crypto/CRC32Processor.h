@@ -2,13 +2,12 @@
 // Created by vogje01 on 2/17/26.
 //
 
-#ifndef AWSMOCK_CRC32PROCESSOR_H
-#define AWSMOCK_CRC32PROCESSOR_H
+#pragma once
 
 #include <cstdint>
 #include <iostream>
-#include <netinet/in.h>
 #include <vector>
+#include <netinet/in.h>
 
 namespace AwsMock::Core::Crypto {
 
@@ -45,8 +44,7 @@ namespace AwsMock::Core::Crypto {
             return base64_encode_bytes(bytes, 4);
         }
 
-      public:
-
+    public:
         CRC32Processor() {
             for (uint32_t i = 0; i < 256; i++) {
                 uint32_t remainder = i;
@@ -71,14 +69,4 @@ namespace AwsMock::Core::Crypto {
             return get_s3_crc32_header(crc ^ 0xFFFFFFFF);
         }
     };
-    /*
-    int main() {
-        CRC32 crcProcessor;
-        std::string msg = "Hello S3!";
-        uint32_t result = crcProcessor.update((const uint8_t *) msg.c_str(), msg.length());
-
-        std::cout << "Manual CRC32: " << std::hex << result << std::endl;
-    }*/
-}// namespace AwsMock::Core::Crypto
-
-#endif//AWSMOCK_CRC32PROCESSOR_H
+} // namespace AwsMock::Core::Crypto

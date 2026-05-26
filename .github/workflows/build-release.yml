@@ -381,6 +381,14 @@ jobs:
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
 
+      - name: Cache vcpkg
+        uses: actions/cache@v4.2.3
+        with:
+          path: "${{ github.workspace }}/vcpkg"
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
       - name: Set g++-14 as default
         run: |
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
@@ -428,9 +436,9 @@ jobs:
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/awsmock/etc/key.pem
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
           cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
@@ -502,7 +510,6 @@ jobs:
       PACKAGE_DIR: "${{ github.workspace }}/package-rpm"
       BUILD_DIR: "${{ github.workspace }}/build-rpm"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-      #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -516,10 +523,25 @@ jobs:
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
 
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+
+      - name: Cache vcpkg
+        uses: actions/cache@v4.2.3
+        with:
+          path: "${{ github.workspace }}/vcpkg"
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
 
       - name: Set g++-14 as default
         run: |
@@ -568,9 +590,9 @@ jobs:
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/awsmock/etc/key.pem
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
           cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend

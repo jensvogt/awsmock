@@ -2,13 +2,10 @@
 // Created by vogje01 on 02/09/2022.
 //
 
-#ifndef AWS_MOCK_CORE_DATABASE_EXCEPTION_H
-#define AWS_MOCK_CORE_DATABASE_EXCEPTION_H
+#pragma once
 
 // Boost includes
 #include <boost/beast/http.hpp>
-
-// AwsMock includes
 
 namespace AwsMock::Core {
 
@@ -21,8 +18,7 @@ namespace AwsMock::Core {
      */
     class DatabaseException final : public std::exception {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          *
@@ -88,8 +84,7 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-      private:
-
+    private:
         /**
          * Code
          */
@@ -111,6 +106,4 @@ namespace AwsMock::Core {
         const char *_requestId;
     };
 
-}// namespace AwsMock::Core
-
-#endif//AWS_MOCK_CORE_DATABASE_EXCEPTION_H
+} // namespace AwsMock::Core
