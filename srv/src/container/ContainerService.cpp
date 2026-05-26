@@ -9,12 +9,9 @@ namespace AwsMock::Service {
     thread_local std::shared_ptr<Core::DomainSocket> ContainerService::_domainSocket;
 
     ContainerService::ContainerService() {
-        // Get network mode
-        _networkName = Core::Configuration::instance().get<std::string>("awsmock.docker.network-name");
+        _networkName = GetNetworkName();
         _containerPort = Core::Configuration::instance().get<std::string>("awsmock.docker.container.port");
-        _isDocker = Core::Configuration::instance().get<bool>("awsmock.docker.active");
 
-        // TLS configuration
         _tlsEnabled = Core::Configuration::instance().get<bool>("awsmock.docker.tls.enabled");
         if (_tlsEnabled) {
             _tlsHost = Core::Configuration::instance().get<std::string>("awsmock.docker.tls.host");
@@ -25,11 +22,10 @@ namespace AwsMock::Service {
             _tlsVerifyPeer = Core::Configuration::instance().get<bool>("awsmock.docker.tls.verify-peer");
             log_info << "Docker TLS enabled, host: " << _tlsHost << ", port: " << _tlsPort;
         } else {
-            // UNIX socket path (Linux/macOS) or Windows TCP URL
 #ifdef WIN32
             _containerSocketPath = Core::Configuration::instance().get<std::string>("awsmock.docker.socket");
 #else
-            _containerSocketPath = _isDocker ? Core::Configuration::instance().get<std::string>("awsmock.docker.socket") : Core::Configuration::instance().get<std::string>("awsmock.podman.socket");
+            _containerSocketPath = Core::Configuration::instance().get<std::string>("awsmock.docker.socket");
 #endif
         }
     }
@@ -55,21 +51,18 @@ namespace AwsMock::Service {
             log_debug << "Docker image found, name: " << name << ":" << tag;
             return true;
         }
-        log_info << "Image does not exists, name: " << name << ":" << tag << ", httpStatus: " << result.statusCode;
+        log_info << "Image does not exist, name: " << name << ":" << tag << ", httpStatus: " << result.statusCode;
         return false;
     }
 
     void ContainerService::CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) const {
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage); statusCode == http::status::ok) {
-            log_debug << "Docker image created, name: " << name << ":" << tag;
-
-            // Wait for image creation
-            Dto::Docker::Image image = GetImageByName(name, tag, true);
             while (GetImageByName(name, tag, true).size == 0) {
                 std::this_thread::sleep_for(500ms);
             }
+            log_debug << "Docker image created, name: " << name << ":" << tag;
         } else {
-            log_error << "Docker image create failed, statusCode: " << statusCode;
+            log_error << "Docker image create failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
         }
     }
 
@@ -80,38 +73,34 @@ namespace AwsMock::Service {
             log_warning << "Get image by name failed, name: " << imageName << ", statusCode: " << statusCode;
             return {};
         }
-        Dto::Docker::Image response = response.FromJson(body);
+        Dto::Docker::Image response = Dto::Docker::Image::FromJson(body);
         response.id = Core::StringUtils::Split(response.id, ":")[1];
-
         log_debug << "Image found, name: " << imageName;
         return response;
     }
 
     std::string ContainerService::BuildLambdaImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const {
         log_debug << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime;
-
         std::string dockerFile = WriteLambdaDockerFile(codeDir, handler, runtime, environment);
-        std::string imageFile = BuildImageFile(codeDir, name);
+        const std::string imageFile = BuildImageFile(codeDir, name);
         auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
         log_trace << "Build image, status: " << statusCode << ", body: " << body;
         if (statusCode != http::status::ok) {
             log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
             return {};
         }
-
         log_info << "Build image request finished, name: " << name << " version: " << tag << " runtime: " << runtime;
         return imageFile;
     }
 
     std::string ContainerService::BuildApplicationImage(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity) const {
         log_debug << "Build image request, name: " << applicationEntity << ", tags: " << applicationEntity.version;
-
-        // Write the docker file
-        std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
+        const std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
         const std::string imageFile = BuildImageFile(codeDir, applicationEntity.name);
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {}); statusCode != http::status::ok) {
+        auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {});
+        if (statusCode != http::status::ok) {
             log_error << "Build image failed, image: " << applicationEntity.name << ":" << applicationEntity.version << ", statusCode: " << statusCode << ", body: " << body;
-            return dockerFile;
+            return {};
         }
         log_info << "Build image successful, name: " << applicationEntity.name << ":" << applicationEntity.version;
         return dockerFile;
@@ -120,7 +109,7 @@ namespace AwsMock::Service {
     std::vector<Dto::Docker::Image> ContainerService::ListImagesByName(const std::string &name, const std::string &tag) const {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/images/json?all=true");
         if (statusCode != http::status::ok) {
-            log_error << "Get image by name failed, statusCode: " << statusCode;
+            log_error << "List images failed, statusCode: " << statusCode;
             throw Core::ServiceException("Get image by name failed", statusCode);
         }
 
@@ -131,10 +120,10 @@ namespace AwsMock::Service {
         }
 
         const std::string target = tag.empty() ? name : name + ":" + tag;
-        auto hasTag = [&](const auto &image) {
-            return std::ranges::contains(image.repoTags, target);
-        };
-        auto images = response.imageList | std::views::filter(hasTag) | std::ranges::to<std::vector>();
+        auto images = response.imageList | std::views::filter([&](const auto &image) {
+                          return std::ranges::contains(image.repoTags, target);
+                      }) |
+                      std::ranges::to<std::vector>();
         log_info << "Images found, name: " << name << ", count: " << images.size();
         return images;
     }
@@ -153,14 +142,13 @@ namespace AwsMock::Service {
             log_debug << "Docker container found, name: " << containerName;
             return true;
         }
-        log_info << "Docker container exists failed, name: " << containerName << ", statusCode: " << statusCode;
+        log_info << "Docker container not found, name: " << containerName << ", statusCode: " << statusCode;
         return false;
     }
 
     bool ContainerService::ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const {
         if (const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); containers.empty()) {
-            std::string containerName = tag.empty() ? imageName : imageName + ":" + tag;
-            log_info << "Docker container not found, name: " << containerName;
+            log_info << "Docker container not found, name: " << (tag.empty() ? imageName : imageName + ":" + tag);
             return false;
         }
         return true;
@@ -172,11 +160,9 @@ namespace AwsMock::Service {
             log_info << "Docker container not found, name: " << name << ":" << tag;
             return {};
         }
-
         if (containers.size() > 1) {
             log_info << "More than one docker container found, name: " << name << ":" << tag << " count: " << containers.size();
         }
-
         log_debug << "Docker container found, name: " << name << ":" << tag;
         return containers.front();
     }
@@ -187,10 +173,8 @@ namespace AwsMock::Service {
             log_info << "Get docker container by ID failed, statusCode: " << statusCode;
             return {};
         }
-
-        Dto::Docker::Container response = Dto::Docker::Container::FromJson(body);
         log_debug << "Docker container found, containerId: " << containerId;
-        return response;
+        return Dto::Docker::Container::FromJson(body);
     }
 
     Dto::Docker::Container ContainerService::GetContainerByName(const std::string &name) const {
@@ -199,45 +183,36 @@ namespace AwsMock::Service {
             log_info << "Get container by name failed, name: " << name << ", statusCode: " << statusCode;
             return {};
         }
-
-        Dto::Docker::Container response = Dto::Docker::Container::FromJson(body);
         log_debug << "Container found, name: " << name;
-        return response;
+        return Dto::Docker::Container::FromJson(body);
     }
 
     Dto::Docker::InspectContainerResponse ContainerService::InspectContainer(const std::string &containerId) const {
-        Dto::Docker::InspectContainerResponse inspectContainerResponse{};
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         if (statusCode != http::status::ok) {
-            inspectContainerResponse.status = statusCode;
             log_info << "Inspect container failed, containerId: " << Core::StringUtils::Continuation(containerId, 16) << ", statusCode: " << statusCode;
-            return inspectContainerResponse;
+            Dto::Docker::InspectContainerResponse err{};
+            err.status = statusCode;
+            return err;
         }
-
-        inspectContainerResponse = Dto::Docker::InspectContainerResponse::FromJson(body);
-        inspectContainerResponse.status = statusCode;
-        log_debug << "Container found, containerId: " << containerId;
-        return inspectContainerResponse;
+        Dto::Docker::InspectContainerResponse response = Dto::Docker::InspectContainerResponse::FromJson(body);
+        response.status = statusCode;
+        log_debug << "Container inspected, containerId: " << containerId;
+        return response;
     }
 
     Dto::Docker::ListContainerResponse ContainerService::ListContainers() const {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
-            log_info << "List docker containers failed, state: " << statusCode;
+            log_info << "List docker containers failed, statusCode: " << statusCode;
             return {};
         }
-
         Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
-        if (response.containerList.empty()) {
-            log_info << "Docker containers not found";
-            return {};
-        }
         log_debug << "Docker containers found, count: " << response.containerList.size();
         return response;
     }
 
     std::vector<Dto::Docker::Container> ContainerService::ListContainerByImageName(const std::string &name, const std::string &tag) const {
-        // Send request
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
             log_info << "List docker container by image name failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
@@ -245,19 +220,12 @@ namespace AwsMock::Service {
         }
 
         const Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
-        if (response.containerList.empty()) {
-            log_info << "Docker containers not found, name: " << name << ":" << tag;
-            return {};
-        }
-
-        // Docker API does not work as expected, therefore, we filter ourselves
         const std::string target = tag.empty() ? name : name + ":" + tag;
         auto containers = response.containerList | std::views::filter([&](const auto &c) {
                               return c.image == target;
                           }) |
                           std::ranges::to<std::vector>();
 
-        // Check number of containers found
         if (containers.empty()) {
             log_info << "Docker container not found, name: " << name << ":" << tag;
         } else {
@@ -266,35 +234,27 @@ namespace AwsMock::Service {
         return containers;
     }
 
-    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort) const {
-        // Create the request
+    Dto::Docker::CreateContainerResponse ContainerService::SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, const int hostPort, const std::vector<std::string> &environment) const {
         Dto::Docker::CreateContainerRequest request;
-
-        request.hostName = instanceName;
+        request.hostName = hostName;
         request.domainName = "awsmock";
         request.tty = false;
         request.image = imageName + ":" + tag;
-        request.environment = environment;
-        request.containerPort = _containerPort;
+        request.containerPort = containerPortStr;
         request.hostPort = std::to_string(hostPort);
-
-        Dto::Docker::ExposedPort exposedPorts;
-        request.exposedPorts[_containerPort + "/tcp"] = exposedPorts;
+        request.environment = environment;
+        request.exposedPorts[containerPortStr + "/tcp"] = {};
 
         Dto::Docker::LogConfig logConfig;
         logConfig.type = "json-file";
 
-        Dto::Docker::Port portBindingHostPort;
-        portBindingHostPort.hostPort = hostPort;
-        std::vector<Dto::Docker::Port> portBindingHostPorts;
-        portBindingHostPorts.push_back(portBindingHostPort);
+        Dto::Docker::Port portBinding;
+        portBinding.hostPort = hostPort;
 
-        // Host config
         Dto::Docker::HostConfig hostConfig;
-        hostConfig.networkMode = GetNetworkName();
+        hostConfig.networkMode = _networkName;
         hostConfig.logConfig = logConfig;
-        hostConfig.portBindings[_containerPort + "/tcp"] = portBindingHostPorts;
-
+        hostConfig.portBindings[containerPortStr + "/tcp"] = {portBinding};
         hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
         hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
         hostConfig.extraHosts.emplace_back("localstack:host-gateway");
@@ -302,9 +262,9 @@ namespace AwsMock::Service {
         request.hostConfig = hostConfig;
         log_debug << "Create container request: " << request.ToJson();
 
-        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + urlName, request.ToJson());
         if (statusCode != http::status::created) {
-            log_info << "Create container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
+            log_warning << "Create container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return {};
         }
 
@@ -314,98 +274,16 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort,
-                                                                           const int containerPort) const {
-        // Create the request
-        Dto::Docker::CreateContainerRequest request;
+    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort) const {
+        return SendCreateContainer(imageName, tag, instanceName, instanceName, _containerPort, hostPort, environment);
+    }
 
-        request.hostName = imageName;
-        request.domainName = "awsmock";
-        request.tty = false;
-        request.image = imageName + ":" + tag;
-        request.containerPort = std::to_string(containerPort);
-        request.hostPort = std::to_string(hostPort);
-        request.environment = environment;
-
-        Dto::Docker::ExposedPort exposedPorts;
-        request.exposedPorts[std::to_string(containerPort) + "/tcp"] = exposedPorts;
-
-        Dto::Docker::LogConfig logConfig;
-        logConfig.type = "json-file";
-
-        Dto::Docker::Port portBindingHostPort;
-        portBindingHostPort.hostPort = hostPort;
-        std::vector<Dto::Docker::Port> portBindingHostPorts;
-        portBindingHostPorts.push_back(portBindingHostPort);
-
-        Dto::Docker::HostConfig hostConfig;
-        hostConfig.networkMode = GetNetworkName();
-        hostConfig.logConfig = logConfig;
-        hostConfig.portBindings[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
-
-        hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
-        hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
-        hostConfig.extraHosts.emplace_back("localstack:host-gateway");
-
-        request.hostConfig = hostConfig;
-        log_debug << "Create container request: " << request.ToJson();
-
-        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
-        if (statusCode != http::status::created) {
-            log_info << "Create container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
-            return {};
-        }
-
-        Dto::Docker::CreateContainerResponse response = Dto::Docker::CreateContainerResponse::FromJson(body);
-        response.hostPort = hostPort;
-        log_debug << "Docker container created, name: " << imageName << ":" << tag << " id: " << response.id;
-        return response;
+    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort, const int containerPort) const {
+        return SendCreateContainer(imageName, tag, imageName, instanceName, std::to_string(containerPort), hostPort, environment);
     }
 
     Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, const int hostPort, const int containerPort) const {
-        // Create the request
-        Dto::Docker::CreateContainerRequest request;
-
-        request.hostName = containerName;
-        request.domainName = "awsmock";
-        request.tty = false;
-        request.image = imageName + ":" + tag;
-        request.containerPort = std::to_string(containerPort);
-        request.hostPort = std::to_string(hostPort);
-
-        Dto::Docker::ExposedPort exposedPorts;
-        request.exposedPorts[std::to_string(containerPort) + "/tcp"] = exposedPorts;
-
-        Dto::Docker::LogConfig logConfig;
-        logConfig.type = "json-file";
-
-        Dto::Docker::Port portBindingHostPort;
-        portBindingHostPort.hostPort = hostPort;
-        std::vector<Dto::Docker::Port> portBindingHostPorts;
-        portBindingHostPorts.push_back(portBindingHostPort);
-
-        Dto::Docker::HostConfig hostConfig;
-        hostConfig.networkMode = GetNetworkName();
-        hostConfig.logConfig = logConfig;
-        hostConfig.portBindings[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
-
-        hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
-        hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
-        hostConfig.extraHosts.emplace_back("localstack:host-gateway");
-
-        request.hostConfig = hostConfig;
-        log_debug << "Create container request: " << request.ToJson();
-
-        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + containerName, request.ToJson());
-        if (statusCode != http::status::created) {
-            log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
-            return {};
-        }
-
-        Dto::Docker::CreateContainerResponse response = Dto::Docker::CreateContainerResponse::FromJson(body);
-        response.hostPort = hostPort;
-        log_debug << "Docker container created, name: " << imageName << ":" << tag;
-        return response;
+        return SendCreateContainer(imageName, tag, containerName, containerName, std::to_string(containerPort), hostPort, {});
     }
 
     Dto::Docker::ListStatsResponse ContainerService::ListContainerStats() const {
@@ -437,12 +315,10 @@ namespace AwsMock::Service {
             if (kind == boost::beast::websocket::frame_type::close) {
                 ws.close(boost::beast::websocket::close_code::abnormal);
             } else if (kind == boost::beast::websocket::frame_type::ping) {
-                const boost::beast::websocket::ping_data pd(message);
-                ws.pong(boost::beast::websocket::ping_data("message"));
+                ws.pong(boost::beast::websocket::ping_data(message));
             }
         });
 
-        // First the last 1000 lines
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=" + std::to_string(tail) + "&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
             ws.text(true);
             ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
@@ -461,7 +337,6 @@ namespace AwsMock::Service {
                 }
                 last = system_clock::now();
 
-                // Check for a closing message
                 ws.read(buffer);
                 log_trace << "Container read, message: " << boost::beast::make_printable(buffer.data());
                 if (const Dto::Apps::WebSocketCommand webSocketCommand = Dto::Apps::WebSocketCommand::FromJson(boost::beast::buffers_to_string(buffer.data()));
@@ -484,20 +359,18 @@ namespace AwsMock::Service {
             log_debug << "Docker network found, name: " << name;
             return true;
         }
-        log_error << "Network exists request failed, statusCode: " << statusCode;
+        log_debug << "Docker network not found, name: " << name << ", statusCode: " << statusCode;
         return false;
     }
 
     Dto::Docker::CreateNetworkResponse ContainerService::CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) const {
-        Dto::Docker::CreateNetworkResponse response;
-
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
-            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
-            response = Dto::Docker::CreateNetworkResponse::FromJson(body);
-        } else {
-            log_error << "Docker network create failed, statusCode: " << statusCode;
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/networks/create", request.ToJson());
+        if (statusCode != http::status::ok) {
+            log_error << "Docker network create failed, name: " << request.name << ", statusCode: " << statusCode;
+            return {};
         }
-        return response;
+        log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+        return Dto::Docker::CreateNetworkResponse::FromJson(body);
     }
 
     void ContainerService::StartContainer(const std::string &containerId, const std::string &containerName) const {
@@ -509,14 +382,14 @@ namespace AwsMock::Service {
     }
 
     bool ContainerService::IsContainerRunning(const std::string &containerId) const {
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json"); statusCode == http::status::ok) {
-            log_debug << "Container running, statusCode: " << statusCode;
-            const Dto::Docker::InspectContainerResponse response = Dto::Docker::InspectContainerResponse::FromJson(body);
-            log_debug << "Docker container state, id: " << containerId << " state: " << std::boolalpha << response.state.running;
-            return response.state.running;
+        auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json");
+        if (statusCode != http::status::ok) {
+            log_debug << "Is docker container running failed, id: " << containerId;
+            return false;
         }
-        log_debug << "Is docker container running failed, id: " << containerId;
-        return false;
+        const Dto::Docker::InspectContainerResponse response = Dto::Docker::InspectContainerResponse::FromJson(body);
+        log_debug << "Docker container state, id: " << containerId << " running: " << std::boolalpha << response.state.running;
+        return response.state.running;
     }
 
     void ContainerService::WaitForContainer(const std::string &containerId) const {
@@ -541,25 +414,24 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const {
-        std::string logMessages;
         const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(start));
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true");
-        if (statusCode == http::status::ok) {
-            log_debug << "Container logs received, containerId: " << containerId;
-            return body;
+        if (statusCode != http::status::ok) {
+            log_error << "Receive container logs failed, containerId: " << containerId << ", statusCode: " << statusCode;
+            return {};
         }
-        log_error << "Receive container logs failed, containerId: " << containerId << ", statusCode: " << statusCode;
-        return {};
+        log_debug << "Container logs received, containerId: " << containerId;
+        return body;
     }
 
     Dto::Docker::ContainerStat ContainerService::GetContainerStats(const std::string &containerId) const {
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
-        if (statusCode == http::status::ok) {
-            log_debug << "Container statistics received, containerId: " << containerId;
-            return Dto::Docker::ContainerStat::FromJson(body);
+        if (statusCode != http::status::ok) {
+            log_error << "Get container stats failed, containerId: " << containerId << ", statusCode: " << statusCode;
+            return {};
         }
-        log_error << "Get container stats failed, containerId: " << containerId << ", statusCode: " << statusCode;
-        return {};
+        log_debug << "Container statistics received, containerId: " << containerId;
+        return Dto::Docker::ContainerStat::FromJson(body);
     }
 
     void ContainerService::StopContainer(const Dto::Docker::Container &container) const {
@@ -580,10 +452,6 @@ namespace AwsMock::Service {
 
     void ContainerService::KillContainer(const std::string &containerId, const std::string &signal) const {
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content) {
-            if (statusCode == http::status::conflict) {
-                log_debug << "Kill container failed, containerId: " << containerId << ", statusCode: " << statusCode;
-                return;
-            }
             log_warning << "Kill container failed, containerId: " << containerId << ", statusCode: " << statusCode;
             return;
         }
@@ -603,10 +471,10 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::DeleteContainers(const std::string &imageName, const std::string &tag) const {
-        for (const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); const auto &container: containers) {
+        for (const auto &container: ListContainerByImageName(imageName, tag)) {
             DeleteContainer(container.id);
         }
-        log_debug << "All docker containers deleted, id: " << imageName << ":" << tag;
+        log_debug << "All docker containers deleted, image: " << imageName << ":" << tag;
     }
 
     void ContainerService::PruneContainers() const {
@@ -615,108 +483,71 @@ namespace AwsMock::Service {
             log_warning << "Prune containers failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
-
         const Dto::Docker::PruneContainerResponse response = Dto::Docker::PruneContainerResponse::FromJson(body);
-
         log_debug << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed;
     }
 
     std::string ContainerService::WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
-        std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
+        const std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
-        auto supportedRuntime = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
-        auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
-        log_debug << "Using supported runtime, runtime: " << supportedRuntime;
+        const auto supportedRuntime = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        log_debug << "Using supported runtime: " << supportedRuntime;
 
-        std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
-        std::ofstream awsOfs(awsConfig);
-        awsOfs << "[default]" << std::endl;
-        awsOfs << "region=" << region << std::endl;
-        awsOfs << "output=json" << std::endl;
-        awsOfs.close();
-
-        std::string awsCredentials = codeDir + Core::FileUtils::separator() + "credentials";
-        std::ofstream awsCredOfs(awsCredentials);
-        awsCredOfs << "[default]" << std::endl;
-        awsCredOfs << "region=" << region << std::endl;
-        awsCredOfs << "aws_access_key_id=none" << std::endl;
-        awsCredOfs << "aws_secret_access_key=none" << std::endl;
-        awsCredOfs << "aws_session_token=none" << std::endl;
-        awsCredOfs << "retry_mode=standard" << std::endl;
-        awsCredOfs << "max_attempts=1" << std::endl;
-        awsCredOfs.close();
+        const std::string credentialsCopy = AddCredentials(codeDir, region);
+        const std::string envLines = AddEnvironment(environment);
 
         std::ofstream ofs(dockerFilename);
-        if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(environment);
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws/" << std::endl;
-            ofs << "COPY credentials /root/.aws/" << std::endl;
-            ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "postgres")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(environment);
-            ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(environment);
-            ofs << "COPY config /root/.aws/" << std::endl;
-            ofs << "COPY credentials /root/.aws/" << std::endl;
-            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
-            ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin" << std::endl;
-            ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/" << std::endl;
-            ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/" << std::endl;
-            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/lib" << std::endl;
-            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/bin" << std::endl;
-            ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(environment);
-            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}/" << std::endl;
-            ofs << "RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws/" << std::endl;
-            ofs << "COPY credentials /root/.aws/" << std::endl;
-            ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
-            ofs << "CMD [\"" + handler + "\"]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
-            std::string handlerFile = GetHandlerFileNodeJs22(handler);
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(environment);
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/dist" << std::endl;
-            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
-            ofs << "COPY " << handlerFile << " ${LAMBDA_TASK_ROOT}/dist" << std::endl;
-            ofs << "CMD [\"" + handler + "\"]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(environment);
-            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
-            ofs << "COPY index.js ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "CMD [\"" + handler + "\"]" << std::endl;
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
-            ofs << "FROM " << supportedRuntime << std::endl;
-            AddEnvironment(environment);
-            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
-            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
-            ofs << "CMD [\"" + handler + "\"]" << std::endl;
-        }
-        ofs.close();
-        log_debug << "Dockerfile written, filename: " << dockerFilename;
+        ofs << "FROM " << supportedRuntime << "\n";
+        ofs << envLines;
 
+        if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
+            ofs << "RUN mkdir -p /root/.aws\n";
+            ofs << credentialsCopy;
+            ofs << "COPY classes ${LAMBDA_TASK_ROOT}\n";
+            ofs << "CMD [ \"" + handler + "::handleRequest\" ]\n";
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "postgres")) {
+            ofs << "CMD [ \"" + handler + "\" ]\n";
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
+            ofs << credentialsCopy;
+            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}\n";
+            ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap\n";
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib\n";
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/bin\n";
+            ofs << "COPY bin/* ${LAMBDA_TASK_ROOT}/bin/\n";
+            ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/\n";
+            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/lib\n";
+            ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/bin\n";
+            ofs << "CMD [ \"" + handler + "\" ]\n";
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
+            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}/\n";
+            ofs << "RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt\n";
+            ofs << "RUN mkdir -p /root/.aws\n";
+            ofs << credentialsCopy;
+            ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/\n";
+            ofs << "CMD [\"" + handler + "\"]\n";
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/dist\n";
+            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
+            ofs << "COPY " << GetHandlerFileNodeJs22(handler) << " ${LAMBDA_TASK_ROOT}/dist\n";
+            ofs << "CMD [\"" + handler + "\"]\n";
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
+            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
+            ofs << "COPY index.js ${LAMBDA_TASK_ROOT}\n";
+            ofs << "CMD [\"" + handler + "\"]\n";
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
+            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}\n";
+            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap\n";
+            ofs << "CMD [\"" + handler + "\"]\n";
+        }
+
+        log_debug << "Dockerfile written, filename: " << dockerFilename;
         return dockerFilename;
     }
 
     std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity) {
-
-        // Name of the docker file
-        std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
-
-        // Replace variables
+        const std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::string dockerFileContent = applicationEntity.dockerFile;
         Core::StringUtils::Replace(dockerFileContent, "$$ENV$$", AddEnvironment(applicationEntity.environment));
         Core::StringUtils::Replace(dockerFileContent, "$$PORT$$", std::to_string(applicationEntity.privatePort));
@@ -724,23 +555,19 @@ namespace AwsMock::Service {
         Core::StringUtils::Replace(dockerFileContent, "$$CREDENTIALS$$", AddCredentials(codeDir, applicationEntity.region));
 
         std::ofstream ofs(dockerFilename);
-        ofs << dockerFileContent << std::endl;
-        ofs.close();
+        ofs << dockerFileContent << "\n";
         log_debug << "Dockerfile written, filename: " << dockerFilename;
-
         return dockerFilename;
     }
 
     std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &name) {
-        std::string tarFileName;
 #ifdef _WIN32
-        tarFileName = codeDir + Core::FileUtils::separator() + name + ".tar";
+        const std::string tarFileName = codeDir + Core::FileUtils::separator() + name + ".tar";
 #else
-        tarFileName = codeDir + Core::FileUtils::separator() + name + ".tgz";
+        const std::string tarFileName = codeDir + Core::FileUtils::separator() + name + ".tgz";
 #endif
         Core::TarUtils::TarDirectory(tarFileName, codeDir + Core::FileUtils::separator());
         log_debug << "Zipped TAR file written: " << tarFileName;
-
         return tarFileName;
     }
 
@@ -752,39 +579,39 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::GetHandlerFileNodeJs22(const std::string &handler) {
-        const std::string prefix = handler.substr(0, handler.find('.'));
-        return prefix + ".mjs";
+        return handler.substr(0, handler.find('.')) + ".mjs";
     }
 
     std::string ContainerService::AddEnvironment(const std::map<std::string, std::string> &environment) {
         std::stringstream ss;
         for (const auto &[fst, snd]: environment) {
-            ss << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
+            ss << "ENV " << fst << "=\"" << snd << "\"\n";
         }
-        ss << "ENV " << "AWS_REGION=\"eu-central-1\"" << std::endl;
-        ss << "ENV " << "AWS_ACCESS_KEY_ID=\"none\"" << std::endl;
-        ss << "ENV " << "AWS_SECRET_ACCESS_KEY=\"none\"" << std::endl;
-        ss << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
+        ss << "ENV AWS_REGION=\"eu-central-1\"\n";
+        ss << "ENV AWS_ACCESS_KEY_ID=\"none\"\n";
+        ss << "ENV AWS_SECRET_ACCESS_KEY=\"none\"\n";
+        ss << "ENV AWS_SESSION_TOKEN=\"none\"\n";
         return ss.str();
     }
 
     std::string ContainerService::AddCredentials(const std::string &codeDir, const std::string &region) {
-        std::string awsCredentials = codeDir + Core::FileUtils::separator() + "credentials";
-        std::ofstream awsCredOfs(awsCredentials);
-        awsCredOfs << "[default]" << std::endl;
-        awsCredOfs << "region=" << region << std::endl;
-        awsCredOfs << "aws_access_key_id=none" << std::endl;
-        awsCredOfs << "aws_secret_access_key=none" << std::endl;
-        awsCredOfs << "aws_session_token=none" << std::endl;
-        awsCredOfs << "retry_mode=standard" << std::endl;
-        awsCredOfs << "max_attempts=1" << std::endl;
-        awsCredOfs.close();
-        std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
-        std::ofstream awsOfs(awsConfig);
-        awsOfs << "[default]" << std::endl;
-        awsOfs << "region=" << region << std::endl;
-        awsOfs << "output=json" << std::endl;
-        awsOfs.close();
+        const std::string sep = Core::FileUtils::separator();
+
+        std::ofstream credOfs(codeDir + sep + "credentials");
+        credOfs << "[default]\n"
+                << "region=" << region << "\n"
+                << "aws_access_key_id=none\n"
+                << "aws_secret_access_key=none\n"
+                << "aws_session_token=none\n"
+                << "retry_mode=standard\n"
+                << "max_attempts=1\n";
+
+        std::ofstream cfgOfs(codeDir + sep + "config");
+        cfgOfs << "[default]\n"
+               << "region=" << region << "\n"
+               << "output=json\n";
+
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
+
 }// namespace AwsMock::Service
