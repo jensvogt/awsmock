@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.45](https://github.com/jensvogt/awsmock/compare/v1.18.44...v1.18.45) (2026-05-27)
+
+
+### Bug Fixes
+
+* add tests to github action ([8f2429f](https://github.com/jensvogt/awsmock/commit/8f2429f421f6a886745eac83f10cbbf6899b4fc0))
+
 ## [1.18.44](https://github.com/jensvogt/awsmock/compare/v1.18.43...v1.18.44) (2026-05-26)
 
 
