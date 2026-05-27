@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.46](https://github.com/jensvogt/awsmock/compare/v1.18.45...v1.18.46) (2026-05-27)
+
+
+### Bug Fixes
+
+* windows application support ([6b020ce](https://github.com/jensvogt/awsmock/commit/6b020ced440c2ed92690e625f52e9ea8a15bb302))
+* windows application support ([5c2c374](https://github.com/jensvogt/awsmock/commit/5c2c374e394ce5afaed315aa417a4244163f6adb))
+* windows application support ([d61447b](https://github.com/jensvogt/awsmock/commit/d61447bd4b39cd6154dadd5d1ef4718fc21fcba4))
+
 ## [1.18.45](https://github.com/jensvogt/awsmock/compare/v1.18.44...v1.18.45) (2026-05-27)
 
 
