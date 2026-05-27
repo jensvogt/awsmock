@@ -20,6 +20,7 @@ jobs:
   release-please:
     name: Create Release PR / Tag
     runs-on: ubuntu-latest
+    needs: [ test ]
 
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
@@ -43,11 +44,11 @@ jobs:
   test:
     name: Run Tests (core + db)
     runs-on: ubuntu-latest
-    needs: [ release-please ]
     env:
       CXX: g++-14
       CC: gcc-14
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
       BUILD_DIR: "${{ github.workspace }}/build-test"
     services:
       mongodb:
@@ -69,30 +70,26 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev
 
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
-
-      - name: Cache vcpkg
-        uses: actions/cache@v4.2.3
-        with:
-          path: "${{ github.workspace }}/vcpkg"
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
 
       - name: Set g++-14 as default
         run: |
@@ -130,10 +127,11 @@ jobs:
   build-windows-msi:
     name: Build & Package (Windows MSI)
     runs-on: windows-latest
-    needs: [ release-please, test ]
+    needs: [ release-please ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
       BUILD_DIR: "${{ github.workspace }}/cmake-build-release"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
@@ -150,12 +148,17 @@ jobs:
         with:
           arch: x64
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
         with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: Create vcpkg binary cache directory
+        shell: pwsh
+        run: New-Item -Path "${{ env.VCPKG_DEFAULT_BINARY_CACHE }}" -ItemType Directory -Force
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -163,14 +166,6 @@ jobs:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
-
-      - name: Cache vcpkg
-        uses: actions/cache@v4.2.3
-        with:
-          path: "${{ github.workspace }}/vcpkg"
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
 
       - name: Build (Backend)
         shell: cmd
@@ -214,9 +209,11 @@ jobs:
   build-macos:
     name: Build & Package (macOS)
     runs-on: macos-latest
-    needs: [ release-please, test ]
+    needs: [ release-please ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
+      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
       BUILD_DIR: "${{ github.workspace }}/build-macos"
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
@@ -233,12 +230,16 @@ jobs:
         run: |
           brew install doxygen pandoc file autoconf autoconf-archive automake libtool
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
         with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -328,12 +329,13 @@ jobs:
   build-linux-deb:
     name: Build & Package (Linux DEB)
     runs-on: ubuntu-latest
-    needs: [ release-please, test ]
+    needs: [ release-please ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       CXX: g++-14
       CC: gcc-14
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
       PACKAGE_DIR: "${{ github.workspace }}/package-deb"
       BUILD_DIR: "${{ github.workspace }}/build-deb"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
@@ -344,18 +346,22 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool g++-14
           sudo gem install --no-document fpm
+
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -474,12 +480,13 @@ jobs:
   build-linux-rpm:
     name: Build & Package (Linux RPM)
     runs-on: ubuntu-latest
-    needs: [ release-please, test ]
+    needs: [ release-please ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       CXX: g++-14
       CC: gcc-14
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
       PACKAGE_DIR: "${{ github.workspace }}/package-rpm"
       BUILD_DIR: "${{ github.workspace }}/build-rpm"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
@@ -496,6 +503,17 @@ jobs:
           sudo apt update
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
+
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: Create vcpkg binary cache directory
+        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -608,7 +626,7 @@ jobs:
   build-docker:
     name: "Build & Package (Docker)"
     runs-on: ubuntu-latest
-    needs: [ release-please, test ]
+    needs: [ release-please ]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       GH_TOKEN: ${{ github.token }}

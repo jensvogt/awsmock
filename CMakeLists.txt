@@ -79,8 +79,7 @@ target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_st
 target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
         Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive)
-target_link_libraries(awsmockcore PRIVATE unofficial::libmagic::libmagic)
-target_link_libraries(awsmockcore PRIVATE PCRE2::8BIT PCRE2::POSIX)
+target_link_libraries(awsmockcore PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
 
 if (WIN32)
     target_link_libraries(awsmockcore PUBLIC Boost::system)
@@ -113,7 +112,7 @@ target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenS
         LibArchive::LibArchive)
 target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-target_link_libraries(awsmockdto PRIVATE unofficial::libmagic::libmagic)
+target_link_libraries(awsmockdto PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Database library
@@ -156,7 +155,7 @@ target_link_libraries(awsmockdb PUBLIC awsmockcore OpenSSL::SSL OpenSSL::Crypto 
         Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json LibArchive::LibArchive)
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-target_link_libraries(awsmockdb PRIVATE unofficial::libmagic::libmagic)
+target_link_libraries(awsmockdb PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
 
 if (NOT WIN32)
     add_subdirectory(db/tst/mongodb)
@@ -202,7 +201,7 @@ target_link_libraries(awsmocksrv PRIVATE awsmockcore awsmockdb awsmockdto OpenSS
         LibArchive::LibArchive ssh)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-target_link_libraries(awsmocksrv PRIVATE unofficial::libmagic::libmagic)
+target_link_libraries(awsmocksrv PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
 
 if (NOT WIN32)
     add_subdirectory(srv/tst)
@@ -220,10 +219,10 @@ target_link_libraries(awsmockmgr PRIVATE awsmockcore awsmockdb awsmockdto awsmoc
         Boost::program_options Boost::chrono LibArchive::LibArchive)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
 target_link_libraries(awsmockmgr PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+target_link_libraries(awsmockmgr PRIVATE unofficial::libmagic::libmagic PCRE2::POSIX PCRE2::8BIT)
 
 if (WIN32)
     target_link_libraries(awsmockmgr PUBLIC Boost::system crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
-    target_link_libraries(awsmockmgr PRIVATE unofficial::libmagic::libmagic PCRE2::POSIX PCRE2::8BIT)
     # magic.lib and ssh.lib both define strndup (POSIX fn absent from MSVC runtime)
     target_link_options(awsmockmgr PRIVATE /FORCE:MULTIPLE)
 endif ()
@@ -239,9 +238,10 @@ target_link_libraries(awsmockctl PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_sta
 target_link_libraries(awsmockctl PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockctl PUBLIC awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto Boost::boost
         Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::program_options
-        Boost::chrono LibArchive::LibArchive magic)
+        Boost::chrono LibArchive::LibArchive unofficial::libmagic::libmagic PCRE2::POSIX PCRE2::8BIT)
+
 if (WIN32)
-    target_link_libraries(awsmockctl PUBLIC Boost::system pcre2-posix pcre2-8 shlwapi.lib)
+    target_link_libraries(awsmockctl PUBLIC Boost::system shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------
@@ -253,7 +253,8 @@ target_include_directories(awslocal PRIVATE ${CMAKE_SOURCE_DIR}/awslocal/include
         ${CMAKE_SOURCE_DIR}/dto/include)
 target_link_libraries(awslocal PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
         Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::program_options Boost::chrono
-        LibArchive::LibArchive magic)
+        LibArchive::LibArchive unofficial::libmagic::libmagic PCRE2::POSIX PCRE2::8BIT)
+
 if (WIN32)
     target_link_libraries(awslocal PUBLIC shlwapi.lib)
 endif ()
