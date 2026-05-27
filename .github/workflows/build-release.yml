@@ -20,11 +20,11 @@ jobs:
   release-please:
     name: Create Release PR / Tag
     runs-on: ubuntu-latest
-    needs: [ test ]
 
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.strip_tag.outputs.clean_tag }}
+      prs_created: ${{ steps.release.outputs.prs_created }}
 
     steps:
       - name: Release Please
@@ -44,6 +44,8 @@ jobs:
   test:
     name: Run Tests (core + db)
     runs-on: ubuntu-latest
+    needs: [ release-please ]
+    if: ${{ needs.release-please.outputs.prs_created == 'true' }}
     env:
       CXX: g++-14
       CC: gcc-14
