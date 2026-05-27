@@ -26,6 +26,7 @@
 #include <awsmock/core/container/DomainSocketResult.h>
 #include <awsmock/core/container/TlsSocket.h>
 #include <awsmock/core/container/UnixSocket.h>
+#include <awsmock/core/container/WindowsSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/internal/WebSocketCommand.h>
@@ -46,12 +47,7 @@
 #include <awsmock/dto/container/StopContainerRequest.h>
 #include <awsmock/dto/container/VersionResponse.h>
 #include <awsmock/dto/container/model/ContainerStat.h>
-
-#include "awsmock/entity/apps/Application.h"
-
-#ifdef _WIN32
-#include <awsmock/core/WindowsSocket.h>
-#endif
+#include <awsmock/entity/apps/Application.h>
 
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
@@ -98,8 +94,7 @@ namespace AwsMock::Service {
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -470,8 +465,7 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-      private:
-
+    private:
         /**
          * @brief Write the lambda docker file.
          *
@@ -561,7 +555,8 @@ namespace AwsMock::Service {
          * @return CreateContainerResponse
          */
         [[nodiscard]]
-        Dto::Docker::CreateContainerResponse SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, int hostPort, const std::vector<std::string> &environment) const;
+        Dto::Docker::CreateContainerResponse SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, int hostPort,
+                                                                 const std::vector<std::string> &environment) const;
 
         /**
          * @brief Guarded domain socket helper
@@ -636,4 +631,4 @@ namespace AwsMock::Service {
         static thread_local std::shared_ptr<Core::DomainSocket> _domainSocket;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
