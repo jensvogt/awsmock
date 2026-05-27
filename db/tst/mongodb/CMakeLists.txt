@@ -9,6 +9,6 @@ target_link_libraries(${BINARY} PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_stat
 target_link_libraries(${BINARY} PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(${BINARY} PRIVATE OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
         Boost::thread Boost::process Boost::date_time Boost::url Boost::unit_test_framework Boost::chrono Boost::locale
-        LibArchive::LibArchive magic)
+        LibArchive::LibArchive unofficial::libmagic::libmagic PCRE2::POSIX PCRE2::8BIT)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ..)
