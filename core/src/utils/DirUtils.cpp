@@ -22,7 +22,7 @@ namespace AwsMock::Core {
         if (localParent.empty()) {
             localParent = boost::filesystem::temp_directory_path().string();
         }
-        auto tempDir = localParent + FileUtils::separator() + boost::filesystem::unique_path().string();
+        auto tempDir = FileUtils::appendPath(localParent, boost::filesystem::unique_path().string());
         MakeDirectory(tempDir, true);
         return tempDir;
     }
@@ -40,14 +40,14 @@ namespace AwsMock::Core {
     long DirUtils::DirectoryCountFiles(const std::string &dirName, const bool recursive) {
         if (recursive) {
             return std::count_if(
-                    boost::filesystem::recursive_directory_iterator(dirName),
-                    boost::filesystem::recursive_directory_iterator(),
-                    static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+                boost::filesystem::recursive_directory_iterator(dirName),
+                boost::filesystem::recursive_directory_iterator(),
+                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
         }
         return std::count_if(
-                boost::filesystem::directory_iterator(dirName),
-                boost::filesystem::directory_iterator(),
-                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+            boost::filesystem::directory_iterator(dirName),
+            boost::filesystem::directory_iterator(),
+            static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
     }
 
     bool DirUtils::DirectoryEmpty(const std::string &dirName) {
@@ -167,4 +167,4 @@ namespace AwsMock::Core {
             }
         }
     }
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

@@ -374,7 +374,7 @@ namespace AwsMock::Service {
         std::string uploadDir = GetMultipartUploadDirectory(updateId);
         log_trace << "Using uploadDir: " << uploadDir;
 
-        std::string fileName = uploadDir + Core::FileUtils::separator() + updateId + "-" + std::to_string(part);
+        std::string fileName = Core::FileUtils::appendPath(uploadDir, updateId + "-" + std::to_string(part));
         std::ofstream ofs(fileName, std::ios::binary);
         long count = Core::FileUtils::StreamCopier(stream, ofs, length);
         ofs.close();
@@ -393,16 +393,16 @@ namespace AwsMock::Service {
         const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
 
-        const std::string sourceFile = s3DataDir + Core::FileUtils::separator() + sourceObject.internalName;
+        const std::string sourceFile = Core::FileUtils::appendPath(s3DataDir, sourceObject.internalName);
         const std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
         log_trace << "Using uploadDir: " << uploadDir;
 
-        long start = request.min;
-        long length = request.max - request.min + 1;
-        const std::string destFile = uploadDir + Core::FileUtils::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
+        const long start = request.min;
+        const long length = request.max - request.min + 1;
+        const std::string destFile = Core::FileUtils::appendPath(uploadDir, request.uploadId + "-" + std::to_string(request.partNumber));
 
         // Copy part of the file
-        long copied = Core::FileUtils::StreamCopier(sourceFile, destFile, start, length);
+        const long copied = Core::FileUtils::StreamCopier(sourceFile, destFile, start, length);
 
         // Get md5sum as ETag
         Dto::S3::UploadPartCopyResponse response;
@@ -431,7 +431,7 @@ namespace AwsMock::Service {
 
             // Output file
             const std::string filename = Core::AwsUtils::CreateS3FileName();
-            const std::string outFile = dataS3Dir + Core::FileUtils::separator() + filename;
+            const std::string outFile = Core::FileUtils::appendPath(dataS3Dir, filename);
             log_debug << "Output file, outFile: " << outFile;
 
             // Append all parts to the output file
@@ -546,7 +546,7 @@ namespace AwsMock::Service {
                 object = _database.GetObject(request.region, request.bucket, request.key);
             }
 
-            std::string filename = s3DataDir + Core::FileUtils::separator() + object.internalName;
+            std::string filename = Core::FileUtils::appendPath(s3DataDir, object.internalName);
 
             // Check decryption
             CheckDecryption(bucketEntity, object, filename);
@@ -610,7 +610,7 @@ namespace AwsMock::Service {
         request.region = region;
         request.bucket = transferBucket;
         request.owner = username;
-        request.key = Core::StringUtils::StripBeginning(filename, userHomeDir + Core::FileUtils::separator());
+        request.key = Core::StringUtils::StripBeginning(filename, userHomeDir + "/");
         request.contentType = Core::MagicDetector::instance().fromFile(filename);
         request.contentLength = Core::FileUtils::FileSize(filename);
         request.metadata = metadata;
@@ -694,7 +694,7 @@ namespace AwsMock::Service {
         log_trace << "Copy object request: " << request.ToString();
 
         const auto dataDir = Core::Configuration::instance().get<std::string>("awsmock.data-dir");
-        const std::string dataS3Dir = dataDir + Core::FileUtils::separator() + "s3";
+        const std::string dataS3Dir = Core::FileUtils::appendPath(dataDir, "s3");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Check existence
@@ -723,8 +723,8 @@ namespace AwsMock::Service {
 
             // Copy the physical file
             const std::string targetFile = Core::AwsUtils::CreateS3FileName();
-            const std::string sourcePath = dataS3Dir + Core::FileUtils::separator() + sourceObject.internalName;
-            const std::string targetPath = dataS3Dir + Core::FileUtils::separator() + targetFile;
+            const std::string sourcePath = Core::FileUtils::appendPath(dataS3Dir, sourceObject.internalName);
+            const std::string targetPath = Core::FileUtils::appendPath(dataS3Dir, targetFile);
             Core::FileUtils::CopyTo(sourcePath, targetPath);
 
             // Add default metadata if existing. Can be overwritten by request metadata
@@ -802,8 +802,8 @@ namespace AwsMock::Service {
 
             // Copy the physical file
             const std::string targetFile = Core::AwsUtils::CreateS3FileName();
-            const std::string sourcePath = dataS3Dir + Core::FileUtils::separator() + sourceObject.internalName;
-            const std::string targetPath = dataS3Dir + Core::FileUtils::separator() + targetFile;
+            const std::string sourcePath = Core::FileUtils::appendPath(dataS3Dir, sourceObject.internalName);
+            const std::string targetPath = Core::FileUtils::appendPath(dataS3Dir, targetFile);
             Core::FileUtils::CopyTo(sourcePath, targetPath);
 
             // Update database
@@ -896,7 +896,7 @@ namespace AwsMock::Service {
 
             Dto::S3::GetObjectCounterResponse getObjectCounterResponse;
             auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
-            std::string body = Core::FileUtils::ReadFile(dataS3Dir + Core::FileUtils::separator() + object.internalName);
+            std::string body = Core::FileUtils::ReadFile(Core::FileUtils::appendPath(dataS3Dir, object.internalName));
 
             Dto::S3::ObjectCounter objectCounter;
             objectCounter.oid = object.oid;
@@ -943,7 +943,7 @@ namespace AwsMock::Service {
 
             // Write the file
             std::string fileName = Core::AwsUtils::CreateS3FileName();
-            std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
+            std::string filePath = Core::FileUtils::appendPath(dataS3Dir, fileName);
 
             // Write the file in chunks
             std::string data = Core::Crypto::Base64Decode(request.content);
@@ -1380,7 +1380,7 @@ namespace AwsMock::Service {
     std::string S3Service::GetMultipartUploadDirectory(const std::string &uploadId) {
         const auto tempDir = Core::Configuration::instance().get<std::string>("awsmock.temp-dir");
         Core::DirUtils::EnsureDirectory(tempDir);
-        return tempDir + Core::FileUtils::separator() + uploadId;
+        return Core::FileUtils::appendPath(tempDir, uploadId);
     }
 
     void S3Service::ReloadAllCounters() const {
@@ -1395,13 +1395,13 @@ namespace AwsMock::Service {
         const auto transferBucket = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.bucket");
 
         if (!internalName.empty()) {
-            std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
+            std::string filename = Core::FileUtils::appendPath(dataS3Dir, internalName);
             Core::FileUtils::RemoveFile(filename);
             log_debug << "File system object deleted, filename: " << filename;
 
             if (bucket == transferBucket) {
                 filename = key;
-                filename = transferDir + Core::FileUtils::separator() + Core::FileUtils::SetFileSeparator(filename);
+                filename = Core::FileUtils::appendPath(transferDir, filename);
                 Core::FileUtils::RemoveFile(filename);
                 log_debug << "Transfer file system object deleted, filename: " << filename;
             }
@@ -1415,7 +1415,7 @@ namespace AwsMock::Service {
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // TODO: List object in bucket und delete each object individually
-        if (const std::string bucketDir = dataS3Dir + Core::FileUtils::separator() + bucket; Core::DirUtils::DirectoryExists(bucketDir)) {
+        if (const std::string bucketDir = Core::FileUtils::appendPath(dataS3Dir, bucket); Core::DirUtils::DirectoryExists(bucketDir)) {
             Core::DirUtils::DeleteDirectory(bucketDir);
             log_debug << "Bucket directory deleted, bucketDir: " + bucketDir;
         }
@@ -1429,7 +1429,7 @@ namespace AwsMock::Service {
 
         // Write the file
         std::string fileName = Core::AwsUtils::CreateS3FileName();
-        std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
+        std::string filePath = Core::FileUtils::appendPath(dataS3Dir, fileName);
 
         std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
         long count = Core::FileUtils::StreamCopier(stream, ofs, request.contentLength);
@@ -1510,7 +1510,7 @@ namespace AwsMock::Service {
 
         // Write the file
         std::string fileName = Core::AwsUtils::CreateS3FileName();
-        std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
+        std::string filePath = Core::FileUtils::appendPath(dataS3Dir, fileName);
 
         // Write the file in chunks
         std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
@@ -1701,4 +1701,4 @@ namespace AwsMock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

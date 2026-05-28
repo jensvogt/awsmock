@@ -80,13 +80,13 @@ namespace AwsMock::Service {
         std::ifstream ifs(applicationCodeFile);
         const std::string applicationCode((std::istreambuf_iterator(ifs)), std::istreambuf_iterator<char>());
         ifs.close();
-        Core::Crypto::Base64Decode(applicationCode, codeDir + Core::FileUtils::separator() + applicationEntity.archive);
+        Core::Crypto::Base64Decode(applicationCode, Core::FileUtils::appendPath(codeDir, applicationEntity.archive));
         log_debug << "Created Base64 string, length: " << applicationCode.size();
 
         // Unzip if necessary
         if (applicationEntity.runtime.find("python") != std::string::npos) {
-            Core::ZipUtils::Unzip(codeDir + Core::FileUtils::separator() + applicationEntity.archive, codeDir);
-            Core::FileUtils::RemoveFile(codeDir + Core::FileUtils::separator() + applicationEntity.archive);
+            Core::ZipUtils::Unzip(Core::FileUtils::appendPath(codeDir, applicationEntity.archive), codeDir);
+            Core::FileUtils::RemoveFile(Core::FileUtils::appendPath(codeDir, applicationEntity.archive));
             log_debug << "Unzipped Python code, dir: " << codeDir;
         }
 
@@ -128,7 +128,7 @@ namespace AwsMock::Service {
         const auto tempDir = Core::Configuration::instance().get<std::string>("awsmock.temp-dir");
 
         // Decode the Base64 file
-        const std::string zipFile = tempDir + Core::FileUtils::separator() + Core::StringUtils::GenerateRandomHexString(8) + ".zip";
+        const std::string zipFile = Core::FileUtils::appendPath(tempDir, Core::StringUtils::GenerateRandomHexString(8) + ".zip");
         Core::Crypto::Base64Decode(applicationCode, zipFile);
 
         try {
@@ -137,7 +137,7 @@ namespace AwsMock::Service {
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
                 // Create the classes directory
-                const std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
+                const std::string classesDir = Core::FileUtils::appendPath(codeDir, "classes");
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.
@@ -175,8 +175,8 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -191,7 +191,7 @@ namespace AwsMock::Service {
         // Get the base64 encoded application code
         const auto applicationDataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
         const std::string base64File = application.name + "-" + application.version + ".b64";
-        std::string fullBase64File = applicationDataDir + Core::FileUtils::separator() + base64File;
+        std::string fullBase64File = Core::FileUtils::appendPath(applicationDataDir, base64File);
         log_debug << "Using Base64File: " << fullBase64File;
 
         // Create the application asynchronously
@@ -278,7 +278,7 @@ namespace AwsMock::Service {
 
         // Get code base64 file name
         auto dataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
-        std::string fullBase64File = Core::FileUtils::appendPath(dataDir, Core::FileUtils::separator(), application.name, "-", application.version, ".b64");
+        std::string fullBase64File = Core::FileUtils::appendPath(dataDir, application.name + "-" + application.version + ".b64");
         if (!Core::FileUtils::FileExists(fullBase64File)) {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
             application = _database.UpdateApplication(application);
@@ -384,7 +384,7 @@ namespace AwsMock::Service {
         log_debug << "Application stopped, name: " << application.name;
 
         const auto dataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
-        const auto fullBase64File = dataDir + Core::FileUtils::separator() + Core::FileUtils::separator() + application.name + "-" + application.version + ".b64";
+        const auto fullBase64File = Core::FileUtils::appendPath(dataDir, application.name + "-" + application.version + ".b64");
 
         // Check whether a container exists already
         if (application.containerName.empty() || !ContainerService::instance().ContainerExistsByImageName(application.name, application.version)) {
@@ -563,7 +563,7 @@ namespace AwsMock::Service {
         auto applicationDataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
 
         std::string base64File = application.name + "-" + version + ".b64";
-        std::string base64FullFile = applicationDataDir + Core::FileUtils::separator() + base64File;
+        std::string base64FullFile = Core::FileUtils::appendPath(applicationDataDir, base64File);
         log_debug << "Using Base64File: " << base64FullFile;
 
         // If we do not have a local file already or the MD5 sum changed, write the Base64 encoded file to lambda dir
@@ -607,4 +607,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

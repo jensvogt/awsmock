@@ -426,7 +426,7 @@ namespace AwsMock::Service {
     void ModuleService::ImportLocalS3File(const Database::Entity::S3::Object &object) {
         if (Core::FileUtils::FileExists(object.localName)) {
             const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
-            const std::string localFilePath = s3DataDir + "/" + object.internalName;
+            const std::string localFilePath = Core::FileUtils::appendPath(s3DataDir, object.internalName);
             Core::FileUtils::CopyTo(object.localName, localFilePath);
             log_info << "Local file imported, bucket: " << object.bucket << ", key: " << object.key << ", localName: " << object.localName;
         } else {
@@ -481,4 +481,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_info << "Infrastructure exported, file: " << filename;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

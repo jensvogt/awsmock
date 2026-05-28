@@ -5,7 +5,7 @@
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
-    std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_instanceMutex;
+    std::map<std::string, std::shared_ptr<boost::mutex> > LambdaService::_instanceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string>> environments;
+            std::vector<std::pair<std::string, std::string> > environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -445,7 +445,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string>> tags;
+            std::vector<std::pair<std::string, std::string> > tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -610,12 +610,12 @@ namespace AwsMock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-            function.handler = lambda.handler,
-            function.runtime = lambda.runtime,
-            function.lastUpdateStatus = "Successful",
-            function.state = LambdaStateToString(lambda.state),
-            function.stateReason = lambda.stateReason,
-            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+                    function.handler = lambda.handler,
+                    function.runtime = lambda.runtime,
+                    function.lastUpdateStatus = "Successful",
+                    function.state = LambdaStateToString(lambda.state),
+                    function.stateReason = lambda.stateReason,
+                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -1292,14 +1292,14 @@ namespace AwsMock::Service {
 
     std::string LambdaService::GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda) {
         const auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
-        return lambdaDir + Core::FileUtils::separator() + lambda.function + "-" + lambda.dockerTag + ".b64";
+        return Core::FileUtils::appendPath(lambdaDir, lambda.function + "-" + lambda.dockerTag + ".b64");
     }
 
     std::string LambdaService::GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const {
         const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
         const Database::Entity::S3::Object object = _s3Database.GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
-        return s3DataDir + Core::FileUtils::separator() + object.internalName;
+        return Core::FileUtils::appendPath(s3DataDir, object.internalName);
     }
 
     void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {
@@ -1408,7 +1408,7 @@ namespace AwsMock::Service {
 
     void LambdaService::WriteBase64File(const std::string &base64File, const std::string &content) {
         auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
-        std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
+        std::string base64FullFile = Core::FileUtils::appendPath(lambdaDir, base64File);
         log_debug << "Using Base64File: " << base64FullFile;
 
         std::ofstream ofs(base64FullFile);
@@ -1416,4 +1416,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

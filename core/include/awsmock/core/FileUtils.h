@@ -313,21 +313,6 @@ namespace AwsMock::Core {
         static void Base64DecodeFile(const std::string &filePath);
 
         /**
-         * @brief File path separator
-         *
-         * @return file path separator
-         */
-        static std::string SetFileSeparator(std::string &filePath);
-
-        /**
-         * @brief Converts a Unix-style path (forward slashes) to a Windows-style path (backslashes).
-         *
-         * @param unixPath Unix path string
-         * @return Windows path string
-         */
-        static std::string toWindowsPath(const std::string &unixPath);
-
-        /**
          * @brief Remove the last n bytes from the file
          *
          * @param filename name of the file
@@ -419,48 +404,24 @@ namespace AwsMock::Core {
         static std::string ExtractVersionFromFileName(const std::string &filename);
 
         /**
-         * @brief File path separator
-         *
-         * @return file path separator
-         */
-        static std::string separator();
-
-        /**
          * Mime types from file extensions
          */
         const static std::map<std::string, std::string> MimeTypes;
 
+        /**
+         * @brief Append the different file path parts using the correct separator for Windows, Linux and macOS
+         *
+         * @tparam Ts type
+         * @param args variable list of arguments
+         * @return file path with correct separator
+         */
         template<typename... Ts>
         static std::string appendPath(Ts &&... args) {
-            std::ostringstream oss;
-            (oss << ... << std::forward<Ts>(args));
-            return oss.str();
+            std::filesystem::path result;
+            ((result /= std::forward<Ts>(args)), ...);
+            return result.string();
         }
     };
-
-    inline std::string FileUtils::SetFileSeparator(std::string &filePath) {
-        boost::replace_all(filePath, "\\", "/");
-        return filePath;
-    }
-
-    inline std::string FileUtils::toWindowsPath(const std::string &unixPath) {
-#ifdef _WIN32
-        std::string result = unixPath;
-        boost::replace_all(result, "/", "\\");
-        return result;
-#else
-        return unixPath;
-#endif
-    }
-
-    inline std::string FileUtils::separator() {
-#ifdef _WIN32
-        return "\\";
-#else
-        return "/";
-#endif
-    }
-
 
 } // namespace AwsMock::Core
 

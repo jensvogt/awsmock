@@ -234,7 +234,8 @@ namespace AwsMock::Service {
         return containers;
     }
 
-    Dto::Docker::CreateContainerResponse ContainerService::SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, const int hostPort, const std::vector<std::string> &environment) const {
+    Dto::Docker::CreateContainerResponse ContainerService::SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, const int hostPort,
+                                                                               const std::vector<std::string> &environment) const {
         Dto::Docker::CreateContainerRequest request;
         request.hostName = hostName;
         request.domainName = "awsmock";
@@ -278,7 +279,8 @@ namespace AwsMock::Service {
         return SendCreateContainer(imageName, tag, instanceName, instanceName, _containerPort, hostPort, environment);
     }
 
-    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort, const int containerPort) const {
+    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort,
+                                                                           const int containerPort) const {
         return SendCreateContainer(imageName, tag, imageName, instanceName, std::to_string(containerPort), hostPort, environment);
     }
 
@@ -488,7 +490,7 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
-        const std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
+        const std::string dockerFilename = Core::FileUtils::appendPath(codeDir, "Dockerfile");
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
         const auto supportedRuntime = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
@@ -547,7 +549,7 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity) {
-        const std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
+        const std::string dockerFilename = Core::FileUtils::appendPath(codeDir, "Dockerfile");
         std::string dockerFileContent = applicationEntity.dockerFile;
         Core::StringUtils::Replace(dockerFileContent, "$$ENV$$", AddEnvironment(applicationEntity.environment));
         Core::StringUtils::Replace(dockerFileContent, "$$PORT$$", std::to_string(applicationEntity.privatePort));
@@ -562,11 +564,11 @@ namespace AwsMock::Service {
 
     std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &name) {
 #ifdef _WIN32
-        const std::string tarFileName = codeDir + Core::FileUtils::separator() + name + ".tar";
+        const std::string tarFileName = Core::FileUtils::appendPath(codeDir, name + ".tar");
 #else
-        const std::string tarFileName = codeDir + Core::FileUtils::separator() + name + ".tgz";
+        const std::string tarFileName = Core::FileUtils::appendPath(codeDir, name + ".tgz");
 #endif
-        Core::TarUtils::TarDirectory(tarFileName, codeDir + Core::FileUtils::separator());
+        Core::TarUtils::TarDirectory(tarFileName, codeDir);
         log_debug << "Zipped TAR file written: " << tarFileName;
         return tarFileName;
     }
@@ -595,9 +597,8 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::AddCredentials(const std::string &codeDir, const std::string &region) {
-        const std::string sep = Core::FileUtils::separator();
 
-        std::ofstream credOfs(codeDir + sep + "credentials");
+        std::ofstream credOfs(Core::FileUtils::appendPath(codeDir, "credentials"));
         credOfs << "[default]\n"
                 << "region=" << region << "\n"
                 << "aws_access_key_id=none\n"
@@ -606,12 +607,12 @@ namespace AwsMock::Service {
                 << "retry_mode=standard\n"
                 << "max_attempts=1\n";
 
-        std::ofstream cfgOfs(codeDir + sep + "config");
+        std::ofstream cfgOfs(Core::FileUtils::appendPath(codeDir, "config"));
         cfgOfs << "[default]\n"
-               << "region=" << region << "\n"
-               << "output=json\n";
+                << "region=" << region << "\n"
+                << "output=json\n";
 
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
