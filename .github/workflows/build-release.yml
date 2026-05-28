@@ -417,9 +417,9 @@ jobs:
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/key.pem
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
           cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
@@ -569,9 +569,9 @@ jobs:
           cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/awsmock/etc/key.pem
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
           cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
           cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
           cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend

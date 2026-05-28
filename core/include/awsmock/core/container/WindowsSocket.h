@@ -37,14 +37,14 @@ namespace AwsMock::Core {
      */
     class WindowsSocket final : public DomainSocket {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
          * @param path domain socket path
          */
-        explicit WindowsSocket(const std::string &path) : DomainSocket(path) {};
+        explicit WindowsSocket(const std::string &path) : DomainSocket(path) {
+        };
 
         /**
          * @brief Send JSON data
@@ -130,10 +130,10 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        [[nodiscard]] boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
+        [[nodiscard]]
+        boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
 
-      private:
-
+    private:
         /**
          * @brief Get the host and port from the supplied URL
          *
@@ -144,4 +144,4 @@ namespace AwsMock::Core {
         static void GetHostPort(const std::string &url, std::string &host, int &port);
     };
 
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core
