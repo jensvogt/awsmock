@@ -43,7 +43,7 @@ namespace AwsMock::FtpServer {
         try {
             if (Database::Entity::Cognito::User user = Database::CognitoDatabase::instance().GetUserByUserName(_region, _userPoolId, username); user.password == password) {
 
-                std::string homeDir = _baseDir + Core::FileUtils::separator() + user.userName;
+                std::string homeDir = Core::FileUtils::appendPath(_baseDir, user.userName);
 
                 // Ensure the home directory exists
                 Core::DirUtils::EnsureDirectory(homeDir);
@@ -65,7 +65,7 @@ namespace AwsMock::FtpServer {
     void UserDatabase::CreateDirectories(const std::string &userName) {
         const auto basePath = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
         for (const auto &directory: Core::Configuration::instance().getArray<std::string>("awsmock.modules.transfer.directories")) {
-            if (std::string dirPath = basePath + Core::FileUtils::separator() + userName + Core::FileUtils::separator() + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
+            if (std::string dirPath = Core::FileUtils::appendPath(basePath, userName, directory); !Core::DirUtils::DirectoryExists(dirPath)) {
                 Core::DirUtils::MakeDirectory(dirPath, true);
                 log_debug << "Created directory, path: " << dirPath;
             }
@@ -76,4 +76,4 @@ namespace AwsMock::FtpServer {
         return (username.empty() || username == "ftp" || username == "anonymous");
     }
 
-}// namespace AwsMock::FtpServer
+} // namespace AwsMock::FtpServer

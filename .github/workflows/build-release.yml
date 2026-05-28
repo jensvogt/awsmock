@@ -9,6 +9,7 @@ env:
   APP_NAME: "awsmock"
   INSTALLER_ID: "de.jensvogt.awsmock"
   VCPKG_BUILD_TYPE: release
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: write
@@ -51,6 +52,7 @@ jobs:
       CC: gcc-14
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
       BUILD_DIR: "${{ github.workspace }}/build-test"
     services:
       mongodb:
@@ -76,17 +78,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev
-
-      - name: Cache vcpkg packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
-
-      - name: Create vcpkg binary cache directory
-        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -134,6 +125,7 @@ jobs:
     env:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
       BUILD_DIR: "${{ github.workspace }}/cmake-build-release"
       PACKAGE_DIR: "${{ github.workspace }}/package-windows"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
@@ -149,18 +141,6 @@ jobs:
         uses: step-security/msvc-dev-cmd@v1
         with:
           arch: x64
-
-      - name: Cache vcpkg packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
-
-      - name: Create vcpkg binary cache directory
-        shell: pwsh
-        run: New-Item -Path "${{ env.VCPKG_DEFAULT_BINARY_CACHE }}" -ItemType Directory -Force
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -216,6 +196,7 @@ jobs:
     env:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
       BUILD_DIR: "${{ github.workspace }}/build-macos"
       PACKAGE_DIR: "${{ github.workspace }}/package-macos"
       SEMVER: ${{ needs.release-please.outputs.tag_name }}
@@ -231,17 +212,6 @@ jobs:
         shell: bash
         run: |
           brew install doxygen pandoc file autoconf autoconf-archive automake libtool
-
-      - name: Cache vcpkg packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
-
-      - name: Create vcpkg binary cache directory
-        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -338,6 +308,7 @@ jobs:
       CC: gcc-14
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
       PACKAGE_DIR: "${{ github.workspace }}/package-deb"
       BUILD_DIR: "${{ github.workspace }}/build-deb"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
@@ -353,17 +324,6 @@ jobs:
           sudo apt update
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool g++-14
           sudo gem install --no-document fpm
-
-      - name: Cache vcpkg packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
-
-      - name: Create vcpkg binary cache directory
-        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -489,6 +449,7 @@ jobs:
       CC: gcc-14
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
       PACKAGE_DIR: "${{ github.workspace }}/package-rpm"
       BUILD_DIR: "${{ github.workspace }}/build-rpm"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
@@ -505,17 +466,6 @@ jobs:
           sudo apt update
           sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
           sudo gem install --no-document fpm
-
-      - name: Cache vcpkg packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
-
-      - name: Create vcpkg binary cache directory
-        run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11

@@ -148,7 +148,7 @@ namespace AwsMock::Service {
 
         // Check the base64 encoded zip file
         const auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
-        const std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + zipFile;
+        const std::string base64FullFile = Core::FileUtils::appendPath(lambdaDir, zipFile);
         if (!Core::FileUtils::FileExists(base64FullFile)) {
             log_error << "Base64 file does not exist, path: " << base64FullFile;
             throw Core::ContainerException("Base64 file does not exist, path: " + base64FullFile);
@@ -195,7 +195,7 @@ namespace AwsMock::Service {
         const auto tempDir = Core::Configuration::instance().get<std::string>("awsmock.temp-dir");
 
         // Decode the Base64 file
-        const std::string zipFile = tempDir + Core::FileUtils::separator() + Core::StringUtils::GenerateRandomHexString(8) + ".zip";
+        const std::string zipFile = Core::FileUtils::appendPath(tempDir, Core::StringUtils::GenerateRandomHexString(8) + ".zip");
         Core::Crypto::Base64Decode(functionCode, zipFile);
 
         try {
@@ -204,7 +204,7 @@ namespace AwsMock::Service {
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
                 // Create the classes directory
-                const std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
+                const std::string classesDir = Core::FileUtils::appendPath(codeDir, "classes");
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.
@@ -256,7 +256,7 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
@@ -266,7 +266,7 @@ namespace AwsMock::Service {
         auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
 
         std::string base64File = lambda.function + "-" + dockerTag + ".b64";
-        std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
+        std::string base64FullFile = Core::FileUtils::appendPath(lambdaDir, base64File);
         log_debug << "Using Base64File: " << base64FullFile;
 
         std::string base64EncodedCodeString = zipFile;
@@ -276,7 +276,7 @@ namespace AwsMock::Service {
 
             // Get internal name of S3 object
             Database::Entity::S3::Object s3Object = Database::S3Database::instance().GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
-            std::string s3CodeFile = s3DataDir + Core::FileUtils::separator() + s3Object.internalName;
+            std::string s3CodeFile = Core::FileUtils::appendPath(s3DataDir, s3Object.internalName);
 
             // Load file
             std::vector<char> input;
@@ -317,4 +317,4 @@ namespace AwsMock::Service {
         lambda.code.zipFile = base64File;
         return base64FullFile;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

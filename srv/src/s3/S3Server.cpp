@@ -51,7 +51,7 @@ namespace AwsMock::Service {
             std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000);
             while (!objects.empty()) {
                 for (const auto &object: objects) {
-                    if (!Core::FileUtils::FileExists(s3DataDir + Core::FileUtils::separator() + object.internalName)) {
+                    if (!Core::FileUtils::FileExists(Core::FileUtils::appendPath(s3DataDir, object.internalName))) {
                         const long deleted = _s3Database.DeleteObject(object);
                         log_debug << "Object deleted, internalName: " << object.internalName << ", count: " << deleted;
                         objectsDeleted++;
@@ -108,4 +108,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("s3-sync-objects");
         _scheduler.Shutdown("s3-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

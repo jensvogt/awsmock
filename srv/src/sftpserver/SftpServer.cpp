@@ -154,7 +154,7 @@ static void clear_filexfer_attrib(struct sftp_attributes_struct *z_attr) {
 struct ssh_common_struct {
     error_struct error;
     ssh_callbacks callbacks; /* Callbacks to user functions */
-    int log_verbosity;       /* verbosity of the log functions */
+    int log_verbosity; /* verbosity of the log functions */
 };
 
 static int unix_errno_to_ssh_stat(int u_errno) {
@@ -908,7 +908,7 @@ static int process_open(sftp_client_message client_msg) {
 
     if ((msg_flag & static_cast<uint32_t>(SSH_FXF_READ)) == SSH_FXF_READ &&
         (msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
-        file_flag = O_RDWR;// file must exist
+        file_flag = O_RDWR; // file must exist
         if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT) file_flag |= O_CREAT;
     } else if ((msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
         file_flag = O_WRONLY;
@@ -2066,32 +2066,32 @@ extern int sftp_reply_version(sftp_client_message client_msg);
  * may have different representations but the values are always the same.
  */
 const sftp_message_handler message_handlers[] = {
-        {"open", nullptr, SSH_FXP_OPEN, process_open},
-        {"close", nullptr, SSH_FXP_CLOSE, process_close},
-        {"read", nullptr, SSH_FXP_READ, process_read},
-        {"write", nullptr, SSH_FXP_WRITE, process_write},
-        {"lstat", nullptr, SSH_FXP_LSTAT, process_lstat},
-        {"fstat", nullptr, SSH_FXP_FSTAT, process_unsupported},
-        {"setstat", nullptr, SSH_FXP_SETSTAT, process_setstat},//7
-        {"fsetstat", nullptr, SSH_FXP_FSETSTAT, process_unsupported},
-        {"opendir", nullptr, SSH_FXP_OPENDIR, process_opendir},
-        {"readdir", nullptr, SSH_FXP_READDIR, process_readdir},
-        {"remove", nullptr, SSH_FXP_REMOVE, process_remove},
-        {"mkdir", nullptr, SSH_FXP_MKDIR, process_mkdir},
-        {"rmdir", nullptr, SSH_FXP_RMDIR, process_rmdir},
-        {"realpath", nullptr, SSH_FXP_REALPATH, process_realpath},//14
-        {"stat", nullptr, SSH_FXP_STAT, process_stat},
-        {"rename", nullptr, SSH_FXP_RENAME, process_unsupported},
-        {"readlink", nullptr, SSH_FXP_READLINK, process_readlink},
-        {"symlink", nullptr, SSH_FXP_SYMLINK, process_symlink},
-        {"init", nullptr, SSH_FXP_INIT, sftp_reply_version},
-        {nullptr, nullptr, 0, nullptr},
+    {"open", nullptr, SSH_FXP_OPEN, process_open},
+    {"close", nullptr, SSH_FXP_CLOSE, process_close},
+    {"read", nullptr, SSH_FXP_READ, process_read},
+    {"write", nullptr, SSH_FXP_WRITE, process_write},
+    {"lstat", nullptr, SSH_FXP_LSTAT, process_lstat},
+    {"fstat", nullptr, SSH_FXP_FSTAT, process_unsupported},
+    {"setstat", nullptr, SSH_FXP_SETSTAT, process_setstat}, //7
+    {"fsetstat", nullptr, SSH_FXP_FSETSTAT, process_unsupported},
+    {"opendir", nullptr, SSH_FXP_OPENDIR, process_opendir},
+    {"readdir", nullptr, SSH_FXP_READDIR, process_readdir},
+    {"remove", nullptr, SSH_FXP_REMOVE, process_remove},
+    {"mkdir", nullptr, SSH_FXP_MKDIR, process_mkdir},
+    {"rmdir", nullptr, SSH_FXP_RMDIR, process_rmdir},
+    {"realpath", nullptr, SSH_FXP_REALPATH, process_realpath}, //14
+    {"stat", nullptr, SSH_FXP_STAT, process_stat},
+    {"rename", nullptr, SSH_FXP_RENAME, process_unsupported},
+    {"readlink", nullptr, SSH_FXP_READLINK, process_readlink},
+    {"symlink", nullptr, SSH_FXP_SYMLINK, process_symlink},
+    {"init", nullptr, SSH_FXP_INIT, sftp_reply_version},
+    {nullptr, nullptr, 0, nullptr},
 };
 
 const sftp_message_handler extended_handlers[] = {
-        /* here are some extended type handlers */
-        {"statvfs", "statvfs@openssh.com", 0, process_extended_statvfs},
-        {nullptr, nullptr, 0, nullptr},
+    /* here are some extended type handlers */
+    {"statvfs", "statvfs@openssh.com", 0, process_extended_statvfs},
+    {nullptr, nullptr, 0, nullptr},
 };
 
 static int process_extended(sftp_client_message sftp_msg) {
@@ -3259,7 +3259,11 @@ static int auth_password(ssh_session session, const char *user, const char *pass
         const auto ftpBaseDir = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
         userBasePath = static_cast<char *>(malloc(1024));
         strcpy(userBasePath, ftpBaseDir.c_str());
-        strcpy(userBasePath + strlen(userBasePath), AwsMock::Core::FileUtils::separator().c_str());
+#ifdef _WIN332
+        strcpy(userBasePath + strlen(userBasePath), "/");
+#else
+        strcpy(userBasePath + strlen(userBasePath), "\\");
+#endif
         strcpy(userBasePath + strlen(userBasePath), currentUser);
         log_info << "SFTP user authenticated, userName: " << userEntity << ", homeDir: " << userBasePath;
         return SSH_AUTH_SUCCESS;
@@ -3386,7 +3390,7 @@ static void handle_session(const ssh_event &event, const ssh_session &session) {
         ssh_event_dopoll(event, 100);
     }
 }
-}// extern C
+} // extern C
 
 namespace AwsMock::Service {
     void SftpServer::AddUser(const std::string &userName, const std::string &password, const std::string &homeDirectory) {
@@ -3469,4 +3473,4 @@ namespace AwsMock::Service {
         ssh_bind_free(sshbind);
         ssh_finalize();
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
