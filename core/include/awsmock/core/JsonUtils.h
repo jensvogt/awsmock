@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/17/24.
 //
 
-#ifndef AWS_MOCK_CORE_JSON_UTILS_H
-#define AWS_MOCK_CORE_JSON_UTILS_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -147,5 +146,3 @@ namespace AwsMock::Core::Json {
         return value.as_object().if_contains(name);
     }
 } // namespace AwsMock::Core::Json
-
-#endif// AWS_MOCK_CORE_JSON_UTILS_H

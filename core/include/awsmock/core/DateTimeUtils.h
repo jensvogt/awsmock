@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWS_MOCK_CORE_DATETIME_UTILS_H
-#define AWS_MOCK_CORE_DATETIME_UTILS_H
+#pragma once
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -45,8 +44,7 @@ namespace AwsMock::Core {
      */
     class DateTimeUtils {
 
-      public:
-
+    public:
         /**
          * @brief Returns the time_point in ISO8001 format
          *
@@ -203,6 +201,4 @@ namespace AwsMock::Core {
         static system_clock::time_point ConvertToUtc(const system_clock::time_point &value);
     };
 
-}// namespace AwsMock::Core
-
-#endif
+} // namespace AwsMock::Core

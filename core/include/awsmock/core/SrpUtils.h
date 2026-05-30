@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/19/24.
 //
 
-#ifndef AWS_MOCK_CORE_SRP_UTILS_H
-#define AWS_MOCK_CORE_SRP_UTILS_H
+#pragma once
 
 // C++ includes
 #include <cassert>
@@ -22,23 +21,30 @@
 
 namespace AwsMock::Core {
 
-    enum { M_FROM_K,
-           M_FROM_S,
+    enum {
+        M_FROM_K,
+        M_FROM_S,
     };
-    enum { RANDOM_SIZE = 32,
+
+    enum {
+        RANDOM_SIZE = 32,
     };
 
     class SrpUtils {
 
-      public:
-
+    public:
         explicit SrpUtils(int nMFrom = M_FROM_K);
+
         ~SrpUtils();
 
         const BIGNUM *CalcB();
+
         bool CalcV(BIGNUM **ppSalt, const char *pszPassword);
+
         void SetSaltAndV(BIGNUM *pSalt, BIGNUM *pV);
+
         bool VerifyA(const BIGNUM *pA);
+
         bool VerifyM1(const BIGNUM *pM1);
 
         /**
@@ -49,32 +55,47 @@ namespace AwsMock::Core {
          */
         bool VerifyA(const std::string &srpAStr);
 
-      private:
-
+    private:
         // Common
         // non-const method
         const BIGNUM *CalcM1();
+
         const BIGNUM *CalcM2();
+
         void SetA(BIGNUM *pA);
+
         void SetB(BIGNUM *pB);
+
         void SetI(const char *pszUserName);
+
         void SetMFrom(int nMFrom);
+
         void SetS(BIGNUM *pS);
+
         void SetSalt(BIGNUM *pSalt);
 
         // non-const method
         const BIGNUM *CalcM1FromK();
+
         const BIGNUM *CalcM1FromS();
 
         // const method
         [[nodiscard]] const BIGNUM *GetA() const;
+
         [[nodiscard]] const BIGNUM *GetB() const;
+
         [[nodiscard]] const BIGNUM *Getg() const;
+
         [[nodiscard]] const char *GetI() const;
+
         [[nodiscard]] const BIGNUM *GetK() const;
+
         [[nodiscard]] int GetMFrom() const;
+
         [[nodiscard]] const BIGNUM *GetN() const;
+
         [[nodiscard]] const BIGNUM *GetS() const;
+
         [[nodiscard]] const BIGNUM *GetSalt() const;
 
         int m_nMFrom;
@@ -129,6 +150,5 @@ namespace AwsMock::Core {
     inline void SrpUtils::SetMFrom(const int nMFrom) {
         m_nMFrom = nMFrom;
     }
-}// namespace AwsMock::Core
 
-#endif// AWS_MOCK_CORE_SRP_UTILS_H
+} // namespace AwsMock::Core

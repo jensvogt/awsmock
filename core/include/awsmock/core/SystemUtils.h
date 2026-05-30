@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/11/2022.
 //
 
-#ifndef AWSMOCK_CORE_SYSTEM_UTILS_H
-#define AWSMOCK_CORE_SYSTEM_UTILS_H
+#pragma once
 
 // C++ includes
 #include <filesystem>
@@ -132,4 +131,3 @@ namespace AwsMock::Core {
 
 } // namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_SYSTEM_UTILS_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_RANDOM_UTILS_H
-#define AWSMOCK_CORE_RANDOM_UTILS_H
+#pragma once
 
 // Standard C++ includes
 #include <algorithm>
@@ -24,8 +23,7 @@ namespace AwsMock::Core {
      */
     class RandomUtils {
 
-      public:
-
+    public:
         /**
          * @brief Generates a random integer between min and max
          *
@@ -74,6 +72,4 @@ namespace AwsMock::Core {
         static std::vector<double> DoubleArray(int size, double min, double max);
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_RANDOM_UTILS_H
+} // namespace AwsMock::Core

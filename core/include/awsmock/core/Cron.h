@@ -2,8 +2,6 @@
 // Created by vogje01 on 15/03/2025.
 //
 
-#ifndef AWS_MOCK_CORE_CRON_H
-#define AWS_MOCK_CORE_CRON_H
 #pragma once
 
 #include <algorithm>
@@ -54,10 +52,11 @@ namespace AwsMock::Core {
 
         template<typename Traits>
         static bool find_next(cronexpr const &cex, std::tm &date, size_t dot);
-    }// namespace detail
+    } // namespace detail
 
     struct bad_cronexpr final : std::runtime_error {
-        explicit bad_cronexpr(CRONCPP_STRING_VIEW message) : std::runtime_error(message.data()) {}
+        explicit bad_cronexpr(CRONCPP_STRING_VIEW message) : std::runtime_error(message.data()) {
+        }
     };
 
 
@@ -188,12 +187,14 @@ namespace AwsMock::Core {
         std::string expr;
 
         friend bool operator==(cronexpr const &e1, cronexpr const &e2);
+
         friend bool operator!=(cronexpr const &e1, cronexpr const &e2);
 
         template<typename Traits>
         friend bool detail::find_next(cronexpr const &cex, std::tm &date, size_t const dot);
 
         friend std::string to_cronstr(cronexpr const &cex);
+
         friend std::string to_string(cronexpr const &cex);
 
         template<typename Traits>
@@ -263,7 +264,7 @@ namespace AwsMock::Core {
             result.tm_min = minute;
             result.tm_sec = second;
 #endif
-            result.tm_isdst = -1;// DST info not available
+            result.tm_isdst = -1; // DST info not available
 
             return result;
         }
@@ -302,7 +303,7 @@ namespace AwsMock::Core {
         CRONCPP_CONSTEXPTR bool contains(CRONCPP_STRING_VIEW text, char const ch) noexcept {
             return CRONCPP_STRING_VIEW_NPOS != text.find_first_of(ch);
         }
-    }// namespace utils
+    } // namespace utils
 
     namespace detail {
 
@@ -408,11 +409,11 @@ namespace AwsMock::Core {
         static void set_cron_days_of_week(const std::string &value, std::bitset<7> &target) {
             const auto days = utils::to_upper(value);
             auto days_replaced = detail::replace_ordinals(
-                    days,
+                days,
 #ifdef CRONCPP_IS_CPP17
-                    Traits::DAYS
+                Traits::DAYS
 #else
-                    Traits::DAYS()
+                Traits::DAYS()
 #endif
             );
 
@@ -434,11 +435,11 @@ namespace AwsMock::Core {
         static void set_cron_month(const std::string &value, std::bitset<12> &target) {
             const auto month = utils::to_upper(value);
             auto month_replaced = replace_ordinals(
-                    month,
+                month,
 #ifdef CRONCPP_IS_CPP17
-                    Traits::MONTHS
+                Traits::MONTHS
 #else
-                    Traits::MONTHS()
+                Traits::MONTHS()
 #endif
             );
 
@@ -455,9 +456,9 @@ namespace AwsMock::Core {
         }
 
         inline void add_to_field(
-                std::tm &date,
-                cron_field const field,
-                int const val) {
+            std::tm &date,
+            cron_field const field,
+            int const val) {
             switch (field) {
                 case cron_field::second:
                     date.tm_sec += val;
@@ -487,9 +488,9 @@ namespace AwsMock::Core {
         }
 
         inline void set_field(
-                std::tm &date,
-                cron_field const field,
-                int const val) {
+            std::tm &date,
+            cron_field const field,
+            int const val) {
             switch (field) {
                 case cron_field::second:
                     date.tm_sec = val;
@@ -521,8 +522,8 @@ namespace AwsMock::Core {
         }
 
         inline void reset_field(
-                std::tm &date,
-                cron_field const field) {
+            std::tm &date,
+            cron_field const field) {
             switch (field) {
                 case cron_field::second:
                     date.tm_sec = 0;
@@ -554,8 +555,8 @@ namespace AwsMock::Core {
         }
 
         inline void reset_all_fields(
-                std::tm &date,
-                std::bitset<7> const &marked_fields) {
+            std::tm &date,
+            std::bitset<7> const &marked_fields) {
             for (size_t i = 0; i < marked_fields.size(); ++i) {
                 if (marked_fields.test(i))
                     reset_field(date, static_cast<cron_field>(i));
@@ -563,22 +564,22 @@ namespace AwsMock::Core {
         }
 
         inline void mark_field(
-                std::bitset<7> &orders,
-                cron_field const field) {
+            std::bitset<7> &orders,
+            cron_field const field) {
             if (!orders.test(static_cast<size_t>(field)))
                 orders.set(static_cast<size_t>(field));
         }
 
         template<size_t N>
         static size_t find_next(
-                std::bitset<N> const &target,
-                std::tm &date,
-                unsigned int const minimum,
-                unsigned int const maximum,
-                unsigned int const value,
-                cron_field const field,
-                cron_field const next_field,
-                std::bitset<7> const &marked_fields) {
+            std::bitset<N> const &target,
+            std::tm &date,
+            unsigned int const minimum,
+            unsigned int const maximum,
+            unsigned int const value,
+            cron_field const field,
+            cron_field const next_field,
+            std::bitset<7> const &marked_fields) {
             auto next_value = next_set_bit(target, minimum, maximum, value);
             if (INVALID_INDEX == next_value) {
                 add_to_field(date, next_field, 1);
@@ -596,18 +597,18 @@ namespace AwsMock::Core {
 
         template<typename Traits>
         static size_t find_next_day(
-                std::tm &date,
-                std::bitset<31> const &days_of_month,
-                size_t day_of_month,
-                std::bitset<7> const &days_of_week,
-                size_t day_of_week,
-                std::bitset<7> const &marked_fields) {
+            std::tm &date,
+            std::bitset<31> const &days_of_month,
+            size_t day_of_month,
+            std::bitset<7> const &days_of_week,
+            size_t day_of_week,
+            std::bitset<7> const &marked_fields) {
             unsigned int count = 0;
             const unsigned int maximum = 366;
             while (
-                    (!days_of_month.test(day_of_month - Traits::CRON_MIN_DAYS_OF_MONTH) ||
-                     !days_of_week.test(day_of_week - Traits::CRON_MIN_DAYS_OF_WEEK)) &&
-                    count++ < maximum) {
+                (!days_of_month.test(day_of_month - Traits::CRON_MIN_DAYS_OF_MONTH) ||
+                 !days_of_week.test(day_of_week - Traits::CRON_MIN_DAYS_OF_WEEK)) &&
+                count++ < maximum) {
                 add_to_field(date, cron_field::day_of_month, 1);
 
                 day_of_month = date.tm_mday;
@@ -628,14 +629,14 @@ namespace AwsMock::Core {
 
             unsigned int second = date.tm_sec;
             auto updated_second = find_next(
-                    cex.seconds,
-                    date,
-                    Traits::CRON_MIN_SECONDS,
-                    Traits::CRON_MAX_SECONDS,
-                    second,
-                    cron_field::second,
-                    cron_field::minute,
-                    empty_list);
+                cex.seconds,
+                date,
+                Traits::CRON_MIN_SECONDS,
+                Traits::CRON_MAX_SECONDS,
+                second,
+                cron_field::second,
+                cron_field::minute,
+                empty_list);
 
             if (second == updated_second) {
                 mark_field(marked_fields, cron_field::second);
@@ -643,14 +644,14 @@ namespace AwsMock::Core {
 
             unsigned int minute = date.tm_min;
             auto update_minute = find_next(
-                    cex.minutes,
-                    date,
-                    Traits::CRON_MIN_MINUTES,
-                    Traits::CRON_MAX_MINUTES,
-                    minute,
-                    cron_field::minute,
-                    cron_field::hour_of_day,
-                    marked_fields);
+                cex.minutes,
+                date,
+                Traits::CRON_MIN_MINUTES,
+                Traits::CRON_MAX_MINUTES,
+                minute,
+                cron_field::minute,
+                cron_field::hour_of_day,
+                marked_fields);
             if (minute == update_minute) {
                 mark_field(marked_fields, cron_field::minute);
             } else {
@@ -660,14 +661,14 @@ namespace AwsMock::Core {
 
             unsigned int hour = date.tm_hour;
             auto updated_hour = find_next(
-                    cex.hours,
-                    date,
-                    Traits::CRON_MIN_HOURS,
-                    Traits::CRON_MAX_HOURS,
-                    hour,
-                    cron_field::hour_of_day,
-                    cron_field::day_of_week,
-                    marked_fields);
+                cex.hours,
+                date,
+                Traits::CRON_MIN_HOURS,
+                Traits::CRON_MAX_HOURS,
+                hour,
+                cron_field::hour_of_day,
+                cron_field::day_of_week,
+                marked_fields);
             if (hour == updated_hour) {
                 mark_field(marked_fields, cron_field::hour_of_day);
             } else {
@@ -678,12 +679,12 @@ namespace AwsMock::Core {
             const unsigned int day_of_week = date.tm_wday;
             unsigned int day_of_month = date.tm_mday;
             auto updated_day_of_month = find_next_day<Traits>(
-                    date,
-                    cex.days_of_month,
-                    day_of_month,
-                    cex.days_of_week,
-                    day_of_week,
-                    marked_fields);
+                date,
+                cex.days_of_month,
+                day_of_month,
+                cex.days_of_week,
+                day_of_week,
+                marked_fields);
             if (day_of_month == updated_day_of_month) {
                 mark_field(marked_fields, cron_field::day_of_month);
             } else {
@@ -693,14 +694,14 @@ namespace AwsMock::Core {
 
             unsigned int month = date.tm_mon;
             auto updated_month = find_next(
-                    cex.months,
-                    date,
-                    Traits::CRON_MIN_MONTHS,
-                    Traits::CRON_MAX_MONTHS,
-                    month,
-                    cron_field::month,
-                    cron_field::year,
-                    marked_fields);
+                cex.months,
+                date,
+                Traits::CRON_MIN_MONTHS,
+                Traits::CRON_MAX_MONTHS,
+                month,
+                cron_field::month,
+                cron_field::year,
+                marked_fields);
             if (month != updated_month) {
                 if (date.tm_year - dot > Traits::CRON_MAX_YEARS_DIFF)
                     return false;
@@ -711,7 +712,7 @@ namespace AwsMock::Core {
 
             return res;
         }
-    }// namespace detail
+    } // namespace detail
 
     template<typename Traits>
     static cronexpr make_cron(CRONCPP_STRING_VIEW expr) {
@@ -722,9 +723,9 @@ namespace AwsMock::Core {
 
         auto fields = utils::split(expr, ' ');
         fields.erase(
-                std::remove_if(std::begin(fields), std::end(fields),
-                               [](CRONCPP_STRING_VIEW s) { return s.empty(); }),
-                std::end(fields));
+            std::remove_if(std::begin(fields), std::end(fields),
+                           [](CRONCPP_STRING_VIEW s) { return s.empty(); }),
+            std::end(fields));
         if (fields.size() != 6)
             throw bad_cronexpr("cron expression must have six fields");
 
@@ -791,5 +792,5 @@ namespace AwsMock::Core {
     static std::chrono::system_clock::time_point cron_next(cronexpr const &cex, std::chrono::system_clock::time_point const &time_point) {
         return std::chrono::system_clock::from_time_t(cron_next<Traits>(cex, std::chrono::system_clock::to_time_t(time_point)));
     }
-}// namespace AwsMock::Core
-#endif// AWS_MOCK_CORE_CRON_H
+
+} // namespace AwsMock::Core

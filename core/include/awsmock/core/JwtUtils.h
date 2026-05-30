@@ -2,8 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_JWT_UTILS_H
-#define AWSMOCK_CORE_JWT_UTILS_H
+#pragma once
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -30,8 +29,7 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class JwtUtils {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -77,6 +75,4 @@ namespace AwsMock::Core {
          */
         static bool VerifyTokenHs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer);
     };
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_JWT_UTILS_H
+} // namespace AwsMock::Core

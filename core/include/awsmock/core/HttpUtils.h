@@ -2,8 +2,7 @@
 // Created by vogje01 on 09/09/2023.
 //
 
-#ifndef AWS_MOCK_CORE_HTTP_UTILS_H
-#define AWS_MOCK_CORE_HTTP_UTILS_H
+#pragma once
 
 // Standard C++ includes
 #include <iostream>
@@ -38,8 +37,7 @@ namespace AwsMock::Core {
      */
     class HttpUtils {
 
-      public:
-
+    public:
         /**
          * @brief Returns a given path parameter by index.
          *
@@ -176,6 +174,7 @@ namespace AwsMock::Core {
          * @return integer parameter
          */
         static std::string GetStringParameterFromBody(const std::string &uri, const std::string &name, const std::string &def = {});
+
         static std::string GetStringParameter(const std::string &uri, const std::string &name);
 
         /**
@@ -243,7 +242,7 @@ namespace AwsMock::Core {
          * @param request HTTP serer request
          * @return HTTP body as string
          */
-        static std::string GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request);
+        static std::string GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t> > &request);
 
         /**
          * @brief Gets the body as a string from a boost dynamic_body request
@@ -285,7 +284,7 @@ namespace AwsMock::Core {
          * @param name header key
          * @return header value or empty string.
          */
-        static bool HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name);
+        static bool HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &name);
 
         /**
          * @brief Checks whether a header exists.
@@ -332,7 +331,7 @@ namespace AwsMock::Core {
          * @param defaultValue returned when the key was not found
          * @return header value or empty string.
          */
-        static std::string GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &key, const std::string &defaultValue = {});
+        static std::string GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &key, const std::string &defaultValue = {});
 
         /**
          * @brief Returns a header value by key.
@@ -469,7 +468,7 @@ namespace AwsMock::Core {
          * @param reason reason string
          * @return HTTP response
          */
-        static http::response<http::dynamic_body> BadRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &reason);
+        static http::response<http::dynamic_body> BadRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &reason);
 
         /**
          * @brief Return a bad request response (400)
@@ -532,8 +531,7 @@ namespace AwsMock::Core {
          */
         static http::status StatusCodeFromString(const std::string &status);
 
-      private:
-
+    private:
         /**
          * @brief Checks whether the query parameter value is URL encoded
          *
@@ -562,7 +560,7 @@ namespace AwsMock::Core {
 
         // Declare our chunk header callback  This is invoked
         // after each chunk header and also after the last chunk.
-        auto header_cb = [&](const std::uint64_t size, const boost::string_view extensions, boost::beast::error_code &ev)// We can set this to indicate an error
+        auto header_cb = [&](const std::uint64_t size, const boost::string_view extensions, boost::beast::error_code &ev) // We can set this to indicate an error
         {
             // Parse the chunk extensions so we can access them easily
             ce.parse(extensions, ev);
@@ -587,7 +585,7 @@ namespace AwsMock::Core {
 
         // Declare the chunk body callback. This is called one or
         // more times for each piece of a chunk body.
-        auto body_cb = [&](const std::uint64_t remain, const boost::string_view body, boost::beast::error_code &ev)// We can set this to indicate an error
+        auto body_cb = [&](const std::uint64_t remain, const boost::string_view body, boost::beast::error_code &ev) // We can set this to indicate an error
         {
             // If this is the last piece of the chunk body,
             // set the error so that the call to `read` returns,
@@ -642,6 +640,4 @@ namespace AwsMock::Core {
             os << it->name() << ": " << it->value() << std::endl;
         }
     }
-}// namespace AwsMock::Core
-
-#endif// AWS_MOCK_CORE_HTTP_UTILS_H
+} // namespace AwsMock::Core

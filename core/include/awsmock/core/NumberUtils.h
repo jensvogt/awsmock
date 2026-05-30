@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/10/2023.
 //
 
-#ifndef AWSMOCK_CORE_NUMBER_UTILS_H
-#define AWSMOCK_CORE_NUMBER_UTILS_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -24,8 +23,7 @@ namespace AwsMock::Core {
      */
     class NumberUtils {
 
-      public:
-
+    public:
         /**
          * @brief Return a string with the value in kilobytes.
          *
@@ -104,7 +102,4 @@ namespace AwsMock::Core {
         }
     };
 
-
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_NUMBER_UTILS_H
+} // namespace AwsMock::Core
