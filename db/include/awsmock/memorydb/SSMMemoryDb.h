@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 29/05/2023.
 //
 
@@ -144,6 +144,8 @@ namespace AwsMock::Database {
         long DeleteAllParameters();
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SSM"};
 
         /**
          * SSM parameter vector, when running without database

@@ -13,7 +13,7 @@ namespace AwsMock::Service {
         _scheduler.AddTask("monitoring-system-collector", [this] { _metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
-        _scheduler.AddTask("monitoring-docker-collector", [] { Monitoring::MetricDockerCollector::CollectDockerCounter(); }, systemPeriod);
+        _scheduler.AddTask("monitoring-docker-collector", [] { Monitoring::MetricDockerCollector{}.CollectDockerCounter(); }, systemPeriod);
         log_debug << "Docker collector started";
 
         // Start the database cleanup worker thread every day
@@ -70,4 +70,4 @@ namespace AwsMock::Service {
         return std::ranges::find(_exclusions, name + "::" + labelName + "::" + labelValue) == _exclusions.end();
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

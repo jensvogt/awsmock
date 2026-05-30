@@ -217,7 +217,7 @@ namespace AwsMock::Service {
                 case Dto::Common::CognitoCommandType::GLOBAL_SIGN_OUT: {
 
                     Dto::Cognito::GlobalSignOutRequest cognitoRequest = Dto::Cognito::GlobalSignOutRequest::FromJson(clientCommand);
-                    CognitoService::GlobalSignOut(cognitoRequest);
+                    _cognitoService.GlobalSignOut(cognitoRequest);
                     log_info << "Global sign out, accessToken: " << cognitoRequest.accessToken;
                     return SendResponse(request, http::status::ok, {}, headers);
                 }
@@ -288,4 +288,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

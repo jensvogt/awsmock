@@ -558,7 +558,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string ApplicationService::WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version) {
+    std::string ApplicationService::WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version) const {
 
         auto applicationDataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.application.data-dir");
 
@@ -591,7 +591,7 @@ namespace AwsMock::Service {
         return base64FullFile;
     }
 
-    void ApplicationService::CleanupDocker(const Database::Entity::Apps::Application &application) {
+    void ApplicationService::CleanupDocker(const Database::Entity::Apps::Application &application) const {
 
         if (ContainerService::instance().ContainerExists(application.containerId)) {
             ContainerService::instance().KillContainer(application.containerId);

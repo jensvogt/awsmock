@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -242,6 +242,8 @@ namespace AwsMock::Service {
         void ResetItemCounters() const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 
         /**
          * @brief create query expression.

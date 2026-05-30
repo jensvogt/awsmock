@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 01/06/2023.
 //
 
@@ -127,6 +127,10 @@ namespace AwsMock::Database::Entity::SNS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Message &message);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
+
     };
 
     typedef Message Message;

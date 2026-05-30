@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 07/05/2024.
 //
 
@@ -59,6 +59,8 @@ namespace AwsMock::Database {
         void Shutdown();
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
         /**
          * MongoDB instance

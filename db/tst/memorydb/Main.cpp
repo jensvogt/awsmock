@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 5/20/25.
 //
 
@@ -9,6 +9,10 @@
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 struct GlobalTestFixture {
 

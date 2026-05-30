@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 06/09/2023.
 //
 
@@ -68,6 +68,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @return topic notification entity
          */
         static TopicNotification FromDocument(const std::optional<view> &mResult);
+
     };
 
 } // namespace AwsMock::Database::Entity::S3

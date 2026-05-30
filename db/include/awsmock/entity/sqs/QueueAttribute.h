@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 12/10/23.
 //
 
@@ -70,7 +70,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * <p>The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object. The parameters are as follows:
          * <ul>
-         * <li>deadLetterTargetArn – The Amazon Resource Name (ARN) of the dead-letter queue to which Amazon SQS moves resources after the value of maxReceiveCount is exceeded.</li>
+         * <li>deadLetterTargetArn â€“ The Amazon Resource Name (ARN) of the dead-letter queue to which Amazon SQS moves resources after the value of maxReceiveCount is exceeded.</li>
          * <li>The number of times a message is delivered to the source queue before being moved to the dead-letter queue. Default: 10. When the ReceiveCount for a message exceeds the maxReceiveCount for a queue, Amazon SQS moves the message to the dead-letter-queue.</li>
          * </ul>
          * </p>
@@ -82,14 +82,14 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * <p>The string that includes the parameters for the permissions for the dead-letter queue redrive permission and which source queues can specify dead-letter queues as a JSON object. The parameters are as follows:
          * <ul>
-         * <li>redrivePermission – The permission type that defines which source queues can specify the current queue as the dead-letter queue. Valid values are:
+         * <li>redrivePermission â€“ The permission type that defines which source queues can specify the current queue as the dead-letter queue. Valid values are:
          * <ul>
-         * <li>allowAll – (Default) Any source queues in this AWS account in the same Region can specify this queue as the dead-letter queue.</li>
-         * <li>denyAll – No source queues can specify this queue as the dead-letter queue.</li>
-         * <li>byQueue – Only queues specified by the sourceQueueArns parameter can specify this queue as the dead-letter queue.</li>
+         * <li>allowAll â€“ (Default) Any source queues in this AWS account in the same Region can specify this queue as the dead-letter queue.</li>
+         * <li>denyAll â€“ No source queues can specify this queue as the dead-letter queue.</li>
+         * <li>byQueue â€“ Only queues specified by the sourceQueueArns parameter can specify this queue as the dead-letter queue.</li>
          * </ul>
          * </li>
-         * <li>sourceQueueArns – The Amazon Resource Names (ARN)s of the source queues that can specify this queue as the dead-letter queue and redrive resources. You can specify this parameter only when the redrivePermission parameter
+         * <li>sourceQueueArns â€“ The Amazon Resource Names (ARN)s of the source queues that can specify this queue as the dead-letter queue and redrive resources. You can specify this parameter only when the redrivePermission parameter
          * is set to byQueue. You can specify up to 10 source queue ARNs. To allow more than 10 source queues to specify dead-letter queues, set the redrivePermission parameter to allowAll.</li>
          * </ul>
          * </p>
@@ -129,6 +129,10 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document view.
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
+
     };
 
 }// namespace AwsMock::Database::Entity::SQS

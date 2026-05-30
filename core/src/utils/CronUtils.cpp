@@ -1,8 +1,12 @@
-//
+﻿//
 // Created by vogje01 on 6/10/25.
 //
 
 #include <awsmock/core/CronUtils.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
 
 namespace AwsMock::Core {
 

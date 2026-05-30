@@ -4,6 +4,10 @@
 
 #include <awsmock/dto/module/model/Module.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Module"};
+}
+
 namespace AwsMock::Dto::Module {
 
     std::string Module::ToJson() const {
@@ -148,4 +152,4 @@ namespace AwsMock::Dto::Module {
         return os;
     }
 
-}// namespace AwsMock::Dto::Module
+} // namespace AwsMock::Dto::Module

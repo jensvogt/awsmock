@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -48,6 +48,8 @@ namespace AwsMock::Service {
         Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
+
         /**
          * Database connection
          */

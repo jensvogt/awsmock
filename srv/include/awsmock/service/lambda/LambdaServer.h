@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 03/06/2023.
 //
 
@@ -39,6 +39,8 @@ namespace AwsMock::Service {
         void Initialize();
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
+
         /**
          * @brief Delete dangling, stopped containers
          */
@@ -107,7 +109,7 @@ namespace AwsMock::Service {
         ContainerService _dockerService;
 
         /**
-         * Lambda controller — reacts to EventBus lambda signals
+         * Lambda controller â€” reacts to EventBus lambda signals
          */
         LambdaController _lambdaController;
 

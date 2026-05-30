@@ -60,13 +60,13 @@ namespace AwsMock::Database {
         };
 
         std::ranges::sort(userPoolList, [&sortColumns, compare](const auto &a, const auto &b) {
-            for (const auto &[column, dir]: sortColumns) {
+            for (const auto &sortColumn: sortColumns) {
                 int res = 0;
-                if (column == "userPoolId") res = compare(a.userPoolId, b.userPoolId, dir);
-                else if (column == "name")
-                    res = compare(a.name, b.name, dir);
-                else if (column == "oid")
-                    res = compare(a.oid, b.oid, dir);
+                if (sortColumn.column == "userPoolId") res = compare(a.userPoolId, b.userPoolId, sortColumn.sortDirection);
+                else if (sortColumn.column == "name")
+                    res = compare(a.name, b.name, sortColumn.sortDirection);
+                else if (sortColumn.column == "oid")
+                    res = compare(a.oid, b.oid, sortColumn.sortDirection);
 
                 if (res != 0) return res == 1;
             }
@@ -330,8 +330,8 @@ namespace AwsMock::Database {
 
         for (const auto &val: _users | std::views::values) {
             if (val.region == region && val.userPoolId == userPoolId && std::ranges::find_if(val.groups, [&groupName](const Entity::Cognito::Group &g) {
-                                                                            return g.groupName == groupName;
-                                                                        }) != val.groups.end()) {
+                return g.groupName == groupName;
+            }) != val.groups.end()) {
                 userList.emplace_back(val);
             }
         }
@@ -492,4 +492,4 @@ namespace AwsMock::Database {
                                     }) != _userPools.end();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

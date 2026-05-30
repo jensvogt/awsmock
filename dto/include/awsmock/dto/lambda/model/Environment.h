@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 21/06/2023.
 //
 
@@ -80,6 +80,8 @@ namespace AwsMock::Dto::Lambda {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         friend EnvironmentVariables tag_invoke(boost::json::value_to_tag<EnvironmentVariables>, boost::json::value const &v) {
             EnvironmentVariables r;

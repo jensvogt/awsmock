@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 4/20/24.
 //
 
@@ -61,6 +61,8 @@ namespace AwsMock::Dto::Cognito {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         friend CustomEmailSender tag_invoke(boost::json::value_to_tag<CustomEmailSender>, boost::json::value const &v) {
             CustomEmailSender r;

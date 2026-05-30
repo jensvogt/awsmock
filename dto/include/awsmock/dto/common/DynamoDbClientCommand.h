@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 11/26/23.
 //
 
@@ -108,7 +108,7 @@ namespace AwsMock::Dto::Common {
         static std::string GetClientCommandFromHeader(const http::request<http::dynamic_body> &request);
 
         /**
-         * @brief Getś the value from the user-agent string
+         * @brief GetÅ› the value from the user-agent string
          *
          * @param request HTTP server request
          * @param region AWS region
@@ -143,6 +143,10 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         std::string _secretAccessKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key");
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+
     };
 
 }// namespace AwsMock::Dto::Common

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 04/01/2023.
 //
 
@@ -10,6 +10,7 @@
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/s3/S3Service.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 
 namespace AwsMock::Service {
 
@@ -27,8 +28,7 @@ namespace AwsMock::Service {
      */
     class S3Handler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -90,8 +90,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * @brief Get the range for a range request
          *
@@ -138,6 +137,6 @@ namespace AwsMock::Service {
         S3Service _s3Service;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_HANDLER_H

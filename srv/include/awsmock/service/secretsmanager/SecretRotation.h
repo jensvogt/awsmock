@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -26,11 +26,11 @@ namespace AwsMock::Service {
     };
 
     static std::map<TaskType, std::string> TaskTypeNames{
-            {createSecret, "createSecret"},
-            {setSecret, "setSecret"},
-            {testSecret, "testSecret"},
-            {finishSecret, "finishSecret"},
-            {unknown, "unknown"},
+        {createSecret, "createSecret"},
+        {setSecret, "setSecret"},
+        {testSecret, "testSecret"},
+        {finishSecret, "finishSecret"},
+        {unknown, "unknown"},
     };
 
     [[maybe_unused]] static std::string TaskTypeToString(const TaskType taskType) {
@@ -53,8 +53,7 @@ namespace AwsMock::Service {
      */
     class SecretRotation {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -68,7 +67,8 @@ namespace AwsMock::Service {
          */
         void operator()(Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const;
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
          * @brief Create a secret
@@ -77,7 +77,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        static void CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
+        void CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
 
         /**
          * @brief Set a secret in the resource
@@ -86,7 +86,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        static void SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
+        void SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
 
         /**
          * @brief Test the new secret
@@ -95,7 +95,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        static void TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
+        void TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
 
         /**
          * @brief Finish secret rotation
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        static void FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
+        void FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
 
         /**
          * @brief Send a lambda invocation request
@@ -112,7 +112,7 @@ namespace AwsMock::Service {
          * @param lambda lambda entity
          * @param body message body
          */
-        static void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body);
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body) const;
 
         /**
          * @brief Calculates the next rotation date
@@ -120,9 +120,9 @@ namespace AwsMock::Service {
          * @param secret secret entity
          * @return next rotation datetime
          */
-        static system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret);
+        system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SECRETSMANAGER_ROTATION_H

@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_KMS_SERVICE_H
-#define AWSMOCK_SERVICE_KMS_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -191,6 +190,8 @@ namespace AwsMock::Service {
         void DeleteKey(const Dto::KMS::DeleteKeyRequest &request) const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
+
         /**
          * @brief Encrypt a plaintext.
          *
@@ -198,7 +199,7 @@ namespace AwsMock::Service {
          * @param plainText plain text
          * @return ciphertext
          */
-        static std::string EncryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &plainText);
+        std::string EncryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &plainText) const;
 
         /**
          * @brief Decrypt a ciphertext.
@@ -207,7 +208,7 @@ namespace AwsMock::Service {
          * @param ciphertext cipher text
          * @return plaintext
          */
-        static std::string DecryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &ciphertext);
+        std::string DecryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &ciphertext) const;
 
         /**
          * Account ID
@@ -221,5 +222,3 @@ namespace AwsMock::Service {
     };
 
 } // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_KMS_SERVICE_H

@@ -43,7 +43,7 @@ namespace AwsMock::Service {
     }
 
     void SSMServer::BackupSsm() {
-        ModuleService::BackupModule("ssm", Dto::Module::ExportType::INFRA_STRUCTURE);
+        ModuleService{}.BackupModule("ssm", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void SSMServer::Shutdown() {
@@ -51,4 +51,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("ssm-monitoring");
         _scheduler.Shutdown("ssm-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

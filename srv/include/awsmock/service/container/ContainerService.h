@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -465,6 +465,8 @@ namespace AwsMock::Service {
         void PruneContainers() const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Container"};
+
         /**
          * @brief Write the lambda docker file.
          *
@@ -474,7 +476,7 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return return docker file path
          */
-        static std::string WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+        std::string WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
 
         /**
          * @brief Write the application docker file.
@@ -495,7 +497,7 @@ namespace AwsMock::Service {
          * @param applicationEntity
          * @return return docker file path
          */
-        static std::string WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity);
+        std::string WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity) const;
 
         /**
          * @brief Write the compressed docker image file.
@@ -504,7 +506,7 @@ namespace AwsMock::Service {
          * @param name function name
          * @return return docker file path
          */
-        static std::string BuildImageFile(const std::string &codeDir, const std::string &name);
+        std::string BuildImageFile(const std::string &codeDir, const std::string &name) const;
 
         /**
          * @brief Returns the network name

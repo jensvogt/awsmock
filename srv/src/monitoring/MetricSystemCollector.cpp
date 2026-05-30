@@ -112,7 +112,7 @@ namespace AwsMock::Monitoring {
         // skip first 13 fields
         for (int i = 0; i < 13; i++) ss >> token;
 
-        ss >> pt.utime >> pt.stime;// fields 14 and 15
+        ss >> pt.utime >> pt.stime; // fields 14 and 15
         pt.initialized = true;
         return pt;
     }
@@ -304,7 +304,7 @@ namespace AwsMock::Monitoring {
         Core::EventBus::instance().sigMetricGauge(TOTAL_THREADS, {}, {}, GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count"));
     }
 
-    double MetricSystemCollector::GetPerformanceValue(const std::string &counter) {
+    double MetricSystemCollector::GetPerformanceValue(const std::string &counter) const {
         static PDH_STATUS status;
         static PDH_FMT_COUNTERVALUE value;
         static HQUERY query;
@@ -349,4 +349,4 @@ namespace AwsMock::Monitoring {
     }
 #endif
 
-}// namespace AwsMock::Monitoring
+} // namespace AwsMock::Monitoring

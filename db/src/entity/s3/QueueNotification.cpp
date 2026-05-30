@@ -6,6 +6,8 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
+    logger_t _logger{boost::log::keywords::channel = "S3"};
+
     bool QueueNotification::CheckFilter(const std::string &key) {
 
         if (filterRules.empty()) {

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 06/10/2023.
 //
 
@@ -33,6 +33,8 @@ namespace AwsMock::Service {
         explicit KMSServer(Core::Scheduler &scheduler);
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
+
         /**
          * @brief Update counters
          */

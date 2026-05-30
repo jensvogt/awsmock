@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 12/11/2022.
 //
 
@@ -8,10 +8,18 @@
 #include <winsock2.h>
 #else
 #include <unistd.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
 #endif
 
-namespace AwsMock::Core {
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
 
+namespace AwsMock::Core {
+    
     std::string SystemUtils::GetCurrentWorkingDir() {
         return boost::filesystem::current_path().string();
     }

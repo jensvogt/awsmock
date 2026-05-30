@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -17,6 +17,8 @@
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
+
+    inline logger_t _logger{boost::log::keywords::channel = "SNS"};
 
     struct TagResourceResponse final : Common::BaseCounter<TagResourceResponse> {
 
@@ -40,8 +42,7 @@ namespace AwsMock::Dto::SNS {
             }
         }
 
-      private:
-
+    private:
         friend TagResourceResponse tag_invoke(boost::json::value_to_tag<TagResourceResponse>, boost::json::value const &v) {
             TagResourceResponse r;
             return r;
@@ -49,13 +50,13 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TagResourceResponse const &obj) {
             jv = {
-                    {"requestId", obj.requestId},
+                {"requestId", obj.requestId},
             };
         }
     };
 
     typedef std::map<std::string, std::string> TagList;
 
-}// namespace AwsMock::Dto::SNS
+} // namespace AwsMock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_TAG_RESOURCE_RESPONSE_H

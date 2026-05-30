@@ -4,6 +4,10 @@
 
 #include <awsmock/service/apps/ApplicationCreator.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Application"};
+}
+
 namespace AwsMock::Service {
 
     void ApplicationCreator::operator()(const std::string &applicationCodeFile, const std::string &region, const std::string &name, const std::string &instanceId) const {

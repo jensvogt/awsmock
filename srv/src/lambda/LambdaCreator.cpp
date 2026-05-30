@@ -4,6 +4,10 @@
 
 #include <awsmock/service/lambda/LambdaCreator.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Lambda"};
+}
+
 namespace AwsMock::Service {
 
     Database::Entity::Lambda::Lambda LambdaCreator::CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const {

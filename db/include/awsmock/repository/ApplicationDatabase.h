@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 29/11/2023.
 //
 
@@ -123,6 +123,8 @@ namespace AwsMock::Database {
         long DeleteAllApplications() const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Application"};
+
         /**
          * Database name
          */

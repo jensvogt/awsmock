@@ -19,8 +19,7 @@ namespace AwsMock::Service::Frontend {
         net::io_context &_ioc;
         tcp::acceptor _acceptor;
 
-      public:
-
+    public:
         listener(net::io_context &ioc, const tcp::endpoint &endpoint)
             : _ioc(ioc), _acceptor(boost::asio::make_strand(ioc)) {
             beast::error_code ec;
@@ -61,13 +60,17 @@ namespace AwsMock::Service::Frontend {
             do_accept();
         }
 
-      private:
+    private:
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Frontend"};
 
         void do_accept() {
             _acceptor.async_accept(
-                    boost::asio::make_strand(_ioc),
-                    beast::bind_front_handler(&listener::on_accept,
-                                              shared_from_this()));
+                boost::asio::make_strand(_ioc),
+                beast::bind_front_handler(&listener::on_accept,
+                                          shared_from_this()));
         }
 
         void on_accept(const beast::error_code &ec, tcp::socket socket) {
@@ -148,4 +151,4 @@ namespace AwsMock::Service::Frontend {
         }
     }
 
-}// namespace AwsMock::Service::Frontend
+} // namespace AwsMock::Service::Frontend

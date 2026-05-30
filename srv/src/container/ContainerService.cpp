@@ -97,8 +97,7 @@ namespace AwsMock::Service {
         log_debug << "Build image request, name: " << applicationEntity << ", tags: " << applicationEntity.version;
         const std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
         const std::string imageFile = BuildImageFile(codeDir, applicationEntity.name);
-        auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {});
-        if (statusCode != http::status::ok) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, image: " << applicationEntity.name << ":" << applicationEntity.version << ", statusCode: " << statusCode << ", body: " << body;
             return {};
         }
@@ -489,7 +488,7 @@ namespace AwsMock::Service {
         log_debug << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed;
     }
 
-    std::string ContainerService::WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
+    std::string ContainerService::WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const {
         const std::string dockerFilename = Core::FileUtils::appendPath(codeDir, "Dockerfile");
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
@@ -548,7 +547,7 @@ namespace AwsMock::Service {
         return dockerFilename;
     }
 
-    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity) {
+    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const Database::Entity::Apps::Application &applicationEntity) const {
         const std::string dockerFilename = Core::FileUtils::appendPath(codeDir, "Dockerfile");
         std::string dockerFileContent = applicationEntity.dockerFile;
         Core::StringUtils::Replace(dockerFileContent, "$$ENV$$", AddEnvironment(applicationEntity.environment));
@@ -562,7 +561,7 @@ namespace AwsMock::Service {
         return dockerFilename;
     }
 
-    std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &name) {
+    std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &name) const {
 #ifdef _WIN32
         const std::string tarFileName = Core::FileUtils::appendPath(codeDir, name + ".tar");
 #else

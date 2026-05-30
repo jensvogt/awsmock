@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // C++ includes
 #include <atomic>
@@ -123,6 +123,8 @@ namespace AwsMock::FtpServer {
         std::string getAddress() const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
 
         /**
          * Accept FTP session

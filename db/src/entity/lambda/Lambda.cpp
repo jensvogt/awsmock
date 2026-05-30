@@ -4,6 +4,10 @@
 
 #include <awsmock/entity/lambda/Lambda.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Lambda"};
+}
+
 namespace AwsMock::Database::Entity::Lambda {
 
     bool Lambda::HasEventSource(const std::string &eventSourceArn) const {

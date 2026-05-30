@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 7/19/25.
 //
 
@@ -69,6 +69,8 @@ namespace AwsMock::Service {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         void do_accept() {
             // The new connection gets its own strand

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 04/01/2023.
 //
 
@@ -42,6 +42,8 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
+
         /**
          * KMS service
          */

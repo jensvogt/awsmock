@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -9,6 +9,10 @@
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/lambda/LambdaServer.h>
 #include <awsmock/service/lambda/LambdaService.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define REGION "eu-central-1"
 #define OWNER "test-owner"

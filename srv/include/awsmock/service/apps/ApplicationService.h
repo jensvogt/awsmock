@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -228,6 +228,8 @@ namespace AwsMock::Service {
         Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Application"};
+
         /**
          * @brief Saves the Base64 file
          *
@@ -235,14 +237,14 @@ namespace AwsMock::Service {
          * @param application application entity
          * @param version application version
          */
-        static std::string WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version);
+        std::string WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version) const;
 
         /**
          * @brief Stop any container, removes container and deletes the image
          *
          * @param application application entity
          */
-        static void CleanupDocker(const Database::Entity::Apps::Application &application);
+        void CleanupDocker(const Database::Entity::Apps::Application &application) const;
 
         /**
          * Database connection

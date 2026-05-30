@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 01/06/2023.
 //
 
@@ -65,6 +65,10 @@ namespace AwsMock::Database::Entity::SecretsManager {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
+
     };
 
 }// namespace AwsMock::Database::Entity::SecretsManager

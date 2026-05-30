@@ -6,7 +6,8 @@
 
 namespace AwsMock::Database {
 
-    ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {}
+    ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {
+    }
 
     bool ApplicationDatabase::ApplicationExists(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "application_exists");
@@ -117,8 +118,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -264,4 +265,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllApplications();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

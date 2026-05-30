@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 20/12/2023.
 //
 
@@ -45,6 +45,8 @@ namespace AwsMock::Service {
         void Shutdown() override;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
+
         /**
          * @brief Creates a local network.
          *

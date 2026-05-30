@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 5/28/24.
 //
 
@@ -129,6 +129,10 @@ namespace AwsMock::Core {
          * @see Core::DomainSocketResult
          */
         [[nodiscard]] boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+
     };
 
 }// namespace AwsMock::Core

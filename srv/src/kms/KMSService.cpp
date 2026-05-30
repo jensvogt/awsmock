@@ -5,6 +5,8 @@
 #include <awsmock/service/kms/KMSService.h>
 #include <thread>
 
+#include "awsmock/core/scheduler/Scheduler.h"
+
 namespace AwsMock::Service {
 
     template<typename K>
@@ -104,22 +106,24 @@ namespace AwsMock::Service {
             std::string keyId = Core::StringUtils::CreateRandomUuid();
 
             std::string arn = Core::AwsUtils::CreateKMSKeyArn(request.region, _accountId, keyId);
-            Database::Entity::KMS::Key keyEntity = {
-                    .region = request.region,
-                    .keyId = keyId,
-                    .keyUsage = KeyUsageToString(request.keyUsage),
-                    .keySpec = KeySpecToString(request.keySpec),
-                    .arn = arn,
-                    .description = request.description,
-                    .tags = request.tags};
+            Database::Entity::KMS::Key keyEntity;
+            keyEntity.region = request.region;
+            keyEntity.keyId = keyId;
+            keyEntity.keyUsage = KeyUsageToString(request.keyUsage);
+            keyEntity.keySpec = KeySpecToString(request.keySpec);
+            keyEntity.arn = arn;
+            keyEntity.description = request.description;
+            keyEntity.tags = request.tags;
 
             // Store in a database
             keyEntity = _kmsDatabase.CreateKey(keyEntity);
             log_trace << "KMS keyEntity created: " << keyEntity;
 
             // Create keyEntity material asynchronously
-            CallAsyncCreateKey<std::string &>(keyId);
-            log_debug << "KMS keyEntity creation started, keyId: " << keyId;
+            Core::Scheduler::instance().AddOneTimeTask("create-kms-key", [this, keyId]() {
+                KMSCreator{}.CreateKmsKey(keyId);
+                log_debug << "KMS keyEntity creation started, keyId: " << keyId;
+            });
 
             Dto::KMS::Key key;
             key.keyId = keyEntity.keyId;
@@ -382,7 +386,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string KMSService::EncryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &plainText) {
+    std::string KMSService::EncryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &plainText) const {
 
         switch (Dto::KMS::KeySpecFromString(key.keySpec)) {
 
@@ -458,7 +462,7 @@ namespace AwsMock::Service {
         return {};
     }
 
-    std::string KMSService::DecryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &ciphertext) {
+    std::string KMSService::DecryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &ciphertext) const {
 
         switch (Dto::KMS::KeySpecFromString(key.keySpec)) {
             case Dto::KMS::KeySpec::SYMMETRIC_DEFAULT: {
@@ -506,4 +510,4 @@ namespace AwsMock::Service {
         return {};
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

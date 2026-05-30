@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 11/19/23.
 //
 
@@ -378,6 +378,8 @@ namespace AwsMock::Database {
         void AdjustObjectCounters();
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "S3"};
+
         /**
          * @brief Convert the bucket map to a vector
          *

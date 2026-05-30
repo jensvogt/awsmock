@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SNS_SERVER_H
-#define AWSMOCK_SERVICE_SNS_SERVER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
@@ -29,7 +28,17 @@ namespace AwsMock::Service {
          */
         explicit SNSServer(Core::Scheduler &scheduler);
 
+        /**
+         * @brief Shutdown server
+         */
+        void Shutdown() override;
+
     private:
+        /**
+         * Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
+
         /**
          * @brief Delete resources, which are over the retention period.
          */
@@ -44,11 +53,6 @@ namespace AwsMock::Service {
          * @brief Backup the SNS topics and messages
          */
         static void BackupSns();
-
-        /**
-         * @brief Shutdown server
-         */
-        void Shutdown() override;
 
         /**
          * @brief Database connection
@@ -103,5 +107,3 @@ namespace AwsMock::Service {
     };
 
 } // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_SNSSERVER_H

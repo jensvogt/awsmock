@@ -1,8 +1,12 @@
-//
+﻿//
 // Created by vogje01 on 29/05/2023.
 //
 
 #include <awsmock/core/HttpUtils.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
 
 namespace AwsMock::Core {
 

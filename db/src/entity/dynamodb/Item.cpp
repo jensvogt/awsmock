@@ -7,6 +7,10 @@
 template<typename T>
 struct always_false : std::false_type {};
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
+}
+
 namespace AwsMock::Database::Entity::DynamoDb {
 
     bsoncxx::types::bson_value::value Item::KeyValueToBson(const KeyValue &kv) {

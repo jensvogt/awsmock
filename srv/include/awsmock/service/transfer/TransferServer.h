@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 03/06/2023.
 //
 
@@ -32,17 +32,19 @@ namespace AwsMock::Service {
         explicit TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
+
         /**
          * @brief Creates the transfer server bucket
          */
-        static void CreateTransferBucket();
+        void CreateTransferBucket() const;
 
         /**
          * @brief Creates the transfer server default directories
          *
          * @param userName name of the user
          */
-        static void CreateDirectories(const std::string &userName);
+        void CreateDirectories(const std::string &userName) const;
 
         /**
          * @brief Starts a single transfer manager
@@ -63,7 +65,7 @@ namespace AwsMock::Service {
          *
          * @param server transfer manager entity
          */
-        static void StartSftpServer(Database::Entity::Transfer::Transfer &server);
+        void StartSftpServer(Database::Entity::Transfer::Transfer &server) const;
 
         /**
          * @brief Stops a single transfer manager

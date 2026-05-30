@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -50,12 +50,12 @@ namespace AwsMock::Service {
      */
     class ModuleService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {
+        };
 
         /**
          * @brief Return a list of all modules
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
          * @param request export infrastructure request
          * @return JSON string
          */
-        static Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request = {});
+        Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request = {});
 
         /**
          * @brief Import the infrastructure
@@ -106,7 +106,7 @@ namespace AwsMock::Service {
          *
          * @param request infrastructure import request
          */
-        static void ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request);
+        void ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request);
 
         /**
          * @brief Cleans the current infrastructure.
@@ -116,7 +116,7 @@ namespace AwsMock::Service {
          *
          * @param request clean infrastructure request
          */
-        static void CleanInfrastructure(const Dto::Module::CleanInfrastructureRequest &request);
+        void CleanInfrastructure(const Dto::Module::CleanInfrastructureRequest &request) const;
 
         /**
          * @brief Cleans the objects from the infrastructure.
@@ -126,7 +126,7 @@ namespace AwsMock::Service {
          *
          * @param request clean infrastructure request
          */
-        static void CleanObjects(const Dto::Module::CleanInfrastructureRequest &request);
+        void CleanObjects(const Dto::Module::CleanInfrastructureRequest &request) const;
 
         /**
          * @brief Backup infrastructure
@@ -134,14 +134,14 @@ namespace AwsMock::Service {
          * @param module module name
          * @param exportType
          */
-        static void BackupModule(const std::string &module, const Dto::Module::ExportType &exportType);
+        void BackupModule(const std::string &module, const Dto::Module::ExportType &exportType);
 
         /**
          * @brief Cleanup backups, keep only the number of backups which are defined in the module retention property
          *
          * @param module module name
          */
-        static void BackupRetention(const std::string &module);
+        void BackupRetention(const std::string &module) const;
 
         /**
          * @brief Update lambda slot, signaled whenever a lambda function is updated
@@ -150,7 +150,8 @@ namespace AwsMock::Service {
          */
         void UpdateLambda(const std::string &name);
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
          * @brief Import a local S3 file
@@ -160,7 +161,7 @@ namespace AwsMock::Service {
          *
          * @param object S3 object to import
          */
-        static void ImportLocalS3File(const Database::Entity::S3::Object &object);
+        void ImportLocalS3File(const Database::Entity::S3::Object &object) const;
 
         /**
          * @brief Module database
@@ -168,6 +169,6 @@ namespace AwsMock::Service {
         Database::ModuleDatabase &_moduleDatabase;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_MODULE_SERVICE_H

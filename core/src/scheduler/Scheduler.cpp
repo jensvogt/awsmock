@@ -6,6 +6,8 @@
 
 namespace AwsMock::Core {
 
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+
     // Static member definitions
     std::unique_ptr<Scheduler> Scheduler::_instance;
     std::mutex Scheduler::_mutex;

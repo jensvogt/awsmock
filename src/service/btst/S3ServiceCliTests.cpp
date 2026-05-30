@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -9,6 +9,10 @@
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/s3/S3Server.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define BOOST_TEST_MODULE S3ServiceCliTestss
 #define REGION "eu-central-1"

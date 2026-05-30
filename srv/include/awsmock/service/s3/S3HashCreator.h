@@ -48,6 +48,10 @@ namespace AwsMock::Service {
          * @param object S3 object to hash
          */
         void operator()(const std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const;
+
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "S3"};
     };
 
 }// namespace AwsMock::Service

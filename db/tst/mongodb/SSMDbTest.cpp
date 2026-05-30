@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 // Boost includes
@@ -9,6 +9,10 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <boost/test/utils/runtime/modifier.hpp>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define TEST_ACCOUNT_ID "000000000000"
 #define TEST_REGION "eu-central-1"

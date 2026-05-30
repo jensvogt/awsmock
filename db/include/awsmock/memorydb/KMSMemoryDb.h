@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 11/19/23.
 //
 
@@ -120,6 +120,8 @@ namespace AwsMock::Database {
         long DeleteAllKeys();
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
          * KMS topic vector, when running without database

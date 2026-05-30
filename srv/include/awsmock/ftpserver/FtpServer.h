@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // C++ includes
 #include <memory>
@@ -13,6 +13,8 @@
 // C++ includes
 #include <awsmock/ftpserver/Permissions.h>
 #include <boost/asio/io_context.hpp>
+
+#include "awsmock/core/logging/LogStream.h"
 
 namespace AwsMock::FtpServer {
 
@@ -40,8 +42,7 @@ namespace AwsMock::FtpServer {
      */
     class FtpServer {
 
-      public:
-
+    public:
         /**
          * @brief Creates an FTP Server instance that will listen on the the given control port.
          *
@@ -155,7 +156,8 @@ namespace AwsMock::FtpServer {
          */
         [[nodiscard]] std::string getAddress() const;
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
 
         /**
          * Actual implementation
@@ -208,4 +210,4 @@ namespace AwsMock::FtpServer {
         boost::asio::io_context &_awsIoc;
     };
 
-}// namespace AwsMock::FtpServer
+} // namespace AwsMock::FtpServer

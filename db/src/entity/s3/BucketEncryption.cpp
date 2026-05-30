@@ -4,7 +4,12 @@
 
 #include <awsmock/entity/s3/BucketEncryption.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "S3"};
+}
+
 namespace AwsMock::Database::Entity::S3 {
+
     view_or_value<view, value> BucketEncryption::ToDocument() const {
         try {
             view_or_value<view, value> notificationDoc = make_document(

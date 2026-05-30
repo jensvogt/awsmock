@@ -4,6 +4,10 @@
 
 #include <awsmock/entity/lambda/Instance.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Lambda"};
+}
+
 namespace AwsMock::Database::Entity::Lambda {
 
     void Instance::FromDocument(const std::optional<view> &mResult) {

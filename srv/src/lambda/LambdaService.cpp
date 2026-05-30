@@ -4,7 +4,12 @@
 
 #include <awsmock/service/lambda/LambdaService.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Lambda"};
+}
+
 namespace AwsMock::Service {
+
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
         log_debug << "Create function request, name: " << request.functionName;

@@ -3,9 +3,10 @@
 //
 
 #include <awsmock/utils/SqsUtils.h>
-#include <mongocxx/pipeline-fwd.hpp>
 
-#include "awsmock/entity/sns/MessageAttribute.h"
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "SQS"};
+}
 
 namespace AwsMock::Database {
 

@@ -209,6 +209,9 @@ namespace AwsMock::Dto::SQS {
         // }
 
     private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
+
         friend MessageEntry tag_invoke(boost::json::value_to_tag<MessageEntry>, boost::json::value const &v) {
             MessageEntry r;
             r.messageId = Core::Json::GetStringValue(v, "MessageId");

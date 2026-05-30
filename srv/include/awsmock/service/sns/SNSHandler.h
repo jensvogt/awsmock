@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 04/01/2023.
 //
 
@@ -43,13 +43,15 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
+
         /**
          * Get the message attributes.
          *
          * @param payload HTTP body
          * @return list of message userAttributes
          */
-        static std::map<std::string, Dto::SNS::MessageAttribute> GetMessageAttributes(const std::string &payload);
+        std::map<std::string, Dto::SNS::MessageAttribute> GetMessageAttributes(const std::string &payload) const;
 
         /**
          * @brief Get the tags from the URL inside the payload
@@ -57,7 +59,7 @@ namespace AwsMock::Service {
          * @param payload HTTP body
          * @return map of tags key/value pairs
          */
-        static std::map<std::string, std::string> GetTags(const std::string &payload);
+        std::map<std::string, std::string> GetTags(const std::string &payload) const;
 
         /**
          * SNS module

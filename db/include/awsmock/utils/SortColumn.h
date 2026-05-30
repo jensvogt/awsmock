@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 9/30/24.
 //
 
@@ -56,8 +56,12 @@ namespace AwsMock::Database {
                 throw Core::JsonException(exc.what());
             }
         }
+
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+
     };
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database
 
 #endif// AWSMOCK_DATABASE_COMMON_SORT_COLUMN_H

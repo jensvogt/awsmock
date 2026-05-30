@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 03/09/2023.
 //
 
@@ -55,6 +55,8 @@ namespace AwsMock::Dto::Lambda {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         friend EphemeralStorage tag_invoke(boost::json::value_to_tag<EphemeralStorage>, boost::json::value const &v) {
             EphemeralStorage r;

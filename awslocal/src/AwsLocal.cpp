@@ -1,8 +1,12 @@
-//
+﻿//
 // Created by vogje01 on 10/23/23.
 //
 
 #include <awsmock/awslocal/AwsLocal.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "AwsLocal"};
+}
 
 namespace AwsMock::AwsLocal {
     void AwsLocal::Initialize(const boost::program_options::variables_map &vm) {

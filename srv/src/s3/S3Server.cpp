@@ -99,7 +99,7 @@ namespace AwsMock::Service {
     void S3Server::BackupS3() {
 
         // Backup S3 buckets and objects
-        ModuleService::BackupModule("s3", Dto::Module::ExportType::INFRA_STRUCTURE);
+        ModuleService{}.BackupModule("s3", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void S3Server::Shutdown() {

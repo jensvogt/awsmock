@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 8/23/24.
 //
 
@@ -97,6 +97,8 @@ namespace AwsMock::Dto::SSM {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SSM"};
 
         friend ParameterFilter tag_invoke(boost::json::value_to_tag<ParameterFilter>, boost::json::value const &v) {
             ParameterFilter r;

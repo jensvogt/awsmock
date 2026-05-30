@@ -4,6 +4,10 @@
 
 #include <awsmock/entity/s3/LambdaNotification.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Lambda"};
+}
+
 namespace AwsMock::Database::Entity::S3 {
 
     LambdaNotification::LambdaNotification(const view &mResult) {

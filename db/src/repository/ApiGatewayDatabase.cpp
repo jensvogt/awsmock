@@ -6,7 +6,8 @@
 
 namespace AwsMock::Database {
 
-    ApiGatewayDatabase::ApiGatewayDatabase() : _databaseName(GetDatabaseName()), _apiKeyCollectionName("apigateway_key"), _restApiCollectionName("apigateway_rest"), _memoryDb(ApiGatewayMemoryDb::instance()) {}
+    ApiGatewayDatabase::ApiGatewayDatabase() : _databaseName(GetDatabaseName()), _apiKeyCollectionName("apigateway_key"), _restApiCollectionName("apigateway_rest"), _memoryDb(ApiGatewayMemoryDb::instance()) {
+    }
 
     // ========================================================================================================================
     // API key
@@ -353,8 +354,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -400,8 +401,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -433,4 +434,4 @@ namespace AwsMock::Database {
         return _memoryDb.ListRestApiCounters(prefix, pageSize, pageIndex, sortColumns);
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

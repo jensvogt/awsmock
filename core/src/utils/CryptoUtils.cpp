@@ -1,13 +1,17 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
 #include <awsmock/core/CryptoUtils.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
+
 namespace AwsMock::Core {
 
     unsigned int Crypto::_salt[] = {1214370622, 264849915};
-    unsigned char Crypto::_iv[] = "[Qáwu";
+    unsigned char Crypto::_iv[] = "Â€[QÃ¡wu";
 
     std::string Crypto::GetMd5FromString(const std::string &content) {
 
@@ -509,7 +513,7 @@ namespace AwsMock::Core {
 
         if (actualLen < 0) return {}; // decode error
 
-        // EVP_DecodeBlock pads with zeros for '=' padding — trim them
+        // EVP_DecodeBlock pads with zeros for '=' padding â€” trim them
         int padding = 0;
         if (encoded.size() >= 2) {
             if (encoded[encoded.size() - 1] == '=') padding++;

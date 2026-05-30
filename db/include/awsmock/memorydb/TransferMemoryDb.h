@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 11/19/23.
 //
 
@@ -168,6 +168,8 @@ namespace AwsMock::Database {
         long DeleteAllTransfers();
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
          * Transfer server map, when running without database

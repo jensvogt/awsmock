@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -178,6 +178,8 @@ namespace AwsMock::Service {
         void DeleteProtocol(const Dto::Transfer::DeleteProtocolRequest &request) const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
          * Transfer database connection

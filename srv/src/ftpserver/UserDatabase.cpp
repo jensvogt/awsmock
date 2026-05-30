@@ -62,7 +62,7 @@ namespace AwsMock::FtpServer {
         }
     }
 
-    void UserDatabase::CreateDirectories(const std::string &userName) {
+    void UserDatabase::CreateDirectories(const std::string &userName) const {
         const auto basePath = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
         for (const auto &directory: Core::Configuration::instance().getArray<std::string>("awsmock.modules.transfer.directories")) {
             if (std::string dirPath = Core::FileUtils::appendPath(basePath, userName, directory); !Core::DirUtils::DirectoryExists(dirPath)) {

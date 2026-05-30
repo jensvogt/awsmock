@@ -72,6 +72,7 @@ namespace AwsMock::FtpServer {
 
         return file_status_.st_size;
     }
+
     bool FileStatus::permissionRootRead() const { return 0 != (file_status_.st_mode & boost::filesystem::owner_read); }
     bool FileStatus::permissionRootWrite() const { return 0 != (file_status_.st_mode & boost::filesystem::owner_write); }
     bool FileStatus::permissionRootExecute() const { return 0 != (file_status_.st_mode & boost::filesystem::owner_exe); }
@@ -118,12 +119,12 @@ namespace AwsMock::FtpServer {
         return permission_string;
     }
 
-    std::string FileStatus::ownerString() const// NOLINT(readability-convert-member-functions-to-static) Reason: I want being able to extend the stub code here and return an actual owner
+    std::string FileStatus::ownerString() const // NOLINT(readability-convert-member-functions-to-static) Reason: I want being able to extend the stub code here and return an actual owner
     {
         return "fineFTP";
     }
 
-    std::string FileStatus::groupString() const// NOLINT(readability-convert-member-functions-to-static) Reason: I want being able to extend the stub code here and return an actual group
+    std::string FileStatus::groupString() const // NOLINT(readability-convert-member-functions-to-static) Reason: I want being able to extend the stub code here and return an actual group
     {
         return "fineFTP";
     }
@@ -176,32 +177,33 @@ namespace AwsMock::FtpServer {
 
         // Hardcoded english month names, because returning a localized string by strftime here may break certain FTP clients
         static const std::array<std::string, 12> month_names =
-                {
-                        "Jan",
-                        "Feb",
-                        "Mar",
-                        "Apr",
-                        "May",
-                        "Jun",
-                        "Jul",
-                        "Aug",
-                        "Sep",
-                        "Oct",
-                        "Nov",
-                        "Dec"};
+        {
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        };
 
         std::stringstream date;
 
         if (file_year == current_year) {
             // We are allowed to return the time!
             date << std::setw(3) << file_timeinfo.tm_mday << " "
-                 << std::setw(2) << file_timeinfo.tm_hour << ":"
-                 << std::setw(2) << std::setfill('0') << file_timeinfo.tm_min;
+                    << std::setw(2) << file_timeinfo.tm_hour << ":"
+                    << std::setw(2) << std::setfill('0') << file_timeinfo.tm_min;
         } else {
             // We must not return the time, only the date :(
             static constexpr auto tm_year_base_year = 1900;
             date << std::setw(3) << file_timeinfo.tm_mday
-                 << "  " << (file_timeinfo.tm_year + tm_year_base_year);
+                    << "  " << (file_timeinfo.tm_year + tm_year_base_year);
         }
 
         return month_names.at(file_timeinfo.tm_mon) + date.str();
@@ -221,14 +223,12 @@ namespace AwsMock::FtpServer {
 
     std::map<std::string, FileStatus> dirContent(const std::string &path) {
         std::map<std::string, FileStatus> content;
-        log_debug << "Get directory content, path: " << path;
         if (const boost::filesystem::path p(path); is_directory(boost::filesystem::directory_entry(p))) {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(p), {})) {
                 std::string tmp = entry.path().filename().string();
                 content.emplace(std::string(entry.path().filename().string()), FileStatus(entry.path().string()));
             }
         }
-        log_debug << "Found directory content, path: " << path << " count: " << content.size();
         return content;
     }
 
@@ -242,8 +242,8 @@ namespace AwsMock::FtpServer {
 
         if (windows_path) {
             // On Windows, a root folder can be: C:\, //Host, \\Host
-            const std::regex win_local_drive(R"(^[a-zA-Z]\:)");       // Local drive
-            const std::regex win_network_drive(R"(^[/\\]{2}[^/\\]+)");// Network path starting with two slashes or backslashes followed by a hostname
+            const std::regex win_local_drive(R"(^[a-zA-Z]\:)"); // Local drive
+            const std::regex win_network_drive(R"(^[/\\]{2}[^/\\]+)"); // Network path starting with two slashes or backslashes followed by a hostname
 
             if (std::regex_search(path, win_local_drive)) {
                 // Windows local drive, consisting of drive-letter and colon
@@ -251,7 +251,7 @@ namespace AwsMock::FtpServer {
             } else if (std::regex_search(path, win_network_drive)) {
                 // Window network drive, consisting of \\ and hostname
                 const size_t sep_pos = path.find_first_of("/\\", 2);
-                absolute_root = path.substr(0, sep_pos);// If no seperator was found, this will return the entire string
+                absolute_root = path.substr(0, sep_pos); // If no seperator was found, this will return the entire string
             }
         } else {
             // On Unix there is only one root, and it is '/'
@@ -334,8 +334,6 @@ namespace AwsMock::FtpServer {
 
             ++comp_it;
         }
-
-        log_debug << "CleanPath finished, path: " << path_ss.str();
         return path_ss.str();
     }
 
@@ -344,4 +342,4 @@ namespace AwsMock::FtpServer {
         constexpr char separator = '/';
         return cleanPath(path, windows_path, separator);
     }
-}// namespace AwsMock::FtpServer
+} // namespace AwsMock::FtpServer

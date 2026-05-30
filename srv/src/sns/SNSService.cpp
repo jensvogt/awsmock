@@ -28,7 +28,12 @@ namespace AwsMock::Service {
             // Update database
             const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
             const std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
-            Database::Entity::SNS::Topic topic = {.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn};
+            Database::Entity::SNS::Topic topic;
+            topic.region = request.region;
+            topic.topicName = request.topicName;
+            topic.owner = request.owner;
+            topic.topicArn = topicArn;
+
             topic = _snsDatabase.CreateTopic(topic);
             log_trace << "SNS topic created: " << topic.ToJson();
 
@@ -292,7 +297,10 @@ namespace AwsMock::Service {
         try {
 
             // Update database
-            _snsDatabase.DeleteTopic({.region = request.region, .topicArn = request.topicArn});
+            Database::Entity::SNS::Topic topic;
+            topic.region = request.region;
+            topic.topicArn = request.topicArn;
+            _snsDatabase.DeleteTopic(topic);
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS delete topic failed, message: " << ex.what();
@@ -1065,7 +1073,7 @@ namespace AwsMock::Service {
         log_trace << "SNS SendMessage response: " << sendMessageRequest.ToJson();
     }
 
-    void SNSService::SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
+    void SNSService::SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
         namespace beast = boost::beast;
         namespace http = beast::http;
         namespace net = boost::asio;
@@ -1243,4 +1251,4 @@ namespace AwsMock::Service {
         return contentType;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

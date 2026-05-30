@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 11/26/23.
 //
 
@@ -254,6 +254,10 @@ namespace AwsMock::Dto::Common {
          * @param user AWS user
          */
         void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+
     };
 }// namespace AwsMock::Dto::Common
 

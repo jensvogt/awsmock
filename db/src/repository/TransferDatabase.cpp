@@ -10,7 +10,8 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    TransferDatabase::TransferDatabase() : _memoryDb(TransferMemoryDb::instance()), _databaseName(GetDatabaseName()), _serverCollectionName("transfer") {}
+    TransferDatabase::TransferDatabase() : _memoryDb(TransferMemoryDb::instance()), _databaseName(GetDatabaseName()), _serverCollectionName("transfer") {
+    }
 
     bool TransferDatabase::TransferExists(const std::string &region, const std::string &serverId) const {
 
@@ -176,8 +177,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -281,8 +282,8 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -376,4 +377,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllTransfers();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

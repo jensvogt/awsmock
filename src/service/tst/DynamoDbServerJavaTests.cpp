@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -13,6 +13,10 @@
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/gateway/GatewayServer.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define REGION "eu-central-1"
 #define TEST_TABLE "test-table"

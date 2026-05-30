@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 11/25/23.
 //
 
@@ -97,6 +97,10 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
+
     };
 
     typedef std::vector<UserPool> UserPoolList;

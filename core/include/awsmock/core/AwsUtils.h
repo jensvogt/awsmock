@@ -727,6 +727,7 @@ namespace AwsMock::Core {
      * @return SQS queue URL
      */
     inline std::string CreateSQSQueueUrl(const std::string &queueName) {
+        static logger_t _logger{boost::log::keywords::channel = "Core"};
         const std::string hostname = SystemUtils::GetHostName();
         const auto port = Configuration::instance().get<std::string>("awsmock.gateway.http.port");
         const auto region = Configuration::instance().get<std::string>("awsmock.region");
@@ -743,6 +744,7 @@ namespace AwsMock::Core {
      * @return SQS queue ARN
      */
     inline std::string CreateSQSQueueArn(const std::string &queueName) {
+        static logger_t _logger{boost::log::keywords::channel = "Core"};
         const auto region = Configuration::instance().get<std::string>("awsmock.region");
         const auto accountId = Configuration::instance().get<std::string>("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
@@ -757,6 +759,7 @@ namespace AwsMock::Core {
      * @return SQS queue ARN
      */
     inline std::string CreateSQSQueueArn(const std::string &region, const std::string &queueName) {
+        static logger_t _logger{boost::log::keywords::channel = "Core"};
         const std::string accountId = Configuration::instance().get<std::string>("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);

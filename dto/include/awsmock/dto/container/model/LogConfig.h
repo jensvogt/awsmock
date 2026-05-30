@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by JVO on 22.04.2024.
 //
 
@@ -29,6 +29,8 @@ namespace AwsMock::Dto::Docker {
     struct Config final : Common::BaseCounter<Config> {
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Container"};
 
         friend Config tag_invoke(boost::json::value_to_tag<Config>, boost::json::value const &v) {
             Config r;
@@ -82,6 +84,8 @@ namespace AwsMock::Dto::Docker {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Container"};
 
         friend LogConfig tag_invoke(boost::json::value_to_tag<LogConfig>, boost::json::value const &v) {
             LogConfig r;

@@ -1,4 +1,8 @@
-#include <awsmock/core/FileUtils.h>
+﻿#include <awsmock/core/FileUtils.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
 
 namespace AwsMock::Core {
 

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 10/2/24.
 //
 
@@ -84,6 +84,8 @@ namespace AwsMock::Database {
         [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
 
         /**
          * Database name

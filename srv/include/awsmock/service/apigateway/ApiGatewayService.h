@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -122,6 +122,8 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::ApiGateway::ListRestApiCountersResponse ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
 
         /**
          * Database connection

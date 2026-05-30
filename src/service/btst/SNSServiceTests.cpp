@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -9,6 +9,10 @@
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define BOOST_TEST_MODULE SNSServiceTests
 #define REGION "eu-central-1"

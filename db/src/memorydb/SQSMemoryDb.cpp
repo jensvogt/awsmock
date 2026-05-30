@@ -4,6 +4,10 @@
 
 #include <awsmock/memorydb/SQSMemoryDb.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "SQS"};
+}
+
 namespace AwsMock::Database {
 
     boost::mutex SQSMemoryDb::_sqsQueueMutex;
@@ -28,8 +32,8 @@ namespace AwsMock::Database {
     bool SQSMemoryDb::QueueArnExists(const std::string &queueArn) {
 
         return std::ranges::find_if(_queues, [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
-                   return queue.second.arn == queueArn;
-               }) != _queues.end();
+            return queue.second.arn == queueArn;
+        }) != _queues.end();
     }
 
     Entity::SQS::Queue SQSMemoryDb::CreateQueue(const Entity::SQS::Queue &queue) {
@@ -133,15 +137,15 @@ namespace AwsMock::Database {
         log_trace << "Got queue list, size: " << q.to_vector().size();
         if (!sortColumns.empty()) {
             std::ranges::sort(q.to_vector(), [sortColumns](const Entity::SQS::Queue &a, const Entity::SQS::Queue &b) {
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    if (column == "name") {
-                        return sortDirection == 1 ? a.name < b.name : b.name < a.name;
+                for (const auto &sortColumn: sortColumns) {
+                    if (sortColumn.column == "name") {
+                        return sortColumn.sortDirection == 1 ? a.name < b.name : b.name < a.name;
                     }
-                    if (column == "size") {
-                        return sortDirection == 1 ? a.size < b.size : b.size < a.size;
+                    if (sortColumn.column == "size") {
+                        return sortColumn.sortDirection == 1 ? a.size < b.size : b.size < a.size;
                     }
-                    if (column == "messages") {
-                        return sortDirection == 1 ? a.attributes.approximateNumberOfMessages < b.attributes.approximateNumberOfMessages : b.attributes.approximateNumberOfMessages < a.attributes.approximateNumberOfMessages;
+                    if (sortColumn.column == "messages") {
+                        return sortColumn.sortDirection == 1 ? a.attributes.approximateNumberOfMessages < b.attributes.approximateNumberOfMessages : b.attributes.approximateNumberOfMessages < a.attributes.approximateNumberOfMessages;
                     }
                 }
                 return false;
@@ -159,15 +163,15 @@ namespace AwsMock::Database {
 
         log_trace << "Got queue list, size: " << q.size();
         std::ranges::sort(q, [sortColumns](const Entity::SQS::Queue &a, const Entity::SQS::Queue &b) {
-            for (const auto &[column, sortDirection]: sortColumns) {
-                if (column == "name") {
-                    return sortDirection == 1 ? a.name < b.name : b.name < a.name;
+            for (const auto &sortColumn: sortColumns) {
+                if (sortColumn.column == "name") {
+                    return sortColumn.sortDirection == 1 ? a.name < b.name : b.name < a.name;
                 }
-                if (column == "size") {
-                    return sortDirection == 1 ? a.size < b.size : b.size < a.size;
+                if (sortColumn.column == "size") {
+                    return sortColumn.sortDirection == 1 ? a.size < b.size : b.size < a.size;
                 }
-                if (column == "messages") {
-                    return sortDirection == 1 ? a.attributes.approximateNumberOfMessages < b.attributes.approximateNumberOfMessages : b.attributes.approximateNumberOfMessages < a.attributes.approximateNumberOfMessages;
+                if (sortColumn.column == "messages") {
+                    return sortColumn.sortDirection == 1 ? a.attributes.approximateNumberOfMessages < b.attributes.approximateNumberOfMessages : b.attributes.approximateNumberOfMessages < a.attributes.approximateNumberOfMessages;
                 }
             }
             return false;
@@ -610,4 +614,4 @@ namespace AwsMock::Database {
         log_debug << "All message counters updated, count: " << _queues.size();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

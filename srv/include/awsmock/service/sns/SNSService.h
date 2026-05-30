@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -94,8 +94,7 @@ namespace AwsMock::Service {
      */
     class SNSService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -431,7 +430,8 @@ namespace AwsMock::Service {
          */
         void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
 
         /**
          * @brief Checks the subscriptions.
@@ -475,7 +475,7 @@ namespace AwsMock::Service {
          * @param subscription SNS subscription
          * @param request SNS publish request
         */
-        static void SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
+        void SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Send a lambda invocation request for a message.
@@ -521,6 +521,6 @@ namespace AwsMock::Service {
         LambdaService _lambdaService;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SNS_SERVICE_H

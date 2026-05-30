@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -93,8 +93,7 @@ namespace AwsMock::Service {
      */
     class CognitoService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -171,7 +170,7 @@ namespace AwsMock::Service {
          * @return DescribeUserPoolDomainResponse DTO
          * @see DescribeUserPoolDomainResponse DTO
          */
-        static Dto::Cognito::DescribeUserPoolDomainResponse DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request);
+        Dto::Cognito::DescribeUserPoolDomainResponse DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request);
 
         /**
          * @brief Create a new cognito user pool client
@@ -319,7 +318,7 @@ namespace AwsMock::Service {
          * @param request sign out request
          * @see GlobalSignOutRequest
          */
-        static void GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request);
+        void GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request) const;
 
         /**
          * @brief Create a new cognito user
@@ -379,7 +378,8 @@ namespace AwsMock::Service {
          */
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const;
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
          * @brief Process SRP challenge.
@@ -387,7 +387,7 @@ namespace AwsMock::Service {
          * @param request cognito initiate request
          * @return initiate auth response
          */
-        static Dto::Cognito::InitiateAuthResponse ProcessSrpChallenge(const Dto::Cognito::InitiateAuthRequest &request);
+        Dto::Cognito::InitiateAuthResponse ProcessSrpChallenge(const Dto::Cognito::InitiateAuthRequest &request) const;
 
         /**
          * @brief Process user password challenge.
@@ -408,6 +408,6 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_COGNITO_SERVICE_H

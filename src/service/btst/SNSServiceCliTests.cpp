@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 21/10/2023.
 //
 
@@ -12,6 +12,10 @@
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/sns/SNSServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define BOOST_TEST_MODULE SNSServiceCliTests
 #define TEST_TOPIC std::string("test-topic")

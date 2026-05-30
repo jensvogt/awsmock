@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <iostream>
 #include <istream>
+#include <map>
 #include <string_view>
 
 // Boost includes
@@ -34,6 +35,7 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/sources/severity_channel_logger.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/manipulators/add_value.hpp>
@@ -47,14 +49,17 @@
 #define DEFAULT_LOG_SIZE (10 * 1024 * 1024)
 #define DEFAULT_LOG_COUNT 5
 
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(my_logger, boost::log::sources::severity_logger<boost::log::trivial::severity_level>)
-
 BOOST_LOG_ATTRIBUTE_KEYWORD(process_id, "ProcessID", boost::log::attributes::current_process_id::value_type)
 BOOST_LOG_ATTRIBUTE_KEYWORD(thread_id, "ThreadID", boost::log::attributes::current_thread_id::value_type)
 BOOST_LOG_ATTRIBUTE_KEYWORD(timestamp, "TimeStamp", boost::posix_time::ptime)
 BOOST_LOG_ATTRIBUTE_KEYWORD(line, "Line", int)
 BOOST_LOG_ATTRIBUTE_KEYWORD(file, "File", std::string)
 BOOST_LOG_ATTRIBUTE_KEYWORD(function, "Function", boost::log::attributes::function<std::string>)
+BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
+
+// Per-class/per-module channel logger type. Declare as:
+//   logger_t _logger{boost::log::keywords::channel = "ServiceName"};
+using logger_t = boost::log::sources::severity_channel_logger_mt<boost::log::trivial::severity_level>;
 
 namespace AwsMock::Core {
 
@@ -92,6 +97,14 @@ namespace AwsMock::Core {
          * @param lvl PLog severity string
          */
         static void SetSeverity(const std::string &lvl);
+
+        /**
+         * @brief Set severity for a specific channel, overriding the global level
+         *
+         * @param channel channel name (e.g. "S3", "SQS", "DynamoDB")
+         * @param lvl severity string
+         */
+        static void SetChannelSeverity(const std::string &channel, const std::string &lvl);
 
         /**
          * @brief Add a file logging sink
@@ -157,6 +170,16 @@ namespace AwsMock::Core {
         static boost::log::trivial::severity_level _severity;
 
         /**
+         * Per-channel severity overrides (empty = use global _severity)
+         */
+        static std::map<std::string, boost::log::trivial::severity_level> _channelLevels;
+
+        /**
+         * Rebuilds and applies the core filter from _severity + _channelLevels
+         */
+        static void UpdateFilter();
+
+        /**
          * Console appender
          */
         static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> > console_sink;
@@ -185,19 +208,19 @@ namespace AwsMock::Core {
 } // namespace AwsMock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
-#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
-#define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
-#define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
-#define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
-#define log_debug BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
-#define log_trace BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_fatal BOOST_LOG_SEV(_logger, boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_error BOOST_LOG_SEV(_logger, boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_warning BOOST_LOG_SEV(_logger, boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_info BOOST_LOG_SEV(_logger, boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_debug BOOST_LOG_SEV(_logger, boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_trace BOOST_LOG_SEV(_logger, boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #else
-#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
-#define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
-#define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
-#define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
-#define log_debug BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
-#define log_trace BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
+#define log_fatal BOOST_LOG_SEV(_logger, boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
+#define log_error BOOST_LOG_SEV(_logger, boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
+#define log_warning BOOST_LOG_SEV(_logger, boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
+#define log_info BOOST_LOG_SEV(_logger, boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
+#define log_debug BOOST_LOG_SEV(_logger, boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
+#define log_trace BOOST_LOG_SEV(_logger, boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #endif
 
 #endif

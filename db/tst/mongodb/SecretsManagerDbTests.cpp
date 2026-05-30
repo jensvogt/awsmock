@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -8,6 +8,10 @@
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #ifndef SECRET_TEST_CONSTANTS
 #define SECRET_TEST_CONSTANTS
