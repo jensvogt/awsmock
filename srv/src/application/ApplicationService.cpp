@@ -7,7 +7,7 @@
 
 namespace AwsMock::Service {
 
-    ApplicationService::ApplicationService(boost::asio::io_context &ioc) : _database(Database::ApplicationDatabase::instance()), _ioc(ioc) {
+    ApplicationService::ApplicationService() : _database(Database::ApplicationDatabase::instance()) {
         _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
     }
 
@@ -34,7 +34,7 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+            Core::Scheduler::instance().AddOneTimeTask("create-application", [this, fullBase64File, application, instanceId] {
                 applicationCreator(fullBase64File, application.region, application.name, instanceId);
             });
 
@@ -163,8 +163,8 @@ namespace AwsMock::Service {
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
-            applicationCreator(fullBase64File, application.region, application.name, instanceId);
+        Core::Scheduler::instance().AddOneTimeTask("upload-application", [fullBase64File, application, instanceId] {
+            ApplicationCreator{}(fullBase64File, application.region, application.name, instanceId);
         });
         log_debug << "Application code updated, name: " << request.applicationName << ", version: " << request.version;
     }
@@ -196,7 +196,7 @@ namespace AwsMock::Service {
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+        Core::Scheduler::instance().AddOneTimeTask("rebuild-application", [this, fullBase64File, application, instanceId] {
             applicationCreator(fullBase64File, application.region, application.name, instanceId);
         });
     }
@@ -305,7 +305,7 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+            Core::Scheduler::instance().AddOneTimeTask("start-application", [this, fullBase64File, application, instanceId] {
                 applicationCreator(fullBase64File, application.region, application.name, instanceId);
             });
             log_debug << "Application start initiated, name: " << application.name;
@@ -391,7 +391,7 @@ namespace AwsMock::Service {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-            boost::asio::post(_ioc, [this, fullBase64File, application, instanceId] {
+            Core::Scheduler::instance().AddOneTimeTask("restart-application", [this, fullBase64File, application, instanceId] {
                 applicationCreator(fullBase64File, application.region, application.name, instanceId);
             });
             log_debug << "Application start initiated, name: " << request.application.name;

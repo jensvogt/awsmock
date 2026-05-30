@@ -61,10 +61,10 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/utils/TestUtils.cpp core/src/utils/HttpUtils.cpp core/src/utils/NumberUtils.cpp
         core/src/utils/XmlUtils.cpp core/src/container/UnixSocket.cpp core/src/container/TlsSocket.cpp
         core/src/exception/DynamoDbParseException.cpp core/src/utils/HttpSocket.cpp core/src/utils/JwtUtils.cpp
-        core/src/scheduler/PeriodicTask.cpp core/src/scheduler/Scheduler.cpp core/src/utils/BackupUtils.cpp
+        core/src/scheduler/Scheduler.cpp core/src/utils/BackupUtils.cpp
         core/src/config/Configuration.cpp core/src/utils/SrpUtils.cpp core/src/container/DomainSocket.cpp
-        core/src/scheduler/CronTask.cpp core/src/container/WindowsSocket.cpp core/src/utils/CronUtils.cpp
-        core/src/scheduler/OneTimeTask.cpp core/src/utils/ZipUtils.cpp core/src/exception/CoreException.cpp
+        core/src/container/WindowsSocket.cpp core/src/utils/CronUtils.cpp
+        core/src/utils/ZipUtils.cpp core/src/exception/CoreException.cpp
         core/src/exception/DatabaseException.cpp core/src/exception/ServiceException.cpp
         core/src/exception/JsonException.cpp core/src/exception/NotFoundException.cpp
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
@@ -170,6 +170,7 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/s3/S3Handler.cpp srv/src/s3/S3Service.cpp srv/src/s3/S3HashCreator.cpp srv/src/sqs/SQSServer.cpp
         srv/src/sqs/SQSHandler.cpp srv/src/sqs/SQSService.cpp srv/src/sns/SNSServer.cpp srv/src/sns/SNSHandler.cpp
         srv/src/sns/SNSService.cpp srv/src/lambda/LambdaServer.cpp srv/src/lambda/LambdaHandler.cpp
+        srv/src/lambda/LambdaController.cpp
         srv/src/lambda/LambdaService.cpp srv/src/lambda/LambdaCreator.cpp srv/src/lambda/LambdaExecutor.cpp
         srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoService.cpp
         srv/src/cognito/CognitoServer.cpp srv/src/transfer/TransferServer.cpp srv/src/transfer/TransferHandler.cpp

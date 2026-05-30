@@ -54,12 +54,14 @@ namespace AwsMock::Service {
         // Check for "Expect: 100-continue"
         if (_parser->get()[http::field::expect] == "100-continue") {
 
-            // Check body size
-            const boost::optional<std::uint64_t> contentLength{};
-            _parser->get().content_length(contentLength);
-            if (contentLength.value_or(0) > _bodyLimit) {
-                log_error << "Body too big ";
-                return;
+            // Check body size against limit before accepting
+            if (const auto contentLength = _parser->get().payload_size(); contentLength && *contentLength > static_cast<std::uint64_t>(_bodyLimit)) {
+                log_error << "Body too large: " << *contentLength << " > " << _bodyLimit;
+                http::response<http::empty_body> res;
+                res.version(_parser->get().version());
+                res.result(http::status::payload_too_large);
+                http::write(_stream, res);
+                return DoClose();
             }
 
             // Send the "100 Continue" status immediately
@@ -73,7 +75,7 @@ namespace AwsMock::Service {
         http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
-    void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
+    void GatewaySession::OnRead(const beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
@@ -82,10 +84,6 @@ namespace AwsMock::Service {
 
         if (ec) {
             log_error << "Read failed: " << ec.message();
-            _buffer.commit(90000000);
-            std::cout << "--- ERROR BUFFER DUMP (" << _buffer.size() << " bytes) ---" << std::endl;
-            std::cout << boost::beast::buffers_to_string(_buffer.cdata()) << std::endl;
-            std::cout << "\n------------------------------------------" << std::endl;
             return;
         }
 
@@ -100,7 +98,7 @@ namespace AwsMock::Service {
     // Return a response for the given request. The concrete type of the response message (which depends on the request)
     // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -124,8 +122,7 @@ namespace AwsMock::Service {
             log_trace << "Handler found, name: " << _handler->name();
         } else {
             // Verify AWS signature
-            const std::string secretKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key");
-            if (_verifySignature && !Core::AwsUtils::VerifySignature(request, secretKey)) {
+            if (const std::string secretKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key"); _verifySignature && !Core::AwsUtils::VerifySignature(request, secretKey)) {
                 log_warning << "AWS signature could not be verified";
                 return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
             }
@@ -271,4 +268,4 @@ namespace AwsMock::Service {
         QueueWrite(std::move(response));
         log_debug << "Options request answered";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

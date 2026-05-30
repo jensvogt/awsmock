@@ -13,6 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/StringUtils.h>
@@ -88,7 +89,7 @@
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
-#include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/repository/SQSDatabase.h>
 
 // Maximal output length for a synchronous invocation call
 #define MAX_OUTPUT_LENGTH (4 * 1024)
@@ -120,8 +121,7 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
@@ -554,41 +554,13 @@ namespace AwsMock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-      private:
-
-        /**
-         * @brief Tries to find an idle lambda function instance
-         *
-         * @par
-         * Tries to find an idle instance. If no instance is found and the current total number of lambda instances is below the
-         * concurrency limit, a new instance will be created, otherwise it will wait for an idle instance in a loop with 1 sec.
-         * Period time.
-         *
-         * @param lambda lambda entity to check
-         * @param instance
-         * @return lambda instance
-         */
-        void FindIdleInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance) const;
-
+    private:
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
          *
          * @param lambda lambda entity to cleanup
          */
         static void CleanupDocker(Database::Entity::Lambda::Lambda &lambda);
-
-        /**
-         * @brief Waits in a  loop for an idle lambda instance
-         *
-         * @par
-         * This is a blocking call, the calling function will be blocked until an idle instance is available. The maximal waiting
-         * time is limited by the total timeout period of the lambda (i.e. 900sec.)
-         *
-         * @param lambda lambda entity to check
-         * @return idle instance
-         * @see Database::Entity::Lambda::Lambda
-         */
-        Database::Entity::Lambda::Instance WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Returns the full path to the base64 encoded lambda function code.
@@ -646,16 +618,7 @@ namespace AwsMock::Service {
          */
         //boost::asio::io_context &_ioc;
 
-        /**
-         * @brief Lambda executor
-         */
-        LambdaExecutor lambdaExecutor;
-
-        /**
-         * @brief Function mutexes
-         */
-        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

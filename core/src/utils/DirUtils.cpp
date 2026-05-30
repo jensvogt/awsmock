@@ -31,7 +31,7 @@ namespace AwsMock::Core {
         return boost::filesystem::exists(dirName) && boost::filesystem::is_directory(dirName);
     }
 
-    void DirUtils::EnsureDirectory(const std::string &dirName) {
+    void DirUtils::EnsureDirectoryExists(const std::string &dirName) {
         if (!DirectoryExists(dirName)) {
             MakeDirectory(dirName, true);
         }

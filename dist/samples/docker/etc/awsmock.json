@@ -35,8 +35,8 @@
         "port": 4566,
         "max-queue": 512,
         "max-thread": 32,
-        "max-body": 104857600,
-        "timeout": 30,
+        "max-body": 536870912,
+        "timeout": 900,
         "keep-alive": true
       }
     },

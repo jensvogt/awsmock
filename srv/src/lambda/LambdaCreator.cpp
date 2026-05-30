@@ -85,6 +85,21 @@ namespace AwsMock::Service {
         return inspectContainerResponse.id;
     }
 
+    Database::Entity::Lambda::Lambda LambdaCreator::AddInstance(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const {
+        log_debug << "Adding lambda instance, function: " << lambda.function << ", instanceId: " << instanceId;
+        try {
+            CreateInstance(instanceId, lambda, lambda.code.zipFile);
+            lambda.lastStarted = system_clock::now();
+            lambda.state = Database::Entity::Lambda::LambdaState::Active;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_info << "Lambda instance added, function: " << lambda.function << ", instanceId: " << instanceId << ", total instances: " << lambda.instances.size();
+            return lambda;
+        } catch (const Core::ContainerException &e) {
+            log_error << "Error adding lambda instance, function: " << lambda.function << ", error: " << e.what();
+        }
+        return lambda;
+    }
+
     void LambdaCreator::UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) const {
 
         const auto privatePort = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.private-port");
@@ -205,7 +220,7 @@ namespace AwsMock::Service {
 
                 // Create the classes directory
                 const std::string classesDir = Core::FileUtils::appendPath(codeDir, "classes");
-                Core::DirUtils::EnsureDirectory(classesDir);
+                Core::DirUtils::EnsureDirectoryExists(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.
                 Core::ZipUtils::Unzip(zipFile, classesDir);

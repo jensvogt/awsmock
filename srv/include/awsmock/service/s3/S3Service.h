@@ -452,7 +452,7 @@ namespace AwsMock::Service {
          * @param size S3 object size in bytes.
          * @param event S3 event type.
          */
-        void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event);
+        void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) const;
 
         /**
          * @brief Checks the encryption status and encrypt the internal file using the

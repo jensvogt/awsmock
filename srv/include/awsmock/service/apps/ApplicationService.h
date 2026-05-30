@@ -16,6 +16,7 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/apps/internal/CreateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/CreateApplicationResponse.h>
 #include <awsmock/dto/apps/internal/DeleteApplicationRequest.h>
@@ -57,12 +58,11 @@ namespace AwsMock::Service {
      */
     class ApplicationService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit ApplicationService(boost::asio::io_context &ioc);
+        explicit ApplicationService();
 
         /**
          * @brief Create a new application
@@ -227,8 +227,7 @@ namespace AwsMock::Service {
         [[nodiscard]]
         Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Saves the Base64 file
          *
@@ -256,14 +255,9 @@ namespace AwsMock::Service {
         std::string _accountId;
 
         /**
-         * Boost asio IO context
-         */
-        boost::asio::io_context &_ioc;
-
-        /**
          * Application creator
          */
         ApplicationCreator applicationCreator;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

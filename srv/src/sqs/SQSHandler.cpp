@@ -2,8 +2,6 @@
 
 #include <awsmock/service/sqs/SQSHandler.h>
 
-#include "awsmock/service/gateway/GatewayServer.h"
-
 namespace AwsMock::Service {
     http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SQS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -25,7 +23,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
-                    boost::asio::post(GatewayServer::WorkerPool(), [sqsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-queue", [sqsRequest]() {
                         try {
                             const long purged = SQSService{}.PurgeQueue(sqsRequest);
                             log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged;
@@ -38,7 +36,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::PURGE_ALL_QUEUES: {
 
-                    boost::asio::post(GatewayServer::WorkerPool(), []() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-all-queues", []() {
                         try {
                             const long purged = SQSService{}.PurgeAllQueues();
                             log_info << "Purge all queues, count: " << purged;
@@ -60,7 +58,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
 
                     Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
-                    boost::asio::post(GatewayServer::WorkerPool(), [sqsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("set-queue-attribute", [sqsRequest]() {
                         try {
                             SQSService{}.SetQueueAttributes(sqsRequest);
                             log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
@@ -294,22 +292,18 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::UPDATE_MESSAGE: {
 
                     Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
-                        _sqsService.UpdateMessage(sqsRequest);
-                        log_info << "Update message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                    _sqsService.UpdateMessage(sqsRequest);
+                    log_info << "Update message, messageId: " << sqsRequest.messageId;
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SqsCommandType::RESEND_MESSAGE: {
 
                     Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
-                        _sqsService.ResendMessage(sqsRequest);
-                        log_info << "Resend message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [sqsRequest]() {
+                        SQSService{}.ResendMessage(sqsRequest);
+                        log_info << "Resend message, messageId: " << sqsRequest.messageId;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -372,11 +366,10 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::IMPORT_MESSAGES: {
 
                     Dto::SQS::ImportMessagesRequest sqsRequest = Dto::SQS::ImportMessagesRequest::FromJson(clientCommand.payload);
-                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
-                        _sqsService.ImportMessages(sqsRequest);
-                        log_info << "Import messages"; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [sqsRequest]() {
+                        SQSService{}.ImportMessages(sqsRequest);
+                        log_info << "Import messages";
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -484,4 +477,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

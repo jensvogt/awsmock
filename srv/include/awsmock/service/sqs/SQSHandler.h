@@ -2,13 +2,13 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SQS_HANDLER_H
-#define AWSMOCK_SERVICE_SQS_HANDLER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
@@ -19,8 +19,6 @@
 #include <awsmock/dto/sqs/model/DeleteMessageBatchEntry.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/sqs/SQSService.h>
-#include <boost/asio/detached.hpp>
-#include <boost/asio/spawn.hpp>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
@@ -40,8 +38,7 @@ namespace AwsMock::Service {
      */
     class SQSHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -59,8 +56,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * Get the queue userAttributes.
          *
@@ -99,6 +95,4 @@ namespace AwsMock::Service {
         SQSService _sqsService;
     };
 
-}// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_SQS_HANDLER_H
+} // namespace AwsMock::Service

@@ -13,6 +13,9 @@ namespace AwsMock::Manager {
 
     void Manager::Initialize() const {
 
+        // Initialize scheduler
+        Core::Scheduler::initialize(_ioc);
+
         // Initialize websocket logging
         InitializeWebsocketLogging();
 
@@ -39,7 +42,7 @@ namespace AwsMock::Manager {
             _pool.Configure();
 
             // Create database indexes in a background thread
-            boost::asio::post(Service::GatewayServer::WorkerPool(), [] {
+            Core::Scheduler::instance().AddOneTimeTask("create-indexes", [] {
                 Database::ModuleDatabase::instance().CreateIndexes();
             });
 
@@ -158,7 +161,7 @@ namespace AwsMock::Manager {
         LoadModulesFromConfiguration();
         log_info << "Module configuration loaded";
 
-        Core::Scheduler scheduler(_ioc);
+        Core::Scheduler &scheduler = Core::Scheduler::initialize(_ioc);
         log_info << "Scheduler initialized";
 
         // Initialize monitoring
@@ -166,7 +169,7 @@ namespace AwsMock::Manager {
         log_info << "Monitoring server started";
 
         // Autoload the init files before modules start
-        AutoLoad();
+        Core::Scheduler::instance().AddOneTimeTask("auto-loader", [] { AutoLoad(); });
 
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
@@ -180,7 +183,7 @@ namespace AwsMock::Manager {
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler, _ioc));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler));
             } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler, _ioc));
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -194,7 +197,7 @@ namespace AwsMock::Manager {
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ioc));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler));
             }
         }
         log_info << "Modules started, count: " << Service::ModuleMap::instance().GetSize();
@@ -272,4 +275,4 @@ namespace AwsMock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-}// namespace AwsMock::Manager
+} // namespace AwsMock::Manager

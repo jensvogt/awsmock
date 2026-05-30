@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
     std::string BackupUtils::GetBackupFilename(const std::string &module) {
         const auto backupDir = Configuration::instance().get<std::string>("awsmock.backup-dir");
-        DirUtils::EnsureDirectory(backupDir);
+        DirUtils::EnsureDirectoryExists(backupDir);
         return backupDir + "/" + module + "-" + GetTimestamp() + ".json";
     }
 

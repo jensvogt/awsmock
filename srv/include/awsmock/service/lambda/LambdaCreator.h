@@ -68,6 +68,19 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const;
 
         /**
+         * @brief Add a new container instance to an already-running lambda function.
+         *
+         * @par
+         * Unlike CreateLambda, this method does NOT reset invocation counters or average runtime.
+         * Use when spawning additional concurrent instances of an active lambda.
+         *
+         * @param lambda lambda entity (modified in-place and persisted to DB)
+         * @param instanceId new instance ID
+         * @return updated lambda entity with the new instance attached
+         */
+        Database::Entity::Lambda::Lambda AddInstance(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const;
+
+        /**
          * @brief Create a new version of an existing lambda function
          *
          * @param lambda lambda instance

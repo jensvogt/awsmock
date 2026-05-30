@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/kms/KMSMonitoring.h>
