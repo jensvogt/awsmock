@@ -201,7 +201,7 @@ namespace AwsMock::Database {
                 log_trace << "Key updated: " << key;
                 session.commit_transaction();
 
-                if (!mResult->empty()) {
+                if (mResult && !mResult->empty()) {
                     key.FromDocument(mResult->view());
                     return key;
                 }

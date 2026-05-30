@@ -214,6 +214,7 @@ namespace AwsMock::Service {
                 listBucketResponse.contents.push_back(content);
             }
             log_debug << "Bucket list returned, count: " << objectList.size();
+            listBucketResponse.keyCount = objectList.size();
             return listBucketResponse;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 list bucket failed, message: " << ex.what();
@@ -1706,4 +1707,4 @@ namespace AwsMock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

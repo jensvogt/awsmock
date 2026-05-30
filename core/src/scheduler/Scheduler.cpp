@@ -63,9 +63,11 @@ namespace AwsMock::Core {
     void Scheduler::Shutdown(const std::string &name) {
         if (_periodicTasks.contains(name)) {
             _periodicTasks[name]->Stop();
+            _periodicTasks.erase(name);
         }
         if (_cronTasks.contains(name)) {
             _cronTasks[name]->Stop();
+            _cronTasks.erase(name);
         }
     }
 

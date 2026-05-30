@@ -39,7 +39,7 @@ namespace AwsMock::Service {
          *
          * @param keyId ID of the key
          */
-        void CreateKmsKey(const std::string &keyId);
+        void CreateKmsKey(const std::string &keyId) const;
 
     private:
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
          * @param key key entity
          */
         [[maybe_unused]]
-        void GenerateAes256Key(Database::Entity::KMS::Key &key);
+        void GenerateAes256Key(Database::Entity::KMS::Key &key) const;
 
         /**
          * @brief Generate HMAC key.
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
          * @param length key length
          */
         [[maybe_unused]]
-        void CreateHmacKey(Database::Entity::KMS::Key &key, int length);
+        void CreateHmacKey(Database::Entity::KMS::Key &key, int length) const;
 
         /**
          * @brief Generate a public/private key pair
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
          * @see AwsMock::Core::CryptoUtils
          */
         [[maybe_unused]]
-        void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length);
+        void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length) const;
     };
 
 } // namespace AwsMock::Service
