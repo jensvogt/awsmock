@@ -118,7 +118,7 @@ jobs:
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
       - name: Build test binaries
-        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst --parallel
+        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst service_tst --parallel
 
       - name: Run core tests
         run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure
