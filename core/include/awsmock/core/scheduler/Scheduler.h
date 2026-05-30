@@ -2,12 +2,13 @@
 // Created by vogje01 on 10/7/24.
 //
 
-#ifndef AWSMOCK_CORE_PERIODIC_SCHEDULER_H
-#define AWSMOCK_CORE_PERIODIC_SCHEDULER_H
+#pragma once
 
 // C++ includes
-#include <chrono>
+#include <functional>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <string>
 
 // Boost includes
@@ -18,73 +19,116 @@
 // AwsMock includes
 #include <awsmock/core/CronUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/scheduler/CronTask.h>
-#include <awsmock/core/scheduler/PeriodicTask.h>
 
 namespace AwsMock::Core {
 
-    using std::chrono::system_clock;
-
+    /**
+     * @brief Singleton scheduler that manages periodic, cron, and one-time tasks.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class Scheduler : boost::noncopyable {
 
-      public:
-
-        explicit Scheduler(boost::asio::io_context &ioc);
-
+    public:
         /**
-         * @brief Main routine
+         * @brief Task handler function type
          */
-        static void Run();
+        using handler_fn = std::function<void()>;
 
         /**
-         * @brief Add a task to the scheduler.
+         * @brief Initialize the singleton with an IO context (call once at startup).
          *
-         * @param name name of the task
-         * @param task task function
-         * @param interval interval in seconds
-         * @param delay start delay in seconds
+         * @param ioc boost IO context
+         * @return reference to the singleton instance
          */
-        void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval = 0, int delay = 0);
+        static Scheduler &initialize(boost::asio::io_context &ioc);
 
         /**
-         * @brief Add a cron task to the scheduler
+         * @brief Access the singleton instance.
          *
-         * @param name name of the task
-         * @param task task function
+         * @return reference to the singleton instance
+         */
+        static Scheduler &instance();
+
+        /**
+         * @brief Add a periodic or one-time task.
+         *
+         * @param name task name
+         * @param task handler function
+         * @param interval repeat interval in seconds (0 = run once)
+         * @param delay initial delay in seconds before first execution
+         */
+        void AddTask(const std::string &name, handler_fn task, int interval = 0, int delay = 0);
+
+        /**
+         * @brief Add a one-time task that runs after an optional delay.
+         *
+         * @param name task name
+         * @param task handler function
+         * @param delay delay in seconds before execution (0 = immediate)
+         */
+        void AddOneTimeTask(const std::string &name, handler_fn task, long delay = 0);
+
+        /**
+         * @brief Add a cron-scheduled task.
+         *
+         * @param name task name
+         * @param task handler function
          * @param cronExpression cron expression
          */
-        void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, const std::string &cronExpression);
+        void AddTask(const std::string &name, handler_fn task, const std::string &cronExpression);
 
         /**
-         * @brief Shutdown the scheduler
+         * @brief Shutdown all tasks.
          */
         void Shutdown() const;
 
         /**
-         * @brief Shutdown a specific task
+         * @brief Shutdown a specific task by name.
          *
-         * @param name name of the task
+         * @param name task name
          */
         void Shutdown(const std::string &name);
 
-      private:
+    private:
+        // ---- Periodic / one-time task entry ----
+        struct PeriodicEntry : boost::noncopyable {
+            PeriodicEntry(boost::asio::io_context &ioc, std::string name, long interval, handler_fn task, long delay);
+            void Start();
+            void Execute(const boost::system::error_code &e);
+            void Stop();
+            void StartWait();
 
-        /**
-         * Boost asio IO service
-         */
+            boost::asio::steady_timer timer;
+            handler_fn task;
+            std::string name;
+            long interval{};
+            long delay{};
+        };
+
+        // ---- Cron task entry ----
+        struct CronEntry : boost::noncopyable {
+            CronEntry(boost::asio::io_context &ioc, std::string name, std::string cronExpression, handler_fn task);
+            void Start();
+            void Execute(const boost::system::error_code &e);
+            void Stop();
+            void StartWait();
+
+            boost::asio::steady_timer timer;
+            handler_fn task;
+            std::string name;
+            std::string cronExpression;
+            long next{};
+        };
+
+        explicit Scheduler(boost::asio::io_context &ioc);
+
+        static std::unique_ptr<Scheduler> _instance;
+        static std::mutex _mutex;
+
         boost::asio::io_context &_ioc;
-
-        /**
-         * Periodic task list
-         */
-        std::map<std::string, std::unique_ptr<PeriodicTask>> _periodicTasks;
-
-        /**
-         * Cron task list
-         */
-        std::map<std::string, std::unique_ptr<CronTask>> _cronTasks;
+        std::map<std::string, std::unique_ptr<PeriodicEntry>> _periodicTasks;
+        std::map<std::string, std::unique_ptr<CronEntry>> _cronTasks;
     };
 
-}// namespace AwsMock::Core
-
-#endif//AWSMOCK_CORE_PERIODIC_SCHEDULER_H
+} // namespace AwsMock::Core

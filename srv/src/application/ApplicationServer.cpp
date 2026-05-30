@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    ApplicationServer::ApplicationServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("application"), _applicationService(ioc), _module("application"), _scheduler(scheduler) {
+    ApplicationServer::ApplicationServer(Core::Scheduler &scheduler) : AbstractServer("application"), _module("application"), _scheduler(scheduler) {
 
         // Get configuration values
         _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.application.monitoring-period");
@@ -212,4 +212,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

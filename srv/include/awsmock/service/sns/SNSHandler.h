@@ -2,10 +2,10 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVER_LAMBDA_SERVER_H
-#define AWSMOCK_SERVER_LAMBDA_SERVER_H
+#pragma once
 
 // AwsMock includes
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -24,8 +24,7 @@ namespace AwsMock::Service {
      */
     class SNSHandler final : public AbstractHandler, public std::enable_shared_from_this<SNSHandler> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -43,8 +42,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         /**
          * Get the message attributes.
          *
@@ -72,6 +70,4 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-}// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVER_LAMBDA_SERVER_H
+} // namespace AwsMock::Service

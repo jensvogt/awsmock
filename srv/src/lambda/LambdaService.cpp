@@ -5,8 +5,6 @@
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
-    std::map<std::string, std::shared_ptr<boost::mutex> > LambdaService::_instanceMutex;
-
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
@@ -19,9 +17,6 @@ namespace AwsMock::Service {
         lambda.function = request.functionName;
         lambda.runtime = request.runtime;
         lambda.handler = request.handler;
-
-        // Create mutex
-        _instanceMutex[request.functionName] = std::make_shared<boost::mutex>();
 
         // Write the base64 file
         lambda.code.zipFile = request.functionName + "-" + request.version + ".b64";
@@ -39,7 +34,7 @@ namespace AwsMock::Service {
         std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
         // Create lambda
-        LambdaCreator lambdaCreator;
+        const LambdaCreator lambdaCreator;
         lambda = lambdaCreator.CreateLambda(lambda, instanceId);
         log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", status: " << Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status) << ", totalSize: " << lambda.instances.size();
 
@@ -356,9 +351,6 @@ namespace AwsMock::Service {
             // Create lambda
             LambdaCreator lambdaCreator;
             lambda = lambdaCreator.CreateLambda(lambda, instanceId);
-
-            // Create mutex
-            _instanceMutex[request.functionName] = std::make_shared<boost::mutex>();
 
             // Start lambda
             Dto::Lambda::StartLambdaRequest startRequest;
@@ -692,38 +684,21 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        const auto accountId = Core::Configuration::instance().getAccountId();
-        const auto lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
-        int maxInvocationRetries = Core::Configuration::instance().get<int>("awsmock.modules.lambda.max-invocation-count");
-        int invocationInterval = Core::Configuration::instance().get<int>("awsmock.modules.lambda.invocation-timeout");
-
-        // Get the lambda entity
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
-        log_debug << "Got lambda entity, name: " << lambda.function;
-
-        // Check status
-        if (!lambda.enabled) {
-            log_warning << "Lambda function is disabled, arn: " << lambdaArn;
-            throw Core::ServiceException("Lambda function is disabled, arn: " + lambdaArn);
+        // REQUEST_RESPONSE
+        if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
+            auto promise = std::make_shared<std::promise<std::pair<int, std::string> > >();
+            auto future = promise->get_future();
+            Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), promise);
+            const auto [status, body] = future.get();
+            Dto::Lambda::LambdaResult result;
+            result.status = status;
+            result.responseBody = body;
+            return result;
         }
 
-        // Find an idle instance
-        Database::Entity::Lambda::Instance instance;
-        FindIdleInstance(lambda, instance);
-        log_info << "Found idle instance, name: " << lambda.function << ", instanceId: " << instance.instanceId << ", containerId: " << instance.containerId << ", hostName: " << instance.hostName << ", port: " << instance.publicPort;
-
-        // Execution depending on the invocation type
-        Dto::Lambda::LambdaResult result{};
-        for (int i = 0; i < maxInvocationRetries; i++) {
-            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance, payload);
-            result = Dto::Lambda::Mapper::mapResult(lambdaResult);
-            if (result.status == 200) {
-                break;
-            }
-            log_info << "Lambda result: " << result.functionArn << ", invocation failed: " << i << ", error: " << result.status;
-            std::this_thread::sleep_for(std::chrono::seconds(invocationInterval));
-        }
-        return result;
+        // EVENT: fire-and-forget
+        Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), nullptr);
+        return {};
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) const {
@@ -1003,11 +978,6 @@ namespace AwsMock::Service {
         lambda.state = Database::Entity::Lambda::Pending;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
 
-        // Create mutex
-        if (!_instanceMutex.contains(lambda.function)) {
-            _instanceMutex[lambda.function] = std::make_shared<boost::mutex>();
-        }
-
         // Create the lambda function asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         const LambdaCreator lambdaCreator;
@@ -1246,48 +1216,6 @@ namespace AwsMock::Service {
         }
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
         log_debug << "Delete tag request succeeded, arn: " + lambdaEntity.arn << " deleted: " << count;
-    }
-
-    void LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance) const {
-        boost::mutex::scoped_lock lock(*_instanceMutex[lambda.function]);
-
-        // Synchronize the docker daemon with the DB
-        lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
-
-        // Check existing instances
-        if (lambda.HasIdleInstance()) {
-
-            instance = lambda.GetIdleInstance();
-
-        } else if (lambda.instances.size() < lambda.concurrency) {
-
-            // Create new instance ID
-            std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-
-            // Create new lambda instance
-            const LambdaCreator lambdaCreator;
-            lambda = lambdaCreator.CreateLambda(lambda, instanceId);
-            log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
-            instance = lambda.GetInstance(instanceId);
-
-        } else {
-
-            // Wait for an idle instance
-            instance = WaitForIdleInstance(lambda);
-        }
-        _lambdaDatabase.SetInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceRunning);
-        log_info << "Lambda instances: name: " << lambda.function << ", count(running/idle/total): " << lambda.CountRunningInstances() << "/" << lambda.CountIdleInstances() << "/" << lambda.instances.size();
-    }
-
-    Database::Entity::Lambda::Instance LambdaService::WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda) const {
-        const system_clock::time_point deadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
-
-        lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
-        while (!lambda.HasIdleInstance() && system_clock::now() < deadline) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
-        }
-        return lambda.GetIdleInstance();
     }
 
     std::string LambdaService::GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda) {

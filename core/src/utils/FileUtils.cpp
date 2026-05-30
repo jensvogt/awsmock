@@ -102,7 +102,7 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
-        DirUtils::EnsureDirectory(dir);
+        DirUtils::EnsureDirectoryExists(dir);
         const boost::filesystem::path temp = boost::filesystem::unique_path();
         return appendPath(dir, temp.string(), ".", extension);
     }

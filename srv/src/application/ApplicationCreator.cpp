@@ -138,7 +138,7 @@ namespace AwsMock::Service {
 
                 // Create the classes directory
                 const std::string classesDir = Core::FileUtils::appendPath(codeDir, "classes");
-                Core::DirUtils::EnsureDirectory(classesDir);
+                Core::DirUtils::EnsureDirectoryExists(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.
                 Core::ZipUtils::Unzip(zipFile, classesDir);

@@ -5,6 +5,11 @@
 #ifndef AWSMOCK_CORE_EVENTBUS_H
 #define AWSMOCK_CORE_EVENTBUS_H
 
+// C++ standard includes
+#include <future>
+#include <memory>
+#include <utility>
+
 // Boost includes
 #include <boost/signals2/signal.hpp>
 
@@ -58,6 +63,55 @@ namespace AwsMock::Core {
          * @brief Signal monitoring system
          */
         boost::signals2::signal<void(std::map<std::string, double>)> sigCollector;
+
+        /**
+         * @brief Signal to start a single lambda function by ARN.
+         *
+         * @tparam functionArn lambda function ARN
+         * @tparam region AWS region
+         */
+        boost::signals2::signal<void(std::string, std::string)> sigLambdaStart;
+
+        /**
+         * @brief Signal to stop a single lambda function by ARN.
+         *
+         * @tparam functionArn lambda function ARN
+         * @tparam region AWS region
+         */
+        boost::signals2::signal<void(std::string, std::string)> sigLambdaStop;
+
+        /**
+         * @brief Signal to start all lambda functions in a region.
+         *
+         * @tparam region AWS region
+         */
+        boost::signals2::signal<void(std::string)> sigLambdaStartAll;
+
+        /**
+         * @brief Signal to stop all lambda functions in a region.
+         *
+         * @tparam region AWS region
+         */
+        boost::signals2::signal<void(std::string)> sigLambdaStopAll;
+
+        /**
+         * @brief Signal to invoke a lambda function.
+         *
+         * @tparam region AWS region
+         * @tparam functionName lambda function name
+         * @tparam payload JSON payload
+         * @tparam invocationType "RequestResponse" or "Event"
+         * @tparam promise result channel; nullptr for fire-and-forget (EVENT invocations)
+         */
+        boost::signals2::signal<void(std::string, std::string, std::string, std::string,
+            std::shared_ptr<std::promise<std::pair<int, std::string>>>)> sigLambdaInvoke;
+
+        /**
+         * @brief Signal to check the Docker daemon status of a lambda function.
+         *
+         * @tparam functionArn lambda function ARN
+         */
+        boost::signals2::signal<void(std::string)> sigLambdaCheck;
     };
 
 }; // namespace AwsMock::Core

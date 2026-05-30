@@ -1,5 +1,4 @@
 
-
 #include <awsmock/service/apps/ApplicationHandler.h>
 
 namespace AwsMock::Service {
@@ -67,9 +66,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
 
                     Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.RebuildApplication(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("restart-application", [this, serviceRequest] {
+                        ApplicationService{}.RebuildApplication(serviceRequest);
                         log_info << "Applications rebuild, region: " << serviceRequest.region;
                     });
                     return SendResponse(request, http::status::ok);
@@ -78,9 +76,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::ENABLE_APPLICATION: {
 
                     Dto::Apps::EnableApplicationRequest serviceRequest = Dto::Apps::EnableApplicationRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.EnableApplication(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("enable-application", [this, serviceRequest] {
+                        ApplicationService{}.EnableApplication(serviceRequest);
                         log_info << "Application enabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
                     return SendResponse(request, http::status::ok);
@@ -89,9 +86,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::ENABLE_ALL_APPLICATIONS: {
 
                     Dto::Apps::EnableAllApplicationsRequest serviceRequest = Dto::Apps::EnableAllApplicationsRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.EnableAllApplications(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("enable-all-application", [this, serviceRequest] {
+                        ApplicationService{}.EnableAllApplications(serviceRequest);
                         log_info << "Application enabled, region: " << serviceRequest.region;
                     });
                     return SendResponse(request, http::status::ok);
@@ -100,9 +96,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::DISABLE_APPLICATION: {
 
                     Dto::Apps::DisableApplicationRequest serviceRequest = Dto::Apps::DisableApplicationRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.DisableApplication(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("disable-application", [this, serviceRequest] {
+                        ApplicationService{}.DisableApplication(serviceRequest);
                         log_info << "Application disabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
                     return SendResponse(request, http::status::ok);
@@ -111,9 +106,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::DISABLE_ALL_APPLICATIONS: {
 
                     Dto::Apps::DisableAllApplicationsRequest serviceRequest = Dto::Apps::DisableAllApplicationsRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.DisableAllApplications(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("disable-all-application", [this, serviceRequest] {
+                        ApplicationService{}.DisableAllApplications(serviceRequest);
                         log_info << "Application disabled, region: " << serviceRequest.region;
                     });
                     return SendResponse(request, http::status::ok);
@@ -122,9 +116,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::START_APPLICATION: {
 
                     Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.StartApplication(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("start-application", [this, serviceRequest] {
+                        ApplicationService{}.StartApplication(serviceRequest);
                         log_info << "Application started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
                     return SendResponse(request, http::status::ok);
@@ -132,9 +125,8 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ApplicationCommandType::START_ALL_APPLICATIONS: {
 
-                    boost::asio::post(_ioc, [this] {
-                        const ApplicationService service{_ioc};
-                        const long count = service.StartAllApplications();
+                    Core::Scheduler::instance().AddOneTimeTask("start-all-application", [this] {
+                        const long count = ApplicationService{}.StartAllApplications();
                         log_info << "All applications started, count: " << count;
                     });
                     return SendResponse(request, http::status::ok);
@@ -143,9 +135,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::RESTART_APPLICATION: {
 
                     Dto::Apps::RestartApplicationRequest serviceRequest = Dto::Apps::RestartApplicationRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.RestartApplication(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("restart-application", [this, serviceRequest] {
+                        ApplicationService{}.RestartApplication(serviceRequest);
                         log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
                     return SendResponse(request, http::status::ok);
@@ -153,9 +144,8 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ApplicationCommandType::RESTART_ALL_APPLICATIONS: {
 
-                    boost::asio::post(_ioc, [this] {
-                        const ApplicationService service{_ioc};
-                        const long count = service.RestartAllApplications();
+                    Core::Scheduler::instance().AddOneTimeTask("restart-all-application", [this] {
+                        const long count = ApplicationService{}.RestartAllApplications();
                         log_info << "All applications restarted, count: " << count;
                     });
                     return SendResponse(request, http::status::ok);
@@ -164,9 +154,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::STOP_APPLICATION: {
 
                     Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, serviceRequest] {
-                        const ApplicationService service{_ioc};
-                        service.StopApplication(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("stop-application", [this, serviceRequest] {
+                        ApplicationService{}.StopApplication(serviceRequest);
                         log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
                     return SendResponse(request, http::status::ok);
@@ -174,9 +163,8 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ApplicationCommandType::STOP_ALL_APPLICATIONS: {
 
-                    boost::asio::post(_ioc, [this] {
-                        const ApplicationService service{_ioc};
-                        const long count = service.StopAllApplications();
+                    Core::Scheduler::instance().AddOneTimeTask("stop-all-application", [this] {
+                        const long count = ApplicationService{}.StopAllApplications();
                         log_info << "All applications stopped, count: " << count;
                     });
                     return SendResponse(request, http::status::ok);

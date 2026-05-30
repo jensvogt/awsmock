@@ -176,7 +176,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
                     Dto::SNS::PurgeTopicRequest snsRequest = Dto::SNS::PurgeTopicRequest::FromJson(clientCommand.payload);
-                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-topic", [snsRequest]() {
                         try {
                             const long deleted = SNSService{}.PurgeTopic(snsRequest);
                             log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
@@ -188,12 +188,12 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
-                    boost::asio::post(GatewayServer::WorkerPool(), []() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-all-topics", []() {
                         try {
                             const long purged = SNSService{}.PurgeAllTopics();
                             log_info << "All topic purged, count: " << purged;
                         } catch (const std::exception &e) {
-                            log_error << "Purging all topic failed: " << e.what();
+                            log_error << "Purging all topics failed: " << e.what();
                         }
                     });
                     return SendResponse(request, http::status::ok);
@@ -231,7 +231,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
                     Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
-                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("delete-message", [snsRequest]() {
                         try {
                             SNSService{}.DeleteMessage(snsRequest);
                             log_info << "Message deleted, messageId: " << snsRequest.messageId;
@@ -360,7 +360,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::RESEND_TOPIC: {
 
                     Dto::SNS::ResendTopicRequest snsRequest = Dto::SNS::ResendTopicRequest::FromJson(clientCommand);
-                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("resond-topic", [snsRequest]() {
                         try {
                             SNSService{}.ResendTopic(snsRequest);
                             log_info << "Message resend, topicArn: " << snsRequest.topicArn;
@@ -374,7 +374,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::RESEND_MESSAGE: {
 
                     Dto::SNS::ResendMessageRequest snsRequest = Dto::SNS::ResendMessageRequest::FromJson(clientCommand);
-                    boost::asio::post(GatewayServer::WorkerPool(), [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [snsRequest]() {
                         try {
                             SNSService{}.ResendMessage(snsRequest);
                             log_info << "Message resend, topicArn: " << snsRequest.topicArn;
@@ -443,4 +443,4 @@ namespace AwsMock::Service {
         return tags;
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -2,26 +2,19 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDA_SERVER_H
-#define AWSMOCK_SERVICE_LAMBDA_SERVER_H
+#pragma once
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/EventBus.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/dto/container/CreateNetworkRequest.h>
-#include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
+#include <awsmock/service/lambda/LambdaController.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
-#include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
 
@@ -32,21 +25,20 @@ namespace AwsMock::Service {
      */
     class LambdaServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
+        explicit LambdaServer(Core::Scheduler &scheduler);
 
         /**
          * @brief Shutdown server
          */
         void Shutdown() override;
+
         void Initialize();
 
-      private:
-
+    private:
         /**
          * @brief Delete dangling, stopped containers
          */
@@ -115,9 +107,9 @@ namespace AwsMock::Service {
         ContainerService _dockerService;
 
         /**
-         * Lambda service module
+         * Lambda controller — reacts to EventBus lambda signals
          */
-        LambdaService _lambdaService;
+        LambdaController _lambdaController;
 
         /**
          * @brief Dynamo DB backup flag.
@@ -173,6 +165,4 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_LAMBDA_SERVER_H
+} // namespace AwsMock::Service

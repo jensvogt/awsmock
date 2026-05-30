@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -26,15 +25,13 @@ namespace AwsMock::Service {
      */
     class SSMServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit SSMServer(Core::Scheduler &scheduler);
 
-      private:
-
+    private:
         /**
          * @brief Update counters
          */
@@ -92,6 +89,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_SERVER_H

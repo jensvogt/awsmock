@@ -131,7 +131,7 @@ namespace AwsMock::Core {
          *
          * @param dirName name of the directory.
          */
-        static void EnsureDirectory(const std::string &dirName);
+        static void EnsureDirectoryExists(const std::string &dirName);
 
         /**
          * @brief Checks whether the given file name is a directory.

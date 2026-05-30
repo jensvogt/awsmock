@@ -35,7 +35,7 @@
         "max-queue": 8,
         "max-thread": 64,
         "max-body": 536870912,
-        "timeout": 300
+        "timeout": 900
       }
     },
     "modules": {

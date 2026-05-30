@@ -46,7 +46,7 @@ namespace AwsMock::FtpServer {
                 std::string homeDir = Core::FileUtils::appendPath(_baseDir, user.userName);
 
                 // Ensure the home directory exists
-                Core::DirUtils::EnsureDirectory(homeDir);
+                Core::DirUtils::EnsureDirectoryExists(homeDir);
                 log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
 
                 // Create default directories

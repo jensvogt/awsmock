@@ -4,10 +4,8 @@
 
 #include <awsmock/service/lambda/LambdaServer.h>
 
-#include "awsmock/core/scheduler/OneTimeTask.h"
-
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(), _scheduler(scheduler) {
+    LambdaServer::LambdaServer(Core::Scheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaController(scheduler), _scheduler(scheduler) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.get<std::string>("awsmock.region");
@@ -51,30 +49,21 @@ namespace AwsMock::Service {
     void LambdaServer::Shutdown() {
         log_debug << "Lambda server shutdown, region: " << _region;
 
+        Core::EventBus::instance().sigLambdaStopAll(_region);
+
+        _lambdaController.Shutdown();
         _scheduler.Shutdown("lambda-monitoring");
         _scheduler.Shutdown("lambda-remove");
         _scheduler.Shutdown("lambda-remove-logs");
         _scheduler.Shutdown("lambda-backup");
 
-        // Stop all lambda docker containers
-        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
-
-            // Cleanup instances
-            for (const auto &instance: lambda.instances) {
-                ContainerService::instance().KillContainer(instance.containerId);
-                log_debug << "Lambda instances cleaned up, id: " << instance.containerId;
-            }
-            lambda.instances.clear();
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
-            log_info << "Lambda stopped, name: " << lambda.function;
-        }
         log_info << "Lambda server stopped";
     }
 
     void LambdaServer::Initialize() {
 
         // Directories
-        Core::DirUtils::EnsureDirectory(_lambdaDir);
+        Core::DirUtils::EnsureDirectoryExists(_lambdaDir);
         log_debug << "Lambda directory: " << _lambdaDir;
 
         // Cleanup instances
@@ -129,7 +118,7 @@ namespace AwsMock::Service {
     void LambdaServer::RemoveExpiredLambdas() const {
 
         // Get the list of lambdas
-        Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
+        const Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
         if (lambdaList.empty()) {
             return;
         }
@@ -138,27 +127,21 @@ namespace AwsMock::Service {
         // Get expiration time
         const auto expired = system_clock::now() - std::chrono::seconds(_lifetime);
 
-        // Loop over lambdas and remove expired instances
-        for (auto &lambda: lambdaList) {
+        // Fire stop signal for any function that has at least one expired instance
+        for (const auto &lambda: lambdaList) {
 
             if (lambda.instances.empty()) {
                 continue;
             }
 
-            // Remove instance
-            const auto count = std::erase_if(lambda.instances, [lambda, expired](const Database::Entity::Lambda::Instance &instance) {
-                if (instance.created > system_clock::time_point::min() && instance.created < expired) {
-                    ContainerService::instance().StopContainer(instance.containerId);
-                    log_info << "Lambda instance stopped, lambda: " << lambda.function << ", containerId: " << instance.containerId;
-                    return true;
-                }
-                return false;
-            });
+            const bool hasExpired = std::ranges::any_of(lambda.instances,
+                                                        [expired](const Database::Entity::Lambda::Instance &instance) {
+                                                            return instance.created > system_clock::time_point::min() && instance.created < expired;
+                                                        });
 
-            // Update lambda
-            if (count > 0) {
-                lambda = _lambdaDatabase.UpdateLambda(lambda);
-                log_debug << "Lambda updated, function" << lambda.function << " removed: " << count;
+            if (hasExpired) {
+                log_info << "Lambda instances expired, stopping function: " << lambda.function;
+                Core::EventBus::instance().sigLambdaStop(lambda.arn, _region);
             }
         }
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
@@ -185,39 +168,17 @@ namespace AwsMock::Service {
 
         for (const auto &lambda: lambdas) {
             Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambdas.size()));
-            //        _monitoringCollector.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
         }
         log_trace << "Lambda monitoring finished";
     }
 
     void LambdaServer::CreateContainers() const {
-
-        try {
-
-            // Loop over lambdas and create the containers
-            for (Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
-
-                if (lambda.enabled) {
-                    log_info << "Starting lambda container, function: " << lambda.function;
-                    Dto::Lambda::StartLambdaRequest request;
-                    request.region = _region;
-                    request.functionArn = lambda.arn;
-                    _lambdaService.StartLambda(request);
-                    log_info << "Finished starting lambda container, function: " << lambda.function;
-                } else {
-                    lambda.state = Database::Entity::Lambda::Inactive;
-                    _lambdaDatabase.UpdateLambda(lambda);
-                }
-            }
-            log_debug << "Lambda containers started";
-
-        } catch (Core::ServiceException &e) {
-            log_error << e.message();
-        }
+        Core::EventBus::instance().sigLambdaStartAll(_region);
+        log_debug << "Lambda containers started";
     }
 
     void LambdaServer::BackupLambda() {
         ModuleService::BackupModule("lambda", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

@@ -54,6 +54,11 @@ namespace AwsMock::Service {
         if (ec) {
             log_error << ec.message();
         } else {
+            // Disable Nagle algorithm for large uploads — avoids head-of-line blocking on Windows
+            beast::error_code opt_ec;
+            socket.set_option(ip::tcp::no_delay(true), opt_ec);
+            if (opt_ec) log_warning << "TCP_NODELAY failed: " << opt_ec.message();
+
             // Create the http session and run it
             std::make_shared<GatewaySession>(_ioc, std::move(socket))->Run();
         }

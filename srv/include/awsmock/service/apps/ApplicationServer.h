@@ -28,20 +28,18 @@ namespace AwsMock::Service {
      */
     class ApplicationServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit ApplicationServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
+        explicit ApplicationServer(Core::Scheduler &scheduler);
 
         /**
          * @brief Shutdown server
          */
         void Shutdown() override;
 
-      private:
-
+    private:
         /**
          * @brief Update counters
          */
@@ -150,4 +148,4 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
