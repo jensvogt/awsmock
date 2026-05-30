@@ -72,7 +72,8 @@ namespace AwsMock::Monitoring {
      */
     class MetricSystemCollector {
 
-    public:
+      public:
+
         /**
          * @brief Constructor.
          */
@@ -124,7 +125,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get the number of threads on macOS
          */
-        static void GetThreadInfoAwsmockLinux();
+        void GetThreadInfoAwsmockLinux() const;
 
         /**
          * @brief Get AwsMock CPU utilization on Linux
@@ -139,7 +140,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get AwsMock memory info on Linux systems
          */
-        static void GetMemoryInfoAwsmockLinux();
+        void GetMemoryInfoAwsmockLinux() const;
 
         /**
          * @brief Get AwsMock memory info on Linux systems
@@ -175,7 +176,8 @@ namespace AwsMock::Monitoring {
 
 #endif
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
 
         /**
@@ -250,6 +252,6 @@ namespace AwsMock::Monitoring {
         int _period = 60;
     };
 
-} // namespace AwsMock::Monitoring
+}// namespace AwsMock::Monitoring
 
 #endif// AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
