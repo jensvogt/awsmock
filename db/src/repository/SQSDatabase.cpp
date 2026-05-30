@@ -562,18 +562,14 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _queueCollection.delete_many({});
-                session.commit_transaction();
                 log_debug << "All queues deleted, count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -870,7 +866,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
 
             try {
 
@@ -930,17 +925,14 @@ namespace AwsMock::Database {
 
                 // Queue bulk
                 if (!queueBulk.empty()) {
-                    session.start_transaction();
                     auto result = queueBulk.execute();
                     log_debug << "Queue bulk update, count: " << result->modified_count();
-                    session.commit_transaction();
                 }
 
                 log_trace << "Messages received, queueArn: " << queueArn + " count: " << messageList.size();
 
             } catch (mongocxx::exception &e) {
-                log_error << "Collection transaction exception: " << e.what();
-                session.abort_transaction();
+                log_error << "Collection exception: " << e.what();
             }
 
         } else {
@@ -1329,20 +1321,14 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto queueCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = messageCollection.delete_many({});
                 deleted = result->deleted_count();
-                session.commit_transaction();
                 log_debug << "All messages deleted, count: " << deleted;
 
-
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }

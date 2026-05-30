@@ -50,12 +50,16 @@ namespace AwsMock::Database {
     struct CognitoServiceFixture {
         CognitoServiceFixture() = default;
         ~CognitoServiceFixture() {
-            CognitoDatabase::instance().DeleteAllGroups();
-            log_debug << "Cognito groups deleted";
-            CognitoDatabase::instance().DeleteAllUsers();
-            log_debug << "Cognito users deleted";
-            CognitoDatabase::instance().DeleteAllUserPools();
-            log_debug << "Cognito user pools deleted";
+            try {
+                CognitoDatabase::instance().DeleteAllGroups();
+                log_debug << "Cognito groups deleted";
+                CognitoDatabase::instance().DeleteAllUsers();
+                log_debug << "Cognito users deleted";
+                CognitoDatabase::instance().DeleteAllUserPools();
+                log_debug << "Cognito user pools deleted";
+            } catch (const std::exception &exc) {
+                log_error << "Cognito fixture cleanup failed: " << exc.what();
+            }
         }
     };
 

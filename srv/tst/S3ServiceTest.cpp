@@ -49,10 +49,14 @@ namespace AwsMock::Database {
     struct S3ServiceFixture {
         S3ServiceFixture() = default;
         ~S3ServiceFixture() {
-            const long deletedObjects = S3Database::instance().DeleteAllObjects();
-            log_debug << "S3 objects deleted, count: " << deletedObjects;
-            const long deletedBuckets = S3Database::instance().DeleteAllBuckets();
-            log_debug << "S3 buckets deleted, count: " << deletedBuckets;
+            try {
+                const long deletedObjects = S3Database::instance().DeleteAllObjects();
+                log_debug << "S3 objects deleted, count: " << deletedObjects;
+                const long deletedBuckets = S3Database::instance().DeleteAllBuckets();
+                log_debug << "S3 buckets deleted, count: " << deletedBuckets;
+            } catch (const std::exception &exc) {
+                log_error << "S3 fixture cleanup failed: " << exc.what();
+            }
         }
     };
 

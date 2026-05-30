@@ -68,11 +68,16 @@ struct GlobalTestFixture {
     }
 
     ~GlobalTestFixture() {
-        const long itemCount = AwsMock::Database::DynamoDbDatabase::instance().DeleteAllItems();
-        log_debug << "Items deleted, count: " << itemCount;
-        const long tableCount = AwsMock::Database::DynamoDbDatabase::instance().DeleteAllTables();
-        log_debug << "Tables deleted, count: " << tableCount;
+        try {
+            const long itemCount = AwsMock::Database::DynamoDbDatabase::instance().DeleteAllItems();
+            log_debug << "Items deleted, count: " << itemCount;
+            const long tableCount = AwsMock::Database::DynamoDbDatabase::instance().DeleteAllTables();
+            log_debug << "Tables deleted, count: " << tableCount;
+        } catch (const std::exception &exc) {
+            log_error << "Global fixture cleanup failed: " << exc.what();
+        }
         _iocWork.reset();
+        _ioc.stop();
         if (_iocThread.joinable()) {
             _iocThread.join();
         }

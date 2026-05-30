@@ -364,17 +364,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _userPoolCollection.delete_many({});
-                session.commit_transaction();
                 log_debug << "All cognito user pools deleted, count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -735,17 +731,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _userCollection.delete_many({});
-                session.commit_transaction();
                 log_debug << "All cognito users deleted, count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -958,11 +950,8 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
-            auto session = client->start_session();
 
             try {
-
-                session.start_transaction();
 
                 document query;
                 if (!region.empty()) {
@@ -970,12 +959,10 @@ namespace AwsMock::Database {
                 }
                 const auto result = _groupCollection.delete_many(query.extract());
                 log_debug << "All groups deleted, count: " << result->deleted_count();
-                session.commit_transaction();
 
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }

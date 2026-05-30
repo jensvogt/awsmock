@@ -52,14 +52,18 @@ namespace AwsMock::Database {
     struct SNSServiceFixture {
         SNSServiceFixture() = default;
         ~SNSServiceFixture() {
-            const long deletedMessages = SNSDatabase::instance().DeleteAllMessages();
-            log_debug << "SNS messages deleted, count: " << deletedMessages;
-            const long deletedTopics = SNSDatabase::instance().DeleteAllTopics();
-            log_debug << "SNS topics deleted, count: " << deletedTopics;
-            const long deletedSqsMessages = SQSDatabase::instance().DeleteAllMessages();
-            log_debug << "SQS messages deleted, count: " << deletedSqsMessages;
-            const long deletedQueues = SQSDatabase::instance().DeleteAllQueues();
-            log_debug << "SQS queues deleted, count: " << deletedQueues;
+            try {
+                const long deletedMessages = SNSDatabase::instance().DeleteAllMessages();
+                log_debug << "SNS messages deleted, count: " << deletedMessages;
+                const long deletedTopics = SNSDatabase::instance().DeleteAllTopics();
+                log_debug << "SNS topics deleted, count: " << deletedTopics;
+                const long deletedSqsMessages = SQSDatabase::instance().DeleteAllMessages();
+                log_debug << "SQS messages deleted, count: " << deletedSqsMessages;
+                const long deletedQueues = SQSDatabase::instance().DeleteAllQueues();
+                log_debug << "SQS queues deleted, count: " << deletedQueues;
+            } catch (const std::exception &exc) {
+                log_error << "SNS fixture cleanup failed: " << exc.what();
+            }
         }
     };
 
