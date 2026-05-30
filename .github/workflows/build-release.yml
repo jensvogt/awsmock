@@ -43,7 +43,7 @@ jobs:
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
   test:
-    name: Run Tests (core + db)
+    name: Run Tests
     runs-on: ubuntu-latest
     needs: [ release-please ]
     if: ${{ needs.release-please.outputs.prs_created == 'true' || needs.release-please.outputs.release_created == 'true' }}
