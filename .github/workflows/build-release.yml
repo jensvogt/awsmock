@@ -118,7 +118,7 @@ jobs:
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
       - name: Build test binaries
-        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst service_tst --parallel
+        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst service_tst --parallel 2
 
       - name: Run core tests
         run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure
@@ -181,7 +181,7 @@ jobs:
         run: |
           mkdir "${{ env.BUILD_DIR }}"
           cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
-          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel 
+          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel 2
 
       - name: Build (Frontend)
         shell: pwsh
@@ -390,7 +390,7 @@ jobs:
         run: |
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel 2
 
       - name: Build (Frontend)
         shell: bash
@@ -543,7 +543,7 @@ jobs:
         run: |
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel 2
 
       - name: Build (Frontend)
         shell: bash
