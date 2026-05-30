@@ -268,8 +268,8 @@ namespace AwsMock::Database {
 
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto &sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -301,8 +301,8 @@ namespace AwsMock::Database {
             const document query = {};
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto &sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             } else {
@@ -805,8 +805,8 @@ namespace AwsMock::Database {
 
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto &sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -1371,15 +1371,15 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.group(make_document(
-                        kvp("_id", "$queueArn"),
-                        kvp("size", make_document(kvp("$sum", "$size"))),
-                        kvp("total", make_document(kvp("$sum", 1))),
-                        kvp("initial", make_document(kvp("$sum",
-                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))), 1, 0)))))),
-                        kvp("invisible", make_document(kvp("$sum",
-                                                           make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)))), 1, 0)))))),
-                        kvp("delayed", make_document(kvp("$sum",
-                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)))), 1, 0))))))));
+                    kvp("_id", "$queueArn"),
+                    kvp("size", make_document(kvp("$sum", "$size"))),
+                    kvp("total", make_document(kvp("$sum", 1))),
+                    kvp("initial", make_document(kvp("$sum",
+                                                     make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))), 1, 0)))))),
+                    kvp("invisible", make_document(kvp("$sum",
+                                                       make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)))), 1, 0)))))),
+                    kvp("delayed", make_document(kvp("$sum",
+                                                     make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)))), 1, 0))))))));
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
@@ -1402,24 +1402,24 @@ namespace AwsMock::Database {
                     const auto queueArn = Core::Bson::BsonUtils::GetStringValue(t, "queueArn");
                     queuesWithMessages.insert(queueArn);
                     bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("arn", queueArn)),
-                            make_document(kvp("$set", make_document(
-                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                              kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
-                                                              kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
-                                                              kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
+                        make_document(kvp("arn", queueArn)),
+                        make_document(kvp("$set", make_document(
+                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                              kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                              kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
+                                              kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
                 }
 
                 // Zero out queues with no messages
                 for (auto queueCursor = queueCollection.find({}); const auto &q: queueCursor) {
                     if (const auto queueArn = Core::Bson::BsonUtils::GetStringValue(q, "arn"); !queuesWithMessages.contains(queueArn)) {
                         bulk.append(mongocxx::model::update_one(
-                                make_document(kvp("arn", queueArn)),
-                                make_document(kvp("$set", make_document(
-                                                                  kvp("size", bsoncxx::types::b_int64()),
-                                                                  kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
-                                                                  kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
-                                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64()))))));
+                            make_document(kvp("arn", queueArn)),
+                            make_document(kvp("$set", make_document(
+                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                  kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
+                                                  kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
+                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64()))))));
                     }
                 }
 
@@ -1439,4 +1439,4 @@ namespace AwsMock::Database {
         _memoryDb.AdjustMessageCounters();
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

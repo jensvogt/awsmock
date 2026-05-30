@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -496,6 +496,8 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
 
         /**
          * @brief Send a lambda invocation request for a message.

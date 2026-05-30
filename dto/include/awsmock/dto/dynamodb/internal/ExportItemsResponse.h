@@ -14,6 +14,7 @@
 
 
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
@@ -71,6 +72,10 @@ namespace AwsMock::Dto::DynamoDb {
                 throw Core::JsonException(exc.what());
             }
         }
+
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
     };
 
 }// namespace AwsMock::Dto::DynamoDb

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 29/05/2023.
 //
 
@@ -323,6 +323,8 @@ namespace AwsMock::Database {
         std::vector<Entity::DynamoDb::Item> GetItems(const std::string &region, const std::string &tableName) const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 
         Entity::DynamoDb::KeyValue DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const;
         void DumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) const;

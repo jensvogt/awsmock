@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 04/01/2023.
 //
 
@@ -46,6 +46,8 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload) const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
          * Lambda database connection

@@ -51,7 +51,7 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::WriteInfoMessages() {
+    void Manager::WriteInfoMessages() const {
         std::string boostVersion = BOOST_LIB_VERSION;
         Core::StringUtils::Replace(boostVersion, "_", ".");
         log_info << "Starting " << Core::Configuration::getAppName() << " " << Core::Configuration::getVersion() << ", pid: " << Core::SystemUtils::GetPid()
@@ -84,7 +84,7 @@ namespace AwsMock::Manager {
                     importRequest.infrastructure = infrastructure;
 
                     // Import infrastructure
-                    Service::ModuleService::ImportInfrastructure(importRequest);
+                    Service::ModuleService{}.ImportInfrastructure(importRequest);
                     log_info << "Loaded infrastructure, filename: " << file;
                 }
             }
@@ -95,14 +95,14 @@ namespace AwsMock::Manager {
                 Dto::Module::ImportInfrastructureRequest importRequest;
                 importRequest.cleanFirst = false;
                 importRequest.infrastructure = infrastructure;
-                Service::ModuleService::ImportInfrastructure(importRequest);
+                Service::ModuleService{}.ImportInfrastructure(importRequest);
                 log_info << "Loaded infrastructure, filename: " << autoLoadFile;
             }
         }
         log_info << "Autoload finished";
     }
 
-    void Manager::StopModules(Service::ModuleMap &moduleMap) {
+    void Manager::StopModules(Service::ModuleMap &moduleMap) const {
         log_info << "Stopping modules";
 
         // Stop scheduler
@@ -123,7 +123,7 @@ namespace AwsMock::Manager {
         log_info << "All modules stopped, count: " << moduleMap.GetSize();
     }
 
-    void Manager::LoadModulesFromConfiguration() {
+    void Manager::LoadModulesFromConfiguration() const {
 
         using Database::Entity::Module::ModuleStatus;
 
@@ -169,7 +169,7 @@ namespace AwsMock::Manager {
         log_info << "Monitoring server started";
 
         // Autoload the init files before modules start
-        Core::Scheduler::instance().AddOneTimeTask("auto-loader", [] { AutoLoad(); });
+        Core::Scheduler::instance().AddOneTimeTask("auto-loader", [this] { AutoLoad(); });
 
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 12/17/24.
 //
 
@@ -53,7 +53,7 @@ namespace AwsMock::Service::Frontend {
     }
 
     //--------------------------------------------------------------------
-    // HTTP session: reads req → serves Angular files → sends response
+    // HTTP session: reads req â†’ serves Angular files â†’ sends response
     //--------------------------------------------------------------------
     class FrontendSession : public std::enable_shared_from_this<FrontendSession> {
 
@@ -61,13 +61,13 @@ namespace AwsMock::Service::Frontend {
         boost::beast::flat_buffer buffer_;
         boost::beast::http::request<boost::beast::http::string_body> req_;
 
-      public:
-
+    public:
         explicit FrontendSession(boost::asio::ip::tcp::socket socket);
 
         void run();
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Frontend"};
 
         void do_read();
 
@@ -83,8 +83,8 @@ namespace AwsMock::Service::Frontend {
         //----------------------------------------------------------------
         template<class Body>
         void write_response(boost::beast::http::response<Body> &&res) {
-            auto sp = std::make_shared<boost::beast::http::response<Body>>(std::move(res));
-            boost::beast::http::async_write(socket_, *sp, [self = shared_from_this(), sp](const boost::beast::error_code &ec, std::size_t) {
+            auto sp = std::make_shared<boost::beast::http::response<Body> >(std::move(res));
+            boost::beast::http::async_write(socket_, *sp, [this,self = shared_from_this(), sp](const boost::beast::error_code &ec, std::size_t) {
                 if (ec) {
                     log_error << "Error writing: " << ec.message();
                 }
@@ -95,4 +95,4 @@ namespace AwsMock::Service::Frontend {
         void do_close();
     };
 
-}// namespace AwsMock::Service::Frontend
+} // namespace AwsMock::Service::Frontend

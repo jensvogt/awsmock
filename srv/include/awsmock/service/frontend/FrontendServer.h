@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 12/17/24.
 //
 
-#ifndef AWSMOCK_SERVICE_FRONTEND_HTTP_SERVER_H
-#define AWSMOCK_SERVICE_FRONTEND_HTTP_SERVER_H
+#pragma once
 
 // C++ standard includes
 #include <list>
@@ -43,11 +42,14 @@ namespace AwsMock::Service::Frontend {
 
     private:
         /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Frontend"};
+
+        /**
          * Running flag
          */
         bool _running = false;
     };
 
 } // namespace AwsMock::Service::Frontend
-
-#endif// AWSMOCK_SERVICE_FRONTEND_HTTP_SERVER_H

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 06/10/2023.
 //
 
@@ -32,6 +32,8 @@ namespace AwsMock::Service {
         explicit SSMServer(Core::Scheduler &scheduler);
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "SSM"};
+
         /**
          * @brief Update counters
          */

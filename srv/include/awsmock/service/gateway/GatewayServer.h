@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 03/06/2023.
 //
 
@@ -59,6 +59,8 @@ namespace AwsMock::Service {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Gateway"};
 
         /**
          * Rest port

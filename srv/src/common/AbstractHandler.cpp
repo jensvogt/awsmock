@@ -1,7 +1,12 @@
 
 #include <awsmock/service/common/AbstractHandler.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Common"};
+}
+
 namespace AwsMock::Service {
+
     http::response<http::dynamic_body> AbstractHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
@@ -136,4 +141,4 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

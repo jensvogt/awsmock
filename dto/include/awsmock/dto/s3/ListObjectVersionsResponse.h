@@ -100,6 +100,9 @@ namespace AwsMock::Dto::S3 {
         system_clock::time_point lastModified;
 
     private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "S3"};
+
         friend DeleteMarker tag_invoke(boost::json::value_to_tag<DeleteMarker>, boost::json::value const &v) {
             DeleteMarker r;
             r.key = Core::Json::GetStringValue(v, "Key");
@@ -262,6 +265,9 @@ namespace AwsMock::Dto::S3 {
         }
 
     private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "S3"};
+
         friend ListObjectVersionsResponse tag_invoke(boost::json::value_to_tag<ListObjectVersionsResponse>, boost::json::value const &v) {
             ListObjectVersionsResponse r;
             r.name = Core::Json::GetStringValue(v, "name");

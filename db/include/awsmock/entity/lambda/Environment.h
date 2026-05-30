@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 03/09/2023.
 //
 
@@ -43,6 +43,10 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
+
     };
 
 }// namespace AwsMock::Database::Entity::Lambda

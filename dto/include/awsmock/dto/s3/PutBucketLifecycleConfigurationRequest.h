@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 13/10/2023.
 //
 
@@ -59,6 +59,8 @@ namespace AwsMock::Dto::S3 {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
         friend PutBucketLifecycleConfigurationRequest tag_invoke(boost::json::value_to_tag<PutBucketLifecycleConfigurationRequest>, boost::json::value const &v) {
             PutBucketLifecycleConfigurationRequest r;

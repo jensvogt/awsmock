@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 01/05/2023.
 //
 
@@ -151,31 +151,33 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get total CPU utilization on Windows
          */
-        static void GetCpuInfoWin32();
+        void GetCpuInfoWin32();
 
         /**
          * @brief Get CPU utilization on Windows
          */
-        static void GetCpuInfoAwsmockWin32();
+        void GetCpuInfoAwsmockWin32();
 
         /**
          * @brief Get total memory utilization on Win32
          */
-        static void GetMemoryInfoWin32();
+        void GetMemoryInfoWin32();
 
         /**
          * @brief Get memory utilization on Win32
          */
-        static void GetMemoryInfoAwsmockWin32();
+        void GetMemoryInfoAwsmockWin32();
 
         /**
          * @brief Get memory utilization on Win32
          */
-        static void GetThreadInfoWin32();
+        void GetThreadInfoWin32();
 
 #endif
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
+
         /**
          * Number of cores
          */
@@ -233,7 +235,7 @@ namespace AwsMock::Monitoring {
          * @param counter name of the WMI counter
          * @return value of the WMI counter
          */
-        static double GetPerformanceValue(const std::string &counter);
+        double GetPerformanceValue(const std::string &counter) const;
 
 #endif
 

@@ -236,8 +236,8 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
                                              make_document(kvp("$set", make_document(
-                                                                               kvp("instances.$.status", LambdaInstanceStatusToString(status)),
-                                                                               kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
+                                                                   kvp("instances.$.status", LambdaInstanceStatusToString(status)),
+                                                                   kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
                 session.commit_transaction();
             } catch (mongocxx::exception::system_error &e) {
                 session.abort_transaction();
@@ -317,8 +317,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -445,8 +445,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -597,4 +597,4 @@ namespace AwsMock::Database {
         }
         return _memoryDb.DeleteAllLambdas();
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

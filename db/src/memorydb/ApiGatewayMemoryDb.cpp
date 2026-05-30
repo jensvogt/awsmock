@@ -12,6 +12,8 @@ namespace AwsMock::Database {
     boost::mutex ApiGatewayMemoryDb::_apiKeyMutex;
     boost::mutex ApiGatewayMemoryDb::_restApiMutex;
 
+    logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
+
     // ========================================================================================================================
     // API key
     // ========================================================================================================================
@@ -171,11 +173,11 @@ namespace AwsMock::Database {
 
         auto q = Core::from(values);
         if (!sortColumns.empty()) {
-            for (const auto &[column, sortDirection]: sortColumns) {
-                if (column == "id") {
+            for (const auto &sc: sortColumns) {
+                if (sc.column == "id") {
                     q = q.order_by([](const Entity::ApiGateway::ApiKey &key1, const Entity::ApiGateway::ApiKey &key2) { return key1.id < key2.id; });
                 }
-                if (column == "name") {
+                if (sc.column == "name") {
                     q = q.order_by([](const Entity::ApiGateway::ApiKey &key1, const Entity::ApiGateway::ApiKey &key2) { return key1.name < key2.name; });
                 }
             }
@@ -200,11 +202,11 @@ namespace AwsMock::Database {
 
         auto q = Core::from(values);
         if (!sortColumns.empty()) {
-            for (const auto &[column, sortDirection]: sortColumns) {
-                if (column == "id") {
+            for (const auto &sc: sortColumns) {
+                if (sc.column == "id") {
                     q = q.order_by([](const Entity::ApiGateway::RestApi &key1, const Entity::ApiGateway::RestApi &key2) { return key1.id < key2.id; });
                 }
-                if (column == "name") {
+                if (sc.column == "name") {
                     q = q.order_by([](const Entity::ApiGateway::RestApi &key1, const Entity::ApiGateway::RestApi &key2) { return key1.name < key2.name; });
                 }
             }
@@ -216,4 +218,4 @@ namespace AwsMock::Database {
         auto resultVector = q.to_vector();
         return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

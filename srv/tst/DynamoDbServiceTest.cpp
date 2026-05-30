@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 // Boost includes
@@ -9,6 +9,10 @@
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define TEST_ACCOUNT_ID "000000000000"
 #define TEST_TABLE "test-table"

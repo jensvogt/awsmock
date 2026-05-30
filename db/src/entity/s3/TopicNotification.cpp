@@ -4,7 +4,12 @@
 
 #include <awsmock/entity/s3/TopicNotification.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "S3"};
+}
+
 namespace AwsMock::Database::Entity::S3 {
+
     bool TopicNotification::CheckFilter(const std::string &key) {
         if (filterRules.empty()) {
             return true;

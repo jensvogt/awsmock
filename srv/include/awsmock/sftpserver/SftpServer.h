@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 3/30/25.
 //
 
@@ -341,6 +341,8 @@ namespace AwsMock::Service {
         static SftpUsers _sftpUsers;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "SftpServer"};
+
         /**
          * Server port
          */

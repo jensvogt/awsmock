@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 11/19/23.
 //
 
@@ -315,6 +315,8 @@ namespace AwsMock::Database {
         void AdjustMessageCounters();
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
 
         /**
          * SNS topic vector when running without a database

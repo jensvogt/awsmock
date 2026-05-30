@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // C++ standard
 #include <algorithm>
@@ -26,7 +26,7 @@ namespace AwsMock::Core {
     // Forward declare for recursive variant
     struct ConfigObject;
 
-    // Recursive variant — supports nested objects
+    // Recursive variant â€” supports nested objects
     using ConfigValue = std::variant<bool, long, double, std::string, std::shared_ptr<ConfigObject> >;
 
     /**
@@ -279,7 +279,7 @@ namespace AwsMock::Core {
          * @code
          * // JSON: { "awsmock": { "modules": { "s3": {...}, "sqs": {...} } } }
          * auto keys = cfg.getKeys("awsmock.modules");
-         * // → ["s3", "sqs"]
+         * // â†’ ["s3", "sqs"]
          * @endcode
          *
          * @param path  dot-separated path to an object node
@@ -289,7 +289,7 @@ namespace AwsMock::Core {
         std::vector<std::string> getKeys(const std::string &path) const noexcept;
 
         /**
-         * @brief Get a single object node as a flat key→ConfigValue map
+         * @brief Get a single object node as a flat keyâ†’ConfigValue map
          *
          * @par Example:
          * @code
@@ -442,6 +442,8 @@ namespace AwsMock::Core {
         static std::string getAppName() { return "awsmockmgr"; }
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+
         /**
          * @brief Default constructor for the Configuration class.
          *
@@ -565,7 +567,7 @@ namespace AwsMock::Core {
         std::filesystem::path _filePath;
     };
 
-    // ── extractValue specializations (inline in header) ──────────────────────
+    // â”€â”€ extractValue specializations (inline in header) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     template<>
     inline int Configuration::extractValue<int>(const boost::json::value &v, const std::string &path) {
@@ -615,7 +617,7 @@ namespace AwsMock::Core {
         throw std::runtime_error("Config key '" + path + "' is not a string");
     }
 
-    // ── set specializations (inline in header) ────────────────────────────────
+    // â”€â”€ set specializations (inline in header) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     template<>
     inline void Configuration::set<int>(const std::string &p, const int v) {
@@ -642,7 +644,7 @@ namespace AwsMock::Core {
         *resolveOrCreatePath(p) = boost::json::value(boost::json::string_view(v));
     }
 
-    // ── envOverride specializations ───────────────────────────────────────────
+    // â”€â”€ envOverride specializations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     template<>
     inline std::optional<std::string> Configuration::envOverride<std::string>(const std::string &path) {

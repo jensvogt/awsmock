@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 29/05/2023.
 //
 
@@ -345,6 +345,8 @@ namespace AwsMock::Database {
         bool ClientIdExists(const std::string &region, const std::string &clientId);
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
          * Cognito user pool map

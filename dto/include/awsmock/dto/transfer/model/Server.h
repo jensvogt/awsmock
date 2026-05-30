@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 12/18/23.
 //
 
@@ -150,6 +150,8 @@ namespace AwsMock::Dto::Transfer {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         friend Server tag_invoke(boost::json::value_to_tag<Server>, boost::json::value const &v) {
             Server r;

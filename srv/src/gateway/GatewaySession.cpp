@@ -114,7 +114,7 @@ namespace AwsMock::Service {
 
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            _handler = GatewayRouter::GetHandler(target, _ioc);
+            _handler = GatewayRouter{}.GetHandler(target, _ioc);
             if (!_handler) {
                 log_error << "Handler not found, target: " << target;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
             log_trace << "Handler found, name: " << _handler->name();
         } else {
             // Verify AWS signature
-            if (const std::string secretKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key"); _verifySignature && !Core::AwsUtils::VerifySignature(request, secretKey)) {
+            if (const auto secretKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key"); _verifySignature && !Core::AwsUtils::VerifySignature(request, secretKey)) {
                 log_warning << "AWS signature could not be verified";
                 return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
             }
@@ -131,7 +131,7 @@ namespace AwsMock::Service {
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
             _region = authKey.region;
-            _handler = GatewayRouter::GetHandler(authKey.module, _ioc);
+            _handler = GatewayRouter{}.GetHandler(authKey.module, _ioc);
             if (!_handler) {
                 log_error << "Handler not found, target: " << authKey.module;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -181,11 +181,11 @@ namespace AwsMock::Service {
     void GatewaySession::DoWrite() {
         if (!_response_queue.empty()) {
             bool keep_alive = _response_queue.front().keep_alive();
-            boost::beast::async_write(_stream,
-                                      std::move(_response_queue.front()),
-                                      boost::beast::bind_front_handler(&GatewaySession::OnWrite,
-                                                                       shared_from_this(),
-                                                                       keep_alive));
+            beast::async_write(_stream,
+                               std::move(_response_queue.front()),
+                               boost::beast::bind_front_handler(&GatewaySession::OnWrite,
+                                                                shared_from_this(),
+                                                                keep_alive));
         }
     }
 
@@ -213,7 +213,7 @@ namespace AwsMock::Service {
         // At this point the connection is closed gracefully
     }
 
-    Core::AuthorizationHeaderKeys GatewaySession::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) {
+    Core::AuthorizationHeaderKeys GatewaySession::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) const {
         // Get signing version
         Core::AuthorizationHeaderKeys authKeys = {};
 

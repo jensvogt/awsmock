@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 04/01/2023.
 //
 
@@ -31,6 +31,8 @@ namespace AwsMock::Service {
         explicit CognitoServer(Core::Scheduler &scheduler);
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
+
         /**
          * @brief Update counters
          */

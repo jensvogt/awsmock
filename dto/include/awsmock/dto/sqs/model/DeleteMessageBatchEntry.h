@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -47,6 +47,8 @@ namespace AwsMock::Dto::SQS {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
 
         friend DeleteMessageBatchEntry tag_invoke(boost::json::value_to_tag<DeleteMessageBatchEntry>, boost::json::value const &v) {
             DeleteMessageBatchEntry r;

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 1/5/25.
 //
 
@@ -6,6 +6,10 @@
 
 #include "awsmock/core/TestUtils.h"
 #include "awsmock/utils/TestUtils.h"
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 //std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::instance();

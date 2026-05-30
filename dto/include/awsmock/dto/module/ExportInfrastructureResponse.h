@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 10/6/24.
 //
 
@@ -66,6 +66,10 @@ namespace AwsMock::Dto::Module {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, ExportInfrastructureResponse &r);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Module"};
+
     };
 
 }// namespace AwsMock::Dto::Module

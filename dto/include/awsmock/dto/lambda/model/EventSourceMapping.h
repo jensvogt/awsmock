@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 7/13/24.
 //
 
@@ -73,6 +73,8 @@ namespace AwsMock::Dto::Lambda {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         friend EventSourceMapping tag_invoke(boost::json::value_to_tag<EventSourceMapping>, boost::json::value const &v) {
             EventSourceMapping r;

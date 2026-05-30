@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 4/26/24.
 //
 
@@ -200,6 +200,8 @@ namespace AwsMock::Dto::KMS {
 
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         friend Key tag_invoke(boost::json::value_to_tag<Key>, boost::json::value const &v) {
             Key r;

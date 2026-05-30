@@ -66,6 +66,9 @@ namespace AwsMock::Service {
 
         // Create infrastructure object
         Dto::Module::Infrastructure infrastructure = {};
+        Database::SortColumn sortColumn;
+        sortColumn.column = "name";
+        sortColumn.sortDirection = 1;
 
         for (const auto &module: request.modules) {
 
@@ -73,7 +76,7 @@ namespace AwsMock::Service {
 
                 Database::S3Database &_s3Database = Database::S3Database::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.s3Buckets = _s3Database.ExportBuckets({{.column = "name", .sortDirection = 1}});
+                    infrastructure.s3Buckets = _s3Database.ExportBuckets({sortColumn});
                 }
                 if (request.IsObjects()) {
                     infrastructure.s3Objects = _s3Database.ListObjects();
@@ -83,7 +86,7 @@ namespace AwsMock::Service {
 
                 Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.sqsQueues = _sqsDatabase.ExportQueues({{.column = "name", .sortDirection = 1}});
+                    infrastructure.sqsQueues = _sqsDatabase.ExportQueues({sortColumn});
                 }
                 if (request.IsObjects()) {
                     infrastructure.sqsMessages = _sqsDatabase.ListMessages();
@@ -93,7 +96,7 @@ namespace AwsMock::Service {
 
                 Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.snsTopics = _snsDatabase.ExportTopics({{.column = "name", .sortDirection = 1}});
+                    infrastructure.snsTopics = _snsDatabase.ExportTopics({sortColumn});
                 }
                 if (request.IsObjects()) {
                     infrastructure.snsMessages = _snsDatabase.ListMessages();
@@ -103,16 +106,16 @@ namespace AwsMock::Service {
 
                 Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.lambdas = _lambdaDatabase.ExportLambdas({{.column = "name", .sortDirection = 1}});
+                    infrastructure.lambdas = _lambdaDatabase.ExportLambdas({sortColumn});
                 }
 
             } else if (module == "cognito") {
 
                 Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.cognitoUserPools = _cognitoDatabase.ExportUserPools({{.column = "name", .sortDirection = 1}});
-                    infrastructure.cognitoUserGroups = _cognitoDatabase.ExportGroups({{.column = "name", .sortDirection = 1}});
-                    infrastructure.cognitoUsers = _cognitoDatabase.ExportUsers({{.column = "name", .sortDirection = 1}});
+                    infrastructure.cognitoUserPools = _cognitoDatabase.ExportUserPools({sortColumn});
+                    infrastructure.cognitoUserGroups = _cognitoDatabase.ExportGroups({sortColumn});
+                    infrastructure.cognitoUsers = _cognitoDatabase.ExportUsers({sortColumn});
                 }
 
             } else if (module == "dynamodb") {
@@ -168,7 +171,11 @@ namespace AwsMock::Service {
                 }
             }
         }
-        return {.infrastructure = infrastructure, .exportType = request.exportType, .prettyPrint = request.prettyPrint};
+        Dto::Module::ExportInfrastructureResponse response;
+        response.infrastructure = infrastructure;
+        response.exportType = request.exportType;
+        response.prettyPrint = request.prettyPrint;
+        return response;
     }
 
     void ModuleService::ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) {
@@ -360,7 +367,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void ModuleService::CleanInfrastructure(const Dto::Module::CleanInfrastructureRequest &request) {
+    void ModuleService::CleanInfrastructure(const Dto::Module::CleanInfrastructureRequest &request) const {
         log_info << "Cleaning services, length: " << request.modules.size();
 
         CleanObjects(request);
@@ -389,7 +396,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void ModuleService::CleanObjects(const Dto::Module::CleanInfrastructureRequest &request) {
+    void ModuleService::CleanObjects(const Dto::Module::CleanInfrastructureRequest &request) const {
         log_info << "Cleaning objects, modules: " << request.modules.size();
 
         long count = 0;
@@ -423,7 +430,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void ModuleService::ImportLocalS3File(const Database::Entity::S3::Object &object) {
+    void ModuleService::ImportLocalS3File(const Database::Entity::S3::Object &object) const {
         if (Core::FileUtils::FileExists(object.localName)) {
             const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
             const std::string localFilePath = Core::FileUtils::appendPath(s3DataDir, object.internalName);
@@ -461,7 +468,7 @@ namespace AwsMock::Service {
         std::this_thread::sleep_for(std::chrono::minutes(5));
     }
 
-    void ModuleService::BackupRetention(const std::string &module) {
+    void ModuleService::BackupRetention(const std::string &module) const {
 
         // Get the file list
         const int retention = Core::Configuration::instance().get<int>("awsmock.modules." + module + ".backup.count");

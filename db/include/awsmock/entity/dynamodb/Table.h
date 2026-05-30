@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 07/06/2023.
 //
 
@@ -131,6 +131,10 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
+
     };
 
     typedef std::vector<Table> TableList;

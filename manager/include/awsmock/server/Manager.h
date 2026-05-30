@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 5/27/24.
 //
 
@@ -88,16 +88,18 @@ namespace AwsMock::Manager {
          * precedence. In the case of a directory, all files will be loaded in alphabetic order. So files names 01_xy, 02_xy will be imported
          * in that order.
          */
-        static void AutoLoad();
+        void AutoLoad();
 
         /**
          * @brief Stops all currently running modules.
          *
          * @param moduleMap hash map of all modules
          */
-        static void StopModules(Service::ModuleMap &moduleMap);
+        void StopModules(Service::ModuleMap &moduleMap) const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Manager"};
+
         /**
          * @brief @STart websocket logging, when configures
          */
@@ -111,7 +113,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Writes some info message to the logging
          */
-        static void WriteInfoMessages();
+        void WriteInfoMessages() const;
 
         /**
          * @brief Load the modules from the configuration file.
@@ -119,7 +121,7 @@ namespace AwsMock::Manager {
          * @par
          * Gateway and monitoring are a bit special, as they are not modules, but they still exists in the module database.
          */
-        static void LoadModulesFromConfiguration();
+        void LoadModulesFromConfiguration() const;
 
         /**
          * @brief Ensures that the module exists

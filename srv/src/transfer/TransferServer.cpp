@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         log_info << "Transfer server initialized";
     }
 
-    void TransferServer::CreateTransferBucket() {
+    void TransferServer::CreateTransferBucket() const {
         Dto::S3::CreateBucketRequest request;
         request.owner = Core::Configuration::instance().get<std::string>("awsmock.user");
         request.region = Core::Configuration::instance().get<std::string>("awsmock.region");
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void TransferServer::CreateDirectories(const std::string &userName) {
+    void TransferServer::CreateDirectories(const std::string &userName) const {
         const auto basePath = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
         for (const auto &directory: Core::Configuration::instance().getArray<std::string>("awsmock.modules.transfer.directories")) {
             if (std::string dirPath = Core::FileUtils::appendPath(basePath, userName, directory); !Core::DirUtils::DirectoryExists(dirPath)) {
@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void TransferServer::StartSftpServer(Database::Entity::Transfer::Transfer &server) {
+    void TransferServer::StartSftpServer(Database::Entity::Transfer::Transfer &server) const {
 
         // Get base dir
         //const auto baseDir = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.data-dir");
@@ -163,7 +163,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::BackupTransfer() {
-        ModuleService::BackupModule("transfer", Dto::Module::ExportType::INFRA_STRUCTURE);
+        ModuleService{}.BackupModule("transfer", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void TransferServer::Shutdown() {

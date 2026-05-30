@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 03/06/2023.
 //
 
@@ -34,11 +34,13 @@ namespace AwsMock::Service {
         void AdjustCounter() const;
 
         /**
-         * @ſbrief Server shutdown
+         * @Å¿brief Server shutdown
          */
         void Shutdown() override;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
+
         /**
          * @brief Reset resources
          *

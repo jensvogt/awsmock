@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 4/8/24.
 //
 
@@ -85,6 +85,10 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 }
             }
         }
+    private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
+
     };
 
 }// namespace AwsMock::Database::Entity::SecretsManager

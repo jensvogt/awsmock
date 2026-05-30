@@ -173,6 +173,8 @@ namespace AwsMock::Service {
          * @brief Guards _instanceMutex map insertions.
          */
         mutable std::mutex _mutexMapLock;
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
     };
 
 } // namespace AwsMock::Service

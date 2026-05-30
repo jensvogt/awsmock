@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 27/09/2025.
 //
 
@@ -9,6 +9,10 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/server/Manager.h>
 #include <awsmock/service/frontend/FrontendServer.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Manager"};
+}
 
 HANDLE g_hEventSource = nullptr;
 HANDLE g_ServiceStopEvent = nullptr;
@@ -183,7 +187,7 @@ void WINAPI ServiceMain(DWORD, LPTSTR *) {
         return;
     }
 
-    // No cast needed — signature matches exactly
+    // No cast needed â€” signature matches exactly
     const HANDLE hThread = CreateThread(nullptr, 0, RunService, nullptr, 0, nullptr);
     if (!hThread) {
         LogWindowsEvent("Failed to create worker thread");

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <chrono>
 #include <iostream>
@@ -6,6 +6,8 @@
 #include <regex>
 
 #include <sys/stat.h>
+
+#include "awsmock/core/logging/LogStream.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Filesystem
@@ -25,23 +27,31 @@ namespace AwsMock::FtpServer {
     };
 
     class FileStatus {
-      public:
-
+    public:
         FileStatus(const std::string &path);
 
         bool isOk() const;
+
         FileType type() const;
 
         int64_t fileSize() const;
 
         bool permissionRootRead() const;
+
         bool permissionRootWrite() const;
+
         bool permissionRootExecute() const;
+
         bool permissionGroupRead() const;
+
         bool permissionGroupWrite() const;
+
         bool permissionGroupExecute() const;
+
         bool permissionOwnerRead() const;
+
         bool permissionOwnerWrite() const;
+
         bool permissionOwnerExecute() const;
 
         std::string permissionString() const;
@@ -54,7 +64,8 @@ namespace AwsMock::FtpServer {
 
         bool canOpenDir() const;
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
 
         std::string path_;
         bool is_ok_;
@@ -66,4 +77,4 @@ namespace AwsMock::FtpServer {
     std::string cleanPath(const std::string &path, bool windows_path, char output_separator);
 
     std::string cleanPathNative(const std::string &path);
-}// namespace AwsMock::FtpServer
+} // namespace AwsMock::FtpServer

@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVER_GATEWAY_ROUTER_H
-#define AWSMOCK_SERVER_GATEWAY_ROUTER_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -12,6 +11,7 @@
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 #include <awsmock/service/apps/ApplicationHandler.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
+#include <awsmock/service/container/ContainerHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 #include <awsmock/service/kms/KMSHandler.h>
 #include <awsmock/service/lambda/LambdaHandler.h>
@@ -23,7 +23,6 @@
 #include <awsmock/service/sqs/SQSHandler.h>
 #include <awsmock/service/ssm/SSMHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
-#include <awsmock/service/container/ContainerHandler.h>
 
 namespace AwsMock::Service {
 
@@ -34,12 +33,11 @@ namespace AwsMock::Service {
      */
     class GatewayRouter final {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit GatewayRouter() {};
+        explicit GatewayRouter() = default;
 
         /**
          * @brief Returns an HTTP request handler for a module.
@@ -48,9 +46,11 @@ namespace AwsMock::Service {
          * @param routingKey module name
          * @return pointer to module handler
          */
-        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, boost::asio::io_context &ioc);
+        std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, boost::asio::io_context &ioc);
+
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Gateway"};
+
     };
 
-}// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVER_GATEWAY_ROUTER_H
+} // namespace AwsMock::Service

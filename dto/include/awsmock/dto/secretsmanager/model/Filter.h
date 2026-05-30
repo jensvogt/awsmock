@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 4/11/24.
 //
 
@@ -96,6 +96,8 @@ namespace AwsMock::Dto::SecretsManager {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         friend Filter tag_invoke(boost::json::value_to_tag<Filter>, boost::json::value const &v) {
             Filter r;

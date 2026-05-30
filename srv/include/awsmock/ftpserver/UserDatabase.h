@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // C++ includes
 #include <iostream>
@@ -16,8 +16,7 @@ namespace AwsMock::FtpServer {
 
     class UserDatabase {
 
-      public:
-
+    public:
         /**
          * Constructor
          */
@@ -43,7 +42,8 @@ namespace AwsMock::FtpServer {
          */
         std::shared_ptr<FtpUser> getUser(const std::string &username, const std::string &password) const;
 
-      private:
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
 
         /**
          * Check whether the user is the anonymous user
@@ -58,7 +58,7 @@ namespace AwsMock::FtpServer {
          *
          * @param userName name of the user
          */
-        static void CreateDirectories(const std::string &userName);
+        void CreateDirectories(const std::string &userName) const;
 
         /**
          * Server mutex
@@ -68,7 +68,7 @@ namespace AwsMock::FtpServer {
         /**
          * User database
          */
-        std::map<std::string, std::shared_ptr<FtpUser>> database_;
+        std::map<std::string, std::shared_ptr<FtpUser> > database_;
 
         /**
          * Anonymous user
@@ -90,4 +90,4 @@ namespace AwsMock::FtpServer {
          */
         std::string _baseDir;
     };
-}// namespace AwsMock::FtpServer
+} // namespace AwsMock::FtpServer

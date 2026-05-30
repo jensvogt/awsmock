@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 3/22/26.
 //
 
@@ -100,6 +100,8 @@ namespace AwsMock::Service {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 
         std::string_view src_;
         std::size_t pos_;
@@ -245,7 +247,7 @@ namespace AwsMock::Service {
                 return Between{field, std::move(low), std::move(high)};
             }
 
-            // EQ / comparison branch — skip optional spaces around operator
+            // EQ / comparison branch â€” skip optional spaces around operator
             skip_spaces();
             const std::string op = parse_operator();
             skip_spaces();
@@ -263,7 +265,7 @@ namespace AwsMock::Service {
     };
 
     // =========================================================================
-    // DynamoDbQueryHelper — public API
+    // DynamoDbQueryHelper â€” public API
     // =========================================================================
 
     class DynamoDbQueryHelper {
@@ -304,12 +306,14 @@ namespace AwsMock::Service {
 
       private:
 
+        inline static logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
+
         // -----------------------------------------------------------------
         // Parse step
         // -----------------------------------------------------------------
 
         static And parse_expression(const std::string &input) {
-            try {// Normalize line endings — remove \r in case of Windows-style input
+            try {// Normalize line endings â€” remove \r in case of Windows-style input
                 std::string normalized;
                 normalized.reserve(input.size());
                 for (const unsigned char c: input)
@@ -351,11 +355,11 @@ namespace AwsMock::Service {
 
             using bsoncxx::builder::basic::kvp;
 
-            // Single condition — no $and wrapper needed
+            // Single condition â€” no $and wrapper needed
             if (ast.conditions.size() == 1)
                 return build_single(ast.conditions.front(), attr_values);
 
-            // Multiple conditions — wrap in $and array
+            // Multiple conditions â€” wrap in $and array
             document doc{};
             array arr{};
 
@@ -461,7 +465,7 @@ namespace AwsMock::Service {
                     }
                 }
 
-                // Unreachable — silences -Wreturn-type for non-exhaustive if constexpr chains
+                // Unreachable â€” silences -Wreturn-type for non-exhaustive if constexpr chains
                 throw Core::DynamoDbParseException("Unhandled condition variant in build_single");
             },
                               cond);

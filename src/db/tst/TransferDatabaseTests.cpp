@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -11,6 +11,10 @@
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/TransferDatabase.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define BUCKET "test-bucket"
 #define OWNER "test-owner"

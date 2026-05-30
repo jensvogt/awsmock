@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -14,6 +14,10 @@
 
 // Test includes
 #include <awsmock/core/TestUtils.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define REGION "eu-central-1"
 #define TABLE_NAME "test-table"

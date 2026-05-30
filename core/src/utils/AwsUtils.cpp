@@ -11,6 +11,8 @@
 
 namespace {
 
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+
     // Percent-encode a string per RFC 3986 unreserved characters (required for SigV4)
     std::string SigV4Encode(const std::string &input) {
         std::ostringstream out;

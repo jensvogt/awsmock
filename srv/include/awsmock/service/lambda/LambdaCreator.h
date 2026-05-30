@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDA_CREATOR_H
-#define AWSMOCK_SERVICE_LAMBDA_CREATOR_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -51,8 +50,7 @@ namespace AwsMock::Service {
      */
     class LambdaCreator {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -90,8 +88,7 @@ namespace AwsMock::Service {
          */
         void UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) const;
 
-      private:
-
+    private:
         /**
          * @brief Create a lambda function instance
          *
@@ -186,6 +183,4 @@ namespace AwsMock::Service {
         bool _dockerized = Core::Configuration::instance().get<bool>("awsmock.dockerized");
     };
 
-}// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_LAMBDA_CREATOR_H
+} // namespace AwsMock::Service

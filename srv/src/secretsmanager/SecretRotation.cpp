@@ -27,7 +27,7 @@ namespace AwsMock::Service {
         log_debug << "Secret updated, arn: " << secret.arn;
     }
 
-    void SecretRotation::CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
+    void SecretRotation::CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, payload);
     }
 
-    void SecretRotation::SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
+    void SecretRotation::SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, payload);
     }
 
-    void SecretRotation::TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
+    void SecretRotation::TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, payload);
     }
 
-    void SecretRotation::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body) {
+    void SecretRotation::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body) const {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
@@ -89,7 +89,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda send invocation request finished, function: " << lambda.function;
     }
 
-    system_clock::time_point SecretRotation::GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) {
+    system_clock::time_point SecretRotation::GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const {
         log_debug << "Get next rotation datetime, secret: " << secret.secretId;
         system_clock::time_point nextRotationDate = system_clock::now();
         if (secret.rotationRules.automaticallyAfterDays > 0) {
@@ -97,4 +97,4 @@ namespace AwsMock::Service {
         }
         return nextRotationDate;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

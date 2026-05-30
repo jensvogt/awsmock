@@ -1,9 +1,13 @@
-//
+﻿//
 // Created by vogje01 on 5/28/24.
 //
 
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/HttpSocket.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
 
 namespace AwsMock::Core {
 

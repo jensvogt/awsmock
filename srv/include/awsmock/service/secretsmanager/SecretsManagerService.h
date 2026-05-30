@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 07/04/2024.
 //
 
@@ -174,6 +174,8 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
          * @brief Create a secret

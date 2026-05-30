@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 01/05/2023.
 //
 
-#ifndef AWSMOCK_MONITORING_METRIC_DOCKER_COLLECTOR_H
-#define AWSMOCK_MONITORING_METRIC_DOCKER_COLLECTOR_H
+#pragma once
 
 // Awsmock includes
 #include <awsmock/core/EventBus.h>
@@ -23,8 +22,7 @@ namespace AwsMock::Monitoring {
      */
     class MetricDockerCollector {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -33,9 +31,14 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Updates the system counter
          */
-        static void CollectDockerCounter();
+        void CollectDockerCounter();
+
+    private:
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
+
     };
 
-}// namespace AwsMock::Monitoring
-
-#endif// AWSMOCK_MONITORING_METRIC_DOCKER_COLLECTOR_H
+} // namespace AwsMock::Monitoring

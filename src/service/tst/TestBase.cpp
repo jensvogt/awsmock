@@ -1,8 +1,12 @@
-//
+﻿//
 // Created by vogje01 on 1/5/25.
 //
 
 #include "TestBase.h"
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 namespace AwsMock::Service {
 

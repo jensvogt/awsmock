@@ -49,6 +49,8 @@ namespace AwsMock::Dto::Transfer {
 
       private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
+
         friend ProtocolCounter tag_invoke(boost::json::value_to_tag<ProtocolCounter>, boost::json::value const &v) {
             ProtocolCounter r;
             r.port = Core::Json::GetLongValue(v, "port");

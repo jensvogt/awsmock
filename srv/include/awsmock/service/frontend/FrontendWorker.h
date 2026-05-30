@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 12/17/24.
 //
 
-#ifndef AWSMOCK_SERVICE_FRONTEND_HTTP_WORKER_H
-#define AWSMOCK_SERVICE_FRONTEND_HTTP_WORKER_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -21,9 +20,7 @@
 #include <boost/numeric/ublas/fwd.hpp>
 
 // AwsMock includes
-#include "awsmock/core/HttpUtils.h"
-
-
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/config/Configuration.h>
@@ -73,6 +70,8 @@ namespace AwsMock::Service::Frontend {
         void Start();
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Frontend"};
+
         using alloc_t = fields_alloc<char>;
         using request_body_t = http::string_body;
 
@@ -175,5 +174,3 @@ namespace AwsMock::Service::Frontend {
     };
 
 } // namespace AwsMock::Service::Frontend
-
-#endif// AWSMOCK_SERVICE_FRONTEND_HTTP_WORKER_H

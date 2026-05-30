@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 5/27/24.
 //
 
@@ -48,6 +48,8 @@ namespace AwsMock::Service {
         void Run();
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Gateway"};
+
         /**
          * @brief The new connection gets its own strand
          */

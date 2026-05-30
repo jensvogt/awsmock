@@ -61,7 +61,7 @@ namespace AwsMock::FtpServer {
         async_write(command_socket_,
                     boost::asio::buffer(command_output_queue_.front()),
                     boost::asio::bind_executor(command_write_strand_,
-                                               [me = shared_from_this()](const boost::beast::error_code &ec, std::size_t /*bytes*/) {
+                                               [this,me = shared_from_this()](const boost::beast::error_code &ec, std::size_t /*bytes*/) {
                                                    if (!ec) {
                                                        me->command_output_queue_.pop_front();
                                                        if (!me->command_output_queue_.empty()) {
@@ -77,7 +77,7 @@ namespace AwsMock::FtpServer {
         async_read_until(command_socket_,
                          command_input_stream_,
                          "\r\n",
-                         [me = shared_from_this()](const boost::beast::error_code &ec, const std::size_t length) {
+                         [this,me = shared_from_this()](const boost::beast::error_code &ec, const std::size_t length) {
                              if (ec) {
                                  if (ec != boost::asio::error::eof) {
                                      log_error << "Read_until error: " << ec.message();
@@ -1164,7 +1164,7 @@ namespace AwsMock::FtpServer {
         auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
-        data_acceptor_.async_accept(*data_socket, [data_socket, directory_content, me = shared_from_this()](auto ec) {
+        data_acceptor_.async_accept(*data_socket, [this,data_socket, directory_content, me = shared_from_this()](auto ec) {
             if (ec) {
                 log_error << "Error sending directory listing, error: " << ec.message();
                 me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
@@ -1289,15 +1289,15 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::writeDataToSocket(const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
-                                       const std::function<void(void)> &fetch_more) {
+                                       const std::function<void()> &fetch_more) {
         data_buffer_strand_.post(
-            [me = shared_from_this(), data_socket, fetch_more]() {
+            [this,me = shared_from_this(), data_socket, fetch_more]() {
                 if (auto data = me->data_buffer_.front()) {
                     // Send out the buffer
                     async_write(*data_socket,
                                 boost::asio::buffer(*data),
                                 boost::asio::bind_executor(me->data_buffer_strand_,
-                                                           [me, data_socket, data, fetch_more](
+                                                           [this,me, data_socket, data, fetch_more](
                                                        const boost::beast::error_code &ec,
                                                        std::size_t /*bytes_to_transfer*/) {
                                                                me->data_buffer_.pop_front();

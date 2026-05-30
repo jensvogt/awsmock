@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 6/3/24.
 //
 
@@ -38,6 +38,8 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Module"};
+
         /**
          * Module database connection
          */

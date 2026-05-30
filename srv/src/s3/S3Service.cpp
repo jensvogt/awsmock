@@ -4,7 +4,12 @@
 
 #include <awsmock/service/s3/S3Service.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "S3"};
+}
+
 namespace AwsMock::Service {
+
     bool S3Service::BucketExists(const std::string &region, const std::string &bucket) const {
         return _database.BucketExists(region, bucket);
     }

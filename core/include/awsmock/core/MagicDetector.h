@@ -69,6 +69,7 @@ namespace AwsMock::Core {
 
         magic_t _magic;
         mutable std::mutex _mutex;
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
 }// namespace AwsMock::Core

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 01/06/2023.
 //
 
@@ -155,6 +155,10 @@ namespace AwsMock::Database::Entity::SNS {
          * @return DTO as JSON string
          */
         [[nodiscard]] std::string ToJson() const;
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
+
     };
 
     typedef std::vector<Topic> TopicList;

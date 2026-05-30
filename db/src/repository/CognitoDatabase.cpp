@@ -233,8 +233,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -283,8 +283,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto [column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -557,8 +557,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -608,8 +608,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -904,8 +904,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -1008,4 +1008,4 @@ namespace AwsMock::Database {
         return _memoryDb.ClientIdExists(region, clientId);
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

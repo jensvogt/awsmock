@@ -1,8 +1,12 @@
-//
+﻿//
 // Created by vogje01 on 18/05/2023.
 //
 
 #include <awsmock/core/TarUtils.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
 
 namespace AwsMock::Core {
 

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 21/10/2023.
 //
 
@@ -9,6 +9,10 @@
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define BOOST_TEST_MODULE SQSServiceJavaTests
 #define TEST_QUEUE std::string("test-queue")

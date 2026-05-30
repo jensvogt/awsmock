@@ -117,7 +117,7 @@ namespace AwsMock::Service {
 
                 Dto::Module::ImportInfrastructureRequest infrastructureRequest;
                 infrastructureRequest.FromJson(payload);
-                ModuleService::ImportInfrastructure(infrastructureRequest);
+                ModuleService{}.ImportInfrastructure(infrastructureRequest);
                 log_info << "Infrastructure imported, size: " << payload.length();
                 return SendResponse(request, http::status::ok);
             }
@@ -128,7 +128,7 @@ namespace AwsMock::Service {
                 Dto::Module::ExportInfrastructureRequest moduleRequest = Dto::Module::ExportInfrastructureRequest::FromJson(payload);
 
                 // Get modules
-                const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
+                const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService{}.ExportInfrastructure(moduleRequest);
                 std::string json = moduleResponse.ToJson();
                 log_info << "Infrastructure exported, size: " << json.length();
                 return SendResponse(request, http::status::ok, json);
@@ -147,9 +147,9 @@ namespace AwsMock::Service {
 
                 // Get modules
                 if (Dto::Module::CleanInfrastructureRequest moduleRequest = Dto::Module::CleanInfrastructureRequest::FromJson(payload); moduleRequest.onlyObjects) {
-                    ModuleService::CleanObjects(moduleRequest);
+                    ModuleService{}.CleanObjects(moduleRequest);
                 } else {
-                    ModuleService::CleanInfrastructure(moduleRequest);
+                    ModuleService{}.CleanInfrastructure(moduleRequest);
                 }
                 return SendResponse(request, http::status::ok);
             }
@@ -164,4 +164,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

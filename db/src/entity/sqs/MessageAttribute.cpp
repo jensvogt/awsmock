@@ -4,6 +4,10 @@
 
 #include <awsmock/entity/sqs/MessageAttribute.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "SQS"};
+}
+
 namespace AwsMock::Database::Entity::SQS {
 
     view_or_value<view, value> MessageAttribute::ToDocument() const {

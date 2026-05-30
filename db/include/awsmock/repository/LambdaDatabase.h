@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 29/05/2023.
 //
 
@@ -201,7 +201,7 @@ namespace AwsMock::Database {
          * @brief Export a list of lambdas
          *
          * @param sortColumns sorting columns
-         * @return ölist of lambda entries
+         * @return Ã¶list of lambda entries
          */
         [[nodiscard]] std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<SortColumn> &sortColumns = {}) const;
 
@@ -305,6 +305,8 @@ namespace AwsMock::Database {
         [[nodiscard]] long DeleteAllLambdas() const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
+
         /**
          * Database name
          */

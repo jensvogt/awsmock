@@ -19,6 +19,9 @@ namespace AwsMock::Service {
 
 //================================= sftpserver =======================================
 extern "C" {
+
+logger_t _logger{boost::log::keywords::channel = "SFTP"};
+
 #ifdef _WIN32
 
 #define ctime_r(t, b) ctime_s(b, sizeof(b), t)
@@ -3425,7 +3428,8 @@ namespace AwsMock::Service {
             log_error << "SSH bind new failed";
             return;
         }
-        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str() << ", hostKey: " << hostKey;
+        // TODO:: Fix with anthropic
+        //log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str() << ", hostKey: " << hostKey;
 
         // Command line options
         ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT_STR, port.c_str());

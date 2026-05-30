@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 12/10/23.
 //
 
@@ -106,8 +106,8 @@ namespace AwsMock::Database::Entity::SNS {
          * @brief Beginning archive time.
          *
          * <p>
-         * The earliest starting point at which a message in the topic’s archive can be replayed from. This point in time
-         * is based on the configured message retention period set by the topic’s message archiving policy.
+         * The earliest starting point at which a message in the topicâ€™s archive can be replayed from. This point in time
+         * is based on the configured message retention period set by the topicâ€™s message archiving policy.
          * </p>
          */
         system_clock::time_point beginningArchiveTime;
@@ -155,6 +155,10 @@ namespace AwsMock::Database::Entity::SNS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const TopicAttribute &r);
+      private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
+
     };
 
 } // namespace AwsMock::Database::Entity::SNS

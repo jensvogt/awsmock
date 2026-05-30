@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -140,6 +140,8 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "SSM"};
+
         /**
          * Account ID
          */

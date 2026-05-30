@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
@@ -56,6 +56,8 @@ namespace AwsMock::Dto::SNS {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
 
         friend CreateTopicResponse tag_invoke(boost::json::value_to_tag<CreateTopicResponse>, boost::json::value const &v) {
             CreateTopicResponse r;

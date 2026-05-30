@@ -1,7 +1,12 @@
 
 #include <awsmock/service/sns/SNSHandler.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "SNS"};
+}
+
 namespace AwsMock::Service {
+
     http::response<http::dynamic_body> SNSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SNS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
@@ -176,7 +181,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
                     Dto::SNS::PurgeTopicRequest snsRequest = Dto::SNS::PurgeTopicRequest::FromJson(clientCommand.payload);
-                    Core::Scheduler::instance().AddOneTimeTask("purge-topic", [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-topic", [this,snsRequest]() {
                         try {
                             const long deleted = SNSService{}.PurgeTopic(snsRequest);
                             log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
@@ -188,7 +193,7 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
-                    Core::Scheduler::instance().AddOneTimeTask("purge-all-topics", []() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-all-topics", [this]() {
                         try {
                             const long purged = SNSService{}.PurgeAllTopics();
                             log_info << "All topic purged, count: " << purged;
@@ -231,7 +236,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
                     Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
-                    Core::Scheduler::instance().AddOneTimeTask("delete-message", [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("delete-message", [this,snsRequest]() {
                         try {
                             SNSService{}.DeleteMessage(snsRequest);
                             log_info << "Message deleted, messageId: " << snsRequest.messageId;
@@ -360,7 +365,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::RESEND_TOPIC: {
 
                     Dto::SNS::ResendTopicRequest snsRequest = Dto::SNS::ResendTopicRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("resond-topic", [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("resond-topic", [this,snsRequest]() {
                         try {
                             SNSService{}.ResendTopic(snsRequest);
                             log_info << "Message resend, topicArn: " << snsRequest.topicArn;
@@ -374,7 +379,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::RESEND_MESSAGE: {
 
                     Dto::SNS::ResendMessageRequest snsRequest = Dto::SNS::ResendMessageRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [snsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [this,snsRequest]() {
                         try {
                             SNSService{}.ResendMessage(snsRequest);
                             log_info << "Message resend, topicArn: " << snsRequest.topicArn;
@@ -400,7 +405,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::map<std::string, Dto::SNS::MessageAttribute> SNSHandler::GetMessageAttributes(const std::string &payload) {
+    std::map<std::string, Dto::SNS::MessageAttribute> SNSHandler::GetMessageAttributes(const std::string &payload) const {
 
         std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes;
         const int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttributes");
@@ -424,7 +429,7 @@ namespace AwsMock::Service {
         return messageAttributes;
     }
 
-    std::map<std::string, std::string> SNSHandler::GetTags(const std::string &payload) {
+    std::map<std::string, std::string> SNSHandler::GetTags(const std::string &payload) const {
 
         std::map<std::string, std::string> tags;
         const int tagCount = Core::HttpUtils::CountQueryParametersByPrefix("/?" + payload, "Tags.member") / 2;

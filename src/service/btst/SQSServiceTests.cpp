@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 02/06/2023.
 //
 
@@ -12,6 +12,10 @@
 
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/utils/SqsUtils.h>
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 #define BOOST_TEST_MODULE SQSServiceTests
 #define REGION "eu-central-1"

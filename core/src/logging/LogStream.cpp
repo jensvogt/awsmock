@@ -5,6 +5,10 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/logging/LoggingServer.h>
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Core"};
+}
+
 namespace AwsMock::Core {
 
     long LogStream::logSize = DEFAULT_LOG_SIZE;
@@ -13,9 +17,10 @@ namespace AwsMock::Core {
     std::string LogStream::_logPrefix;
     std::string LogStream::_currentLevel = "info";
     boost::log::trivial::severity_level LogStream::_severity;
-    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> LogStream::console_sink;
-    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> LogStream::file_sink;
-    boost::shared_ptr<websocket::stream<beast::tcp_stream>> LogStream::_ws;
+    std::map<std::string, boost::log::trivial::severity_level> LogStream::_channelLevels;
+    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> > LogStream::console_sink;
+    boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> > LogStream::file_sink;
+    boost::shared_ptr<websocket::stream<beast::tcp_stream> > LogStream::_ws;
     boost::shared_ptr<LogWebsocketSink> LogStream::webSocketBackend(new LogWebsocketSink(_ws));
     boost::shared_ptr<webSocketSink_t> LogStream::webSocketSink(new webSocketSink_t(webSocketBackend));
 
@@ -31,7 +36,7 @@ namespace AwsMock::Core {
             return {func};
         }
 
-        for (const char *i = funcEnd - 1; i >= funcBegin; --i)// search backwards for the first space char
+        for (const char *i = funcEnd - 1; i >= funcBegin; --i) // search backwards for the first space char
         {
             if (*i == '>') {
                 foundTemplate++;
@@ -93,12 +98,13 @@ namespace AwsMock::Core {
         auto date_time_formatter = boost::log::expressions::stream << boost::log::expressions::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f");
         date_time_formatter(rec, strm);
 
-        // The same for the severity
         strm << " [" << rec[boost::log::trivial::severity] << "]";
         strm << " [" << rec[thread_id].get().native_id() << "]";
+        if (auto chan = boost::log::extract<std::string>("Channel", rec); chan) {
+            strm << " [" << chan.get() << "]";
+        }
         strm << " [" << func << ":" << boost::log::extract<int>("Line", rec) << "] ";
 
-        // Finally, put the record message to the stream
         strm << rec[boost::log::expressions::smessage];
 
 #ifndef _WIN32
@@ -113,12 +119,13 @@ namespace AwsMock::Core {
         auto date_time_formatter = boost::log::expressions::stream << boost::log::expressions::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f");
         date_time_formatter(rec, strm);
 
-        // The same for the severity
         strm << " [" << rec[boost::log::trivial::severity] << "]";
         strm << " [" << rec[thread_id].get().native_id() << "]";
+        if (auto chan = boost::log::extract<std::string>("Channel", rec); chan) {
+            strm << " [" << chan.get() << "]";
+        }
         strm << " [" << func << ":" << boost::log::extract<int>("Line", rec) << "] ";
 
-        // Finally, put the record message to the stream
         strm << rec[boost::log::expressions::smessage];
     }
 
@@ -142,29 +149,52 @@ namespace AwsMock::Core {
     void LogStream::SetSeverity(const std::string &lvl) {
         _currentLevel = lvl;
         from_string(lvl.c_str(), lvl.length(), _severity);
-        const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
-        core->set_filter(boost::log::trivial::severity >= _severity);
+        UpdateFilter();
+    }
+
+    void LogStream::SetChannelSeverity(const std::string &ch, const std::string &lvl) {
+        boost::log::trivial::severity_level sev;
+        from_string(lvl.c_str(), lvl.length(), sev);
+        _channelLevels[ch] = sev;
+        UpdateFilter();
+    }
+
+    void LogStream::UpdateFilter() {
+        auto channelLevels = _channelLevels;
+        auto globalLevel = _severity;
+        boost::log::core::get()->set_filter(
+            [channelLevels, globalLevel](boost::log::attribute_value_set const &attrs) {
+                const auto sev = attrs["Severity"].extract<boost::log::trivial::severity_level>();
+                const auto chan = attrs["Channel"].extract<std::string>();
+                if (!sev) return false;
+                if (chan) {
+                    if (const auto it = channelLevels.find(chan.get()); it != channelLevels.end()) {
+                        return sev.get() >= it->second;
+                    }
+                }
+                return sev.get() >= globalLevel;
+            });
     }
 
     void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {
 #ifdef _WIN32
         file_sink = add_file_log(
-                boost::log::keywords::file_name = dir + "\\" + prefix + ".log ", boost::log::keywords::rotation_size = size,
-                boost::log::keywords::target_file_name = dir + "\\" + prefix + "_ % N.log ", boost::log::keywords::format = &LogFormatter);
+            boost::log::keywords::file_name = dir + "\\" + prefix + ".log ", boost::log::keywords::rotation_size = size,
+            boost::log::keywords::target_file_name = dir + "\\" + prefix + "_ % N.log ", boost::log::keywords::format = &LogFormatter);
 #else
         file_sink = add_file_log(
-                boost::log::keywords::file_name = dir + "/" + prefix + ".log",
-                boost::log::keywords::rotation_size = size,
-                boost::log::keywords::target_file_name = dir + "/" + prefix + "_%N.log",
-                boost::log::keywords::format = &LogColorFormatter);
+            boost::log::keywords::file_name = dir + "/" + prefix + ".log",
+            boost::log::keywords::rotation_size = size,
+            boost::log::keywords::target_file_name = dir + "/" + prefix + "_%N.log",
+            boost::log::keywords::format = &LogColorFormatter);
 #endif
 
         // Set level
         file_sink->set_filter(boost::log::trivial::severity >= _severity);
 
         file_sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
-                boost::log::keywords::target = dir,
-                boost::log::keywords::max_files = count));
+            boost::log::keywords::target = dir,
+            boost::log::keywords::max_files = count));
 
         file_sink->locked_backend()->scan_for_files();
 
@@ -173,7 +203,7 @@ namespace AwsMock::Core {
 
     void LogStream::AddWebSocket(websocket::stream<beast::tcp_stream> &ws) {
         const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
-        webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<websocket::stream<beast::tcp_stream>>(std::move(ws)));
+        webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<websocket::stream<beast::tcp_stream> >(std::move(ws)));
         webSocketSink = boost::make_shared<webSocketSink_t>(webSocketBackend);
         webSocketSink->set_formatter(&LogFormatter);
         webSocketSink->set_filter(boost::log::trivial::severity >= _severity);
@@ -206,4 +236,4 @@ namespace AwsMock::Core {
     void LogStream::RemoveConsoleLogs() {
         boost::log::core::get()->remove_sink(console_sink);
     }
-}// namespace AwsMock::Core
+} // namespace AwsMock::Core

@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by vogje01 on 12/18/23.
 //
 
@@ -55,6 +55,8 @@ namespace AwsMock::Dto::Cognito {
         }
 
       private:
+
+        mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         friend UserContextData tag_invoke(boost::json::value_to_tag<UserContextData>, boost::json::value const &v) {
             UserContextData r;

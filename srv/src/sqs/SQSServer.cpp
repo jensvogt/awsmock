@@ -133,7 +133,7 @@ namespace AwsMock::Service {
     }
 
     void SQSServer::BackupSqs() {
-        ModuleService::BackupModule("sqs", Dto::Module::ExportType::INFRA_STRUCTURE);
+        ModuleService{}.BackupModule("sqs", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void SQSServer::Shutdown() {
@@ -142,4 +142,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("sns-delete-messages");
         _scheduler.Shutdown("sns-backup");
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

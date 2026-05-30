@@ -2,17 +2,18 @@
 // Created by vogje01 on 5/1/25.
 //
 
-#ifndef AWSMOCK_DB_SQS_UTILS_H
-#define AWSMOCK_DB_SQS_UTILS_H
+#pragma once
 
 // C++ includes
 #include <map>
 #include <string>
 
+// Mongodb includes
+#include <mongocxx/pipeline.hpp>
+
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
-#include <mongocxx/pipeline.hpp>
 
 namespace AwsMock::Database {
 
@@ -69,5 +70,3 @@ namespace AwsMock::Database {
     };
 
 } // namespace AwsMock::Database
-
-#endif//AWSMOCK_DB_SQS_UTILS_H

@@ -82,9 +82,9 @@ namespace AwsMock::Database {
         }
         if (!sortColumns.empty()) {
             std::ranges::sort(q.to_vector(), [sortColumns](const Entity::Apps::Application &a, const Entity::Apps::Application &b) {
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    if (column == "name") {
-                        return sortDirection == 1 ? a.name < b.name : b.name < a.name;
+                for (const auto &sc: sortColumns) {
+                    if (sc.column == "name") {
+                        return sc.sortDirection == 1 ? a.name < b.name : b.name < a.name;
                     }
                 }
                 return false;

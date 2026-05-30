@@ -6,6 +6,10 @@
 
 #include "awsmock/utils/SqsUtils.h"
 
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "SNS"};
+}
+
 namespace AwsMock::Database {
 
     SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
@@ -145,7 +149,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
                 if (const auto mResult = _topicCollection.find_one(
-                            make_document(kvp("targetArn", targetArn)));
+                        make_document(kvp("targetArn", targetArn)));
                     !mResult->empty()) {
                     Entity::SNS::Topic result;
                     result.FromDocument(mResult->view());
@@ -168,7 +172,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
                 if (const auto mResult = _topicCollection.find_one(
-                            make_document(kvp("region", region), kvp("topicName", topicName)));
+                        make_document(kvp("region", region), kvp("topicName", topicName)));
                     !mResult->empty()) {
                     Entity::SNS::Topic result;
                     result.FromDocument(mResult->view());
@@ -267,8 +271,8 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -304,8 +308,8 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto &sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -731,7 +735,7 @@ namespace AwsMock::Database {
 
             Entity::SNS::MessageList messageList;
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
 
             mongocxx::options::find opts;
@@ -751,8 +755,8 @@ namespace AwsMock::Database {
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto &sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -982,13 +986,13 @@ namespace AwsMock::Database {
             try {
                 mongocxx::pipeline p{};
                 p.group(make_document(
-                        kvp("_id", "$topicArn"),
-                        kvp("size", make_document(kvp("$sum", "$size"))),
-                        kvp("total", make_document(kvp("$sum", 1))),
-                        kvp("send", make_document(kvp("$sum",
-                                                      make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
-                        kvp("resend", make_document(kvp("$sum",
-                                                        make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::RESEND)))), 1, 0))))))));
+                    kvp("_id", "$topicArn"),
+                    kvp("size", make_document(kvp("$sum", "$size"))),
+                    kvp("total", make_document(kvp("$sum", 1))),
+                    kvp("send", make_document(kvp("$sum",
+                                                  make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
+                    kvp("resend", make_document(kvp("$sum",
+                                                    make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::RESEND)))), 1, 0))))))));
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
@@ -1010,24 +1014,24 @@ namespace AwsMock::Database {
                     const auto topicArn = Core::Bson::BsonUtils::GetStringValue(t, "topicArn");
                     topicWithMessages.insert(topicArn);
                     bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("topicArn", topicArn)),
-                            make_document(kvp("$set", make_document(
-                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
-                                                              kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
-                                                              kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
+                        make_document(kvp("topicArn", topicArn)),
+                        make_document(kvp("$set", make_document(
+                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
+                                              kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
+                                              kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
                 }
 
                 // Zero out queues with no messages
                 for (auto queueCursor = topicCollection.find({}); const auto &q: queueCursor) {
                     if (const auto topicArn = Core::Bson::BsonUtils::GetStringValue(q, "topicArn"); !topicWithMessages.contains(topicArn)) {
                         bulk.append(mongocxx::model::update_one(
-                                make_document(kvp("topicArn", topicArn)),
-                                make_document(kvp("$set", make_document(
-                                                                  kvp("size", bsoncxx::types::b_int64()),
-                                                                  kvp("messages", bsoncxx::types::b_int64()),
-                                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
-                                                                  kvp("messagesResend", bsoncxx::types::b_int64()))))));
+                            make_document(kvp("topicArn", topicArn)),
+                            make_document(kvp("$set", make_document(
+                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                  kvp("messages", bsoncxx::types::b_int64()),
+                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
+                                                  kvp("messagesResend", bsoncxx::types::b_int64()))))));
                     }
                 }
 
@@ -1046,4 +1050,4 @@ namespace AwsMock::Database {
         }
         _memoryDb.AdjustMessageCounters();
     }
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

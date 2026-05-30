@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // C++ includes
 #include <algorithm>
@@ -38,6 +38,8 @@ namespace AwsMock::FtpServer {
   class FtpSession : public std::enable_shared_from_this<FtpSession> {
 
   private:
+    mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
+
     struct IoFile {
       IoFile(const std::string &filename, std::string user, const std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024), _fileName(filename), _user(std::move(user)) {
         file_stream_.rdbuf()->pubsetbuf(stream_buffer_.data(), static_cast<std::streamsize>(stream_buffer_.size()));

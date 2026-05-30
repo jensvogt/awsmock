@@ -74,8 +74,8 @@ namespace AwsMock::Database {
 
         q = q.order_by([](const Entity::Lambda::Lambda &key1, const Entity::Lambda::Lambda &key2) { return key1.oid < key2.oid; });
 
-        for (const auto &[column, sortDirection]: sortColumns) {
-            if (column == "name") {
+        for (const auto &sc: sortColumns) {
+            if (sc.column == "name") {
                 q = q.order_by([](const Entity::Lambda::Lambda &key1, const Entity::Lambda::Lambda &key2) { return key1.function < key2.function; });
             }
         }

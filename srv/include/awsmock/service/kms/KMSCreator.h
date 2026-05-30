@@ -1,9 +1,8 @@
-//
+﻿//
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_KMS_CREATOR_H
-#define AWSMOCK_SERVICE_KMS_CREATOR_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -32,16 +31,19 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        [[maybe_unused]] explicit KMSCreator() = default;
+        [[maybe_unused]]
+        explicit KMSCreator() = default;
 
         /**
          * @brief Create new KMS key
          *
          * @param keyId ID of the key
          */
-        static void CreateKmsKey(const std::string &keyId);
+        void CreateKmsKey(const std::string &keyId);
 
     private:
+        mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
+
         /**
          * @brief Generate AES 256 key
          *
@@ -50,7 +52,8 @@ namespace AwsMock::Service {
          *
          * @param key key entity
          */
-        [[maybe_unused]] static void GenerateAes256Key(Database::Entity::KMS::Key &key);
+        [[maybe_unused]]
+        void GenerateAes256Key(Database::Entity::KMS::Key &key);
 
         /**
          * @brief Generate HMAC key.
@@ -61,20 +64,21 @@ namespace AwsMock::Service {
          * @param key key entity
          * @param length key length
          */
-        static void CreateHmacKey(Database::Entity::KMS::Key &key, const int length);
+        [[maybe_unused]]
+        void CreateHmacKey(Database::Entity::KMS::Key &key, int length);
 
         /**
          * @brief Generate a public/private key pair
          *
          * @par
          * Key material will be hex-encoded.
+         *
          * @param key key
          * @param length length
          * @see AwsMock::Core::CryptoUtils
          */
-        [[maybe_unused]] static void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length);
+        [[maybe_unused]]
+        void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length);
     };
 
 } // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_KMS_CREATOR_H

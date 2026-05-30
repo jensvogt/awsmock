@@ -333,18 +333,18 @@ namespace AwsMock::Database {
         }
         if (!sortColumns.empty()) {
             std::ranges::sort(q.to_vector(), [sortColumns](const Entity::S3::Object &a, const Entity::S3::Object &b) {
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    if (column == "bucket") {
-                        return sortDirection == 1 ? a.bucket < b.bucket : b.bucket < a.bucket;
+                for (const auto &sc: sortColumns) {
+                    if (sc.column == "bucket") {
+                        return sc.sortDirection == 1 ? a.bucket < b.bucket : b.bucket < a.bucket;
                     }
-                    if (column == "size") {
-                        return sortDirection == 1 ? a.size < b.size : b.size < a.size;
+                    if (sc.column == "size") {
+                        return sc.sortDirection == 1 ? a.size < b.size : b.size < a.size;
                     }
-                    if (column == "created") {
-                        return sortDirection == 1 ? a.created < b.created : b.created < a.created;
+                    if (sc.column == "created") {
+                        return sc.sortDirection == 1 ? a.created < b.created : b.created < a.created;
                     }
-                    if (column == "modified") {
-                        return sortDirection == 1 ? a.modified < b.modified : b.modified < a.modified;
+                    if (sc.column == "modified") {
+                        return sc.sortDirection == 1 ? a.modified < b.modified : b.modified < a.modified;
                     }
                 }
                 return false;
