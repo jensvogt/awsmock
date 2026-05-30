@@ -2,7 +2,7 @@ set(BINARY service_tst)
 set(STATIC_LIB awsmocksrv)
 set(CMAKE_BUILD_TYPE "Debug")
 
-set(SOURCES Main.cpp DynamoDbServiceTest.cpp)
+set(SOURCES Main.cpp DynamoDbServiceTest.cpp SQSServiceTest.cpp SNSServiceTest.cpp S3ServiceTest.cpp CognitoServiceTest.cpp KMSServiceTest.cpp SSMServiceTest.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PUBLIC ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/db/include

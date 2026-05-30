@@ -65,6 +65,8 @@ namespace AwsMock::Core {
 
         // Transfer configuration
         Configuration::instance().set<bool>("awsmock.modules.transfer.active", true);
+        Configuration::instance().set<std::string>("awsmock.modules.transfer.bucket", "transfer-server");
+        Configuration::instance().set<std::string>("awsmock.modules.transfer.data-dir", "/tmp/awsmock/data/transfer");
 
         // Cognito configuration
         Configuration::instance().set<bool>("awsmock.modules.cognito.active", true);
@@ -114,4 +116,4 @@ namespace AwsMock::Core {
         return output;
     }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

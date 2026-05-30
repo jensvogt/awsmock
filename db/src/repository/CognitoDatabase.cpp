@@ -952,7 +952,7 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteGroup(region, userPoolId, groupName);
     }
 
-    void CognitoDatabase::DeleteAllGroups(const std::string &region) const {
+    long CognitoDatabase::DeleteAllGroups(const std::string &region) const {
 
         if (HasDatabase()) {
 
@@ -965,24 +965,22 @@ namespace AwsMock::Database {
                 session.start_transaction();
 
                 document query;
-                if (region.empty()) {
+                if (!region.empty()) {
                     query.append(kvp("region", region));
                 }
                 const auto result = _groupCollection.delete_many(query.extract());
                 log_debug << "All groups deleted, count: " << result->deleted_count();
-
                 session.commit_transaction();
+
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteAllGroups(region);
         }
+        return _memoryDb.DeleteAllGroups(region);
     }
 
     bool CognitoDatabase::ClientIdExists(const std::string &region, const std::string &clientId) const {
@@ -1008,4 +1006,4 @@ namespace AwsMock::Database {
         return _memoryDb.ClientIdExists(region, clientId);
     }
 
-} // namespace AwsMock::Database
+}// namespace AwsMock::Database

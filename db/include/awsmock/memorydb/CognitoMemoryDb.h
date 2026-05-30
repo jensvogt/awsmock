@@ -330,9 +330,10 @@ namespace AwsMock::Database {
          * @brief Deletes all existing cognito user groups.
          *
          * @param region AWS region
+         * @return number of groups deleted
          * @throws DatabaseException
          */
-        void DeleteAllGroups(const std::string &region = {});
+        long DeleteAllGroups(const std::string &region = {});
 
         /**
          * @brief Check existence of a client ID

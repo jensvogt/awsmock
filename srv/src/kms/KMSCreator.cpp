@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    void KMSCreator::CreateKmsKey(const std::string &keyId) {
+    void KMSCreator::CreateKmsKey(const std::string &keyId) const {
 
         log_debug << "Start creating KMS key, keyId: " << keyId;
 
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
         log_debug << "KMS key created, keyId: " << key.keyId;
     }
 
-    void KMSCreator::GenerateAes256Key(Database::Entity::KMS::Key &key) {
+    void KMSCreator::GenerateAes256Key(Database::Entity::KMS::Key &key) const {
         log_debug << "Start creating AES256 KMS key, keyId: " << key.keyId;
 
         unsigned char keyMaterial[32], iv[32];
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
         log_debug << "AES256 KMS key created, keyId: " << key.keyId;
     }
 
-    void KMSCreator::CreateHmacKey(Database::Entity::KMS::Key &key, const int length) {
+    void KMSCreator::CreateHmacKey(Database::Entity::KMS::Key &key, const int length) const {
         log_debug << "Start creating HMAC KMS key, keyId: " << key.keyId << " length: " << length;
 
         unsigned char keyMaterial[512];
@@ -110,10 +110,10 @@ namespace AwsMock::Service {
         log_debug << "HMAC KMS key created, keyId: " << key.keyId;
     }
 
-    void KMSCreator::GenerateRsaKeyPair(Database::Entity::KMS::Key &key, const int length) {
+    void KMSCreator::GenerateRsaKeyPair(Database::Entity::KMS::Key &key, const int length) const {
         log_debug << "Start creating RSA KMS key pair, keyId: " << key.keyId << " length: " << length;
 
-        EVP_PKEY *keyMaterial = Core::Crypto::GenerateRsaKeys(length);
+        const EVP_PKEY *keyMaterial = Core::Crypto::GenerateRsaKeys(length);
         key.rsaPublicKey = Core::Crypto::GetRsaPublicKey(keyMaterial);
         key.rsaPrivateKey = Core::Crypto::GetRsaPrivateKey(keyMaterial);
 

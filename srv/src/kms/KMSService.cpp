@@ -120,10 +120,16 @@ namespace AwsMock::Service {
             log_trace << "KMS keyEntity created: " << keyEntity;
 
             // Create keyEntity material asynchronously
-            Core::Scheduler::instance().AddOneTimeTask("create-kms-key", [this, keyId]() {
-                KMSCreator{}.CreateKmsKey(keyId);
-                log_debug << "KMS keyEntity creation started, keyId: " << keyId;
+            const std::string taskName = "create-kms-key-" + keyId;
+            Core::Scheduler::instance().AddOneTimeTask(taskName, [this, taskName, keyId]() {
+                try {
+                    KMSCreator{}.CreateKmsKey(keyId);
+                } catch (const std::exception &exc) {
+                    log_warning << "KMS key material creation failed, keyId: " << keyId << " error: " << exc.what();
+                }
+                Core::Scheduler::instance().Shutdown(taskName);
             });
+            log_debug << "KMS keyEntity creation started, keyId: " << keyId;
 
             Dto::KMS::Key key;
             key.keyId = keyEntity.keyId;
@@ -510,4 +516,4 @@ namespace AwsMock::Service {
         return {};
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
