@@ -39,10 +39,14 @@ namespace AwsMock::Database {
     struct SQSServiceFixture {
         SQSServiceFixture() = default;
         ~SQSServiceFixture() {
-            const long deletedQueues = SQSDatabase::instance().DeleteAllQueues();
-            log_debug << "Queues deleted, count: " << deletedQueues;
-            const long deletedMessages = SQSDatabase::instance().DeleteAllMessages();
-            log_debug << "Messages deleted, count: " << deletedMessages;
+            try {
+                const long deletedQueues = SQSDatabase::instance().DeleteAllQueues();
+                log_debug << "Queues deleted, count: " << deletedQueues;
+                const long deletedMessages = SQSDatabase::instance().DeleteAllMessages();
+                log_debug << "Messages deleted, count: " << deletedMessages;
+            } catch (const std::exception &exc) {
+                log_error << "SQS fixture cleanup failed: " << exc.what();
+            }
         }
     };
 

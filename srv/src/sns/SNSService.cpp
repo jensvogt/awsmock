@@ -1108,6 +1108,7 @@ namespace AwsMock::Service {
             tcp::resolver resolver(ioc);
             beast::tcp_stream stream(ioc);
 
+            stream.expires_after(std::chrono::seconds(5));
             auto const results = resolver.resolve(host, port);
             stream.connect(results);
 

@@ -33,8 +33,12 @@ namespace AwsMock::Database {
     struct SSMServiceFixture {
         SSMServiceFixture() = default;
         ~SSMServiceFixture() {
-            const long count = SSMDatabase::instance().DeleteAllParameters();
-            log_debug << "SSM parameters deleted, count: " << count;
+            try {
+                const long count = SSMDatabase::instance().DeleteAllParameters();
+                log_debug << "SSM parameters deleted, count: " << count;
+            } catch (const std::exception &exc) {
+                log_error << "SSM fixture cleanup failed: " << exc.what();
+            }
         }
     };
 

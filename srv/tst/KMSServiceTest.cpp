@@ -40,8 +40,12 @@ namespace AwsMock::Database {
     struct KMSServiceFixture {
         KMSServiceFixture() = default;
         ~KMSServiceFixture() {
-            const long count = KMSDatabase::instance().DeleteAllKeys();
-            log_debug << "KMS keys deleted, count: " << count;
+            try {
+                const long count = KMSDatabase::instance().DeleteAllKeys();
+                log_debug << "KMS keys deleted, count: " << count;
+            } catch (const std::exception &exc) {
+                log_error << "KMS fixture cleanup failed: " << exc.what();
+            }
         }
     };
 

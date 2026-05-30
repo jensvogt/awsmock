@@ -505,18 +505,14 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto delete_many_result = _bucketCollection.delete_many({});
-                session.commit_transaction();
                 log_debug << "All buckets deleted, count: " << delete_many_result->deleted_count();
                 deleted = delete_many_result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -964,19 +960,15 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _objectCollection.delete_many({});
-                session.commit_transaction();
 
                 log_debug << "All objects deleted, count: " << result->deleted_count();
                 deleted = result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }

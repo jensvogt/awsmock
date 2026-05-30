@@ -121,16 +121,16 @@ jobs:
         run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst service_tst --parallel 2
 
       - name: Run core tests
-        run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure --timeout 120
 
       - name: Run memory DB tests
-        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_memory_tst --output-on-failure
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_memory_tst --output-on-failure --timeout 120
 
       - name: Run MongoDB tests
-        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_mongo_tst --output-on-failure
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_mongo_tst --output-on-failure --timeout 120
 
       - name: Run Service tests
-        run: ctest --test-dir ${{ env.BUILD_DIR }} -R service_tst --output-on-failure
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R service_tst --output-on-failure --timeout 300
 
   build-windows-msi:
     name: Build & Package (Windows MSI)
