@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.18.52](https://github.com/jensvogt/awsmock/compare/1.18.51...v1.18.52) (2026-05-30)
+
+
+### Bug Fixes
+
+* channel logging ([79c6262](https://github.com/jensvogt/awsmock/commit/79c626294b666aa351d3b145a8c91b253e516ab1))
+* cleanup of code ([f2dbbc8](https://github.com/jensvogt/awsmock/commit/f2dbbc889617ab0c19e15fece15c56d72d48ad7d))
+* core scheduler ([2edb234](https://github.com/jensvogt/awsmock/commit/2edb234737720d19a7284183705bb47625784db4))
+* tests ([5001a8e](https://github.com/jensvogt/awsmock/commit/5001a8ef8889fe40a555486ae3fea3d5ebb57b09))
+* tests ([96f792e](https://github.com/jensvogt/awsmock/commit/96f792e7fe9f42b25980d26dfd44b9de8051e1d7))
+
 ## [1.18.51](https://github.com/jensvogt/awsmock/compare/v1.18.50...v1.18.51) (2026-05-28)
 
 
