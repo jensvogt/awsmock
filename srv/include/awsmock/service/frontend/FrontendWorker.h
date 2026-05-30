@@ -29,10 +29,10 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace beast = boost::beast;  // from <boost/beast.hpp>
-namespace http = beast::http;    // from <boost/beast/http.hpp>
-namespace net = boost::asio;     // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp;// from <boost/asio/ip/tcp.hpp>
+namespace beast = boost::beast; // from <boost/beast.hpp>
+namespace http = beast::http; // from <boost/beast/http.hpp>
+namespace net = boost::asio; // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
 #define DEFAULT_PAGE std::string("/index.html")
 
@@ -42,15 +42,15 @@ namespace AwsMock::Service::Frontend {
 
     class FrontendWorker : public boost::enable_shared_from_this<FrontendWorker> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
          * @param acceptor request acceptor
          * @param docRoot document root directory
          */
-        FrontendWorker(boost::asio::ip::tcp::acceptor &acceptor, std::string docRoot) : _acceptor(acceptor), _docRoot(std::move(docRoot)) {}
+        FrontendWorker(boost::asio::ip::tcp::acceptor &acceptor, std::string docRoot) : _acceptor(acceptor), _docRoot(std::move(docRoot)) {
+        }
 
         /**
          * @brief Copy constructor
@@ -72,8 +72,7 @@ namespace AwsMock::Service::Frontend {
          */
         void Start();
 
-      private:
-
+    private:
         using alloc_t = fields_alloc<char>;
         using request_body_t = http::string_body;
 
@@ -90,7 +89,7 @@ namespace AwsMock::Service::Frontend {
         /**
          * @brief Process incoming socket request
          */
-        void ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req);
+        void ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t> > const &req);
 
         /**
          * @brief Sends a bad request response
@@ -105,7 +104,7 @@ namespace AwsMock::Service::Frontend {
          *
          * @param request incoming HTTP request
          */
-        void HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request);
+        void HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request);
 
         /**
          * @brief Handle file request
@@ -152,29 +151,29 @@ namespace AwsMock::Service::Frontend {
         /**
          * The timer putting a time limit on requests.
          */
-        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max) ()};
+        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max)()};
 
         /**
          * The string-based response message.
          */
-        boost::optional<http::response<http::string_body, http::basic_fields<alloc_t>>> _stringResponse;
+        boost::optional<http::response<http::string_body, http::basic_fields<alloc_t> > > _stringResponse;
 
         /**
          * The string-based response serializer.
          */
-        boost::optional<http::response_serializer<http::string_body, http::basic_fields<alloc_t>>> _stringSerializer;
+        boost::optional<http::response_serializer<http::string_body, http::basic_fields<alloc_t> > > _stringSerializer;
 
         /**
          * The file-based response message.
          */
-        boost::optional<http::response<http::file_body, http::basic_fields<alloc_t>>> _fileResponse;
+        boost::optional<http::response<http::file_body, http::basic_fields<alloc_t> > > _fileResponse;
 
         /**
          * The file-based response serializer.
          */
-        boost::optional<http::response_serializer<http::file_body, http::basic_fields<alloc_t>>> _fileSerializer;
+        boost::optional<http::response_serializer<http::file_body, http::basic_fields<alloc_t> > > _fileSerializer;
     };
 
-}// namespace AwsMock::Service::Frontend
+} // namespace AwsMock::Service::Frontend
 
 #endif// AWSMOCK_SERVICE_FRONTEND_HTTP_WORKER_H

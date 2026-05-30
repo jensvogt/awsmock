@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#ifndef AWSMOCK_CORE_HTTP_SOCKET_H
-#define AWSMOCK_CORE_HTTP_SOCKET_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -25,8 +24,7 @@ namespace AwsMock::Core {
 
     class HttpSocket {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -58,7 +56,8 @@ namespace AwsMock::Core {
          * @param headers HTTP headers
          * @return HTTP response
          */
-        static HttpSocketResponse SendAuthorizedJson(http::verb method, const std::string &module, const std::string &host, int port, const std::string &path, const std::string &signedHeaders, std::map<std::string, std::string> &headers, const std::string &body = {});
+        static HttpSocketResponse SendAuthorizedJson(http::verb method, const std::string &module, const std::string &host, int port, const std::string &path, const std::string &signedHeaders, std::map<std::string, std::string> &headers,
+                                                     const std::string &body = {});
 
         /**
          * @brief Send a binary to an HTTP endpoint
@@ -75,8 +74,7 @@ namespace AwsMock::Core {
          */
         static HttpSocketResponse SendBinary(http::verb method, const std::string &host, int port, const std::string &path, const std::string &filename = {}, const std::map<std::string, std::string> &headers = {});
 
-      private:
-
+    private:
         /**
          * @brief Prepare an HTTP message
          *
@@ -122,6 +120,4 @@ namespace AwsMock::Core {
         std::string _path;
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_HTTP_SOCKET_H
+} // namespace AwsMock::Core

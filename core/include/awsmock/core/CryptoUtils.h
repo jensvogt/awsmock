@@ -2,8 +2,7 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWS_MOCK_CORE_CRYPTO_UTILS_H
-#define AWS_MOCK_CORE_CRYPTO_UTILS_H
+#pragma once
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -45,7 +44,6 @@
 #include <boost/uuid/detail/sha1.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Base64Utils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
@@ -430,5 +428,3 @@ namespace AwsMock::Core {
     };
 
 } // namespace AwsMock::Core
-
-#endif

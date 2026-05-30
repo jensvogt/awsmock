@@ -2,8 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_ZIP_UTILS_H
-#define AWSMOCK_CORE_ZIP_UTILS_H
+#pragma once
 
 #undef BOOST_FILESYSTEM_DYN_LINK
 
@@ -48,8 +47,7 @@ namespace AwsMock::Core {
      */
     class ZipUtils {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -63,8 +61,7 @@ namespace AwsMock::Core {
          */
         static void Unzip(const std::string &zipFile, const std::string &directory);
 
-      private:
-
+    private:
         /**
          * @brief Copy data from A to B
          *
@@ -75,6 +72,4 @@ namespace AwsMock::Core {
         static long CopyData(archive *ar, archive *aw);
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_ZIP_UTILS_H
+} // namespace AwsMock::Core

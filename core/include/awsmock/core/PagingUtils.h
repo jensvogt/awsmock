@@ -2,8 +2,7 @@
 // Created by vogje01 on 6/27/25.
 //
 
-#ifndef AWSMOCK_CORE_PAGING_UTILS_H
-#define AWSMOCK_CORE_PAGING_UTILS_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -45,4 +44,3 @@ namespace AwsMock::Core {
     }
 
 } // namespace AwsMock::Core
-#endif// AWSMOCK_CORE_PAGING_UTILS_H

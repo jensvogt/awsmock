@@ -26,7 +26,8 @@ namespace AwsMock::Core {
         return *_instance;
     }
 
-    Scheduler::Scheduler(boost::asio::io_context &ioc) : _ioc(ioc) {}
+    Scheduler::Scheduler(boost::asio::io_context &ioc) : _ioc(ioc) {
+    }
 
     // ---- Public API ----
 

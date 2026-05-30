@@ -2,8 +2,9 @@
 // Created by vogje01 on 11/17/24.
 //
 
-#ifndef AWS_MOCK_CORE_BSON_UTILS_H
-#define AWS_MOCK_CORE_BSON_UTILS_H
+#pragma once
+
+// Boost includes
 #include <boost/json/array.hpp>
 
 #ifdef _WIN32
@@ -119,7 +120,7 @@ namespace AwsMock::Core::Bson {
         if (FindBsonObject(viewDocument.value(), name)) {
             std::map<std::string, std::string> valueMap;
             for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element
-                                                                                                &tagElement: tagsView) {
+                 &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 valueMap.emplace(key, value);
@@ -465,6 +466,4 @@ namespace AwsMock::Core::Bson {
         }
     };
 
-}// namespace AwsMock::Core::Bson
-
-#endif// AWS_MOCK_CORE_BSON_UTILS_H
+} // namespace AwsMock::Core::Bson

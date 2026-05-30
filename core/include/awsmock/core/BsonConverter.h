@@ -2,9 +2,6 @@
 // Created by jensv on 10/04/2026.
 //
 
-#ifndef AWSMOCK_CORE_BSON_CONVERTER_H
-#define AWSMOCK_CORE_BSON_CONVERTER_H
-
 #pragma once
 
 #include <boost/json.hpp>
@@ -221,5 +218,3 @@ namespace AwsMock::Core {
     };
 
 } // namespace Awsmock::Core
-
-#endif // AWSMOCK_CORE_BSON_CONVERTER_H

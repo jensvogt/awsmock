@@ -2,8 +2,7 @@
 // Created by vogje01 on 2/16/26.
 //
 
-#ifndef AWSMOCK_CORE_EVENTBUS_H
-#define AWSMOCK_CORE_EVENTBUS_H
+#pragma once
 
 // C++ standard includes
 #include <future>
@@ -104,7 +103,7 @@ namespace AwsMock::Core {
          * @tparam promise result channel; nullptr for fire-and-forget (EVENT invocations)
          */
         boost::signals2::signal<void(std::string, std::string, std::string, std::string,
-            std::shared_ptr<std::promise<std::pair<int, std::string>>>)> sigLambdaInvoke;
+                                     std::shared_ptr<std::promise<std::pair<int, std::string> > >)> sigLambdaInvoke;
 
         /**
          * @brief Signal to check the Docker daemon status of a lambda function.
@@ -115,5 +114,3 @@ namespace AwsMock::Core {
     };
 
 }; // namespace AwsMock::Core
-
-#endif//AWSMOCK_CORE_EVENTBUS_H

@@ -20,7 +20,6 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/RandomUtils.h>
-#include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/container/DomainSocketResult.h>

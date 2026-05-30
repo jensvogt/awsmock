@@ -2,8 +2,7 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_XML_UTILS_H
-#define AWSMOCK_CORE_XML_UTILS_H
+#pragma once
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -34,8 +33,7 @@ namespace AwsMock::Core {
      */
     class XmlUtils {
 
-      public:
-
+    public:
         /**
          * @brief Returns the XML string for the document.
          *
@@ -60,8 +58,7 @@ namespace AwsMock::Core {
          */
         static void PrintTree(const boost::property_tree::ptree &rootTree, int level = 2);
 
-      private:
-
+    private:
         /**
          * @brief Indentation
          *
@@ -70,6 +67,4 @@ namespace AwsMock::Core {
         static std::string Indent(int level = 2);
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_XML_UTILS_H
+} // namespace AwsMock::Core

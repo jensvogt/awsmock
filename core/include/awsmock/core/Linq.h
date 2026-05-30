@@ -2,8 +2,7 @@
 // Created by vogje01 on 9/5/25.
 //
 
-#ifndef AWSMOCK_CORE_LINQ_H
-#define AWSMOCK_CORE_LINQ_H
+#pragma once
 
 #include <algorithm>
 #include <functional>
@@ -26,9 +25,9 @@ namespace AwsMock::Core {
 
         std::vector<T> data;
 
-      public:
-
-        explicit Query(std::vector<T> d) : data(std::move(d)) {}
+    public:
+        explicit Query(std::vector<T> d) : data(std::move(d)) {
+        }
 
         // where: filter elements
         Query<T> where(std::function<bool(const T &)> pred) const {
@@ -61,8 +60,8 @@ namespace AwsMock::Core {
          * @brief group_by: group elements by key selector
          */
         template<typename K>
-        std::map<K, std::vector<T>> group_by(std::function<K(const T &)> keySelector) const {
-            std::map<K, std::vector<T>> groups;
+        std::map<K, std::vector<T> > group_by(std::function<K(const T &)> keySelector) const {
+            std::map<K, std::vector<T> > groups;
             for (const auto &item: data) {
                 groups[keySelector(item)].push_back(item);
             }
@@ -110,6 +109,4 @@ namespace AwsMock::Core {
         return Query<T>(v);
     }
 
-}// namespace AwsMock::Core
-
-#endif//AWSMOCK_LINQ_H
+} // namespace AwsMock::Core

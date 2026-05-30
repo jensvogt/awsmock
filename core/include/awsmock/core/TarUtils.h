@@ -2,8 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_TAR_UTILS_H
-#define AWSMOCK_CORE_TAR_UTILS_H
+#pragma once
 
 #undef BOOST_FILESYSTEM_DYN_LINK
 
@@ -127,5 +126,3 @@ namespace AwsMock::Core {
     };
 
 } // namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_TAR_UTILS_H

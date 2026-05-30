@@ -58,7 +58,7 @@ endif ()
 set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp core/src/utils/DirUtils.cpp
         core/src/utils/DateTimeUtils.cpp core/src/utils/CryptoUtils.cpp core/src/utils/AwsUtils.cpp
         core/src/utils/SystemUtils.cpp core/src/utils/TarUtils.cpp core/src/utils/RandomUtils.cpp
-        core/src/utils/TestUtils.cpp core/src/utils/HttpUtils.cpp core/src/utils/NumberUtils.cpp
+        core/src/utils/HttpUtils.cpp core/src/utils/NumberUtils.cpp
         core/src/utils/XmlUtils.cpp core/src/container/UnixSocket.cpp core/src/container/TlsSocket.cpp
         core/src/exception/DynamoDbParseException.cpp core/src/utils/HttpSocket.cpp core/src/utils/JwtUtils.cpp
         core/src/scheduler/Scheduler.cpp core/src/utils/BackupUtils.cpp

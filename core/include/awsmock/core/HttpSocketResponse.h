@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#ifndef AWSMOCK_CORE_HTTP_SOCKER_RESPONSE_H
-#define AWSMOCK_CORE_HTTP_SOCKER_RESPONSE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -31,6 +30,4 @@ namespace AwsMock::Core {
         std::map<std::string, std::string> headers;
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_HTTP_SOCKER_RESPONSE_H
+} // namespace AwsMock::Core

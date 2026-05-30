@@ -2,8 +2,7 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_STRING_UTILS_H
-#define AWSMOCK_CORE_STRING_UTILS_H
+#pragma once
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -467,5 +466,3 @@ namespace AwsMock::Core {
     }
 
 } // namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_STRING_UTILS_H

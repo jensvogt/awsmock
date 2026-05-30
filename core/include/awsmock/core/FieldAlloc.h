@@ -7,8 +7,7 @@
 // Official repository: https://github.com/boostorg/beast
 //
 
-#ifndef BOOST_BEAST_EXAMPLE_FIELDS_ALLOC_HPP
-#define BOOST_BEAST_EXAMPLE_FIELDS_ALLOC_HPP
+#pragma once
 
 // C++ standard includes
 #include <cstdlib>
@@ -16,9 +15,9 @@
 #include <stdexcept>
 
 // Boost includes
+#include <boost/throw_exception.hpp>
 #include <boost/beast/core/string.hpp>
 #include <boost/beast/core/string_type.hpp>
-#include <boost/throw_exception.hpp>
 
 // Return a reasonable mime type based on the extension of a file.
 inline boost::beast::string_view mime_type(boost::beast::string_view path) {
@@ -73,7 +72,7 @@ namespace detail {
         static static_pool &
         construct(const std::size_t size) {
             auto p = new char[sizeof(static_pool) + size];
-            return *(::new (p) static_pool{size});
+            return *(::new(p) static_pool{size});
         }
 
         static_pool &
@@ -109,7 +108,7 @@ namespace detail {
         }
     };
 
-}// namespace detail
+} // namespace detail
 
 /** A non-thread-safe allocator optimized for @ref basic_fields.
 
@@ -131,8 +130,7 @@ template<class T>
 struct fields_alloc {
     detail::static_pool *pool_;
 
-  public:
-
+public:
     using value_type = T;
     using is_always_equal = std::false_type;
     using pointer = T *;
@@ -181,9 +179,9 @@ struct fields_alloc {
 #if defined(BOOST_LIBSTDCXX_VERSION) && BOOST_LIBSTDCXX_VERSION < 60000
     template<class U, class... Args>
     void
-    construct(U *ptr, Args &&...args) {
-        ::new (static_cast<void *>(ptr)) U(
-                std::forward<Args>(args)...);
+    construct(U *ptr, Args &&... args) {
+        ::new(static_cast<void *>(ptr)) U(
+            std::forward<Args>(args)...);
     }
 
     template<class U>
@@ -205,5 +203,3 @@ struct fields_alloc {
         return !(lhs == rhs);
     }
 };
-
-#endif

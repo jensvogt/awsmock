@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DIRECTORY_UTILS_H
-#define AWSMOCK_CORE_DIRECTORY_UTILS_H
+#pragma once
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -66,8 +65,7 @@ namespace AwsMock::Core {
      */
     class DirUtils {
 
-      public:
-
+    public:
         /**
          * @brief Returns a thread safe temp directory name.
          *
@@ -194,8 +192,7 @@ namespace AwsMock::Core {
          */
         static void DeleteFilesInDirectory(const std::string &dirName);
 
-      private:
-
+    private:
         /**
          * @brief Extract the number from a file named: abc-nn
          *
@@ -205,6 +202,4 @@ namespace AwsMock::Core {
         static long ExtractNumber(const std::string &filename);
     };
 
-}// namespace AwsMock::Core
-
-#endif// AWSMOCK_CORE_DIRECTORY_UTILS_H
+} // namespace AwsMock::Core
