@@ -112,7 +112,7 @@ namespace AwsMock::Monitoring {
         // skip first 13 fields
         for (int i = 0; i < 13; i++) ss >> token;
 
-        ss >> pt.utime >> pt.stime; // fields 14 and 15
+        ss >> pt.utime >> pt.stime;// fields 14 and 15
         pt.initialized = true;
         return pt;
     }
@@ -140,7 +140,7 @@ namespace AwsMock::Monitoring {
         _previousCpuTimes = _currentCpuTimes;
     }
 
-    void MetricSystemCollector::GetMemoryInfoAwsmockLinux() {
+    void MetricSystemCollector::GetMemoryInfoAwsmockLinux() const {
 
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
@@ -177,7 +177,7 @@ namespace AwsMock::Monitoring {
         }
     }
 
-    void MetricSystemCollector::GetThreadInfoAwsmockLinux() {
+    void MetricSystemCollector::GetThreadInfoAwsmockLinux() const {
 
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
@@ -349,4 +349,4 @@ namespace AwsMock::Monitoring {
     }
 #endif
 
-} // namespace AwsMock::Monitoring
+}// namespace AwsMock::Monitoring

@@ -8,10 +8,6 @@
 #include <winsock2.h>
 #else
 #include <unistd.h>
-
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "Core"};
-}
 #endif
 
 namespace {
@@ -19,7 +15,7 @@ namespace {
 }
 
 namespace AwsMock::Core {
-    
+
     std::string SystemUtils::GetCurrentWorkingDir() {
         return boost::filesystem::current_path().string();
     }
@@ -149,7 +145,7 @@ namespace AwsMock::Core {
         auto isPipeClose = [](const boost::system::error_code &ec) {
             return !ec || ec == boost::asio::error::eof || ec == boost::asio::error::broken_pipe
 #ifdef _WIN32
-                   || ec == boost::system::error_code(109, boost::system::system_category()) // ERROR_BROKEN_PIPE
+                   || ec == boost::system::error_code(109, boost::system::system_category())// ERROR_BROKEN_PIPE
 #endif
                     ;
         };
@@ -160,5 +156,4 @@ namespace AwsMock::Core {
             log_error << "stderr read error: " << errEc.message() << " (" << errEc.value() << ")";
     }
 
-} // namespace Awsmock::Core
-
+}// namespace AwsMock::Core

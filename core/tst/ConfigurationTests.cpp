@@ -6,7 +6,9 @@
 #include <boost/test/unit_test.hpp>
 
 // Local includes
-#include <awsmock/core/TestUtils.h>
+#include "awsmock/core/TestUtils.h"
+
+
 #include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {

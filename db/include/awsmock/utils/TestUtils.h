@@ -10,7 +10,6 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/TestUtils.h>
 #include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/repository/ModuleDatabase.h>
 

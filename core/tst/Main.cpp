@@ -3,10 +3,9 @@
 //
 
 #define BOOST_TEST_MODULE CoreTests
-#include <boost/test/included/unit_test.hpp>
-
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <boost/test/included/unit_test.hpp>
 
 struct GlobalTestFixture {
     GlobalTestFixture() {
