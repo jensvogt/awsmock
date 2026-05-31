@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.18.53](https://github.com/jensvogt/awsmock/compare/v1.18.52...v1.18.53) (2026-05-31)
+
+
+### Bug Fixes
+
+* KMS tests ([e3c8c46](https://github.com/jensvogt/awsmock/commit/e3c8c46f3407438570bed3efa37d1a98cf2fc7a6))
+* tests ([163b67f](https://github.com/jensvogt/awsmock/commit/163b67f648289eb04941b1944b4317e6b103244e))
+* tests ([660bbb9](https://github.com/jensvogt/awsmock/commit/660bbb911c067e53a5cdf91f3dd70245fa76757f))
+* tests ([b33c9d0](https://github.com/jensvogt/awsmock/commit/b33c9d01bc4ec970b7ef8af1aabffd9a70638f8c))
+* tests ([f60c5d3](https://github.com/jensvogt/awsmock/commit/f60c5d3374e2cdc318a09622fc9d0d709881ed7f))
+* tests ([0bc047a](https://github.com/jensvogt/awsmock/commit/0bc047a06dba996a5841f8174ec5c8b9e5d5f9f0))
+* tests ([841c8e5](https://github.com/jensvogt/awsmock/commit/841c8e5795ef1830eced0a2908a02bd6d5ac24ef))
+
 ## [1.18.52](https://github.com/jensvogt/awsmock/compare/1.18.51...v1.18.52) (2026-05-30)
 
 
