@@ -91,6 +91,16 @@ namespace AwsMock::Database {
         Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application);
 
         /**
+         * @brief Toggle the enabled flag of an application without loading the full entity.
+         *
+         * @param region AWS region
+         * @param name application name
+         * @param enabled new value
+         * @throws DatabaseException
+         */
+        void SetEnabled(const std::string &region, const std::string &name, bool enabled);
+
+        /**
          * @brief Returns a list of cognito user pools.
          *
          * @param region AWS region name

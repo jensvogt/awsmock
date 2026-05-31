@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/04/2024.
 //
 
-#ifndef AWSMOCK_SERVICE_SECRETSMANAGER_SERVICE_H
-#define AWSMOCK_SERVICE_SECRETSMANAGER_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -175,6 +174,9 @@ namespace AwsMock::Service {
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
@@ -286,5 +288,3 @@ namespace AwsMock::Service {
     };
 
 }// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_SECRETSMANAGER_SERVICE_H

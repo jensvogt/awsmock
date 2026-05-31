@@ -42,6 +42,7 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
+#include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/logging/LogWebsocketSink.h>
@@ -73,7 +74,8 @@ namespace AwsMock::Core {
      */
     class LogStream {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -138,7 +140,8 @@ namespace AwsMock::Core {
          */
         static void RemoveConsoleLogs();
 
-    private:
+      private:
+
         /**
          * Log size
          */
@@ -182,17 +185,17 @@ namespace AwsMock::Core {
         /**
          * Console appender
          */
-        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> > console_sink;
+        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> console_sink;
 
         /**
          * File appender
          */
-        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> > file_sink;
+        static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> file_sink;
 
         /**
          * Web socket
          */
-        static boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream> > _ws;
+        static boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> _ws;
 
         /**
          * Web socket backend
@@ -205,7 +208,7 @@ namespace AwsMock::Core {
         static boost::shared_ptr<webSocketSink_t> webSocketSink;
     };
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
 #define log_fatal BOOST_LOG_SEV(_logger, boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)

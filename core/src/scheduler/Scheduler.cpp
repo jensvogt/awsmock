@@ -41,8 +41,36 @@ namespace AwsMock::Core {
 
     void Scheduler::AddOneTimeTask(const std::string &name, handler_fn task, long delay) {
         if (!_periodicTasks.contains(name)) {
-            _periodicTasks[name] = std::make_unique<PeriodicEntry>(std::ref(_ioc), name, 0, std::move(task), delay);
+            auto wrapped = [this, name, t = std::move(task)]() mutable {
+                try {
+                    t();
+                } catch (const std::exception &exc) {
+                    log_error << "One-time task '" << name << "' threw an unhandled exception: " << exc.what();
+                } catch (...) {
+                    log_error << "One-time task '" << name << "' threw an unknown exception";
+                }
+                boost::asio::post(_ioc, [this, name] { Shutdown(name); });
+            };
+            _periodicTasks[name] = std::make_unique<PeriodicEntry>(std::ref(_ioc), name, 0, std::move(wrapped), delay);
         }
+    }
+
+    std::shared_future<void> Scheduler::AddWaitableOneTimeTask(const std::string &name, handler_fn task, long delay) {
+        auto promise = std::make_shared<std::promise<void>>();
+        std::shared_future<void> future = promise->get_future().share();
+        if (!_periodicTasks.contains(name)) {
+            auto wrapped = [this, name, t = std::move(task), p = std::move(promise)]() mutable {
+                try {
+                    t();
+                    p->set_value();
+                } catch (...) {
+                    p->set_exception(std::current_exception());
+                }
+                boost::asio::post(_ioc, [this, name] { Shutdown(name); });
+            };
+            _periodicTasks[name] = std::make_unique<PeriodicEntry>(std::ref(_ioc), name, 0, std::move(wrapped), delay);
+        }
+        return future;
     }
 
     void Scheduler::AddTask(const std::string &name, handler_fn task, const std::string &cronExpression) {

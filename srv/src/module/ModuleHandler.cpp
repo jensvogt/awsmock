@@ -136,16 +136,19 @@ namespace AwsMock::Service {
 
             if (action == "set-log-level") {
 
-                Core::LogStream::SetSeverity(payload);
-                log_info << "Log level set to '" << payload << "'";
-
-                // Send response
+                if (const auto req = Dto::Module::SetLogLevelRequest::FromJson(payload); req.channel.empty()) {
+                    Core::LogStream::SetSeverity(req.level);
+                    log_info << "Log level set to '" << req.level << "'";
+                } else {
+                    Core::LogStream::SetChannelSeverity(req.channel, req.level);
+                    log_info << "Log level for channel '" << req.channel << "' set to '" << req.level << "'";
+                }
                 return SendResponse(request, http::status::ok);
             }
 
             if (action == "clean-objects") {
 
-                // Get modules
+                // Get clean modules request
                 if (Dto::Module::CleanInfrastructureRequest moduleRequest = Dto::Module::CleanInfrastructureRequest::FromJson(payload); moduleRequest.onlyObjects) {
                     ModuleService{}.CleanObjects(moduleRequest);
                 } else {
@@ -164,4 +167,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

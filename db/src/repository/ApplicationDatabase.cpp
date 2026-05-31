@@ -213,6 +213,31 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateApplication(application);
     }
 
+    void ApplicationDatabase::SetEnabled(const std::string &region, const std::string &name, const bool enabled) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "set_enabled");
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+                applicationCollection.update_one(
+                        make_document(kvp("region", region), kvp("name", name)),
+                        make_document(kvp("$set", make_document(
+                                              kvp("enabled", enabled),
+                                              kvp("modified", bsoncxx::types::b_date(system_clock::now()))))));
+                log_debug << "Application enabled flag set, region: " << region << ", name: " << name << ", enabled: " << enabled;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+            return;
+        }
+        _memoryDb.SetEnabled(region, name, enabled);
+    }
+
     long ApplicationDatabase::DeleteApplication(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "delete_applications");
 

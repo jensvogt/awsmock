@@ -3,7 +3,8 @@
 //
 
 #include <awsmock/service/kms/KMSService.h>
-#include <future>
+
+#include <awsmock/core/scheduler/Scheduler.h>
 
 namespace AwsMock::Service {
 
@@ -111,16 +112,13 @@ namespace AwsMock::Service {
             keyEntity = _kmsDatabase.CreateKey(keyEntity);
             log_trace << "KMS keyEntity created: " << keyEntity;
 
-            // Create key material asynchronously; callers use WaitForAesKey/WaitForRsaKey to synchronize
-            auto future = std::async(std::launch::async, [this, keyId]() {
-                try {
-                    KMSCreator{}.CreateKmsKey(keyId);
-                } catch (const std::exception &exc) {
-                    log_warning << "KMS key material creation failed, keyId: " << keyId << " error: " << exc.what();
-                }
+            // Create key material asynchronously via scheduler; callers use WaitForAesKey/WaitForRsaKey to synchronize
+            const std::string taskName = "create-kms-key-" + keyId;
+            auto future = Core::Scheduler::instance().AddWaitableOneTimeTask(taskName, [keyId]() {
+                KMSCreator{}.CreateKmsKey(keyId);
             });
             std::lock_guard lock(_futureMutex);
-            _keyCreationFutures[keyId] = future.share();
+            _keyCreationFutures[keyId] = std::move(future);
             log_debug << "KMS key creation started asynchronously, keyId: " << keyId;
 
             Dto::KMS::Key key;

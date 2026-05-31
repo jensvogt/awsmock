@@ -1042,7 +1042,7 @@ namespace AwsMock::Service {
                 entryRequest.body = entry.body;
 
                 // Send the message
-                Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
+                const Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
 
                 Dto::SQS::MessageSuccessful s;
                 s.id = entry.id;

@@ -71,6 +71,21 @@ namespace AwsMock::Database {
         return _applications[it->first];
     }
 
+    void ApplicationMemoryDb::SetEnabled(const std::string &region, const std::string &name, const bool enabled) {
+        boost::mutex::scoped_lock lock(_applicationMutex);
+
+        const auto it = std::ranges::find_if(_applications, [&region, &name](const std::pair<std::string, Entity::Apps::Application> &a) {
+            return a.second.region == region && a.second.name == name;
+        });
+
+        if (it == _applications.end()) {
+            log_error << "SetEnabled failed, region: " << region << " name: " << name;
+            throw Core::DatabaseException("SetEnabled failed, region: " + region + " name: " + name);
+        }
+        it->second.enabled = enabled;
+        it->second.modified = system_clock::now();
+    }
+
     std::vector<Entity::Apps::Application> ApplicationMemoryDb::ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
 
         auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());

@@ -175,9 +175,8 @@ namespace AwsMock::Core {
     void TarUtils::WriteFile(archive *archive, std::string &fileName, const std::string &directory, const bool isDir, const bool isLink) {
 
         int err = 0;
-        std::string entryName = fileName;
-        StringUtils::Replace(entryName, directory, "");
-        log_trace << "Removed directory, entryName: " << entryName << ", filename: " << fileName << ", directory: " << directory;
+        std::string entryName = std::filesystem::relative(fileName, directory).string();
+        log_trace << "Relative path, entryName: " << entryName << ", filename: " << fileName << ", directory: " << directory;
 
         struct stat st{};
         stat(fileName.c_str(), &st);

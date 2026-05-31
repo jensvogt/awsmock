@@ -2,8 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_API_GATEWAY_HANDLER_H
-#define AWSMOCK_SERVICE_API_GATEWAY_HANDLER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/exception/BadRequestException.h>
@@ -74,5 +73,3 @@ namespace AwsMock::Service {
     };
 
 }// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_APPLICATION_HANDLER_H
