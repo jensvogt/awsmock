@@ -135,7 +135,7 @@ namespace AwsMock::Core {
     void Scheduler::PeriodicEntry::Stop() {
         log_debug << "Stopping periodic task '" << name << "'";
         timer.cancel();
-        log_info << "Periodic task '" << name << "' stopped";
+        log_debug << "Periodic task '" << name << "' stopped";
     }
 
     void Scheduler::PeriodicEntry::StartWait() {
@@ -170,11 +170,11 @@ namespace AwsMock::Core {
     void Scheduler::CronEntry::Stop() {
         log_debug << "Stopping cron task '" << name << "'";
         timer.cancel();
-        log_info << "Cron task '" << name << "' stopped";
+        log_debug << "Cron task '" << name << "' stopped";
     }
 
     void Scheduler::CronEntry::StartWait() {
         timer.async_wait([this](const boost::system::error_code &e) { Execute(e); });
     }
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core

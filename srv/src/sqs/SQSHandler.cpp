@@ -28,7 +28,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("purge-queue", [sqsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-queue", [sqsRequest, _logger = _logger]() mutable {
                         try {
                             const long purged = SQSService{}.PurgeQueue(sqsRequest);
                             log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged;
@@ -41,7 +41,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::PURGE_ALL_QUEUES: {
 
-                    Core::Scheduler::instance().AddOneTimeTask("purge-all-queues", []() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-all-queues", [_logger = _logger]() mutable {
                         try {
                             const long purged = SQSService{}.PurgeAllQueues();
                             log_info << "Purge all queues, count: " << purged;
@@ -63,7 +63,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
 
                     Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("set-queue-attribute", [sqsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("set-queue-attribute", [sqsRequest, _logger = _logger]() mutable {
                         try {
                             SQSService{}.SetQueueAttributes(sqsRequest);
                             log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
@@ -305,7 +305,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::RESEND_MESSAGE: {
 
                     Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [sqsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [sqsRequest, _logger = _logger]() mutable {
                         SQSService{}.ResendMessage(sqsRequest);
                         log_info << "Resend message, messageId: " << sqsRequest.messageId;
                     });
@@ -371,7 +371,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::IMPORT_MESSAGES: {
 
                     Dto::SQS::ImportMessagesRequest sqsRequest = Dto::SQS::ImportMessagesRequest::FromJson(clientCommand.payload);
-                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [sqsRequest]() {
+                    Core::Scheduler::instance().AddOneTimeTask("resend-message", [sqsRequest, _logger = _logger]() mutable {
                         SQSService{}.ImportMessages(sqsRequest);
                         log_info << "Import messages";
                     });

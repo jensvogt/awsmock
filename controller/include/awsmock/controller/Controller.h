@@ -144,7 +144,8 @@ namespace AwsMock::Controller {
     }
 
     static std::vector<std::string> validLogLevels = {"trace", "debug", "info", "warning", "error", "fatal"};
-    static std::vector<std::string> validChannels = {"Common", "Core", "Application", "S3", "SQS", "SNS", "Lambda", "SSM", "KMS", "SecretsManager", "DynamoDB", "Cognito", "Module", "Monitoring"};
+    static std::vector<std::string> validChannels = {"Common", "Core", "Application", "S3", "SQS", "SNS", "Lambda", "SSM", "KMS", "SecretsManager", "DynamoDB", "Cognito",
+                                                     "Module", "Monitoring", "Container"};
 
     /**
      * @brief AwsMock controller
