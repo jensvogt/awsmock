@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SECRETSMANAGER_SERVER_H
-#define AWSMOCK_SERVICE_SECRETSMANAGER_SERVER_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -28,13 +27,20 @@ namespace AwsMock::Service {
      */
     class SecretsManagerServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit SecretsManagerServer(Core::Scheduler &scheduler);
 
-    private:
+        /**
+         * @brief Shutdown server
+         */
+        void Shutdown() override;
+
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
@@ -43,14 +49,9 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Backup the secrets manager objects
+         * @brief Back up the secrets manager objects
          */
         static void BackupSecretsManger();
-
-        /**
-         * @brief Shutdown server
-         */
-        void Shutdown() override;
 
         /**
          * @brief Database connection
@@ -85,6 +86,4 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_SECRETSMANAGER_SERVER_H
+}// namespace AwsMock::Service

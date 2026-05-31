@@ -41,7 +41,10 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::UPLOAD_APPLICATION: {
 
                     Dto::Apps::UploadApplicationCodeRequest serviceRequest = Dto::Apps::UploadApplicationCodeRequest::FromJson(clientCommand);
-                    _applicationService.UploadApplicationCode(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("upload-application", [this, serviceRequest] {
+                        ApplicationService{}.UploadApplicationCode(serviceRequest);
+                        log_info << "Applications uploaded, region: " << serviceRequest.region;
+                    });
                     log_info << "Upload application code succeeded, name: " << serviceRequest.applicationName << ", version: " << serviceRequest.version;
                     return SendResponse(request, http::status::ok);
                 }
@@ -200,4 +203,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

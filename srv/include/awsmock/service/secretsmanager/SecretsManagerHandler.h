@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/04/2024.
 //
 
-#ifndef AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H
-#define AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H
+#pragma once
 
 // Boost includes
 #include <boost/beast.hpp>
@@ -26,7 +25,8 @@ namespace AwsMock::Service {
      */
     class SecretsManagerHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * Constructor
          */
@@ -44,7 +44,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
@@ -53,6 +54,4 @@ namespace AwsMock::Service {
         SecretsManagerService _secretsManagerService;
     };
 
-} // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_SECRETSMANAGER_HANDLER_H
+}// namespace AwsMock::Service

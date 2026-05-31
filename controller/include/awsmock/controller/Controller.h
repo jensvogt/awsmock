@@ -53,6 +53,7 @@
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
+#include <awsmock/dto/module/SetLogLevelRequest.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/dto/transfer/model/Server.h>
@@ -97,31 +98,32 @@ namespace AwsMock::Controller {
     };
 
     static std::map<CommandType, std::string> CommandTypeNames{
-        {CommandType::CONFIG, "config"},
-        {CommandType::STATUS, "status"},
-        {CommandType::SET_LOG_LEVEL, "set-loglevel"},
-        {CommandType::GET_LOG_LEVEL, "get-loglevel"},
-        {CommandType::LIST, "list"},
-        {CommandType::LIST_APPLICATIONS, "list-applications"},
-        {CommandType::LIST_LAMBDAS, "list-lambdas"},
-        {CommandType::ENABLE_APPLICATIONS, "enable-applications"},
-        {CommandType::ENABLE_LAMBDAS, "enable-lambdas"},
-        {CommandType::DISABLE_APPLICATIONS, "disable-applications"},
-        {CommandType::DISABLE_APPLICATIONS, "disable-lambdas"},
-        {CommandType::START_APPLICATIONS, "start-applications"},
-        {CommandType::START_LAMBDAS, "start-lambdas"},
-        {CommandType::RESTART_APPLICATIONS, "restart-applications"},
-        {CommandType::RESTART_LAMBDAS, "restart-lambdas"},
-        {CommandType::STOP_APPLICATIONS, "stop-applications"},
-        {CommandType::STOP_LAMBDAS, "stop-lambdas"},
-        {CommandType::IMPORT, "import"},
-        {CommandType::EXPORT, "export"},
-        {CommandType::CLEAN, "clean"},
-        {CommandType::DEPLOY_APPLICATION, "deploy-application"},
-        {CommandType::DEPLOY_LAMBDA, "deploy-lambda"},
-        {CommandType::CLEAN_OBJECTS, "clean-objects"},
-        {CommandType::PING, "ping"},
-        {CommandType::UNKNOWN, "unknown"},
+            {CommandType::CONFIG, "config"},
+            {CommandType::STATUS, "status"},
+            {CommandType::SET_LOG_LEVEL, "set-loglevel"},
+            {CommandType::GET_LOG_LEVEL, "get-loglevel"},
+            {CommandType::LIST, "list"},
+            {CommandType::LIST_APPLICATIONS, "list-applications"},
+            {CommandType::LIST_LAMBDAS, "list-lambdas"},
+            {CommandType::ENABLE_APPLICATIONS, "enable-applications"},
+            {CommandType::ENABLE_LAMBDAS, "enable-lambdas"},
+            {CommandType::DISABLE_APPLICATIONS, "disable-applications"},
+            {CommandType::DISABLE_LAMBDAS, "disable-lambdas"},
+            {CommandType::START_APPLICATIONS, "start-applications"},
+            {CommandType::START_LAMBDAS, "start-lambdas"},
+            {CommandType::RESTART_APPLICATIONS, "restart-applications"},
+            {CommandType::RESTART_LAMBDAS, "restart-lambdas"},
+            {CommandType::STOP_APPLICATIONS, "stop-applications"},
+            {CommandType::STOP_LAMBDAS, "stop-lambdas"},
+            {CommandType::IMPORT, "import"},
+            {CommandType::EXPORT, "export"},
+            {CommandType::CLEAN, "clean"},
+            {CommandType::DEPLOY_APPLICATION, "deploy-application"},
+            {CommandType::DEPLOY_LAMBDA, "deploy-lambda"},
+            {CommandType::CLEAN_OBJECTS, "clean-objects"},
+            {CommandType::LOGS, "logs"},
+            {CommandType::PING, "ping"},
+            {CommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string CommandTypeToString(const CommandType &commandType) {
@@ -141,17 +143,21 @@ namespace AwsMock::Controller {
         return CommandTypeNames | std::views::values | std::ranges::to<std::vector>();
     }
 
+    static std::vector<std::string> validLogLevels = {"trace", "debug", "info", "warning", "error", "fatal"};
+    static std::vector<std::string> validChannels = {"Common", "Core", "Application", "S3", "SQS", "SNS", "Lambda", "SSM", "KMS", "SecretsManager", "DynamoDB", "Cognito", "Module", "Monitoring"};
+
     /**
      * @brief AwsMock controller
      *
      * @par
-     * AwsMock controller, which sends commands to the awsmock manager. Default port is 4567, but can be changed in the awsmock properties file.
+     * AwsMock controller, which sends commands to the awsmock manager. The default port is 4567, but can be changed in the awsmock properties file.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     class AwsMockCtl {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -266,7 +272,6 @@ namespace AwsMock::Controller {
          */
         void StartAllLambdas() const;
 
-
         /**
          * @brief Restart one or more lambdas
          *
@@ -291,6 +296,15 @@ namespace AwsMock::Controller {
          */
         void StopAllLambdas() const;
 
+        /**
+         * @brief Deploys an application to the specified environment.
+         *
+         * This method handles the deployment process by transferring the application
+         * package to the target environment and performing the necessary setup and configuration.
+         *
+         * @param applicationName The name of the application to be deployed.
+         * @param filename The name of the file to deploy
+         */
         void DeployApplication(const std::string &applicationName, const std::string &filename) const;
 
         void DeployLambda(const std::string &functionName, const std::string &filename) const;
@@ -306,8 +320,9 @@ namespace AwsMock::Controller {
          * @brief Sets the manager's log level
          *
          * @param level log level
+         * @param channel optional channel name; empty means global
          */
-        void SetLogLevel(const std::string &level) const;
+        void SetLogLevel(const std::string &level, const std::string &channel = {}) const;
 
         /**
          * @brief Prints out the current log level
@@ -352,7 +367,8 @@ namespace AwsMock::Controller {
          */
         void PingManager() const;
 
-    private:
+      private:
+
         /**
          * @brief Add an authorization header.
          *
@@ -363,11 +379,34 @@ namespace AwsMock::Controller {
         void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &target, const std::string &action) const;
 
         /**
+         * @brief Send a POST command to the manager and return the raw response.
+         */
+        [[nodiscard]]
+        Core::HttpSocketResponse SendCommand(const std::string &target, const std::string &action, const std::string &body = {}) const;
+
+        /**
+         * @brief Send a GET command to the manager and return the raw response.
+         */
+        [[nodiscard]]
+        Core::HttpSocketResponse SendGetCommand(const std::string &target, const std::string &action, const std::string &body = {}) const;
+
+        /**
+         * @brief Print the application list (name, enabled, status) to stdout.
+         */
+        void PrintApplicationList() const;
+
+        /**
+         * @brief Print the lambda list (name, enabled, state) to stdout.
+         */
+        void PrintLambdaList() const;
+
+        /**
          * @brief Get a list of applications
          *
          * @param commands command line arguments
          * @return list of applications
          */
+        [[nodiscard]]
         std::vector<Dto::Apps::Application> GetApplicationFromCommands(const std::vector<std::string> &commands);
 
         /**
@@ -376,6 +415,7 @@ namespace AwsMock::Controller {
          * @param commands command line arguments
          * @return list of lambdas
          */
+        [[nodiscard]]
         std::vector<Dto::Lambda::Function> GetLambdasFromCommand(const std::vector<std::string> &commands);
 
         /**
@@ -384,28 +424,50 @@ namespace AwsMock::Controller {
          * @param commands command line arguments
          * @return list of modules
          */
+        [[nodiscard]]
         std::vector<Dto::Module::Module> GetModulesFromCommand(const std::vector<std::string> &commands);
+
+        /**
+         * @brief Verifies the validity of a log level.
+         *
+         * @param level The log level to validate.
+         * @return true if the level is valid
+         */
+        [[nodiscard]]
+        static bool VerifyLogLevel(const std::string &level);
+
+        /**
+         * @brief Verifies the name of the logging channel.
+         *
+         * @param channel A list or collection of channel objects to be validated.
+         * @return True if all channels are verified successfully, false otherwise.
+         */
+        [[nodiscard]]
+        static bool VerifyChannel(const std::string &channel);
 
         /**
          * @brief Get a list of all applications.
          *
          * @return list of all applications.
          */
-        [[nodiscard]] std::vector<Dto::Apps::Application> GetAllApplications() const;
+        [[nodiscard]]
+        std::vector<Dto::Apps::Application> GetAllApplications() const;
 
         /**
          * @brief Get a list of all lambdas.
          *
          * @return list of all lambdas.
          */
-        [[nodiscard]] std::vector<Dto::Lambda::Function> GetAllLambdas() const;
+        [[nodiscard]]
+        std::vector<Dto::Lambda::Function> GetAllLambdas() const;
 
         /**
          * @brief Get a list of all modules.
          *
          * @return list of all modules.
          */
-        [[nodiscard]] std::vector<Dto::Module::Module> GetAllModules() const;
+        [[nodiscard]]
+        std::vector<Dto::Module::Module> GetAllModules() const;
 
         /**
          * @brief Returns a lits of lambda instance counters
@@ -413,6 +475,7 @@ namespace AwsMock::Controller {
          * @param function lambda function
          * @return list of instances
          */
+        [[nodiscard]]
         std::vector<Dto::Lambda::InstanceCounter> GetLambdaInstances(const Dto::Lambda::Function &function) const;
 
         /**
@@ -471,4 +534,4 @@ namespace AwsMock::Controller {
         std::vector<Dto::Lambda::Function> _lambdas;
     };
 
-} // namespace AwsMock::Controller
+}// namespace AwsMock::Controller

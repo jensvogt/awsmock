@@ -142,7 +142,7 @@ namespace AwsMock::Service {
          */
         void DoRead();
 
-        void OnReadHeader(boost::beast::error_code ec, std::size_t);
+        void OnReadHeader(const boost::beast::error_code &ec, std::size_t);
 
         /**
          * @brief On read callback

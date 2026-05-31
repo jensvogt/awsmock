@@ -3,7 +3,7 @@
 #include <awsmock/service/sqs/SQSHandler.h>
 
 namespace {
-    logger_t _logger{boost::log::keywords::channel = "Common"};
+    logger_t _logger{boost::log::keywords::channel = "SQS"};
 }
 
 namespace AwsMock::Service {
@@ -482,4 +482,4 @@ namespace AwsMock::Service {
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -7,6 +7,7 @@
 
 // AwsMock includes
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
+#include <awsmock/dto/module/SetLogLevelRequest.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
 #include <awsmock/dto/transfer/ListUsersRequest.h>
 #include <awsmock/dto/transfer/model/Server.h>

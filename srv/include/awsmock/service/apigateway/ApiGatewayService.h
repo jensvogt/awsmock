@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_API_GATEWAY_SERVICE_H
-#define AWSMOCK_SERVICE_API_GATEWAY_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -64,7 +63,8 @@ namespace AwsMock::Service {
          * @param request Api gateway create key request
          * @return API gateway create key response
          */
-        [[nodiscard]] Dto::ApiGateway::CreateApiKeyResponse CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
+        [[nodiscard]]
+        Dto::ApiGateway::CreateApiKeyResponse CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
 
         /**
          * @brief Creates a new API key
@@ -72,7 +72,8 @@ namespace AwsMock::Service {
          * @param request Api gateway create key request
          * @return get API key response
          */
-        [[nodiscard]] Dto::ApiGateway::GetApiKeysResponse GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
+        [[nodiscard]]
+        Dto::ApiGateway::GetApiKeysResponse GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
 
         /**
          * @brief Deletes an API gateway key
@@ -87,7 +88,8 @@ namespace AwsMock::Service {
          * @param request create a REST API request
          * @return create REST API response
          */
-        [[nodiscard]] Dto::ApiGateway::CreateRestApiResponse CreateRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const;
+        [[nodiscard]]
+        Dto::ApiGateway::CreateRestApiResponse CreateRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const;
 
         /**
          * @brief List the API key counters
@@ -95,7 +97,8 @@ namespace AwsMock::Service {
          * @param request internal API key counters request
          * @return list of API key counters
          */
-        [[nodiscard]] Dto::ApiGateway::ListApiKeyCountersResponse ListApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const;
+        [[nodiscard]]
+        Dto::ApiGateway::ListApiKeyCountersResponse ListApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const;
 
         /**
          * @brief Get an API key detail
@@ -103,7 +106,8 @@ namespace AwsMock::Service {
          * @param request internal API key counters request
          * @return list of API key counters
          */
-        [[nodiscard]] Dto::ApiGateway::GetApiKeyCounterResponse GetApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const;
+        [[nodiscard]]
+        Dto::ApiGateway::GetApiKeyCounterResponse GetApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const;
 
         /**
          * @brief Updates an API key
@@ -137,5 +141,3 @@ namespace AwsMock::Service {
     };
 
 }// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_API_GATEWAY_SERVICE_H

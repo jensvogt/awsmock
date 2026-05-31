@@ -15,7 +15,7 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * @brief Create container response
+     * @brief Create a container response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
