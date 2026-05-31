@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.54](https://github.com/jensvogt/awsmock/compare/v1.18.53...v1.18.54) (2026-05-31)
+
+
+### Bug Fixes
+
+* application startup and bad_alloc error in periodic tasks ([a4fa7a7](https://github.com/jensvogt/awsmock/commit/a4fa7a7dfb13309f6129a3af1f67dba7455e940f))
+* logging channels ([25f9eb9](https://github.com/jensvogt/awsmock/commit/25f9eb9705ede63917324b39ea9ad8fdf385337d))
+* logging channels ([6167c07](https://github.com/jensvogt/awsmock/commit/6167c07cc1d0f563c2a53c56f7f8b06194d8687c))
+
 ## [1.18.53](https://github.com/jensvogt/awsmock/compare/v1.18.52...v1.18.53) (2026-05-31)
 
 
