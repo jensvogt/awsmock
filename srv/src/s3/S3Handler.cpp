@@ -635,7 +635,7 @@ namespace AwsMock::Service {
                     log_debug << "S3 purge all buckets request";
 
                     // Build request
-                    boost::asio::post(GatewayServer::WorkerPool(), []() {
+                    Core::Scheduler::instance().AddOneTimeTask("purge-all-buckets", [_logger = _logger]() mutable {
                         try {
                             const long deleted = S3Service{}.PurgeAllBuckets();
                             log_info << "Purge all buckets, deleted: " << deleted;
@@ -686,7 +686,7 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
-                    boost::asio::post(GatewayServer::WorkerPool(), [s3Request]() {
+                    Core::Scheduler::instance().AddOneTimeTask("touch-objects", [s3Request, _logger = _logger]() mutable {
                         try {
                             S3Service{}.TouchObject(s3Request);
                             log_info << "Touched all S3 object, region: " << s3Request.region;
@@ -702,7 +702,7 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
-                    boost::asio::post(GatewayServer::WorkerPool(), [s3Request]() {
+                    Core::Scheduler::instance().AddOneTimeTask("update-object", [s3Request, _logger = _logger]() mutable {
                         try {
                             S3Service{}.UpdateObject(s3Request);
                             log_info << "Updated S3 object, region: " << s3Request.region;
@@ -744,9 +744,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::S3CommandType::DELETE_ALL_OBJECTS: {
+
                     // Build request
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
-                    boost::asio::post(GatewayServer::WorkerPool(), [s3Request]() {
+                    Core::Scheduler::instance().AddOneTimeTask("delete-all-objects", [s3Request, _logger = _logger]() mutable {
                         try {
                             const auto s3response = S3Service{}.DeleteObjects(s3Request);
                             log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
@@ -973,4 +974,4 @@ namespace AwsMock::Service {
         key = Core::StringUtils::SubStringAfter(path, "/");
         log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service
