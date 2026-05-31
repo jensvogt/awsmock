@@ -110,7 +110,7 @@ jobs:
       - name: Install magic database
         run: |
           sudo mkdir -p /usr/local/awsmock/etc
-          sudo cp /usr/share/misc/magic.mgc /usr/local/awsmock/etc/magic.mgc
+          sudo cp ${{ github.workspace }}/dist/etc/magic.mgc /usr/local/awsmock/etc/magic.mgc
 
       - name: Configure
         run: |
