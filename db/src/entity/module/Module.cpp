@@ -6,19 +6,17 @@
 
 namespace AwsMock::Database::Entity::Module {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     view_or_value<view, value> Module::ToDocument() const {
 
         view_or_value<view, value> objectDoc = make_document(
-                kvp("name", name),
-                kvp("port", port),
-                kvp("state", ModuleStateToString(state)),
-                kvp("status", ModuleStatusToString(status)),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+            kvp("name", name),
+            kvp("port", port),
+            kvp("state", ModuleStateToString(state)),
+            kvp("status", ModuleStatusToString(status)),
+            kvp("logChannel", logChannel),
+            kvp("logLevel", logLevel),
+            kvp("created", bsoncxx::types::b_date(created)),
+            kvp("modified", bsoncxx::types::b_date(modified)));
 
         return objectDoc;
     }
@@ -30,23 +28,10 @@ namespace AwsMock::Database::Entity::Module {
         port = Core::Bson::BsonUtils::GetIntValue(mResult, "port");
         state = ModuleStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
         status = ModuleStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
+        logChannel = Core::Bson::BsonUtils::GetStringValue(mResult, "logChannel");
+        logLevel = Core::Bson::BsonUtils::GetStringValue(mResult, "logLevel");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }
 
-    std::string Module::ToJson() const {
-        return to_json(ToDocument());
-    }
-
-    std::string Module::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Module &m) {
-        os << "Module=" << m.ToJson();
-        return os;
-    }
-
-}// namespace AwsMock::Database::Entity::Module
+} // namespace AwsMock::Database::Entity::Module

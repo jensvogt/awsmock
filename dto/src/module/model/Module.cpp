@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-    std::string Module::ToJson(const Database::Entity::Module::ModuleList &moduleList) {
+    std::string Module::ToJson(const std::vector<Database::Entity::Module::Module> &moduleList) {
 
         try {
 

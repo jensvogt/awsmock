@@ -2,10 +2,10 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_SERVICE_MODULE_HANDLER_H
-#define AWSMOCK_SERVICE_MODULE_HANDLER_H
+#pragma once
 
 // AwsMock includes
+#include <awsmock/dto/module/GetLogLevelRequest.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/SetLogLevelRequest.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
@@ -26,12 +26,12 @@ namespace AwsMock::Service {
      */
     class ModuleHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Manager HTTP server
          */
-        explicit ModuleHandler(boost::asio::io_context &ioc) : AbstractHandler("module-handler", ioc) {}
+        explicit ModuleHandler(boost::asio::io_context &ioc) : AbstractHandler("module-handler", ioc) {
+        }
 
         /**
          * @brief Handler HTTP GET requests.
@@ -57,8 +57,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
@@ -67,6 +66,4 @@ namespace AwsMock::Service {
         ModuleService _moduleService;
     };
 
-}// namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_MODULE_HANDLER_H
+} // namespace AwsMock::Service

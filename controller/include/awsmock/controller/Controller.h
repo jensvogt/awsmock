@@ -72,7 +72,7 @@ namespace AwsMock::Controller {
         CONFIG,
         STATUS,
         SET_LOG_LEVEL,
-        GET_LOG_LEVEL,
+        GET_LOG_LEVELS,
         LIST,
         LIST_APPLICATIONS,
         LIST_LAMBDAS,
@@ -98,32 +98,32 @@ namespace AwsMock::Controller {
     };
 
     static std::map<CommandType, std::string> CommandTypeNames{
-            {CommandType::CONFIG, "config"},
-            {CommandType::STATUS, "status"},
-            {CommandType::SET_LOG_LEVEL, "set-loglevel"},
-            {CommandType::GET_LOG_LEVEL, "get-loglevel"},
-            {CommandType::LIST, "list"},
-            {CommandType::LIST_APPLICATIONS, "list-applications"},
-            {CommandType::LIST_LAMBDAS, "list-lambdas"},
-            {CommandType::ENABLE_APPLICATIONS, "enable-applications"},
-            {CommandType::ENABLE_LAMBDAS, "enable-lambdas"},
-            {CommandType::DISABLE_APPLICATIONS, "disable-applications"},
-            {CommandType::DISABLE_LAMBDAS, "disable-lambdas"},
-            {CommandType::START_APPLICATIONS, "start-applications"},
-            {CommandType::START_LAMBDAS, "start-lambdas"},
-            {CommandType::RESTART_APPLICATIONS, "restart-applications"},
-            {CommandType::RESTART_LAMBDAS, "restart-lambdas"},
-            {CommandType::STOP_APPLICATIONS, "stop-applications"},
-            {CommandType::STOP_LAMBDAS, "stop-lambdas"},
-            {CommandType::IMPORT, "import"},
-            {CommandType::EXPORT, "export"},
-            {CommandType::CLEAN, "clean"},
-            {CommandType::DEPLOY_APPLICATION, "deploy-application"},
-            {CommandType::DEPLOY_LAMBDA, "deploy-lambda"},
-            {CommandType::CLEAN_OBJECTS, "clean-objects"},
-            {CommandType::LOGS, "logs"},
-            {CommandType::PING, "ping"},
-            {CommandType::UNKNOWN, "unknown"},
+        {CommandType::CONFIG, "config"},
+        {CommandType::STATUS, "status"},
+        {CommandType::SET_LOG_LEVEL, "set-loglevel"},
+        {CommandType::GET_LOG_LEVELS, "get-loglevel"},
+        {CommandType::LIST, "list"},
+        {CommandType::LIST_APPLICATIONS, "list-applications"},
+        {CommandType::LIST_LAMBDAS, "list-lambdas"},
+        {CommandType::ENABLE_APPLICATIONS, "enable-applications"},
+        {CommandType::ENABLE_LAMBDAS, "enable-lambdas"},
+        {CommandType::DISABLE_APPLICATIONS, "disable-applications"},
+        {CommandType::DISABLE_LAMBDAS, "disable-lambdas"},
+        {CommandType::START_APPLICATIONS, "start-applications"},
+        {CommandType::START_LAMBDAS, "start-lambdas"},
+        {CommandType::RESTART_APPLICATIONS, "restart-applications"},
+        {CommandType::RESTART_LAMBDAS, "restart-lambdas"},
+        {CommandType::STOP_APPLICATIONS, "stop-applications"},
+        {CommandType::STOP_LAMBDAS, "stop-lambdas"},
+        {CommandType::IMPORT, "import"},
+        {CommandType::EXPORT, "export"},
+        {CommandType::CLEAN, "clean"},
+        {CommandType::DEPLOY_APPLICATION, "deploy-application"},
+        {CommandType::DEPLOY_LAMBDA, "deploy-lambda"},
+        {CommandType::CLEAN_OBJECTS, "clean-objects"},
+        {CommandType::LOGS, "logs"},
+        {CommandType::PING, "ping"},
+        {CommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string CommandTypeToString(const CommandType &commandType) {
@@ -144,8 +144,10 @@ namespace AwsMock::Controller {
     }
 
     static std::vector<std::string> validLogLevels = {"trace", "debug", "info", "warning", "error", "fatal"};
-    static std::vector<std::string> validChannels = {"Common", "Core", "Application", "S3", "SQS", "SNS", "Lambda", "SSM", "KMS", "SecretsManager", "DynamoDB", "Cognito",
-                                                     "Module", "Monitoring", "Container"};
+    static std::vector<std::string> validChannels = {
+        "Common", "Core", "Application", "S3", "SQS", "SNS", "Lambda", "SSM", "KMS", "SecretsManager", "DynamoDB", "Cognito",
+        "Module", "Monitoring", "Container"
+    };
 
     /**
      * @brief AwsMock controller
@@ -157,8 +159,7 @@ namespace AwsMock::Controller {
      */
     class AwsMockCtl {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -327,8 +328,10 @@ namespace AwsMock::Controller {
 
         /**
          * @brief Prints out the current log level
+         *
+         * @param moduleName name of the logger, if missing levels of all modules
          */
-        void GetLogLevel() const;
+        void GetLogLevel(const std::string &moduleName = {}) const;
 
         /**
          * @brief Returns the current AwsMock configuration
@@ -368,8 +371,7 @@ namespace AwsMock::Controller {
          */
         void PingManager() const;
 
-      private:
-
+    private:
         /**
          * @brief Add an authorization header.
          *
@@ -535,4 +537,4 @@ namespace AwsMock::Controller {
         std::vector<Dto::Lambda::Function> _lambdas;
     };
 
-}// namespace AwsMock::Controller
+} // namespace AwsMock::Controller

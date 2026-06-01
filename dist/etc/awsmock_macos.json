@@ -303,7 +303,73 @@
       "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",
       "file-size": 10485760,
-      "file-count": 5
+      "file-count": 5,
+      "channels": [
+        {
+          "name": "Common",
+          "level": "info"
+        },
+        {
+          "name": "S3",
+          "level": "info"
+        },
+        {
+          "name": "SQS",
+          "level": "info"
+        },
+        {
+          "name": "SNS",
+          "level": "info"
+        },
+        {
+          "name": "KMS",
+          "level": "info"
+        },
+        {
+          "name": "SSM",
+          "level": "info"
+        },
+        {
+          "name": "SecretsManager",
+          "level": "info"
+        },
+        {
+          "name": "Application",
+          "level": "info"
+        },
+        {
+          "name": "Lambda",
+          "level": "info"
+        },
+        {
+          "name": "Cognito",
+          "level": "info"
+        },
+        {
+          "name": "DynamoDB",
+          "level": "info"
+        },
+        {
+          "name": "ApiGateway",
+          "level": "info"
+        },
+        {
+          "name": "Container",
+          "level": "info"
+        },
+        {
+          "name": "Transfer",
+          "level": "info"
+        },
+        {
+          "name": "Gateway",
+          "level": "info"
+        },
+        {
+          "name": "Monitoring",
+          "level": "info"
+        }
+      ]
     }
   }
 }

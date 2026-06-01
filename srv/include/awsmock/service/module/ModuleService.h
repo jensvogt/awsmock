@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_MODULE_SERVICE_H
-#define AWSMOCK_SERVICE_MODULE_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -37,6 +36,10 @@
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/module/ModuleMap.h>
 
+#include "awsmock/dto/module/GetLogLevelRequest.h"
+#include "awsmock/dto/module/GetLogLevelResponse.h"
+#include "awsmock/dto/module/SetLogLevelRequest.h"
+
 namespace AwsMock::Service {
 
     /**
@@ -62,7 +65,8 @@ namespace AwsMock::Service {
          *
          * @return list of all modules
          */
-        [[nodiscard]] Database::Entity::Module::ModuleList ListModules() const;
+        [[nodiscard]]
+        std::vector<Database::Entity::Module::Module> ListModules() const;
 
         /**
          * @brief Starts a module
@@ -70,7 +74,8 @@ namespace AwsMock::Service {
          * @param modules list of modules
          * @return updated module list
          */
-        [[nodiscard]] Dto::Module::Module::ModuleList StartModules(const Dto::Module::Module::ModuleList &modules) const;
+        [[nodiscard]]
+        Dto::Module::Module::ModuleList StartModules(const Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief Stops one or several modules
@@ -78,6 +83,7 @@ namespace AwsMock::Service {
          * @param modules module list
          * @return updated module list
          */
+        [[nodiscard]]
         Dto::Module::Module::ModuleList StopModules(Dto::Module::Module::ModuleList &modules) const;
 
         /**
@@ -85,7 +91,8 @@ namespace AwsMock::Service {
          *
          * @return JSON string
          */
-        [[nodiscard]] Dto::Module::ListModuleNamesResponse ListModuleNames() const;
+        [[nodiscard]]
+        Dto::Module::ListModuleNamesResponse ListModuleNames() const;
 
         /**
          * @brief Exports the current infrastructure
@@ -96,6 +103,7 @@ namespace AwsMock::Service {
          * @param request export infrastructure request
          * @return JSON string
          */
+        [[nodiscard]]
         Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request = {});
 
         /**
@@ -150,7 +158,24 @@ namespace AwsMock::Service {
          */
         void UpdateLambda(const std::string &name);
 
+        /**
+         * @brief Update the log level for a module.
+         *
+         * @param request set log level request
+         */
+        void setLogLevel(const Dto::Module::SetLogLevelRequest &request) const;
+
+        /**
+         * @brief Returns the log level for a module.
+         *
+         * @param request get log level request
+         */
+        Dto::Module::GetLogLevelResponse getLogLevels(const Dto::Module::GetLogLevelRequest &request) const;
+
     private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
@@ -170,5 +195,3 @@ namespace AwsMock::Service {
     };
 
 } // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_MODULE_SERVICE_H

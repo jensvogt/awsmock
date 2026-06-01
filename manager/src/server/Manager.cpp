@@ -16,14 +16,37 @@ namespace AwsMock::Manager {
         // Initialize scheduler
         Core::Scheduler::initialize(_ioc);
 
-        // Initialize websocket logging
-        InitializeWebsocketLogging();
-
         // Start database
         InitializeDatabase();
 
+        // Initialize logging
+        InitializeLogging();
+
+        // Initialize websocket logging
+        InitializeWebsocketLogging();
+
         // Write some info
         WriteInfoMessages();
+    }
+
+    void Manager::InitializeLogging() const {
+
+        // Initialize log channels from configuration
+        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
+        if (Core::Configuration::instance().has("awsmock.logging.channels")) {
+            for (const auto &channel: Core::Configuration::instance().getArrayOfObjects("awsmock.logging.channels")) {
+                if (!channel.contains("name") || !channel.contains("level")) continue;
+                const std::string &channelName = channel.at("name");
+                const std::string &level = channel.at("level");
+                std::string moduleName = channelName;
+                std::ranges::transform(moduleName, moduleName.begin(), ::tolower);
+                Core::LogStream::SetChannelSeverity(channelName, level);
+                if (moduleDatabase.ModuleExists(moduleName)) {
+                    moduleDatabase.SetModuleLogChannelAndLevel(moduleName, channelName, level);
+                    log_trace << "Module log channel initialized, name: " << moduleName << " channel: " << channelName << " level: " << level;
+                }
+            }
+        }
     }
 
     void Manager::InitializeWebsocketLogging() const {
@@ -60,7 +83,7 @@ namespace AwsMock::Manager {
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().get<bool>("awsmock.dockerized");
     }
 
-    void Manager::AutoLoad() {
+    void Manager::AutoLoad() const {
 
         // Check active flag
         if (!Core::Configuration::instance().get<bool>("awsmock.autoload.active")) {
@@ -109,7 +132,7 @@ namespace AwsMock::Manager {
         log_info << "Found modules, count: " << moduleMap.GetSize();
         int i = 0;
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
+        for (const std::vector<Database::Entity::Module::Module> modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_info << "Stopping module " << i << " module: " << module.name;
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
                 moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
@@ -172,7 +195,7 @@ namespace AwsMock::Manager {
         Core::Scheduler::instance().AddOneTimeTask("auto-loader", [this] { AutoLoad(); });
 
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
+        for (const std::vector<Database::Entity::Module::Module> modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));
