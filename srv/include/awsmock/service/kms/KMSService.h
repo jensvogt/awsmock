@@ -7,7 +7,10 @@
 // C++ standard includes
 #include <chrono>
 #include <ctime>
+#include <future>
+#include <mutex>
 #include <string>
+#include <unordered_map>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -211,6 +214,14 @@ namespace AwsMock::Service {
         std::string DecryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &ciphertext) const;
 
         /**
+         * @brief Wait for the key creation future associated with keyId.
+         *
+         * @param keyId key ID
+         * @param maxSeconds timeout in seconds
+         */
+        void WaitForKey(const std::string &keyId, int maxSeconds) const;
+
+        /**
          * Account ID
          */
         std::string _accountId;
@@ -219,6 +230,12 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::KMSDatabase &_kmsDatabase;
+
+        /**
+         * Per-key async creation futures
+         */
+        mutable std::unordered_map<std::string, std::shared_future<void>> _keyCreationFutures;
+        mutable std::mutex _futureMutex;
     };
 
 } // namespace AwsMock::Service

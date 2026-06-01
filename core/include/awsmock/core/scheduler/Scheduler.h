@@ -6,6 +6,7 @@
 
 // C++ includes
 #include <functional>
+#include <future>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -61,13 +62,31 @@ namespace AwsMock::Core {
         void AddTask(const std::string &name, handler_fn task, int interval = 0, int delay = 0);
 
         /**
-         * @brief Add a one-time task that runs after an optional delay.
+         * @brief Add a fire-and-forget one-time task.
+         *
+         * The task runs once and the scheduler entry is automatically removed
+         * afterwards, freeing the name slot for reuse.
          *
          * @param name task name
          * @param task handler function
          * @param delay delay in seconds before execution (0 = immediate)
          */
         void AddOneTimeTask(const std::string &name, handler_fn task, long delay = 0);
+
+        /**
+         * @brief Add a waitable one-time task.
+         *
+         * Like AddOneTimeTask but returns a shared_future<void> that becomes
+         * ready when the task finishes (or carries the exception if it throws).
+         * The scheduler entry is removed automatically; callers do not need to
+         * call Shutdown() for the task name.
+         *
+         * @param name task name
+         * @param task handler function
+         * @param delay delay in seconds before execution (0 = immediate)
+         * @return shared_future<void> resolved when task completes
+         */
+        std::shared_future<void> AddWaitableOneTimeTask(const std::string &name, handler_fn task, long delay = 0);
 
         /**
          * @brief Add a cron-scheduled task.

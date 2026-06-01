@@ -163,9 +163,9 @@ namespace AwsMock::Service {
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        Core::Scheduler::instance().AddOneTimeTask("upload-application", [fullBase64File, application, instanceId] {
-            ApplicationCreator{}(fullBase64File, application.region, application.name, instanceId);
-        });
+        // Core::Scheduler::instance().AddOneTimeTask("upload-application", [fullBase64File, application, instanceId] {
+        ApplicationCreator{}(fullBase64File, application.region, application.name, instanceId);
+        // });
         log_debug << "Application code updated, name: " << request.applicationName << ", version: " << request.version;
     }
 
@@ -205,16 +205,12 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_application");
         log_debug << "Enable application request, name: " << request.application.name;
 
-        // Check existence
         if (!_database.ApplicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             return;
         }
 
-        // Get application
-        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
-        application.enabled = true;
-        application = _database.UpdateApplication(application);
+        _database.SetEnabled(request.region, request.application.name, true);
         log_debug << "Application enabled, name: " << request.application.name;
     }
 
@@ -222,10 +218,8 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_all_applications");
         log_debug << "Enable all applications request, region: " << request.region;
 
-        // Get application
-        for (std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region); auto &application: applications) {
-            application.enabled = true;
-            application = _database.UpdateApplication(application);
+        for (const auto &application: _database.ListApplications(request.region)) {
+            _database.SetEnabled(application.region, application.name, true);
         }
         log_debug << "All applications enabled, region: " << request.region;
     }
@@ -239,10 +233,7 @@ namespace AwsMock::Service {
             return;
         }
 
-        // Get application
-        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
-        application.enabled = false;
-        application = _database.UpdateApplication(application);
+        _database.SetEnabled(request.region, request.application.name, false);
         log_debug << "Application disabled, name: " << request.application.name;
     }
 
@@ -250,10 +241,8 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "disable_all_applications");
         log_debug << "Disable all applications request, region: " << request.region;
 
-        // Get application
-        for (std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region); auto &application: applications) {
-            application.enabled = false;
-            application = _database.UpdateApplication(application);
+        for (const auto &application: _database.ListApplications(request.region)) {
+            _database.SetEnabled(application.region, application.name, false);
         }
         log_debug << "All applications disabled, region: " << request.region;
     }
@@ -607,4 +596,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

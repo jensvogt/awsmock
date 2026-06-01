@@ -7,6 +7,7 @@
 
 // C++ includes
 #include <map>
+#include <ostream>
 #include <string>
 
 namespace AwsMock::Dto::KMS {
@@ -56,6 +57,10 @@ namespace AwsMock::Dto::KMS {
             }
         }
         return KeySpec::SYMMETRIC_DEFAULT;
+    }
+
+    inline std::ostream &operator<<(std::ostream &os, const KeySpec &keySpec) {
+        return os << KeySpecToString(keySpec);
     }
 
 }// namespace AwsMock::Dto::KMS

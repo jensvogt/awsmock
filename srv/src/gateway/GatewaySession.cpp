@@ -39,7 +39,7 @@ namespace AwsMock::Service {
                                 boost::beast::bind_front_handler(&GatewaySession::OnReadHeader, shared_from_this()));
     }
 
-    void GatewaySession::OnReadHeader(boost::beast::error_code ec, std::size_t) {
+    void GatewaySession::OnReadHeader(const beast::error_code &ec, std::size_t) {
 
         if (ec) return DoClose();
 
@@ -98,7 +98,7 @@ namespace AwsMock::Service {
     // Return a response for the given request. The concrete type of the response message (which depends on the request)
     // is type-erased in message_generator.
     template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request) {
+    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
@@ -268,4 +268,4 @@ namespace AwsMock::Service {
         QueueWrite(std::move(response));
         log_debug << "Options request answered";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

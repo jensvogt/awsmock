@@ -41,6 +41,10 @@ namespace AwsMock::Dto::SSM {
         return ParameterType::string;
     }
 
+    inline std::ostream &operator<<(std::ostream &os, ParameterType t) {
+        return os << ParameterTypeToString(t);
+    }
+
 }// namespace AwsMock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_MODEL_PARAMETER_TYPE_H

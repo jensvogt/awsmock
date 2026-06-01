@@ -201,7 +201,7 @@ namespace AwsMock::Database {
                 log_trace << "Key updated: " << key;
                 session.commit_transaction();
 
-                if (!mResult->empty()) {
+                if (mResult && !mResult->empty()) {
                     key.FromDocument(mResult->view());
                     return key;
                 }
@@ -258,17 +258,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _keyCollection.delete_many({});
-                session.commit_transaction();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }

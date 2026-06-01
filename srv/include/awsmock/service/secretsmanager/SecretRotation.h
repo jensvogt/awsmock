@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SECRETSMANAGER_ROTATION_H
-#define AWSMOCK_SERVICE_SECRETSMANAGER_ROTATION_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -26,11 +25,11 @@ namespace AwsMock::Service {
     };
 
     static std::map<TaskType, std::string> TaskTypeNames{
-        {createSecret, "createSecret"},
-        {setSecret, "setSecret"},
-        {testSecret, "testSecret"},
-        {finishSecret, "finishSecret"},
-        {unknown, "unknown"},
+            {createSecret, "createSecret"},
+            {setSecret, "setSecret"},
+            {testSecret, "testSecret"},
+            {finishSecret, "finishSecret"},
+            {unknown, "unknown"},
     };
 
     [[maybe_unused]] static std::string TaskTypeToString(const TaskType taskType) {
@@ -53,7 +52,8 @@ namespace AwsMock::Service {
      */
     class SecretRotation {
 
-    public:
+      public:
+
         /**
          * @brief Constructor.
          */
@@ -67,7 +67,8 @@ namespace AwsMock::Service {
          */
         void operator()(Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
@@ -123,6 +124,4 @@ namespace AwsMock::Service {
         system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const;
     };
 
-} // namespace AwsMock::Service
-
-#endif// AWSMOCK_SERVICE_SECRETSMANAGER_ROTATION_H
+}// namespace AwsMock::Service

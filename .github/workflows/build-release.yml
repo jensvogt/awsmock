@@ -43,7 +43,7 @@ jobs:
           echo "clean_tag=$CLEAN" >> $GITHUB_OUTPUT
 
   test:
-    name: Run Tests (core + db)
+    name: Run Tests
     runs-on: ubuntu-latest
     needs: [ release-please ]
     if: ${{ needs.release-please.outputs.prs_created == 'true' || needs.release-please.outputs.release_created == 'true' }}
@@ -79,10 +79,23 @@ jobs:
           sudo apt update
           sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev
 
+      - name: Create vcpkg binary cache dir
+        run: mkdir -p ${{ github.workspace }}/vcpkg-bincache
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-bincache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
+
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: false
 
       - name: Set g++-14 as default
         run: |
@@ -97,25 +110,27 @@ jobs:
       - name: Install magic database
         run: |
           sudo mkdir -p /usr/local/awsmock/etc
-          sudo cp /usr/share/misc/magic.mgc /usr/local/awsmock/etc/magic.mgc
+          sudo cp ${{ github.workspace }}/dist/etc/magic.mgc /usr/local/awsmock/etc/magic.mgc
 
       - name: Configure
         run: |
           mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
       - name: Build test binaries
-        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst --parallel
+        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst service_tst --parallel 2
 
       - name: Run core tests
-        run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure --timeout 120
 
       - name: Run memory DB tests
-        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_memory_tst --output-on-failure
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_memory_tst --output-on-failure --timeout 120
 
       - name: Run MongoDB tests
-        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_mongo_tst --output-on-failure
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_mongo_tst --output-on-failure --timeout 120
+
+      - name: Run Service tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R service_tst --output-on-failure --timeout 300
 
   build-windows-msi:
     name: Build & Package (Windows MSI)
@@ -142,6 +157,18 @@ jobs:
         with:
           arch: x64
 
+      - name: Create vcpkg binary cache dir
+        shell: bash
+        run: mkdir -p ${{ github.workspace }}/vcpkg-bincache
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-bincache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
+
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
@@ -154,7 +181,7 @@ jobs:
         run: |
           mkdir "${{ env.BUILD_DIR }}"
           cmake -B "${{ env.BUILD_DIR }}" -S . -DCMAKE_BUILD_TYPE=Release -DVCPKG_ROOT=${{ env.VCPKG_ROOT}} -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_DEFAULT_TRIPLET }} -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
-          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel 
+          cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel 2
 
       - name: Build (Frontend)
         shell: pwsh
@@ -212,6 +239,17 @@ jobs:
         shell: bash
         run: |
           brew install doxygen pandoc file autoconf autoconf-archive automake libtool
+
+      - name: Create vcpkg binary cache dir
+        run: mkdir -p ${{ github.workspace }}/vcpkg-bincache
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-bincache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -298,8 +336,8 @@ jobs:
           name: installer-macos
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.tgz
 
-  build-linux-deb:
-    name: Build & Package (Linux DEB)
+  build-linux:
+    name: Build & Package (Linux DEB + RPM)
     runs-on: ubuntu-latest
     needs: [ release-please, test ]
     if: ${{ needs.release-please.outputs.release_created == 'true' && needs.test.result == 'success' }}
@@ -309,8 +347,9 @@ jobs:
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
       VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
-      PACKAGE_DIR: "${{ github.workspace }}/package-deb"
-      BUILD_DIR: "${{ github.workspace }}/build-deb"
+      BUILD_DIR: "${{ github.workspace }}/build-linux"
+      PACKAGE_DIR_DEB: "${{ github.workspace }}/package-deb"
+      PACKAGE_DIR_RPM: "${{ github.workspace }}/package-rpm"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
       - name: Checkout
@@ -322,8 +361,19 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool g++-14
+          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool g++-14 rpm
           sudo gem install --no-document fpm
+
+      - name: Create vcpkg binary cache dir
+        run: mkdir -p ${{ github.workspace }}/vcpkg-bincache
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-bincache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -341,7 +391,7 @@ jobs:
         run: |
           mkdir ${{ env.BUILD_DIR }}
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
+          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel 2
 
       - name: Build (Frontend)
         shell: bash
@@ -353,39 +403,38 @@ jobs:
           npm install
           npm run build
 
-      - name: Prepare package structure
+      # ── DEB ────────────────────────────────────────────────────────────────
+
+      - name: Prepare DEB package structure
         run: |
-          mkdir -p ${{ env.PACKAGE_DIR }}/DEBIAN
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/log
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/s3
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sqs
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sns
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/lambda
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/application
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
-          mkdir -p ${{ env.PACKAGE_DIR }}/etc/systemd/system
-          mkdir -p ${{ env.PACKAGE_DIR }}/etc/ld.so.conf.d
-          mkdir -p ${{ env.PACKAGE_DIR }}/DEBIAN
-          
-          # Copy your app
-          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
-          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
-          cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
-          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
-          cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
-          
-          # Create control file
-          cat << EOF > ${{ env.PACKAGE_DIR }}/DEBIAN/control
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/DEBIAN
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/bin
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/etc
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/log
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/frontend
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/data/s3
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/data/sqs
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/data/sns
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/data/lambda
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/data/application
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/usr/local/share/man/man1
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/etc/systemd/system
+          mkdir -p ${{ env.PACKAGE_DIR_DEB }}/etc/ld.so.conf.d
+
+          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/bin/
+          cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/etc/awsmock.json
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/etc/ssh_host_key
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/etc/key.pem
+          cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR_DEB }}/etc/systemd/system
+          cp docs/man/*.1 ${{ env.PACKAGE_DIR_DEB }}/usr/local/share/man/man1
+          cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR_DEB }}/usr/local/awsmock/frontend
+
+          cat << EOF > ${{ env.PACKAGE_DIR_DEB }}/DEBIAN/control
           Package: awsmock
           Version: ${SEMVER}
           Section: utils
@@ -395,9 +444,8 @@ jobs:
           Description: AWSMock local AWS emulator service
           Depends: systemd
           EOF
-          
-          # Create postinst
-          cat << EOF > ${{ env.PACKAGE_DIR }}/DEBIAN/postinst
+
+          cat << EOF > ${{ env.PACKAGE_DIR_DEB }}/DEBIAN/postinst
           #!/bin/bash
           set -e
           systemctl daemon-reload
@@ -405,24 +453,22 @@ jobs:
           systemctl restart awsmock.service || true
           ldconfig
           EOF
-          
-          # Create postrm
-          cat << EOF > ${{ env.PACKAGE_DIR }}/DEBIAN/postrm
+
+          cat << EOF > ${{ env.PACKAGE_DIR_DEB }}/DEBIAN/postrm
           #!/bin/bash
           set -e
           systemctl stop awsmock.service || true
           systemctl disable awsmock.service || true
-          rm -rf /etc/systemd/system/awsmock.service
-          rm -rf ${{ env.PACKAGE_DIR }}/etc/ld.so.conf.d/awsmock.conf
+          rm -f /etc/systemd/system/awsmock.service
+          rm -f /etc/ld.so.conf.d/awsmock.conf
           ldconfig
           EOF
-          
-          # Create ldconfig config
-          cat << EOF > ${{ env.PACKAGE_DIR }}/etc/ld.so.conf.d/awsmock.conf
+
+          cat << EOF > ${{ env.PACKAGE_DIR_DEB }}/etc/ld.so.conf.d/awsmock.conf
           /usr/local/awsmock/lib
           EOF
-          
-          chmod 755 ${{ env.PACKAGE_DIR }}/DEBIAN/postinst $PACKAGE_DIR/DEBIAN/postrm
+
+          chmod 755 ${{ env.PACKAGE_DIR_DEB }}/DEBIAN/postinst ${{ env.PACKAGE_DIR_DEB }}/DEBIAN/postrm
 
       - name: Build DEB with fpm
         run: |
@@ -430,7 +476,7 @@ jobs:
           --version "${{ env.SEMVER }}" \
           --architecture amd64 \
           --package "${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb" \
-          ${{ env.PACKAGE_DIR }}/=/
+          ${{ env.PACKAGE_DIR_DEB }}/=/
 
       - name: Upload .deb
         uses: actions/upload-artifact@v7
@@ -439,95 +485,38 @@ jobs:
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
           overwrite: true
 
-  build-linux-rpm:
-    name: Build & Package (Linux RPM)
-    runs-on: ubuntu-latest
-    needs: [ release-please, test ]
-    if: ${{ needs.release-please.outputs.release_created == 'true' && needs.test.result == 'success' }}
-    env:
-      CXX: g++-14
-      CC: gcc-14
-      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
-      VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
-      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
-      PACKAGE_DIR: "${{ github.workspace }}/package-rpm"
-      BUILD_DIR: "${{ github.workspace }}/build-rpm"
-      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-      #X_VCPKG_ASSET_SOURCES: "clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.2.2
-        with:
-          fetch-depth: 0
-          submodules: recursive
+      # ── RPM ────────────────────────────────────────────────────────────────
 
-      - name: Install system dependencies
+      - name: Prepare RPM package structure
         run: |
-          sudo apt update
-          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool
-          sudo gem install --no-document fpm
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/bin
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/etc
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/log
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/frontend
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/data/s3
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/data/sqs
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/data/sns
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/data/lambda
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/data/application
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/usr/local/share/man/man1
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/etc/systemd/system
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/etc/ld.so.conf.d
+          mkdir -p ${{ env.PACKAGE_DIR_RPM }}/scripts
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/bin/
+          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/bin/
+          cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/etc/awsmock.json
+          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/etc/ssh_host_key
+          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/etc/ca.pem
+          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/etc/cert.pem
+          cp dist/etc/key.pem ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/etc/key.pem
+          cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR_RPM }}/etc/systemd/system
+          cp docs/man/*.1 ${{ env.PACKAGE_DIR_RPM }}/usr/local/share/man/man1
+          cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR_RPM }}/usr/local/awsmock/frontend
 
-      - name: Set g++-14 as default
-        run: |
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
-          sudo update-alternatives --set g++ /usr/bin/g++-14
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
-          sudo update-alternatives --set gcc /usr/bin/gcc-14
-
-      - name: Build (Backend)
-        run: |
-          mkdir ${{ env.BUILD_DIR }}
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
-          cmake --build ${{ env.BUILD_DIR }} --config Release --parallel
-
-      - name: Build (Frontend)
-        shell: bash
-        run: |
-          mkdir -p ${{ github.workspace }}/frontend
-          cd ${{ github.workspace }}/frontend
-          git clone https://github.com/jensvogt/awsmock-ui
-          cd awsmock-ui
-          npm install
-          npm run build
-
-      - name: Prepare package structure
-        run: |
-          mkdir -p ${{ env.PACKAGE_DIR }}/DEBIAN
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/log
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/s3
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sqs
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/sns
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/lambda
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/data/application
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
-          mkdir -p ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
-          mkdir -p ${{ env.PACKAGE_DIR }}/etc/systemd/system
-          mkdir -p ${{ env.PACKAGE_DIR }}/etc/ld.so.conf.d
-          mkdir -p ${{ env.PACKAGE_DIR }}/scripts
-          
-          # Copy app
-          cp ${{ env.BUILD_DIR }}/awsmockmgr ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awsmockctl ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp ${{ env.BUILD_DIR }}/awslocal ${{ env.PACKAGE_DIR }}/usr/local/awsmock/bin/
-          cp dist/etc/awsmock_linux.json ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/awsmock.json
-          cp dist/etc/magic.mgc ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/magic.mgc
-          cp dist/etc/ssh_host_key ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ssh_host_key
-          cp dist/etc/ca.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/ca.pem
-          cp dist/etc/cert.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/cert.pem
-          cp dist/etc/key.pem ${{ env.PACKAGE_DIR }}/usr/local/awsmock/etc/key.pem
-          cp dist/etc/systemd/system/awsmock.service ${{ env.PACKAGE_DIR }}/etc/systemd/system
-          cp docs/man/*.1 ${{ env.PACKAGE_DIR }}/usr/local/share/man/man1
-          cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* ${{ env.PACKAGE_DIR }}/usr/local/awsmock/frontend
-          
-          # Create postinstall
-          cat << EOF > ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh
+          cat << EOF > ${{ env.PACKAGE_DIR_RPM }}/scripts/postinstall.sh
           #!/bin/bash
           set -e
           systemctl daemon-reload
@@ -535,9 +524,8 @@ jobs:
           systemctl restart awsmock.service || true
           ldconfig
           EOF
-          
-          # Create postremove
-          cat << EOF > ${{ env.PACKAGE_DIR }}/scripts/postremove.sh
+
+          cat << EOF > ${{ env.PACKAGE_DIR_RPM }}/scripts/postremove.sh
           #!/bin/bash
           systemctl stop awsmock.service || true
           systemctl disable awsmock.service || true
@@ -546,15 +534,14 @@ jobs:
           rm -f /etc/ld.so.conf.d/awsmock.conf
           ldconfig
           EOF
-          
-          chmod +x ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh $PACKAGE_DIR/scripts/postremove.sh
-          
-          # Create ldconfig config
-          cat << EOF > ${{ env.PACKAGE_DIR }}/etc/ld.so.conf.d/awsmock.conf
+
+          chmod +x ${{ env.PACKAGE_DIR_RPM }}/scripts/postinstall.sh ${{ env.PACKAGE_DIR_RPM }}/scripts/postremove.sh
+
+          cat << EOF > ${{ env.PACKAGE_DIR_RPM }}/etc/ld.so.conf.d/awsmock.conf
           /usr/local/awsmock/lib
           EOF
 
-      - name: Build RPM using FPM
+      - name: Build RPM with fpm
         run: |
           fpm -s dir -t rpm \
           -n awsmock \
@@ -564,9 +551,9 @@ jobs:
           --vendor "AWSMock Project" \
           --license "Apache-2.0" \
           --prefix / \
-          --after-install ${{ env.PACKAGE_DIR }}/scripts/postinstall.sh \
-          --after-remove ${{ env.PACKAGE_DIR }}/scripts/postremove.sh \
-          ${{ env.PACKAGE_DIR }}/=/
+          --after-install ${{ env.PACKAGE_DIR_RPM }}/scripts/postinstall.sh \
+          --after-remove ${{ env.PACKAGE_DIR_RPM }}/scripts/postremove.sh \
+          ${{ env.PACKAGE_DIR_RPM }}/=/
 
       - name: Upload .rpm
         uses: actions/upload-artifact@v7
@@ -610,7 +597,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-linux-deb, build-linux-rpm, build-macos, build-windows-msi ]
+    needs: [ release-please, build-linux, build-macos, build-windows-msi ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:

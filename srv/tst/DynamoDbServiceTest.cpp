@@ -88,9 +88,13 @@ namespace AwsMock::Database {
     struct DynamoDbServiceFixture {
         DynamoDbServiceFixture() = default;
         ~DynamoDbServiceFixture() {
-            const Service::DynamoDbService _dynamoDbService;
-            const long deletedTables = _dynamoDbService.DeleteAllTables();
-            log_debug << "Tables deleted, count: " << deletedTables;
+            try {
+                const Service::DynamoDbService _dynamoDbService;
+                const long deletedTables = _dynamoDbService.DeleteAllTables();
+                log_debug << "Tables deleted, count: " << deletedTables;
+            } catch (const std::exception &exc) {
+                log_error << "DynamoDB fixture cleanup failed: " << exc.what();
+            }
         }
     };
 

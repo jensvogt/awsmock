@@ -144,18 +144,17 @@ int main(const int argc, char *argv[]) {
     // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
-                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::getVersion() << std::endl
+                  << "AwsMock awsmockctl v" << AwsMock::Core::Configuration::getVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
 
     // Read the configuration file.
-    AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
+    auto configFilePath = DEFAULT_CONFIG_FILE;
     if (vm.contains("config")) {
-        configuration.setFilePath(vm["config"].as<std::string>());
-    } else {
-        configuration.setFilePath(DEFAULT_CONFIG_FILE);
+        configFilePath = vm["config"].as<std::string>();
     }
+    AwsMock::Core::Configuration::instance().load(configFilePath);
 
     // Set the log level.
     if (vm.contains("loglevel")) {

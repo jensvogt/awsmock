@@ -38,10 +38,6 @@
 #define DEFAULT_LOG_LEVEL std::string("info")
 #ifdef _WIN32
 #include <awsmock/WindowsService.h>
-
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "Manager"};
-}
 #elif __APPLE__
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
@@ -49,6 +45,10 @@ namespace {
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
 #endif
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Manager"};
+}
 
 /**
  * Main routine.

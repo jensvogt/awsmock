@@ -41,7 +41,10 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::UPLOAD_APPLICATION: {
 
                     Dto::Apps::UploadApplicationCodeRequest serviceRequest = Dto::Apps::UploadApplicationCodeRequest::FromJson(clientCommand);
-                    _applicationService.UploadApplicationCode(serviceRequest);
+                    Core::Scheduler::instance().AddOneTimeTask("upload-application", [serviceRequest, _logger = _logger]() mutable {
+                        ApplicationService{}.UploadApplicationCode(serviceRequest);
+                        log_info << "Applications uploaded, region: " << serviceRequest.region;
+                    });
                     log_info << "Upload application code succeeded, name: " << serviceRequest.applicationName << ", version: " << serviceRequest.version;
                     return SendResponse(request, http::status::ok);
                 }
@@ -66,7 +69,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
 
                     Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("restart-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("restart-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.RebuildApplication(serviceRequest);
                         log_info << "Applications rebuild, region: " << serviceRequest.region;
                     });
@@ -76,7 +79,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::ENABLE_APPLICATION: {
 
                     Dto::Apps::EnableApplicationRequest serviceRequest = Dto::Apps::EnableApplicationRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("enable-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("enable-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.EnableApplication(serviceRequest);
                         log_info << "Application enabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
@@ -86,7 +89,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::ENABLE_ALL_APPLICATIONS: {
 
                     Dto::Apps::EnableAllApplicationsRequest serviceRequest = Dto::Apps::EnableAllApplicationsRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("enable-all-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("enable-all-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.EnableAllApplications(serviceRequest);
                         log_info << "Application enabled, region: " << serviceRequest.region;
                     });
@@ -96,7 +99,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::DISABLE_APPLICATION: {
 
                     Dto::Apps::DisableApplicationRequest serviceRequest = Dto::Apps::DisableApplicationRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("disable-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("disable-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.DisableApplication(serviceRequest);
                         log_info << "Application disabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
@@ -106,7 +109,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::DISABLE_ALL_APPLICATIONS: {
 
                     Dto::Apps::DisableAllApplicationsRequest serviceRequest = Dto::Apps::DisableAllApplicationsRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("disable-all-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("disable-all-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.DisableAllApplications(serviceRequest);
                         log_info << "Application disabled, region: " << serviceRequest.region;
                     });
@@ -116,7 +119,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::START_APPLICATION: {
 
                     Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("start-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("start-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.StartApplication(serviceRequest);
                         log_info << "Application started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
@@ -125,7 +128,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ApplicationCommandType::START_ALL_APPLICATIONS: {
 
-                    Core::Scheduler::instance().AddOneTimeTask("start-all-application", [this] {
+                    Core::Scheduler::instance().AddOneTimeTask("start-all-application", [_logger = _logger]() mutable {
                         const long count = ApplicationService{}.StartAllApplications();
                         log_info << "All applications started, count: " << count;
                     });
@@ -135,7 +138,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::RESTART_APPLICATION: {
 
                     Dto::Apps::RestartApplicationRequest serviceRequest = Dto::Apps::RestartApplicationRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("restart-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("restart-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.RestartApplication(serviceRequest);
                         log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
@@ -144,7 +147,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ApplicationCommandType::RESTART_ALL_APPLICATIONS: {
 
-                    Core::Scheduler::instance().AddOneTimeTask("restart-all-application", [this] {
+                    Core::Scheduler::instance().AddOneTimeTask("restart-all-application", [_logger = _logger]() mutable {
                         const long count = ApplicationService{}.RestartAllApplications();
                         log_info << "All applications restarted, count: " << count;
                     });
@@ -154,7 +157,7 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::STOP_APPLICATION: {
 
                     Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);
-                    Core::Scheduler::instance().AddOneTimeTask("stop-application", [this, serviceRequest] {
+                    Core::Scheduler::instance().AddOneTimeTask("stop-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.StopApplication(serviceRequest);
                         log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
@@ -163,7 +166,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ApplicationCommandType::STOP_ALL_APPLICATIONS: {
 
-                    Core::Scheduler::instance().AddOneTimeTask("stop-all-application", [this] {
+                    Core::Scheduler::instance().AddOneTimeTask("stop-all-application", [_logger = _logger]() mutable {
                         const long count = ApplicationService{}.StopAllApplications();
                         log_info << "All applications stopped, count: " << count;
                     });
@@ -200,4 +203,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

@@ -4,6 +4,8 @@
 
 #include <awsmock/service/apps/ApplicationServer.h>
 
+#include <set>
+
 namespace AwsMock::Service {
 
     ApplicationServer::ApplicationServer(Core::Scheduler &scheduler) : AbstractServer("application"), _module("application"), _scheduler(scheduler) {
@@ -19,7 +21,7 @@ namespace AwsMock::Service {
         // Start application background threads
         _scheduler.AddTask("application-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod /*, _watchdogPeriod*/);
+        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
@@ -139,8 +141,10 @@ namespace AwsMock::Service {
 
     void ApplicationServer::WatchdogApplications() const {
 
-        // Synchronize containers
+        // Synchronize containers — clears stale containerId for disappeared containers
         SyncContainers();
+
+        const auto stopped = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
 
         // Check status
         for (auto &application: _applicationDatabase.ListApplications()) {
@@ -159,20 +163,33 @@ namespace AwsMock::Service {
                 continue;
             }
 
+            // Container exists in Docker but is not running — restart it
+            if (!application.containerId.empty() && application.enabled && application.status == stopped) {
+                StartApplication(application);
+                log_info << "Application restarted (was stopped), name: " << application.name;
+                continue;
+            }
+
+            // Safety net: if image is gone from Docker, clear the stale DB record
             if (Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version); container.id.empty()) {
-                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application.status = stopped;
                 application.containerId = "";
                 application.containerName = "";
                 application = _applicationDatabase.UpdateApplication(application);
+                log_warning << "Application container not found, cleared, name: " << application.name;
             }
         }
     }
 
     void ApplicationServer::SyncContainers() const {
 
-        // Sync docker container with the database
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+
+        // Update DB records for containers that exist in Docker
+        std::set<std::string> activeContainerIds;
         for (const auto &container: ContainerService::instance().ListContainers().containerList) {
+
+            activeContainerIds.insert(container.id);
 
             std::string name{}, version{};
             if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ":"); parts.size() == 2) {
@@ -197,6 +214,17 @@ namespace AwsMock::Service {
                 log_debug << "Application updated, imageName: " << application.imageName;
             }
         }
+
+        // Clear stale containerId for applications whose containers are no longer in Docker
+        for (auto &application: _applicationDatabase.ListApplications()) {
+            if (!application.containerId.empty() && !activeContainerIds.contains(application.containerId)) {
+                application.containerId = "";
+                application.containerName = "";
+                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application = _applicationDatabase.UpdateApplication(application);
+                log_info << "Cleared stale container reference, application: " << application.name;
+            }
+        }
     }
 
     void ApplicationServer::Shutdown() {
@@ -212,4 +240,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

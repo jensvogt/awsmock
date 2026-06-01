@@ -3,17 +3,10 @@
 //
 
 #include <awsmock/service/kms/KMSService.h>
-#include <thread>
 
-#include "awsmock/core/scheduler/Scheduler.h"
+#include <awsmock/core/scheduler/Scheduler.h>
 
 namespace AwsMock::Service {
-
-    template<typename K>
-    void CallAsyncCreateKey(K &&k) {
-        boost::thread t(&KMSCreator::CreateKmsKey, k);
-        t.detach();
-    }
 
     KMSService::KMSService() : _kmsDatabase(Database::KMSDatabase::instance()) {
 
@@ -119,11 +112,14 @@ namespace AwsMock::Service {
             keyEntity = _kmsDatabase.CreateKey(keyEntity);
             log_trace << "KMS keyEntity created: " << keyEntity;
 
-            // Create keyEntity material asynchronously
-            Core::Scheduler::instance().AddOneTimeTask("create-kms-key", [this, keyId]() {
+            // Create key material asynchronously via scheduler; callers use WaitForAesKey/WaitForRsaKey to synchronize
+            const std::string taskName = "create-kms-key-" + keyId;
+            auto future = Core::Scheduler::instance().AddWaitableOneTimeTask(taskName, [keyId]() {
                 KMSCreator{}.CreateKmsKey(keyId);
-                log_debug << "KMS keyEntity creation started, keyId: " << keyId;
             });
+            std::lock_guard lock(_futureMutex);
+            _keyCreationFutures[keyId] = std::move(future);
+            log_debug << "KMS key creation started asynchronously, keyId: " << keyId;
 
             Dto::KMS::Key key;
             key.keyId = keyEntity.keyId;
@@ -142,28 +138,28 @@ namespace AwsMock::Service {
         }
     }
 
-    void KMSService::WaitForRsaKey(const std::string &keyId, const int maxSeconds) const {
-
-        int i = 0;
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            if (Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId); !key.rsaPrivateKey.empty() || i > maxSeconds * 2) {
-                break;
+    void KMSService::WaitForKey(const std::string &keyId, const int maxSeconds) const {
+        std::shared_future<void> future;
+        {
+            std::lock_guard lock(_futureMutex);
+            if (const auto it = _keyCreationFutures.find(keyId); it != _keyCreationFutures.end()) {
+                future = it->second;
+                _keyCreationFutures.erase(it);
             }
-            i++;
+        }
+        if (future.valid()) {
+            if (future.wait_for(std::chrono::seconds(maxSeconds)) == std::future_status::timeout) {
+                log_warning << "Timed out waiting for KMS key material, keyId: " << keyId;
+            }
         }
     }
 
-    void KMSService::WaitForAesKey(const std::string &keyId, const int maxSeconds) const {
+    void KMSService::WaitForRsaKey(const std::string &keyId, const int maxSeconds) const {
+        WaitForKey(keyId, maxSeconds);
+    }
 
-        int i = 0;
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            if (Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(keyId); !key.aes256Key.empty() || i > maxSeconds * 2) {
-                break;
-            }
-            i++;
-        }
+    void KMSService::WaitForAesKey(const std::string &keyId, const int maxSeconds) const {
+        WaitForKey(keyId, maxSeconds);
     }
 
     Dto::KMS::ScheduledKeyDeletionResponse KMSService::ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const {
@@ -510,4 +506,4 @@ namespace AwsMock::Service {
         return {};
     }
 
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

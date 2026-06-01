@@ -1,5 +1,60 @@
 # Changelog
 
+## [1.18.54](https://github.com/jensvogt/awsmock/compare/v1.18.53...v1.18.54) (2026-05-31)
+
+
+### Bug Fixes
+
+* application startup and bad_alloc error in periodic tasks ([a4fa7a7](https://github.com/jensvogt/awsmock/commit/a4fa7a7dfb13309f6129a3af1f67dba7455e940f))
+* logging channels ([25f9eb9](https://github.com/jensvogt/awsmock/commit/25f9eb9705ede63917324b39ea9ad8fdf385337d))
+* logging channels ([6167c07](https://github.com/jensvogt/awsmock/commit/6167c07cc1d0f563c2a53c56f7f8b06194d8687c))
+
+## [1.18.53](https://github.com/jensvogt/awsmock/compare/v1.18.52...v1.18.53) (2026-05-31)
+
+
+### Bug Fixes
+
+* KMS tests ([e3c8c46](https://github.com/jensvogt/awsmock/commit/e3c8c46f3407438570bed3efa37d1a98cf2fc7a6))
+* tests ([163b67f](https://github.com/jensvogt/awsmock/commit/163b67f648289eb04941b1944b4317e6b103244e))
+* tests ([660bbb9](https://github.com/jensvogt/awsmock/commit/660bbb911c067e53a5cdf91f3dd70245fa76757f))
+* tests ([b33c9d0](https://github.com/jensvogt/awsmock/commit/b33c9d01bc4ec970b7ef8af1aabffd9a70638f8c))
+* tests ([f60c5d3](https://github.com/jensvogt/awsmock/commit/f60c5d3374e2cdc318a09622fc9d0d709881ed7f))
+* tests ([0bc047a](https://github.com/jensvogt/awsmock/commit/0bc047a06dba996a5841f8174ec5c8b9e5d5f9f0))
+* tests ([841c8e5](https://github.com/jensvogt/awsmock/commit/841c8e5795ef1830eced0a2908a02bd6d5ac24ef))
+
+## [1.18.52](https://github.com/jensvogt/awsmock/compare/1.18.51...v1.18.52) (2026-05-30)
+
+
+### Bug Fixes
+
+* channel logging ([79c6262](https://github.com/jensvogt/awsmock/commit/79c626294b666aa351d3b145a8c91b253e516ab1))
+* cleanup of code ([f2dbbc8](https://github.com/jensvogt/awsmock/commit/f2dbbc889617ab0c19e15fece15c56d72d48ad7d))
+* core scheduler ([2edb234](https://github.com/jensvogt/awsmock/commit/2edb234737720d19a7284183705bb47625784db4))
+* tests ([5001a8e](https://github.com/jensvogt/awsmock/commit/5001a8ef8889fe40a555486ae3fea3d5ebb57b09))
+* tests ([96f792e](https://github.com/jensvogt/awsmock/commit/96f792e7fe9f42b25980d26dfd44b9de8051e1d7))
+
+## [1.18.51](https://github.com/jensvogt/awsmock/compare/v1.18.50...v1.18.51) (2026-05-28)
+
+
+### Bug Fixes
+
+* windows application support ([5833771](https://github.com/jensvogt/awsmock/commit/58337713e15d2966cbb007ca1e538aafc496cf73))
+
+## [1.18.50](https://github.com/jensvogt/awsmock/compare/v1.18.49...v1.18.50) (2026-05-28)
+
+
+### Bug Fixes
+
+* windows application support ([015842a](https://github.com/jensvogt/awsmock/commit/015842a637af52cf869104a006ba89248b09da70))
+
+## [1.18.49](https://github.com/jensvogt/awsmock/compare/v1.18.48...v1.18.49) (2026-05-27)
+
+
+### Bug Fixes
+
+* windows application support ([b328254](https://github.com/jensvogt/awsmock/commit/b328254ce0242fe2fe38555f01d8957206a9e176))
+* windows application support ([ae06621](https://github.com/jensvogt/awsmock/commit/ae06621c7a2b43f95d0c7b677acdda9736c9a17b))
+
 ## [1.18.48](https://github.com/jensvogt/awsmock/compare/v1.18.47...v1.18.48) (2026-05-27)
 
 

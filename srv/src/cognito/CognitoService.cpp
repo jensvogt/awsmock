@@ -21,8 +21,6 @@ namespace AwsMock::Service {
 
         Dto::Cognito::CreateUserPoolResponse response{};
         try {
-            // Create KMS SHA 256 key
-
             // Generate user pool ID
             const std::string userPoolId = Core::AwsUtils::CreateCognitoUserPoolId(request.region);
             Database::Entity::Cognito::UserPool userPool;
@@ -79,7 +77,7 @@ namespace AwsMock::Service {
         try {
             const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list count: " << userPools.size();
-            return Dto::Cognito::Mapper::map(request, userPools, request.maxResults);
+            return Dto::Cognito::Mapper::map(request, userPools, userPools.size());
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -320,7 +318,7 @@ namespace AwsMock::Service {
             std::string clientId = request.clientId;
             const auto it = std::ranges::find_if(userPool.userPoolClients,
                                                  [clientId](
-                                             const Database::Entity::Cognito::UserPoolClient &userPoolClient) {
+                                                         const Database::Entity::Cognito::UserPoolClient &userPoolClient) {
                                                      return userPoolClient.clientId == clientId;
                                                  });
 
@@ -331,18 +329,18 @@ namespace AwsMock::Service {
                 it->clientName = request.clientName;
                 if (request.idTokenValidity > 0) {
                     it->idTokenValidity = Dto::Cognito::Mapper::GetValidityInSeconds(
-                        request.idTokenValidity,
-                        request.tokenValidityUnits.idToken);
+                            request.idTokenValidity,
+                            request.tokenValidityUnits.idToken);
                 }
                 if (request.accessTokenValidity > 0) {
                     it->accessTokenValidity = Dto::Cognito::Mapper::GetValidityInSeconds(
-                        request.accessTokenValidity,
-                        request.tokenValidityUnits.accessToken);
+                            request.accessTokenValidity,
+                            request.tokenValidityUnits.accessToken);
                 }
                 if (request.refreshTokenValidity > 0) {
                     it->refreshTokenValidity = Dto::Cognito::Mapper::GetValidityInSeconds(
-                        request.refreshTokenValidity,
-                        request.tokenValidityUnits.refreshToken);
+                            request.refreshTokenValidity,
+                            request.tokenValidityUnits.refreshToken);
                 }
 
                 // Update database
@@ -374,7 +372,7 @@ namespace AwsMock::Service {
             if (count == 0) {
                 log_error << "User pool client does not exists, userPoolId: " << request.userPoolId << " clientId: " << request.clientId;
                 throw Core::ServiceException(
-                    "User pool client does not exists, userPoolId: " + request.userPoolId + " clientId: " + clientId);
+                        "User pool client does not exists, userPoolId: " + request.userPoolId + " clientId: " + clientId);
             }
             userPool = _database.UpdateUserPool(userPool);
             log_trace << "User pool client deleted, userPoolId: " + request.userPoolId << " clients: " << userPool.userPoolClients.size();
@@ -469,24 +467,24 @@ namespace AwsMock::Service {
         if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
             log_error << "User does not exists, userName: " << request.userName << " userPoolId: " << request.userPoolId;
             throw Core::ServiceException(
-                "User does not exists, userName: " + request.userName + " userPoolId: " + request.userPoolId);
+                    "User does not exists, userName: " + request.userName + " userPoolId: " + request.userPoolId);
         }
 
         if (!_database.GroupExists(request.region, request.groupName)) {
             log_error << "Group does not exist, groupName: " << request.groupName << " userPoolId: " << request.userPoolId;
             throw Core::ServiceException(
-                "Group does not exist, groupName: " + request.groupName + " userPoolId: " + request.userPoolId);
+                    "Group does not exist, groupName: " + request.groupName + " userPoolId: " + request.userPoolId);
         }
 
         try {
             Database::Entity::Cognito::User user = _database.GetUserByUserName(
-                request.region,
-                request.userPoolId,
-                request.userName);
+                    request.region,
+                    request.userPoolId,
+                    request.userName);
             Database::Entity::Cognito::Group group = _database.GetGroupByGroupName(
-                request.region,
-                request.userPoolId,
-                request.groupName);
+                    request.region,
+                    request.userPoolId,
+                    request.groupName);
 
             if (!user.HasGroup(request.userPoolId, request.groupName)) {
                 user.groups.emplace_back(group);
@@ -511,24 +509,24 @@ namespace AwsMock::Service {
         if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
             log_error << "User does not exists, userName: " << request.userName << " userPoolId: " << request.userPoolId;
             throw Core::ServiceException(
-                "User does not exists, userName: " + request.userName + " userPoolId: " + request.userPoolId);
+                    "User does not exists, userName: " + request.userName + " userPoolId: " + request.userPoolId);
         }
 
         if (!_database.GroupExists(request.region, request.groupName)) {
             log_error << "Group does not exist, groupName: " << request.groupName << " userPoolId: " << request.userPoolId;
             throw Core::ServiceException(
-                "Group does not exist, groupName: " + request.groupName + " userPoolId: " + request.userPoolId);
+                    "Group does not exist, groupName: " + request.groupName + " userPoolId: " + request.userPoolId);
         }
 
         try {
             Database::Entity::Cognito::User user = _database.GetUserByUserName(
-                request.region,
-                request.userPoolId,
-                request.userName);
+                    request.region,
+                    request.userPoolId,
+                    request.userName);
             Database::Entity::Cognito::Group group = _database.GetGroupByGroupName(
-                request.region,
-                request.userPoolId,
-                request.groupName);
+                    request.region,
+                    request.userPoolId,
+                    request.groupName);
 
             if (user.HasGroup(request.userPoolId, request.groupName)) {
                 std::string groupName = group.groupName;
@@ -599,9 +597,9 @@ namespace AwsMock::Service {
 
         try {
             const Database::Entity::Cognito::UserList users = _database.ListUsersInGroup(
-                request.region,
-                request.userPoolId,
-                request.groupName);
+                    request.region,
+                    request.userPoolId,
+                    request.groupName);
 
             return Dto::Cognito::Mapper::map(request, users);
         } catch (bsoncxx::exception &exc) {
@@ -626,9 +624,9 @@ namespace AwsMock::Service {
 
         try {
             Database::Entity::Cognito::User user = _database.GetUserByUserName(
-                request.region,
-                request.userPoolId,
-                request.userName);
+                    request.region,
+                    request.userPoolId,
+                    request.userName);
             user.enabled = true;
             user = _database.UpdateUser(user);
             log_trace << "User enabled, userName:  " << user.userName << " userPoolId: " << user.userPoolId;
@@ -787,16 +785,16 @@ namespace AwsMock::Service {
         if (_database.UserExists(request.region, request.userPoolId, request.userName)) {
             const Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByUserPoolId(request.userPoolId);
             Database::Entity::Cognito::User user = _database.GetUserByUserName(
-                request.region,
-                userPool.userPoolId,
-                request.userName);
+                    request.region,
+                    userPool.userPoolId,
+                    request.userName);
             user.userStatus = Database::Entity::Cognito::UserStatus::CONFIRMED;
             user = _database.UpdateUser(user);
             log_debug << "User confirmed, userName: " << user.userName;
         } else {
             log_error << "User does not exist, region: " << request.region << " userPoolId: " << request.userPoolId;
             throw Core::NotFoundException(
-                "User does not exist, region: " + request.region + " userPoolId: " + request.userPoolId);
+                    "User does not exist, region: " + request.region + " userPoolId: " + request.userPoolId);
         }
     }
 
@@ -875,17 +873,17 @@ namespace AwsMock::Service {
         response.challengeName = request.challengeName;
         response.requestId = request.requestId;
         response.authenticationResult.accessToken = Core::JwtUtils::CreateTokenHs256(
-            request.GetPasswordClaim_Signature(),
-            request.GetUserName(),
-            {});
+                request.GetPasswordClaim_Signature(),
+                request.GetUserName(),
+                {});
         response.authenticationResult.refreshToken = Core::JwtUtils::CreateTokenHs256(
-            request.GetPasswordClaim_Signature(),
-            request.GetUserName(),
-            {});
+                request.GetPasswordClaim_Signature(),
+                request.GetUserName(),
+                {});
         response.authenticationResult.idToken = Core::JwtUtils::CreateTokenHs256(
-            request.GetPasswordClaim_Signature(),
-            request.GetUserName(),
-            {});
+                request.GetPasswordClaim_Signature(),
+                request.GetUserName(),
+                {});
         response.session = request.session;
         return response;
     }
@@ -909,8 +907,8 @@ namespace AwsMock::Service {
         std::string saltStr = "BEB25379D1A8581EB5A727673A2441EE";
         BN_hex2bn(&salt, "BEB25379D1A8581EB5A727673A2441EE");
         BN_hex2bn(
-            &v,
-            "7E273DE8696FFC4F4E337D05B4B375BEB0DDE1569E8FA00A9886D8129BADA1F1822223CA1A605B530E379BA4729FDC59F105B4787E5186F5C671085A1447B52A48CF1970B4FB6F8400BBF4CEBFBB168152E08AB5EA53D15C1AFF87B2B9DA6E04E058AD51CC72BFC9033B564E26480D78E955A5E29E7AB245DB2BE315E2099AFB");
+                &v,
+                "7E273DE8696FFC4F4E337D05B4B375BEB0DDE1569E8FA00A9886D8129BADA1F1822223CA1A605B530E379BA4729FDC59F105B4787E5186F5C671085A1447B52A48CF1970B4FB6F8400BBF4CEBFBB168152E08AB5EA53D15C1AFF87B2B9DA6E04E058AD51CC72BFC9033B564E26480D78E955A5E29E7AB245DB2BE315E2099AFB");
         srpUtils.SetSaltAndV(salt, v);
         const BIGNUM *srpB = srpUtils.CalcB();
         //  BN_print_fp(stderr, srpB);
@@ -925,12 +923,11 @@ namespace AwsMock::Service {
         response.availableChallenges.emplace_back("PASSWORD_SRP");
         response.challengeName = "PASSWORD_VERIFIER_CHALLENGE";
         response.challengeParameters = {
-            {"SRP_B", srpBStr},
-            {"USERNAME", request.authParameters.at("USERNAME")},
-            {"SALT", saltStr},
-            {"USER_ID_FOR_SRP", request.authParameters.at("USERNAME")},
-            {"SECRET_BLOCK", Core::StringUtils::GenerateRandomString(40)}
-        };
+                {"SRP_B", srpBStr},
+                {"USERNAME", request.authParameters.at("USERNAME")},
+                {"SALT", saltStr},
+                {"USER_ID_FOR_SRP", request.authParameters.at("USERNAME")},
+                {"SECRET_BLOCK", Core::StringUtils::GenerateRandomString(40)}};
         return response;
     }
 
@@ -944,9 +941,8 @@ namespace AwsMock::Service {
         response.availableChallenges.emplace_back("PASSWORD");
         response.challengeName = "PASSWORD";
         response.challengeParameters = {
-            {"USERNAME", request.authParameters.at("USERNAME")},
-            {"PASSWORD", request.authParameters.at("PASSWORD")}
-        };
+                {"USERNAME", request.authParameters.at("USERNAME")},
+                {"PASSWORD", request.authParameters.at("PASSWORD")}};
         return response;
     }
-} // namespace AwsMock::Service
+}// namespace AwsMock::Service

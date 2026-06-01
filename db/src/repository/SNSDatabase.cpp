@@ -538,17 +538,13 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-            auto session = client->start_session();
 
             try {
-                session.start_transaction();
                 const auto result = _topicCollection.delete_many({});
-                session.commit_transaction();
                 log_debug << "All topics deleted, count: " << result->deleted_count();
                 deleted = result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
