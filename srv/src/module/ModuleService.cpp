@@ -4,18 +4,20 @@
 
 #include <awsmock/service/module/ModuleService.h>
 
+#include "awsmock/dto/module/GetLogLevelRequest.h"
+
 namespace AwsMock::Service {
 
-    Database::Entity::Module::ModuleList ModuleService::ListModules() const {
+    std::vector<Database::Entity::Module::Module> ModuleService::ListModules() const {
 
-        Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
+        std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.ListModules();
         log_debug << "Module list, count: " << modules.size();
         return modules;
     }
 
     Dto::Module::ListModuleNamesResponse ModuleService::ListModuleNames() const {
 
-        const Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
+        const std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.ListModules();
         log_debug << "Module list, count: " << modules.size();
         Dto::Module::ListModuleNamesResponse moduleNamesResponse;
         for (const auto &module: modules) {
@@ -410,9 +412,9 @@ namespace AwsMock::Service {
             } else if (m == "lambda") {
                 count += Database::LambdaDatabase::instance().DeleteAllLambdas();
             } else if (m == "cognito") {
-                Database::CognitoDatabase::instance().DeleteAllUsers();
-                Database::CognitoDatabase::instance().DeleteAllUserPools();
-                Database::CognitoDatabase::instance().DeleteAllGroups();
+                count += Database::CognitoDatabase::instance().DeleteAllUsers();
+                count += Database::CognitoDatabase::instance().DeleteAllUserPools();
+                count += Database::CognitoDatabase::instance().DeleteAllGroups();
             } else if (m == "dynamodb") {
                 count += Database::DynamoDbDatabase::instance().DeleteAllItems();
             } else if (m == "secretsmanager") {
@@ -487,5 +489,29 @@ namespace AwsMock::Service {
         ofs << response.ToJson();
         ofs.close();
         log_info << "Infrastructure exported, file: " << filename;
+    }
+
+    void ModuleService::setLogLevel(const Dto::Module::SetLogLevelRequest &request) const {
+        if (request.channel.empty()) {
+            _moduleDatabase.SetAllModulesLoglevel(request.level);
+            Core::LogStream::SetSeverity(request.level);
+            log_info << "Log level set, channel: all, level: " << request.level;
+        } else {
+            _moduleDatabase.SetModuleLoglevel(request.channel, request.level);
+            Core::LogStream::SetChannelSeverity(request.channel, request.level);
+            log_info << "Log level set, channel: " << request.channel << ", level: " << request.level;
+        }
+    }
+
+    Dto::Module::GetLogLevelResponse ModuleService::getLogLevels(const Dto::Module::GetLogLevelRequest &request) const {
+
+        Dto::Module::GetLogLevelResponse response;
+        for (std::vector<Database::Entity::Module::Module> modules = ListModules(); const auto module: modules) {
+            if (request.names.empty() || std::ranges::find(request.names, module.name) != request.names.end()) {
+                Dto::Module::LogLevel level = {.name = module.name, .level = module.logLevel};
+                response.logLevels.emplace_back(level);
+            }
+        }
+        return response;
     }
 } // namespace AwsMock::Service

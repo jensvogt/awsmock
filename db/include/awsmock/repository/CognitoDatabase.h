@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/11/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_COGNITO_DATABASE_H
-#define AWSMOCK_REPOSITORY_COGNITO_DATABASE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -29,12 +28,12 @@ namespace AwsMock::Database {
      */
     class CognitoDatabase : public DatabaseBase {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()) {};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()) {
+        };
 
         /**
          * @brief Singleton instance
@@ -164,9 +163,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing cognito user pools
          *
+         * @return number of user pools deleted
          * @throws DatabaseException
          */
-        void DeleteAllUserPools() const;
+        long DeleteAllUserPools() const;
 
         /**
          * @brief Check existence of cognito user
@@ -296,9 +296,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing cognito users
          *
+         * @return number of users deleted
          * @throws DatabaseException
          */
-        void DeleteAllUsers() const;
+        long DeleteAllUsers() const;
 
         /**
          * @brief Check existence of cognito group
@@ -385,8 +386,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] bool ClientIdExists(const std::string &region, const std::string &clientId) const;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
@@ -415,6 +415,4 @@ namespace AwsMock::Database {
         CognitoMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_COGNITO_DATABASE_H
+} // namespace AwsMock::Database

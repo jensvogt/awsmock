@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_COGNITO_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_COGNITO_MEMORYDB_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -33,8 +32,7 @@ namespace AwsMock::Database {
      */
     class CognitoMemoryDb {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -155,9 +153,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing cognito user pools
          *
+         * @return number of user pools deleted
          * @throws DatabaseException
          */
-        void DeleteAllUserPools();
+        long DeleteAllUserPools();
 
         /**
          * @brief Check existence of cognito user
@@ -265,9 +264,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing cognito users
          *
+         * @return number of users deleted
          * @throws DatabaseException
          */
-        void DeleteAllUsers();
+        long DeleteAllUsers();
 
         /**
          * @brief Check existence of cognito group
@@ -345,8 +345,7 @@ namespace AwsMock::Database {
          */
         bool ClientIdExists(const std::string &region, const std::string &clientId);
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
@@ -380,6 +379,4 @@ namespace AwsMock::Database {
         static boost::mutex _groupMutex;
     };
 
-}// namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_COGNITO_MEMORYDB_H
+} // namespace AwsMock::Database

@@ -2,8 +2,7 @@
 // Created by vogje01 on 10/22/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_MODULE_MODULE_H
-#define AWSMOCK_DB_ENTITY_MODULE_MODULE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -14,14 +13,6 @@
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::Module {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief AwsMock module entity
@@ -56,9 +47,20 @@ namespace AwsMock::Database::Entity::Module {
         int port = -1;
 
         /**
+         * @brief Logger channel
+         */
+        std::string logChannel;
+
+        /**
+         * @brief Logger log level
+         */
+        std::string logLevel;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
+
         /**
          * Last modification date
          */
@@ -77,33 +79,6 @@ namespace AwsMock::Database::Entity::Module {
          * @param mResult MongoDB document.
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @param os output stream
-         * @param module module entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Module &module);
     };
 
-    typedef std::vector<Module> ModuleList;
-
-}// namespace AwsMock::Database::Entity::Module
-
-#endif// AWSMOCK_DB_ENTITY_MODULE_MODULE_H
+} // namespace AwsMock::Database::Entity::Module

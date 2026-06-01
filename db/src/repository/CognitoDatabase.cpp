@@ -358,7 +358,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void CognitoDatabase::DeleteAllUserPools() const {
+    long CognitoDatabase::DeleteAllUserPools() const {
 
         if (HasDatabase()) {
 
@@ -369,16 +369,15 @@ namespace AwsMock::Database {
 
                 const auto result = _userPoolCollection.delete_many({});
                 log_debug << "All cognito user pools deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
-        } else {
-
-            _memoryDb.DeleteAllUserPools();
         }
+        return _memoryDb.DeleteAllUserPools();
     }
 
     bool CognitoDatabase::UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) const {
@@ -725,7 +724,7 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteUser(user);
     }
 
-    void CognitoDatabase::DeleteAllUsers() const {
+    long CognitoDatabase::DeleteAllUsers() const {
 
         if (HasDatabase()) {
 
@@ -736,16 +735,15 @@ namespace AwsMock::Database {
 
                 const auto result = _userCollection.delete_many({});
                 log_debug << "All cognito users deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
 
-        } else {
-
-            _memoryDb.DeleteAllUsers();
         }
+        return _memoryDb.DeleteAllUsers();
     }
 
     bool CognitoDatabase::GroupExists(const std::string &region, const std::string &groupName) const {
@@ -993,4 +991,4 @@ namespace AwsMock::Database {
         return _memoryDb.ClientIdExists(region, clientId);
     }
 
-}// namespace AwsMock::Database
+} // namespace AwsMock::Database

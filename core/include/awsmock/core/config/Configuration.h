@@ -362,6 +362,21 @@ namespace AwsMock::Core {
         }
 
         /**
+         * @brief Get a JSON array of objects as a vector of string maps.
+         *
+         * @par Example:
+         * @code
+         * // JSON: { "awsmock": { "channels": [{"name": "S3", "level": "info"}] } }
+         * auto channels = cfg.getArrayOfObjects("awsmock.channels");
+         * @endcode
+         *
+         * @param path dot-separated config path to the array
+         * @return vector of string key/value maps, one per array element
+         */
+        [[nodiscard]]
+        std::vector<std::map<std::string, std::string>> getArrayOfObjects(const std::string &path) const;
+
+        /**
          * @brief Serializes the current configuration state to a JSON-formatted string.
          *
          * This method converts the internal configuration data into a string
@@ -567,8 +582,6 @@ namespace AwsMock::Core {
         std::filesystem::path _filePath;
     };
 
-    // â”€â”€ extractValue specializations (inline in header) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
     template<>
     inline int Configuration::extractValue<int>(const boost::json::value &v, const std::string &path) {
         if (v.is_int64()) return static_cast<int>(v.get_int64());
@@ -617,7 +630,20 @@ namespace AwsMock::Core {
         throw std::runtime_error("Config key '" + path + "' is not a string");
     }
 
-    // â”€â”€ set specializations (inline in header) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    inline std::vector<std::map<std::string, std::string>> Configuration::getArrayOfObjects(const std::string &path) const {
+        const auto *node = resolvePath(path);
+        if (!node || !node->is_array()) return {};
+        std::vector<std::map<std::string, std::string>> result;
+        for (const auto &elem: node->get_array()) {
+            if (!elem.is_object()) continue;
+            std::map<std::string, std::string> obj;
+            for (const auto &kv: elem.get_object()) {
+                try { obj[std::string(kv.key())] = extractValue<std::string>(kv.value(), std::string(kv.key())); } catch (...) {}
+            }
+            result.push_back(std::move(obj));
+        }
+        return result;
+    }
 
     template<>
     inline void Configuration::set<int>(const std::string &p, const int v) {

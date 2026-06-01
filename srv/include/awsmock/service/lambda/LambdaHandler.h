@@ -34,15 +34,14 @@ namespace AwsMock::Service {
      */
     class LambdaHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc) {
             _moduleService = std::make_shared<ModuleService>();
             _lambdaService.sigLambdaCodeUpdated.connect(
-                    boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService)// This is the 'magic' that prevents crashes!
+                boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService)
             );
         }
 
@@ -90,8 +89,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
@@ -105,6 +103,6 @@ namespace AwsMock::Service {
         std::shared_ptr<ModuleService> _moduleService;
     };
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_HANDLER_H

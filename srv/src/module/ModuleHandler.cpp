@@ -41,7 +41,7 @@ namespace AwsMock::Service {
             }
             if (action == "list-modules") {
 
-                Database::Entity::Module::ModuleList modules = _moduleService.ListModules();
+                std::vector<Database::Entity::Module::Module> modules = _moduleService.ListModules();
                 std::string body = Dto::Module::Module::ToJson(modules);
                 return SendResponse(request, http::status::ok, body);
             }
@@ -61,15 +61,6 @@ namespace AwsMock::Service {
                 std::string json = moduleResponse.ToJson();
                 log_info << "Infrastructure send to client, size: " << json.length();
                 return SendResponse(request, http::status::ok, json);
-            }
-
-            if (action == "get-log-level") {
-
-                std::string currentLogLevel = Core::LogStream::GetSeverity();
-                log_info << "Current log level: '" << currentLogLevel << "'";
-
-                // Send response
-                return SendResponse(request, http::status::ok, currentLogLevel);
             }
 
             if (action == "ping") {
@@ -136,23 +127,28 @@ namespace AwsMock::Service {
 
             if (action == "set-log-level") {
 
-                if (const auto req = Dto::Module::SetLogLevelRequest::FromJson(payload); req.channel.empty()) {
-                    Core::LogStream::SetSeverity(req.level);
-                    log_info << "Log level set to '" << req.level << "'";
-                } else {
-                    Core::LogStream::SetChannelSeverity(req.channel, req.level);
-                    log_info << "Log level for channel '" << req.channel << "' set to '" << req.level << "'";
-                }
+                const auto moduleRequest = Dto::Module::SetLogLevelRequest::FromJson(payload);
+                _moduleService.setLogLevel(moduleRequest);
                 return SendResponse(request, http::status::ok);
+            }
+
+            if (action == "get-log-level") {
+
+                Dto::Module::GetLogLevelRequest moduleRequest = Dto::Module::GetLogLevelRequest::FromJson(payload);
+                Dto::Module::GetLogLevelResponse moduleResponse = _moduleService.getLogLevels(moduleRequest);
+                log_info << "Current log levels, size: " << moduleResponse.contentType.size();
+
+                // Send response
+                return SendResponse(request, http::status::ok, moduleResponse.ToJson());
             }
 
             if (action == "clean-objects") {
 
                 // Get clean modules request
                 if (Dto::Module::CleanInfrastructureRequest moduleRequest = Dto::Module::CleanInfrastructureRequest::FromJson(payload); moduleRequest.onlyObjects) {
-                    ModuleService{}.CleanObjects(moduleRequest);
+                    _moduleService.CleanObjects(moduleRequest);
                 } else {
-                    ModuleService{}.CleanInfrastructure(moduleRequest);
+                    _moduleService.CleanInfrastructure(moduleRequest);
                 }
                 return SendResponse(request, http::status::ok);
             }
@@ -167,4 +163,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service

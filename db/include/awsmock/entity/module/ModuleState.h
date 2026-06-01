@@ -2,8 +2,7 @@
 // Created by vogje01 on 10/22/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_MODULE_MODULE_STATUS_H
-#define AWSMOCK_DB_ENTITY_MODULE_MODULE_STATUS_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -25,11 +24,11 @@ namespace AwsMock::Database::Entity::Module {
     };
 
     static std::map<ModuleState, std::string> ModuleStateNames{
-            {ModuleState::STOPPED, "STOPPED"},
-            {ModuleState::STARTING, "STARTING"},
-            {ModuleState::RUNNING, "RUNNING"},
-            {ModuleState::SUSPENDED, "SUSPENDED"},
-            {ModuleState::UNKNOWN, "UNKNOWN"},
+        {ModuleState::STOPPED, "STOPPED"},
+        {ModuleState::STARTING, "STARTING"},
+        {ModuleState::RUNNING, "RUNNING"},
+        {ModuleState::SUSPENDED, "SUSPENDED"},
+        {ModuleState::UNKNOWN, "UNKNOWN"},
     };
 
     [[maybe_unused]] static std::string ModuleStateToString(ModuleState serviceStatus) {
@@ -52,9 +51,10 @@ namespace AwsMock::Database::Entity::Module {
     };
 
     static std::map<ModuleStatus, std::string> ModuleStatusNames{
-            {ModuleStatus::INACTIVE, "INACTIVE"},
-            {ModuleStatus::ACTIVE, "ACTIVE"},
-            {ModuleStatus::UNKNOWN, "UNKNOWN"}};
+        {ModuleStatus::INACTIVE, "INACTIVE"},
+        {ModuleStatus::ACTIVE, "ACTIVE"},
+        {ModuleStatus::UNKNOWN, "UNKNOWN"}
+    };
 
     [[maybe_unused]] static std::string ModuleStatusToString(ModuleStatus modulesStatus) {
         return ModuleStatusNames[modulesStatus];
@@ -69,6 +69,4 @@ namespace AwsMock::Database::Entity::Module {
         return ModuleStatus::UNKNOWN;
     }
 
-}// namespace AwsMock::Database::Entity::Module
-
-#endif// AWSMOCK_DB_ENTITY_MODULE_MODULE_STATUS_H
+} // namespace AwsMock::Database::Entity::Module

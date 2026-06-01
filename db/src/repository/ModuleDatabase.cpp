@@ -210,7 +210,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
                 const auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", module.name)), module.ToDocument(), opts);
-                log_trace << "Module updated: " << module.ToString();
+                log_trace << "Module updated: " << module.name;
 
                 if (mResult) {
                     module.FromDocument(mResult->view());
@@ -344,14 +344,14 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::Module::ModuleList ModuleDatabase::ListModules() const {
+    std::vector<Entity::Module::Module> ModuleDatabase::ListModules() const {
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
-            Entity::Module::ModuleList modulesList;
+            std::vector<Entity::Module::Module> modulesList;
             for (auto serviceCursor = _moduleCollection.find({}); auto service: serviceCursor) {
                 Entity::Module::Module result;
                 result.FromDocument(service);
@@ -361,6 +361,66 @@ namespace AwsMock::Database {
             return modulesList;
         }
         return _memoryDb.ListModules();
+    }
+
+    long ModuleDatabase::SetModuleLoglevel(const std::string &name, const std::string &level) {
+        if (HasDatabase()) {
+
+            try {
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+
+                const auto result = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("logLevel", level)))));
+                log_debug << "Module logLevel updated, name: " << name << " level: " << level;
+                return result ? result->modified_count() : 0;
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Set module loglevel failed, error: " << e.what();
+            }
+
+        }
+        return _memoryDb.SetModuleLoglevel(name, level);
+    }
+
+    long ModuleDatabase::SetAllModulesLoglevel(const std::string &level) {
+        if (HasDatabase()) {
+
+            try {
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+
+                const auto result = _moduleCollection.update_many(make_document(), make_document(kvp("$set", make_document(kvp("logLevel", level)))));
+                log_debug << "All modules updated, logLevel: " << level;
+                return result ? result->modified_count() : 0;
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Set all modules loglevel failed, error: " << e.what();
+            }
+
+        }
+        return _memoryDb.SetAllModulesLoglevel(level);
+    }
+
+    void ModuleDatabase::SetModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level) {
+
+        if (HasDatabase()) {
+
+            try {
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+                _moduleCollection.update_one(
+                        make_document(kvp("name", name)),
+                        make_document(kvp("$set", make_document(kvp("logChannel", channel), kvp("logLevel", level)))));
+                log_trace << "Module log channel/level updated, name: " << name << " channel: " << channel << " level: " << level;
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "Set module log channel/level failed, error: " << e.what();
+            }
+
+        } else {
+
+            _memoryDb.SetModuleLogChannelAndLevel(name, channel, level);
+        }
     }
 
     void ModuleDatabase::DeleteModule(const Entity::Module::Module &module) {

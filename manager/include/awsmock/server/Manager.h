@@ -63,6 +63,8 @@ namespace AwsMock::Manager {
          */
         void Initialize() const;
 
+        void InitializeLogging() const;
+
         /**
          * @brief Main processing loop.
          */
@@ -88,7 +90,7 @@ namespace AwsMock::Manager {
          * precedence. In the case of a directory, all files will be loaded in alphabetic order. So files names 01_xy, 02_xy will be imported
          * in that order.
          */
-        void AutoLoad();
+        void AutoLoad() const;
 
         /**
          * @brief Stops all currently running modules.

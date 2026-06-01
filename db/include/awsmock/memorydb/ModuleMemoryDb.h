@@ -147,7 +147,33 @@ namespace AwsMock::Database {
          * @return list of all modules
          */
         [[nodiscard]]
-        Entity::Module::ModuleList ListModules() const;
+        std::vector<Entity::Module::Module> ListModules() const;
+
+        /**
+         * @brief Updates the log level for a single module
+         *
+         * @param name name of the module
+         * @param level log level for the module
+         * @return number of modules updated
+         */
+        long SetModuleLoglevel(const std::string &name, const std::string &level);
+
+        /**
+         * @briwf Updates the log level for all modules.
+         *
+         * @param level log level for the modules
+         * @return number of updated modules
+         */
+        long SetAllModulesLoglevel(const std::string &level);
+
+        /**
+         * @brief Sets the log channel and log level for a single module.
+         *
+         * @param name module name
+         * @param channel log channel name
+         * @param level log level
+         */
+        void SetModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level);
 
         /**
          * @brief Deletes module

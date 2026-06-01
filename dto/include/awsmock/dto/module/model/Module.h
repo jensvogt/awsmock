@@ -68,7 +68,7 @@ namespace AwsMock::Dto::Module {
          * @param moduleList module entity list
          * @return JSON string
          */
-        static std::string ToJson(const Database::Entity::Module::ModuleList &moduleList);
+        static std::string ToJson(const std::vector<Database::Entity::Module::Module> &moduleList);
 
         /**
          * @brief Convert to JSON representation
@@ -77,6 +77,7 @@ namespace AwsMock::Dto::Module {
          * @return JSON string
          */
         typedef std::vector<Module> ModuleList;
+
         static std::string ToJson(const ModuleList &moduleList);
 
         /**
@@ -120,6 +121,6 @@ namespace AwsMock::Dto::Module {
         friend std::ostream &operator<<(std::ostream &os, const Module &m);
     };
 
-}// namespace AwsMock::Dto::Module
+} // namespace AwsMock::Dto::Module
 
 #endif// AWSMOCK_DTO_MODULE_MODULE_H

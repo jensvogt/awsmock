@@ -3,6 +3,9 @@
 
 #include <awsmock/controller/Controller.h>
 
+#include "awsmock/dto/module/GetLogLevelRequest.h"
+#include "awsmock/dto/module/GetLogLevelResponse.h"
+
 namespace AwsMock::Controller {
 
     AwsMockCtl::AwsMockCtl() {
@@ -38,8 +41,8 @@ namespace AwsMock::Controller {
         std::cout << "Applications: " << std::endl;
         for (const auto &application: _applications) {
             std::cout << "  " << std::setw(32) << std::left << application.name
-                      << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                      << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                    << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                    << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
         }
     }
 
@@ -47,8 +50,8 @@ namespace AwsMock::Controller {
         std::cout << "Lambdas: " << std::endl;
         for (const auto &lambda: _lambdas) {
             std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                      << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                      << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                    << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                    << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
         }
     }
 
@@ -67,20 +70,22 @@ namespace AwsMock::Controller {
                 break;
             }
 
-            case CommandType::GET_LOG_LEVEL:
-                GetLogLevel();
+            case CommandType::GET_LOG_LEVELS: {
+                const std::string channel = !_commands.empty() ? _commands[0] : std::string{};
+                GetLogLevel(channel);
                 break;
+            }
 
             case CommandType::STATUS: {
                 std::cout << "Applications: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                          << std::setw(10) << std::left << "Enabled"
-                          << std::setw(10) << std::left << "Status"
-                          << std::setw(12) << std::left << "Ports" << std::endl;
+                        << std::setw(10) << std::left << "Enabled"
+                        << std::setw(10) << std::left << "Status"
+                        << std::setw(12) << std::left << "Ports" << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
+                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
                     if (application.enabled) {
                         std::cout << std::setw(12) << std::left << (std::to_string(application.privatePort) + "->" + std::to_string(application.publicPort));
                     }
@@ -88,13 +93,13 @@ namespace AwsMock::Controller {
                 }
                 std::cout << "Lambdas: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                          << std::setw(10) << std::left << "Enabled"
-                          << std::setw(10) << std::left << "Status"
-                          << std::setw(12) << std::left << "Ports" << std::endl;
+                        << std::setw(10) << std::left << "Enabled"
+                        << std::setw(10) << std::left << "Status"
+                        << std::setw(12) << std::left << "Ports" << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
+                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
                     if (lambda.enabled) {
                         const std::vector<Dto::Lambda::InstanceCounter> instances = GetLambdaInstances(lambda);
                         std::string portStr = "8080->";
@@ -595,13 +600,19 @@ namespace AwsMock::Controller {
     }
 #endif
 
-    void AwsMockCtl::GetLogLevel() const {
-        const auto response = SendGetCommand("module", "get-log-level");
+    void AwsMockCtl::GetLogLevel(const std::string &moduleName) const {
+        Dto::Module::GetLogLevelRequest request;
+        if (!moduleName.empty()) {
+            request.names.emplace_back(moduleName);
+        }
+        const auto response = SendCommand("module", "get-log-level", request.ToJson());
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not get log level, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
-        std::cout << "Log level is: " << response.body << std::endl;
+        for (const auto &[name, level]: Dto::Module::GetLogLevelResponse::FromJson(response.body).logLevels) {
+            std::cout << "  " << std::setw(16) << std::left << "Module: " << std::setw(32) << name << level << std::endl;
+        }
     }
 
     void AwsMockCtl::SetLogLevel(const std::string &level, const std::string &channel) const {
@@ -840,4 +851,4 @@ namespace AwsMock::Controller {
     bool AwsMockCtl::VerifyChannel(const std::string &channel) {
         return std::ranges::find(validChannels.begin(), validChannels.end(), channel) != validChannels.end();
     }
-}// namespace AwsMock::Controller
+} // namespace AwsMock::Controller

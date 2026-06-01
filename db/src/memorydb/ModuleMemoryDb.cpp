@@ -11,15 +11,15 @@ namespace AwsMock::Database {
     bool ModuleMemoryDb::ModuleExists(const std::string &name) {
 
         return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
-                   return module.second.name == name;
-               }) != _modules.end();
+            return module.second.name == name;
+        }) != _modules.end();
     }
 
     bool ModuleMemoryDb::IsActive(const std::string &name) {
 
         return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
-                   return module.second.name == name && module.second.status == Entity::Module::ModuleStatus::ACTIVE;
-               }) != _modules.end();
+            return module.second.name == name && module.second.status == Entity::Module::ModuleStatus::ACTIVE;
+        }) != _modules.end();
     }
 
     Entity::Module::Module ModuleMemoryDb::GetModuleById(const std::string &oid) {
@@ -72,9 +72,9 @@ namespace AwsMock::Database {
         return GetModuleById(oid);
     }
 
-    Entity::Module::ModuleList ModuleMemoryDb::ListModules() const {
+    std::vector<Entity::Module::Module> ModuleMemoryDb::ListModules() const {
 
-        Entity::Module::ModuleList moduleList;
+        std::vector<Entity::Module::Module> moduleList;
         for (const auto &val: _modules | std::views::values) {
             moduleList.emplace_back(val);
         }
@@ -168,12 +168,58 @@ namespace AwsMock::Database {
         log_debug << "Module deleted, count: " << count;
     }
 
+    long ModuleMemoryDb::SetModuleLoglevel(const std::string &name, const std::string &level) {
+        boost::mutex::scoped_lock lock(_moduleMutex);
+
+        const auto it =
+                std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
+                    return module.second.name == name;
+                });
+
+        if (it == _modules.end()) {
+            log_error << "Set logLevel failed, module: " << name;
+            throw Core::DatabaseException("Set logLevel failed, module: " + name);
+        }
+
+        it->second.logLevel = level;
+        _modules[it->first] = it->second;
+        return 1;
+    }
+
+    long ModuleMemoryDb::SetAllModulesLoglevel(const std::string &level) {
+        boost::mutex::scoped_lock lock(_moduleMutex);
+
+        for (auto &module: _modules | std::views::values) {
+            module.logLevel = level;
+        }
+        log_debug << "All module logLevels updated, count: " << _modules.size();
+        return static_cast<long>(_modules.size());
+    }
+
     long ModuleMemoryDb::DeleteAllModules() {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
-        long count = _modules.size();
+        const long count = _modules.size();
         log_debug << "All modules deleted, count: " << _modules.size();
         _modules.clear();
         return count;
     }
-}// namespace AwsMock::Database
+
+    void ModuleMemoryDb::SetModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level) {
+        boost::mutex::scoped_lock lock(_moduleMutex);
+
+        const auto it =
+                std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
+                    return module.second.name == name;
+                });
+
+        if (it == _modules.end()) {
+            log_error << "Set logChannel/logLevel failed, module: " << name;
+            throw Core::DatabaseException("Set logChannel/logLevel failed, module: " + name);
+        }
+
+        it->second.logChannel = channel;
+        it->second.logLevel = level;
+        _modules[it->first] = it->second;
+    }
+} // namespace AwsMock::Database

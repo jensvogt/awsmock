@@ -14,7 +14,7 @@ namespace AwsMock::Core {
             throw CoreException("Config file not found: " + path.string());
         }
 
-        std::ifstream file(path);
+        const std::ifstream file(path);
         if (!file.is_open()) {
             log_error << "Cannot open config file: " << path.string();
             throw CoreException("Cannot open config file: " + path.string());
