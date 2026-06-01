@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.55](https://github.com/jensvogt/awsmock/compare/1.18.54...v1.18.55) (2026-06-01)
+
+
+### Bug Fixes
+
+* log channels ([5f706ee](https://github.com/jensvogt/awsmock/commit/5f706eee0444154168f13518f28191fe8c35d5e3))
+* windows installer download page ([6696aab](https://github.com/jensvogt/awsmock/commit/6696aab82c0675ca5af0db8c76a549498716cc2f))
+
 ## [1.18.54](https://github.com/jensvogt/awsmock/compare/v1.18.53...v1.18.54) (2026-05-31)
 
 
