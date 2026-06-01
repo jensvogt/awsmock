@@ -648,7 +648,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/windows/*.zip
             artifacts/windows/*.exe
             artifacts/macos/*.tgz
             artifacts/linux/*.deb
@@ -693,7 +692,7 @@ jobs:
           cd public
           echo '{ "downloads": [' > files.json
           first=true
-          for f in *.{zip,deb,rpm,tgz}; do
+          for f in *.{exe,deb,rpm,tgz}; do
             [ -f "$f" ] || continue
             if [ "$first" = true ]; then
               first=false
