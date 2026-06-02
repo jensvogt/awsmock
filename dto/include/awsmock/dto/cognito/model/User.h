@@ -13,7 +13,7 @@
 #include <awsmock/dto/cognito/model/Group.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
@@ -160,6 +160,6 @@ namespace AwsMock::Dto::Cognito {
 
     typedef std::vector<User> UserList;
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_USER_H

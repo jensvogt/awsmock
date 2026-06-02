@@ -16,7 +16,7 @@
 #include <awsmock/dto/container/model/CpuStat.h>
 #include <awsmock/dto/container/model/MemoryStat.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief Docker container statistics
@@ -78,7 +78,8 @@ namespace AwsMock::Dto::Docker {
          */
         CpuStat preCpuStats;
 
-    private:
+      private:
+
         friend ContainerStat tag_invoke(boost::json::value_to_tag<ContainerStat>, boost::json::value const &v) {
             ContainerStat r;
             r.containerId = Core::Json::GetStringValue(v, "id");
@@ -98,20 +99,20 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ContainerStat const &obj) {
             jv = {
-                {"id", obj.containerId},
-                {"name", obj.name},
-                {"os_type", obj.osType},
-                {"num_procs", obj.numProcs},
-                {"memory_stats", boost::json::value_from(obj.memoryStats)},
-                {"cpu_stats", boost::json::value_from(obj.cpuStats)},
-                {"precpu_stats", boost::json::value_from(obj.preCpuStats)},
-                {"read", Core::DateTimeUtils::ToISO8601(obj.read)},
-                {"preread", Core::DateTimeUtils::ToISO8601(obj.preRead)},
-                {"state", boost::json::value_from(obj.state)},
+                    {"id", obj.containerId},
+                    {"name", obj.name},
+                    {"os_type", obj.osType},
+                    {"num_procs", obj.numProcs},
+                    {"memory_stats", boost::json::value_from(obj.memoryStats)},
+                    {"cpu_stats", boost::json::value_from(obj.cpuStats)},
+                    {"precpu_stats", boost::json::value_from(obj.preCpuStats)},
+                    {"read", Core::DateTimeUtils::ToISO8601(obj.read)},
+                    {"preread", Core::DateTimeUtils::ToISO8601(obj.preRead)},
+                    {"state", boost::json::value_from(obj.state)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_CONTAINER_H

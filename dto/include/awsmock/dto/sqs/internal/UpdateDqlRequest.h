@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
     /**
      * @brief Update message request
      *
@@ -63,6 +63,6 @@ namespace AwsMock::Dto::SQS {
             };
         }
     };
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UPDATE_DQL_REQUEST_H

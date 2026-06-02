@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct PutObjectResponse final : Common::BaseCounter<PutObjectResponse> {
 
@@ -102,6 +102,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_CORE_DTO_PUT_OBJECT_RESPONSE_H

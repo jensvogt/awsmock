@@ -14,7 +14,7 @@
 
 #define DEFAULT_TABLE_LIMIT 100
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB list table request
@@ -52,6 +52,6 @@ namespace AwsMock::Dto::DynamoDb {
             }
         }
     };
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H

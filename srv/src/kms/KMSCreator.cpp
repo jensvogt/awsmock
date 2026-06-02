@@ -4,7 +4,7 @@
 
 #include <awsmock/service/kms/KMSCreator.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     void KMSCreator::CreateKmsKey(const std::string &keyId) const {
 
@@ -120,4 +120,4 @@ namespace AwsMock::Service {
         log_debug << "AES256 KMS key created, keyId: " << key.keyId;
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

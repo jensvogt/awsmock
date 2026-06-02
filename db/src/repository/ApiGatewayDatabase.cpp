@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/ApiGatewayDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     ApiGatewayDatabase::ApiGatewayDatabase() : _databaseName(GetDatabaseName()), _apiKeyCollectionName("apigateway_key"), _restApiCollectionName("apigateway_rest"), _memoryDb(ApiGatewayMemoryDb::instance()) {
     }
@@ -59,19 +59,15 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = apiKeyCollection.insert_one(key.ToDocument());
-                session.commit_transaction();
                 log_trace << "Key created, oid: " << result->inserted_id().get_oid().value.to_string();
                 key.oid = result->inserted_id().get_oid().value.to_string();
                 return key;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -85,7 +81,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
-            auto session = client->start_session();
 
             try {
                 std::vector<Entity::ApiGateway::ApiKey> apiKeyList;
@@ -116,7 +111,6 @@ namespace AwsMock::Database {
                 return apiKeyList;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -130,7 +124,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
-            auto session = client->start_session();
 
             try {
                 std::vector<Entity::ApiGateway::ApiKey> apiKeyList;
@@ -146,7 +139,6 @@ namespace AwsMock::Database {
                 }
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -161,7 +153,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection apiKeyCollection = (*client)[_databaseName][_apiKeyCollectionName];
-            auto session = client->start_session();
 
             try {
 
@@ -171,9 +162,7 @@ namespace AwsMock::Database {
                 document query = {};
                 query.append(kvp("id", key.id));
 
-                session.start_transaction();
                 const auto mResult = apiKeyCollection.find_one_and_update(query.extract(), key.ToDocument(), opts);
-                session.commit_transaction();
 
                 if (mResult) {
                     key.FromDocument(mResult->view());
@@ -183,7 +172,6 @@ namespace AwsMock::Database {
                 return {};
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -225,17 +213,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = apiKeyCollection.delete_one(make_document(kvp("id", id)));
-                session.commit_transaction();
                 log_trace << "Key deleted, count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -249,17 +233,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = apiKeyCollection.delete_many({});
-                session.commit_transaction();
                 log_trace << "Key deleted, count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -317,19 +297,15 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = restApiCollection.insert_one(restApi.ToDocument());
-                session.commit_transaction();
                 log_trace << "Key created, oid: " << result->inserted_id().get_oid().value.to_string();
                 restApi.oid = result->inserted_id().get_oid().value.to_string();
                 return restApi;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -346,7 +322,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
-            auto session = client->start_session();
 
             try {
                 std::vector<Entity::ApiGateway::ApiKey> apiKeyList;
@@ -379,7 +354,6 @@ namespace AwsMock::Database {
                 return apiKeyList;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -393,7 +367,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection restapiCollection = client->database(_databaseName)[_restApiCollectionName];
-            auto session = client->start_session();
 
             try {
                 std::vector<Entity::ApiGateway::RestApi> restApiList;
@@ -426,7 +399,6 @@ namespace AwsMock::Database {
                 return restApiList;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -434,4 +406,4 @@ namespace AwsMock::Database {
         return _memoryDb.ListRestApiCounters(prefix, pageSize, pageIndex, sortColumns);
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

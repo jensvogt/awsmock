@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGE_WAIT_TIME_H
 #define AWSMOCK_DB_ENTITY_SQS_MESSAGE_WAIT_TIME_H
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     /**
      * @brief Aggregate structure for the waiting time.
@@ -20,6 +20,6 @@ namespace AwsMock::Database::Entity::SQS {
         std::map<std::string, double> waitTime;
     };
 
-}// namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_WAIT_TIME_H

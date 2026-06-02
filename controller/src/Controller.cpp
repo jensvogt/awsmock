@@ -3,7 +3,7 @@
 
 #include <awsmock/controller/Controller.h>
 
-namespace AwsMock::Controller {
+namespace Awsmock::Controller {
 
     AwsMockCtl::AwsMockCtl() {
         _host = Core::Configuration::instance().get<std::string>("awsmock.gateway.http.host");
@@ -38,8 +38,8 @@ namespace AwsMock::Controller {
         std::cout << "Applications: " << std::endl;
         for (const auto &application: _applications) {
             std::cout << "  " << std::setw(32) << std::left << application.name
-                    << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                    << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                      << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                      << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
         }
     }
 
@@ -47,8 +47,8 @@ namespace AwsMock::Controller {
         std::cout << "Lambdas: " << std::endl;
         for (const auto &lambda: _lambdas) {
             std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                    << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                    << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                      << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                      << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
         }
     }
 
@@ -76,13 +76,13 @@ namespace AwsMock::Controller {
             case CommandType::STATUS: {
                 std::cout << "Applications: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                        << std::setw(10) << std::left << "Enabled"
-                        << std::setw(10) << std::left << "Status"
-                        << std::setw(12) << std::left << "Ports" << std::endl;
+                          << std::setw(10) << std::left << "Enabled"
+                          << std::setw(10) << std::left << "Status"
+                          << std::setw(12) << std::left << "Ports" << std::endl;
                 for (const auto &application: _applications) {
                     std::cout << "  " << std::setw(32) << std::left << application.name
-                            << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
+                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status);
                     if (application.enabled) {
                         std::cout << std::setw(12) << std::left << (std::to_string(application.privatePort) + "->" + std::to_string(application.publicPort));
                     }
@@ -90,13 +90,13 @@ namespace AwsMock::Controller {
                 }
                 std::cout << "Lambdas: " << std::endl;
                 std::cout << "  " << std::setw(32) << std::left << "Name"
-                        << std::setw(10) << std::left << "Enabled"
-                        << std::setw(10) << std::left << "Status"
-                        << std::setw(12) << std::left << "Ports" << std::endl;
+                          << std::setw(10) << std::left << "Enabled"
+                          << std::setw(10) << std::left << "Status"
+                          << std::setw(12) << std::left << "Ports" << std::endl;
                 for (const auto &lambda: _lambdas) {
                     std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                            << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                            << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
+                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state);
                     if (lambda.enabled) {
                         const std::vector<Dto::Lambda::InstanceCounter> instances = GetLambdaInstances(lambda);
                         std::string portStr = "8080->";
@@ -850,4 +850,4 @@ namespace AwsMock::Controller {
     bool AwsMockCtl::VerifyChannel(const std::string &channel) {
         return std::ranges::find(validChannels.begin(), validChannels.end(), channel) != validChannels.end();
     }
-} // namespace AwsMock::Controller
+}// namespace Awsmock::Controller

@@ -4,7 +4,7 @@
 
 #include <awsmock/service/container/ContainerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     thread_local std::shared_ptr<Core::DomainSocket> ContainerService::_domainSocket;
 
@@ -605,10 +605,10 @@ namespace AwsMock::Service {
 
         std::ofstream cfgOfs(Core::FileUtils::appendPath(codeDir, "config"));
         cfgOfs << "[default]\n"
-                << "region=" << region << "\n"
-                << "output=json\n";
+               << "region=" << region << "\n"
+               << "output=json\n";
 
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

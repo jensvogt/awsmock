@@ -24,7 +24,7 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/StringUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Substring comparison
@@ -65,7 +65,8 @@ namespace AwsMock::Core {
      */
     class DirUtils {
 
-    public:
+      public:
+
         /**
          * @brief Returns a thread safe temp directory name.
          *
@@ -192,7 +193,8 @@ namespace AwsMock::Core {
          */
         static void DeleteFilesInDirectory(const std::string &dirName);
 
-    private:
+      private:
+
         /**
          * @brief Extract the number from a file named: abc-nn
          *
@@ -202,4 +204,4 @@ namespace AwsMock::Core {
         static long ExtractNumber(const std::string &filename);
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

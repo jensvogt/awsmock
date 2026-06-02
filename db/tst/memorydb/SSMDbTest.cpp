@@ -20,7 +20,7 @@ namespace {
 #define TEST_DESCRIPTION "description"
 #define TEST_TIER "tier"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::SSM::Parameter CreateDefaultParameter(const std::string &region, const std::string &name, const std::string &value) {
         Entity::SSM::Parameter parameter;
@@ -151,4 +151,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/S3MemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex S3MemoryDb::_bucketMutex;
     boost::mutex S3MemoryDb::_objectMutex;
@@ -106,8 +106,8 @@ namespace AwsMock::Database {
 
     bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) const {
         return std::ranges::count_if(_objects, [bucket](const auto &object) {
-            return object.second.region == bucket.region && object.second.bucket == bucket.name;
-        }) > 0;
+                   return object.second.region == bucket.region && object.second.bucket == bucket.name;
+               }) > 0;
     }
 
     std::vector<Entity::S3::Object> S3MemoryDb::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) {
@@ -409,4 +409,4 @@ namespace AwsMock::Database {
         }
         log_debug << "All object counters updated, count: " << _buckets.size();
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -16,7 +16,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/BaseDto.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief S3 name type for the filter rules
@@ -102,6 +102,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_FILTER_RULE_H

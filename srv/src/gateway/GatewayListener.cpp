@@ -4,7 +4,7 @@
 
 #include <awsmock/service/gateway/GatewayListener.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     GatewayListener::GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(make_strand(ioc)) {
 
@@ -67,4 +67,4 @@ namespace AwsMock::Service {
         DoAccept();
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

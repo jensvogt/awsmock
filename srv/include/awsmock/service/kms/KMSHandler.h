@@ -11,7 +11,7 @@
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/kms/KMSService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace http = http;
     namespace ip = boost::asio::ip;
@@ -23,7 +23,8 @@ namespace AwsMock::Service {
      */
     class KMSHandler : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -41,7 +42,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
@@ -50,6 +52,6 @@ namespace AwsMock::Service {
         KMSService _kmsService;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_HANDLER_H

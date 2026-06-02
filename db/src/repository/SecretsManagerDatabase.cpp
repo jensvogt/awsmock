@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
@@ -169,20 +169,16 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto insert_one_result = _secretCollection.insert_one(secret.ToDocument());
-                session.commit_transaction();
                 log_trace << "Secret created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
 
                 secret.oid = insert_one_result->inserted_id().get_oid().value.to_string();
                 return secret;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -196,7 +192,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
-            auto session = client->start_session();
 
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
@@ -204,9 +199,7 @@ namespace AwsMock::Database {
 
             try {
 
-                session.start_transaction();
                 const auto mResult = _secretCollection.find_one_and_update(make_document(kvp("secretId", secret.secretId)), secret.ToDocument(), opts);
-                session.commit_transaction();
                 log_trace << "Secret updated: " << secret.ToString();
 
                 if (!mResult->empty()) {
@@ -217,7 +210,6 @@ namespace AwsMock::Database {
                 return {};
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -290,17 +282,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("region", secret.region), kvp("name", secret.name)));
-                session.commit_transaction();
                 log_debug << "Secret deleted, count: " << delete_many_result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -317,18 +305,14 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _secretCollection.delete_many({});
-                session.commit_transaction();
                 log_debug << "Secrets deleted, count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -336,4 +320,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllSecrets();
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/RedrivePolicy.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct QueueAttribute final : Common::BaseCounter<QueueAttribute> {
 
@@ -153,6 +153,6 @@ namespace AwsMock::Dto::SQS {
 
     typedef std::vector<QueueAttribute> QueueAttributeList;
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_QUEUE_ATTRIBUTE_H

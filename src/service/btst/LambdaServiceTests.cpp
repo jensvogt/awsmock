@@ -21,7 +21,7 @@
 #define QUALIFIER "latest"
 #define ZIP_FILE "data/lambda/java-basic-1.0-SNAPSHOT.jar"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     struct LambdaServiceTest : TestBase {
 
@@ -185,4 +185,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(0, functionCount);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

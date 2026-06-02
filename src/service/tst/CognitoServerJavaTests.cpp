@@ -24,7 +24,7 @@
 #define TEST_DOMAIN "test-domain"
 #define TEST_PORT 10100
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Tests the aws-sdk-java interface to the AwsMock system.
@@ -430,6 +430,6 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, userGroupList.size());
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_COGNITO_SERVERJAVATEST_H

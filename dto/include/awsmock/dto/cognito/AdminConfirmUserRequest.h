@@ -13,7 +13,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Confirm user request
@@ -58,14 +58,14 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> clientMetadata;
 
-    private:
+      private:
 
         friend AdminConfirmUserRequest tag_invoke(boost::json::value_to_tag<AdminConfirmUserRequest>, boost::json::value const &v) {
             AdminConfirmUserRequest r;
             r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
             r.userName = Core::Json::GetStringValue(v, "Username");
             if (Core::Json::AttributeExists(v, "ClientMetadata")) {
-                r.clientMetadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("ClientMetadata"));
+                r.clientMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("ClientMetadata"));
             }
             return r;
         }
@@ -82,6 +82,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_CONFIRM_USER_REQUEST_H

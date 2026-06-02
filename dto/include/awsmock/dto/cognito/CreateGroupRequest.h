@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Create a group request
@@ -85,6 +85,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_CREATE_GROUP_REQUEST_H

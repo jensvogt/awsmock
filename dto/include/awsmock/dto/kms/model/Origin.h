@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief KMS key origin
@@ -42,6 +42,6 @@ namespace AwsMock::Dto::KMS {
         return Origin::AWS_KMS;
     }
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_ORIGIN_H

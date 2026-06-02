@@ -17,7 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     using bsoncxx::to_json;
     using bsoncxx::view_or_value;
@@ -68,6 +68,6 @@ namespace AwsMock::Database::Entity::Lambda {
         friend std::ostream &operator<<(std::ostream &os, const EphemeralStorage &m);
     };
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif// AWSMOCK_ENTITY_LAMBDA_EPHEMERAL_STORAGE_H

@@ -15,7 +15,7 @@
 #include <awsmock/dto/s3/model/FilterRule.h>
 #include <awsmock/dto/s3/model/NotificationEvent.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief S3 notification configuration for a SQS queue.
@@ -111,6 +111,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_QUEUE_CONFIGURATION_H

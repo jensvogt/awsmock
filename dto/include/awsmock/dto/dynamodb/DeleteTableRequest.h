@@ -14,7 +14,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB delete table request
@@ -43,6 +43,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_DELETE_TABLE_REQUEST_H

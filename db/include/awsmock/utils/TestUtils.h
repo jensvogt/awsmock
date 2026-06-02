@@ -13,7 +13,7 @@
 #include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     class TestUtils {
 
@@ -30,6 +30,6 @@ namespace AwsMock::Database {
         static std::vector<std::string> _modules;
     };
 
-}//namespace AwsMock::Database
+}//namespace Awsmock::Database
 
 #endif// AWSMOCK_DB_TEST_UTILS_H

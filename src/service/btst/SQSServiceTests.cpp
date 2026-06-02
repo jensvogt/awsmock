@@ -26,7 +26,7 @@ namespace {
 #define EMPTY_MD5 "d41d8cd98f00b204e9800998ecf8427e"
 #define OWNER "test-owner"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Test the SQS service layer
@@ -443,4 +443,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL("e555c73571247ca6f0c0078e86da8c96", md5sum);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

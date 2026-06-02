@@ -19,7 +19,7 @@
 
 // AwsMock includes
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     enum {
         M_FROM_K,
@@ -32,7 +32,8 @@ namespace AwsMock::Core {
 
     class SrpUtils {
 
-    public:
+      public:
+
         explicit SrpUtils(int nMFrom = M_FROM_K);
 
         ~SrpUtils();
@@ -55,7 +56,8 @@ namespace AwsMock::Core {
          */
         bool VerifyA(const std::string &srpAStr);
 
-    private:
+      private:
+
         // Common
         // non-const method
         const BIGNUM *CalcM1();
@@ -151,4 +153,4 @@ namespace AwsMock::Core {
         m_nMFrom = nMFrom;
     }
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

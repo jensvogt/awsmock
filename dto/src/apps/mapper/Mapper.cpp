@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/apps/mapper/Mapper.h>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
     Application Mapper::map(const Database::Entity::Apps::Application &applicationEntity) {
         Application applicationDto;
         applicationDto.region = applicationEntity.region;
@@ -73,4 +73,4 @@ namespace AwsMock::Dto::Apps {
         }
         return applicationEntities;
     }
-} // namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps

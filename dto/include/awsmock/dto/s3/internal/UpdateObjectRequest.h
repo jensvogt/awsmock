@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct UpdateObjectRequest final : Common::BaseCounter<UpdateObjectRequest> {
 
@@ -61,6 +61,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_UPDATE_OBJECT_REQUEST_H

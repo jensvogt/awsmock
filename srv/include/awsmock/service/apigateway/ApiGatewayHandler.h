@@ -13,7 +13,7 @@
 #include <awsmock/service/apigateway/ApiGatewayService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief API gateway HTTP handler
@@ -72,4 +72,4 @@ namespace AwsMock::Service {
         ApiGatewayService _apiGatewayService;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

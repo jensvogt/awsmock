@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/sns/model/MessageCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListMessageCountersResponse final : Common::BaseCounter<ListMessageCountersResponse> {
 
@@ -25,7 +25,7 @@ namespace AwsMock::Dto::SNS {
          */
         long total = 0;
 
-    private:
+      private:
 
         friend ListMessageCountersResponse tag_invoke(boost::json::value_to_tag<ListMessageCountersResponse>, boost::json::value const &v) {
             ListMessageCountersResponse r;
@@ -33,7 +33,7 @@ namespace AwsMock::Dto::SNS {
             r.user = v.at("user").as_string();
             r.requestId = v.at("requestId").as_string();
             r.total = static_cast<long>(v.at("total").as_int64());
-            r.messages = boost::json::value_to<std::vector<MessageCounter> >(v.at("messages"));
+            r.messages = boost::json::value_to<std::vector<MessageCounter>>(v.at("messages"));
             return r;
         }
 
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_MESSAGE_COUNTERS_RESPONSE_H

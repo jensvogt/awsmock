@@ -4,7 +4,7 @@
 
 #include <awsmock/core/NumberUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string NumberUtils::ToKilobytesStr(long value) {
         return std::to_string(ToKilobytes(value)) + "k";
@@ -47,4 +47,4 @@ namespace AwsMock::Core {
         return -1.0;
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

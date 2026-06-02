@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/BucketCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct ListBucketCounterResponse final : Common::BaseCounter<ListBucketCounterResponse> {
 
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_LIST_BUCKET_COUNTERS_RESPONSE_H

@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/Protocol.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct ProtocolCounter final : Common::BaseCounter<ProtocolCounter> {
 
@@ -101,6 +101,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_LIST_PROTOCOL_COUNTERS_RESPONSE_H

@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     /**
      * @brief Returns a single API key
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::ApiGateway {
         }
     };
 
-}// namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway
 
 #endif// AWSMOCK_DTO_API_GATEWAY_GET_API_KEY_COUNTER_REQUEST_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/ApplicationDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {
     }
@@ -40,19 +40,15 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = applicationCollection.insert_one(application.ToDocument());
-                session.commit_transaction();
                 log_trace << "Application created, oid: " << result->inserted_id().get_oid().value.to_string();
                 application.oid = result->inserted_id().get_oid().value.to_string();
                 return application;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -189,13 +185,10 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto mResult = applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts);
-                session.commit_transaction();
 
                 if (mResult) {
                     log_trace << "Application updated: " << application;
@@ -205,7 +198,6 @@ namespace AwsMock::Database {
                 return {};
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -225,8 +217,8 @@ namespace AwsMock::Database {
                 applicationCollection.update_one(
                         make_document(kvp("region", region), kvp("name", name)),
                         make_document(kvp("$set", make_document(
-                                              kvp("enabled", enabled),
-                                              kvp("modified", bsoncxx::types::b_date(system_clock::now()))))));
+                                                          kvp("enabled", enabled),
+                                                          kvp("modified", bsoncxx::types::b_date(system_clock::now()))))));
                 log_debug << "Application enabled flag set, region: " << region << ", name: " << name << ", enabled: " << enabled;
 
             } catch (const mongocxx::exception &exc) {
@@ -244,19 +236,15 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            auto session = client->start_session();
+            mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
 
             try {
 
-                session.start_transaction();
-                mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
                 const auto result = applicationCollection.delete_many(make_document(kvp("region", region), kvp("name", name)));
-                session.commit_transaction();
                 log_trace << "Application deleted: " << result.value().deleted_count();
                 return result.value().deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -271,18 +259,14 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _groupCollection = client->database(_databaseName)[_applicationCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _groupCollection.delete_many({});
-                log_debug << "All groups deleted, count: " << result->deleted_count();
-                session.commit_transaction();
+                log_debug << "All applications deleted, count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -290,4 +274,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllApplications();
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

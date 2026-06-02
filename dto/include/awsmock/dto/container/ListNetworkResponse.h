@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/container/model/Network.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief List networks response
@@ -43,6 +43,6 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_LIST_NETWORK_RESPONSE_H

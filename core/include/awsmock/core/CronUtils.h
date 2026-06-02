@@ -14,7 +14,7 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     using std::chrono::system_clock;
 
@@ -54,4 +54,4 @@ namespace AwsMock::Core {
         static long GetNextExecutionTimeSeconds(const std::string &cron);
     };
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

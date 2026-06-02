@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct DeleteMessageRequest final : Common::BaseCounter<DeleteMessageRequest> {
 
@@ -45,6 +45,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_DELETE_MESSAGE_REQUEST_H

@@ -7,7 +7,7 @@
 
 #include "awsmock/dto/monitoring/Counter.h"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().get<bool>("awsmock.monitoring.smooth")) {
         Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> &values) {
@@ -105,7 +105,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
-            auto session = client->start_session();
 
             try {
 
@@ -126,15 +125,12 @@ namespace AwsMock::Database {
 
                 // Execute bulk update
                 if (!documents.empty()) {
-                    session.start_transaction();
                     monitoringCollection.insert_many(documents);
-                    session.commit_transaction();
                 }
                 log_debug << "Imported monitoring values: " << documents.size();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
-                session.abort_transaction();
                 throw Core::DatabaseException(e.what());
             }
         }
@@ -146,19 +142,15 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
-            auto session = client->start_session();
 
             try {
                 // Find and delete counters
-                session.start_transaction();
                 const auto retention = Core::DateTimeUtils::UtcDateTimeNow() - std::chrono::days(retentionPeriod);
                 const auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
                 log_debug << "Counters deleted, count: " << mResult.value().deleted_count();
-                session.commit_transaction();
                 return mResult.value().deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -167,4 +159,4 @@ namespace AwsMock::Database {
         return 0;
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

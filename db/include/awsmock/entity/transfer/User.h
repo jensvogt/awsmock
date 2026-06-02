@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Database::Entity::Transfer {
+namespace Awsmock::Database::Entity::Transfer {
 
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
@@ -84,6 +84,6 @@ namespace AwsMock::Database::Entity::Transfer {
         friend std::ostream &operator<<(std::ostream &os, const User &m);
     };
 
-}// namespace AwsMock::Database::Entity::Transfer
+}// namespace Awsmock::Database::Entity::Transfer
 
 #endif// AWSMOCK_DB_ENTITY_USER_H

@@ -21,7 +21,7 @@
 #include <awsmock/core/CronUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Singleton scheduler that manages periodic, cron, and one-time tasks.
@@ -30,7 +30,8 @@ namespace AwsMock::Core {
      */
     class Scheduler : boost::noncopyable {
 
-    public:
+      public:
+
         /**
          * @brief Task handler function type
          */
@@ -109,7 +110,8 @@ namespace AwsMock::Core {
          */
         void Shutdown(const std::string &name);
 
-    private:
+      private:
+
         // ---- Periodic / one-time task entry ----
         struct PeriodicEntry : boost::noncopyable {
             PeriodicEntry(boost::asio::io_context &ioc, std::string name, long interval, handler_fn task, long delay);
@@ -150,4 +152,4 @@ namespace AwsMock::Core {
         std::map<std::string, std::unique_ptr<CronEntry>> _cronTasks;
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

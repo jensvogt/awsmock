@@ -12,7 +12,7 @@
 #include <awsmock/dto/cognito/model/Group.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Create group response
@@ -59,6 +59,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_CREATE_GROUP_RESPONSE_H

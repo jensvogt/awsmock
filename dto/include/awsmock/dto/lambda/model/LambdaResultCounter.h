@@ -18,7 +18,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/entity/lambda/Instance.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief AWS Lambda result counter DTO.
@@ -137,6 +137,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_RESULT_COUNTER_H

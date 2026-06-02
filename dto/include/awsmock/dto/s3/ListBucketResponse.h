@@ -18,7 +18,7 @@
 #include <awsmock/dto/s3/model/Owner.h>
 #include <awsmock/entity/s3/Object.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct ListBucketResponse final : Common::BaseCounter<ListBucketResponse> {
 
@@ -159,6 +159,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_LIST_BUCKET_RESPONSE_H

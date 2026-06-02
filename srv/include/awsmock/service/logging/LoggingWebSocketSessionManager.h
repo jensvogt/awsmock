@@ -22,9 +22,9 @@ namespace websocket = beast::websocket;
 namespace net = boost::asio;
 using tcp = boost::asio::ip::tcp;
 
-namespace AwsMock::Service::Logging {
+namespace Awsmock::Service::Logging {
 
 
-}// namespace AwsMock::Service::Logging
+}// namespace Awsmock::Service::Logging
 
 #endif//AWSMOCK_LOGGING_WEB_SOCKET_SESSION_MANAGER_H

@@ -12,7 +12,7 @@
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct CreateMultipartUploadResult final : Common::BaseCounter<CreateMultipartUploadResult> {
 
@@ -67,6 +67,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_CREATE_MULTIPART_UPLOAD_RESULT_H

@@ -10,7 +10,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     /**
      * @brief Delete API gateway key request
@@ -24,7 +24,8 @@ namespace AwsMock::Dto::ApiGateway {
          */
         std::string apiKey;
 
-    private:
+      private:
+
         friend DeleteApiKeyRequest tag_invoke(boost::json::value_to_tag<DeleteApiKeyRequest>, boost::json::value const &v) {
             DeleteApiKeyRequest r;
             r.apiKey = Core::Json::GetStringValue(v, "apiKey");
@@ -33,12 +34,12 @@ namespace AwsMock::Dto::ApiGateway {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteApiKeyRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"apiKey", obj.apiKey},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"apiKey", obj.apiKey},
             };
         }
     };
 
-} // namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway

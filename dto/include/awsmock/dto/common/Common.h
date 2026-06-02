@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 
-namespace AwsMock::Dto {
+namespace Awsmock::Dto {
 
     /**
      * @brief Common DTO
@@ -37,6 +37,6 @@ namespace AwsMock::Dto {
         std::string requestId = Core::StringUtils::CreateRandomUuid();
     };
 
-}// namespace AwsMock::Dto
+}// namespace Awsmock::Dto
 
 #endif// AWSMOCK_DTO_COMMON_COMMON_H

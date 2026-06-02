@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct ListServerCountersRequest final : Common::BaseCounter<ListServerCountersRequest> {
 
@@ -62,6 +62,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_LIST_SERVER_COUNTERS_REQUEST_H

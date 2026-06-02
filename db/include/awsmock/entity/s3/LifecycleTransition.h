@@ -10,7 +10,7 @@
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/s3/StorageClass.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief Filter rule for the S3 bucket notification to SQS queues
@@ -62,6 +62,6 @@ namespace AwsMock::Database::Entity::S3 {
         static LifecycleTransition FromDocument(const view &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_LIFECYCLE_TRANSITION_H

@@ -23,7 +23,7 @@
 #include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     using namespace boost::filesystem;
 
@@ -34,13 +34,15 @@ namespace AwsMock::Service {
      */
     class S3Server final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit S3Server(Core::Scheduler &scheduler);
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
         /**
@@ -123,6 +125,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVER_H

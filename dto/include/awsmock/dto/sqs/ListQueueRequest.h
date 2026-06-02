@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief List SQS queues request
@@ -67,6 +67,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_QUEUES_REQUEST_H

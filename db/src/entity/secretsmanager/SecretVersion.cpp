@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/secretsmanager/SecretVersion.h>
 
-namespace AwsMock::Database::Entity::SecretsManager {
+namespace Awsmock::Database::Entity::SecretsManager {
 
     view_or_value<view, value> SecretVersion::ToDocument() const {
 
@@ -44,4 +44,4 @@ namespace AwsMock::Database::Entity::SecretsManager {
         }
     }
 
-}// namespace AwsMock::Database::Entity::SecretsManager
+}// namespace Awsmock::Database::Entity::SecretsManager

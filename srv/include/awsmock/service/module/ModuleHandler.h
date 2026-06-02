@@ -15,7 +15,7 @@
 #include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/transfer/TransferService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace http = boost::beast::http;
 
@@ -26,7 +26,8 @@ namespace AwsMock::Service {
      */
     class ModuleHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Manager HTTP server
          */
@@ -57,7 +58,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
@@ -66,4 +68,4 @@ namespace AwsMock::Service {
         ModuleService _moduleService;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

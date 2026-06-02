@@ -44,7 +44,7 @@ using bsoncxx::document::value;
 using bsoncxx::document::view;
 using std::chrono::system_clock;
 
-namespace AwsMock::Core::Bson {
+namespace Awsmock::Core::Bson {
 
     inline bool FindBsonObject(const view &value, const std::string &name) {
         return value.find(name) != value.end();
@@ -120,7 +120,7 @@ namespace AwsMock::Core::Bson {
         if (FindBsonObject(viewDocument.value(), name)) {
             std::map<std::string, std::string> valueMap;
             for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element
-                 &tagElement: tagsView) {
+                                                                                                &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 valueMap.emplace(key, value);
@@ -466,4 +466,4 @@ namespace AwsMock::Core::Bson {
         }
     };
 
-} // namespace AwsMock::Core::Bson
+}// namespace Awsmock::Core::Bson

@@ -12,7 +12,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief Describe parameter request
@@ -60,6 +60,6 @@ namespace AwsMock::Dto::SSM {
         }
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_DESCRIBE_PARAMETERS_REQUEST_H

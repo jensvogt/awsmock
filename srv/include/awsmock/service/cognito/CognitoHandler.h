@@ -14,7 +14,7 @@
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -26,7 +26,8 @@ namespace AwsMock::Service {
      */
     class CognitoHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -44,7 +45,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
@@ -68,6 +70,6 @@ namespace AwsMock::Service {
         static const std::map<std::string, std::string> headers;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_COGNITO_HANDLER_H

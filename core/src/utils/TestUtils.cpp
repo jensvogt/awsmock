@@ -4,7 +4,7 @@
 
 #include <awsmock/core/TestUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     void TestUtils::CreateTestConfigurationFile(const bool withDatabase) {
 
@@ -116,4 +116,4 @@ namespace AwsMock::Core {
         return output;
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

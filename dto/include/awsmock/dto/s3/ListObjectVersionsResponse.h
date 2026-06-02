@@ -16,7 +16,7 @@
 #include <awsmock/dto/s3/model/ObjectVersion.h>
 #include <awsmock/dto/s3/model/Owner.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief List S3 object version response
@@ -99,7 +99,7 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point lastModified;
 
-    private:
+      private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
@@ -115,14 +115,14 @@ namespace AwsMock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMarker const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"Key", obj.key},
-                {"Owner", boost::json::value_from(obj.owner)},
-                {"IsLatest", obj.isLatest},
-                {"VersionId", obj.versionId},
-                {"LastModified", Core::DateTimeUtils::ToISO8601(obj.lastModified)},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"Key", obj.key},
+                    {"Owner", boost::json::value_from(obj.owner)},
+                    {"IsLatest", obj.isLatest},
+                    {"VersionId", obj.versionId},
+                    {"LastModified", Core::DateTimeUtils::ToISO8601(obj.lastModified)},
             };
         }
     };
@@ -264,7 +264,7 @@ namespace AwsMock::Dto::S3 {
             }
         }
 
-    private:
+      private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
@@ -281,39 +281,39 @@ namespace AwsMock::Dto::S3 {
             r.nextKeyMarker = Core::Json::GetStringValue(v, "nextKeyMarker");
             r.nextVersionIdMarker = Core::Json::GetStringValue(v, "nextVersionIdMarker");
             if (Core::Json::AttributeExists(v, "commonPrefixes")) {
-                r.commonPrefixes = boost::json::value_to<std::vector<std::string> >(v.at("commonPrefixes"));
+                r.commonPrefixes = boost::json::value_to<std::vector<std::string>>(v.at("commonPrefixes"));
             }
             if (Core::Json::AttributeExists(v, "versions")) {
-                r.versions = boost::json::value_to<std::vector<ObjectVersion> >(v.at("versions"));
+                r.versions = boost::json::value_to<std::vector<ObjectVersion>>(v.at("versions"));
             }
             if (Core::Json::AttributeExists(v, "deleteMarkers")) {
-                r.deleteMarkers = boost::json::value_to<std::vector<DeleteMarker> >(v.at("deleteMarkers"));
+                r.deleteMarkers = boost::json::value_to<std::vector<DeleteMarker>>(v.at("deleteMarkers"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListObjectVersionsResponse const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"name", obj.name},
-                {"prefix", obj.prefix},
-                {"delimiter", obj.delimiter},
-                {"encodingType", obj.encodingType},
-                {"maxKeys", obj.maxKeys},
-                {"isTruncated", obj.isTruncated},
-                {"keyMarker", obj.keyMarker},
-                {"versionIdMarker", obj.versionIdMarker},
-                {"nextKeyMarker", obj.nextKeyMarker},
-                {"nextVersionIdMarker", obj.nextVersionIdMarker},
-                {"commonPrefixes", boost::json::value_from(obj.commonPrefixes)},
-                {"versions", boost::json::value_from(obj.versions)},
-                {"deleteMarkers", boost::json::value_from(obj.deleteMarkers)},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"name", obj.name},
+                    {"prefix", obj.prefix},
+                    {"delimiter", obj.delimiter},
+                    {"encodingType", obj.encodingType},
+                    {"maxKeys", obj.maxKeys},
+                    {"isTruncated", obj.isTruncated},
+                    {"keyMarker", obj.keyMarker},
+                    {"versionIdMarker", obj.versionIdMarker},
+                    {"nextKeyMarker", obj.nextKeyMarker},
+                    {"nextVersionIdMarker", obj.nextVersionIdMarker},
+                    {"commonPrefixes", boost::json::value_from(obj.commonPrefixes)},
+                    {"versions", boost::json::value_from(obj.versions)},
+                    {"deleteMarkers", boost::json::value_from(obj.deleteMarkers)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_LIST_OBJECT_VERSIONS_RESPONSE_H

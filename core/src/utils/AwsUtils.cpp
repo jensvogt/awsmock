@@ -32,12 +32,12 @@ namespace {
         const auto qpos = target.find('?');
         const auto path = (qpos != std::string_view::npos) ? target.substr(0, qpos) : target;
         if (path.empty()) return "/";
-        const std::string encoded = AwsMock::Core::StringUtils::AwsUrlEncode(std::string(path), false);
+        const std::string encoded = Awsmock::Core::StringUtils::AwsUrlEncode(std::string(path), false);
         return (!encoded.empty() && encoded[0] == '/') ? encoded : "/" + encoded;
     }
 
     // Collapse sequential internal spaces to a single space (AWS canonical header normalisation)
-    std::string NormalizeHeaderValue(std::string value) {
+    std::string NormalizeHeaderValue(const std::string &value) {
         const auto trimmed = boost::algorithm::trim_copy(value);
         std::string result;
         result.reserve(trimmed.size());
@@ -56,7 +56,7 @@ namespace {
 
 }// anonymous namespace
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string AwsUtils::CreateApiKeyId() {
         return StringUtils::GenerateRandomAlphanumericString(12);
@@ -572,4 +572,4 @@ namespace AwsMock::Core {
         static const std::regex urlPattern(R"(^https?:\/\/.*$)", std::regex::optimize);
         return std::regex_match(value, urlPattern);
     }
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

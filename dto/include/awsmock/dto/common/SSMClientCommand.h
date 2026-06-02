@@ -15,7 +15,7 @@
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -40,17 +40,17 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<SSMCommandType, std::string> SSMCommandTypeNames{
-        {SSMCommandType::PUT_PARAMETER, "put-parameter"},
-        {SSMCommandType::GET_PARAMETER, "get-parameter"},
-        {SSMCommandType::DESCRIBE_PARAMETERS, "describe-parameters"},
-        {SSMCommandType::DELETE_PARAMETER, "delete-parameter"},
-        // AwsMock internal
-        {SSMCommandType::LIST_PARAMETER_COUNTERS, "list-parameter-counters"},
-        {SSMCommandType::GET_PARAMETER_COUNTER, "get-parameter-counter"},
-        {SSMCommandType::CREATE_PARAMETER_COUNTER, "create-parameter-counter"},
-        {SSMCommandType::UPDATE_PARAMETER_COUNTER, "update-parameter-counter"},
-        {SSMCommandType::DELETE_PARAMETER_COUNTER, "delete-parameter-counter"},
-        {SSMCommandType::UNKNOWN, "unknown"},
+            {SSMCommandType::PUT_PARAMETER, "put-parameter"},
+            {SSMCommandType::GET_PARAMETER, "get-parameter"},
+            {SSMCommandType::DESCRIBE_PARAMETERS, "describe-parameters"},
+            {SSMCommandType::DELETE_PARAMETER, "delete-parameter"},
+            // AwsMock internal
+            {SSMCommandType::LIST_PARAMETER_COUNTERS, "list-parameter-counters"},
+            {SSMCommandType::GET_PARAMETER_COUNTER, "get-parameter-counter"},
+            {SSMCommandType::CREATE_PARAMETER_COUNTER, "create-parameter-counter"},
+            {SSMCommandType::UPDATE_PARAMETER_COUNTER, "update-parameter-counter"},
+            {SSMCommandType::DELETE_PARAMETER_COUNTER, "delete-parameter-counter"},
+            {SSMCommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string SSMCommandTypeToString(SSMCommandType commandType) {
@@ -120,11 +120,11 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const SSMClientCommand &i);
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-} // namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_SSM_CLIENT_COMMAND_H

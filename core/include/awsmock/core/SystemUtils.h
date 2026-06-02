@@ -34,7 +34,7 @@
 #define BUFSIZE 4096
 #endif
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief System utils for command line execution and other system routines.
@@ -129,5 +129,5 @@ namespace AwsMock::Core {
         static int GetNextFreePort();
     };
 
-} // namespace AwsMock::Core
+} // namespace Awsmock::Core
 

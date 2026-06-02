@@ -4,7 +4,7 @@
 
 #include <awsmock/core/DateTimeUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
 #ifdef _WIN32
     extern "C" char *strptime(const char *s, const char *f, struct tm *tm) {
@@ -148,4 +148,4 @@ namespace AwsMock::Core {
         return 24 * 2600 - static_cast<int>(duration_cast<seconds>(now - today).count());
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -13,7 +13,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/transfer/model/Server.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct ListServerCountersResponse final : Common::BaseCounter<ListServerCountersResponse> {
 
@@ -47,6 +47,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_LIST_SERVER_COUNTERS_RESPONSE_H

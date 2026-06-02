@@ -20,7 +20,7 @@ namespace {
 #define TEST_ROLE "arn:aws:iam::000000000000:role/ignoreme"
 #define TEST_HANDLER "org.springframework.cloud.function.adapter.aws.FunctionInvoker"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::Lambda::Lambda CreateDefaultLambda(const std::string &region, const std::string &name) {
         Entity::Lambda::Lambda lambda;
@@ -172,4 +172,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

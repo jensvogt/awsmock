@@ -16,7 +16,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     /**
      * @brief Lambda environment entity
@@ -43,12 +43,12 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
-
     };
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif// AWSMOCK_ENTITY_LAMBDA_ENVIRONMENT_H

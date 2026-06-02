@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListAttributeCountersRequest final : Common::BaseCounter<ListAttributeCountersRequest> {
 
@@ -67,6 +67,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_ATTRIBUTE_COUNTERS_REQUEST_H

@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/lambda/model/EventSourceMapping.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
     /**
      * @brief List Lambda event sources response.
      *
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_LIST_EVENT_SOURCE_COUNTERS_RESPONSE_H

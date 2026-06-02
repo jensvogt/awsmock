@@ -37,7 +37,7 @@
 
 #define TRANSFER_DEFAULT_FTP_PORT 21
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Transfer family service
@@ -187,6 +187,6 @@ namespace AwsMock::Service {
         Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVICE_H

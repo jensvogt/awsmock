@@ -15,7 +15,7 @@
 #include <bsoncxx/types.hpp>
 #include <mongocxx/pipeline.hpp>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using namespace boost::posix_time;
     using bsoncxx::builder::basic::kvp;
@@ -45,6 +45,6 @@ namespace AwsMock::Database {
         static system_clock::time_point GetDatetime(const std::optional<bsoncxx::document::view> &result, const std::string &attribute);
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_CORE_MONGO_UTILS_H

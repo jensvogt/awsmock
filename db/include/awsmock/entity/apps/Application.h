@@ -9,7 +9,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::Apps {
+namespace Awsmock::Database::Entity::Apps {
 
     /**
      * @brief Application entity
@@ -158,6 +158,6 @@ namespace AwsMock::Database::Entity::Apps {
         void FromDocument(const std::optional<view> &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::Apps
+}// namespace Awsmock::Database::Entity::Apps
 
 #endif// AWSMOCK_DB_ENTITY_APPS_APPLICATION_H

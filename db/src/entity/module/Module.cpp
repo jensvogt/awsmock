@@ -4,19 +4,19 @@
 
 #include <awsmock/entity/module/Module.h>
 
-namespace AwsMock::Database::Entity::Module {
+namespace Awsmock::Database::Entity::Module {
 
     view_or_value<view, value> Module::ToDocument() const {
 
         view_or_value<view, value> objectDoc = make_document(
-            kvp("name", name),
-            kvp("port", port),
-            kvp("state", ModuleStateToString(state)),
-            kvp("status", ModuleStatusToString(status)),
-            kvp("logChannel", logChannel),
-            kvp("logLevel", logLevel),
-            kvp("created", bsoncxx::types::b_date(created)),
-            kvp("modified", bsoncxx::types::b_date(modified)));
+                kvp("name", name),
+                kvp("port", port),
+                kvp("state", ModuleStateToString(state)),
+                kvp("status", ModuleStatusToString(status)),
+                kvp("logChannel", logChannel),
+                kvp("logLevel", logLevel),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return objectDoc;
     }
@@ -34,4 +34,4 @@ namespace AwsMock::Database::Entity::Module {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }
 
-} // namespace AwsMock::Database::Entity::Module
+}// namespace Awsmock::Database::Entity::Module

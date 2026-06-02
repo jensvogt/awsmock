@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief Kill a container request
@@ -47,6 +47,6 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_CONTAINER_KILL_CONTAINER_REQUEST_H

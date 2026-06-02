@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     /**
      * @brief List SQS queue ARNs response.
@@ -43,6 +43,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_TOPIC_ARNS_RESPONSE_H

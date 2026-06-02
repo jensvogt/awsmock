@@ -7,7 +7,7 @@
 
 #include <awsmock/memorydb/ApiGatewayMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex ApiGatewayMemoryDb::_apiKeyMutex;
     boost::mutex ApiGatewayMemoryDb::_restApiMutex;
@@ -218,4 +218,4 @@ namespace AwsMock::Database {
         auto resultVector = q.to_vector();
         return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void DynamoDbClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Common {
             case http::verb::delete_:
             case http::verb::head:
                 break;
-            default: ;
+            default:;
         }
     }
 
@@ -85,4 +85,4 @@ namespace AwsMock::Dto::Common {
         os << "DynamoDbClientCommand=" << r.ToJson();
         return os;
     }
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

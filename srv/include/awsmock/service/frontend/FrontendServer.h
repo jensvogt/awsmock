@@ -9,10 +9,10 @@
 #include <string>
 
 // Boost includes
-#include <boost/asio/signal_set.hpp>
-#include <boost/asio/strand.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/v6_only.hpp>
+#include <boost/asio/signal_set.hpp>
+#include <boost/asio/strand.hpp>
 
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
@@ -20,11 +20,12 @@
 #include <awsmock/service/frontend/FrontendSession.h>
 #include <awsmock/service/frontend/FrontendWorker.h>
 
-namespace AwsMock::Service::Frontend {
+namespace Awsmock::Service::Frontend {
 
     class FrontendServer {
 
-    public:
+      public:
+
         /**
          * Constructor
          */
@@ -40,7 +41,8 @@ namespace AwsMock::Service::Frontend {
          */
         void operator()(bool isService);
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -52,4 +54,4 @@ namespace AwsMock::Service::Frontend {
         bool _running = false;
     };
 
-} // namespace AwsMock::Service::Frontend
+}// namespace Awsmock::Service::Frontend

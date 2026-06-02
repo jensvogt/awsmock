@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Table status
@@ -59,6 +59,6 @@ namespace AwsMock::Dto::DynamoDb {
         return TableStatusType::UNKNOWN;
     }
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_RESTORESTATUS_H

@@ -22,7 +22,7 @@
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -38,7 +38,8 @@ namespace AwsMock::Service {
      */
     class SQSHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -56,7 +57,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         /**
          * Get the queue userAttributes.
          *
@@ -95,4 +97,4 @@ namespace AwsMock::Service {
         SQSService _sqsService;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

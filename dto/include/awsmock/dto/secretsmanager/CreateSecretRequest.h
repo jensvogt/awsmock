@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief Secrets manager create secret request
@@ -102,6 +102,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_CREATE_SECRET_REQUEST_H

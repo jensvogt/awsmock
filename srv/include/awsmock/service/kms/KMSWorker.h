@@ -13,7 +13,7 @@
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/repository/KMSDatabase.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     using std::chrono::system_clock;
 
@@ -48,6 +48,6 @@ namespace AwsMock::Service {
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_WORKER_H

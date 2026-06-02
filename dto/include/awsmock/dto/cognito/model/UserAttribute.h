@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/entity/cognito/User.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief User attribute
@@ -71,6 +71,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_USER_ATTRIBUTE_H

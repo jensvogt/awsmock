@@ -16,7 +16,7 @@
 #include <awsmock/service/monitoring/MonitoringCollector.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Monitoring module server
@@ -96,6 +96,6 @@ namespace AwsMock::Service {
         std::vector<std::string> _exclusions;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVER_H

@@ -14,7 +14,7 @@
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     enum TaskType {
         createSecret,
@@ -124,4 +124,4 @@ namespace AwsMock::Service {
         system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

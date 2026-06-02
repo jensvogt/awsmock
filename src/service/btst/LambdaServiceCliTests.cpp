@@ -23,7 +23,7 @@ namespace {
 #define CODE std::string("S3Bucket=lambdaBucket,S3Key=lambdaKey")
 #define RUNTIME std::string("java11")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief AwsMock lambda integration test.
@@ -128,4 +128,4 @@ namespace AwsMock::Service {
     BOOST_CHECK_EQUAL(0, bucketList.size());
   }*/
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -2,7 +2,7 @@
 
 #include <awsmock/core/RandomUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     template<typename T = std::mt19937>
     auto RandomGenerator() -> T {
@@ -50,4 +50,4 @@ namespace AwsMock::Core {
         }
         return result;
     }
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

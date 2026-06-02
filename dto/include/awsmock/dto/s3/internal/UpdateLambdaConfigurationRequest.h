@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct UpdateLambdaConfigurationRequest final : Common::BaseCounter<UpdateLambdaConfigurationRequest> {
 
@@ -57,6 +57,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_UPDATE_LAMBDA_CONFIGURATION_REQUEST_H

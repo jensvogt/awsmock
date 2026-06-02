@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/sqs/model/TagCounter.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief List Lambda environment counter response.
@@ -54,6 +54,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_LIST_ENVIRONMENT_COUNTERS_RESPONSE_H

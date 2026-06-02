@@ -65,7 +65,7 @@
 #define CRYPTO_HMAC256_BLOCK_SIZE 32
 #define SHA256_EMPTY_STRING "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     static const std::string _base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -79,7 +79,8 @@ namespace AwsMock::Core {
      */
     class Crypto {
 
-    public:
+      public:
+
         /**
          * @brief Returns the MD5 hash of a string.
          *
@@ -391,7 +392,8 @@ namespace AwsMock::Core {
          */
         static std::string RsaDecrypt(EVP_PKEY *keyPair, const std::string &in);
 
-    private:
+      private:
+
         /**
          * @brief Create a 256 bit key and IV using the supplied key_data. salt can be added for taste.
          *
@@ -427,4 +429,4 @@ namespace AwsMock::Core {
         static unsigned char _iv[16];
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/lambda/Environment.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     view_or_value<view, value> Environment::ToDocument() const {
 
@@ -35,4 +35,4 @@ namespace AwsMock::Database::Entity::Lambda {
             }
         }
     }
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

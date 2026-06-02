@@ -23,7 +23,7 @@ namespace {
                                 <LocationConstraint>eu-central-1</LocationConstraint> \
                              </CreateBucketConfiguration>"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Test the S3 services of AwsMock.
@@ -201,4 +201,4 @@ namespace AwsMock::Service {
         // assert
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

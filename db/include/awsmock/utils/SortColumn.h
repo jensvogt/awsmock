@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     struct SortColumn /*final : Entity::Common::BaseEntity<SortColumn>*/ {
 
@@ -57,11 +57,11 @@ namespace AwsMock::Database {
             }
         }
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_DATABASE_COMMON_SORT_COLUMN_H

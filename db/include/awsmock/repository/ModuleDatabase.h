@@ -12,9 +12,10 @@
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/memorydb/ModuleMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/ConnectionPool.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief Module MongoDB database.
@@ -23,9 +24,10 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleDatabase : public DatabaseBase {
+    class ModuleDatabase : public AwsMock::Database::DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -227,7 +229,8 @@ namespace AwsMock::Database {
          */
         long DeleteAllModules();
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
@@ -251,4 +254,4 @@ namespace AwsMock::Database {
         static std::map<std::string, Entity::Module::Module> _existingModules;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief Versioning status
@@ -36,6 +36,6 @@ namespace AwsMock::Dto::S3 {
         return LIFECYCLE_DISABLED;
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_LIFECYCLE_STATUS_H

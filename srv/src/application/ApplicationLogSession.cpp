@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Application"};
 }
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     void ApplicationLogSession::Run() {
 
@@ -101,4 +101,4 @@ namespace AwsMock::Service {
                 return "ok";
         }
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

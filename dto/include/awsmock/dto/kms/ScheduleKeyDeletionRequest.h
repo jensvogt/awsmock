@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief Schedule a KMS key deletion
@@ -58,6 +58,6 @@ namespace AwsMock::Dto::KMS {
         }
     };
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_SCHEDULE_KEX_DELETION_REQUEST_H

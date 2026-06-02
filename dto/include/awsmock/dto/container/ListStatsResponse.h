@@ -16,7 +16,7 @@
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/dto/container/model/Statistic.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief List container statistics response
@@ -67,6 +67,6 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_LIST_STATS_RESPONSE_H

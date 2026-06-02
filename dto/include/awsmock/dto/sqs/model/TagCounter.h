@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct TagCounter final : Common::BaseCounter<TagCounter> {
 
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_TAG_COUNTER_H

@@ -23,7 +23,7 @@ namespace {
 #define TEST_LAMBDA_NAME "none"
 #define TEST_MESSAGE_BODY "{\"testAttribute\":\"testValue\"}"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::S3::Bucket CreateDefaultBucket(const std::string &name) {
         Entity::S3::Bucket bucket;
@@ -398,7 +398,7 @@ namespace AwsMock::Database {
         // assert
         BOOST_CHECK_EQUAL(result, false);
     }
-    
+
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

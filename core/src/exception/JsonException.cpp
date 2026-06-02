@@ -4,7 +4,7 @@
 
 #include <awsmock/core/exception/JsonException.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     JsonException::JsonException(const http::status code, const char *resource, const char *requestId) : _code(code), _resource(resource), _requestId(requestId) {}
 
@@ -22,4 +22,4 @@ namespace AwsMock::Core {
 
     const char *JsonException::requestId() const noexcept { return _requestId; }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

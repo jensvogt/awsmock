@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/secretsmanager/model/RotationRules.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief Rotate a secret value request.
@@ -89,6 +89,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_CORE_DTO_ROTATE_SECRET_REQUEST_H

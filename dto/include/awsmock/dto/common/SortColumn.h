@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     struct SortColumn final : BaseCounter<SortColumn> {
 
@@ -45,6 +45,6 @@ namespace AwsMock::Dto::Common {
         }
     };
 
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_SORT_COLUMN_H

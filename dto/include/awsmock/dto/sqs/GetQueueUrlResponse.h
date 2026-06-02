@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief Get SQS queue URL response.
@@ -55,6 +55,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_GET_QUEUE_URL_RESPONSE_H

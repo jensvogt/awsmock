@@ -12,7 +12,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief List DynamoDB table ARNs response.
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_LIST_TABLE_ARNS_RESPONSE_H

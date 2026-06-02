@@ -10,9 +10,9 @@
 
 // Boost includes
 #include <boost/asio/io_context.hpp>
-#include <boost/asio/strand.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/v6_only.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/beast/core/bind_handler.hpp>
 
 // AwsMock includes
@@ -21,7 +21,7 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Accepts incoming connections and launches the sessions
@@ -30,7 +30,8 @@ namespace AwsMock::Service {
      */
     class GatewayListener : public std::enable_shared_from_this<GatewayListener> {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -47,7 +48,8 @@ namespace AwsMock::Service {
          */
         void Run();
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Gateway"};
 
         /**
@@ -74,6 +76,6 @@ namespace AwsMock::Service {
         ip::tcp::acceptor _acceptor;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_GATEWAY_LISTENER_H

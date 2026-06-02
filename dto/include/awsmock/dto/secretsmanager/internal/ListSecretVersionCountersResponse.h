@@ -10,7 +10,7 @@
 #include <awsmock/dto/secretsmanager/model/SecretCounter.h>
 #include <awsmock/dto/secretsmanager/model/SecretVersionCounter.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     struct ListSecretVersionCountersResponse final : Common::BaseCounter<ListSecretVersionCountersResponse> {
 
@@ -46,6 +46,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRET_VERSION_COUNTERS_RESPONSE_H

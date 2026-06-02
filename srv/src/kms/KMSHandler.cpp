@@ -1,7 +1,7 @@
 
 #include <awsmock/service/kms/KMSHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     boost::beast::http::response<http::dynamic_body> KMSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "KMS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -121,4 +121,4 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::internal_server_error, "Invalid request");
         }
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

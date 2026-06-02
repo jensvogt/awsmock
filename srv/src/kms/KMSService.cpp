@@ -6,7 +6,7 @@
 
 #include <awsmock/core/scheduler/Scheduler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     KMSService::KMSService() : _kmsDatabase(Database::KMSDatabase::instance()) {
 
@@ -506,4 +506,4 @@ namespace AwsMock::Service {
         return {};
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

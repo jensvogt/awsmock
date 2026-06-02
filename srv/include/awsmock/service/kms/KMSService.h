@@ -46,7 +46,7 @@
 
 #define DEFAULT_KMS_ACCOUNT_ID "000000000000"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     using std::chrono::system_clock;
 
@@ -57,7 +57,8 @@ namespace AwsMock::Service {
      */
     class KMSService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -192,7 +193,8 @@ namespace AwsMock::Service {
          */
         void DeleteKey(const Dto::KMS::DeleteKeyRequest &request) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
@@ -238,4 +240,4 @@ namespace AwsMock::Service {
         mutable std::mutex _futureMutex;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListMessageCountersRequest final : Common::BaseCounter<ListMessageCountersRequest> {
 
@@ -68,6 +68,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_MESSAGE_COUNTERS_REQUEST_H

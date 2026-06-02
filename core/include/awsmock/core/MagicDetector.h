@@ -10,7 +10,7 @@
 // Awsmock includes
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     class MagicDetector {
 
@@ -78,4 +78,4 @@ namespace AwsMock::Core {
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

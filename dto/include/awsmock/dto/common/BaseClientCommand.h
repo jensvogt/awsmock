@@ -11,7 +11,7 @@
 // Boost includes
 #include <boost/beast/http/verb.hpp>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     namespace http = boost::beast::http;
 
@@ -73,6 +73,6 @@ namespace AwsMock::Dto::Common {
         std::string requestId;
     };
 
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif//AWSMOCK_DTO_BASE_CLIENT_COMMAND_H

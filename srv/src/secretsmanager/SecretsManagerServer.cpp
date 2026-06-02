@@ -4,7 +4,7 @@
 
 #include <awsmock/service/secretsmanager/SecretsManagerServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     SecretsManagerServer::SecretsManagerServer(Core::Scheduler &scheduler) : AbstractServer("secretsmanager"), _scheduler(scheduler) {
 
@@ -43,4 +43,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("secretsmanager-monitoring");
         _scheduler.Shutdown("secretsmanager-backup");
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

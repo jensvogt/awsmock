@@ -12,7 +12,7 @@
 #include <awsmock/core/CronUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     using std::chrono::system_clock;
 
@@ -41,4 +41,4 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(datetimeSeconds, seconds);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

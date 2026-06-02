@@ -10,7 +10,7 @@
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Manager monitoring
@@ -26,7 +26,8 @@ namespace AwsMock::Service {
      */
     class ModuleMonitoring {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -37,7 +38,8 @@ namespace AwsMock::Service {
          */
         void UpdateCounter() const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
@@ -46,5 +48,5 @@ namespace AwsMock::Service {
         Database::ModuleDatabase &_moduleDatabase = Database::ModuleDatabase::instance();
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 #endif// AWSMOCK_SERVICE_MODULE_MONITORING_H

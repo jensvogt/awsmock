@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     struct RestApi final : Common::BaseCounter<RestApi> {
 
@@ -136,6 +136,6 @@ namespace AwsMock::Dto::ApiGateway {
         }
     };
 
-}// namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway
 
 #endif// AWSMOCK_DTO_API_GATEWAY_MODEL_REST_API_H

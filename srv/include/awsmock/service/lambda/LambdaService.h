@@ -12,9 +12,10 @@
 #include <boost/signals2/signal.hpp>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/EventBus.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
@@ -89,12 +90,11 @@
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
-#include <awsmock/repository/SQSDatabase.h>
 
 // Maximal output length for a synchronous invocation call
 #define MAX_OUTPUT_LENGTH (4 * 1024)
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     /**
      * @brief Lambda service module. Handles all lambda related requests:
      *
@@ -121,13 +121,14 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
          * @param ioc boost asio IO context
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()),
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSMongoRepository::instance()),
                                    _snsDatabase(Database::SNSDatabase::instance()) {
         }
 
@@ -554,7 +555,8 @@ namespace AwsMock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-    private:
+      private:
+
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
          *
@@ -606,7 +608,7 @@ namespace AwsMock::Service {
         /**
          * @brief SQS database connection
          */
-        Database::SQSDatabase &_sqsDatabase;
+        Database::SQSMongoRepository &_sqsDatabase;
 
         /**
          * @brief SQS database connection
@@ -617,8 +619,7 @@ namespace AwsMock::Service {
          * @brief Boost IO context
          */
         //boost::asio::io_context &_ioc;
-
     };
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

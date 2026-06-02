@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/dynamodb/KeySchema.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> KeySchema::ToDocument() const {
 
@@ -19,4 +19,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         keyType = Core::Bson::BsonUtils::GetStringValue(mResult, "keyType");
     }
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb

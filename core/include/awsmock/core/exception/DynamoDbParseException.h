@@ -15,7 +15,7 @@
 #include <boost/beast/http/status.hpp>
 #include <utility>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Bad request exception class.
@@ -94,5 +94,5 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-} // namespace AwsMock::Core
+} // namespace Awsmock::Core
 

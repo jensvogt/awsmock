@@ -38,7 +38,7 @@
 #define GATEWAY_DEFAULT_PROTOCOL std::string("http")
 #define GATEWAY_DEFAULT_REGION "eu-central-1"
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     struct AuthorizationHeaderKeys {
 
@@ -811,4 +811,4 @@ namespace AwsMock::Core {
         return CreateSQSQueueUrl(queue);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

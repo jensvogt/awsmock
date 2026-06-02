@@ -8,7 +8,7 @@
 // Local includes
 #include <awsmock/core/SystemUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(GetHostNameTest) {
 
@@ -21,6 +21,6 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(hostName.empty(), false);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWSMOCK_CORE_SYSTEM_UTILS_TEST_H

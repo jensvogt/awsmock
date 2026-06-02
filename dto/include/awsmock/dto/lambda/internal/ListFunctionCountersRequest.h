@@ -16,7 +16,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     struct ListFunctionCountersRequest final : Common::BaseCounter<ListFunctionCountersRequest> {
 
@@ -61,6 +61,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif//AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_COUNTERS_REQUEST_H

@@ -8,7 +8,7 @@
 // Local includes
 #include <awsmock/core/XmlUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(CreateTextNodeTest) {
 
@@ -44,6 +44,6 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(Core::StringUtils::StripLineEndings(result), xmlString);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWMOCK_CORE_XML_UTILS_TEST_H

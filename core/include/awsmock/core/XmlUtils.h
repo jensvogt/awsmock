@@ -24,7 +24,7 @@
 // AwsMOck includes
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief XML utilities.
@@ -33,7 +33,8 @@ namespace AwsMock::Core {
      */
     class XmlUtils {
 
-    public:
+      public:
+
         /**
          * @brief Returns the XML string for the document.
          *
@@ -58,7 +59,8 @@ namespace AwsMock::Core {
          */
         static void PrintTree(const boost::property_tree::ptree &rootTree, int level = 2);
 
-    private:
+      private:
+
         /**
          * @brief Indentation
          *
@@ -67,4 +69,4 @@ namespace AwsMock::Core {
         static std::string Indent(int level = 2);
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

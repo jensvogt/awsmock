@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct UntagResourceRequest final : Common::BaseCounter<UntagResourceRequest> {
 
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_UNTAG_RESOURCE_REQUEST_H

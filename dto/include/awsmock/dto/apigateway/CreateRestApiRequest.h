@@ -11,7 +11,7 @@
 #include <awsmock/dto/apigateway/model/ApiKeySource.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     /**
      * @brief Create API gateway key request
@@ -75,7 +75,8 @@ namespace AwsMock::Dto::ApiGateway {
          */
         std::map<std::string, std::string> tags;
 
-    private:
+      private:
+
         friend CreateRestApiRequest tag_invoke(boost::json::value_to_tag<CreateRestApiRequest>, boost::json::value const &v) {
             CreateRestApiRequest r;
             r.name = Core::Json::GetStringValue(v, "name");
@@ -87,31 +88,31 @@ namespace AwsMock::Dto::ApiGateway {
             r.minimumCompressionSize = Core::Json::GetLongValue(v, "minimumCompressionSize");
             r.policy = Core::Json::GetStringValue(v, "policy");
             if (Core::Json::AttributeExists(v, "binaryMediaTypes")) {
-                r.binaryMediaTypes = boost::json::value_to<std::vector<std::string> >(v.at("binaryMediaTypes"));
+                r.binaryMediaTypes = boost::json::value_to<std::vector<std::string>>(v.at("binaryMediaTypes"));
             }
             if (Core::Json::AttributeExists(v, "tags")) {
-                r.tags = boost::json::value_to<std::map<std::string, std::string> >(v.at("tags"));
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateRestApiRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"name", obj.name},
-                {"apiKeySource", ApiKeySourceTypeToString(obj.apiKeySource)},
-                {"description", obj.description},
-                {"cloneFrom", obj.cloneFrom},
-                {"disableExecuteApiEndpoint", obj.disableExecuteApiEndpoint},
-                {"version", obj.version},
-                {"minimumCompressionSize", obj.minimumCompressionSize},
-                {"policy", obj.policy},
-                {"binaryMediaTypes", boost::json::value_from(obj.binaryMediaTypes)},
-                {"tags", boost::json::value_from(obj.tags)},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"name", obj.name},
+                    {"apiKeySource", ApiKeySourceTypeToString(obj.apiKeySource)},
+                    {"description", obj.description},
+                    {"cloneFrom", obj.cloneFrom},
+                    {"disableExecuteApiEndpoint", obj.disableExecuteApiEndpoint},
+                    {"version", obj.version},
+                    {"minimumCompressionSize", obj.minimumCompressionSize},
+                    {"policy", obj.policy},
+                    {"binaryMediaTypes", boost::json::value_from(obj.binaryMediaTypes)},
+                    {"tags", boost::json::value_from(obj.tags)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway

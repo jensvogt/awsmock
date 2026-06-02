@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     /**
      * @brief SQS queue attribute entity
@@ -129,12 +129,12 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document view.
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
-
     };
 
-}// namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_QUEUE_ATTRIBUTE_H

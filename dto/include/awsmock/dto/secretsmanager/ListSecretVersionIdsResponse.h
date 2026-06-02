@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/SecretVersion.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief List secrets version IDs request.
@@ -77,6 +77,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRETS_VERSION_IDS_RESPONSE_H

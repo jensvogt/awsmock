@@ -24,7 +24,7 @@ namespace {
 #define OWNER "test-owner"
 #define TEST_PORT 10100
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class DynamoDbServerJavaTest : public ::testing::Test {
 
@@ -201,6 +201,6 @@ namespace AwsMock::Service {
         EXPECT_EQ(1, itemCount);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_DYNAMODB_SERVER_JAVA_TEST_H

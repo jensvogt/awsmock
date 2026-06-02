@@ -21,7 +21,7 @@
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     class TopicMapper : public StaticMapper<TopicMapper, Database::Entity::SNS::Topic, Topic> {
 
@@ -206,6 +206,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_MAPPER_H

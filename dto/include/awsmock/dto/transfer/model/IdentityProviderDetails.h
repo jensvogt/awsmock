@@ -17,7 +17,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/SftpAuthenticationMethod.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct IdentityProviderDetails final : Common::BaseCounter<IdentityProviderDetails> {
 
@@ -101,6 +101,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_SERVER_IDENTITY_PROVIDER_DETAILS_H

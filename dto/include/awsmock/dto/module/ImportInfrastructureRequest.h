@@ -14,11 +14,11 @@
 
 
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/module/model/Infrastructure.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     /**
      * @brief Import infrastructure request
@@ -64,12 +64,12 @@ namespace AwsMock::Dto::Module {
          * @return JSON string
          */
         std::string ToJson() const override;
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
-
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif//AWSMOCK_DTO_IMPORT_INFRASTRUCTURE_REQUEST_H

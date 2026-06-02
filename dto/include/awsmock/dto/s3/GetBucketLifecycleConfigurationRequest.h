@@ -8,7 +8,7 @@
 // AwsMock include
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct GetBucketLifecycleConfigurationRequest final : Common::BaseCounter<GetBucketLifecycleConfigurationRequest> {
 
@@ -35,6 +35,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_CORE_DTO_GET_BUCKET_LIFECYCLE_CONFIGURATION_REQUEST_H

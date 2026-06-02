@@ -15,7 +15,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/sns/model/EventRecord.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     /**
      * @brief SNS event notification
@@ -81,6 +81,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_EVENT_NOTIFICATION_H

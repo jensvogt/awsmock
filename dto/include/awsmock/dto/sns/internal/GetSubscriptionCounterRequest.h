@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct GetSubscriptionCounterRequest final : Common::BaseCounter<GetSubscriptionCounterRequest> {
 
@@ -26,7 +26,8 @@ namespace AwsMock::Dto::SNS {
          */
         std::string subscriptionArn;
 
-    private:
+      private:
+
         friend GetSubscriptionCounterRequest tag_invoke(boost::json::value_to_tag<GetSubscriptionCounterRequest>, boost::json::value const &v) {
             GetSubscriptionCounterRequest r;
             r.topicArn = Core::Json::GetStringValue(v, "topicArn");
@@ -36,15 +37,15 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetSubscriptionCounterRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"topicArn", obj.topicArn},
-                {"subscriptionArn", obj.subscriptionArn},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicArn", obj.topicArn},
+                    {"subscriptionArn", obj.subscriptionArn},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_GET_SUBSCRIPTION_COUNTER_REQUEST_H

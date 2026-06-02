@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     struct LogLevel {
         /**
@@ -81,4 +81,4 @@ namespace AwsMock::Dto::Module {
         }
     };
 
-} // namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module

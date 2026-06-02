@@ -17,7 +17,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     using std::chrono::system_clock;
 
@@ -79,29 +79,29 @@ namespace AwsMock::Dto::S3 {
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "metadata")) {
-                r.metadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("metadata"));
+                r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetObjectMetadataResponse const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"bucket", obj.bucket},
-                {"key", obj.bucket},
-                {"md5Sum", obj.md5Sum},
-                {"contentType", obj.contentType},
-                {"storageClass", obj.storageClass},
-                {"size", obj.size},
-                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-                {"metadata", boost::json::value_from(obj.metadata)},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"key", obj.bucket},
+                    {"md5Sum", obj.md5Sum},
+                    {"contentType", obj.contentType},
+                    {"storageClass", obj.storageClass},
+                    {"size", obj.size},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"metadata", boost::json::value_from(obj.metadata)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H

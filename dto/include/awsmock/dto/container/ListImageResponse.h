@@ -15,7 +15,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/container/model/Image.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief List images response
@@ -62,6 +62,6 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_LIST_IMAGE_RESPONSE_H

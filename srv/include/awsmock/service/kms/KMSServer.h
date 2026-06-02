@@ -17,7 +17,7 @@
 #include <awsmock/service/kms/KMSWorker.h>
 #include <awsmock/service/module/ModuleService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief KMS HTTP server
@@ -26,13 +26,15 @@ namespace AwsMock::Service {
      */
     class KMSServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit KMSServer(Core::Scheduler &scheduler);
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
@@ -108,6 +110,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_SERVER_H

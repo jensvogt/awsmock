@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief KMS key expiration model
@@ -38,6 +38,6 @@ namespace AwsMock::Dto::KMS {
         return ExpirationModel::KEY_MATERIAL_DOES_NOT_EXPIRE;
     }
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_EXPIRATION_MODEL_H

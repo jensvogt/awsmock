@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/entity/cognito/User.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Cognito message actions
@@ -37,6 +37,6 @@ namespace AwsMock::Dto::Cognito {
         return SUPPRESS;
     }
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_MESSAGE_ACTION_H

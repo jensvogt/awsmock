@@ -19,7 +19,7 @@
 #include <awsmock/entity/lambda/LambdaResult.h>
 #include <awsmock/repository/Database.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * Lambda in-memory database.
@@ -28,7 +28,8 @@ namespace AwsMock::Database {
      */
     class LambdaMemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -280,7 +281,8 @@ namespace AwsMock::Database {
          */
         long DeleteAllLambdas();
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
@@ -304,6 +306,6 @@ namespace AwsMock::Database {
         static boost::mutex _lambdaResultMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_LAMBDA_MEMORYDB_H

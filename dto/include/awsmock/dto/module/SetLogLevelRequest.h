@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     /**
      * @brief Set log level request
@@ -58,6 +58,6 @@ namespace AwsMock::Dto::Module {
         }
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_SET_LOG_LEVEL_REQUEST_H

@@ -18,13 +18,14 @@
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     namespace http = boost::beast::http;
 
     class HttpSocket {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -74,7 +75,8 @@ namespace AwsMock::Core {
          */
         static HttpSocketResponse SendBinary(http::verb method, const std::string &host, int port, const std::string &path, const std::string &filename = {}, const std::map<std::string, std::string> &headers = {});
 
-    private:
+      private:
+
         /**
          * @brief Prepare an HTTP message
          *
@@ -120,4 +122,4 @@ namespace AwsMock::Core {
         std::string _path;
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

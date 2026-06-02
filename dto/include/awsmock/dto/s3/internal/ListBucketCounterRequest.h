@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct ListBucketCounterRequest final : Common::BaseCounter<ListBucketCounterRequest> {
 
@@ -65,6 +65,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_LIST_BUCKET_REQUEST_H

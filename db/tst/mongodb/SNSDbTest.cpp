@@ -19,7 +19,7 @@ namespace {
 #define TEST_TOPIC_NAME "test-topic"
 #define TEST_MESSAGE_BODY "{\"testAttribute\":\"testValue\"}"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::SNS::Message CreateDefaultSQSMessage(const std::string &topicArn) {
         Entity::SNS::Message message;
@@ -132,4 +132,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

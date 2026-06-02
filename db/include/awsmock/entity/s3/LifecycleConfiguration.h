@@ -14,7 +14,7 @@
 #include <awsmock/entity/s3/LifecycleStatus.h>
 #include <awsmock/entity/s3/LifecycleTransition.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief Life cycle rules for a S3 bucket
@@ -80,6 +80,6 @@ namespace AwsMock::Database::Entity::S3 {
         static LifecycleConfiguration FromDocument(const view &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_LIFE_CYCLE_CONFIGURATION_H

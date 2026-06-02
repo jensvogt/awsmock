@@ -4,7 +4,7 @@
 
 #include <awsmock/service/gateway/GatewayRouter.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     std::shared_ptr<AbstractHandler> GatewayRouter::GetHandler(const std::string &routingKey, boost::asio::io_context &ioc) {
         if (routingKey == "s3" || routingKey == "s3api") {
@@ -56,4 +56,4 @@ namespace AwsMock::Service {
         return nullptr;
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

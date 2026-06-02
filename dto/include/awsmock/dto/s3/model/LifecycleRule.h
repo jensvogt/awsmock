@@ -18,7 +18,7 @@
 #include <awsmock/dto/s3/model/LifecycleStatus.h>
 #include <awsmock/dto/s3/model/LifecycleTransition.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief Lifecycle rule for the S3 bucket
@@ -120,6 +120,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_LIFECYCLE_RULE_H

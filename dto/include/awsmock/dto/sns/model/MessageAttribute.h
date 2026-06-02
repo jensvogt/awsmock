@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sns/model/MessageAttributeDataType.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct MessageAttribute final : Common::BaseCounter<MessageAttribute> {
 
@@ -36,25 +36,26 @@ namespace AwsMock::Dto::SNS {
         /**
          * Attribute binary list values
          */
-        std::vector<std::vector<uint8_t> > binaryListValues;
+        std::vector<std::vector<uint8_t>> binaryListValues;
 
         /**
          * Logical data type
          */
         MessageAttributeDataType dataType = STRING;
 
-    private:
+      private:
+
         friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
             MessageAttribute r;
             r.stringValue = Core::Json::GetStringValue(v, "StringValue");
             if (Core::Json::AttributeExists(v, "StringListValues")) {
-                r.stringListValues = boost::json::value_to<std::vector<std::string> >(v.at("StringListValues"));
+                r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("StringListValues"));
             }
             if (Core::Json::AttributeExists(v, "StringListValues")) {
-                r.binaryValue = boost::json::value_to<std::vector<uint8_t> >(v.at("BinaryVValue"));
+                r.binaryValue = boost::json::value_to<std::vector<uint8_t>>(v.at("BinaryVValue"));
             }
             if (Core::Json::AttributeExists(v, "BinaryListValues")) {
-                r.binaryListValues = boost::json::value_to<std::vector<std::vector<uint8_t> > >(v.at("BinaryListValues"));
+                r.binaryListValues = boost::json::value_to<std::vector<std::vector<uint8_t>>>(v.at("BinaryListValues"));
             }
             r.dataType = MessageAttributeDataTypeFromString(Core::Json::GetStringValue(v, "DataType"));
             return r;
@@ -96,6 +97,6 @@ namespace AwsMock::Dto::SNS {
 
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_MESSAGE_ATTRIBUTE_H

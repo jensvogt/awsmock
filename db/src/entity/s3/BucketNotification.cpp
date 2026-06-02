@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/s3/BucketNotification.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     view_or_value<view, value> BucketNotification::ToDocument() const {
 
@@ -17,4 +17,4 @@ namespace AwsMock::Database::Entity::S3 {
         return notificationDoc;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

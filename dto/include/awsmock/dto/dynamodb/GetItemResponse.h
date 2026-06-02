@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     namespace http = boost::beast::http;
 
@@ -64,6 +64,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H

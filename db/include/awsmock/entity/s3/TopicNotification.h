@@ -13,7 +13,7 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/FilterRule.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief S3 bucket topic notification entity
@@ -68,9 +68,8 @@ namespace AwsMock::Database::Entity::S3 {
          * @return topic notification entity
          */
         static TopicNotification FromDocument(const std::optional<view> &mResult);
-
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_TOPIC_NOTIFICATION_H

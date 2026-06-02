@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief Start a container request
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_CONTAINER_START_CONTAINER_REQUEST_H

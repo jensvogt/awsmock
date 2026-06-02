@@ -18,7 +18,7 @@ namespace {
 #define SQS_ACCOUNT_ID "000000000000"
 #define TEST_QUEUE std::string("test-queue")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Test the SQS command line interface of AwsMock.
@@ -173,4 +173,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(0, messageCount);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

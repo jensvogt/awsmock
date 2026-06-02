@@ -11,7 +11,7 @@
 #include <awsmock/entity/common/BaseEntity.h>
 
 struct User;
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     /**
      * @brief Cognito group entity
@@ -84,6 +84,6 @@ namespace AwsMock::Database::Entity::Cognito {
 
     typedef std::vector<Group> GroupList;
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito
 
 #endif// AWSMOCK_DB_ENTITY_COGNITO_GROUP_H

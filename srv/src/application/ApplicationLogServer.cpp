@@ -4,7 +4,7 @@
 
 #include <awsmock/service/apps/ApplicationLogServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     ApplicationLogServer::ApplicationLogServer() : AbstractServer("application-log") {}
 
     void ApplicationLogServer::operator()(const std::string &listenAddress, const long port) const {
@@ -30,4 +30,4 @@ namespace AwsMock::Service {
     void ApplicationLogServer::Shutdown() {
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

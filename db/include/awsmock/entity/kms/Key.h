@@ -21,7 +21,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::KMS {
+namespace Awsmock::Database::Entity::KMS {
 
     /**
      * @brief KMS key entity
@@ -174,14 +174,14 @@ namespace AwsMock::Database::Entity::KMS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Key &k);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
-
     };
 
     typedef std::vector<Key> KeyList;
 
-}// namespace AwsMock::Database::Entity::KMS
+}// namespace Awsmock::Database::Entity::KMS
 
 #endif// AWSMOCK_DB_ENTITY_KMS_KEY_H

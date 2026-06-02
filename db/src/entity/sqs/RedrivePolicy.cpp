@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     view_or_value<view, value> RedrivePolicy::ToDocument() const {
 
@@ -21,4 +21,4 @@ namespace AwsMock::Database::Entity::SQS {
         maxReceiveCount = Core::Bson::BsonUtils::GetIntValue(mResult, "maxReceiveCount");
     }
 
-}// namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS

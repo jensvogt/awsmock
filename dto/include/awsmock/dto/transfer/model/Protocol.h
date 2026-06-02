@@ -8,7 +8,7 @@
 // C++ standard includes
 #include <string>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     /**
      * @brief Transfer server protocol
@@ -41,6 +41,6 @@ namespace AwsMock::Dto::Transfer {
     }
 
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_SERVER_PROTOCOL_H

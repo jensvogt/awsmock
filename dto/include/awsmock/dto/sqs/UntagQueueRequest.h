@@ -13,7 +13,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct UntagQueueRequest final : Common::BaseCounter<UntagQueueRequest> {
 
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::SQS {
             };
         }
     };
-};// namespace AwsMock::Dto::SQS
+};// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UNTAG_QUEUE_REQUEST_H

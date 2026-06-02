@@ -5,7 +5,7 @@
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/service/frontend/FrontendWorker.h>
 
-namespace AwsMock::Service::Frontend {
+namespace Awsmock::Service::Frontend {
 
     void FrontendWorker::Start() {
         Accept();
@@ -197,4 +197,4 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-};// namespace AwsMock::Service::Frontend
+};// namespace Awsmock::Service::Frontend

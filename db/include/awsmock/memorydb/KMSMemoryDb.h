@@ -17,7 +17,7 @@
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/Database.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * KMS in-memory database.
@@ -134,6 +134,6 @@ namespace AwsMock::Database {
         static boost::mutex _keyMutex;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_KMS_MEMORYDB_H

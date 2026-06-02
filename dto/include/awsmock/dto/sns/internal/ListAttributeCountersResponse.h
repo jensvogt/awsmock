@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sns/model/AttributeCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListAttributeCountersResponse final : Common::BaseCounter<ListAttributeCountersResponse> {
 
@@ -43,6 +43,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_ATTRIBUTE_COUNTERS_RESPONSE_H

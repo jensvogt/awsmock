@@ -13,7 +13,7 @@
 #include <awsmock/dto/module/model/ExportType.h>
 #include <awsmock/dto/module/model/Infrastructure.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     /**
      * @brief Export infrastructure request
@@ -66,12 +66,12 @@ namespace AwsMock::Dto::Module {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, ExportInfrastructureResponse &r);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
-
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_RESPONSE_H

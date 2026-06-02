@@ -6,14 +6,14 @@
 #define AWSMOCK_SERVICE_SQS_SERVER_H
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief SQS module server
@@ -22,7 +22,8 @@ namespace AwsMock::Service {
      */
     class SQSServer : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -38,7 +39,8 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
 
         /**
@@ -82,7 +84,7 @@ namespace AwsMock::Service {
         /**
          * SQS database
          */
-        Database::SQSDatabase _sqsDatabase;
+        Database::SQSMongoRepository _sqsDatabase;
 
         /**
          * SQS monitoring period
@@ -123,6 +125,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVER_H

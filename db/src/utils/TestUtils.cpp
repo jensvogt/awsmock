@@ -4,7 +4,7 @@
 
 #include <awsmock/utils/TestUtils.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     std::vector<std::string> TestUtils::_modules = {"s3", "sqs", "sns", "lambda", "transfer", "cognito", "gateway", "database", "kms", "dynamodb"};
 
@@ -15,4 +15,4 @@ namespace AwsMock::Database {
             _serviceDatabase.CreateOrUpdateModule(module);
         }
     }
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

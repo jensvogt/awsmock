@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/UserAgent.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void UserAgent::FromRequest(const http::request<http::dynamic_body> &request) {
 
@@ -69,4 +69,4 @@ namespace AwsMock::Dto::Common {
         os << "UserAgent=" << r.ToJson();
         return os;
     }
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

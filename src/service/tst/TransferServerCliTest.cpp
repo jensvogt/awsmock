@@ -27,7 +27,7 @@ namespace {
 #define TEST_BUCKET std::string("s3://test-bucket")
 #define S3_ACCOUNT_ID "000000000000"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Test the Transfer Server command line interface of AwsMock,
@@ -138,6 +138,6 @@ namespace AwsMock::Service {
         EXPECT_TRUE(transferList.front().state == Database::Entity::Transfer::ServerState::OFFLINE);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_SERVICE_TRANSFER_SERVER_CLI_TEST_H

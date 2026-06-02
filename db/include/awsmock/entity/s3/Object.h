@@ -23,7 +23,7 @@
 #include <awsmock/entity/s3/StorageClass.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief S3 object entity
@@ -137,6 +137,6 @@ namespace AwsMock::Database::Entity::S3 {
         static Object FromDocument(const std::optional<view> &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif//AWSMOCK_DB_ENTITY_S3_OBJECT_H

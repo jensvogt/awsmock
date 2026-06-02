@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/AttributeCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListMessageAttributeCountersResponse final : Common::BaseCounter<ListMessageAttributeCountersResponse> {
 
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SNS_LIST_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H

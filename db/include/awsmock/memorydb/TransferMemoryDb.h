@@ -13,14 +13,14 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/repository/Database.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief Transfer manager in-memory database.
@@ -192,6 +192,6 @@ namespace AwsMock::Database {
         static boost::mutex _userMutex;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H

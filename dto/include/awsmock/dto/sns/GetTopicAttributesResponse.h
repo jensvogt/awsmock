@@ -13,7 +13,7 @@
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct GetTopicAttributesResponse final : Common::BaseCounter<GetTopicAttributesResponse> {
 
@@ -101,6 +101,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_GET_TOPIC_ATTRIBUTES_RESPONSE_H

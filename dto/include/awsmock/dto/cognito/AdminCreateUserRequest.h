@@ -13,7 +13,7 @@
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Create user request
@@ -47,7 +47,7 @@ namespace AwsMock::Dto::Cognito {
          */
         std::vector<UserAttribute> userAttributes;
 
-    private:
+      private:
 
         friend AdminCreateUserRequest tag_invoke(boost::json::value_to_tag<AdminCreateUserRequest>, boost::json::value const &v) {
             AdminCreateUserRequest r;
@@ -56,7 +56,7 @@ namespace AwsMock::Dto::Cognito {
             r.messageAction = MessageActionFromString(Core::Json::GetStringValue(v, "MessageAction"));
             r.temporaryPassword = Core::Json::GetStringValue(v, "TemporaryPassword");
             if (Core::Json::AttributeExists(v, "UserAttributes")) {
-                r.userAttributes = boost::json::value_to<std::vector<UserAttribute> >(v.at("UserAttributes"));
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v.at("UserAttributes"));
             }
             return r;
         }
@@ -75,6 +75,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_ADMIN_CREATE_USER_REQUEST_H

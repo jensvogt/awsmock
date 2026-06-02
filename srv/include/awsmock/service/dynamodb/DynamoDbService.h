@@ -64,7 +64,7 @@
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/dynamodb/DynamoDbQueryHelper.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief DynamoDb module service.
@@ -275,6 +275,6 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_DYNAMODB_SERVICE_H

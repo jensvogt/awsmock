@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "SNS"};
 }
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     view_or_value<view, value> MessageAttribute::ToDocument() const {
 
@@ -70,4 +70,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS

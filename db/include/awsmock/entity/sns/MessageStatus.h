@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     /**
      * @brief SNS message attribute entity
@@ -23,9 +23,9 @@ namespace AwsMock::Database::Entity::SNS {
     };
 
     static std::map<MessageStatus, std::string> MessageStatusNames{
-        {INITIAL, "INITIAL"},
-        {SEND, "SEND"},
-        {RESEND, "RESEND"},
+            {INITIAL, "INITIAL"},
+            {SEND, "SEND"},
+            {RESEND, "RESEND"},
     };
 
     [[maybe_unused]]
@@ -39,6 +39,6 @@ namespace AwsMock::Database::Entity::SNS {
         return it != MessageStatusNames.end() ? it->first : INITIAL;
     }
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_STATUS_H

@@ -46,7 +46,7 @@
  */
 void ShowHelp(const boost::program_options::options_description &desc) {
     std::cout << std::endl
-              << "AwsMock awslocal v" << AwsMock::Core::Configuration::getVersion() << std::endl
+              << "AwsMock awslocal v" << Awsmock::Core::Configuration::getVersion() << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awslocal [Options] Commands" << std::endl
@@ -64,7 +64,7 @@ void ShowHelp(const boost::program_options::options_description &desc) {
  */
 int main(const int argc, char *argv[]) {
     // Initialize logging
-    AwsMock::Core::LogStream::Initialize();
+    Awsmock::Core::LogStream::Initialize();
 
     // Declare the supported options.
     boost::program_options::options_description desc("Options");
@@ -90,13 +90,13 @@ int main(const int argc, char *argv[]) {
     // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
-                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::getVersion() << std::endl
+                  << "AwsMock awslocal v" << Awsmock::Core::Configuration::getVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
 
     // Read the configuration.
-    AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
+    Awsmock::Core::Configuration &configuration = Awsmock::Core::Configuration::instance();
     if (vm.contains("config")) {
         configuration.setFilePath(vm["config"].as<std::string>());
     } else {
@@ -106,18 +106,18 @@ int main(const int argc, char *argv[]) {
     // Set the log level
     if (vm.contains("loglevel")) {
         const auto value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().set<std::string>("awsmock.logging.level", value);
-        AwsMock::Core::LogStream::SetSeverity(value);
+        Awsmock::Core::Configuration::instance().set<std::string>("awsmock.logging.level", value);
+        Awsmock::Core::LogStream::SetSeverity(value);
     } else {
-        const auto level = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.logging.level");
-        AwsMock::Core::LogStream::SetSeverity(level);
+        const auto level = Awsmock::Core::Configuration::instance().get<std::string>("awsmock.logging.level");
+        Awsmock::Core::LogStream::SetSeverity(level);
     }
 
     // Get commands.
     std::vector<std::string> commands = collect_unrecognized(parsed.options, boost::program_options::include_positional);
 
     // Start manager
-    AwsMock::AwsLocal::AwsLocal awsLocal;
+    Awsmock::AwsLocal::AwsLocal awsLocal;
     awsLocal.Initialize(vm);
     awsLocal.Run(commands);
 

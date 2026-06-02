@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/LambdaMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex LambdaMemoryDb::_lambdaMutex;
     boost::mutex LambdaMemoryDb::_lambdaResultMutex;
@@ -40,8 +40,8 @@ namespace AwsMock::Database {
     bool LambdaMemoryDb::LambdaExistsByArn(const std::string &arn) {
 
         return std::ranges::find_if(_lambdas, [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-            return lambda.second.arn == arn;
-        }) != _lambdas.end();
+                   return lambda.second.arn == arn;
+               }) != _lambdas.end();
     }
 
     Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdasWithEventSource(const std::string &eventSourceArn) {
@@ -201,8 +201,8 @@ namespace AwsMock::Database {
 
     bool LambdaMemoryDb::LambdaResultExists(const std::string &oid) {
         return std::ranges::find_if(_lambdaResults, [oid](const std::pair<std::string, Entity::Lambda::LambdaResult> &lambdaResult) {
-            return lambdaResult.first == oid;
-        }) != _lambdaResults.end();
+                   return lambdaResult.first == oid;
+               }) != _lambdaResults.end();
     }
 
     Entity::Lambda::LambdaResult LambdaMemoryDb::GetLambdaResultById(const std::string &oid) {
@@ -275,4 +275,4 @@ namespace AwsMock::Database {
         _lambdas.clear();
         return deleted;
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

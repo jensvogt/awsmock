@@ -22,14 +22,15 @@
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
     /**
      * @brief JWT token utilities
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     class JwtUtils {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -75,4 +76,4 @@ namespace AwsMock::Core {
          */
         static bool VerifyTokenHs256(const std::string &publicKey, const std::string &jwt, const std::string &issuer);
     };
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

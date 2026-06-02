@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/TransferDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
@@ -377,4 +377,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllTransfers();
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

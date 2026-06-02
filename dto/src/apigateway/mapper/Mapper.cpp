@@ -8,7 +8,7 @@
 
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     Database::Entity::ApiGateway::ApiKey Mapper::map(const CreateApiKeyRequest &request) {
         Database::Entity::ApiGateway::ApiKey keyEntity;
@@ -134,4 +134,4 @@ namespace AwsMock::Dto::ApiGateway {
         return restApiDtos;
     }
 
-}// namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway

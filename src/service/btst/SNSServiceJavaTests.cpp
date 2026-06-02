@@ -20,7 +20,7 @@ namespace {
 #define TEST_QUEUE std::string("test-queue")
 #define TEST_MESSAGE_JSON std::string("{\"test-message\":\"test-value\"")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Tests the aws-sdk-java interface to the AwsMock system.
@@ -188,4 +188,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(0, topicList.size());
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

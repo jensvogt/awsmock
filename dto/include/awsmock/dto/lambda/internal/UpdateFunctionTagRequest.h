@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Update function tag request
@@ -60,6 +60,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_UPDATE_FUNCTION_TAG_REQUEST_H

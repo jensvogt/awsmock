@@ -4,7 +4,7 @@
 
 #include <awsmock/service/secretsmanager/SecretRotation.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     void SecretRotation::operator()(Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const {
 
@@ -97,4 +97,4 @@ namespace AwsMock::Service {
         }
         return nextRotationDate;
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

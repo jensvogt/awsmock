@@ -60,7 +60,7 @@ namespace {
 int main(const int argc, char *argv[]) {
 
     // Initialize logging
-    AwsMock::Core::LogStream::Initialize();
+    Awsmock::Core::LogStream::Initialize();
 
     // Declare the supported options.
     boost::program_options::options_description desc("Options");
@@ -87,7 +87,7 @@ int main(const int argc, char *argv[]) {
     // Show usage
     if (vm.contains("help")) {
         std::cout << std::endl
-                  << "AwsMock manager v" << AwsMock::Core::Configuration::getVersion() << std::endl
+                  << "AwsMock manager v" << Awsmock::Core::Configuration::getVersion() << std::endl
                   << std::endl
                   << "Usage: " << std::endl
                   << "  awsmockmgr [Options]" << std::endl
@@ -99,7 +99,7 @@ int main(const int argc, char *argv[]) {
     // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
-                  << "AwsMock manager v" << AwsMock::Core::Configuration::getVersion() << std::endl
+                  << "AwsMock manager v" << Awsmock::Core::Configuration::getVersion() << std::endl
                   << std::endl;
         return 0;
     }
@@ -131,23 +131,23 @@ int main(const int argc, char *argv[]) {
     if (vm.contains("config")) {
         configFilename = vm["config"].as<std::string>();
     }
-    AwsMock::Core::Configuration::instance().load(configFilename);
+    Awsmock::Core::Configuration::instance().load(configFilename);
 
     // Set the log level, first default, then command line, then environment variables, the configuration file
     auto level = DEFAULT_LOG_LEVEL;
     if (vm.contains("loglevel")) {
         level = vm["loglevel"].as<std::string>();
     }
-    level = AwsMock::Core::Configuration::instance().getOr<std::string>("awsmock.logging.level", level);
-    AwsMock::Core::LogStream::SetSeverity(level);
+    level = Awsmock::Core::Configuration::instance().getOr<std::string>("awsmock.logging.level", level);
+    Awsmock::Core::LogStream::SetSeverity(level);
 
     // Set the log file
-    if (AwsMock::Core::Configuration::instance().get<bool>("awsmock.logging.file-active")) {
-        auto logDir = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.logging.dir");
-        auto prefix = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.logging.prefix");
-        int size = AwsMock::Core::Configuration::instance().get<int>("awsmock.logging.file-size");
-        int count = AwsMock::Core::Configuration::instance().get<int>("awsmock.logging.file-count");
-        AwsMock::Core::LogStream::AddFile(logDir, prefix, size, count);
+    if (Awsmock::Core::Configuration::instance().get<bool>("awsmock.logging.file-active")) {
+        auto logDir = Awsmock::Core::Configuration::instance().get<std::string>("awsmock.logging.dir");
+        auto prefix = Awsmock::Core::Configuration::instance().get<std::string>("awsmock.logging.prefix");
+        int size = Awsmock::Core::Configuration::instance().get<int>("awsmock.logging.file-size");
+        int count = Awsmock::Core::Configuration::instance().get<int>("awsmock.logging.file-count");
+        Awsmock::Core::LogStream::AddFile(logDir, prefix, size, count);
     }
 
 #ifdef WIN32
@@ -157,14 +157,14 @@ int main(const int argc, char *argv[]) {
 
         // Run the detached frontend server thread
         boost::thread frontendThread;
-        AwsMock::Service::Frontend::FrontendServer server;
+        Awsmock::Service::Frontend::FrontendServer server;
         frontendThread = boost::thread{boost::ref(server), false};
         frontendThread.detach();
         log_info << "Frontend server started.";
 
         // Start manager
         boost::asio::io_context ioc;
-        AwsMock::Manager::Manager awsMockManager{ioc};
+        Awsmock::Manager::Manager awsMockManager{ioc};
         awsMockManager.Initialize();
         log_info << "Backend server started.";
         awsMockManager.Run(false);
@@ -173,11 +173,11 @@ int main(const int argc, char *argv[]) {
     }
 
     // Windows service needs a file logger
-    auto logDir = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.logging.dir");
-    auto prefix = AwsMock::Core::Configuration::instance().get<std::string>("awsmock.logging.prefix");
-    int size = AwsMock::Core::Configuration::instance().get<int>("awsmock.logging.file-size");
-    int count = AwsMock::Core::Configuration::instance().get<int>("awsmock.logging.file-count");
-    AwsMock::Core::LogStream::AddFile(logDir, prefix, size, count);
+    auto logDir = Awsmock::Core::Configuration::instance().get<std::string>("awsmock.logging.dir");
+    auto prefix = Awsmock::Core::Configuration::instance().get<std::string>("awsmock.logging.prefix");
+    int size = Awsmock::Core::Configuration::instance().get<int>("awsmock.logging.file-size");
+    int count = Awsmock::Core::Configuration::instance().get<int>("awsmock.logging.file-count");
+    Awsmock::Core::LogStream::AddFile(logDir, prefix, size, count);
 
     // Windows service table entries
     constexpr SERVICE_TABLE_ENTRY serviceTable[] = {
@@ -194,14 +194,14 @@ int main(const int argc, char *argv[]) {
 
     // Run the detached frontend server thread
     boost::thread frontendThread;
-    AwsMock::Service::Frontend::FrontendServer server;
+    Awsmock::Service::Frontend::FrontendServer server;
     frontendThread = boost::thread{boost::ref(server), false};
     frontendThread.detach();
     log_info << "Frontend server started.";
 
     // Start manager
     boost::asio::io_context ioc;
-    AwsMock::Manager::Manager awsMockManager{ioc};
+    Awsmock::Manager::Manager awsMockManager{ioc};
     awsMockManager.Initialize();
     log_info << "Backend server started.";
     awsMockManager.Run(false);

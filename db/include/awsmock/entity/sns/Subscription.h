@@ -11,10 +11,10 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     /**
      * SNS message attribute entity
@@ -71,5 +71,5 @@ namespace AwsMock::Database::Entity::SNS {
 
     typedef std::vector<Subscription> SubscriptionList;
 
-}// namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS
 #endif// AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H

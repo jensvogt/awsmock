@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "SQS"};
 }
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     std::string SqsUtils::CreateMd5OfMessageBody(const std::string &messageBody) {
         return Core::Crypto::GetMd5FromString(messageBody);
@@ -50,7 +50,7 @@ namespace AwsMock::Database {
     }
 
     std::string SqsUtils::CreateMd5OfMessageAttributes(
-        const std::map<std::string, Entity::SQS::MessageAttribute> &messageAttributes) {
+            const std::map<std::string, Entity::SQS::MessageAttribute> &messageAttributes) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         EVP_DigestInit(context, EVP_md5());
@@ -112,4 +112,4 @@ namespace AwsMock::Database {
         return bsoncxx::to_json(p.view_array());
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

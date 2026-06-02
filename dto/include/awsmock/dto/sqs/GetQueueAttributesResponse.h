@@ -13,7 +13,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct GetQueueAttributesResponse final : Common::BaseCounter<GetQueueAttributesResponse> {
 
@@ -55,6 +55,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_GET_QUEUE_ATTRIBUTE_RESPONSE_H

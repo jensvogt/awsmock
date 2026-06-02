@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     enum class FtpReplyCode : int {
         // Reply codes from RFC 959 (plain FTP)
@@ -76,4 +76,4 @@ namespace AwsMock::FtpServer {
         FtpReplyCode code_;
         std::string message_;
     };
-}// namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

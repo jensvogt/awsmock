@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief List all parameters request.
@@ -66,6 +66,6 @@ namespace AwsMock::Dto::SSM {
         }
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_LIST_PARAMETER_COUNTERS_REQUEST_H

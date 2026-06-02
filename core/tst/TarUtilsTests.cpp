@@ -12,7 +12,7 @@
 
 #define FILE_SIZE (100 * 1024)
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(UncompressTest) {
 
@@ -28,6 +28,6 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(71, count);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWMOCK_CORE_ZIP_UTILS_TEST_H

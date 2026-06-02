@@ -12,7 +12,7 @@
 #include <awsmock/dto/container/model/HostConfig.h>
 #include <awsmock/dto/container/model/State.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief Inspect container response
@@ -107,6 +107,6 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_INSPECT_CONTAINER_RESPONSE_H

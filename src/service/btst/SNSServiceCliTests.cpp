@@ -22,7 +22,7 @@ namespace {
 #define TEST_QUEUE std::string("test-queue")
 #define REGION std::string("eu-central-1")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Test the SNS command line interface of AwsMock.
@@ -214,4 +214,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(output6.empty(), false);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

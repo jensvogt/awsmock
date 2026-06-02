@@ -15,7 +15,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttributeDataType.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct MessageAttribute final : Common::BaseCounter<MessageAttribute> {
 
@@ -37,20 +37,21 @@ namespace AwsMock::Dto::SQS {
         /**
          * Attribute binary list values
          */
-        std::vector<std::vector<uint8_t> > binaryListValues;
+        std::vector<std::vector<uint8_t>> binaryListValues;
 
         /**
          * Logical data type
          */
         MessageAttributeDataType dataType{};
 
-    private:
+      private:
+
         friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
             MessageAttribute r;
             r.dataType = MessageAttributeDataTypeFromString(Core::Json::GetStringValue(v, "DataType"));
             r.stringValue = Core::Json::GetStringValue(v, "StringValue");
             if (Core::Json::AttributeExists(v, "StringListValues")) {
-                r.stringListValues = boost::json::value_to<std::vector<std::string> >(v.at("StringListValues"));
+                r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("StringListValues"));
             }
             return r;
         }
@@ -91,6 +92,6 @@ namespace AwsMock::Dto::SQS {
 
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
-} // namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_H

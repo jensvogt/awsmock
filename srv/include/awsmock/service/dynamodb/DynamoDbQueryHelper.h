@@ -22,7 +22,7 @@
 // AwsMock DTO includes
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     // =========================================================================
     // AST nodes
@@ -479,6 +479,6 @@ namespace AwsMock::Service {
         }
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_DYNAMODB_QUERY_HELPER_H

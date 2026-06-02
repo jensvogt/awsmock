@@ -17,7 +17,7 @@
 #include <awsmock/entity/secretsmanager/SecretVersion.h>
 #include <awsmock/entity/secretsmanager/VersionIdsToStages.h>
 
-namespace AwsMock::Database::Entity::SecretsManager {
+namespace Awsmock::Database::Entity::SecretsManager {
 
     using std::chrono::system_clock;
 
@@ -239,14 +239,14 @@ namespace AwsMock::Database::Entity::SecretsManager {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
-
     };
 
     typedef std::vector<Secret> SecretList;
 
-}// namespace AwsMock::Database::Entity::SecretsManager
+}// namespace Awsmock::Database::Entity::SecretsManager
 
 #endif// AWSMOCK_DB_ENTITY_SECRETSMANAGER_SECRET_H

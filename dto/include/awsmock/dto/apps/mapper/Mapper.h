@@ -9,7 +9,7 @@
 #include <awsmock/dto/apps/model/Application.h>
 #include <awsmock/entity/apps/Application.h>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -57,6 +57,6 @@ namespace AwsMock::Dto::Apps {
         static std::vector<Database::Entity::Apps::Application> map(const std::vector<Application> &applicationDtos);
     };
 
-}// namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps
 
 #endif// AWSMOCK_DTO_APPS_MAPPER_H

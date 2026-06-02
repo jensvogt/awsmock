@@ -17,7 +17,7 @@
 #include <awsmock/entity/sns/TopicAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     /**
      * @brief SNS topic entity
@@ -155,14 +155,14 @@ namespace AwsMock::Database::Entity::SNS {
          * @return DTO as JSON string
          */
         [[nodiscard]] std::string ToJson() const;
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
-
     };
 
     typedef std::vector<Topic> TopicList;
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_TOPIC_H

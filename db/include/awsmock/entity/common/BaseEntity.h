@@ -9,7 +9,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
 
-namespace AwsMock::Database::Entity::Common {
+namespace Awsmock::Database::Entity::Common {
 
     /**
      * @brief Base entity
@@ -97,6 +97,6 @@ namespace AwsMock::Database::Entity::Common {
         }
     };
 
-}// namespace AwsMock::Database::Entity::Common
+}// namespace Awsmock::Database::Entity::Common
 
 #endif// AWSMOCK_DB_ENTITY_COMMON_BASE_ENTITY_H

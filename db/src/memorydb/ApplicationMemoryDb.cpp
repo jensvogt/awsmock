@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex ApplicationMemoryDb::_applicationMutex;
 
@@ -140,4 +140,4 @@ namespace AwsMock::Database {
         log_debug << "All applications deleted";
         return count;
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

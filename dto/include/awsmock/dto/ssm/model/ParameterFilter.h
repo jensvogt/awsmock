@@ -15,7 +15,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief SSM parameter filter
@@ -122,6 +122,6 @@ namespace AwsMock::Dto::SSM {
         }
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_MODEL_PARAMETER_FILTERS_H

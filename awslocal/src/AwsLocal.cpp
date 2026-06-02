@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "AwsLocal"};
 }
 
-namespace AwsMock::AwsLocal {
+namespace Awsmock::AwsLocal {
     void AwsLocal::Initialize(const boost::program_options::variables_map &vm) {
         if (vm.find("host") != vm.end()) {
             _host = vm.at("host").as<std::string>();
@@ -54,4 +54,4 @@ namespace AwsMock::AwsLocal {
             _baseUrl = pt.get<std::string>(_profile + ".endpoint_url");
         }
     }
-} // namespace AwsMock::AwsLocal
+}// namespace Awsmock::AwsLocal

@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Reset function counters
@@ -37,6 +37,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif//AWSMOCK_DTO_LAMBDA_RESET_FUNCTION_COUNTERS_REQUEST_H

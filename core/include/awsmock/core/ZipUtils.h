@@ -17,9 +17,9 @@
 #include <io.h>
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#include <winsock2.h>
 #include <Windows.h>
 #include <boost/asio.hpp>
+#include <winsock2.h>
 #endif
 
 // Boost includes
@@ -34,7 +34,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief TAR compression utilities
@@ -47,7 +47,8 @@ namespace AwsMock::Core {
      */
     class ZipUtils {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -61,7 +62,8 @@ namespace AwsMock::Core {
          */
         static void Unzip(const std::string &zipFile, const std::string &directory);
 
-    private:
+      private:
+
         /**
          * @brief Copy data from A to B
          *
@@ -72,4 +74,4 @@ namespace AwsMock::Core {
         static long CopyData(archive *ar, archive *aw);
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

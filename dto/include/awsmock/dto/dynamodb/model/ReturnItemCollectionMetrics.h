@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Return consumed capacity
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::DynamoDb {
         return ReturnItemCollectionMetricsType::NONE;
     }
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_RETURN_ITEM_COLLECTION_METRICS_H

@@ -8,12 +8,12 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Lambda"};
 }
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     bool Lambda::HasEventSource(const std::string &eventSourceArn) const {
         return std::ranges::find_if(eventSources, [eventSourceArn](const EventSourceMapping &e) {
-            return e.eventSourceArn == eventSourceArn;
-        }) != eventSources.end();
+                   return e.eventSourceArn == eventSourceArn;
+               }) != eventSources.end();
     }
 
     EventSourceMapping Lambda::GetEventSource(const std::string &eventSourceArn) const {
@@ -28,8 +28,8 @@ namespace AwsMock::Database::Entity::Lambda {
 
     bool Lambda::HasTag(const std::string &key) const {
         return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
-            return t.first == key;
-        }) != tags.end();
+                   return t.first == key;
+               }) != tags.end();
     }
 
     std::string Lambda::GetTagValue(const std::string &key) const {
@@ -251,4 +251,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "Lambda=" << to_json(l.ToDocument());
         return os;
     }
-} // namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

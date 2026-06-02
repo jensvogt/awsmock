@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/lambda/EventSourceMapping.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     void EventSourceMapping::FromDocument(const std::optional<view> &mResult) {
 
@@ -38,4 +38,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "EventSourceMapping=" << to_json(t.ToDocument());
         return os;
     }
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

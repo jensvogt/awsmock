@@ -4,7 +4,7 @@
 
 #include <awsmock/service/module/ModuleMonitoring.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     void ModuleMonitoring::UpdateCounter() const {
 
@@ -26,4 +26,4 @@ namespace AwsMock::Service {
         }*/
         log_trace << "Manager monitoring finished";
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListMessageAttributeCountersRequest final : Common::BaseCounter<ListMessageAttributeCountersRequest> {
 
@@ -70,6 +70,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_MESSAGE_ATTRIBUTE_COUNTERS_REQUEST_H

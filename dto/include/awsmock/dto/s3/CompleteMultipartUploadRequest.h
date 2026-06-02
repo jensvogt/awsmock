@@ -13,7 +13,7 @@
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief Complete multipart upload
@@ -36,6 +36,11 @@ namespace AwsMock::Dto::S3 {
          * Upload ID
          */
         std::string uploadId;
+
+        /**
+         * Checksum algorithm
+         */
+        std::string checksumAlgorithm;
 
         /**
          * Checksum CRC32
@@ -83,6 +88,7 @@ namespace AwsMock::Dto::S3 {
 
                 boost::property_tree::ptree pt;
                 read_xml(xmlString, pt);
+                checksumAlgorithm = pt.get<std::string>("CompleteMultipartUpload.Part.ChecksumAlgorithm");
                 checksumCrc32 = pt.get<std::string>("CompleteMultipartUpload.Part.ChecksumCRC32");
                 checksumCrc32c = pt.get<std::string>("CompleteMultipartUpload.Part.ChecksumCRC32C");
                 checksumSha1 = pt.get<std::string>("CompleteMultipartUpload.Part.ChecksumSHA1");
@@ -107,6 +113,7 @@ namespace AwsMock::Dto::S3 {
 
                 boost::property_tree::ptree root;
                 root.add("CompleteMultipartUpload.Part.ETag", eTag);
+                root.add("CompleteMultipartUpload.Part.ChecksumAlgorithm", checksumAlgorithm);
                 root.add("CompleteMultipartUpload.Part.ChecksumCRC32", checksumCrc32);
                 root.add("CompleteMultipartUpload.Part.ChecksumCRC32C", checksumCrc32c);
                 root.add("CompleteMultipartUpload.Part.ChecksumSHA1", checksumSha1);
@@ -129,12 +136,13 @@ namespace AwsMock::Dto::S3 {
             r.bucket = Core::Json::GetStringValue(v, "Bucket");
             r.key = Core::Json::GetStringValue(v, "Key");
             r.uploadId = Core::Json::GetStringValue(v, "UploadId");
+            r.checksumAlgorithm = Core::Json::GetStringValue(v, "ChecksumAlgorithm");
             r.checksumCrc32 = Core::Json::GetStringValue(v, "ChecksumCrc32");
             r.checksumCrc32c = Core::Json::GetStringValue(v, "ChecksumCrc32c");
             r.checksumSha1 = Core::Json::GetStringValue(v, "ChecksumSha1");
             r.checksumSha256 = Core::Json::GetStringValue(v, "ChecksumSha256");
             r.eTag = Core::Json::GetStringValue(v, "ETag");
-            r.partNumber = Core::Json::GetLongValue(v, "PartNunmber");
+            r.partNumber = Core::Json::GetLongValue(v, "PartNumber");
             r.contentType = Core::Json::GetStringValue(v, "ContentType");
             return r;
         }
@@ -147,6 +155,7 @@ namespace AwsMock::Dto::S3 {
                     {"Bucket", obj.bucket},
                     {"Key", obj.key},
                     {"UploadId", obj.uploadId},
+                    {"ChecksumAlgorithm", obj.checksumAlgorithm},
                     {"ChecksumCrc32", obj.checksumCrc32},
                     {"ChecksumCrc32c", obj.checksumCrc32c},
                     {"ChecksumSha1", obj.checksumSha1},
@@ -158,6 +167,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_CORE_DTO_S3_COMPLETE_MULTIPART_UPLOAD_REQUEST_H

@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     FtpServer::FtpServer(std::string serverName, const int port, std::string address, boost::asio::io_context &awsIoc) : _serverName(std::move(serverName)), _address(std::move(address)), _port(port), _maxThreads(8), _awsIoc(awsIoc) {
 
@@ -44,4 +44,4 @@ namespace AwsMock::FtpServer {
     std::string FtpServer::getAddress() const {
         return _ftp_server->getAddress();
     }
-}// namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

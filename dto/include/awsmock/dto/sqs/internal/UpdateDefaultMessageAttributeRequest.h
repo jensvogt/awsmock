@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct UpdateDefaultMessageAttributeRequest final : Common::BaseCounter<UpdateDefaultMessageAttributeRequest> {
 
@@ -35,7 +35,8 @@ namespace AwsMock::Dto::SQS {
          */
         std::string dataType;
 
-    private:
+      private:
+
         friend UpdateDefaultMessageAttributeRequest tag_invoke(boost::json::value_to_tag<UpdateDefaultMessageAttributeRequest>, boost::json::value const &v) {
             UpdateDefaultMessageAttributeRequest r;
             r.queueArn = Core::Json::GetStringValue(v, "queueArn");
@@ -47,17 +48,17 @@ namespace AwsMock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateDefaultMessageAttributeRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"queueArn", obj.queueArn},
-                {"name", obj.name},
-                {"value", obj.value},
-                {"dataType", obj.dataType},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueArn", obj.queueArn},
+                    {"name", obj.name},
+                    {"value", obj.value},
+                    {"dataType", obj.dataType},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UPDATE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H

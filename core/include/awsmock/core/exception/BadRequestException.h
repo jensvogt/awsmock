@@ -17,7 +17,7 @@
 
 // AwsMock includes
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Bad request exception class.
@@ -26,7 +26,8 @@ namespace AwsMock::Core {
      */
     class BadRequestException final : public std::exception {
 
-    public:
+      public:
+
         /**
          * Constructor.
          *
@@ -84,7 +85,8 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-    private:
+      private:
+
         /**
          * HTTP status code
          */
@@ -96,4 +98,4 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

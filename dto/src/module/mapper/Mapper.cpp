@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/module/mapper/Mapper.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     Module::ModuleList Mapper::map(const std::vector<Database::Entity::Module::Module> &moduleList) {
 
@@ -15,4 +15,4 @@ namespace AwsMock::Dto::Module {
         return dtoList;
     }
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module

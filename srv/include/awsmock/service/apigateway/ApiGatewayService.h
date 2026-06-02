@@ -34,7 +34,7 @@
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/repository/ApiGatewayDatabase.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     using std::chrono::system_clock;
 
@@ -140,4 +140,4 @@ namespace AwsMock::Service {
         boost::asio::io_context &_ioc;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

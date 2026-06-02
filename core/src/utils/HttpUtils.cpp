@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string HttpUtils::GetPathParameter(const std::string &uri, const int index) {
 
@@ -552,4 +552,4 @@ namespace AwsMock::Core {
         return response;
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

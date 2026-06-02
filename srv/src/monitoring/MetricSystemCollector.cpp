@@ -4,7 +4,7 @@
 
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 
-namespace AwsMock::Monitoring {
+namespace Awsmock::Monitoring {
 
     MetricSystemCollector::MetricSystemCollector() {
 
@@ -349,4 +349,4 @@ namespace AwsMock::Monitoring {
     }
 #endif
 
-}// namespace AwsMock::Monitoring
+}// namespace Awsmock::Monitoring

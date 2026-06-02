@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
 #ifdef _WIN32
     void ZipUtils::Unzip(const std::string &zipFile, const std::string &directory) {
@@ -175,4 +175,4 @@ namespace AwsMock::Core {
         }
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

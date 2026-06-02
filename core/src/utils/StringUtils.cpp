@@ -1,11 +1,11 @@
 
+#include <awsmock/core/StringUtils.h>
 #include <fstream>
 #include <iostream>
-#include <awsmock/core/StringUtils.h>
 
 #include "awsmock/core/logging/LogStream.h"
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     template<typename T = std::mt19937>
     auto RandomGenerator() -> T {
@@ -84,8 +84,8 @@ namespace AwsMock::Core {
 
     bool StringUtils::IsNumeric(const std::string &value) {
         return !value.empty() && std::ranges::find_if(value, [](unsigned char c) {
-            return !std::isdigit(c);
-        }) == value.end();
+                                     return !std::isdigit(c);
+                                 }) == value.end();
     }
 
     bool StringUtils::IsUuid(const std::string &value) {
@@ -190,9 +190,9 @@ namespace AwsMock::Core {
 
     std::string StringUtils::SubString(const std::string &string, const int beginIndex, const int endIndex) {
         const int size = static_cast<int>(string.size());
-        if (beginIndex < 0 || beginIndex > size - 1) return "-1"; // Index out of bounds
-        if (endIndex < 0 || endIndex > size - 1) return "-1"; // Index out of bounds
-        if (beginIndex > endIndex) return "-1"; // Begin index should not be bigger that end.
+        if (beginIndex < 0 || beginIndex > size - 1) return "-1";// Index out of bounds
+        if (endIndex < 0 || endIndex > size - 1) return "-1";    // Index out of bounds
+        if (beginIndex > endIndex) return "-1";                  // Begin index should not be bigger that end.
 
         std::string substr;
         for (int i = 0; i < size; i++)
@@ -331,7 +331,7 @@ namespace AwsMock::Core {
                 i += 4;
             } else {
                 // Invalid UTF-8 byte → replace
-                output.append("\xEF\xBF\xBD"); // Unicode replacement char �
+                output.append("\xEF\xBF\xBD");// Unicode replacement char �
                 i++;
             }
         }
@@ -368,4 +368,4 @@ namespace AwsMock::Core {
     }
 #endif
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

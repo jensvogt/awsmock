@@ -14,7 +14,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     /**
      * @brief Transfer server user
@@ -149,6 +149,6 @@ namespace AwsMock::Dto::Transfer {
 
     typedef std::vector<User> UserList;
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_USER_H

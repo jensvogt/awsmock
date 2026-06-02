@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     Parameter Mapper::map(const Database::Entity::SSM::Parameter &parameterEntity) {
 
@@ -73,4 +73,4 @@ namespace AwsMock::Dto::SSM {
         return response;
     }
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM

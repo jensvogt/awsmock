@@ -32,7 +32,7 @@
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Lambda controller
@@ -50,7 +50,8 @@ namespace AwsMock::Service {
      */
     class LambdaController final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -65,7 +66,8 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
         /**
          * @brief Handle sigLambdaStart — start a single lambda by ARN
          *
@@ -107,7 +109,7 @@ namespace AwsMock::Service {
          */
         void OnInvokeLambda(const std::string &region, const std::string &functionName, const std::string &payload,
                             const std::string &invocationType,
-                            const std::shared_ptr<std::promise<std::pair<int, std::string> > > &promise) const;
+                            const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) const;
 
         /**
          * @brief Handle sigLambdaCheck — inspect the Docker daemon state for a single lambda
@@ -167,7 +169,7 @@ namespace AwsMock::Service {
          * @brief Per-function mutex map — serialises instance selection so that two concurrent
          * invocations of the same function never claim the same idle instance.
          */
-        mutable std::map<std::string, std::shared_ptr<boost::mutex> > _instanceMutex;
+        mutable std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
 
         /**
          * @brief Guards _instanceMutex map insertions.
@@ -177,6 +179,6 @@ namespace AwsMock::Service {
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_CONTROLLER_H

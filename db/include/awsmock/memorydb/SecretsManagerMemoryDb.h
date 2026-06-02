@@ -17,7 +17,7 @@
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/repository/Database.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * Secrets manager in-memory database.
@@ -179,6 +179,6 @@ namespace AwsMock::Database {
         static boost::mutex _secretMutex;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_SECRETS_MANAGER_MEMORYDB_H

@@ -24,7 +24,7 @@
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     using std::chrono::system_clock;
 
@@ -44,7 +44,8 @@ namespace AwsMock::Core {
      */
     class DateTimeUtils {
 
-    public:
+      public:
+
         /**
          * @brief Returns the time_point in ISO8001 format
          *
@@ -149,7 +150,7 @@ namespace AwsMock::Core {
          *
          * @par
          * On Windows (using MSVC) the bson library converts a uint_64 in long long.
-         * 
+         *
          * @param timestamp UNIX timestamp
          * @return system_clock::time_point
          */
@@ -201,4 +202,4 @@ namespace AwsMock::Core {
         static system_clock::time_point ConvertToUtc(const system_clock::time_point &value);
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct GetObjectCounterRequest final : Common::BaseCounter<GetObjectCounterRequest> {
 
@@ -43,6 +43,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_GET_OBJECT_COUNTER_REQUEST_H

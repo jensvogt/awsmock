@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief Create KMS key request
@@ -61,6 +61,6 @@ namespace AwsMock::Dto::KMS {
         }
     };
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_DESCRIBE_KEY_REQUEST_H

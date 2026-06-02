@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};
 }
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     void TestBase::StartGateway() {
 
@@ -65,4 +65,4 @@ namespace AwsMock::Service {
         _ios.stop();
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

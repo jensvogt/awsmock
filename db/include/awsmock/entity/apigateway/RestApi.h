@@ -9,7 +9,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::ApiGateway {
+namespace Awsmock::Database::Entity::ApiGateway {
 
     /**
      * @brief API gateway rest entity
@@ -126,6 +126,6 @@ namespace AwsMock::Database::Entity::ApiGateway {
         void FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::ApiGateway
+}// namespace Awsmock::Database::Entity::ApiGateway
 
 #endif// AWSMOCK_DB_ENTITY_API_GATEWAY_REST_API_H

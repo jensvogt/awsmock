@@ -15,7 +15,7 @@
 #include <awsmock/dto/sns/model/MessageAttribute.h>
 #include <awsmock/dto/sns/model/MessageAttributeDataType.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct MessageAttributeCounter final : Common::BaseCounter<MessageAttributeCounter> {
 
@@ -105,6 +105,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_MESSAGE_ATTRIBUTE_COUNTER_H

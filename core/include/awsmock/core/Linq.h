@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief LINQ like querying of a std::vector
@@ -25,7 +25,8 @@ namespace AwsMock::Core {
 
         std::vector<T> data;
 
-    public:
+      public:
+
         explicit Query(std::vector<T> d) : data(std::move(d)) {
         }
 
@@ -60,8 +61,8 @@ namespace AwsMock::Core {
          * @brief group_by: group elements by key selector
          */
         template<typename K>
-        std::map<K, std::vector<T> > group_by(std::function<K(const T &)> keySelector) const {
-            std::map<K, std::vector<T> > groups;
+        std::map<K, std::vector<T>> group_by(std::function<K(const T &)> keySelector) const {
+            std::map<K, std::vector<T>> groups;
             for (const auto &item: data) {
                 groups[keySelector(item)].push_back(item);
             }
@@ -109,4 +110,4 @@ namespace AwsMock::Core {
         return Query<T>(v);
     }
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

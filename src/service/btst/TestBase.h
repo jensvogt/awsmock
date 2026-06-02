@@ -16,7 +16,7 @@
 #define TEST_CONTAINER_VERSION std::string("latest")
 #define TEST_CONTAINER_NAME std::string("awsmock-test")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class TestBase {
 
@@ -107,5 +107,5 @@ namespace AwsMock::Service {
         std::shared_ptr<GatewayServer> _gatewayServer;
         Core::Configuration &_configuration = Core::Configuration::instance();
     };
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 #endif// AWSMOCK_SERVICE_TEST_BASE_H

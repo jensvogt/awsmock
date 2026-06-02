@@ -15,7 +15,7 @@
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/container/ContainerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Container HTTP handler
@@ -55,6 +55,6 @@ namespace AwsMock::Service {
         ContainerService _containerService;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_CONTAINER_HANDLER_H

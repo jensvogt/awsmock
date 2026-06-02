@@ -4,21 +4,20 @@
 
 #include <awsmock/repository/ModuleDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     std::map<std::string, Entity::Module::Module> ModuleDatabase::_existingModules = {
-        {"s3", {.name = "s3", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"sqs", {.name = "sqs", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"sns", {.name = "sns", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"lambda", {.name = "lambda", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"transfer", {.name = "transfer", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"cognito", {.name = "cognito", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"dynamodb", {.name = "dynamodb", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"ssm", {.name = "ssm", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-        {"application", {.name = "application", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}
-    };
+            {"s3", {.name = "s3", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"sqs", {.name = "sqs", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"sns", {.name = "sns", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"lambda", {.name = "lambda", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"transfer", {.name = "transfer", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"cognito", {.name = "cognito", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"dynamodb", {.name = "dynamodb", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"ssm", {.name = "ssm", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"application", {.name = "application", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
 
     void ModuleDatabase::Initialize() {
 
@@ -236,14 +235,11 @@ namespace AwsMock::Database {
             opts.return_document(mongocxx::options::return_document::k_after);
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", ModuleStateToString(state))))), opts);
                 log_trace << "Module state updated, name: " << name << " state: " << ModuleStateToString(state);
-                session.commit_transaction();
                 if (mResult) {
                     Entity::Module::Module module;
                     module.FromDocument(mResult->view());
@@ -253,7 +249,6 @@ namespace AwsMock::Database {
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Set module state failed, error: " << e.what();
-                session.abort_transaction();
             }
         }
         return _memoryDb.SetState(name, state);
@@ -377,7 +372,6 @@ namespace AwsMock::Database {
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Set module loglevel failed, error: " << e.what();
             }
-
         }
         return _memoryDb.SetModuleLoglevel(name, level);
     }
@@ -396,7 +390,6 @@ namespace AwsMock::Database {
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Set all modules loglevel failed, error: " << e.what();
             }
-
         }
         return _memoryDb.SetAllModulesLoglevel(level);
     }
@@ -463,4 +456,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllModules();
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

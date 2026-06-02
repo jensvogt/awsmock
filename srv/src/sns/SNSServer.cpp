@@ -4,7 +4,7 @@
 
 #include <awsmock/service/sns/SNSServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _scheduler(scheduler) {
 
@@ -69,4 +69,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("sns-delete-messages");
         _scheduler.Shutdown("sns-backup");
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

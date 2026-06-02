@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/Protocol.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct DeleteProtocolRequest final : Common::BaseCounter<DeleteProtocolRequest> {
 
@@ -47,6 +47,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_DELETE_PROTOCOL_REQUEST_H

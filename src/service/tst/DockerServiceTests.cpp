@@ -19,7 +19,7 @@
 #define K8S_PAUSE_IMAGE "k8s.gcr.io/pause"
 #define K8S_PAUSE_TAG "latest"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class DockerServiceTest : public ::testing::Test {
 
@@ -129,6 +129,6 @@ namespace AwsMock::Service {
         // assert
         EXPECT_TRUE(result);
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_CORE_CONTAINER_SERVICE_TEST_H

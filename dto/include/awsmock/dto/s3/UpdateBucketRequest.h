@@ -9,7 +9,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/Bucket.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief Update bucket request
@@ -41,6 +41,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_UPDATE_BUCKET_REQUEST_H

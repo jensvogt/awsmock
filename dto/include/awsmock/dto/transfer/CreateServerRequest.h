@@ -16,7 +16,7 @@
 #include <awsmock/dto/transfer/model/Protocol.h>
 
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct CreateServerRequest final : Common::BaseCounter<CreateServerRequest> {
 
@@ -70,6 +70,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif

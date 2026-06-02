@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
 
     /**
      * @brief Delete an application
@@ -106,6 +106,6 @@ namespace AwsMock::Dto::Apps {
         }
     };
 
-}// namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps
 
 #endif// AWSMOCK_DTO_APPS_DELETE_APPLICATION_REQUEST_H

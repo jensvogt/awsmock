@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct DeleteTopicRequest final : Common::BaseCounter<DeleteTopicRequest> {
 
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::SNS {
          */
         std::string topicArn;
 
-    private:
+      private:
 
         friend DeleteTopicRequest tag_invoke(boost::json::value_to_tag<DeleteTopicRequest>, boost::json::value const &v) {
             DeleteTopicRequest r;
@@ -39,6 +39,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_DELETE_TOPIC_REQUEST_H

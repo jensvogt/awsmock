@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListQueueCountersRequest final : Common::BaseCounter<ListQueueCountersRequest> {
 
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::SQS {
          */
         std::vector<Common::SortColumn> sortColumns;
 
-    private:
+      private:
 
         friend ListQueueCountersRequest tag_invoke(boost::json::value_to_tag<ListQueueCountersRequest>, boost::json::value const &v) {
             ListQueueCountersRequest r;
@@ -44,7 +44,7 @@ namespace AwsMock::Dto::SQS {
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
             if (Core::Json::AttributeExists(v, "sortColumns")) {
-                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn> >(v.at("sortColumns"));
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             }
             return r;
         }
@@ -62,6 +62,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_REQUEST_H

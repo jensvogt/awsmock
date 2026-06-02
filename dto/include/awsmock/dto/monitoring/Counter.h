@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Monitoring {
+namespace Awsmock::Dto::Monitoring {
 
     using std::chrono::system_clock;
 
@@ -50,6 +50,6 @@ namespace AwsMock::Dto::Monitoring {
         }
     };
 
-};// namespace AwsMock::Dto::Monitoring
+};// namespace Awsmock::Dto::Monitoring
 
 #endif// AWSMOCK_DTO_MONITORING_COUNTER_H

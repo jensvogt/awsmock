@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     /**
      * @brief Rest API source type
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::ApiGateway {
         return ApiKeySourceType::UNKNOWN;
     }
 
-}// namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway
 
 #endif// AWSMOCK_DTO_API_GATEWAY_API_KEY_SOURCE_H

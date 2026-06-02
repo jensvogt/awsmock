@@ -15,7 +15,7 @@
 #include <awsmock/dto/secretsmanager/model/Tag.h>
 #include <awsmock/dto/secretsmanager/model/VersionIdsToStages.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief Describe secret response
@@ -163,6 +163,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETMANAGER_DESCRIBE_SECRET_RESPONSE_H

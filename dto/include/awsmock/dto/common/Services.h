@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     /**
      * @brief Services
@@ -70,11 +70,11 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const Services &i);
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-} // namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_SERVICES_H

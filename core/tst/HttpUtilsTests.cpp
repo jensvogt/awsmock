@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(QueryStringTest) {
 
@@ -212,6 +212,6 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(true, enabled);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWMOCK_CORE_HTTP_UTILS_TEST_H

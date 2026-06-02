@@ -26,7 +26,7 @@
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     class FilterRuleMapper : public StaticMapper<FilterRuleMapper, Database::Entity::S3::FilterRule, FilterRule> {
       public:
@@ -374,6 +374,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_MAPPER_H

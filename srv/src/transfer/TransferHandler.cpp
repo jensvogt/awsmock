@@ -1,7 +1,7 @@
 
 #include <awsmock/service/transfer/TransferHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     http::response<http::dynamic_body> TransferHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Transfer server POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -169,4 +169,4 @@ namespace AwsMock::Service {
         return Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/lambda/model/Error.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     struct EnvironmentVariables final : Common::BaseCounter<EnvironmentVariables> {
 
@@ -98,6 +98,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif//AWSMOCK_DTO_LAMBDA_ENVIRONMENT_H

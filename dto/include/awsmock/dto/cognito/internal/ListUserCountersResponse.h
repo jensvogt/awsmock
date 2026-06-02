@@ -12,7 +12,7 @@
 #include <awsmock/dto/cognito/model/UserCounter.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief List user counters response
@@ -53,6 +53,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_LIST_USER_COUNTERS_RESPONSE_H

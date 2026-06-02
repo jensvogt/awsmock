@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/apigateway/RestApi.h>
 
-namespace AwsMock::Database::Entity::ApiGateway {
+namespace Awsmock::Database::Entity::ApiGateway {
 
     view_or_value<view, value> RestApi::ToDocument() const {
 
@@ -98,4 +98,4 @@ namespace AwsMock::Database::Entity::ApiGateway {
         }
     }
 
-}// namespace AwsMock::Database::Entity::ApiGateway
+}// namespace Awsmock::Database::Entity::ApiGateway

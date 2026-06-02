@@ -14,7 +14,7 @@
 
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Put item response
@@ -76,6 +76,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_PUT_ITEM_RESPONSE_H

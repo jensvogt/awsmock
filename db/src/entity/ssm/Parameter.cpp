@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/ssm/Parameter.h>
 
-namespace AwsMock::Database::Entity::SSM {
+namespace Awsmock::Database::Entity::SSM {
 
     view_or_value<view, value> Parameter::ToDocument() const {
 
@@ -71,4 +71,4 @@ namespace AwsMock::Database::Entity::SSM {
         os << "Parameter=" << u.ToJson();
         return os;
     }
-}// namespace AwsMock::Database::Entity::SSM
+}// namespace Awsmock::Database::Entity::SSM

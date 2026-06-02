@@ -7,7 +7,7 @@
 
 #include <awsmock/service/ssm/SSMService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     SSMService::SSMService() : _ssmDatabase(Database::SSMDatabase::instance()) {
 
@@ -322,4 +322,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

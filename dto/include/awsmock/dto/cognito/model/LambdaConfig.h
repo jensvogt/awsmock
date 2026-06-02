@@ -15,7 +15,7 @@
 #include <awsmock/dto/cognito/model/CustomSmsSender.h>
 #include <awsmock/dto/cognito/model/PreTokenGenerationConfig.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Cognito lambda configuration
@@ -167,6 +167,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_LAMBDACONFIG_H

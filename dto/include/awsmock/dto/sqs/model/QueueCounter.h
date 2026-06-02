@@ -15,7 +15,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     using std::chrono::system_clock;
 
@@ -140,6 +140,6 @@ namespace AwsMock::Dto::SQS {
 
     typedef std::vector<QueueCounter> QueueCounterList;
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_QUEUEATTRIBUTE_H

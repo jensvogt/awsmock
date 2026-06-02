@@ -16,7 +16,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/Stream.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB list table response
@@ -58,6 +58,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_LIST_STREAMS_RESPONSE_H

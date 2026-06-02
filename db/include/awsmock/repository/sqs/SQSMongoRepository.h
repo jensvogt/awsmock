@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SQS_DATABASE_H
-#define AWSMOCK_REPOSITORY_SQS_DATABASE_H
+#pragma once
 
 // C++ standard includes
 #include <queue>
@@ -12,8 +11,6 @@
 // Boost includes
 #include <boost/container/map.hpp>
 #include <boost/container/string.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
@@ -30,13 +27,13 @@
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
-#include <awsmock/memorydb/SQSMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/sqs/SQSMemoryRepository.h>
 #include <awsmock/utils/MongoUtils.h>
 #include <awsmock/utils/SortColumn.h>
 #include <awsmock/utils/SqsUtils.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using std::chrono::system_clock;
 
@@ -45,20 +42,20 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSDatabase : public DatabaseBase {
+    class SQSMongoRepository : public ISQSRepository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SQSDatabase();
+        explicit SQSMongoRepository() = default;
 
         /**
          * @brief Singleton instance
          */
-        static SQSDatabase &instance() {
-            static SQSDatabase sqsDatabase;
+        static SQSMongoRepository &instance() {
+            static SQSMongoRepository sqsDatabase;
             return sqsDatabase;
         }
 
@@ -70,7 +67,8 @@ namespace AwsMock::Database {
          * @return true if the queue already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool QueueExists(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        bool queueExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Check the existence of a queue
@@ -80,7 +78,8 @@ namespace AwsMock::Database {
          * @return true if the queue already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool QueueUrlExists(const std::string &region, const std::string &queueUrl) const;
+        [[nodiscard]]
+        bool queueUrlExists(const std::string &region, const std::string &queueUrl) const override;
 
         /**
          * @brief Check the existence of queue by ARN
@@ -89,7 +88,8 @@ namespace AwsMock::Database {
          * @return true in case the queue exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool QueueArnExists(const std::string &queueArn) const;
+        [[nodiscard]]
+        bool queueArnExists(const std::string &queueArn) const override;
 
         /**
          * @brief Create a new queue in the SQS queue table
@@ -98,7 +98,8 @@ namespace AwsMock::Database {
          * @return created SQS queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue CreateQueue(Entity::SQS::Queue &queue) const;
+        [[nodiscard]]
+        Entity::SQS::Queue createQueue(Entity::SQS::Queue &queue) const override;
 
         /**
          * @brief Returns a queue by primary key
@@ -106,54 +107,19 @@ namespace AwsMock::Database {
          * @param oid queue primary key
          * @return queue entity
          * @throws DatabaseException
-         */
-        [[nodiscard]] Entity::SQS::Queue GetQueueById(bsoncxx::oid oid) const;
-
-        /**
-         * @brief Returns a queue by primary key
-         *
-         * @param oid queue primary key
-         * @return queue entity
-         * @throws DatabaseException
-         */
-        [[nodiscard]] Entity::SQS::Queue GetQueueById(const std::string &oid) const;
-
-        /**
-         * @brief Returns a queue by ARN
-         *
-         * @param queueArn queue ARN
-         * @return queue entity
-         * @throws DatabaseException
-         */
-        [[nodiscard]] Entity::SQS::Queue GetQueueByArn(const std::string &queueArn) const;
-
-        /**
-         * @brief Returns a queue by DQL ARN
-         *
-         * @param dlqQueueArn queue ARN of the DQL
-         * @return queue entity
-         * @throws DatabaseException
-         */
-        [[nodiscard]] Entity::SQS::Queue GetQueueByDlq(const std::string &dlqQueueArn) const;
-
-        /**
-         * @brief Checks whether a queue ARN is a dead letter queue
-         *
-         * @param queueArn queue ARN
-         * @return list of main queues
          */
         [[nodiscard]]
-        std::vector<Entity::SQS::Queue> IsDlq(const std::string &queueArn) const;
+        Entity::SQS::Queue getQueueById(bsoncxx::oid oid) const override;
 
         /**
-         * @brief Returns a queue by name and region
+         * @brief Returns a queue by primary key
          *
-         * @param region AWS region
-         * @param queueName queue name
+         * @param oid queue primary key
          * @return queue entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::SQS::Queue GetQueueByName(const std::string &region, const std::string &queueName) const;
+        [[nodiscard]]
+        Entity::SQS::Queue getQueueById(const std::string &oid) const override;
 
         /**
          * @brief Returns a queue by URL
@@ -164,10 +130,50 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Queue GetQueueByUrl(const std::string &region, const std::string &queueUrl) const;
+        Entity::SQS::Queue getQueueByUrl(const std::string &region, const std::string &queueUrl) const override;
 
         /**
-         * @brief List available queues, using paging
+         * @brief Returns a queue by ARN
+         *
+         * @param queueArn queue ARN
+         * @return queue entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::SQS::Queue getQueueByArn(const std::string &queueArn) const override;
+
+        /**
+         * @brief Returns a queue by DQL ARN
+         *
+         * @param dlqQueueArn queue ARN of the DQL
+         * @return queue entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::SQS::Queue getQueueByDlq(const std::string &dlqQueueArn) const override;
+
+        /**
+         * @brief Checks whether a queue ARN is a dead letter queue
+         *
+         * @param queueArn queue ARN
+         * @return list of main queues
+         */
+        [[nodiscard]]
+        std::vector<Entity::SQS::Queue> isDlq(const std::string &queueArn) const override;
+
+        /**
+         * @brief Returns a queue by name and region
+         *
+         * @param region AWS region
+         * @param queueName queue name
+         * @return queue entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::SQS::Queue getQueueByName(const std::string &region, const std::string &queueName) const override;
+
+        /**
+         * @brief List all available queues using paging
          *
          * @param prefix queue name prefix
          * @param pageSize maximal number of results
@@ -178,7 +184,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::QueueList ListQueues(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region = {}) const;
+        Entity::SQS::QueueList listQueues(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const override;
 
         /**
          * @brief List available queues, using paging
@@ -188,7 +194,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::QueueList ExportQueues(const std::vector<SortColumn> &sortColumns) const;
+        Entity::SQS::QueueList exportQueues(const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Import s a single queue
@@ -200,7 +206,7 @@ namespace AwsMock::Database {
          * @param queue queue entity
          * @throws DatabaseException
          */
-        void ImportQueue(Entity::SQS::Queue &queue) const;
+        void importQueue(Entity::SQS::Queue &queue) const override;
 
         /**
          * @brief List all available queues
@@ -210,7 +216,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::QueueList ListQueues(const std::string &region = {}) const;
+        Entity::SQS::QueueList listQueues(const std::string &region) const override;
 
         /**
          * @brief Purge a given queueUrl.
@@ -219,7 +225,7 @@ namespace AwsMock::Database {
          * @return total number of deleted messages
          */
         [[nodiscard]]
-        long PurgeQueue(const std::string &queueArn) const;
+        long purgeQueue(const std::string &queueArn) const override;
 
         /**
          * @brief Updates a given queue.
@@ -228,15 +234,7 @@ namespace AwsMock::Database {
          * @return updated queue
          */
         [[nodiscard]]
-        Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue) const;
-
-        /**
-         * @brief Increases the number of invisible messages
-         *
-         * @param queueArn queue ARN
-         * @param messageNumber number of invisible messages
-         */
-        void UpdateQueueReceiveNumbers(const std::string &queueArn, long messageNumber) const;
+        Entity::SQS::Queue updateQueue(Entity::SQS::Queue &queue) const override;
 
         /**
          * @brief Create a new queue or updates an existing queue
@@ -246,21 +244,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Queue CreateOrUpdateQueue(Entity::SQS::Queue &queue) const;
-
-        /**
-         * @brief Updates the counters of a queue
-         *
-         * @param queueArn queue ARN
-         * @param messages number of keys
-         * @param size bucket size
-         * @param initial messages in status INITIAL
-         * @param invisible messages in status INVISIBLE
-         * @param delayed messages in status DELAYED
-         * @return created bucket entity
-         * @throws DatabaseException
-         */
-        void UpdateQueueCounter(const std::string &queueArn, long messages, long size, long initial, long invisible, long delayed) const;
+        Entity::SQS::Queue createOrUpdateQueue(Entity::SQS::Queue &queue) const override;
 
         /**
          * @brief Count the number of queues for a given region.
@@ -270,7 +254,7 @@ namespace AwsMock::Database {
          * @return number of queues in the given region.
          */
         [[nodiscard]]
-        long CountQueues(const std::string &region = {}, const std::string &prefix = {}) const;
+        long countQueues(const std::string &region, const std::string &prefix) const override;
 
         /**
          * @brief Deletes a queue.
@@ -280,7 +264,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        long DeleteQueue(const Entity::SQS::Queue &queue) const;
+        long deleteQueue(const Entity::SQS::Queue &queue) const override;
 
         /**
          * @brief Deletes all queues
@@ -288,7 +272,7 @@ namespace AwsMock::Database {
          * @return number of deleted queues
          */
         [[nodiscard]]
-        long DeleteAllQueues() const;
+        long deleteAllQueues() const override;
 
         /**
          * @brief Creates a new message in the SQS message table
@@ -298,7 +282,7 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Message CreateMessage(Entity::SQS::Message &message) const;
+        Entity::SQS::Message createMessage(Entity::SQS::Message &message) const override;
 
         /**
          * @brief Checks whether the message exists by the receipt handle.
@@ -308,7 +292,7 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         [[nodiscard]]
-        bool MessageExists(const std::string &receiptHandle) const;
+        bool messageExists(const std::string &receiptHandle) const override;
 
         /**
          * @brief Checks whether the message exists by message ID
@@ -318,7 +302,7 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         [[nodiscard]]
-        bool MessageExistsByMessageId(const std::string &messageId) const;
+        bool messageExistsByMessageId(const std::string &messageId) const override;
 
         /**
          * @brief Returns a message by ID.
@@ -328,7 +312,7 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Message GetMessageById(bsoncxx::oid oid) const;
+        Entity::SQS::Message getMessageById(bsoncxx::oid oid) const override;
 
         /**
          * @brief Returns a message by ID.
@@ -338,7 +322,7 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Message GetMessageById(const std::string &oid) const;
+        Entity::SQS::Message getMessageById(const std::string &oid) const override;
 
         /**
          * @brief Returns a message by receipt handle.
@@ -347,7 +331,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle) const;
+        [[nodiscard]] Entity::SQS::Message getMessageByReceiptHandle(const std::string &receiptHandle) const override;
 
         /**
          * @brief Returns a message by message ID
@@ -356,7 +340,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] Entity::SQS::Message GetMessageByMessageId(const std::string &messageId) const;
+        [[nodiscard]] Entity::SQS::Message getMessageByMessageId(const std::string &messageId) const override;
 
         /**
          * @brief Updates a given message.
@@ -365,7 +349,7 @@ namespace AwsMock::Database {
          * @return updated message
          */
         [[nodiscard]]
-        Entity::SQS::Message UpdateMessage(Entity::SQS::Message &message) const;
+        Entity::SQS::Message updateMessage(Entity::SQS::Message &message) const override;
 
         /**
          * @brief Create a new queue or updates an existing message
@@ -375,7 +359,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Message CreateOrUpdateMessage(Entity::SQS::Message &message) const;
+        Entity::SQS::Message createOrUpdateMessage(Entity::SQS::Message &message) const override;
 
         /**
          * @brief List all available resources
@@ -385,7 +369,7 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::MessageList ListMessages(const std::string &region = {}) const;
+        Entity::SQS::MessageList listMessages(const std::string &region) const override;
 
         /**
          * @brief Paged list of messages
@@ -399,10 +383,10 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::MessageList ListMessages(const std::string &queueArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
+        Entity::SQS::MessageList listMessages(const std::string &queueArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
-         * @brief Receive messages from an queue.
+         * @brief Receive messages from a queue.
          *
          * @param queueArn queue ARN
          * @param visibility in seconds
@@ -411,7 +395,7 @@ namespace AwsMock::Database {
          * @param maxRetries maximal number of retries
          * @param messageList message list
          */
-        void ReceiveMessages(const std::string &queueArn, long visibility, long maxResult, const std::string &dlQueueArn, long maxRetries, Entity::SQS::MessageList &messageList) const;
+        void receiveMessages(const std::string &queueArn, long visibility, long maxResult, const std::string &dlQueueArn, long maxRetries, Entity::SQS::MessageList &messageList) const override;
 
         /**
          * @brief Reset expired resources
@@ -420,7 +404,8 @@ namespace AwsMock::Database {
          * @param visibility visibilityTimeout period in seconds
          * @return number of message resets
          */
-        [[nodiscard]] long ResetMessages(const std::string &queueArn, long visibility) const;
+        [[nodiscard]]
+        long resetMessages(const std::string &queueArn, long visibility) const override;
 
         /**
          * @brief Any message that has a DELAYED state is reset when the delay period is over.
@@ -429,7 +414,8 @@ namespace AwsMock::Database {
          * @param delay delay in seconds.
          * @return number of updated queues
          */
-        [[nodiscard]] long ResetDelayedMessages(const std::string &queueArn, long delay) const;
+        [[nodiscard]]
+        long resetDelayedMessages(const std::string &queueArn, long delay) const override;
 
         /**
          * @brief Redrive message
@@ -439,7 +425,7 @@ namespace AwsMock::Database {
          * @param messageId message ID
          * @return total number of redriven messages
          */
-        long RedriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) const;
+        long redriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) const override;
 
         /**
          * @brief Redrive messages
@@ -448,16 +434,18 @@ namespace AwsMock::Database {
          * @param dlqQueue DLQ queue
          * @return total number of redriven messages
          */
-        [[nodiscard]] long RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const;
+        [[nodiscard]]
+        long redriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const override;
 
         /**
-         * @brief Any message, which has is older than the retention period is deleted.
+         * @brief Redrive all messages, which has is older than the retention period is deleted.
          *
          * @param queueArn queue ARN.
          * @param retentionPeriod retention period in seconds.
          * @return number of messages deleted.
          */
-        [[nodiscard]] long MessageRetention(const std::string &queueArn, long retentionPeriod) const;
+        [[nodiscard]]
+        long messageRetention(const std::string &queueArn, long retentionPeriod) const override;
 
         /**
          * @brief  Count the number of messages by state
@@ -466,23 +454,7 @@ namespace AwsMock::Database {
          * @param prefix message ID prefix
          * @return total number of messages
          */
-        [[nodiscard]] long CountMessages(const std::string &queueArn = {}, const std::string &prefix = {}) const;
-
-        /**
-         * @brief Count the number of messages by state
-         *
-         * @param queueArn ARN of the queue
-         * @return total message size
-         */
-        [[nodiscard]] long CountMessageSize(const std::string &queueArn = {}) const;
-
-        /**
-         * @brief Count the number of messages by state
-         *
-         * @param queueArn ARN of the queue
-         * @param status message state
-         */
-        [[nodiscard]] long CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) const;
+        [[nodiscard]] long countMessages(const std::string &queueArn, const std::string &prefix) const override;
 
         /**
          * @brief Returns the average waiting time for messages in the given queue
@@ -494,15 +466,15 @@ namespace AwsMock::Database {
          * @return map of average message waiting time per queue
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime() const;
+        [[nodiscard]] Entity::SQS::MessageWaitTime getAverageMessageWaitingTime() const override;
 
         /**
          * @brief Import messages via bulk updates
-7         *
+         *
          * @param queueArn queue ARN
          * @param messageArray
          */
-        void ImportMessages(const std::string &queueArn, const value &messageArray) const;
+        void importMessages(const std::string &queueArn, const value &messageArray) const override;
 
         /**
          * @brief Deletes all messages of a queue
@@ -511,7 +483,8 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] auto DeleteMessages(const std::string &queueArn) const -> long;
+        [[nodiscard]]
+        long deleteMessages(const std::string &queueArn) const override;
 
         /**
          * @brief Deletes a message.
@@ -520,7 +493,8 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] auto DeleteMessage(const Entity::SQS::Message &message) const -> long;
+        [[nodiscard]]
+        long deleteMessage(const Entity::SQS::Message &message) const override;
 
         /**
          * @brief Deletes a message by its receipt handle.
@@ -529,46 +503,43 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] auto DeleteMessage(const std::string &receiptHandle) const -> long;
+        [[nodiscard]]
+        long deleteMessage(const std::string &receiptHandle) const override;
 
         /**
-         * @brief Deletes a resources.
+         * @brief Deletes a resource.
          *
          * @return total number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] auto DeleteAllMessages() const -> long;
+        [[nodiscard]]
+        long deleteAllMessages() const override;
 
         /**
          * @brief Adjust all queue counters
          */
-        void AdjustMessageCounters() const;
+        void adjustMessageCounters() const override;
 
       private:
 
+        /**
+         * @brief Channeled log stream
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
 
-        /**
-         * Database name
-         */
-        std::string _databaseName;
+        static constexpr auto DATABASE_NAME = "awsmock";
+        static constexpr auto QUEUE_COLLECTION = "sqs_queue";
+        static constexpr auto MESSAGE_COLLECTION = "sqs_message";
 
-        /**
-         * Queue collection name
-         */
-        std::string _queueCollectionName;
+        [[nodiscard]]
+        static mongocxx::collection queueCollection(const mongocxx::pool::entry &client) {
+            return (*client)[DATABASE_NAME][QUEUE_COLLECTION];
+        }
 
-        /**
-         * Message collection name
-         */
-        std::string _messageCollectionName;
-
-        /**
-         * SQS in-memory database
-         */
-        SQSMemoryDb &_memoryDb;
+        [[nodiscard]]
+        static mongocxx::collection messageCollection(const mongocxx::pool::entry &client) {
+            return (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        }
     };
 
-}// namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_SQS_DATABASE_H
+}// namespace Awsmock::Database

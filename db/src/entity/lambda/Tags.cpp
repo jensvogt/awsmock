@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/lambda/Tags.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     bool Tags::HasTag(const std::string &key) {
         return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
@@ -51,4 +51,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "Tags=" << bsoncxx::to_json(t.ToDocument());
         return os;
     }
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/secretsmanager/RotationRules.h>
 
-namespace AwsMock::Database::Entity::SecretsManager {
+namespace Awsmock::Database::Entity::SecretsManager {
 
     view_or_value<view, value> RotationRules::ToDocument() const {
 
@@ -34,4 +34,4 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return os;
     }
 
-}// namespace AwsMock::Database::Entity::SecretsManager
+}// namespace Awsmock::Database::Entity::SecretsManager

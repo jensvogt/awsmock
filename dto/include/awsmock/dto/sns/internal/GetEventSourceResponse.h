@@ -10,7 +10,7 @@
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/sns/model/LambdaTriggerCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     /**
      * @brief Get the event source as lambda configuration
@@ -43,6 +43,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_GET_EVENT_SOURCE_RESPONSE_H

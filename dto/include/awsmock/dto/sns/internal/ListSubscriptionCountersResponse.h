@@ -13,7 +13,7 @@
 #include <awsmock/dto/sns/model/Subscription.h>
 #include <awsmock/dto/sns/model/SubscriptionCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListSubscriptionCountersResponse final : Common::BaseCounter<ListSubscriptionCountersResponse> {
 
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_SUBSCRIPTION_COUNTERS_RESPONSE_H

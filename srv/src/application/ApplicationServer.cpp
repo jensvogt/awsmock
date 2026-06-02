@@ -6,7 +6,7 @@
 
 #include <set>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     ApplicationServer::ApplicationServer(Core::Scheduler &scheduler) : AbstractServer("application"), _module("application"), _scheduler(scheduler) {
 
@@ -240,4 +240,4 @@ namespace AwsMock::Service {
         }
         log_info << "Application server stopped";
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

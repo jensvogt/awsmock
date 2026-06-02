@@ -9,7 +9,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
     struct RebuildLambdaRequest final : Common::BaseCounter<RebuildLambdaRequest> {
         /**
          * Function name
@@ -21,7 +21,8 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string version;
 
-    private:
+      private:
+
         friend RebuildLambdaRequest tag_invoke(boost::json::value_to_tag<RebuildLambdaRequest>, boost::json::value const &v) {
             RebuildLambdaRequest r;
             r.name = Core::Json::GetStringValue(v, "name");
@@ -31,11 +32,11 @@ namespace AwsMock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RebuildLambdaRequest const &obj) {
             jv = {
-                {"name", obj.name},
-                {"version", obj.version},
+                    {"name", obj.name},
+                    {"version", obj.version},
             };
         }
     };
-} // namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_REBUILD_LAMBDA_REQUEST_H

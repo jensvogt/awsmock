@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sns/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListDefaultMessageAttributeCountersResponse final : Common::BaseCounter<ListDefaultMessageAttributeCountersResponse> {
 
@@ -27,27 +27,28 @@ namespace AwsMock::Dto::SNS {
          */
         long total = 0;
 
-    private:
+      private:
+
         friend ListDefaultMessageAttributeCountersResponse tag_invoke(boost::json::value_to_tag<ListDefaultMessageAttributeCountersResponse>, boost::json::value const &v) {
             ListDefaultMessageAttributeCountersResponse r;
             r.total = Core::Json::GetLongValue(v, "total");
             if (Core::Json::AttributeExists(v, "attributeCounters")) {
-                r.attributeCounters = boost::json::value_to<std::map<std::string, MessageAttribute> >(v.at("attributeCounters"));
+                r.attributeCounters = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("attributeCounters"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListDefaultMessageAttributeCountersResponse const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"total", obj.total},
-                {"attributeCounters", boost::json::value_from(obj.attributeCounters)},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"attributeCounters", boost::json::value_from(obj.attributeCounters)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_RESPONSE_H

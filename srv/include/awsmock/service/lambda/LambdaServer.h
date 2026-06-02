@@ -16,7 +16,7 @@
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/module/ModuleService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Lambda server
@@ -25,7 +25,8 @@ namespace AwsMock::Service {
      */
     class LambdaServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -38,7 +39,8 @@ namespace AwsMock::Service {
 
         void Initialize();
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
@@ -167,4 +169,4 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

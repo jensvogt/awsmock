@@ -19,7 +19,7 @@
 #define TEST_PARAMETER_NAME std::string("test-name")
 #define TEST_PARAMETER_VALUE std::string("test-value")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class SSMServerCliTest : public ::testing::Test, public TestBase {
 
@@ -97,6 +97,6 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, parameterList.size());
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_SERVICE_SSM_CLI_INTEGRATION_TEST_H

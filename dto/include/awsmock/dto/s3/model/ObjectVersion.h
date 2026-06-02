@@ -15,7 +15,7 @@
 #include <awsmock/dto/s3/model/Owner.h>
 #include <awsmock/dto/s3/model/RestoreStatus.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     using std::chrono::system_clock;
 
@@ -109,6 +109,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_OBJECT_VERSION_H

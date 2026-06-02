@@ -74,7 +74,7 @@
 // 1.  Concepts — pin down what Entity and Dto must satisfy
 // ===========================================================================
 
-namespace AwsMock::Dto {
+namespace Awsmock::Dto {
 
     template<typename T>
     concept Mappable = std::movable<T> && std::copyable<T>;
@@ -548,6 +548,6 @@ namespace AwsMock::Dto {
 
         std::unordered_map<Key, std::shared_ptr<void>, KeyHash> store_;
     };
-}// namespace AwsMock::Dto
+}// namespace Awsmock::Dto
 
 #endif//AWSMOCK_DTO_MAPPER_H

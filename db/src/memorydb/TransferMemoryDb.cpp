@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/TransferMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex TransferMemoryDb::_transferMutex;
     boost::mutex TransferMemoryDb::_userMutex;
@@ -184,4 +184,4 @@ namespace AwsMock::Database {
         _transfers.clear();
         return count;
     }
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

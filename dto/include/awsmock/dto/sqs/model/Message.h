@@ -16,7 +16,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     using std::chrono::system_clock;
 
@@ -97,7 +97,8 @@ namespace AwsMock::Dto::SQS {
          */
         system_clock::time_point modified;
 
-    private:
+      private:
+
         friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
             Message r;
             r.id = v.at("id").as_string();
@@ -108,8 +109,8 @@ namespace AwsMock::Dto::SQS {
             r.receiptHandle = v.at("receiptHandle").as_string();
             r.size = v.at("size").as_int64();
             r.body = v.at("body").as_string();
-            r.attributes = boost::json::value_to<std::map<std::string, std::string> >(v.at("attributes"));
-            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute> >(v.at("messageAttributes"));
+            r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
             r.md5OfBody = v.at("md5OfBody").as_string();
             r.md5OfMessageAttributes = v.at("md5OfMessageAttributes").as_string();
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
@@ -119,26 +120,26 @@ namespace AwsMock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Message const &obj) {
             jv = {
-                {"Region", obj.region},
-                {"User", obj.user},
-                {"RequestId", obj.requestId},
-                {"QueueName", obj.queueName},
-                {"QueueUrl", obj.queueUrl},
-                {"QueueArn", obj.queueArn},
-                {"Id", obj.id},
-                {"MessageId", obj.messageId},
-                {"ReceiptHandle", obj.receiptHandle},
-                {"Body", obj.body},
-                {"Attributes", boost::json::value_from(obj.attributes)},
-                {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
-                {"MD5OfBody", obj.md5OfBody},
-                {"MD5OfMessageAttributes", obj.md5OfMessageAttributes},
-                {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueName", obj.queueName},
+                    {"QueueUrl", obj.queueUrl},
+                    {"QueueArn", obj.queueArn},
+                    {"Id", obj.id},
+                    {"MessageId", obj.messageId},
+                    {"ReceiptHandle", obj.receiptHandle},
+                    {"Body", obj.body},
+                    {"Attributes", boost::json::value_from(obj.attributes)},
+                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"MD5OfBody", obj.md5OfBody},
+                    {"MD5OfMessageAttributes", obj.md5OfMessageAttributes},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MESSAGE_H

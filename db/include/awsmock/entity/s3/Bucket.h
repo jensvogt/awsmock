@@ -28,7 +28,7 @@
 #include <awsmock/entity/s3/TopicNotification.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief Versioning status
@@ -284,6 +284,6 @@ namespace AwsMock::Database::Entity::S3 {
 
     typedef std::vector<Bucket> BucketList;
 
-}// namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_BUCKET_H

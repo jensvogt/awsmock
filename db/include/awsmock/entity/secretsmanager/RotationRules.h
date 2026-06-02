@@ -11,7 +11,7 @@
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
 
-namespace AwsMock::Database::Entity::SecretsManager {
+namespace Awsmock::Database::Entity::SecretsManager {
 
     /**
      * Rotation rules
@@ -71,6 +71,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         friend std::ostream &operator<<(std::ostream &os, const RotationRules &r);
     };
 
-}// namespace AwsMock::Database::Entity::SecretsManager
+}// namespace Awsmock::Database::Entity::SecretsManager
 
 #endif// AWSMOCK_ENTITY_SECRETSMANAGER_ROTATION_RULES_H

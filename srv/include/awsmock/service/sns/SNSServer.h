@@ -13,7 +13,7 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief SNS module server
@@ -22,7 +22,8 @@ namespace AwsMock::Service {
      */
     class SNSServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -33,7 +34,8 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
         /**
          * Channeled logger
          */
@@ -106,4 +108,4 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

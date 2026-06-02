@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     enum ExportType {
         INFRA_STRUCTURE,
@@ -36,6 +36,6 @@ namespace AwsMock::Dto::Module {
         }
         return INFRA_STRUCTURE;
     }
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_MODULE_EXPORT_TYPE_H

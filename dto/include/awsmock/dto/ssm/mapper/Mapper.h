@@ -17,7 +17,7 @@
 #include <awsmock/dto/ssm/model/ParameterType.h>
 #include <awsmock/entity/ssm/Parameter.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -95,6 +95,6 @@ namespace AwsMock::Dto::SSM {
         static ListParameterCountersResponse map(const ListParameterCountersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities);
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_S3_MAPPER_H

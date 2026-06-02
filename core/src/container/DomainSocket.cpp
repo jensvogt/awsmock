@@ -4,7 +4,7 @@
 
 #include <awsmock/core/container/DomainSocket.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     request<string_body> DomainSocket::PrepareJsonMessage(const verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
@@ -54,4 +54,4 @@ namespace AwsMock::Core {
         return domainSocketResult;
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

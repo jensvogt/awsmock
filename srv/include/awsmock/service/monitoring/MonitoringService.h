@@ -13,7 +13,7 @@
 #include <awsmock/dto/monitoring/mapper/Mapper.h>
 #include <awsmock/repository/MonitoringDatabase.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Monitoring service.
@@ -22,12 +22,13 @@ namespace AwsMock::Service {
      */
     class MonitoringService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {
-        };
+                                       };
 
         /**
          * @brief Get counters request
@@ -47,7 +48,8 @@ namespace AwsMock::Service {
          */
         Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
 
         /**
@@ -56,6 +58,6 @@ namespace AwsMock::Service {
         Database::MonitoringDatabase &_database;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVICE_H

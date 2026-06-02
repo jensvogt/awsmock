@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sns/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct AddDefaultMessageAttributeRequest final : Common::BaseCounter<AddDefaultMessageAttributeRequest> {
 
@@ -31,7 +31,8 @@ namespace AwsMock::Dto::SNS {
          */
         MessageAttribute messageAttribute;
 
-    private:
+      private:
+
         friend AddDefaultMessageAttributeRequest tag_invoke(boost::json::value_to_tag<AddDefaultMessageAttributeRequest>, boost::json::value const &v) {
             AddDefaultMessageAttributeRequest r;
             r.topicArn = Core::Json::GetStringValue(v, "topicArn");
@@ -44,16 +45,16 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AddDefaultMessageAttributeRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"topicArn", obj.topicArn},
-                {"name", obj.name},
-                {"messageAttribute", boost::json::value_from(obj.messageAttribute)},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicArn", obj.topicArn},
+                    {"name", obj.name},
+                    {"messageAttribute", boost::json::value_from(obj.messageAttribute)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_ADD_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H

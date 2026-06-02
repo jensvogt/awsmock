@@ -12,7 +12,7 @@
 #include <awsmock/dto/cognito/model/CustomDomainConfig.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Updates an existing user pool domain request.
@@ -71,6 +71,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_UPDATE_USERPOOL_DOMAIN_REQUEST_H

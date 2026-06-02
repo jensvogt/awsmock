@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     /**
      * @brief Get a message request
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::SNS {
          */
         std::string messageId;
 
-    private:
+      private:
 
         friend GetMessageCountersRequest tag_invoke(boost::json::value_to_tag<GetMessageCountersRequest>, boost::json::value const &v) {
             GetMessageCountersRequest r;
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::SNS {
             };
         }
     };
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_GET_MESSAGE_COUNTERS_REQUEST_H

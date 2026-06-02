@@ -12,7 +12,7 @@
 #include <awsmock/dto/cognito/model/TokenValidityUnits.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Updates an existing user pool request
@@ -133,6 +133,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_UPDATE_USERPOOL_CLIENT_REQUEST_H

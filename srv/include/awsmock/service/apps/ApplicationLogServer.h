@@ -25,7 +25,7 @@
 #include <awsmock/service/apps/ApplicationLogListener.h>
 #include <awsmock/service/common/AbstractServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Application log server
@@ -65,6 +65,6 @@ namespace AwsMock::Service {
         //boost::asio::io_context _ioc{5};
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_APPLICATION_LOG_SERVER_H

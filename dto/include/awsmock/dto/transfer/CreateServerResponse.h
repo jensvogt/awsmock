@@ -16,7 +16,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct CreateServerResponse final : Common::BaseCounter<CreateServerResponse> {
 
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::Transfer {
                     {"Arn", obj.arn}};
         }
     };
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_CREATE_SERVER_RESPONSE_H

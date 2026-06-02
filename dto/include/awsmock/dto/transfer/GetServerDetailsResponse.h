@@ -14,7 +14,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/transfer/model/Server.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     /**
      * @brief Get transfer server details response.
@@ -46,6 +46,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_GET_SERVER_DETAILS_RESPONSE_H

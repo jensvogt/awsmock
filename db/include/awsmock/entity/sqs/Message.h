@@ -21,7 +21,7 @@
 #include <awsmock/entity/sqs/MessageStatus.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     using std::chrono::system_clock;
 
@@ -46,7 +46,7 @@ namespace AwsMock::Database::Entity::SQS {
          * Queue name
          */
         std::string queueName;
- /**
+        /**
          * Message body
          */
         std::string body;
@@ -181,14 +181,14 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
-
     };
 
     typedef std::vector<Message> MessageList;
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_H

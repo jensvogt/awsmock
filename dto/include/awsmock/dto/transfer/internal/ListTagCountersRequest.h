@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     struct ListTagCountersRequest final : Common::BaseCounter<ListTagCountersRequest> {
 
@@ -71,6 +71,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_LIST_TAG_COUNTERS_REQUEST_H

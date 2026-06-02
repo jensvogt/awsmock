@@ -12,7 +12,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief List S3 bucket ARNs response.
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_LIST_BUCKET_ARNS_RESPONSE_H

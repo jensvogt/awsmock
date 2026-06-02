@@ -15,7 +15,7 @@
 #include <awsmock/dto/sqs/model/Queue.h>
 #include <awsmock/entity/sqs/Queue.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief List SQS queues response.
@@ -63,6 +63,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_QUEUE_RESPONSE_H

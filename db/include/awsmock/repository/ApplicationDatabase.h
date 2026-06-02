@@ -10,19 +10,20 @@
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
-#include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief Application MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ApplicationDatabase : public DatabaseBase {
+    class ApplicationDatabase : public AwsMock::Database::DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -37,7 +38,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * @brief Check existence of application
+         * @brief Check the existence of the application
          *
          * @param region AWS region name
          * @param name application name
@@ -132,7 +133,8 @@ namespace AwsMock::Database {
         [[nodiscard]]
         long DeleteAllApplications() const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
@@ -151,6 +153,6 @@ namespace AwsMock::Database {
         ApplicationMemoryDb &_memoryDb;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_APPLICATION_DATABASE_H

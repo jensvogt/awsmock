@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/secretsmanager/mapper/Mapper.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     GetSecretDetailsResponse Mapper::map(const Database::Entity::SecretsManager::Secret &secret, const std::string &decryptedSecretString) {
 
@@ -65,4 +65,4 @@ namespace AwsMock::Dto::SecretsManager {
         result.scheduleExpression = rotationRule.scheduleExpression;
         return result;
     }
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager

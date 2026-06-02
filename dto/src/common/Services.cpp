@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/Services.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     bool Services::HasService(const std::string &service) const {
 
@@ -78,4 +78,4 @@ namespace AwsMock::Dto::Common {
         return os;
     }
 
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

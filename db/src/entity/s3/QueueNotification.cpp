@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/s3/QueueNotification.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     logger_t _logger{boost::log::keywords::channel = "S3"};
 
@@ -70,4 +70,4 @@ namespace AwsMock::Database::Entity::S3 {
         return n;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

@@ -14,7 +14,7 @@
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/dynamodb/StreamViewType.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     /**
      * @brief DynamoDB stream specification
@@ -73,6 +73,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb
 
 #endif// AWSMOCK_ENTITY_DYNAMODB_STREAM_SPECIFICATION_H

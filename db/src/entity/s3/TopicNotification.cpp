@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "S3"};
 }
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     bool TopicNotification::CheckFilter(const std::string &key) {
         if (filterRules.empty()) {
@@ -18,7 +18,7 @@ namespace AwsMock::Database::Entity::S3 {
         return std::ranges::any_of(filterRules,
                                    [key](const FilterRule &rule) {
                                        return (rule.name == "prefix" && key.starts_with(rule.value)) || (rule.name ==
-                                                                                                         "suffix" &&
+                                                                                                                 "suffix" &&
                                                                                                          key.ends_with(rule.value));
                                    });
     }
@@ -64,4 +64,4 @@ namespace AwsMock::Database::Entity::S3 {
         return t;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

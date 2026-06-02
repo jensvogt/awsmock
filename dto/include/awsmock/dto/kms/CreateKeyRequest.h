@@ -13,7 +13,7 @@
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyUsage.h>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief Create KMS key request
@@ -132,6 +132,6 @@ namespace AwsMock::Dto::KMS {
         }
     };
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_CREATE_KEY_REQUEST_H

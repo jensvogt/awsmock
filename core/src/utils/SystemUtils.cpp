@@ -14,7 +14,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string SystemUtils::GetCurrentWorkingDir() {
         return boost::filesystem::current_path().string();
@@ -156,4 +156,4 @@ namespace AwsMock::Core {
             log_error << "stderr read error: " << errEc.message() << " (" << errEc.value() << ")";
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

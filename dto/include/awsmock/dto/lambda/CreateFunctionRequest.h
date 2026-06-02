@@ -16,7 +16,7 @@
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Create function response
@@ -191,6 +191,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_CREATE_FUNCTION_REQUEST_H

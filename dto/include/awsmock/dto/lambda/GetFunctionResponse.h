@@ -17,7 +17,7 @@
 #include <awsmock/dto/lambda/model/Code.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Get function response
@@ -220,6 +220,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_REQUEST_H

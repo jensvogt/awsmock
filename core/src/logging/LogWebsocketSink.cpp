@@ -5,7 +5,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/logging/LogWebsocketSink.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     LogWebsocketSink::LogWebsocketSink(const boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> &ws) : _ws(ws) {
         if (_ws) {
@@ -39,4 +39,4 @@ namespace AwsMock::Core {
 
     void LogWebsocketSink::flush() {
     }
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

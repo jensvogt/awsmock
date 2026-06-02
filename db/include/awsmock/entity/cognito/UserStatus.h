@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     /**
      * @brief Cognito user status entity
@@ -47,6 +47,6 @@ namespace AwsMock::Database::Entity::Cognito {
         return UserStatus::UNKNOWN;
     }
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito
 
 #endif// AWSMOCK_DB_ENTITY_COGNITO_USER_STATUS_H

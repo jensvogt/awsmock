@@ -11,7 +11,7 @@
 
 #define FILE_SIZE (100 * 1024)
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(DeleteDirTest) {
 
@@ -143,6 +143,6 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(std::ranges::find(result, fileName3) != result.end(), true);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWMOCK_CORE_DIR_UTILS_TEST_H

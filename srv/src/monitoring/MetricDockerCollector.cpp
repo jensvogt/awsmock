@@ -4,7 +4,7 @@
 
 #include <awsmock/service/monitoring/MetricDockerCollector.h>
 
-namespace AwsMock::Monitoring {
+namespace Awsmock::Monitoring {
 
     void MetricDockerCollector::CollectDockerCounter() {
         log_trace << "Docker collector starting";
@@ -46,4 +46,4 @@ namespace AwsMock::Monitoring {
         }
     }
 
-} // namespace AwsMock::Monitoring
+}// namespace Awsmock::Monitoring

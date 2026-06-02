@@ -37,7 +37,7 @@
 #include <pdh.h>
 #endif
 
-namespace AwsMock::Monitoring {
+namespace Awsmock::Monitoring {
 
     using std::chrono::microseconds;
 #ifdef __linux__
@@ -251,4 +251,4 @@ namespace AwsMock::Monitoring {
         int _period = 60;
     };
 
-}// namespace AwsMock::Monitoring
+}// namespace Awsmock::Monitoring

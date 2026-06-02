@@ -18,7 +18,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct Subscription final : Common::BaseCounter<Subscription> {
 
@@ -108,6 +108,6 @@ namespace AwsMock::Dto::SNS {
 
     typedef std::vector<Subscription> SubscriptionsList;
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_SUBSCRIPTIONS_H

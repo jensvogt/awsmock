@@ -12,7 +12,7 @@
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct CreateBucketResponse final : Common::BaseCounter<CreateBucketResponse> {
 
@@ -55,6 +55,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_CREATE_BUCKET_RESPONSE_H

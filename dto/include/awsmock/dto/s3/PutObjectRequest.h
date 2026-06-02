@@ -13,7 +13,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct PutObjectRequest final : Common::BaseCounter<PutObjectRequest> {
 
@@ -96,6 +96,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif//AWSMOCK_CORE_DTO_PUT_OBJECT_REQUEST_H

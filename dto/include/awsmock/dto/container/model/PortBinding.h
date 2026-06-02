@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/container/model/Port.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief Docker port binding object
@@ -72,6 +72,6 @@ namespace AwsMock::Dto::Docker {
             }
         }
     };
-};// namespace AwsMock::Dto::Docker
+};// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_PORT_BINDING_H

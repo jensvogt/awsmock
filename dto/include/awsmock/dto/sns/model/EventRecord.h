@@ -13,7 +13,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/sns/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     /**
      * @brief SNS Lambda notification event record
@@ -111,6 +111,6 @@ namespace AwsMock::Dto::SNS {
             };
         }
     };
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_EVENT_RECORD_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/LambdaClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void LambdaClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &user) {
 
@@ -99,4 +99,4 @@ namespace AwsMock::Dto::Common {
         os << "LambdaClientCommand=" << r.ToJson();
         return os;
     }
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

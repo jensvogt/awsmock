@@ -17,7 +17,7 @@
 #include <awsmock/dto/kms/model/KeyUsage.h>
 #include <awsmock/dto/kms/model/Origin.h>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief KMS metadata
@@ -250,6 +250,6 @@ namespace AwsMock::Dto::KMS {
         }
     };
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_KEY_H

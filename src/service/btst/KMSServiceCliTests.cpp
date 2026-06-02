@@ -14,7 +14,7 @@
 #define BOOST_TEST_MODULE KMSServiceCliTests
 #define PLAIN_TEXT_BASE64 std::string("VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief AwsMock cognito integration test.
@@ -148,4 +148,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(response2.plaintext, PLAIN_TEXT_BASE64);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

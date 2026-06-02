@@ -9,7 +9,7 @@
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     struct TableCounter final : Common::BaseCounter<TableCounter> {
 
@@ -85,6 +85,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_TABLE_COUNTER_H

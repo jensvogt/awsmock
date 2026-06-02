@@ -7,12 +7,12 @@
 
 #include <awsmock/entity/sqs/Message.h>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     bool Message::HasAttribute(const std::string &key) {
         return std::ranges::find_if(attributes, [key](const std::pair<std::string, std::string> &attribute) {
-            return attribute.first == key;
-        }) != attributes.end();
+                   return attribute.first == key;
+               }) != attributes.end();
     }
 
     int Message::GetIntAttribute(const std::string &key) {
@@ -117,4 +117,4 @@ namespace AwsMock::Database::Entity::SQS {
         }
     }
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS

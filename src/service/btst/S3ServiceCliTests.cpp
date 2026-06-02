@@ -21,7 +21,7 @@ namespace {
 #define TEST_BUCKET std::string("s3://test-bucket")
 #define S3_ACCOUNT_ID "000000000000"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Test the S3 command line interface of AwsMock.
@@ -191,4 +191,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(0, objectList.size());
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

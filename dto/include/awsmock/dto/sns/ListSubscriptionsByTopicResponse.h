@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/sns/model/Subscription.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListSubscriptionsByTopicResponse final : Common::BaseCounter<ListSubscriptionsByTopicResponse> {
 
@@ -99,6 +99,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_BY_TOPIC_RESPONSE_H

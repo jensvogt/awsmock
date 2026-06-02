@@ -14,7 +14,7 @@
 #include <awsmock/dto/apps/internal/WebSocketCommand.h>
 #include <awsmock/service/container/ContainerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Logs all log messages to a websocket
@@ -79,6 +79,6 @@ namespace AwsMock::Service {
         boost::shared_ptr<Core::webSocketSink_t> _sink;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_APPLICATION_LOG_SESSION_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/s3/Object.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     view_or_value<view, value> Object::ToDocument() const {
 
@@ -14,23 +14,23 @@ namespace AwsMock::Database::Entity::S3 {
         }
 
         view_or_value<view, value> objectDoc = make_document(
-            kvp("region", region),
-            kvp("bucket", bucket),
-            kvp("bucketArn", bucketArn),
-            kvp("key", key),
-            kvp("owner", owner),
-            kvp("size", static_cast<bsoncxx::types::b_int64>(size)),
-            kvp("md5sum", md5sum),
-            kvp("sha1sum", sha1sum),
-            kvp("sha256sum", sha256sum),
-            kvp("contentType", contentType),
-            kvp("metadata", metadataDoc),
-            kvp("internalName", internalName),
-            kvp("localName", localName),
-            kvp("versionId", versionId),
-            kvp("storageClass", StorageClassToString(storageClass)),
-            kvp("created", bsoncxx::types::b_date(created)),
-            kvp("modified", bsoncxx::types::b_date(modified)));
+                kvp("region", region),
+                kvp("bucket", bucket),
+                kvp("bucketArn", bucketArn),
+                kvp("key", key),
+                kvp("owner", owner),
+                kvp("size", static_cast<bsoncxx::types::b_int64>(size)),
+                kvp("md5sum", md5sum),
+                kvp("sha1sum", sha1sum),
+                kvp("sha256sum", sha256sum),
+                kvp("contentType", contentType),
+                kvp("metadata", metadataDoc),
+                kvp("internalName", internalName),
+                kvp("localName", localName),
+                kvp("versionId", versionId),
+                kvp("storageClass", StorageClassToString(storageClass)),
+                kvp("created", bsoncxx::types::b_date(created)),
+                kvp("modified", bsoncxx::types::b_date(modified)));
 
         return objectDoc;
     }
@@ -67,4 +67,4 @@ namespace AwsMock::Database::Entity::S3 {
         return o;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/Item.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     struct ItemCounter final : Common::BaseCounter<ItemCounter> {
 
@@ -92,9 +92,9 @@ namespace AwsMock::Dto::DynamoDb {
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
-        }// namespace AwsMock::Dto::DynamoDb
+        }// namespace Awsmock::Dto::DynamoDb
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_ITEM_COUNTER_H

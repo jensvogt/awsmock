@@ -10,7 +10,7 @@
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief S3 Notification configuration
@@ -168,6 +168,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_PUT_BUCKET_NOTIFICATION_CONFIGURATION_REQUEST_H

@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 
-namespace AwsMock::Database::Entity::SecretsManager {
+namespace Awsmock::Database::Entity::SecretsManager {
 
     /**
      * @brief Secrets manager version ID and stages
@@ -85,12 +85,12 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 }
             }
         }
-    private:
+
+      private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
-
     };
 
-}// namespace AwsMock::Database::Entity::SecretsManager
+}// namespace Awsmock::Database::Entity::SecretsManager
 
 #endif// AWSMOCK_DB_ENTITY_SECRETSMANAGER_VERSION_IDS_TO_STAGES_H

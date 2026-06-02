@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListLambdaTriggerCountersRequest final : Common::BaseCounter<ListLambdaTriggerCountersRequest> {
 
@@ -70,6 +70,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_LAMBDA_TRIGGER_COUNTERS_REQUEST_H

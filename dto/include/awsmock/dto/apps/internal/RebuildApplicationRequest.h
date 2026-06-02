@@ -9,7 +9,7 @@
 #include <awsmock/dto/apps/model/Application.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
 
     /**
      * @brief Rebuild application from scratch
@@ -77,6 +77,6 @@ namespace AwsMock::Dto::Apps {
         }
     };
 
-}// namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps
 
 #endif// AWSMOCK_DTO_LAMBDA_REBUILD_APPLICATION_CODE_REQUEST_H

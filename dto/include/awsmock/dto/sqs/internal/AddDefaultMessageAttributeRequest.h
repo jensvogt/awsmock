@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct AddDefaultMessageAttributeRequest final : Common::BaseCounter<AddDefaultMessageAttributeRequest> {
 
@@ -55,6 +55,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_ADD_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H

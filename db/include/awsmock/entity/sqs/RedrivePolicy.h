@@ -13,7 +13,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     /**
      * @brief SQS queue re-drive policy entity
@@ -52,6 +52,6 @@ namespace AwsMock::Database::Entity::SQS {
         };
     };
 
-}// namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
-#define AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -13,19 +12,20 @@
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/DynamoDbToMongoTranslator.h>
 #include <awsmock/utils/SortColumn.h>
 
 #define QUERY_SIZE_LIMIT (1024 * 1024)
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief DynamoDB MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class DynamoDbDatabase : public DatabaseBase {
+    class DynamoDbDatabase : public AwsMock::Database::DatabaseBase {
 
       public:
 
@@ -355,6 +355,4 @@ namespace AwsMock::Database {
         DynamoDbMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_DYNAMODB_DATABASE_H
+}// namespace Awsmock::Database

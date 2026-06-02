@@ -10,7 +10,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/LifecycleRule.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief S3 Lifecycle configuration
@@ -119,6 +119,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_GET_BUCKET_LIFECYCLE_CONFIGURATION_RESPONSE_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/sqs/Queue.h>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     view_or_value<view, value> Queue::ToDocument() const {
 
@@ -85,4 +85,4 @@ namespace AwsMock::Database::Entity::SQS {
         return *this;
     }
 
-}// namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS

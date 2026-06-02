@@ -18,7 +18,7 @@
 #include <awsmock/dto/sqs/model/MessageFailed.h>
 #include <awsmock/dto/sqs/model/MessageSuccessful.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief Send message batch response
@@ -90,6 +90,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_SEND_MESSAGE_BATCH_RESPONSE_H

@@ -7,7 +7,7 @@
 
 #include <awsmock/service/kms/KMSServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()), _scheduler((scheduler)) {
 
@@ -68,4 +68,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("kms-backup");
         log_info << "KMS server stopped";
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

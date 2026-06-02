@@ -14,7 +14,7 @@
 #include <awsmock/dto/cognito/model/Group.h>
 #include <awsmock/dto/common/BaseDto.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief List groups response
@@ -46,6 +46,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_LIST_GROUPS_RESPONSE_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/core/exception/UnauthorizedException.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     UnauthorizedException::UnauthorizedException(const http::status code, const char *resource, const char *requestId) : _code(code), _resource(resource), _requestId(requestId) {}
 
@@ -23,4 +23,4 @@ namespace AwsMock::Core {
     const char *UnauthorizedException::requestId() const noexcept { return _requestId; }
 
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -22,7 +22,7 @@
 #include <awsmock/service/ssm/SSMServer.h>
 #include <awsmock/service/transfer/TransferServer.h>
 
-namespace AwsMock::Manager {
+namespace Awsmock::Manager {
 
     /**
      * @brief Main application class for the awsmock manager.
@@ -49,14 +49,15 @@ namespace AwsMock::Manager {
      */
     class Manager {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
          * @param ioc boost IO context
          */
         explicit Manager(boost::asio::io_context &ioc) : _ioc(ioc) {
-        };
+                                                         };
 
         /**
          * @brief Initialization
@@ -99,7 +100,8 @@ namespace AwsMock::Manager {
          */
         void StopModules(Service::ModuleMap &moduleMap) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Manager"};
 
         /**
@@ -148,4 +150,4 @@ namespace AwsMock::Manager {
         boost::asio::io_context &_ioc;
     };
 
-} // namespace AwsMock::Manager
+}// namespace Awsmock::Manager

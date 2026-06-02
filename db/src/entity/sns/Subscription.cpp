@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/sns/Subscription.h>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     view_or_value<view, value> Subscription::ToDocument() const {
 
@@ -34,4 +34,4 @@ namespace AwsMock::Database::Entity::SNS {
         return os;
     }
 
-}// namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS

@@ -10,7 +10,7 @@
 // Boost includes
 #include <boost/beast.hpp>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     using namespace boost::beast::http;
 
@@ -32,4 +32,4 @@ namespace AwsMock::Core {
         long contentLength;
     };
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

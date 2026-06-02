@@ -29,7 +29,7 @@
 #else
 #define AWS_CMD "/usr/bin/aws"
 #endif
-namespace AwsMock::AwsLocal {
+namespace Awsmock::AwsLocal {
 
     /**
      * @brief AWS local command
@@ -41,7 +41,8 @@ namespace AwsMock::AwsLocal {
      */
     class AwsLocal {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -61,7 +62,8 @@ namespace AwsMock::AwsLocal {
          */
         void Run(std::vector<std::string> &command) const;
 
-    private:
+      private:
+
         /**
          * @brief Read the AWS config file
          *
@@ -96,4 +98,4 @@ namespace AwsMock::AwsLocal {
         std::string _profile;
     };
 
-} // namespace AwsMock::AwsLocal
+}// namespace Awsmock::AwsLocal

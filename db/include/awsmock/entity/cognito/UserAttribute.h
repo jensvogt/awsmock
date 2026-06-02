@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     /**
      * @brief Cognito user attribute entity
@@ -31,6 +31,6 @@ namespace AwsMock::Database::Entity::Cognito {
 
     typedef std::vector<UserAttribute> UserAttributeList;
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito
 
 #endif// AWSMOCK_DB_ENTITY_COGNITO_USER_ATTRIBUTE_H

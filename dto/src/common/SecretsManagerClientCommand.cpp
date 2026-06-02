@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void SecretsManagerClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
@@ -68,4 +68,4 @@ namespace AwsMock::Dto::Common {
         os << "SecretsManagerClientCommand=" << r.ToJson();
         return os;
     }
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

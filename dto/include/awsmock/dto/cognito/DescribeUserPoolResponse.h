@@ -14,7 +14,7 @@
 #include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/dto/common/BaseDto.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Create user pool response
@@ -179,6 +179,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_DESCRIBE_USERPOOL_RESPONSE_H

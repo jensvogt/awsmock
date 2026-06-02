@@ -14,7 +14,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Monitoring {
+namespace Awsmock::Dto::Monitoring {
 
     using std::chrono::system_clock;
 
@@ -96,6 +96,6 @@ namespace AwsMock::Dto::Monitoring {
         }
     };
 
-}// namespace AwsMock::Dto::Monitoring
+}// namespace Awsmock::Dto::Monitoring
 
 #endif// AWSMOCK_DTO_MONITORING_GET_COUNTERS_REQUEST_H

@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/service/common/AbstractServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class ModuleMap {
 
@@ -77,5 +77,5 @@ namespace AwsMock::Service {
          */
         std::map<std::string, std::shared_ptr<AbstractServer>> _moduleMap;
     };
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 #endif//AWSMOCK_SERVICE_MODULE_MAP_H

@@ -19,7 +19,7 @@
 #define USER_NAME "test-user"
 #define USER_POOL_NAME "test-user-pool"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class CognitoServiceTest : public ::testing::Test {
 
@@ -192,6 +192,6 @@ namespace AwsMock::Service {
         EXPECT_EQ(0, userCount);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_SERVICE_COGNITOSERVICETEST_H

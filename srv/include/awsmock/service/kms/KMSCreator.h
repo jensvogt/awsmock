@@ -18,7 +18,7 @@
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/KMSDatabase.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief KMS symmetric and asymmetric key creator.
@@ -27,7 +27,8 @@ namespace AwsMock::Service {
      */
     class KMSCreator {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -41,7 +42,8 @@ namespace AwsMock::Service {
          */
         void CreateKmsKey(const std::string &keyId) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
@@ -81,4 +83,4 @@ namespace AwsMock::Service {
         void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length) const;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

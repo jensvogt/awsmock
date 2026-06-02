@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     /**
      * @brief Maps an sort column DTO entity to the corresponding entity
@@ -21,7 +21,8 @@ namespace AwsMock::Dto::Common {
      */
     class SortColumnMapper {
 
-    public:
+      public:
+
         /**
        * @brief Maps a single sort coumn DTo to an sort column entity
        *
@@ -50,6 +51,6 @@ namespace AwsMock::Dto::Common {
         }
     };
 
-} // namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_MAPPER_H

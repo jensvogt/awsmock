@@ -17,12 +17,12 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -39,9 +39,8 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<MonitoringCommandType, std::string> MonitoringCommandTypeNames{
-        {MonitoringCommandType::GET_COUNTERS, "get-counters"},
-        {MonitoringCommandType::GET_MULTI_COUNTERS, "get-multi-counters"}
-    };
+            {MonitoringCommandType::GET_COUNTERS, "get-counters"},
+            {MonitoringCommandType::GET_MULTI_COUNTERS, "get-multi-counters"}};
 
     [[maybe_unused]] static std::string MonitoringCommandTypeToString(MonitoringCommandType commandType) {
         return MonitoringCommandTypeNames[commandType];
@@ -100,11 +99,11 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const MonitoringClientCommand &i);
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-} // namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_MONITORING_CLIENT_COMMAND_H

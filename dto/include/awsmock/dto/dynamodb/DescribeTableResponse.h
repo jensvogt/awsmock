@@ -21,7 +21,7 @@
 #include <awsmock/dto/dynamodb/model/Tag.h>
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB describe table response
@@ -132,7 +132,8 @@ namespace AwsMock::Dto::DynamoDb {
          */
         bool deletionProtectionEnabled{};
 
-    private:
+      private:
+
         friend DescribeTableResponse tag_invoke(boost::json::value_to_tag<DescribeTableResponse>, boost::json::value const &v) {
             DescribeTableResponse r = {};
             if (Core::Json::AttributeExists(v, "Table")) {
@@ -147,13 +148,13 @@ namespace AwsMock::Dto::DynamoDb {
                 r.createdDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(tableObject, "CreationDateTime"));
                 r.deletionProtectionEnabled = Core::Json::GetBoolValue(tableObject, "DeletionProtectionEnabled");
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
-                    r.tags = boost::json::value_to<std::vector<Tag> >(tableObject.at("Tags"));
+                    r.tags = boost::json::value_to<std::vector<Tag>>(tableObject.at("Tags"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "AttributeDefinitions")) {
-                    r.attributeDefinitions = boost::json::value_to<std::vector<AttributeDefinition> >(tableObject.at("AttributeDefinitions"));
+                    r.attributeDefinitions = boost::json::value_to<std::vector<AttributeDefinition>>(tableObject.at("AttributeDefinitions"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "KeySchema")) {
-                    r.keySchema = boost::json::value_to<std::vector<KeySchema> >(tableObject.at("KeySchema"));
+                    r.keySchema = boost::json::value_to<std::vector<KeySchema>>(tableObject.at("KeySchema"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "TableClassSummary")) {
                     r.tableClassSummary = boost::json::value_to<TableClassSummary>(v.at("TableClassSummary"));
@@ -193,6 +194,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-} // namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_DESCRIBE_TABLE_RESPONSE_H

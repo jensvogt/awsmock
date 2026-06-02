@@ -58,7 +58,7 @@
 #define BUFFER_LEN 8092
 #define DEFAULT_MIME_TYPE "application/octet-stream"
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief File utilities.
@@ -67,7 +67,8 @@ namespace AwsMock::Core {
      */
     class FileUtils {
 
-    public:
+      public:
+
         /**
          * @brief Extracts the base name (without extension) from the given file name.
          *
@@ -416,13 +417,13 @@ namespace AwsMock::Core {
          * @return file path with correct separator
          */
         template<typename... Ts>
-        static std::string appendPath(Ts &&... args) {
+        static std::string appendPath(Ts &&...args) {
             std::filesystem::path result;
             ((result /= std::forward<Ts>(args)), ...);
             return result.string();
         }
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWS_MOCK_CORE_FILE_UTILS_H

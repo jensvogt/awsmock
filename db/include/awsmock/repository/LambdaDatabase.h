@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_LAMBDA_DATABASE_H
-#define AWSMOCK_REPOSITORY_LAMBDA_DATABASE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -18,7 +17,7 @@
 #include <awsmock/memorydb/LambdaMemoryDb.h>
 #include <awsmock/repository/Database.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using std::chrono::system_clock;
 
@@ -27,9 +26,10 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaDatabase : public DatabaseBase {
+    class LambdaDatabase : public AwsMock::Database::DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -304,7 +304,8 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllLambdas() const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
@@ -328,6 +329,4 @@ namespace AwsMock::Database {
         LambdaMemoryDb &_memoryDb;
     };
 
-} // namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_LAMBDA_DATABASE_H
+}// namespace Awsmock::Database

@@ -21,6 +21,7 @@
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/module/mapper/Mapper.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
@@ -88,7 +89,7 @@
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/service/transfer/TransferService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     /**
      * @brief S3 service.
      *
@@ -259,7 +260,7 @@ namespace AwsMock::Service {
          * @param request multipart upload request
          * @return Dto::S3::CreateMultipartUploadResult
          */
-        [[nodiscard]] Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request);
+        [[nodiscard]] Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const;
 
         /**
          * @brief Returns an event source as a lambda configuration
@@ -304,7 +305,7 @@ namespace AwsMock::Service {
          * @param request touch object request
          * @see TouchObjectRequest
          */
-        void TouchObject(const Dto::S3::TouchObjectRequest &request);
+        void TouchObject(const Dto::S3::TouchObjectRequest &request) const;
 
         /**
          * @brief Update an object
@@ -529,7 +530,7 @@ namespace AwsMock::Service {
          * @param stream input stream
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream);
+        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
 
         /**
          * @brief Save an un-versioned S3 object.
@@ -540,7 +541,7 @@ namespace AwsMock::Service {
          * @param size input stream size
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size);
+        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const;
 
         /**
          * @brief Adds the queue notification configuration to the provided bucket.
@@ -594,6 +595,6 @@ namespace AwsMock::Service {
         LambdaService _lambdaService;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H

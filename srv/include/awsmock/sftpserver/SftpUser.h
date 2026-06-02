@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     struct SftpUser {
 
@@ -31,6 +31,6 @@ namespace AwsMock::Service {
 
     typedef std::vector<SftpUser> SftpUsers;
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_USER_H

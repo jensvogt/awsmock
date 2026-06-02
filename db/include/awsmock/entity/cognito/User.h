@@ -12,7 +12,7 @@
 #include <awsmock/entity/cognito/UserStatus.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     using std::chrono::system_clock;
 
@@ -108,6 +108,6 @@ namespace AwsMock::Database::Entity::Cognito {
 
     typedef std::vector<User> UserList;
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito
 
 #endif// AWSMOCK_DB_ENTITY_COGNITO_USER_H

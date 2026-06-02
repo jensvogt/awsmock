@@ -19,7 +19,7 @@
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/dto/dynamodb/model/ReturnValues.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB put item request
@@ -131,6 +131,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_PUT_ITEM_REQUEST_H

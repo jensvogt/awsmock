@@ -13,7 +13,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ChangeMessageVisibilityRequest final : Common::BaseCounter<ChangeMessageVisibilityRequest> {
 
@@ -54,6 +54,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_SET_VISIBILITY_TIMEOUT_REQUEST_H

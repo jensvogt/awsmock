@@ -19,7 +19,7 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Application module server
@@ -28,7 +28,8 @@ namespace AwsMock::Service {
      */
     class ApplicationServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -39,7 +40,8 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
@@ -150,4 +152,4 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

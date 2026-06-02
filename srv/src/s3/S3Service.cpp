@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "S3"};
 }
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     bool S3Service::BucketExists(const std::string &region, const std::string &bucket) const {
         return _database.BucketExists(region, bucket);
@@ -421,7 +421,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) {
+    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "complete_multipart_upload");
         log_trace << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region;
 
@@ -463,15 +463,14 @@ namespace AwsMock::Service {
             object = _database.UpdateObject(object);
 
             // Calculate the hashes asynchronously
-            /*if (!request.checksumAlgorithm.empty()) {
+            if (!request.checksumAlgorithm.empty()) {
 
-                S3HashCreator s3HashCreator;
-                const std::vector algorithms = {request.checksumAlgorithm};
-                boost::thread t(boost::ref(s3HashCreator), algorithms, object);
-                t.detach();
-                log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, &object]() {
+                    const std::vector algorithms = {request.checksumAlgorithm};
+                    S3HashCreator{}(algorithms, object);
+                    log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+                });
             }
-            */
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(uploadDir);
@@ -638,7 +637,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::TouchObject(const Dto::S3::TouchObjectRequest &request) {
+    void S3Service::TouchObject(const Dto::S3::TouchObjectRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "touch_object");
         log_trace << "Touch object request: " << request.ToString();
 
@@ -1348,7 +1347,7 @@ namespace AwsMock::Service {
             log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
             const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
             Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
-            Core::Crypto::Aes256EncryptFile(dataS3Dir + "/" + object.internalName, rawKey);
+            Core::Crypto::Aes256EncryptFile(Core::FileUtils::appendPath(dataS3Dir, object.internalName), rawKey);
             free(rawKey);
         }
     }
@@ -1378,7 +1377,7 @@ namespace AwsMock::Service {
             log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
             const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
             Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
-            Core::Crypto::Aes256DecryptFile(dataS3Dir + "/" + object.internalName, outFile, rawKey);
+            Core::Crypto::Aes256DecryptFile(Core::FileUtils::appendPath(dataS3Dir, object.internalName), outFile, rawKey);
             free(rawKey);
         }
     }
@@ -1427,7 +1426,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) {
+    Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const {
         // S3 data directory
         const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
         auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
@@ -1468,15 +1467,16 @@ namespace AwsMock::Service {
             }
             object.metadata.merge(request.metadata);
 
-            // Meta data
+            // Metadata
             object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
             log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
             if (!request.checksumAlgorithm.empty()) {
-                S3HashCreator s3HashCreator;
-                std::vector algorithms = {request.checksumAlgorithm};
-                boost::thread t(boost::ref(s3HashCreator), algorithms, object);
-                t.detach();
-                log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+
+                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, &object]() {
+                    const std::vector algorithms = {request.checksumAlgorithm};
+                    S3HashCreator{}(algorithms, object);
+                    log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+                });
             }
 
             // Create a new version in the database
@@ -1509,7 +1509,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) {
+    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const {
         const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
         auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectoryExists(dataS3Dir);
@@ -1551,18 +1551,16 @@ namespace AwsMock::Service {
         }
         object.metadata.merge(request.metadata);
 
-        // Meta data
+        // Metadata
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
         log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", md5: " << object.md5sum;
         if (!request.checksumAlgorithm.empty()) {
-            const std::string filename = dataS3Dir + "/" + object.internalName;
-            if (request.checksumAlgorithm == "SHA1") {
-                object.sha1sum = Core::Crypto::GetSha1FromFile(filename);
-                log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", sha1: " << object.sha1sum;
-            } else if (request.checksumAlgorithm == "SHA256") {
-                object.sha256sum = Core::Crypto::GetSha256FromFile(filename);
-                log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", sha256: " << object.sha256sum;
-            }
+
+            Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, &object]() {
+                const std::vector algorithms = {request.checksumAlgorithm};
+                S3HashCreator{}(algorithms, object);
+                log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+            });
         }
 
         // Update database
@@ -1707,4 +1705,4 @@ namespace AwsMock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

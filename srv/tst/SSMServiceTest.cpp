@@ -18,7 +18,7 @@ namespace {
 #define TEST_PARAMETER_VALUE "test-value"
 #define TEST_PARAMETER_DESCRIPTION "test-parameter-description"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Dto::SSM::PutParameterResponse PutDefaultParameter(const Service::SSMService &ssmService, const std::string &name = TEST_PARAMETER_NAME) {
         Dto::SSM::PutParameterRequest request;
@@ -258,4 +258,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

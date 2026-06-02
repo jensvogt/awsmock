@@ -12,7 +12,7 @@
 // Boost includes
 #include <boost/signals2/signal.hpp>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief General event bus using boost signals2
@@ -21,7 +21,8 @@ namespace AwsMock::Core {
      * @since 1.14.7
      */
     class EventBus {
-    public:
+      public:
+
         /**
          * @brief Singleton instance
          */
@@ -103,7 +104,8 @@ namespace AwsMock::Core {
          * @tparam promise result channel; nullptr for fire-and-forget (EVENT invocations)
          */
         boost::signals2::signal<void(std::string, std::string, std::string, std::string,
-                                     std::shared_ptr<std::promise<std::pair<int, std::string> > >)> sigLambdaInvoke;
+                                     std::shared_ptr<std::promise<std::pair<int, std::string>>>)>
+                sigLambdaInvoke;
 
         /**
          * @brief Signal to check the Docker daemon status of a lambda function.
@@ -113,4 +115,4 @@ namespace AwsMock::Core {
         boost::signals2::signal<void(std::string)> sigLambdaCheck;
     };
 
-}; // namespace AwsMock::Core
+};// namespace Awsmock::Core

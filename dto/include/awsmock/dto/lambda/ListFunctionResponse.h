@@ -14,7 +14,7 @@
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/entity/lambda/Lambda.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     struct ListFunctionResponse final : Common::BaseCounter<ListFunctionResponse> {
 
@@ -38,6 +38,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_LIST_FUNCTION_REQUEST_H

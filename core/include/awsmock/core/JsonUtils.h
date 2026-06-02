@@ -16,7 +16,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core::Json {
+namespace Awsmock::Core::Json {
 
     using std::chrono::system_clock;
 
@@ -81,7 +81,7 @@ namespace AwsMock::Core::Json {
 
     inline std::vector<std::string> GetStringArrayValue(const boost::json::value &value, const std::string &name, const std::string &defaultValue = {}) {
         if (AttributeExists(value, name)) {
-            return boost::json::value_to<std::vector<std::string> >(value.at(name));
+            return boost::json::value_to<std::vector<std::string>>(value.at(name));
         }
         return {defaultValue};
     }
@@ -145,4 +145,4 @@ namespace AwsMock::Core::Json {
     inline bool findObject(boost::json::value &value, const std::string &name) {
         return value.as_object().if_contains(name);
     }
-} // namespace AwsMock::Core::Json
+}// namespace Awsmock::Core::Json

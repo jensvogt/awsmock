@@ -20,7 +20,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
@@ -88,6 +88,6 @@ namespace AwsMock::Database::Entity::Lambda {
         friend std::ostream &operator<<(std::ostream &os, const Tags &tag);
     };
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif// AWSMOCK_DB_ENTITY_LAMBDA_TAGS_H

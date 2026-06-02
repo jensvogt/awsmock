@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     using std::chrono::system_clock;
 
@@ -155,12 +155,12 @@ namespace AwsMock::Database::Entity::SNS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const TopicAttribute &r);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
-
     };
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_TOPIC_ATTRIBUTE_H

@@ -11,7 +11,7 @@
 
 #include <awsmock/core/config/Configuration.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(ConstructorTest) {
 
@@ -109,4 +109,4 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(directories[1], "/feedback");
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

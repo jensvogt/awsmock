@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/SecretsManagerMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex SecretsManagerMemoryDb::_secretMutex;
 
@@ -117,7 +117,7 @@ namespace AwsMock::Database {
                                                  return secret.second.secretId == secretId;
                                              });
         if (it != _secrets.end()) {
-          _secrets[it->first] = secret;
+            _secrets[it->first] = secret;
             return _secrets[it->first];
         }
         return {};
@@ -170,4 +170,4 @@ namespace AwsMock::Database {
         return deleted;
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

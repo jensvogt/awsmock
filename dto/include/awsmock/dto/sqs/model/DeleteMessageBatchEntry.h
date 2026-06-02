@@ -13,7 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct DeleteMessageBatchEntry final : Common::BaseCounter<DeleteMessageBatchEntry> {
 
@@ -67,6 +67,6 @@ namespace AwsMock::Dto::SQS {
 
     typedef std::vector<DeleteMessageBatchEntry> DeleteMessageBatchEntries;
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_ENTRY_H

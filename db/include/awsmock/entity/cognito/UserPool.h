@@ -12,7 +12,7 @@
 #include <awsmock/entity/cognito/UserPoolDomain.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     /**
      * @brief Cognito user pool entity
@@ -97,14 +97,14 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
-
     };
 
     typedef std::vector<UserPool> UserPoolList;
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito
 
 #endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H

@@ -23,7 +23,7 @@ namespace {
 #define BODY_MD5 "bf54bf4281dc11635fcdd2d7d6c9e126"
 #define OWNER "test-owner"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Test the SNS service layer
@@ -330,4 +330,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(receiveResponse.messageList.size(), 1);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

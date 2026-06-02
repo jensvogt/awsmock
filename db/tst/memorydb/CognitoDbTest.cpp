@@ -6,8 +6,8 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../include/awsmock/repository/cognito/CognitoDatabase.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/repository/CognitoDatabase.h>
 
 #define TEST_ACCOUNT_ID "000000000000"
 #define TEST_REGION "eu-central-1"
@@ -15,7 +15,7 @@
 #define TEST_USER_NAME "test-user"
 #define TEST_USER_GROUP_NAME "test-user-group"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::Cognito::UserPool CreateDefaultUserPool(const std::string &region, const std::string &name) {
         Entity::Cognito::UserPool userPool;
@@ -301,4 +301,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

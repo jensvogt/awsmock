@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/SSMMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex SSMMemoryDb::_parameterMutex;
 
@@ -152,4 +152,4 @@ namespace AwsMock::Database {
         return deleted;
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

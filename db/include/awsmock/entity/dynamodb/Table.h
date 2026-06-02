@@ -13,7 +13,7 @@
 #include <awsmock/entity/dynamodb/StreamSpecification.h>
 #include <awsmock/entity/dynamodb/Tag.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     using std::chrono::system_clock;
 
@@ -131,14 +131,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
-
     };
 
     typedef std::vector<Table> TableList;
 
-} // namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb
 
 #endif// AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H

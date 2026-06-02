@@ -13,7 +13,7 @@
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Respond to an authentication challenge request
@@ -90,6 +90,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_RESPONSE_H

@@ -14,7 +14,7 @@
 
 #define TMP_CONFIGURATION_FILE "/tmp/awsmock.json"
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Test utilities
@@ -55,6 +55,6 @@ namespace AwsMock::Core {
          */
         static std::string SendCliCommand(const std::string &command, const std::vector<std::string> &args);
     };
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWSMOCK_CORE_TEST_UTILS_H

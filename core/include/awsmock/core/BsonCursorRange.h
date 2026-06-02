@@ -1,9 +1,9 @@
 #pragma once
 
 #include <bsoncxx/document/view.hpp>
-#include <mongocxx/cursor.hpp>
 #include <functional>
 #include <iterator>
+#include <mongocxx/cursor.hpp>
 #include <type_traits>
 
 // ---------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 //     BsonMapper / your custom callable must copy any data it needs.
 // ---------------------------------------------------------------------------
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     // Forward-declare the trait so specializations can live alongside each DTO.
     // Leaving the primary template undefined means a missing specialization is a
@@ -49,12 +49,13 @@ namespace AwsMock::Core {
 
         template<typename T, typename MapFn>
         class BsonIterator {
-        public:
+          public:
+
             using iterator_category = std::input_iterator_tag;
             using value_type = T;
             using difference_type = std::ptrdiff_t;
             using pointer = const T *;
-            using reference = T; // returns by value — view lifetime is transient
+            using reference = T;// returns by value — view lifetime is transient
 
             BsonIterator(mongocxx::cursor::iterator inner, MapFn mapper) : inner_(std::move(inner)), mapper_(std::move(mapper)) {
             }
@@ -73,27 +74,29 @@ namespace AwsMock::Core {
             bool operator==(const BsonIterator &o) const { return inner_ == o.inner_; }
             bool operator!=(const BsonIterator &o) const { return inner_ != o.inner_; }
 
-        private:
+          private:
+
             mongocxx::cursor::iterator inner_;
             MapFn mapper_;
         };
 
-    } // namespace detail
+    }// namespace detail
 
     // ---------------------------------------------------------------------------
     // BsonCursorRange
     // ---------------------------------------------------------------------------
-    template<typename T, typename MapFn = std::function<T(bsoncxx::document::view)> >
+    template<typename T, typename MapFn = std::function<T(bsoncxx::document::view)>>
     class BsonCursorRange {
-    public:
+      public:
+
         using iterator = detail::BsonIterator<T, MapFn>;
 
         // -----------------------------------------------------------------------
         // Trait-based constructor — uses BsonMapper<T>::fromBson
         // -----------------------------------------------------------------------
         explicit BsonCursorRange(mongocxx::cursor cursor) : cursor_(std::move(cursor)), mapper_([](bsoncxx::document::view doc) {
-            return BsonMapper<T>::fromBson(doc);
-        }) {
+                                                                return BsonMapper<T>::fromBson(doc);
+                                                            }) {
         }
 
         // -----------------------------------------------------------------------
@@ -107,15 +110,16 @@ namespace AwsMock::Core {
         // passes a lambda or function pointer directly.
         // -----------------------------------------------------------------------
         template<typename Fn>
-        static auto withMapper(mongocxx::cursor cursor, Fn &&fn) -> BsonCursorRange<T, std::decay_t<Fn> > {
-            return BsonCursorRange<T, std::decay_t<Fn> >(std::move(cursor), std::forward<Fn>(fn));
+        static auto withMapper(mongocxx::cursor cursor, Fn &&fn) -> BsonCursorRange<T, std::decay_t<Fn>> {
+            return BsonCursorRange<T, std::decay_t<Fn>>(std::move(cursor), std::forward<Fn>(fn));
         }
 
         // Single-pass — begin() may only be called once
         iterator begin() { return iterator(cursor_.begin(), mapper_); }
         iterator end() { return iterator(cursor_.end(), mapper_); }
 
-    private:
+      private:
+
         // Private constructor used by withMapper
         BsonCursorRange(mongocxx::cursor cursor, MapFn mapper) : cursor_(std::move(cursor)), mapper_(std::move(mapper)) {
         }
@@ -124,4 +128,4 @@ namespace AwsMock::Core {
         MapFn mapper_;
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

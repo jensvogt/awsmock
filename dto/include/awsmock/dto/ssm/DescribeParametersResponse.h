@@ -9,11 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/ssm/model/Parameter.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief Describe parameter response
@@ -54,6 +54,6 @@ namespace AwsMock::Dto::SSM {
         }
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_DESCRIBE_PARAMETERS_RESPONSE_H
