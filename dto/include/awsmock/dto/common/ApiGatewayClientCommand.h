@@ -38,16 +38,16 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<ApiGatewayCommandType, std::string> ApiGatewayCommandTypeNames{
-            {ApiGatewayCommandType::CREATE_API_KEY, "create-api-key"},
-            {ApiGatewayCommandType::GET_API_KEYS, "get-api-keys"},
-            {ApiGatewayCommandType::DELETE_API_KEY, "delete-api-key"},
-            {ApiGatewayCommandType::CREATE_REST_API, "create-rest-api"},
-            // AwsMock internal commands
-            {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
-            {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},
-            {ApiGatewayCommandType::UPDATE_API_KEY_COUNTER, "update-api-key-counter"},
-            {ApiGatewayCommandType::LIST_REST_API_COUNTERS, "list-rest-api-counters"},
-            {ApiGatewayCommandType::UNKNOWN, "unknown"},
+        {ApiGatewayCommandType::CREATE_API_KEY, "create-api-key"},
+        {ApiGatewayCommandType::GET_API_KEYS, "get-api-keys"},
+        {ApiGatewayCommandType::DELETE_API_KEY, "delete-api-key"},
+        {ApiGatewayCommandType::CREATE_REST_API, "create-rest-api"},
+        // AwsMock internal commands
+        {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
+        {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},
+        {ApiGatewayCommandType::UPDATE_API_KEY_COUNTER, "update-api-key-counter"},
+        {ApiGatewayCommandType::LIST_REST_API_COUNTERS, "list-rest-api-counters"},
+        {ApiGatewayCommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string ApiGatewayCommandTypeToString(const ApiGatewayCommandType commandType) {
@@ -104,12 +104,12 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const ApiGatewayClientCommand &i);
-      private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_API_GATEWAY_CLIENT_COMMAND_H

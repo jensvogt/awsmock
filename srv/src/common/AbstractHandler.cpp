@@ -2,7 +2,7 @@
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace {
-    logger_t _logger{boost::log::keywords::channel = "Common"};
+    logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
 namespace AwsMock::Service {

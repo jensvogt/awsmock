@@ -77,8 +77,8 @@ void ShowHelp(const boost::program_options::options_description &desc) {
 #ifdef HAS_SYSTEMD
     std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
 #endif
-    std::cout << std::left << std::setw(leftIndent) << "  set-loglevel <level>" << ": sets the manager log to level" << std::endl
-            << std::left << std::setw(leftIndent) << "  get-loglevel <channel>" << ": shows the current log level for the given channel, if no channel is given, print all" << std::endl
+    std::cout << std::left << std::setw(leftIndent) << "  set-loglevel <level> [<channel>]" << ": sets the manager log to level, if no channel is given, set all" << std::endl
+            << std::left << std::setw(leftIndent) << "  get-loglevel [<channel>]" << ": shows the current log level for the given channel, if no channel is given, get all" << std::endl
             << std::left << std::setw(leftIndent) << "  config" << ": shows the gateway configuration" << std::endl
             << std::left << std::setw(leftIndent) << "  export [<modules>] [export-options]" << ": dumps the current infrastructure to stdout. Modules is a space separated list of module names." << std::endl
             << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
@@ -89,7 +89,7 @@ void ShowHelp(const boost::program_options::options_description &desc) {
             << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
             << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl
             << "\nLog levels:" << std::endl
-            << "  fatal, error, warning, info, debug, verbose." << std::endl
+            << "  fatal, error, warning, info, debug, trace." << std::endl
             << "\nNotes:" << std::endl
             << "  All command support list of applications or lambdas. If no argument is given, the corresponding command will use all applications/lambdas. Several applications/lambdas should be separated by spaces."
             << std::endl;
