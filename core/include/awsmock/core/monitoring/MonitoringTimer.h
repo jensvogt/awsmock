@@ -14,7 +14,7 @@
 
 #define TIME_DIFF (duration_cast<std::chrono::milliseconds>(system_clock::now() - _start).count())
 
-namespace AwsMock::Monitoring {
+namespace Awsmock::Monitoring {
 
     using std::chrono::system_clock;
 
@@ -28,7 +28,8 @@ namespace AwsMock::Monitoring {
      */
     class MonitoringTimer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -94,7 +95,8 @@ namespace AwsMock::Monitoring {
          */
         MonitoringTimer &operator=(const MonitoringTimer &) = delete;
 
-    private:
+      private:
+
         /**
          * Name of the timer
          */
@@ -121,6 +123,6 @@ namespace AwsMock::Monitoring {
         system_clock::time_point _start;
     };
 
-} // namespace AwsMock::Monitoring
+}// namespace Awsmock::Monitoring
 
 #endif//AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H

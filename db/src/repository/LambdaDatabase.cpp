@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/LambdaDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
     LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambda_result"), _memoryDb(LambdaMemoryDb::instance()) {
     }
 
@@ -185,15 +185,12 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-            auto session = client->start_session();
 
             try {
                 mongocxx::options::find_one_and_update opts{};
                 opts.return_document(mongocxx::options::return_document::k_after);
 
-                session.start_transaction();
                 auto mResult = _lambdaCollection.find_one_and_update(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument(), opts);
-                session.commit_transaction();
                 log_trace << "Lambda updated: " << lambda.ToString();
                 if (mResult.has_value()) {
                     lambda.FromDocument(mResult.value());
@@ -201,7 +198,6 @@ namespace AwsMock::Database {
                 }
                 return {};
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -230,17 +226,13 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-            auto session = client->start_session();
 
             try {
-                session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
                                              make_document(kvp("$set", make_document(
-                                                                   kvp("instances.$.status", LambdaInstanceStatusToString(status)),
-                                                                   kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
-                session.commit_transaction();
+                                                                               kvp("instances.$.status", LambdaInstanceStatusToString(status)),
+                                                                               kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
             } catch (mongocxx::exception::system_error &e) {
-                session.abort_transaction();
                 log_error << "Get lambda by ARN failed, error: " << e.what();
             }
         } else {
@@ -252,13 +244,10 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-            auto session = client->start_session();
 
             try {
-                session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("_id", bsoncxx::oid(lambda.oid))),
                                              make_document(kvp("$set", make_document(kvp("invocations", bsoncxx::types::b_int64(invocations)), kvp("averageRuntime", bsoncxx::types::b_int64(avgRuntime))))));
-                session.commit_transaction();
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Set last invocation failed, error: " << e.what();
             }
@@ -597,4 +586,4 @@ namespace AwsMock::Database {
         }
         return _memoryDb.DeleteAllLambdas();
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

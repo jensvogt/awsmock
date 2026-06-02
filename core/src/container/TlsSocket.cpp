@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/container/TlsSocket.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     TlsSocket::TlsSocket(const std::string &host, const int port, const std::string &caFile, const std::string &certFile, const std::string &keyFile, const bool verifyPeer)
         : DomainSocket(host + ":" + std::to_string(port)), _tlsHost(host), _tlsPort(port), _sslContext(boost::asio::ssl::context::tls_client) {
@@ -213,4 +213,4 @@ namespace AwsMock::Core {
         return placeholder;
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -4,7 +4,7 @@
 
 #include <awsmock/core/exception/ContainerException.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     ContainerException::ContainerException(const ContainerException &exc) = default;
 
@@ -12,4 +12,4 @@ namespace AwsMock::Core {
 
     ContainerException &ContainerException::operator=(const ContainerException &exc) = default;
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

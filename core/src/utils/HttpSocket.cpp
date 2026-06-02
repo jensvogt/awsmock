@@ -9,7 +9,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
@@ -217,4 +217,4 @@ namespace AwsMock::Core {
         return {.statusCode = response.result(), .body = boost::beast::buffers_to_string(sb.data())};
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -14,7 +14,7 @@
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -49,28 +49,27 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<DynamoDbCommandType, std::string> DynamoDbCommandTypeNames{
-        {DynamoDbCommandType::CREATE_TABLE, "create-table"},
-        {DynamoDbCommandType::LIST_TABLES, "list-tables"},
-        {DynamoDbCommandType::LIST_TABLE_ARNS, "list-table-arns"},
-        {DynamoDbCommandType::DESCRIBE_TABLE, "describe-table"},
-        {DynamoDbCommandType::DELETE_TABLE, "delete-table"},
-        {DynamoDbCommandType::GET_ITEM, "get-item"},
-        {DynamoDbCommandType::PUT_ITEM, "put-item"},
-        {DynamoDbCommandType::QUERY, "query"},
-        {DynamoDbCommandType::SCAN, "scan"},
-        {DynamoDbCommandType::DELETE_ITEM, "delete-item"},
-        {DynamoDbCommandType::DELETE_ALL_ITEMS, "delete-all-items"},
-        {DynamoDbCommandType::LIST_TABLE_COUNTERS, "list-table-counters"},
-        {DynamoDbCommandType::LIST_ITEM_COUNTERS, "list-item-counters"},
-        {DynamoDbCommandType::LIST_STREAMS, "list-streams"},
-        {DynamoDbCommandType::LIST_STREAMS_COUNTERS, "list-stream-counters"},
-        {DynamoDbCommandType::GET_TABLE_DETAIL_COUNTERS, "get-table-detail-counters"},
-        {DynamoDbCommandType::GET_ITEM_COUNTER, "get-item-counter"},
-        {DynamoDbCommandType::IMPORT_ITEMS, "import-items"},
-        {DynamoDbCommandType::EXPORT_ITEMS, "export-items"},
-        {DynamoDbCommandType::RESET_ITEM_COUNTERS, "reset-item-counters"},
-        {DynamoDbCommandType::UNKNOWN, "unknown"}
-    };
+            {DynamoDbCommandType::CREATE_TABLE, "create-table"},
+            {DynamoDbCommandType::LIST_TABLES, "list-tables"},
+            {DynamoDbCommandType::LIST_TABLE_ARNS, "list-table-arns"},
+            {DynamoDbCommandType::DESCRIBE_TABLE, "describe-table"},
+            {DynamoDbCommandType::DELETE_TABLE, "delete-table"},
+            {DynamoDbCommandType::GET_ITEM, "get-item"},
+            {DynamoDbCommandType::PUT_ITEM, "put-item"},
+            {DynamoDbCommandType::QUERY, "query"},
+            {DynamoDbCommandType::SCAN, "scan"},
+            {DynamoDbCommandType::DELETE_ITEM, "delete-item"},
+            {DynamoDbCommandType::DELETE_ALL_ITEMS, "delete-all-items"},
+            {DynamoDbCommandType::LIST_TABLE_COUNTERS, "list-table-counters"},
+            {DynamoDbCommandType::LIST_ITEM_COUNTERS, "list-item-counters"},
+            {DynamoDbCommandType::LIST_STREAMS, "list-streams"},
+            {DynamoDbCommandType::LIST_STREAMS_COUNTERS, "list-stream-counters"},
+            {DynamoDbCommandType::GET_TABLE_DETAIL_COUNTERS, "get-table-detail-counters"},
+            {DynamoDbCommandType::GET_ITEM_COUNTER, "get-item-counter"},
+            {DynamoDbCommandType::IMPORT_ITEMS, "import-items"},
+            {DynamoDbCommandType::EXPORT_ITEMS, "export-items"},
+            {DynamoDbCommandType::RESET_ITEM_COUNTERS, "reset-item-counters"},
+            {DynamoDbCommandType::UNKNOWN, "unknown"}};
 
     [[maybe_unused]] static std::string DynamoDbCommandTypeToString(const DynamoDbCommandType &commandType) {
         return DynamoDbCommandTypeNames[commandType];
@@ -145,11 +144,11 @@ namespace AwsMock::Dto::Common {
          */
         std::string _secretAccessKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key");
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-} // namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_DYNAMODB_CLIENT_COMMAND_H

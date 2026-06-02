@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     /**
      * SQS message attribute entity
@@ -41,6 +41,6 @@ namespace AwsMock::Database::Entity::SQS {
         }
         return MessageStatus::UNKNOWN;
     }
-}// namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS
 
 #endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_STATUS_H

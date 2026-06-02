@@ -52,7 +52,7 @@
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/secretsmanager/SecretRotation.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Secrets manager service.
@@ -287,4 +287,4 @@ namespace AwsMock::Service {
         boost::mutex _mutex;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -11,7 +11,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 }
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     bsoncxx::types::bson_value::value Item::KeyValueToBson(const KeyValue &kv) {
 
@@ -243,4 +243,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb

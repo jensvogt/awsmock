@@ -12,7 +12,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     struct DeleteKeyRequest final : Common::BaseCounter<DeleteKeyRequest> {
 
@@ -39,6 +39,6 @@ namespace AwsMock::Dto::KMS {
         }
     };
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_CORE_DTO_DELETE_BUCKET_REQUEST_H

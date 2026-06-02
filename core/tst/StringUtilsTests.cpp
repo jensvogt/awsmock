@@ -11,7 +11,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/TestUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(IsNumericTest) {
 
@@ -290,4 +290,4 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(result, "create-queue");
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

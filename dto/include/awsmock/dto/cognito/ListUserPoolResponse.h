@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/cognito/model/UserPool.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief List user pool response
@@ -50,6 +50,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_LIST_USERPOOL_RESPONSE_H

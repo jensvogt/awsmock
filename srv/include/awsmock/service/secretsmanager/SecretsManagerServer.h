@@ -18,7 +18,7 @@
 
 #define SECRETSMANAGER_DEFAULT_MONITORING_PERIOD 300
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Secret manager module server.
@@ -86,4 +86,4 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

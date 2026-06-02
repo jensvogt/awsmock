@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Lambda"};
 }
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     Database::Entity::Lambda::Lambda LambdaCreator::CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const {
         log_debug << "Start creating lambda function, instanceId: " << instanceId;
@@ -275,7 +275,7 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
@@ -336,4 +336,4 @@ namespace AwsMock::Service {
         lambda.code.zipFile = base64File;
         return base64FullFile;
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

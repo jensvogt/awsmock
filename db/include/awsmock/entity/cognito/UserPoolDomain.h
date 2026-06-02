@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H
 #define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     /**
      * @brief Cognito user pool domain
@@ -20,6 +20,6 @@ namespace AwsMock::Database::Entity::Cognito {
         std::string domain;
     };
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito
 
 #endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H

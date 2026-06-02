@@ -4,7 +4,7 @@
 
 #include <awsmock/core/DirUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string DirUtils::RelativePath(const std::string &dir) {
         return dir.substr(1);
@@ -40,14 +40,14 @@ namespace AwsMock::Core {
     long DirUtils::DirectoryCountFiles(const std::string &dirName, const bool recursive) {
         if (recursive) {
             return std::count_if(
-                boost::filesystem::recursive_directory_iterator(dirName),
-                boost::filesystem::recursive_directory_iterator(),
-                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+                    boost::filesystem::recursive_directory_iterator(dirName),
+                    boost::filesystem::recursive_directory_iterator(),
+                    static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
         }
         return std::count_if(
-            boost::filesystem::directory_iterator(dirName),
-            boost::filesystem::directory_iterator(),
-            static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
+                boost::filesystem::directory_iterator(dirName),
+                boost::filesystem::directory_iterator(),
+                static_cast<bool (*)(const boost::filesystem::path &)>(boost::filesystem::is_regular_file));
     }
 
     bool DirUtils::DirectoryEmpty(const std::string &dirName) {
@@ -167,4 +167,4 @@ namespace AwsMock::Core {
             }
         }
     }
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

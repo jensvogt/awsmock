@@ -15,7 +15,7 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     // Forward declare for nested types
     struct DynamoValue;
@@ -177,6 +177,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
     typedef std::vector<Item> ItemList;
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb
 
 #endif// AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H

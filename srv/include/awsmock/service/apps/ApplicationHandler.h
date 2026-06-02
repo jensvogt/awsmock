@@ -8,12 +8,12 @@
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/common/ApplicationClientCommand.h>
 #include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/core/scheduler/Scheduler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Application HTTP handler
@@ -22,7 +22,8 @@ namespace AwsMock::Service {
      */
     class ApplicationHandler final : public AbstractHandler {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -40,7 +41,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
@@ -49,4 +51,4 @@ namespace AwsMock::Service {
         ApplicationService _applicationService;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

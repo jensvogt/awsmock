@@ -13,7 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief List SQS queues tags response.
@@ -54,6 +54,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_QUEUE_TAGS_RESPONSE_H

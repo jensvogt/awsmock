@@ -1,7 +1,7 @@
 
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     std::string ListModuleNamesResponse::ToJson() const {
 
@@ -51,4 +51,4 @@ namespace AwsMock::Dto::Module {
         return os;
     }
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module

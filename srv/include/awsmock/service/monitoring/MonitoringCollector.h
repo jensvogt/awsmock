@@ -16,7 +16,7 @@
 #include <boost/asio.hpp>
 #include <boost/signals2.hpp>
 
-namespace AwsMock::Monitoring {
+namespace Awsmock::Monitoring {
 
     class MonitoringCollector {
       public:
@@ -115,6 +115,6 @@ namespace AwsMock::Monitoring {
         return name + ":" + labelName + ":" + labelValue;
     }
 
-}// namespace AwsMock::Monitoring
+}// namespace Awsmock::Monitoring
 
 #endif// AWSMOCK_MONITORING_COLLECTOR_H

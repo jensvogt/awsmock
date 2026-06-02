@@ -13,7 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     /**
      * @brief DynamoDB provisioned throughput
@@ -58,6 +58,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
         void FromDocument(const std::optional<view> &document);
     };
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb
 
 #endif// AWSMOCK_ENTITY_DYNAMODB_PROVISIONED_THROUGHPUT_H

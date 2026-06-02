@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/lambda/model/LambdaResultCounter.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     struct GetLambdaResultCounterResponse final : Common::BaseCounter<GetLambdaResultCounterResponse> {
 
@@ -36,6 +36,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_GET_RESULT_COUNTER_RESPONSE_H

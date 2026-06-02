@@ -12,7 +12,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief Get the event source as lambda configuration
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_GET_EVENT_SOURCE_RESPONSE_H

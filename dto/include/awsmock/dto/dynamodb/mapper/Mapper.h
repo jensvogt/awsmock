@@ -17,7 +17,7 @@
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Maps an entity to the corresponding DTO and vice versa.
@@ -187,6 +187,6 @@ namespace AwsMock::Dto::DynamoDb {
         static std::string KeyValueToString(const KeyValue &value);
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_S3_MAPPER_H

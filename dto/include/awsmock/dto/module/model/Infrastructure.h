@@ -30,7 +30,7 @@
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/entity/transfer/Transfer.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     using bsoncxx::builder::basic::array;
     using bsoncxx::builder::basic::document;
@@ -155,6 +155,6 @@ namespace AwsMock::Dto::Module {
         void FromJson(const std::string &jsonString);
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_COMMON_INFRASTRUCTURE_H

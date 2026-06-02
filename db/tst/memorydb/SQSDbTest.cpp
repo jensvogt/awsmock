@@ -6,8 +6,8 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../include/awsmock/repository/sqs/SQSDatabase.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/repository/SQSDatabase.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};
@@ -18,7 +18,7 @@ namespace {
 #define TEST_QUEUE_NAME "test-queue"
 #define TEST_MESSAGE_BODY "{\"testAttribute\":\"testValue\"}"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::SQS::Message CreateDefaultSNSMessage(const std::string &region, const std::string &queueName) {
         Entity::SQS::Message message;
@@ -155,4 +155,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

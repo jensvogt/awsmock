@@ -22,7 +22,7 @@
 #define SHA256_SUM "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592"
 #define SHA256_SUM_EMPTY "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(Md5StringTest) {
 
@@ -270,4 +270,4 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL_COLLECTIONS(testString.c_str(), testString.c_str() + strlen(testString.c_str()), decoded, decoded + strlen(reinterpret_cast<const char *>(decoded)));
         delete[] decoded;
     }
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

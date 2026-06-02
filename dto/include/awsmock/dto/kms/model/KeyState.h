@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief KMS key state
@@ -50,6 +50,6 @@ namespace AwsMock::Dto::KMS {
         return KeyState::UNAVAILABLE;
     }
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_MASTER_KEY_STATE_H

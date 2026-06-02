@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     unsigned int Crypto::_salt[] = {1214370622, 264849915};
     unsigned char Crypto::_iv[] = "Â€[QÃ¡wu";
@@ -490,10 +490,9 @@ namespace AwsMock::Core {
         std::string result(encodedLen, '\0');
 
         const int actualLen = EVP_EncodeBlock(
-            reinterpret_cast<unsigned char *>(result.data()),
-            data.data(),
-            static_cast<int>(data.size())
-        );
+                reinterpret_cast<unsigned char *>(result.data()),
+                data.data(),
+                static_cast<int>(data.size()));
 
         result.resize(actualLen);
         return result;
@@ -506,12 +505,11 @@ namespace AwsMock::Core {
         std::vector<uint8_t> result(decodedLen);
 
         const int actualLen = EVP_DecodeBlock(
-            result.data(),
-            reinterpret_cast<const unsigned char *>(encoded.data()),
-            static_cast<int>(encoded.size())
-        );
+                result.data(),
+                reinterpret_cast<const unsigned char *>(encoded.data()),
+                static_cast<int>(encoded.size()));
 
-        if (actualLen < 0) return {}; // decode error
+        if (actualLen < 0) return {};// decode error
 
         // EVP_DecodeBlock pads with zeros for '=' padding â€” trim them
         int padding = 0;
@@ -730,4 +728,4 @@ namespace AwsMock::Core {
         return {reinterpret_cast<char *>(decrypt), outLen};
     }
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief KMS key expiration model
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::KMS {
         return EncryptionAlgorithm::UNKNOWN;
     }
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_ENCRYPTION_ALGORITHMS_H

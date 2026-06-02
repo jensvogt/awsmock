@@ -12,6 +12,7 @@
 #include <openssl/bn.h>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
@@ -77,10 +78,9 @@
 #include <awsmock/dto/cognito/internal/ListUserPoolCountersResponse.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
-#include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     using std::chrono::system_clock;
 
@@ -93,7 +93,8 @@ namespace AwsMock::Service {
      */
     class CognitoService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -378,7 +379,8 @@ namespace AwsMock::Service {
          */
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
@@ -400,7 +402,7 @@ namespace AwsMock::Service {
         /**
          * Database connection
          */
-        Database::CognitoDatabase &_database;
+        Database::CognitoMongoRepository &_database;
 
         /**
          * AWS account userPoolId
@@ -408,6 +410,6 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_COGNITO_SERVICE_H

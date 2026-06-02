@@ -6,7 +6,7 @@
 
 #include "awsmock/dto/module/GetLogLevelRequest.h"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     std::vector<Database::Entity::Module::Module> ModuleService::ListModules() const {
 
@@ -86,12 +86,12 @@ namespace AwsMock::Service {
 
             } else if (module == "sqs") {
 
-                Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+                Database::SQSMongoRepository &_sqsDatabase = Database::SQSMongoRepository::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.sqsQueues = _sqsDatabase.ExportQueues({sortColumn});
+                    infrastructure.sqsQueues = _sqsDatabase.exportQueues({sortColumn});
                 }
                 if (request.IsObjects()) {
-                    infrastructure.sqsMessages = _sqsDatabase.ListMessages();
+                    infrastructure.sqsMessages = _sqsDatabase.listMessages({});
                 }
 
             } else if (module == "sns") {
@@ -113,11 +113,11 @@ namespace AwsMock::Service {
 
             } else if (module == "cognito") {
 
-                Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+                Database::CognitoMongoRepository &_cognitoDatabase = Database::CognitoMongoRepository::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.cognitoUserPools = _cognitoDatabase.ExportUserPools({sortColumn});
-                    infrastructure.cognitoUserGroups = _cognitoDatabase.ExportGroups({sortColumn});
-                    infrastructure.cognitoUsers = _cognitoDatabase.ExportUsers({sortColumn});
+                    infrastructure.cognitoUserPools = _cognitoDatabase.exportUserPools({sortColumn});
+                    infrastructure.cognitoUserGroups = _cognitoDatabase.exportGroups({sortColumn});
+                    infrastructure.cognitoUsers = _cognitoDatabase.exportUsers({sortColumn});
                 }
 
             } else if (module == "dynamodb") {
@@ -221,10 +221,10 @@ namespace AwsMock::Service {
 
         // SQS
         if (!infrastructure.sqsQueues.empty() || !infrastructure.sqsMessages.empty()) {
-            const Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
+            const Database::SQSMongoRepository &_sqsDatabase = Database::SQSMongoRepository::instance();
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
-                    _sqsDatabase.ImportQueue(queue);
+                    _sqsDatabase.importQueue(queue);
                     log_debug << "SQS queues imported, name: " << queue.name;
                 }
                 log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();
@@ -232,7 +232,7 @@ namespace AwsMock::Service {
             if (!infrastructure.sqsMessages.empty()) {
                 for (auto &message: infrastructure.sqsMessages) {
                     message.modified = system_clock::now();
-                    message = _sqsDatabase.CreateOrUpdateMessage(message);
+                    message = _sqsDatabase.createOrUpdateMessage(message);
                     log_debug << "SQS queues imported, queueArn: " << message.queueArn;
                 }
                 log_info << "SQS resources imported, count: " << infrastructure.sqsMessages.size();
@@ -279,18 +279,18 @@ namespace AwsMock::Service {
 
         // Cognito
         if (!infrastructure.cognitoUserPools.empty() || !infrastructure.cognitoUsers.empty()) {
-            Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+            Database::CognitoMongoRepository &_cognitoDatabase = Database::CognitoMongoRepository::instance();
             if (!infrastructure.cognitoUserPools.empty()) {
                 for (auto &userPool: infrastructure.cognitoUserPools) {
                     userPool.modified = system_clock::now();
-                    _cognitoDatabase.CreateOrUpdateUserPool(userPool);
+                    userPool = _cognitoDatabase.createOrUpdateUserPool(userPool);
                 }
                 log_info << "Cognito user pools imported, count: " << infrastructure.cognitoUserPools.size();
             }
             if (!infrastructure.cognitoUsers.empty()) {
                 for (auto &user: infrastructure.cognitoUsers) {
                     user.modified = system_clock::now();
-                    _cognitoDatabase.CreateOrUpdateUser(user);
+                    user = _cognitoDatabase.createOrUpdateUser(user);
                 }
                 log_info << "Cognito users imported, count: " << infrastructure.cognitoUsers.size();
             }
@@ -385,7 +385,7 @@ namespace AwsMock::Service {
             if (m == "s3") {
                 count += Database::S3Database::instance().DeleteAllBuckets();
             } else if (m == "sqs") {
-                count += Database::SQSDatabase::instance().DeleteAllQueues();
+                count += Database::SQSMongoRepository::instance().deleteAllQueues();
             } else if (m == "sns") {
                 count += Database::SNSDatabase::instance().DeleteAllTopics();
             } else if (m == "dynamodb") {
@@ -406,15 +406,15 @@ namespace AwsMock::Service {
             if (m == "s3") {
                 count += Database::S3Database::instance().DeleteAllObjects();
             } else if (m == "sqs") {
-                count += Database::SQSDatabase::instance().DeleteAllMessages();
+                count += Database::SQSMongoRepository::instance().deleteAllMessages();
             } else if (m == "sns") {
                 count += Database::SNSDatabase::instance().DeleteAllMessages();
             } else if (m == "lambda") {
                 count += Database::LambdaDatabase::instance().DeleteAllLambdas();
             } else if (m == "cognito") {
-                count += Database::CognitoDatabase::instance().DeleteAllUsers();
-                count += Database::CognitoDatabase::instance().DeleteAllUserPools();
-                count += Database::CognitoDatabase::instance().DeleteAllGroups();
+                count += Database::CognitoMongoRepository::instance().deleteAllUsers();
+                count += Database::CognitoMongoRepository::instance().deleteAllUserPools();
+                count += Database::CognitoMongoRepository::instance().deleteAllGroups({});
             } else if (m == "dynamodb") {
                 count += Database::DynamoDbDatabase::instance().DeleteAllItems();
             } else if (m == "secretsmanager") {
@@ -514,4 +514,4 @@ namespace AwsMock::Service {
         }
         return response;
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -4,7 +4,7 @@
 
 #include <awsmock/service/module/ModuleMap.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     void ModuleMap::AddModule(const std::string &name, const std::shared_ptr<AbstractServer> &server) {
         _moduleMap[name] = server;
@@ -34,4 +34,4 @@ namespace AwsMock::Service {
         return static_cast<int>(_moduleMap.size());
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

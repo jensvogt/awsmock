@@ -18,7 +18,7 @@ namespace {
 #define TEST_TABLE "test-table"
 #define TEST_REGION "eu-cental-1"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Dto::DynamoDb::CreateTableRequest CreateDefaultTableRequest() {
 
@@ -459,4 +459,4 @@ namespace AwsMock::Database {
     }
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

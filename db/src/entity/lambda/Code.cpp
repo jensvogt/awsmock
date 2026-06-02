@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/lambda/Code.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     void Code::FromDocument(const std::optional<view> &mResult) {
 
@@ -42,4 +42,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "Code=" << to_json(t.ToDocument());
         return os;
     }
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

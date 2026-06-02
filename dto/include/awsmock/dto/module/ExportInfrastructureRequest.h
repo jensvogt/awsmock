@@ -10,7 +10,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/module/model/ExportType.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     /**
      * @brief Export infrastructure request
@@ -82,6 +82,6 @@ namespace AwsMock::Dto::Module {
         }
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H

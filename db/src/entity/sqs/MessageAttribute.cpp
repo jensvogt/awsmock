@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "SQS"};
 }
 
-namespace AwsMock::Database::Entity::SQS {
+namespace Awsmock::Database::Entity::SQS {
 
     view_or_value<view, value> MessageAttribute::ToDocument() const {
 
@@ -47,11 +47,11 @@ namespace AwsMock::Database::Entity::SQS {
                 const auto bin = object.view()["binaryValue"].get_binary();
                 binaryValue.assign(bin.bytes, bin.bytes + bin.size);
             }
-            
+
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
     }
 
-} // namespace AwsMock::Database::Entity::SQS
+}// namespace Awsmock::Database::Entity::SQS

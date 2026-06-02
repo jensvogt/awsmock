@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/repository/ModuleDatabase.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Abstract HTTP request server
@@ -82,6 +82,6 @@ namespace AwsMock::Service {
         Database::ModuleDatabase &_moduleDatabase;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_ABSTRACT_SERVER_H

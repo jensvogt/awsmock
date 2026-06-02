@@ -24,7 +24,7 @@
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
@@ -158,4 +158,4 @@ namespace AwsMock::Database {
         static boost::mutex _parameterMutex;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

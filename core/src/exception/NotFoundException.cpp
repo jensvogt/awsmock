@@ -4,7 +4,7 @@
 
 #include <awsmock/core/exception/NotFoundException.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     NotFoundException::NotFoundException(const http::status code, const char *resource, const char *requestId) : _code(code), _resource(resource), _requestId(requestId) {}
 
@@ -22,4 +22,4 @@ namespace AwsMock::Core {
 
     const char *NotFoundException::requestId() const noexcept { return _requestId; }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

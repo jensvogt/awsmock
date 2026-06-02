@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Delete user request
@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string userName;
 
-    private:
+      private:
 
         friend AdminDeleteUserRequest tag_invoke(boost::json::value_to_tag<AdminDeleteUserRequest>, boost::json::value const &v) {
             AdminDeleteUserRequest r;
@@ -50,6 +50,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_ADMIN_DELETE_USER_REQUEST_H

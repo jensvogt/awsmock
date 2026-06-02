@@ -9,7 +9,7 @@
 #include <awsmock/dto/monitoring/Counter.h>
 #include <awsmock/entity/monitoring/Counter.h>
 
-namespace AwsMock::Dto::Monitoring {
+namespace Awsmock::Dto::Monitoring {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -53,6 +53,6 @@ namespace AwsMock::Dto::Monitoring {
         static std::vector<Database::Entity::Monitoring::Counter> map(const std::vector<Counter> &counterEntity);
     };
 
-}// namespace AwsMock::Dto::Monitoring
+}// namespace Awsmock::Dto::Monitoring
 
 #endif// AWSMOCK_DTO_MONITORING_MAPPER_H

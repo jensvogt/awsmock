@@ -12,7 +12,7 @@
 #include <awsmock/dto/lambda/model/InstanceCounter.h>
 #include <awsmock/dto/sqs/model/TagCounter.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief List Lambda instance counter response
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_LIST_TAG_COUNTERS_RESPONSE_H

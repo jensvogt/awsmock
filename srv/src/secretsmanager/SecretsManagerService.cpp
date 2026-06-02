@@ -4,7 +4,7 @@
 
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     SecretsManagerService::SecretsManagerService(boost::asio::io_context &ioc) : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService() {
 
@@ -697,4 +697,4 @@ namespace AwsMock::Service {
         log_trace << "GetSecretString secret, secretString: " << Core::Crypto::Base64Decode(decryptResponse.plaintext);
         return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

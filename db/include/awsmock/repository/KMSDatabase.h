@@ -11,22 +11,23 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/KMSMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief KMS MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class KMSDatabase : public DatabaseBase {
+    class KMSDatabase : public AwsMock::Database::DatabaseBase {
 
       public:
 
@@ -162,6 +163,6 @@ namespace AwsMock::Database {
         KMSMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_KMS_DATABASE_H

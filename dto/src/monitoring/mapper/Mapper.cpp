@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/monitoring/mapper/Mapper.h>
 
-namespace AwsMock::Dto::Monitoring {
+namespace Awsmock::Dto::Monitoring {
 
     Counter Mapper::map(const Database::Entity::Monitoring::Counter &counterEntity) {
         Counter counter;
@@ -36,4 +36,4 @@ namespace AwsMock::Dto::Monitoring {
         return counters;
     }
 
-}// namespace AwsMock::Dto::Monitoring
+}// namespace Awsmock::Dto::Monitoring

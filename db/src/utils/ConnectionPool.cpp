@@ -4,7 +4,7 @@
 
 #include <awsmock/utils/ConnectionPool.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     void ConnectionPool::Configure() {
         const Core::Configuration &configuration = Core::Configuration::instance();
@@ -32,4 +32,4 @@ namespace AwsMock::Database {
         _pool.reset();
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

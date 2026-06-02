@@ -24,7 +24,7 @@
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/module/ModuleService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief AwsMock DynamoDB server
@@ -33,7 +33,8 @@ namespace AwsMock::Service {
      */
     class DynamoDbServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -44,7 +45,8 @@ namespace AwsMock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 
         /**
@@ -124,6 +126,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVER_DYNAMODB_SERVER_H

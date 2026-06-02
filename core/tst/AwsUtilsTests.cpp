@@ -9,7 +9,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(CreateS3ArnTest) {
 
@@ -221,4 +221,4 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(result, true);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -4,7 +4,7 @@
 
 #include <awsmock/service/monitoring/MonitoringService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     Dto::Monitoring::GetCountersResponse MonitoringService::GetCounters(const Dto::Monitoring::GetCountersRequest &request) const {
         log_trace << "Get counters request, request: " << request.ToString();
@@ -42,4 +42,4 @@ namespace AwsMock::Service {
             throw Core::ServiceException(exc.what());
         }
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

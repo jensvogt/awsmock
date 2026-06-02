@@ -12,7 +12,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     /**
      * @brief Get log level request
@@ -29,7 +29,8 @@ namespace AwsMock::Dto::Module {
 
         std::vector<std::string> names;
 
-    private:
+      private:
+
         friend GetLogLevelRequest tag_invoke(boost::json::value_to_tag<GetLogLevelRequest>, boost::json::value const &v) {
             GetLogLevelRequest r;
             if (Core::Json::AttributeExists(v, "names")) {
@@ -49,4 +50,4 @@ namespace AwsMock::Dto::Module {
         }
     };
 
-} // namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module

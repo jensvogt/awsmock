@@ -11,7 +11,7 @@
 // Boost includes
 #include <boost/beast/http.hpp>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     namespace http = boost::beast::http;
 
@@ -22,7 +22,8 @@ namespace AwsMock::Core {
      */
     class ContainerException final : public std::exception {
 
-    public:
+      public:
+
         /**
          * Constructor.
          *
@@ -73,7 +74,8 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-    private:
+      private:
+
         /**
          * Return code
          */
@@ -91,4 +93,4 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

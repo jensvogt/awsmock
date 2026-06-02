@@ -16,7 +16,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     struct ListSecretVersionCountersRequest final : Common::BaseCounter<ListSecretVersionCountersRequest> {
 
@@ -73,6 +73,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRET_VERSION_COUNTERS_REQUEST_H

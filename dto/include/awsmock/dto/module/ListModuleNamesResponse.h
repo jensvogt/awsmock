@@ -13,7 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     struct ListModuleNamesResponse {
 
@@ -49,12 +49,12 @@ namespace AwsMock::Dto::Module {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const ListModuleNamesResponse &r);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
-
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_MODULE_LIST_NAMES_RESPONSE_H

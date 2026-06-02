@@ -4,7 +4,7 @@
 
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _scheduler(scheduler) {
 
@@ -88,4 +88,4 @@ namespace AwsMock::Service {
         log_info << "DynamoDB server stopped";
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

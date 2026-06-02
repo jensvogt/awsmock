@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/module/model/Infrastructure.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     document Infrastructure::ToDocument() const {
         document document;
@@ -103,4 +103,4 @@ namespace AwsMock::Dto::Module {
         Core::Bson::FromBsonArray(document, "api-gateway-keys", &apiKeys);
     }
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module

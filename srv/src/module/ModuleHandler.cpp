@@ -4,7 +4,7 @@
 
 #include <awsmock/service/module/ModuleHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     http::response<http::dynamic_body> ModuleHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         Monitoring::MonitoringTimer measure(MODULE_HTTP_TIMER, MODULE_HTTP_COUNTER, "method", "GET");
@@ -173,4 +173,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

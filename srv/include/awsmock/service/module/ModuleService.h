@@ -8,6 +8,8 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
+#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/BackupUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/Services.h>
@@ -23,13 +25,11 @@
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ApiGatewayDatabase.h>
 #include <awsmock/repository/ApplicationDatabase.h>
-#include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/repository/SNSDatabase.h>
-#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
@@ -40,7 +40,7 @@
 #include "awsmock/dto/module/GetLogLevelResponse.h"
 #include "awsmock/dto/module/SetLogLevelRequest.h"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief The ModuleService controls the different services
@@ -53,12 +53,13 @@ namespace AwsMock::Service {
      */
     class ModuleService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {
-        };
+                                   };
 
         /**
          * @brief Return a list of all modules
@@ -172,7 +173,8 @@ namespace AwsMock::Service {
          */
         Dto::Module::GetLogLevelResponse getLogLevels(const Dto::Module::GetLogLevelRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -194,4 +196,4 @@ namespace AwsMock::Service {
         Database::ModuleDatabase &_moduleDatabase;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

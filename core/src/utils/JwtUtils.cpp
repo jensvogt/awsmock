@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string JwtUtils::CreateTokenRs256(const std::string &privateKey, const std::string &issuer, const std::map<std::string, std::string> &payload) {
 
@@ -69,4 +69,4 @@ namespace AwsMock::Core {
         return true;
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

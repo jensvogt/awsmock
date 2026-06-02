@@ -16,7 +16,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     using std::chrono::system_clock;
 
@@ -188,6 +188,6 @@ namespace AwsMock::Dto::SSM {
         }
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_MODEL_PARAMETER_H

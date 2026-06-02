@@ -5,7 +5,7 @@
 // AwsMock includes
 #include <awsmock/service/frontend/FrontendSession.h>
 
-namespace AwsMock::Service::Frontend {
+namespace Awsmock::Service::Frontend {
     FrontendSession::FrontendSession(boost::asio::ip::tcp::socket socket) : socket_(std::move(socket)) {
     }
 
@@ -73,4 +73,4 @@ namespace AwsMock::Service::Frontend {
         boost::beast::error_code ec;
         socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
     }
-}// namespace AwsMock::Service::Frontend
+}// namespace Awsmock::Service::Frontend

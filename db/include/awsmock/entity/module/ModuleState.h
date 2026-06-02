@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Database::Entity::Module {
+namespace Awsmock::Database::Entity::Module {
 
     /**
      * @brief AwsMock module state
@@ -24,11 +24,11 @@ namespace AwsMock::Database::Entity::Module {
     };
 
     static std::map<ModuleState, std::string> ModuleStateNames{
-        {ModuleState::STOPPED, "STOPPED"},
-        {ModuleState::STARTING, "STARTING"},
-        {ModuleState::RUNNING, "RUNNING"},
-        {ModuleState::SUSPENDED, "SUSPENDED"},
-        {ModuleState::UNKNOWN, "UNKNOWN"},
+            {ModuleState::STOPPED, "STOPPED"},
+            {ModuleState::STARTING, "STARTING"},
+            {ModuleState::RUNNING, "RUNNING"},
+            {ModuleState::SUSPENDED, "SUSPENDED"},
+            {ModuleState::UNKNOWN, "UNKNOWN"},
     };
 
     [[maybe_unused]] static std::string ModuleStateToString(ModuleState serviceStatus) {
@@ -51,10 +51,9 @@ namespace AwsMock::Database::Entity::Module {
     };
 
     static std::map<ModuleStatus, std::string> ModuleStatusNames{
-        {ModuleStatus::INACTIVE, "INACTIVE"},
-        {ModuleStatus::ACTIVE, "ACTIVE"},
-        {ModuleStatus::UNKNOWN, "UNKNOWN"}
-    };
+            {ModuleStatus::INACTIVE, "INACTIVE"},
+            {ModuleStatus::ACTIVE, "ACTIVE"},
+            {ModuleStatus::UNKNOWN, "UNKNOWN"}};
 
     [[maybe_unused]] static std::string ModuleStatusToString(ModuleStatus modulesStatus) {
         return ModuleStatusNames[modulesStatus];
@@ -69,4 +68,4 @@ namespace AwsMock::Database::Entity::Module {
         return ModuleStatus::UNKNOWN;
     }
 
-} // namespace AwsMock::Database::Entity::Module
+}// namespace Awsmock::Database::Entity::Module

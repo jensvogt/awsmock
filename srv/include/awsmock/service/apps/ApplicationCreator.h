@@ -18,7 +18,7 @@
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Application async creator
@@ -141,6 +141,6 @@ namespace AwsMock::Service {
         static std::string GetDockerTag(const Database::Entity::Apps::Application &application);
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_APPLICATION_CREATOR_H

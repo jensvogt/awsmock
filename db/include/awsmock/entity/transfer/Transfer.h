@@ -16,7 +16,7 @@
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::Transfer {
+namespace Awsmock::Database::Entity::Transfer {
 
     using std::chrono::system_clock;
 
@@ -224,6 +224,6 @@ namespace AwsMock::Database::Entity::Transfer {
     typedef Transfer Transfer;
     typedef std::vector<Transfer> TransferList;
 
-}// namespace AwsMock::Database::Entity::Transfer
+}// namespace Awsmock::Database::Entity::Transfer
 
 #endif// AWSMOCK_DB_ENTITY_TRANSFER_H

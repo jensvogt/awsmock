@@ -1,7 +1,7 @@
 
 #include <awsmock/service/cognito/CognitoHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     const std::map<std::string, std::string> CognitoHandler::headers = CreateHeaderMap();
 
@@ -288,4 +288,4 @@ namespace AwsMock::Service {
         }
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

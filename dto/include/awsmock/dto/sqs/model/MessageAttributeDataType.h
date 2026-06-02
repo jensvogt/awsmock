@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     enum MessageAttributeDataType {
         STRING,
@@ -21,12 +21,12 @@ namespace AwsMock::Dto::SQS {
     };
 
     static std::map<MessageAttributeDataType, std::string> MessageAttributeDataTypeNames{
-        {STRING, "String"},
-        {STRING_LIST, "StringList"},
-        {NUMBER, "Number"},
-        {NUMBER_LIST, "NumberList"},
-        {BINARY, "Binary"},
-        {BINARY_LIST, "BinaryList"},
+            {STRING, "String"},
+            {STRING_LIST, "StringList"},
+            {NUMBER, "Number"},
+            {NUMBER_LIST, "NumberList"},
+            {BINARY, "Binary"},
+            {BINARY_LIST, "BinaryList"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeDataTypeToString(const MessageAttributeDataType &messageAttributeDataType) {
@@ -42,6 +42,6 @@ namespace AwsMock::Dto::SQS {
         return STRING;
     }
 
-} // namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_DATA_TYPE_H

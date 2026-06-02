@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_DATABASE_H
-#define AWSMOCK_REPOSITORY_DATABASE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -25,7 +24,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/ConnectionPool.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     struct IndexColumnDefinition {
 
@@ -59,28 +58,64 @@ namespace AwsMock::Database {
     };
 
     /**
-     * @brief MongoDB database base class.
+     * Represents a database connection and provides methods to interact with the database.
      *
-     * @par
-     * Indexes are created during startup using detached background threads. Indexes which are already existing are ignored.
-     *
-     * @author jens.vogt\@opitz-consulting.com
+     * The Database class is responsible for establishing a connection
+     * to a database, executing queries, and managing transactional operations.
      */
-    class DatabaseBase {
+    class Database {
 
       public:
 
         /**
-         * @brief Constructor
+         * Instance of the class
          */
-        explicit DatabaseBase();
+        static Database &instance() {
+            static Database instance;
+            return instance;
+        }
+
+        /**
+         * Represents a database entity.
+         */
+        Database(const Database &) = delete;
+
+        /**
+         * Overloaded operator for performing a specific operation.
+         *
+         * @param rhs The right-hand side operand to be used in the operation.
+         * @return The result of the operation involving the current object and the right-hand side operand.
+         */
+        Database &operator=(const Database &rhs) = delete;
+
+        /**
+         * @brief Initialize the MongoDB connection pool
+         */
+        void initialize();
+
+        /**
+         * @brief Acquire a client from the pool
+         */
+        mongocxx::pool::entry client() const;
+
+        /**
+         * @brief Returns the database name
+         */
+        [[nodiscard]]
+        const std::string &databaseName() const { return _databaseName; }
+
+        /**
+         * @brief Ping the server — throws if unreachable
+         */
+        void ping();
 
         /**
          * @brief Returns a MongoDB connection from the pool
          *
          * @return MongoDB database client
          */
-        [[nodiscard]] mongocxx::database GetConnection() const;
+        [[nodiscard]]
+        mongocxx::database GetConnection() const;
 
         /**
          * @brief Check all indexes.
@@ -103,6 +138,11 @@ namespace AwsMock::Database {
 
       private:
 
+        Database() = default;
+
+        std::unique_ptr<mongocxx::pool> _pool{};
+        std::string _databaseName;
+
         /**
          * @brief Create index as background thread
          *
@@ -117,11 +157,6 @@ namespace AwsMock::Database {
         std::string _name{};
 
         /**
-         * Database client
-         */
-        std::unique_ptr<mongocxx::pool> _pool{};
-
-        /**
          * Database flag
          */
         bool _useDatabase = true;
@@ -132,6 +167,4 @@ namespace AwsMock::Database {
         const static std::map<std::string, IndexDefinition> indexDefinitions;
     };
 
-}// namespace AwsMock::Database
-
-#endif// AWSMOCK_REPOSITORY_DATABASE_H
+}// namespace Awsmock::Database

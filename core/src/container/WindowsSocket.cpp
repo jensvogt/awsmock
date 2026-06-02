@@ -4,7 +4,7 @@
 
 #include <awsmock/core/container/WindowsSocket.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
     DomainSocketResult WindowsSocket::SendJson(const verb method, const std::string &path) {
         return SendJson(method, path, {}, {});
     }
@@ -174,4 +174,4 @@ namespace AwsMock::Core {
         port = std::stoi(what[2]);
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

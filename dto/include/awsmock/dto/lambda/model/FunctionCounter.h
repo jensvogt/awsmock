@@ -15,7 +15,7 @@
 #include <awsmock/dto/lambda/model/DeadLetterConfig.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     using std::chrono::system_clock;
 
@@ -145,7 +145,7 @@ namespace AwsMock::Dto::Lambda {
          */
         system_clock::time_point modified;
 
-    private:
+      private:
 
         friend FunctionCounter tag_invoke(boost::json::value_to_tag<FunctionCounter>, boost::json::value const &v) {
             FunctionCounter r;
@@ -210,6 +210,6 @@ namespace AwsMock::Dto::Lambda {
 
     typedef std::vector<FunctionCounter> FunctionCounterList;
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_FUNCTION_COUNTER_H

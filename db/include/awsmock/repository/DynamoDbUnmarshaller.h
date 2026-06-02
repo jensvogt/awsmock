@@ -10,7 +10,7 @@
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/types/bson_value/value.hpp>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     class DynamoDbUnmarshaller {
 
@@ -33,6 +33,6 @@ namespace AwsMock::Database {
             return {nullptr};
         }*/
     };
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_DYNAMODB_UNMARSHALL_H

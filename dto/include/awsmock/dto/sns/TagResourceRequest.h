@@ -14,7 +14,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct TagResourceRequest final : Common::BaseCounter<TagResourceRequest> {
 
@@ -52,6 +52,6 @@ namespace AwsMock::Dto::SNS {
 
     typedef std::map<std::string, std::string> TagList;
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H

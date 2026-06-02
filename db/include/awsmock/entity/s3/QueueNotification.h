@@ -13,7 +13,7 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/FilterRule.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
@@ -77,6 +77,6 @@ namespace AwsMock::Database::Entity::S3 {
         static QueueNotification FromDocument(const std::optional<view> &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_QUEUE_NOTIFICATION_H

@@ -13,7 +13,7 @@
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct UntagResourceResponse final : Common::BaseCounter<UntagResourceResponse> {
 
@@ -37,7 +37,8 @@ namespace AwsMock::Dto::SNS {
             }
         }
 
-    private:
+      private:
+
         friend UntagResourceResponse tag_invoke(boost::json::value_to_tag<UntagResourceResponse>, boost::json::value const &v) {
             UntagResourceResponse r;
             return r;
@@ -45,13 +46,13 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UntagResourceResponse const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_UNTAG_RESOURCE_RESPONSE_H

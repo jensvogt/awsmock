@@ -18,7 +18,7 @@ namespace {
 #define TEST_PLAINTEXT "Hello, KMS!"
 #define TEST_DESCRIPTION "test-key-description"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Dto::KMS::CreateKeyResponse CreateDefaultSymmetricKey(const Service::KMSService &kmsService) {
         Dto::KMS::CreateKeyRequest request;
@@ -249,4 +249,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -14,7 +14,7 @@
 #include <boost/beast/websocket.hpp>
 #include <boost/log/sinks/basic_sink_backend.hpp>
 
-namespace AwsMock::Service::Logging {
+namespace Awsmock::Service::Logging {
     class LoggingServer {
 
       public:
@@ -39,6 +39,6 @@ namespace AwsMock::Service::Logging {
         }
     };
 
-}// namespace AwsMock::Service::Logging
+}// namespace Awsmock::Service::Logging
 
 #endif// AWSMOCK_SERVICE_LOGGING_SERVER_H

@@ -17,7 +17,7 @@
 #include <awsmock/entity/sns/MessageStatus.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     /**
      * @brief SNS message entity
@@ -127,15 +127,15 @@ namespace AwsMock::Database::Entity::SNS {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const Message &message);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
-
     };
 
     typedef Message Message;
     typedef std::vector<Message> MessageList;
 
-}// namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_H

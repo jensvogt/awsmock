@@ -18,7 +18,7 @@
 #include <awsmock/core/container/DomainSocketResult.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     namespace http = boost::beast::http;
 
@@ -37,14 +37,15 @@ namespace AwsMock::Core {
      */
     class WindowsSocket final : public DomainSocket {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
          * @param path domain socket path
          */
         explicit WindowsSocket(const std::string &path) : DomainSocket(path) {
-        };
+                                                          };
 
         /**
          * @brief Send JSON data
@@ -133,7 +134,8 @@ namespace AwsMock::Core {
         [[nodiscard]]
         boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
         /**
@@ -146,4 +148,4 @@ namespace AwsMock::Core {
         static void GetHostPort(const std::string &url, std::string &host, int &port);
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

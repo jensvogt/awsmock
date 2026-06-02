@@ -4,7 +4,7 @@
 
 #include <awsmock/service/lambda/LambdaServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     LambdaServer::LambdaServer(Core::Scheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaController(scheduler), _scheduler(scheduler) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
@@ -181,4 +181,4 @@ namespace AwsMock::Service {
         ModuleService{}.BackupModule("lambda", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -15,7 +15,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief Sent when a delete batch error occurs.
@@ -79,6 +79,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MODEL_BATCH_RESULT_ERROR_ENTRY_H

@@ -10,7 +10,7 @@
 // Boost includes
 #include <boost/beast.hpp>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     struct HttpSocketResponse {
 
@@ -30,4 +30,4 @@ namespace AwsMock::Core {
         std::map<std::string, std::string> headers;
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

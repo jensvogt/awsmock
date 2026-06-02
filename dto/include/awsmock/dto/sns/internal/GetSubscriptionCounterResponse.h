@@ -13,7 +13,7 @@
 #include <awsmock/dto/sns/model/Subscription.h>
 #include <awsmock/dto/sns/model/SubscriptionCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct GetSubscriptionCounterResponse final : Common::BaseCounter<GetSubscriptionCounterResponse> {
 
@@ -22,7 +22,8 @@ namespace AwsMock::Dto::SNS {
          */
         SubscriptionCounter subscriptionCounter;
 
-    private:
+      private:
+
         friend GetSubscriptionCounterResponse tag_invoke(boost::json::value_to_tag<GetSubscriptionCounterResponse>, boost::json::value const &v) {
             GetSubscriptionCounterResponse r;
             r.subscriptionCounter = boost::json::value_to<SubscriptionCounter>(v.at("subscriptionCounter"));
@@ -31,11 +32,11 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetSubscriptionCounterResponse const &obj) {
             jv = {
-                {"subscriptionCounter", boost::json::value_from(obj.subscriptionCounter)},
+                    {"subscriptionCounter", boost::json::value_from(obj.subscriptionCounter)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_GET_SUBSCRIPTION_COUNTER_RESPONSE_H

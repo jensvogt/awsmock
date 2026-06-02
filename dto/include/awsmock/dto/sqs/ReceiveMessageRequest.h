@@ -20,7 +20,7 @@
 #define DEFAULT_MESSAGE_ATTRIBUTE_NAMES "All"
 #define DEFAULT_MESSAGE_SYSTEM_ATTRIBUTE_NAMES "All"
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief Receive message request.
@@ -112,6 +112,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_RECEIVE_MESSAGE_REQUEST_H

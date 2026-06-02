@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief S3 storage class
@@ -54,6 +54,6 @@ namespace AwsMock::Dto::S3 {
         }
         return StorageClass::UNKNOWN;
     }
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_STORAGE_CLASS_H

@@ -16,7 +16,7 @@
 #define PLAIN_TEXT "The quick brown fox jumps over the lazy dog"
 #define SYMMETRIC_BASE64_PLAIN_TEXT Core::Crypto::Base64Encode(PLAIN_TEXT)
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     struct KMSServiceTest : TestBase {
 
@@ -432,4 +432,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(deleteResponse.keyState == Dto::KMS::KeyStateToString(Dto::KMS::KeyState::PENDING_DELETION), true);
         BOOST_CHECK_EQUAL(1, keyCount);
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -14,7 +14,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     enum MessageAttributeType {
         STRING,
@@ -23,9 +23,9 @@ namespace AwsMock::Database::Entity::SNS {
     };
 
     static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
-        {STRING, "String"},
-        {NUMBER, "Number"},
-        {BINARY, "Binary"},
+            {STRING, "String"},
+            {NUMBER, "Number"},
+            {BINARY, "Binary"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeTypeToString(MessageAttributeType messageAttributeType) {
@@ -66,7 +66,7 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * Attribute binary list values
          */
-        std::vector<std::vector<uint8_t> > binaryListValues;
+        std::vector<std::vector<uint8_t>> binaryListValues;
 
         /**
          * Message attribute type
@@ -111,6 +111,6 @@ namespace AwsMock::Database::Entity::SNS {
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
     };
 
-} // namespace AwsMock::Database::Entity::SNS
+}// namespace Awsmock::Database::Entity::SNS
 
 #endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H

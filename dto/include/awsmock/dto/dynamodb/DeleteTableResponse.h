@@ -14,7 +14,7 @@
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB delete table response
@@ -81,6 +81,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_DELETE_TABLE_RESPONSE_H

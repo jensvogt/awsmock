@@ -4,7 +4,7 @@
 
 #include <awsmock/core/exception/BadRequestException.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BadRequestException::BadRequestException(const BadRequestException &exc) = default;
 
@@ -12,4 +12,4 @@ namespace AwsMock::Core {
 
     void BadRequestException::rethrow() const { throw *this; }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

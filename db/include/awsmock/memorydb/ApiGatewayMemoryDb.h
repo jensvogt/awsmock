@@ -19,7 +19,7 @@
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief API gateway in-memory database.
@@ -198,6 +198,6 @@ namespace AwsMock::Database {
         static boost::mutex _restApiMutex;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_API_GATEWAY_MEMORYDB_H

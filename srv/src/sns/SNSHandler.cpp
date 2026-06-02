@@ -5,7 +5,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "SNS"};
 }
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     http::response<http::dynamic_body> SNSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SNS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -448,4 +448,4 @@ namespace AwsMock::Service {
         return tags;
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

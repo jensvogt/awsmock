@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
 
     /**
      * @brief List application counters request
@@ -68,6 +68,6 @@ namespace AwsMock::Dto::Apps {
         }
     };
 
-}// namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps
 
 #endif// AWSMOCK_DTO_APPS_LIST_APPLICATION_COUNTERS_REQUEST_H

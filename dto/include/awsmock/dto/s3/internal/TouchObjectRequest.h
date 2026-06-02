@@ -13,11 +13,11 @@
 
 
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct TouchObjectRequest final : Common::BaseCounter<TouchObjectRequest> {
 
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_TOUCH_OBJECT_REQUEST_H

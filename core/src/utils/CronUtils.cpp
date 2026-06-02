@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     system_clock::time_point CronUtils::GetNextExecutionTime(const std::string &cron) {
         try {
@@ -38,4 +38,4 @@ namespace AwsMock::Core {
         return duration_cast<std::chrono::seconds>(nextExecutionTime - system_clock::now()).count();
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

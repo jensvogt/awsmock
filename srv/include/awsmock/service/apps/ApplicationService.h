@@ -44,7 +44,7 @@
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/apps/ApplicationCreator.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     using std::chrono::system_clock;
 
@@ -58,7 +58,8 @@ namespace AwsMock::Service {
      */
     class ApplicationService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -227,7 +228,8 @@ namespace AwsMock::Service {
         [[nodiscard]]
         Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
@@ -262,4 +264,4 @@ namespace AwsMock::Service {
         ApplicationCreator applicationCreator;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

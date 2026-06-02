@@ -1,7 +1,7 @@
 
 #include <awsmock/service/apps/ApplicationHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     http::response<http::dynamic_body> ApplicationHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Application POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -203,4 +203,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

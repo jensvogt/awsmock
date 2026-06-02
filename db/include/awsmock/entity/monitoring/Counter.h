@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Database::Entity::Monitoring {
+namespace Awsmock::Database::Entity::Monitoring {
 
     struct Counter {
 
@@ -61,6 +61,6 @@ namespace AwsMock::Database::Entity::Monitoring {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
     };
 
-}; // namespace AwsMock::Database::Entity::Monitoring
+};// namespace Awsmock::Database::Entity::Monitoring
 
 #endif//AWSMOCK_DB_ENTITY_COUNTER_H

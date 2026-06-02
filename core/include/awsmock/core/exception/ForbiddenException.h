@@ -8,7 +8,7 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/status.hpp>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     namespace http = boost::beast::http;
 
@@ -19,7 +19,8 @@ namespace AwsMock::Core {
      */
     class ForbiddenException final : public std::exception {
 
-    public:
+      public:
+
         /**
          * @brief Constructor.
          *
@@ -66,7 +67,8 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
-    private:
+      private:
+
         /**
          * Code
          */
@@ -78,4 +80,4 @@ namespace AwsMock::Core {
         std::string _message;
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

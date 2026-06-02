@@ -11,7 +11,7 @@
 // Awsmock includes
 #include <awsmock/core/container/UnixSocket.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     DomainSocketResult UnixSocket::SendJson(const verb method, const std::string &path) {
         return SendJson(method, path, {});
@@ -165,4 +165,4 @@ namespace AwsMock::Core {
         return socket;
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/SQSClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void SQSClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
@@ -97,4 +97,4 @@ namespace AwsMock::Dto::Common {
         os << "SQSClientCommand=" << r.ToJson();
         return os;
     }
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

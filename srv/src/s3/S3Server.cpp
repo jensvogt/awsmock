@@ -4,7 +4,7 @@
 
 #include <awsmock/service/s3/S3Server.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _scheduler(scheduler) {
 
@@ -108,4 +108,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("s3-sync-objects");
         _scheduler.Shutdown("s3-backup");
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

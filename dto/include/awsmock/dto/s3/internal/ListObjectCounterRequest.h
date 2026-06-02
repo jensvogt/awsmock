@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct ListObjectCounterRequest final : Common::BaseCounter<ListObjectCounterRequest> {
 
@@ -69,6 +69,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_LIST_OBJECT_REQUEST_H

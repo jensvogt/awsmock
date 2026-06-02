@@ -4,7 +4,7 @@
 
 #include <awsmock/service/gateway/GatewayServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     GatewayServer::GatewayServer(boost::asio::io_context &ios) : AbstractServer("gateway"), _ios(ios) {
 
@@ -35,4 +35,4 @@ namespace AwsMock::Service {
         _ios.stop();
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

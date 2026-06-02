@@ -13,7 +13,7 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchEntry.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct DeleteMessageBatchRequest final : Common::BaseCounter<DeleteMessageBatchRequest> {
 
@@ -56,6 +56,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/dynamodb/ProvisionedThroughput.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> ProvisionedThroughput::ToDocument() const {
         document document;
@@ -24,4 +24,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         numberOfDecreasesToday = Core::Bson::BsonUtils::GetLongValue(document, "NumberOfDecreasesToday");
     }
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb

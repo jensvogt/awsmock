@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/DynamoDbDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(Entity::DynamoDb::Table &table) const {
 
@@ -14,13 +14,10 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _tableCollection.insert_one(table.ToDocument());
-                session.commit_transaction();
                 table.oid = result->inserted_id().get_oid().value.to_string();
 
                 log_trace << "DynamoDb table created, oid: " << table.oid;
@@ -28,7 +25,6 @@ namespace AwsMock::Database {
                 return table;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -255,7 +251,6 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
 
             try {
 
@@ -266,9 +261,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", table.region));
                 query.append(kvp("name", table.name));
 
-                session.start_transaction();
                 const auto mResult = _tableCollection.find_one_and_update(query.extract(), table.ToDocument(), opts);
-                session.commit_transaction();
 
                 if (mResult) {
                     table.FromDocument(mResult->view());
@@ -278,7 +271,6 @@ namespace AwsMock::Database {
                 return {};
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -296,11 +288,9 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
 
                 document filterQuery;
                 filterQuery.append(kvp("arn", tableArn));
@@ -314,10 +304,8 @@ namespace AwsMock::Database {
 
                 _bucketCollection.update_one(filterQuery.extract(), updateQuery.extract());
                 log_trace << "Bucket counter updated";
-                session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -332,18 +320,14 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 auto result = _tableCollection.delete_many(make_document(kvp("region", region), kvp("name", tableName)));
-                session.commit_transaction();
                 log_debug << "DynamoDB table deleted, tableName: " << tableName << " region: " << region;
                 return;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -591,23 +575,19 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
-                const auto doc = item.ToDocument(); // owned document
-                const auto view = doc.view(); // non-owning view into doc
+                const auto doc = item.ToDocument();// owned document
+                const auto view = doc.view();      // non-owning view into doc
                 item.size = static_cast<long>(view.length()) + sizeof(long);
                 const auto itemResult = _itemCollection.insert_one(view);
-                session.commit_transaction();
 
                 log_trace << "DynamoDb item created, oid: " << itemResult->inserted_id().get_oid().value.to_string();
                 item.oid = itemResult->inserted_id().get_oid().value.to_string();
                 return item;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -624,13 +604,11 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-            auto session = client->start_session();
 
             try {
                 mongocxx::options::find_one_and_update opts{};
                 opts.return_document(mongocxx::options::return_document::k_after);
 
-                session.start_transaction();
                 const Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
 
                 // Get partitionKey/sortKey from attributes
@@ -653,7 +631,6 @@ namespace AwsMock::Database {
                 dbItem.size = static_cast<long>(view.length() + sizeof(long));
 
                 const auto result = _itemCollection.find_one_and_update(query.extract(), dbItem.ToDocument(), opts);
-                session.commit_transaction();
                 if (result.has_value()) {
                     item.FromDocument(result->view());
                     log_debug << "DynamoDb item updated, oid: " << item.oid;
@@ -661,7 +638,6 @@ namespace AwsMock::Database {
                 }
                 return {};
             } catch (const Core::DatabaseException &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -715,7 +691,6 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
 
             try {
 
@@ -723,7 +698,6 @@ namespace AwsMock::Database {
                 const Entity::DynamoDb::Item item = GetItemByKeys(region, tableName, partitionKey, sortKey);
                 bsoncxx::oid id(item.oid);
 
-                session.start_transaction();
                 const auto result = _itemCollection.delete_one(make_document(kvp("_id", id)));
 
                 // Update table
@@ -735,11 +709,9 @@ namespace AwsMock::Database {
                 tableUpdateQuery.append(kvp("$inc", make_document(kvp("size", bsoncxx::types::b_int64(-item.size)))));
                 _tableCollection.update_one(tableSearchQuery.view(), tableUpdateQuery.view());
 
-                session.commit_transaction();
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -758,12 +730,10 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
 
             try {
 
                 // Delete item
-                session.start_transaction();
                 const auto result = _itemCollection.delete_many(make_document(kvp("tableName", tableName)));
 
                 // Update table
@@ -776,13 +746,11 @@ namespace AwsMock::Database {
                 tableUpdateQuery.append(kvp("$set", make_document(kvp("modified", bsoncxx::types::b_date(system_clock::now())))));
 
                 _tableCollection.update_one(tableSearchQuery.view(), tableUpdateQuery.view());
-                session.commit_transaction();
 
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
@@ -919,32 +887,30 @@ namespace AwsMock::Database {
 
             // Calculate bsonSize of each document
             p.add_fields(make_document(
-                kvp("bsonSize", make_document(
-                        kvp("$bsonSize", "$$ROOT")))));
+                    kvp("bsonSize", make_document(
+                                            kvp("$bsonSize", "$$ROOT")))));
 
             // Group by tableName, sum sizes and count items
             p.group(make_document(
-                kvp("_id", "$tableName"),
-                kvp("size", make_document(kvp("$sum", "$bsonSize"))),
-                kvp("items", make_document(kvp("$sum", 1)))));
+                    kvp("_id", "$tableName"),
+                    kvp("size", make_document(kvp("$sum", "$bsonSize"))),
+                    kvp("items", make_document(kvp("$sum", 1)))));
 
             // Reshape output
             p.project(make_document(
-                kvp("_id", 0),
-                kvp("tableName", "$_id"),
-                kvp("size", 1),
-                kvp("items", 1)));
+                    kvp("_id", 0),
+                    kvp("tableName", "$_id"),
+                    kvp("size", 1),
+                    kvp("items", 1)));
 
-            auto session = client->start_session();
-            session.start_transaction();
 
             try {
                 // Reset all tables to zero
                 tableCollection.update_many(
-                    {},
-                    make_document(kvp("$set", make_document(
-                                          kvp("size", bsoncxx::types::b_int64{0}),
-                                          kvp("items", bsoncxx::types::b_int64{0})))));
+                        {},
+                        make_document(kvp("$set", make_document(
+                                                          kvp("size", bsoncxx::types::b_int64{0}),
+                                                          kvp("items", bsoncxx::types::b_int64{0})))));
 
                 auto bulk = tableCollection.create_bulk_write();
 
@@ -955,10 +921,10 @@ namespace AwsMock::Database {
                     const auto items = Core::Bson::BsonUtils::GetLongValue(t, "items");
 
                     bulk.append(mongocxx::model::update_one(
-                        make_document(kvp("name", tableName)),
-                        make_document(kvp("$set", make_document(
-                                              kvp("size", bsoncxx::types::b_int64{size}),
-                                              kvp("items", bsoncxx::types::b_int64{items}))))));
+                            make_document(kvp("name", tableName)),
+                            make_document(kvp("$set", make_document(
+                                                              kvp("size", bsoncxx::types::b_int64{size}),
+                                                              kvp("items", bsoncxx::types::b_int64{items}))))));
 
                     log_info << "Table stats updated: " << tableName << ", size: " << size << " bytes" << ", items: " << items;
                 }
@@ -969,11 +935,9 @@ namespace AwsMock::Database {
                     log_debug << "Bulk write result, modified: " << result->modified_count();
                 }
 
-                session.commit_transaction();
                 return;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -983,18 +947,18 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::KeyValue DynamoDbDatabase::DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const {
         return std::visit([]<typename T0>(const T0 &val) -> Entity::DynamoDb::KeyValue {
-                              using T = std::decay_t<T0>;
+            using T = std::decay_t<T0>;
 
-                              if constexpr (std::is_same_v<T, std::string>) {
-                                  return val;
-                              } else if constexpr (std::is_same_v<T, double>) {
-                                  return val;
-                              } else if constexpr (std::is_same_v<T, std::vector<uint8_t> >) {
-                                  return val;
-                              } else {
-                                  throw Core::DatabaseException("DynamoValue type is not a valid KeyValue (S, N, or B)");
-                              }
-                          },
+            if constexpr (std::is_same_v<T, std::string>) {
+                return val;
+            } else if constexpr (std::is_same_v<T, double>) {
+                return val;
+            } else if constexpr (std::is_same_v<T, std::vector<uint8_t>>) {
+                return val;
+            } else {
+                throw Core::DatabaseException("DynamoValue type is not a valid KeyValue (S, N, or B)");
+            }
+        },
                           variant);
     }
 
@@ -1003,28 +967,28 @@ namespace AwsMock::Database {
         std::string tmp1 = table.GetSortKeyName();
         auto debugVariant = [](const Entity::DynamoDb::DynamoValue::DynamoVariant &variant, const std::string &name) {
             std::visit([&name, variant]<typename T0>(const T0 &val) {
-                           using T = std::decay_t<T0>;
-                           if constexpr (std::is_same_v<T, std::string>)
-                               std::cerr << name << " type: string, value: " << val << "\n";
-                           else if constexpr (std::is_same_v<T, double>)
-                               std::cerr << name << " type: double, value: " << val << "\n";
-                           else if constexpr (std::is_same_v<T, std::vector<uint8_t> >)
-                               std::cerr << name << " type: binary\n";
-                           else if constexpr (std::is_same_v<T, bool>)
-                               std::cerr << name << " type: bool, value: " << val << "\n";
-                           else if constexpr (std::is_same_v<T, std::nullptr_t>)
-                               std::cerr << name << " type: null\n";
-                           else if constexpr (std::is_same_v<T, std::set<std::string> >)
-                               std::cerr << name << " type: SS\n";
-                           else if constexpr (std::is_same_v<T, std::set<double> >)
-                               std::cerr << name << " type: NS\n";
-                           else
-                               std::cerr << name << " type: unknown index: " << variant.index() << "\n";
-                       },
+                using T = std::decay_t<T0>;
+                if constexpr (std::is_same_v<T, std::string>)
+                    std::cerr << name << " type: string, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, double>)
+                    std::cerr << name << " type: double, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, std::vector<uint8_t>>)
+                    std::cerr << name << " type: binary\n";
+                else if constexpr (std::is_same_v<T, bool>)
+                    std::cerr << name << " type: bool, value: " << val << "\n";
+                else if constexpr (std::is_same_v<T, std::nullptr_t>)
+                    std::cerr << name << " type: null\n";
+                else if constexpr (std::is_same_v<T, std::set<std::string>>)
+                    std::cerr << name << " type: SS\n";
+                else if constexpr (std::is_same_v<T, std::set<double>>)
+                    std::cerr << name << " type: NS\n";
+                else
+                    std::cerr << name << " type: unknown index: " << variant.index() << "\n";
+            },
                        variant);
         };
 
         debugVariant(item.attributes[table.GetPartitionKeyName()].value, "partitionKey");
         debugVariant(item.attributes[table.GetSortKeyName()].value, "sortKey");
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

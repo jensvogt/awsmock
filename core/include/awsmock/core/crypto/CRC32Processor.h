@@ -6,10 +6,10 @@
 
 #include <cstdint>
 #include <iostream>
-#include <vector>
 #include <netinet/in.h>
+#include <vector>
 
-namespace AwsMock::Core::Crypto {
+namespace Awsmock::Core::Crypto {
 
     class CRC32Processor {
 
@@ -44,7 +44,8 @@ namespace AwsMock::Core::Crypto {
             return base64_encode_bytes(bytes, 4);
         }
 
-    public:
+      public:
+
         CRC32Processor() {
             for (uint32_t i = 0; i < 256; i++) {
                 uint32_t remainder = i;
@@ -69,4 +70,4 @@ namespace AwsMock::Core::Crypto {
             return get_s3_crc32_header(crc ^ 0xFFFFFFFF);
         }
     };
-} // namespace AwsMock::Core::Crypto
+}// namespace Awsmock::Core::Crypto

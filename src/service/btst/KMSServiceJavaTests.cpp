@@ -11,7 +11,7 @@
 #define TEST_PORT 10100
 #define REGION "eu-central-1"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Tests the aws-sdk-java interface to the AwsMock system.
@@ -128,4 +128,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(resultKeys.at(0).arn.empty(), false);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     template<class S, class P>
     std::map<S, P> PageMap(std::map<S, P> map, const long pageSize, const long pageIndex) {
@@ -43,4 +43,4 @@ namespace AwsMock::Core {
         return std::vector(vec.begin() + pageSize * pageIndex, endArray);
     }
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

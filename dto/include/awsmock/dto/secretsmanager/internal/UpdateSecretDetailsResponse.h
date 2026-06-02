@@ -10,7 +10,7 @@
 #include <awsmock/dto/secretsmanager/model/SecretCounter.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     struct UpdateSecretDetailsResponse final : Common::BaseCounter<UpdateSecretDetailsResponse> {
 
@@ -39,6 +39,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_UPDATE_SECRET_COUNTERS_RESPONSE_H

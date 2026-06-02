@@ -13,7 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * Docker filter
@@ -67,6 +67,6 @@ namespace AwsMock::Dto::Docker {
         friend std::ostream &operator<<(std::ostream &os, const Filters &c);
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif//AWSMOCK_DTO_DOCKER_FILTERS_H

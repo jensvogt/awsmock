@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
 #ifdef _WIN32
 
@@ -258,4 +258,4 @@ namespace AwsMock::Core {
     }
 #endif
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

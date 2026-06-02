@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief KMS key usage
@@ -40,7 +40,7 @@ namespace AwsMock::Dto::SecretsManager {
         return VersionStateType::AWSCURRENT;
     }
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 
 #endif//VERSIONSTAGE_H

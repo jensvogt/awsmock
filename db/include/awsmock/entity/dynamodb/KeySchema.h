@@ -14,7 +14,7 @@
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     /**
      * @brief DynamoDB key schema
@@ -47,6 +47,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
          */
         void FromDocument(view_or_value<view, value> mResult);
     };
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb
 
 #endif// AWSMOCK_ENTITY_DYNAMODB_KEY_SCHEMA_H

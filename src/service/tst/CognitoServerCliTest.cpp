@@ -26,7 +26,7 @@
 #define DOMAIN_NAME std::string("test-domain")
 #define USER_POOL_NAME std::string("test-user-pool")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief AwsMock cognito integration test.
@@ -291,6 +291,6 @@ namespace AwsMock::Service {
         EXPECT_TRUE(userList.front().userStatus == Database::Entity::Cognito::UserStatus::UNCONFIRMED);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_COGNITO_SERVER_CLI_TEST_H

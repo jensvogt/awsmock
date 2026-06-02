@@ -13,7 +13,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief Complete multipart upload
@@ -41,6 +41,11 @@ namespace AwsMock::Dto::S3 {
          * ETag
          */
         std::string etag;
+
+        /**
+         * Checksum algorithm
+         */
+        std::string checksumAlgorithm;
 
         /**
          * Checksum CRC32
@@ -74,6 +79,7 @@ namespace AwsMock::Dto::S3 {
             root.add("CompleteMultipartUploadResult.Bucket", bucket);
             root.add("CompleteMultipartUploadResult.Key", key);
             root.add("CompleteMultipartUploadResult.ETag", etag);
+            root.add("CompleteMultipartUploadResult.ChecksumAlgorithm", checksumAlgorithm);
             root.add("CompleteMultipartUploadResult.ChecksumCRC32", checksumCrc32);
             root.add("CompleteMultipartUploadResult.ChecksumCRC32C", checksumCrc32c);
             root.add("CompleteMultipartUploadResult.ChecksumSHA1", checksumSha1);
@@ -89,6 +95,7 @@ namespace AwsMock::Dto::S3 {
             r.bucket = Core::Json::GetStringValue(v, "Bucket");
             r.key = Core::Json::GetStringValue(v, "Key");
             r.location = Core::Json::GetStringValue(v, "UploadId");
+            r.checksumAlgorithm = Core::Json::GetStringValue(v, "ChecksumAlgorithm");
             r.checksumCrc32 = Core::Json::GetStringValue(v, "ChecksumCrc32");
             r.checksumCrc32c = Core::Json::GetStringValue(v, "ChecksumCrc32c");
             r.checksumSha1 = Core::Json::GetStringValue(v, "ChecksumSha1");
@@ -105,6 +112,7 @@ namespace AwsMock::Dto::S3 {
                     {"Bucket", obj.bucket},
                     {"Key", obj.key},
                     {"Location", obj.location},
+                    {"ChecksumAlgorithm", obj.checksumAlgorithm},
                     {"ChecksumCrc32", obj.checksumCrc32},
                     {"ChecksumCrc32c", obj.checksumCrc32c},
                     {"ChecksumSha1", obj.checksumSha1},
@@ -114,6 +122,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_COMPLETE_MULTIPART_UPLOAD_RESULT_H

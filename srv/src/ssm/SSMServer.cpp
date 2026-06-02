@@ -6,7 +6,7 @@
 
 #include "awsmock/core/EventBus.h"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     SSMServer::SSMServer(Core::Scheduler &scheduler) : AbstractServer("ssm"), _scheduler(scheduler) {
 
@@ -51,4 +51,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("ssm-monitoring");
         _scheduler.Shutdown("ssm-backup");
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

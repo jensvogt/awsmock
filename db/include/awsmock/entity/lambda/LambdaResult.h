@@ -14,7 +14,7 @@
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/lambda/Instance.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     using std::chrono::system_clock;
 
@@ -101,6 +101,6 @@ namespace AwsMock::Database::Entity::Lambda {
         void FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif//AWSMOCK_DB_ENTITY_LAMBDA_H

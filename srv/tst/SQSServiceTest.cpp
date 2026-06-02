@@ -7,7 +7,7 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <awsmock/repository/SQSDatabase.h>
+#include <../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/service/sqs/SQSService.h>
 
 namespace {
@@ -19,7 +19,7 @@ namespace {
 #define TEST_REGION "eu-central-1"
 #define TEST_MESSAGE_BODY "Hello, SQS!"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Dto::SQS::CreateQueueResponse CreateDefaultQueue(const Service::SQSService &sqsService) {
         Dto::SQS::CreateQueueRequest request;
@@ -40,9 +40,9 @@ namespace AwsMock::Database {
         SQSServiceFixture() = default;
         ~SQSServiceFixture() {
             try {
-                const long deletedQueues = SQSDatabase::instance().DeleteAllQueues();
+                const long deletedQueues = SQSMongoRepository::instance().DeleteAllQueues();
                 log_debug << "Queues deleted, count: " << deletedQueues;
-                const long deletedMessages = SQSDatabase::instance().DeleteAllMessages();
+                const long deletedMessages = SQSMongoRepository::instance().DeleteAllMessages();
                 log_debug << "Messages deleted, count: " << deletedMessages;
             } catch (const std::exception &exc) {
                 log_error << "SQS fixture cleanup failed: " << exc.what();
@@ -285,4 +285,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

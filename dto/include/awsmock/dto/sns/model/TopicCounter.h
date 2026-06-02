@@ -15,7 +15,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     using std::chrono::system_clock;
 
@@ -78,7 +78,8 @@ namespace AwsMock::Dto::SNS {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-    private:
+      private:
+
         friend TopicCounter tag_invoke(boost::json::value_to_tag<TopicCounter>, boost::json::value const &v) {
             TopicCounter r;
             r.topicArn = Core::Json::GetStringValue(v, "topicArn");
@@ -96,20 +97,20 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TopicCounter const &obj) {
             jv = {
-                {"topicArn", obj.topicArn},
-                {"topicName", obj.topicName},
-                {"retentionPeriod", obj.retentionPeriod},
-                {"maxMessageSize", obj.maxMessageSize},
-                {"messages", obj.messages},
-                {"messagesSend", obj.messagesSend},
-                {"messagesResend", obj.messagesResend},
-                {"size", obj.size},
-                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"topicArn", obj.topicArn},
+                    {"topicName", obj.topicName},
+                    {"retentionPeriod", obj.retentionPeriod},
+                    {"maxMessageSize", obj.maxMessageSize},
+                    {"messages", obj.messages},
+                    {"messagesSend", obj.messagesSend},
+                    {"messagesResend", obj.messagesResend},
+                    {"size", obj.size},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_TOPIC_COUNTER_H

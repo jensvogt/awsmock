@@ -17,7 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     template<typename T>
     std::ostream &operator<<(std::ostream &os, const T &t) {
@@ -126,6 +126,6 @@ namespace AwsMock::Dto::Common {
         };
     };
 
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_BASEREQUEST_H

@@ -14,7 +14,7 @@
 
 #include <awsmock/dto/kms/model/Key.h>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief Get KMS key response
@@ -53,6 +53,6 @@ namespace AwsMock::Dto::KMS {
         }
     };
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_GET_KEY_COUNTER_RESPONSE_H

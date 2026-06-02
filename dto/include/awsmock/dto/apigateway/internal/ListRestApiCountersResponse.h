@@ -12,7 +12,7 @@
 #include <awsmock/dto/apigateway/model/RestApi.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     /**
      * @brief List REST API counters response
@@ -53,6 +53,6 @@ namespace AwsMock::Dto::ApiGateway {
         }
     };
 
-}// namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway
 
 #endif// AWSMOCK_DTO_API_GATEWAY_LIST_REST_API_COUNTERS_RESPONSE_H

@@ -9,7 +9,7 @@
 
 #include <awsmock/service/transfer/TransferService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     Dto::Transfer::CreateServerResponse TransferService::CreateTransferServer(Dto::Transfer::CreateServerRequest &request) const {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_transfer_server");
@@ -476,4 +476,4 @@ namespace AwsMock::Service {
             throw Core::ServiceException(ex.what());
         }
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

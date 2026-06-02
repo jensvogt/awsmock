@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/cognito/User.h>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     bool User::HasGroup(const std::string &userPoolId, const std::string &groupName) {
 
@@ -73,4 +73,4 @@ namespace AwsMock::Database::Entity::Cognito {
         }
     }
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito

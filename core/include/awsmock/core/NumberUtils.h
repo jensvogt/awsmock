@@ -14,7 +14,7 @@
 
 // AwsMock includes
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Number utilities.
@@ -23,7 +23,8 @@ namespace AwsMock::Core {
      */
     class NumberUtils {
 
-    public:
+      public:
+
         /**
          * @brief Return a string with the value in kilobytes.
          *
@@ -102,4 +103,4 @@ namespace AwsMock::Core {
         }
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

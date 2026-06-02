@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     ListUserPoolResponse Mapper::map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, const long total) {
 
@@ -270,4 +270,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito

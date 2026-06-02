@@ -12,7 +12,7 @@
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief Secret tags
@@ -72,5 +72,5 @@ namespace AwsMock::Dto::SecretsManager {
         friend std::ostream &operator<<(std::ostream &os, const SecretTags &r);
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 #endif// AWSMOCK_DTO_SECRETSMANAGER_SECRET_TAGS_H

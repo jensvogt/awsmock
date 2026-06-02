@@ -10,7 +10,7 @@
 
 #define AWS_CMD "/usr/local/bin/aws"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class TestBase {
 
@@ -93,5 +93,5 @@ namespace AwsMock::Service {
         std::shared_ptr<GatewayServer> _gatewayServer;
         Core::Configuration &_configuration = Core::Configuration::instance();
     };
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 #endif// AWSMOCK_SERVICE_TEST_BASE_H

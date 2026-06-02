@@ -27,7 +27,7 @@
 
 // AwsMock includes
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     class LogWebsocketSink : public boost::log::sinks::basic_formatted_sink_backend<char> {
 
@@ -68,6 +68,6 @@ namespace AwsMock::Core {
 
     typedef boost::log::sinks::synchronous_sink<LogWebsocketSink> webSocketSink_t;
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif//AWS_MOCK_CORE_LOG_WEBSOCKET_SINK_H

@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Lambda"};
 }
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     void Instance::FromDocument(const std::optional<view> &mResult) {
 
@@ -52,4 +52,4 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

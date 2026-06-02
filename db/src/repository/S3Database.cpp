@@ -10,12 +10,11 @@
 
 #include "awsmock/core/BsonConverter.h"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
-    std::map<std::string, std::vector<std::string> > S3Database::allowedEventTypes = {
-        {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
-        {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}
-    };
+    std::map<std::string, std::vector<std::string>> S3Database::allowedEventTypes = {
+            {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
+            {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
     S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {
     }
@@ -79,19 +78,15 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto insert_one_result = _bucketCollection.insert_one(bucket.ToDocument());
                 log_trace << "Bucket created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
-                session.commit_transaction();
 
                 bucket.oid = insert_one_result->inserted_id().get_oid().value.to_string();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -312,14 +307,11 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto mResult = _objectCollection.delete_many(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)));
                 log_trace << "Bucket purged: " << bucket.ToString();
-                session.commit_transaction();
 
                 if (mResult) {
                     log_debug << "Bucket purged, name: " << bucket.name << " deleted: " << mResult->deleted_count();
@@ -327,7 +319,6 @@ namespace AwsMock::Database {
                 }
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -345,15 +336,12 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 bucket.modified = system_clock::now();
                 const auto mResult = _bucketCollection.find_one_and_update(make_document(kvp("region", bucket.region), kvp("name", bucket.name)), bucket.ToDocument(), opts);
                 log_trace << "Bucket updated: " << bucket.ToString();
-                session.commit_transaction();
 
                 if (mResult) {
                     return Entity::S3::Bucket::FromDocument(mResult.value());
@@ -361,7 +349,6 @@ namespace AwsMock::Database {
                 return {};
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -379,11 +366,9 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
 
                 document filterQuery;
                 filterQuery.append(kvp("arn", bucketArn));
@@ -397,10 +382,8 @@ namespace AwsMock::Database {
 
                 _bucketCollection.update_one(filterQuery.extract(), updateQuery.extract());
                 log_trace << "Bucket counter updated";
-                session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -475,18 +458,14 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", bucket.name)));
-                session.commit_transaction();
                 log_debug << "Bucket deleted, count: " << delete_many_result->deleted_count();
                 return;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -604,15 +583,11 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            auto session = client->start_session();
 
             try {
-                session.start_transaction();
                 const auto insert_one_result = _objectCollection.insert_one(object.ToDocument().view());
                 object.oid = insert_one_result->inserted_id().get_oid().value.to_string();
-                session.commit_transaction();
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -669,15 +644,12 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 object.modified = system_clock::now();
                 const auto mResult = _objectCollection.find_one_and_update(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), object.ToDocument(), opts);
                 log_trace << "Object updated: " << object.ToString();
-                session.commit_transaction();
 
                 if (mResult) {
                     return Entity::S3::Object::FromDocument(mResult->view());
@@ -685,7 +657,6 @@ namespace AwsMock::Database {
                 return {};
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -883,21 +854,17 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            auto session = client->start_session();
 
             try {
 
 
-                session.start_transaction();
                 const auto result = _objectCollection.delete_many(make_document(kvp("region", object.region),
                                                                                 kvp("bucket", object.bucket),
                                                                                 kvp("key", object.key)));
-                session.commit_transaction();
                 log_debug << "Objects deleted, count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -917,11 +884,9 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
@@ -935,10 +900,8 @@ namespace AwsMock::Database {
 
                 const auto result = _objectCollection.delete_many(query.extract());
                 log_debug << "Objects deleted, count: " << result->result().deleted_count();
-                session.commit_transaction();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -1056,14 +1019,13 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             auto objectCollection = (*client)[_databaseName][_objectCollectionName];
             auto bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            auto session = client->start_session();
 
             try {
                 mongocxx::pipeline p{};
                 p.group(make_document(
-                    kvp("_id", "$bucketArn"),
-                    kvp("size", make_document(kvp("$sum", "$size"))),
-                    kvp("keys", make_document(kvp("$sum", 1)))));
+                        kvp("_id", "$bucketArn"),
+                        kvp("size", make_document(kvp("$sum", "$size"))),
+                        kvp("keys", make_document(kvp("$sum", 1)))));
 
                 document projectDocument;
                 projectDocument.append(kvp("_id", 0),
@@ -1077,30 +1039,27 @@ namespace AwsMock::Database {
                 for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
                     bucketsWithObjects.insert(Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"));
                     bulk.append(mongocxx::model::update_one(
-                        make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
-                        make_document(kvp("$set", make_document(
-                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                              kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys"))))))));
+                            make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "bucketArn"))),
+                            make_document(kvp("$set", make_document(
+                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                              kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys"))))))));
                 }
                 for (auto bucketCursor = bucketCollection.find({}); const auto &b: bucketCursor) {
                     if (const auto bucketArn = Core::Bson::BsonUtils::GetStringValue(b, "arn"); !bucketsWithObjects.contains(bucketArn)) {
                         bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("arn", bucketArn)),
-                            make_document(kvp("$set", make_document(
-                                                  kvp("size", bsoncxx::types::b_int64()),
-                                                  kvp("keys", bsoncxx::types::b_int64()))))));
+                                make_document(kvp("arn", bucketArn)),
+                                make_document(kvp("$set", make_document(
+                                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                                  kvp("keys", bsoncxx::types::b_int64()))))));
                     }
                 }
                 // Bulk updates
                 if (!bulk.empty()) {
-                    session.start_transaction();
                     auto result = bulk.execute();
                     log_debug << "Bulk write result: " << result->modified_count();
-                    session.commit_transaction();
                     return;
                 }
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -1108,4 +1067,4 @@ namespace AwsMock::Database {
         _memoryDb.AdjustObjectCounters();
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

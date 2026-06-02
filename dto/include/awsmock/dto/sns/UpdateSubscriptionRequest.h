@@ -13,7 +13,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct UpdateSubscriptionRequest final : Common::BaseCounter<UpdateSubscriptionRequest> {
 
@@ -42,7 +42,7 @@ namespace AwsMock::Dto::SNS {
          */
         std::string owner;
 
-    private:
+      private:
 
         friend UpdateSubscriptionRequest tag_invoke(boost::json::value_to_tag<UpdateSubscriptionRequest>, boost::json::value const &v) {
             UpdateSubscriptionRequest r;
@@ -56,18 +56,18 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateSubscriptionRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"topicArn", obj.topicArn},
-                {"subscriptionArn", obj.subscriptionArn},
-                {"protocol", obj.protocol},
-                {"endpoint", obj.endpoint},
-                {"owner", obj.owner},
-        };
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicArn", obj.topicArn},
+                    {"subscriptionArn", obj.subscriptionArn},
+                    {"protocol", obj.protocol},
+                    {"endpoint", obj.endpoint},
+                    {"owner", obj.owner},
+            };
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_UPDATE_SUBSCRIPTION_REQUEST_H

@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/AttributeCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListQueueAttributeCountersResponse final : Common::BaseCounter<ListQueueAttributeCountersResponse> {
 
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SNS_LIST_QUEUE_ATTRIBUTE_COUNTERS_RESPONSE_H

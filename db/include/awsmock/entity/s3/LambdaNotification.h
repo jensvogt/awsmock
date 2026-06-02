@@ -13,7 +13,7 @@
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/s3/FilterRule.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief S3 bucket lambda notification entity.
@@ -74,6 +74,6 @@ namespace AwsMock::Database::Entity::S3 {
         static LambdaNotification FromDocument(const view &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_LAMBDA_NOTIFICATION_H

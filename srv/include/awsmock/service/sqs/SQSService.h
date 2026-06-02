@@ -10,6 +10,7 @@
 #include <thread>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MagicDetector.h>
@@ -92,10 +93,9 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventRecord.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     using std::chrono::system_clock;
 
     /**
@@ -109,7 +109,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+        explicit SQSService() : _sqsDatabase(Database::SQSMongoRepository::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
         }
 
         /**
@@ -539,7 +539,7 @@ namespace AwsMock::Service {
         /**
          * SQS database connection
          */
-        Database::SQSDatabase &_sqsDatabase;
+        Database::SQSMongoRepository &_sqsDatabase;
 
         /**
          * Lambda database connection
@@ -551,6 +551,6 @@ namespace AwsMock::Service {
          */
         LambdaService _lambdaService;
     };
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVICE_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/core/scheduler/Scheduler.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     logger_t _logger{boost::log::keywords::channel = "Core"};
 
@@ -113,18 +113,36 @@ namespace AwsMock::Core {
             timer.expires_after(std::chrono::seconds(delay));
             StartWait();
         } else if (interval > 0) {
-            task();
+            try {
+                task();
+            } catch (const std::exception &exc) {
+                log_error << "Periodic task '" << name << "' threw: " << exc.what();
+            } catch (...) {
+                log_error << "Periodic task '" << name << "' threw an unknown exception";
+            }
             timer.expires_after(std::chrono::seconds(interval));
             StartWait();
         } else {
-            task();
+            try {
+                task();
+            } catch (const std::exception &exc) {
+                log_error << "Periodic task '" << name << "' threw: " << exc.what();
+            } catch (...) {
+                log_error << "Periodic task '" << name << "' threw an unknown exception";
+            }
         }
     }
 
     void Scheduler::PeriodicEntry::Execute(const boost::system::error_code &e) {
         if (e != boost::asio::error::operation_aborted) {
             log_debug << "Execute periodic task '" << name << "'";
-            task();
+            try {
+                task();
+            } catch (const std::exception &exc) {
+                log_error << "Periodic task '" << name << "' threw: " << exc.what();
+            } catch (...) {
+                log_error << "Periodic task '" << name << "' threw an unknown exception";
+            }
             if (interval > 0) {
                 timer.expires_after(std::chrono::seconds(interval));
                 StartWait();
@@ -177,4 +195,4 @@ namespace AwsMock::Core {
         timer.async_wait([this](const boost::system::error_code &e) { Execute(e); });
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

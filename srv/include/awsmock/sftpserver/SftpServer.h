@@ -188,13 +188,13 @@ void ssh_reset_error(void *error);
 #define __VA_NARG_(...) \
     VA_APPLY_VARIADIC_MACRO(__VA_ARG_N, (__VA_ARGS__))
 #define __VA_ARG_N(                                       \
-    _1, _2, _3, _4, _5, _6, _7, _8, _9, _10,          \
-    _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, \
-    _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, \
-    _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, \
-    _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, \
-    _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, \
-    _61, _62, _63, N, ...) N
+        _1, _2, _3, _4, _5, _6, _7, _8, _9, _10,          \
+        _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, \
+        _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, \
+        _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, \
+        _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, \
+        _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, \
+        _61, _62, _63, N, ...) N
 #define __RSEQ_N()                                  \
     63, 62, 61, 60,                                 \
             59, 58, 57, 56, 55, 54, 53, 52, 51, 50, \
@@ -312,9 +312,10 @@ int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t arg
 #define DEF_STR_SIZE 1024
 inline char authorizedkeys[DEF_STR_SIZE] = {0};
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     class SftpServer {
-    public:
+      public:
+
         /**
          * Constructor
          */
@@ -340,7 +341,8 @@ namespace AwsMock::Service {
          */
         static SftpUsers _sftpUsers;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SftpServer"};
 
         /**
@@ -358,6 +360,6 @@ namespace AwsMock::Service {
          */
         std::string _address = "0.0.0.0";
     };
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H

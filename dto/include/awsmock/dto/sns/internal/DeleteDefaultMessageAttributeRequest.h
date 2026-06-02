@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct DeleteDefaultMessageAttributeRequest final : Common::BaseCounter<DeleteDefaultMessageAttributeRequest> {
 
@@ -26,7 +26,8 @@ namespace AwsMock::Dto::SNS {
          */
         std::string name;
 
-    private:
+      private:
+
         friend DeleteDefaultMessageAttributeRequest tag_invoke(boost::json::value_to_tag<DeleteDefaultMessageAttributeRequest>, boost::json::value const &v) {
             DeleteDefaultMessageAttributeRequest r;
             r.topicArn = Core::Json::GetStringValue(v, "topicArn");
@@ -36,15 +37,15 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteDefaultMessageAttributeRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"topicArn", obj.topicArn},
-                {"name", obj.name},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicArn", obj.topicArn},
+                    {"name", obj.name},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_DELETE_DEFAULT_MESSAGE_ATTRIBUTE_REQUEST_H

@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     /**
      * @brief Transfer identity provider type
@@ -46,6 +46,6 @@ namespace AwsMock::Dto::Transfer {
     }
 
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_SERVER_IDENTITY_PROVIDER_TYPE_H

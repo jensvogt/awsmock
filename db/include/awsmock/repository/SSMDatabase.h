@@ -16,16 +16,17 @@
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/memorydb/SSMMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief ssm MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SSMDatabase : public DatabaseBase {
+    class SSMDatabase : public AwsMock::Database::DatabaseBase {
 
       public:
 
@@ -164,4 +165,4 @@ namespace AwsMock::Database {
         SSMMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

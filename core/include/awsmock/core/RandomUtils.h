@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Random utilities.
@@ -23,7 +23,8 @@ namespace AwsMock::Core {
      */
     class RandomUtils {
 
-    public:
+      public:
+
         /**
          * @brief Generates a random integer between min and max
          *
@@ -72,4 +73,4 @@ namespace AwsMock::Core {
         static std::vector<double> DoubleArray(int size, double min, double max);
     };
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

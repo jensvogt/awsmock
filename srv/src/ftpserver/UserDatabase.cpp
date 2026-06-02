@@ -2,7 +2,7 @@
 
 #include "awsmock/core/FileUtils.h"
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     UserDatabase::UserDatabase() {
         _region = Core::Configuration::instance().get<std::string>("awsmock.region");
@@ -41,7 +41,7 @@ namespace AwsMock::FtpServer {
         }
 
         try {
-            if (Database::Entity::Cognito::User user = Database::CognitoDatabase::instance().GetUserByUserName(_region, _userPoolId, username); user.password == password) {
+            if (Database::Entity::Cognito::User user = Database::CognitoMongoRepository::instance().getUserByUserName(_region, _userPoolId, username); user.password == password) {
 
                 std::string homeDir = Core::FileUtils::appendPath(_baseDir, user.userName);
 
@@ -76,4 +76,4 @@ namespace AwsMock::FtpServer {
         return (username.empty() || username == "ftp" || username == "anonymous");
     }
 
-} // namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

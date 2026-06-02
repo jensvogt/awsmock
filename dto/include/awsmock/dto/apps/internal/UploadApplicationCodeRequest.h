@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
 
     /**
      * @brief Upload application code
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::Apps {
          */
         std::string archive;
 
-    private:
+      private:
 
         friend UploadApplicationCodeRequest tag_invoke(boost::json::value_to_tag<UploadApplicationCodeRequest>, boost::json::value const &v) {
             UploadApplicationCodeRequest r;
@@ -67,6 +67,6 @@ namespace AwsMock::Dto::Apps {
         }
     };
 
-}// namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps
 
 #endif// AWSMOCK_DTO_LAMBDA_UPLOAD_APPLICATION_CODE_REQUEST_H

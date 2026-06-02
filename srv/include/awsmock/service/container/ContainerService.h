@@ -51,7 +51,7 @@
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     namespace http = boost::beast::http;
     using namespace std::chrono_literals;
 
@@ -93,7 +93,8 @@ namespace AwsMock::Service {
      */
     class ContainerService : public std::enable_shared_from_this<ContainerService> {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -464,7 +465,8 @@ namespace AwsMock::Service {
          */
         void PruneContainers() const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Container"};
 
         /**
@@ -632,4 +634,4 @@ namespace AwsMock::Service {
         static thread_local std::shared_ptr<Core::DomainSocket> _domainSocket;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

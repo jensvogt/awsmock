@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/monitoring/Counter.h>
 
-namespace AwsMock::Dto::Monitoring {
+namespace Awsmock::Dto::Monitoring {
 
     /**
      * @brief Get counters response
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::Monitoring {
         }
     };
 
-}// namespace AwsMock::Dto::Monitoring
+}// namespace Awsmock::Dto::Monitoring
 
 #endif// AWSMOCK_DTO_MONITORING_GET_COUNTERS_RESPONSE_H

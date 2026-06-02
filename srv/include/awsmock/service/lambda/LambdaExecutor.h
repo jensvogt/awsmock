@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -13,10 +14,9 @@
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Lambda executor.
@@ -60,6 +60,6 @@ namespace AwsMock::Service {
         ContainerService &_containerService = ContainerService::instance();
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H

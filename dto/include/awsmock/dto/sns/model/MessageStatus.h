@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     /**
      * @brief SNS message attribute entity
@@ -40,6 +40,6 @@ namespace AwsMock::Dto::SNS {
         return INITIAL;
     }
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_MESSAGE_STATUS_H

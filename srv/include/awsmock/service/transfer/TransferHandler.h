@@ -12,7 +12,7 @@
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/transfer/TransferService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -62,6 +62,6 @@ namespace AwsMock::Service {
         TransferService _transferService;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_HANDLER_H

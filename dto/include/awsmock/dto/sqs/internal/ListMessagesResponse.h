@@ -13,7 +13,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief List SQS messages response.
@@ -53,6 +53,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_MESSAGES_RESPONSE_H

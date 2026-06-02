@@ -13,7 +13,7 @@
 /// Filesystem
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     enum class FileType {
         Unknown,
@@ -27,7 +27,8 @@ namespace AwsMock::FtpServer {
     };
 
     class FileStatus {
-    public:
+      public:
+
         FileStatus(const std::string &path);
 
         bool isOk() const;
@@ -64,8 +65,12 @@ namespace AwsMock::FtpServer {
 
         bool canOpenDir() const;
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
+      private:
+
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         std::string path_;
         bool is_ok_;
@@ -77,4 +82,4 @@ namespace AwsMock::FtpServer {
     std::string cleanPath(const std::string &path, bool windows_path, char output_separator);
 
     std::string cleanPathNative(const std::string &path);
-} // namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

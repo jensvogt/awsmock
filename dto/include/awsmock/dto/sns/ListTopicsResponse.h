@@ -16,7 +16,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/entity/sns/Topic.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListTopicsResponse final : Common::BaseCounter<ListTopicsResponse> {
 
@@ -92,6 +92,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SQS_LIST_TOPICS_RESPONSE_H

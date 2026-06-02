@@ -11,7 +11,7 @@
 
 #define FILE_SIZE (100 * 1024)
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(BasenameTest) {
 
@@ -258,6 +258,6 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(contentType, "application/pdf");
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWMOCK_CORE_FILE_UTILS_TEST_H

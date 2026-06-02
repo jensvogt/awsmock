@@ -13,7 +13,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     /**
      * @brief Clean infrastructure request
@@ -64,6 +64,6 @@ namespace AwsMock::Dto::Module {
         }
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif//AWSMOCK_DTO_CLEAN_INFRASTRUCTURE_REQUEST_H

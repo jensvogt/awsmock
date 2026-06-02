@@ -1,7 +1,7 @@
 
 #include <awsmock/service/secretsmanager/SecretsManagerHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     http::response<http::dynamic_body> SecretsManagerHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "SecretsManager POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -138,4 +138,4 @@ namespace AwsMock::Service {
         log_error << "Unknown method";
         return SendResponse(request, http::status::bad_request, "Unknown method");
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -19,7 +19,7 @@
 #define TABLE_NAME "test-table"
 #define OWNER "test-owner"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     class DynamoDbServiceTest : public testing::Test {
 
@@ -553,6 +553,6 @@ namespace AwsMock::Service {
         EXPECT_EQ(TABLE_NAME, deleteResponse.tableName);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_SERVICE_DYANMODB_SERVICE_TEST_H

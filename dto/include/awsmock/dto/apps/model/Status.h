@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
 
     /**
      * @brief Application status
@@ -45,6 +45,6 @@ namespace AwsMock::Dto::Apps {
         return AppsStatusType::UNKNOWN;
     }
 
-}// namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps
 
 #endif//AWSMOCK_DTO_APPS_STATUS_H

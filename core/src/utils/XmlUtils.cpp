@@ -1,7 +1,7 @@
 
 #include <awsmock/core/XmlUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string XmlUtils::ToXmlString(const boost::property_tree::ptree &rootTree) {
         std::stringstream os;
@@ -46,4 +46,4 @@ namespace AwsMock::Core {
         }
         std::cout << std::endl;
     }
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -17,7 +17,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/apps/ApplicationLogSession.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Accepts incoming connections and launches the sessions
@@ -90,6 +90,6 @@ namespace AwsMock::Service {
         }
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_APPLICATION_LOG_LISTENER_H

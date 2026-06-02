@@ -8,7 +8,7 @@
 // C++ standard includes
 #include <string>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     /**
      * @brief S3 notification events
@@ -69,6 +69,6 @@ namespace AwsMock::Dto::S3 {
                         LIFECYCLE_EXPIRATION,
                         OBJECT_TAGGING);
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_EVENT_H

@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief Versioning status
@@ -37,5 +37,5 @@ namespace AwsMock::Database::Entity::S3 {
         }
         return LIFECYCLE_DISABLED;
     };
-}// namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 #endif//AWSMOCK_DB_ENTITY_S3_LIFECYCLE_STATUS_H

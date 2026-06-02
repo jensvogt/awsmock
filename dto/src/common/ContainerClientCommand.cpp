@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/ContainerClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void ContainerClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
@@ -12,7 +12,6 @@ namespace AwsMock::Dto::Common {
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "container") {
 
             this->command = ContainerCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
-
         }
 
         // Basic values
@@ -59,4 +58,4 @@ namespace AwsMock::Dto::Common {
         return os;
     }
 
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

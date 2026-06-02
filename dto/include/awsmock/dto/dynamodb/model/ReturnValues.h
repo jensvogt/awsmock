@@ -13,7 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/s3/model/Owner.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Return values
@@ -62,6 +62,6 @@ namespace AwsMock::Dto::DynamoDb {
         return ReturnValuesType::NONE;
     }
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_RETURN_VALUES_H

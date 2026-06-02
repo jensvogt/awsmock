@@ -4,18 +4,18 @@
 
 #include <awsmock/entity/sns/Topic.h>
 
-namespace AwsMock::Database::Entity::SNS {
+namespace Awsmock::Database::Entity::SNS {
 
     bool Topic::HasSubscription(const Subscription &subscription) {
         return std::ranges::find_if(subscriptions, [subscription](const Subscription &s) {
-            return s.protocol == subscription.protocol && s.endpoint == subscription.endpoint;
-        }) != subscriptions.end();
+                   return s.protocol == subscription.protocol && s.endpoint == subscription.endpoint;
+               }) != subscriptions.end();
     }
 
     bool Topic::HasSubscription(const std::string &subscriptionArn) {
         return std::ranges::find_if(subscriptions, [subscriptionArn](const Subscription &s) {
-            return s.subscriptionArn == subscriptionArn;
-        }) != subscriptions.end();
+                   return s.subscriptionArn == subscriptionArn;
+               }) != subscriptions.end();
     }
 
     int Topic::GetSubscriptionIndex(const std::string &subscriptionArn) {
@@ -97,10 +97,9 @@ namespace AwsMock::Database::Entity::SNS {
                 subscriptions.clear();
                 for (const bsoncxx::array::view subscriptionsView{mResult.view()["subscriptions"].get_array().value}; const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
                     Subscription subscription{
-                        .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
-                        .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
-                        .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)
-                    };
+                            .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
+                            .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
+                            .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
                     subscriptions.emplace_back(subscription);
                 }
             }
@@ -133,5 +132,5 @@ namespace AwsMock::Database::Entity::SNS {
     std::string Topic::ToJson() const {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
-    
-} // namespace AwsMock::Database::Entity::SNS
+
+}// namespace Awsmock::Database::Entity::SNS

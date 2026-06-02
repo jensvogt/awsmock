@@ -22,7 +22,7 @@
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -155,6 +155,6 @@ namespace AwsMock::Service {
         std::string _name;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_ABSTRACT_HANDLER_H

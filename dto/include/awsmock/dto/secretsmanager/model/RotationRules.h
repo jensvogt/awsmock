@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief Rotation rules
@@ -106,6 +106,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}//namespace AwsMock::Dto::SecretsManager
+}//namespace Awsmock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_ROTATION_RULES_H

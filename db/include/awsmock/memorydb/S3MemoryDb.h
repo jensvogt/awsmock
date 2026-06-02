@@ -24,7 +24,7 @@
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief S3 in-memory database.
@@ -33,7 +33,8 @@ namespace AwsMock::Database {
      */
     class S3MemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -377,7 +378,8 @@ namespace AwsMock::Database {
          */
         void AdjustObjectCounters();
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
         /**
@@ -415,6 +417,6 @@ namespace AwsMock::Database {
         static boost::mutex _objectMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_S3_MEMORYDB_H

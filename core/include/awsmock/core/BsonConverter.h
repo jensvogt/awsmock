@@ -5,14 +5,14 @@
 #pragma once
 
 #include <boost/json.hpp>
-#include <bsoncxx/document/view.hpp>
-#include <bsoncxx/document/element.hpp>
-#include <bsoncxx/types.hpp>
 #include <bsoncxx/array/view.hpp>
+#include <bsoncxx/document/element.hpp>
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/types.hpp>
 #include <stdexcept>
 #include <string>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     // Trait that is true for both bsoncxx element types.
     template<typename T>
@@ -41,7 +41,8 @@ namespace AwsMock::Core {
     //   boost::json::value v = BsonToJson::convert(element);
     // ---------------------------------------------------------------------------
     class BsonToJson {
-    public:
+      public:
+
         // -----------------------------------------------------------------------
         // Convert a BSON document view to a boost::json::object
         // -----------------------------------------------------------------------
@@ -72,7 +73,7 @@ namespace AwsMock::Core {
         // a constrained template — the two types are not related by inheritance
         // inside bsoncxx so a single concrete overload cannot cover both.
         // -----------------------------------------------------------------------
-        template<typename Element, typename = std::enable_if_t<is_bson_element<Element>::value> >
+        template<typename Element, typename = std::enable_if_t<is_bson_element<Element>::value>>
         static boost::json::value convertElement(const Element &element) {
             using bsoncxx::type;
 
@@ -83,7 +84,7 @@ namespace AwsMock::Core {
 
                 case type::k_int32:
                     return boost::json::value(
-                        static_cast<std::int64_t>(element.get_int32().value));
+                            static_cast<std::int64_t>(element.get_int32().value));
 
                 case type::k_int64:
                     return boost::json::value(element.get_int64().value);
@@ -163,7 +164,7 @@ namespace AwsMock::Core {
                 // --- Decimal128 → string representation ----------------------
                 case type::k_decimal128: {
                     return boost::json::value(
-                        element.get_decimal128().value.to_string());
+                            element.get_decimal128().value.to_string());
                 }
 
                 // --- Undefined / MinKey / MaxKey → descriptive string ---------
@@ -188,12 +189,13 @@ namespace AwsMock::Core {
                 // --- Anything else: throw rather than silently drop -----------
                 default:
                     throw std::runtime_error(
-                        std::string("BsonToJson: unsupported BSON type: ") +
-                        bsoncxx::to_string(element.type()));
+                            std::string("BsonToJson: unsupported BSON type: ") +
+                            bsoncxx::to_string(element.type()));
             }
         }
 
-    private:
+      private:
+
         // -----------------------------------------------------------------------
         // Minimal Base64 encoder (no external dependency required)
         // -----------------------------------------------------------------------
@@ -217,4 +219,4 @@ namespace AwsMock::Core {
         }
     };
 
-} // namespace Awsmock::Core
+}// namespace Awsmock::Core

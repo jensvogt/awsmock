@@ -5,7 +5,7 @@
 
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     Function Mapper::mapFunction(const Database::Entity::Lambda::Lambda &lambdaEntity) {
 
@@ -200,4 +200,4 @@ namespace AwsMock::Dto::Lambda {
         result.status = (int) resultEntity.status;
         return result;
     }
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda

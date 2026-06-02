@@ -4,7 +4,7 @@
 
 #include "awsmock/core/exception/ForbiddenException.h"
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     ForbiddenException::ForbiddenException(const boost::beast::http::status code) : _code(code) {
     }
@@ -18,4 +18,4 @@ namespace AwsMock::Core {
 
     void ForbiddenException::rethrow() const { throw *this; }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

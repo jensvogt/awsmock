@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/container/model/MemoryStats.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief Docker container memory statistics
@@ -44,7 +44,8 @@ namespace AwsMock::Dto::Docker {
          */
         MemoryStats stats;
 
-    private:
+      private:
+
         friend MemoryStat tag_invoke(boost::json::value_to_tag<MemoryStat>, boost::json::value const &v) {
             MemoryStat r;
             r.maxUsage = Core::Json::GetLongLongValue(v, "max_usage");
@@ -58,14 +59,14 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MemoryStat const &obj) {
             jv = {
-                {"max_usage", obj.maxUsage},
-                {"usage", obj.usage},
-                {"limit", obj.limit},
-                {"stats", boost::json::value_from(obj.stats)},
+                    {"max_usage", obj.maxUsage},
+                    {"usage", obj.usage},
+                    {"limit", obj.limit},
+                    {"stats", boost::json::value_from(obj.stats)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_CONTAINER_H

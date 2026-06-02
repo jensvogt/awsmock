@@ -15,10 +15,10 @@
 #include <mongocxx/pool.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief MongoDB connection pool.
@@ -73,6 +73,6 @@ namespace AwsMock::Database {
         std::shared_ptr<mongocxx::pool> _pool = nullptr;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif//AWSMOCK_CORE_CONNECTION_POOL_H

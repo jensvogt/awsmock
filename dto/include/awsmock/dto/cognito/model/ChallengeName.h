@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Cognito auth flow enum
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::Cognito {
         return ChallengeName::CUSTOM_CHALLENGE;
     }
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif//AWSMOCK_DTO_COGNITO_CHALLENGE_NAME_H

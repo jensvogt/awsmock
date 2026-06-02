@@ -14,7 +14,7 @@
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief Send message batch request
@@ -89,6 +89,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_SEND_MESSAGE_BATCH_REQUEST_H

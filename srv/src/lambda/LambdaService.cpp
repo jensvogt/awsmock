@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Lambda"};
 }
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
@@ -145,7 +145,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string> > environments;
+            std::vector<std::pair<std::string, std::string>> environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -442,7 +442,7 @@ namespace AwsMock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string> > tags;
+            std::vector<std::pair<std::string, std::string>> tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -607,12 +607,12 @@ namespace AwsMock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-                    function.handler = lambda.handler,
-                    function.runtime = lambda.runtime,
-                    function.lastUpdateStatus = "Successful",
-                    function.state = LambdaStateToString(lambda.state),
-                    function.stateReason = lambda.stateReason,
-                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+            function.handler = lambda.handler,
+            function.runtime = lambda.runtime,
+            function.lastUpdateStatus = "Successful",
+            function.state = LambdaStateToString(lambda.state),
+            function.stateReason = lambda.stateReason,
+            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -691,7 +691,7 @@ namespace AwsMock::Service {
 
         // REQUEST_RESPONSE
         if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
-            auto promise = std::make_shared<std::promise<std::pair<int, std::string> > >();
+            auto promise = std::make_shared<std::promise<std::pair<int, std::string>>>();
             auto future = promise->get_future();
             Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), promise);
             const auto [status, body] = future.get();
@@ -1053,7 +1053,7 @@ namespace AwsMock::Service {
             request.region = lambda.region;
             StopLambda(request);
         }
-        log_info << "All lambda function stoped";
+        log_info << "All lambda function stopped";
     }
 
     void LambdaService::StopLambdaInstance(const Dto::Lambda::StopLambdaInstanceRequest &request) const {
@@ -1287,12 +1287,12 @@ namespace AwsMock::Service {
 
         } else if (request.type == "SQS") {
 
-            if (!_sqsDatabase.QueueArnExists(request.eventSourceArn)) {
+            if (!_sqsDatabase.queueArnExists(request.eventSourceArn)) {
                 log_error << "SQS queue does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
             }
 
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.eventSourceArn);
+            Database::Entity::SQS::Queue queue = _sqsDatabase.getQueueByArn(request.eventSourceArn);
 
             // Convert filter rules
             Database::Entity::S3::FilterRule filterRule;
@@ -1308,7 +1308,7 @@ namespace AwsMock::Service {
             lambdaNotification.filterRules = filterRules;
 
             // Send S3 put notification request
-            queue = _sqsDatabase.CreateOrUpdateQueue(queue);
+            queue = _sqsDatabase.createOrUpdateQueue(queue);
             log_debug << "Queue updated, name: " << queue.name;
 
         } else if (request.type == "SNS") {
@@ -1349,4 +1349,4 @@ namespace AwsMock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

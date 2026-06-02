@@ -13,7 +13,7 @@
 #include <awsmock/dto/lambda/model/AccountLimit.h>
 #include <awsmock/dto/lambda/model/AccountUsage.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Create function response
@@ -64,6 +64,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_ACCOUNT_SETTINGS_RESPONSE_H

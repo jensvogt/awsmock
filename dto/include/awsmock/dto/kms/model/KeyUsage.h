@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief KMS key usage
@@ -39,6 +39,6 @@ namespace AwsMock::Dto::KMS {
         return KeyUsage::ENCRYPT_DECRYPT;
     }
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_KEY_USAGE_H

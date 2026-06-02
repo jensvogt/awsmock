@@ -14,7 +14,7 @@
 
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListSubscriptionsByTopicRequest final : Common::BaseCounter<ListSubscriptionsByTopicRequest> {
 
@@ -41,6 +41,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_BY_TOPI_ARN_REQUEST_H

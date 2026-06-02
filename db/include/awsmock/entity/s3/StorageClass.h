@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief S3 storage class
@@ -55,6 +55,6 @@ namespace AwsMock::Database::Entity::S3 {
         }
         return StorageClass::STANDARD;
     }
-}// namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_STORAGE_CLASS_H

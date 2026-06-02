@@ -4,7 +4,7 @@
 
 #include <awsmock/service/transfer/TransferServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     TransferServer::TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()), _ioc(ioc), _scheduler(scheduler) {
 
@@ -172,4 +172,4 @@ namespace AwsMock::Service {
         _scheduler.Shutdown("ssm-backup");
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

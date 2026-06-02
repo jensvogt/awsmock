@@ -14,7 +14,7 @@
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 #include <awsmock/dto/sqs/model/QueueAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     using std::chrono::system_clock;
 
@@ -119,6 +119,6 @@ namespace AwsMock::Dto::SQS {
 
     typedef std::vector<Queue> QueueList;
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_QUEUE_H

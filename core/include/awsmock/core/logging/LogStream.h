@@ -62,7 +62,7 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
 //   logger_t _logger{boost::log::keywords::channel = "ServiceName"};
 using logger_t = boost::log::sources::severity_channel_logger_mt<boost::log::trivial::severity_level>;
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief Logging stream
@@ -208,7 +208,7 @@ namespace AwsMock::Core {
         static boost::shared_ptr<webSocketSink_t> webSocketSink;
     };
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
 #define log_fatal BOOST_LOG_SEV(_logger, boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)

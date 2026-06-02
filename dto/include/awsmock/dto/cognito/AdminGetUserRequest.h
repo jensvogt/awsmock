@@ -13,7 +13,7 @@
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Admin get user request
@@ -52,6 +52,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_ADMIN_CREATE_USER_REQUEST_H

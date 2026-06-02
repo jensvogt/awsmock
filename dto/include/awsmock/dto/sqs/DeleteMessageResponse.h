@@ -15,7 +15,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct DeleteMessageResponse final : Common::BaseCounter<DeleteMessageResponse> {
 
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_DELETE_MESSAGE_RESPONSE_H

@@ -13,7 +13,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief Purge SQS queue request.
@@ -27,7 +27,7 @@ namespace AwsMock::Dto::SQS {
          */
         std::string queueUrl;
 
-    private:
+      private:
 
         friend PurgeQueueRequest tag_invoke(boost::json::value_to_tag<PurgeQueueRequest>, boost::json::value const &v) {
             PurgeQueueRequest r;
@@ -45,6 +45,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_PURGE_QUEUE_REQUEST_H

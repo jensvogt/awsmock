@@ -13,7 +13,7 @@
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -54,4 +54,4 @@ namespace AwsMock::Service {
         SecretsManagerService _secretsManagerService;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

@@ -10,22 +10,23 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/utils/SortColumn.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/memorydb/TransferMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
+#include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief Transfer manager MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class TransferDatabase : public DatabaseBase {
+    class TransferDatabase : public AwsMock::Database::DatabaseBase {
 
       public:
 
@@ -229,6 +230,6 @@ namespace AwsMock::Database {
         TransferMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_TRANSFER_DATABASE_H

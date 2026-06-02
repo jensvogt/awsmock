@@ -19,7 +19,7 @@
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_document;
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     class DynamoToMongoTranslator {
 
@@ -69,6 +69,6 @@ namespace AwsMock::Database {
         }
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_DYNAMODB_TO_MONGO_TRANSLATOR_H

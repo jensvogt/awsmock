@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/module/ImportInfrastructureRequest.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     void ImportInfrastructureRequest::FromJson(const std::string &payload) {
 
@@ -42,4 +42,4 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module

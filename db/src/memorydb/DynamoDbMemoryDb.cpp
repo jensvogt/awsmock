@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex DynamoDbMemoryDb::_tableMutex;
     boost::mutex DynamoDbMemoryDb::_itemMutex;
@@ -312,4 +312,4 @@ namespace AwsMock::Database {
         _items.clear();
         return count;
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

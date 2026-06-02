@@ -4,7 +4,7 @@
 
 #include <awsmock/service/gateway/GatewaySession.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.get<int>("awsmock.gateway.http.max-queue");
@@ -268,4 +268,4 @@ namespace AwsMock::Service {
         QueueWrite(std::move(response));
         log_debug << "Options request answered";
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

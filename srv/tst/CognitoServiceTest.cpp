@@ -7,7 +7,7 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <awsmock/repository/CognitoDatabase.h>
+#include <../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/service/cognito/CognitoService.h>
 
 namespace {
@@ -21,7 +21,7 @@ namespace {
 #define TEST_PASSWORD "Test1234!"
 #define TEST_GROUP_NAME "test-group"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Dto::Cognito::CreateUserPoolResponse CreateDefaultUserPool(const Service::CognitoService &cognitoService) {
         Dto::Cognito::CreateUserPoolRequest request;
@@ -51,11 +51,11 @@ namespace AwsMock::Database {
         CognitoServiceFixture() = default;
         ~CognitoServiceFixture() {
             try {
-                CognitoDatabase::instance().DeleteAllGroups();
+                CognitoMongoRepository::instance().DeleteAllGroups();
                 log_debug << "Cognito groups deleted";
-                CognitoDatabase::instance().DeleteAllUsers();
+                CognitoMongoRepository::instance().DeleteAllUsers();
                 log_debug << "Cognito users deleted";
-                CognitoDatabase::instance().DeleteAllUserPools();
+                CognitoMongoRepository::instance().DeleteAllUserPools();
                 log_debug << "Cognito user pools deleted";
             } catch (const std::exception &exc) {
                 log_error << "Cognito fixture cleanup failed: " << exc.what();
@@ -434,4 +434,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

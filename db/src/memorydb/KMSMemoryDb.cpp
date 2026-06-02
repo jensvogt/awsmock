@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/KMSMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex KMSMemoryDb::_keyMutex;
 
@@ -117,4 +117,4 @@ namespace AwsMock::Database {
         return deleted;
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

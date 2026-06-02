@@ -17,7 +17,7 @@
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief Module in-memory database.
@@ -26,7 +26,8 @@ namespace AwsMock::Database {
      */
     class ModuleMemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -189,7 +190,8 @@ namespace AwsMock::Database {
          */
         long DeleteAllModules();
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
@@ -208,4 +210,4 @@ namespace AwsMock::Database {
         static boost::mutex _moduleMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

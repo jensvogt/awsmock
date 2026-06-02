@@ -4,7 +4,7 @@
 
 #include <awsmock/core/config/Configuration.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     // ── Load / Reload ─────────────────────────────────────────────────────────
 
@@ -158,13 +158,13 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::vector<std::pair<std::string, std::map<std::string, ConfigValue> > >
+    std::vector<std::pair<std::string, std::map<std::string, ConfigValue>>>
     Configuration::getObjects(const std::string &path) const {
         const auto *node = resolvePath(path);
         if (!node) throw std::runtime_error("Config key not found: " + path);
         if (!node->is_object()) throw std::runtime_error("Config key '" + path + "' is not an object");
 
-        std::vector<std::pair<std::string, std::map<std::string, ConfigValue> > > result;
+        std::vector<std::pair<std::string, std::map<std::string, ConfigValue>>> result;
         const auto &object = node->get_object();
         result.reserve(object.size());
         for (const auto &[key, value]: object) {
@@ -269,4 +269,4 @@ namespace AwsMock::Core {
         return out.str();
     }
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

@@ -9,7 +9,7 @@
 extern HANDLE g_ServiceStopEvent;
 #endif
 
-namespace AwsMock::Manager {
+namespace Awsmock::Manager {
 
     void Manager::Initialize() const {
 
@@ -62,7 +62,7 @@ namespace AwsMock::Manager {
         // Get database variables
         if (Core::Configuration::instance().get<bool>("awsmock.mongodb.active")) {
 
-            _pool.Configure();
+            Awsmock::Database::Database::instance().initialize();
 
             // Create database indexes in a background thread
             Core::Scheduler::instance().AddOneTimeTask("create-indexes", [] {
@@ -298,4 +298,4 @@ namespace AwsMock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-} // namespace AwsMock::Manager
+}// namespace Awsmock::Manager

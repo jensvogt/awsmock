@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Lambda invocation type
@@ -49,6 +49,6 @@ namespace AwsMock::Dto::Lambda {
         return REQUEST_RESPONSE;
     }
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DB_ENTITY_LAMBDA_INVOCATION_TYPE_H

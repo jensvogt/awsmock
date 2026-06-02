@@ -6,7 +6,7 @@
 #include <memory>
 #include <utility>
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, const uint16_t port, boost::asio::io_context &awsIoc)
         : _port(port), _address(std::move(address)), _acceptor(awsIoc), _openConnectionCount(0), _serverName(std::move(serverName)), _awsIoc(awsIoc) {
@@ -89,7 +89,7 @@ namespace AwsMock::FtpServer {
         return true;
     }
 
-    void FtpServerImpl::stop()const {
+    void FtpServerImpl::stop() const {
         _awsIoc.stop();
         log_info << "FTP server stopped.";
     }
@@ -122,4 +122,4 @@ namespace AwsMock::FtpServer {
     std::string FtpServerImpl::getAddress() const {
         return _acceptor.local_endpoint().address().to_string();
     }
-}// namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

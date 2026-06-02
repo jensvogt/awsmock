@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct CreateTopicResponse final : Common::BaseCounter<CreateTopicResponse> {
 
@@ -79,6 +79,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_CREATE_TOPIC_RESPONSE_H

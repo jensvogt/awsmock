@@ -17,7 +17,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief List Lambda environment counter request.
@@ -74,6 +74,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_LIST_ENVIRONMENT_COUNTERS_REQUEST_H

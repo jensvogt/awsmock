@@ -4,7 +4,7 @@
 
 #include <awsmock/memorydb/SNSMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex SNSMemoryDb::_snsTopicMutex;
     boost::mutex SNSMemoryDb::_snsMessageMutex;
@@ -370,4 +370,4 @@ namespace AwsMock::Database {
         }
         log_debug << "Topic counters updated, count: " << _topics.size();
     }
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -20,7 +20,7 @@
 #include <awsmock/entity/lambda/Instance.h>
 #include <awsmock/repository/S3Database.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     /**
      * @brief Lambda entity
@@ -495,6 +495,6 @@ namespace AwsMock::Database::Entity::Lambda {
         });
     }
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif//AWSMOCK_DB_ENTITY_LAMBDA_H

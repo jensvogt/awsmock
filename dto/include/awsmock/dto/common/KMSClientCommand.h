@@ -17,7 +17,7 @@
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
@@ -43,17 +43,17 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<KMSCommandType, std::string> KMSCommandTypeNames{
-        {KMSCommandType::CREATE_KEY, "create-key"},
-        {KMSCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
-        {KMSCommandType::DESCRIBE_KEY, "describe-key"},
-        {KMSCommandType::DELETE_KEY, "delete-key"},
-        {KMSCommandType::ENCRYPT, "encrypt"},
-        {KMSCommandType::DECRYPT, "decrypt"},
-        {KMSCommandType::LIST_KEYS, "list-keys"},
-        {KMSCommandType::LIST_KEY_COUNTERS, "list-key-counters"},
-        {KMSCommandType::LIST_KEY_ARNS, "list-key-arns"},
-        {KMSCommandType::GET_KEY_COUNTER, "get-key-counter"},
-        {KMSCommandType::UPDATE_KEY_COUNTER, "update-key-counter"},
+            {KMSCommandType::CREATE_KEY, "create-key"},
+            {KMSCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
+            {KMSCommandType::DESCRIBE_KEY, "describe-key"},
+            {KMSCommandType::DELETE_KEY, "delete-key"},
+            {KMSCommandType::ENCRYPT, "encrypt"},
+            {KMSCommandType::DECRYPT, "decrypt"},
+            {KMSCommandType::LIST_KEYS, "list-keys"},
+            {KMSCommandType::LIST_KEY_COUNTERS, "list-key-counters"},
+            {KMSCommandType::LIST_KEY_ARNS, "list-key-arns"},
+            {KMSCommandType::GET_KEY_COUNTER, "get-key-counter"},
+            {KMSCommandType::UPDATE_KEY_COUNTER, "update-key-counter"},
     };
 
     [[maybe_unused]] static std::string KMSCommandTypeToString(const KMSCommandType &commandType) {
@@ -123,11 +123,11 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const KMSClientCommand &i);
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-} // namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_KMS_CLIENT_COMMAND_H

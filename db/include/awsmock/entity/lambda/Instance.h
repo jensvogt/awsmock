@@ -14,7 +14,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     /**
      * @brief Lambda instance status enum
@@ -30,11 +30,11 @@ namespace AwsMock::Database::Entity::Lambda {
     };
 
     static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
-        {InstanceIdle, "Idle"},
-        {InstanceRunning, "Running"},
-        {InstanceSuccess, "Success"},
-        {InstanceFailed, "Failed"},
-        {InstanceUnknown, "Unknown"},
+            {InstanceIdle, "Idle"},
+            {InstanceRunning, "Running"},
+            {InstanceSuccess, "Success"},
+            {InstanceFailed, "Failed"},
+            {InstanceUnknown, "Unknown"},
     };
 
     [[maybe_unused]] static std::string LambdaInstanceStatusToString(const LambdaInstanceStatus &lambdaInstanceStatus) {
@@ -125,6 +125,6 @@ namespace AwsMock::Database::Entity::Lambda {
         view_or_value<view, value> ToDocument() const override;
     };
 
-} // namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif// AWSMOCK_DB_ENTITY_LAMBDA_INSTANCE_H

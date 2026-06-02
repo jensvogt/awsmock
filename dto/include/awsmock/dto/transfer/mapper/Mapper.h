@@ -11,7 +11,7 @@
 #include <awsmock/dto/transfer/model/User.h>
 #include <awsmock/entity/transfer/User.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -35,6 +35,6 @@ namespace AwsMock::Dto::Transfer {
         static ListUsersResponse map(const ListUsersRequest &request, const std::vector<Database::Entity::Transfer::User> &userList);
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_MAPPER_H

@@ -15,7 +15,7 @@
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/dto/dynamodb/model/ReturnConsumedCapacity.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB get item request
@@ -94,6 +94,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_GET_ITEM_REQUEST_H

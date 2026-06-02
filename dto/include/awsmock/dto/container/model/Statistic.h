@@ -18,7 +18,7 @@
 
 #define LAMBDA_INTERNAL_PORT 8080
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
 
     /**
      * @brief Docker container statistics
@@ -70,6 +70,6 @@ namespace AwsMock::Dto::Docker {
         }
     };
 
-}// namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_STATISTIC_H

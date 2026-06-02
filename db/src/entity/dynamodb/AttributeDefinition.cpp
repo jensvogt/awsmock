@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> AttributeDefinition::ToDocument() const {
 
@@ -19,4 +19,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         attributeType = Core::Bson::BsonUtils::GetStringValue(mResult, "attributeType");
     }
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb

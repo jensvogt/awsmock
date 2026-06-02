@@ -8,7 +8,7 @@
 // Local includes
 #include <awsmock/core/RandomUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     BOOST_AUTO_TEST_CASE(MinMaxIntTest) {
 
@@ -84,6 +84,6 @@ namespace AwsMock::Core {
         result.clear();
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core
 
 #endif// AWSMOCK_CORE_RANDOM_UTILS_TEST_H

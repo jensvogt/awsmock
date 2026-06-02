@@ -9,7 +9,7 @@
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -29,6 +29,6 @@ namespace AwsMock::Dto::Module {
         static Module::ModuleList map(const std::vector<Database::Entity::Module::Module> &moduleList);
     };
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_MODULE_MAPPER_H

@@ -12,7 +12,7 @@
 #define PLAIN_TEXT "The quick brown fox jumps over the lazy dog"
 #define SYMMETRIC_BASE64_PLAIN_TEXT Core::Crypto::Base64Encode(PLAIN_TEXT)
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     struct SecretsServiceTest : TestBase {
 
@@ -108,4 +108,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(updatedValue.secretString, "new-secret-string");
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

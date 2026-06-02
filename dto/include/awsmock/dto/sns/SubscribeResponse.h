@@ -14,7 +14,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct SubscribeResponse final : Common::BaseCounter<SubscribeResponse> {
 
@@ -63,6 +63,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_SUBSCRIBE_RESPONSE_H

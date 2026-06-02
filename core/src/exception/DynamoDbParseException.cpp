@@ -4,7 +4,7 @@
 
 #include <awsmock/core/exception/DynamoDbParseException.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     DynamoDbParseException::DynamoDbParseException(const DynamoDbParseException &exc) = default;
 
@@ -12,4 +12,4 @@ namespace AwsMock::Core {
 
     void DynamoDbParseException::rethrow() const { throw *this; }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

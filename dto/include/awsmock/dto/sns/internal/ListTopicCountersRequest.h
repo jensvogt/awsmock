@@ -16,7 +16,7 @@
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct ListTopicCountersRequest final : Common::BaseCounter<ListTopicCountersRequest> {
 
@@ -64,6 +64,6 @@ namespace AwsMock::Dto::SNS {
         }
     };
 
-}// namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_LIST_TOPIC_COUNTERS_REQUEST_H

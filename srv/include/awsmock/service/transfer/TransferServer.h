@@ -16,7 +16,7 @@
 #include <awsmock/service/s3/S3Service.h>
 #include <awsmock/sftpserver/SftpServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Transfer module server
@@ -25,13 +25,15 @@ namespace AwsMock::Service {
      */
     class TransferServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
         explicit TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
@@ -165,7 +167,7 @@ namespace AwsMock::Service {
         /**
          * List of transfer servers
          */
-        std::map<std::string, std::shared_ptr<FtpServer::FtpServer> > _transferServerList;
+        std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
 
         /**
          * Actual FTP manager
@@ -188,6 +190,6 @@ namespace AwsMock::Service {
         Core::Scheduler &_scheduler;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVER_H

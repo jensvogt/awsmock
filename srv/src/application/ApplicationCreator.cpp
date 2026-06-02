@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Application"};
 }
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     void ApplicationCreator::operator()(const std::string &applicationCodeFile, const std::string &region, const std::string &name, const std::string &instanceId) const {
 
@@ -179,8 +179,8 @@ namespace AwsMock::Service {
     template<typename Out>
     Out loadFile(std::string const &filename, Out out) {
         std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit); // we prefer exceptions
+        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
         return std::copy(std::istreambuf_iterator(ifs), {}, out);
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

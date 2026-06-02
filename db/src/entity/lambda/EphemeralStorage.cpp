@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/lambda/EphemeralStorage.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     void EphemeralStorage::FromDocument(std::optional<bsoncxx::document::view> mResult) {
         size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
@@ -26,4 +26,4 @@ namespace AwsMock::Database::Entity::Lambda {
         os << "EphemeralStorage=" << bsoncxx::to_json(m.ToDocument());
         return os;
     }
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

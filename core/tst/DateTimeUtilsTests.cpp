@@ -9,7 +9,7 @@
 // Local includes
 #include <awsmock/core/DateTimeUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     using std::chrono::system_clock;
 
@@ -38,4 +38,4 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(offset, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

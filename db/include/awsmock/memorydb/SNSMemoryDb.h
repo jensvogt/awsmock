@@ -19,7 +19,7 @@
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using std::chrono::system_clock;
 
@@ -339,4 +339,4 @@ namespace AwsMock::Database {
         static boost::mutex _snsMessageMutex;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

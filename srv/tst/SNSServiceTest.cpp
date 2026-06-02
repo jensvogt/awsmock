@@ -7,9 +7,9 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/repository/SNSDatabase.h>
-#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
 
@@ -23,7 +23,7 @@ namespace {
 #define TEST_BODY "{\"TestObject\": \"TestValue\"}"
 #define TEST_OWNER "test-owner"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Dto::SNS::CreateTopicResponse CreateDefaultTopic(const Service::SNSService &snsService) {
         Dto::SNS::CreateTopicRequest request;
@@ -57,9 +57,9 @@ namespace AwsMock::Database {
                 log_debug << "SNS messages deleted, count: " << deletedMessages;
                 const long deletedTopics = SNSDatabase::instance().DeleteAllTopics();
                 log_debug << "SNS topics deleted, count: " << deletedTopics;
-                const long deletedSqsMessages = SQSDatabase::instance().DeleteAllMessages();
+                const long deletedSqsMessages = SQSMongoRepository::instance().DeleteAllMessages();
                 log_debug << "SQS messages deleted, count: " << deletedSqsMessages;
-                const long deletedQueues = SQSDatabase::instance().DeleteAllQueues();
+                const long deletedQueues = SQSMongoRepository::instance().DeleteAllQueues();
                 log_debug << "SQS queues deleted, count: " << deletedQueues;
             } catch (const std::exception &exc) {
                 log_error << "SNS fixture cleanup failed: " << exc.what();
@@ -308,4 +308,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -4,7 +4,7 @@
 
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     http::response<http::dynamic_body> ApiGatewayHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Application GET request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -161,4 +161,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

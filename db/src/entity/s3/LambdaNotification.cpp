@@ -8,7 +8,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Lambda"};
 }
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     LambdaNotification::LambdaNotification(const view &mResult) {
         FromDocument(mResult);
@@ -77,4 +77,4 @@ namespace AwsMock::Database::Entity::S3 {
         return n;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

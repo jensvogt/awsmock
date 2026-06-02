@@ -5,7 +5,7 @@
 #include <awsmock/entity/transfer/Transfer.h>
 #include <boost/json/object.hpp>
 
-namespace AwsMock::Database::Entity::Transfer {
+namespace Awsmock::Database::Entity::Transfer {
 
     bool Transfer::HasUser(const std::string &userName) {
         return std::ranges::find_if(users, [userName](const User &user) {
@@ -155,4 +155,4 @@ namespace AwsMock::Database::Entity::Transfer {
         os << "Transfer=" << t.ToJson();
         return os;
     }
-}// namespace AwsMock::Database::Entity::Transfer
+}// namespace Awsmock::Database::Entity::Transfer

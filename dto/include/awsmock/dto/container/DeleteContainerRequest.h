@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Docker {
+namespace Awsmock::Dto::Docker {
     /**
      * @brief Delete a container request
      *
@@ -30,7 +30,8 @@ namespace AwsMock::Dto::Docker {
          */
         std::string containerId;
 
-    private:
+      private:
+
         friend DeleteContainerRequest tag_invoke(boost::json::value_to_tag<DeleteContainerRequest>, boost::json::value const &v) {
             DeleteContainerRequest r;
             r.containerId = Core::Json::GetStringValue(v, "containerId");
@@ -39,10 +40,10 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteContainerRequest const &obj) {
             jv = {
-                {"containerId", obj.containerId},
+                    {"containerId", obj.containerId},
             };
         }
     };
-} // namespace AwsMock::Dto::Docker
+}// namespace Awsmock::Dto::Docker
 
 #endif// AWSMOCK_DTO_CONTAINER_DELETE_CONTAINER_REQUEST_H

@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/dto/ssm/model/Parameter.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief Get parameter response
@@ -40,6 +40,6 @@ namespace AwsMock::Dto::SSM {
         }
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_GET_PARAMETER_RESPONSE_H

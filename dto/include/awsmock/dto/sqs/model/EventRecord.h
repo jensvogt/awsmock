@@ -15,7 +15,7 @@
 #include <awsmock/dto/sqs/model/EventMessageAttribute.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief SQS Lambda notification event record
@@ -97,6 +97,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_EVENT_RECORD_H

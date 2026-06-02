@@ -16,7 +16,7 @@
 #include <awsmock/dto/dynamodb/model/Item.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Scan response
@@ -115,6 +115,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_SCAN_RESPONSE_H

@@ -19,7 +19,7 @@
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB list table counters request
@@ -78,6 +78,6 @@ namespace AwsMock::Dto::DynamoDb {
         mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_EXPORT_ITEMS_RESPONSE_H

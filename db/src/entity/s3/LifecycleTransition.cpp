@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/s3/LifecycleTransition.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     LifecycleTransition::LifecycleTransition(const view &mResult) {
         FromDocument(mResult);
@@ -28,4 +28,4 @@ namespace AwsMock::Database::Entity::S3 {
         return t;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

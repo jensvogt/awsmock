@@ -25,7 +25,7 @@ namespace {
 #define USER_NAME std::string("test-user")
 #define USER_POOL_NAME std::string("test-user-pool")
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * AwsMock DynamoDB integration test.
@@ -181,6 +181,6 @@ namespace AwsMock::Service {
         EXPECT_TRUE(Core::StringUtils::Contains(output3, "orgaNr"));
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWMOCK_COGNITO_SERVER_CLI_TEST_H

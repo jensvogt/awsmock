@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief Update parameter request.
@@ -112,6 +112,6 @@ namespace AwsMock::Dto::SSM {
         }
     };
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_UPDATE_PARAMETER_COUNTER_REQUEST_H

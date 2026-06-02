@@ -21,7 +21,7 @@
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -154,6 +154,6 @@ namespace AwsMock::Dto::Lambda {
         static LambdaResult mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity);
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_MAPPER_H

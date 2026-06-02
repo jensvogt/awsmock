@@ -21,7 +21,7 @@ namespace {
 #define TEST_KEY_COPY std::string("test-key-copy")
 #define TEST_PORT 10100
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Tests the aws-sdk-java interface to the AwsMock system.
@@ -378,4 +378,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(0, objects);
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

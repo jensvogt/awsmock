@@ -23,7 +23,7 @@
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/utils/SqsUtils.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     class RedrivePolicyMapper : public StaticMapper<RedrivePolicyMapper, Database::Entity::SQS::RedrivePolicy, RedrivePolicy> {
       public:
@@ -346,6 +346,6 @@ namespace AwsMock::Dto::SQS {
         static Database::Entity::SQS::Message toEntity(const SendMessageResponse &d) = delete;
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_MAPPER_H

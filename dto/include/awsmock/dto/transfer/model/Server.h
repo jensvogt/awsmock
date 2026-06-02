@@ -15,7 +15,7 @@
 #include <awsmock/dto/transfer/model/IdentityProviderDetails.h>
 #include <awsmock/dto/transfer/model/IdentityProviderType.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     /**
      * @brief Server model
@@ -195,6 +195,6 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer
 
 #endif//AWSMOCK_DTO_TRANSFER_SERVER_H

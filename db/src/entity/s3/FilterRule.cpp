@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/s3/FilterRule.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     view_or_value<view, value> FilterRule::ToDocument() const {
 
@@ -23,4 +23,4 @@ namespace AwsMock::Database::Entity::S3 {
         return f;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

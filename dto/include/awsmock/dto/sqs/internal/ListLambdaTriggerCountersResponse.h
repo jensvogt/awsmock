@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/LambdaTriggerCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListLambdaTriggerCountersResponse final : Common::BaseCounter<ListLambdaTriggerCountersResponse> {
 
@@ -48,6 +48,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SNS_LIST_LAMBDA_TRIGGER_COUNTERS_RESPONSE_H

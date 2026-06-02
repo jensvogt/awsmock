@@ -24,7 +24,7 @@
 #include <awsmock/service/ssm/SSMHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Gateway router
@@ -33,7 +33,8 @@ namespace AwsMock::Service {
      */
     class GatewayRouter final {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -48,9 +49,9 @@ namespace AwsMock::Service {
          */
         std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, boost::asio::io_context &ioc);
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Gateway"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Gateway"};
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

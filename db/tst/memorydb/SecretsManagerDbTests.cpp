@@ -24,7 +24,7 @@ namespace {
 #define SECRET_NAME "test-secret"
 #endif
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     struct SecretsmanagerMemoryDbFixture {
         SecretsmanagerMemoryDbFixture() = default;
@@ -366,4 +366,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

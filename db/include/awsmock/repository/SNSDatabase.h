@@ -20,9 +20,10 @@
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using std::chrono::system_clock;
 
@@ -31,9 +32,10 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSDatabase : public DatabaseBase {
+    class SNSDatabase : public AwsMock::Database::DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -395,7 +397,8 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters() const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
 
         /**
@@ -419,6 +422,6 @@ namespace AwsMock::Database {
         SNSMemoryDb &_memoryDb;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_SNS_DATABASE_H

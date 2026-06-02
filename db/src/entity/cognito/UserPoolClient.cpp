@@ -6,7 +6,7 @@
 
 #include "awsmock/dto/cognito/model/AuthFlow.h"
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     view_or_value<view, value> UserPoolClient::ToDocument() const {
 
@@ -58,4 +58,4 @@ namespace AwsMock::Database::Entity::Cognito {
         }
     }
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito

@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/SSMDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     bool SSMDatabase::ParameterExists(const std::string &name) const {
 
@@ -165,20 +165,16 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _parameterCollection.insert_one(parameter.ToDocument());
-                session.commit_transaction();
                 log_trace << "Parameter created, oid: " << result->inserted_id().get_oid().value.to_string();
 
                 parameter.oid = result->inserted_id().get_oid().value.to_string();
                 return parameter;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -196,14 +192,11 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto mResult = _parameterCollection.find_one_and_update(make_document(kvp("name", parameter.parameterName)), parameter.ToDocument(), opts);
                 log_trace << "Parameter updated: " << parameter.ToString();
-                session.commit_transaction();
 
                 if (mResult) {
                     parameter.FromDocument(mResult->view());
@@ -212,7 +205,6 @@ namespace AwsMock::Database {
                 return {};
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -234,18 +226,14 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto delete_many_result = _parameterCollection.delete_one(make_document(kvp("name", parameter.parameterName)));
-                session.commit_transaction();
                 log_debug << "SSM parameter deleted, count: " << delete_many_result->deleted_count();
                 return delete_many_result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -274,4 +262,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllParameters();
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     /**
      * @brief S3 bucket notification entity
@@ -49,6 +49,6 @@ namespace AwsMock::Database::Entity::S3 {
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
     };
 
-}// namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3
 
 #endif// AWSMOCK_DB_ENTITY_S3_BUCKET_NOTIFICATION_H

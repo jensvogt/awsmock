@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/cognito/UserPool.h>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     UserPoolClient UserPool::GetClient(const std::string &clientId) {
         const auto it = std::ranges::find_if(userPoolClients,
@@ -89,4 +89,4 @@ namespace AwsMock::Database::Entity::Cognito {
         }
     }
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito

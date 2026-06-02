@@ -7,7 +7,7 @@
 #include "awsmock/dto/cognito/mapper/Mapper.h"
 #include "awsmock/dto/dynamodb/internal/ExportItemsResponse.h"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "create_table");
@@ -637,4 +637,4 @@ namespace AwsMock::Service {
         return attr;
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

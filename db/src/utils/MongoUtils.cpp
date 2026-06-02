@@ -4,7 +4,7 @@
 
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     void MongoUtils::SetDatetime(bsoncxx::builder::basic::document &document, const std::string &attribute, const system_clock::time_point datetime) {
         if (datetime.time_since_epoch().count() > 0) {
@@ -21,4 +21,4 @@ namespace AwsMock::Database {
         return system_clock::time_point::min();
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

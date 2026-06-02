@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/cognito/Group.h>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     view_or_value<view, value> Group::ToDocument() const {
 
@@ -34,4 +34,4 @@ namespace AwsMock::Database::Entity::Cognito {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito

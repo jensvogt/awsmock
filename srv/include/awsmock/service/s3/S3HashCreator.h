@@ -12,7 +12,7 @@
 
 #define DEFAULT_DATA_DIR "/home/awsmock/data"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief Asynchronous hash creator (MD5, SHA1, SHA256)
@@ -54,6 +54,6 @@ namespace AwsMock::Service {
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_S3_HASH_CREATOR_H

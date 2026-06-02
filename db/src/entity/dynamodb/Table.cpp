@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/dynamodb/Table.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> Table::ToDocument() const {
 
@@ -12,14 +12,14 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             document tableDoc;
             tableDoc.append(
-                kvp("region", region),
-                kvp("name", name),
-                kvp("arn", arn),
-                kvp("status", status),
-                kvp("size", bsoncxx::types::b_int64(size)),
-                kvp("items", bsoncxx::types::b_int64(items)),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
+                    kvp("region", region),
+                    kvp("name", name),
+                    kvp("arn", arn),
+                    kvp("status", status),
+                    kvp("size", bsoncxx::types::b_int64(size)),
+                    kvp("items", bsoncxx::types::b_int64(items)),
+                    kvp("created", bsoncxx::types::b_date(created)),
+                    kvp("modified", bsoncxx::types::b_date(modified)));
 
             // Tags
             if (!tags.empty()) {
@@ -116,4 +116,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-} // namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb

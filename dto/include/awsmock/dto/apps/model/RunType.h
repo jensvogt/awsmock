@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::Apps {
+namespace Awsmock::Dto::Apps {
 
     /**
      * @brief Application run type
@@ -45,6 +45,6 @@ namespace AwsMock::Dto::Apps {
         return AppsRunType::UNKNOWN;
     }
 
-}// namespace AwsMock::Dto::Apps
+}// namespace Awsmock::Dto::Apps
 
 #endif// AWSMOCK_DTO_APPS_RUNTYPE_H

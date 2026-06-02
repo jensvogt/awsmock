@@ -4,7 +4,7 @@
 
 #include <awsmock/service/common/AbstractServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     AbstractServer::AbstractServer(std::string name) : _name(std::move(name)), _moduleDatabase(Database::ModuleDatabase::instance()) {
     }
@@ -29,4 +29,4 @@ namespace AwsMock::Service {
     }
 
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

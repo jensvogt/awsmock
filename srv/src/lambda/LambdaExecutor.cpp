@@ -4,7 +4,7 @@
 
 #include <awsmock/service/lambda/LambdaExecutor.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload) const {
         Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
@@ -53,4 +53,4 @@ namespace AwsMock::Service {
         return lambdaResult;
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

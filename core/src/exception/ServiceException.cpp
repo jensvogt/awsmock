@@ -4,7 +4,7 @@
 
 #include <awsmock/core/exception/ServiceException.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     ServiceException::ServiceException(const http::status code) : _code(code) {}
 
@@ -18,4 +18,4 @@ namespace AwsMock::Core {
 
     std::string ServiceException::message() const noexcept { return _message; }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

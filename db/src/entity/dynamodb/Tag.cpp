@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/dynamodb/Tag.h>
 
-namespace AwsMock::Database::Entity::DynamoDb {
+namespace Awsmock::Database::Entity::DynamoDb {
 
     view_or_value<view, value> Tag::ToDocument() const {
         auto tagDoc = document{};
@@ -20,4 +20,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return *this;
     }
 
-}// namespace AwsMock::Database::Entity::DynamoDb
+}// namespace Awsmock::Database::Entity::DynamoDb

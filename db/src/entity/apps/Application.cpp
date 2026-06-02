@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/apps/Application.h>
 
-namespace AwsMock::Database::Entity::Apps {
+namespace Awsmock::Database::Entity::Apps {
 
     view_or_value<view, value> Application::ToDocument() const {
 
@@ -115,4 +115,4 @@ namespace AwsMock::Database::Entity::Apps {
         }
     }
 
-} // namespace AwsMock::Database::Entity::Apps
+}// namespace Awsmock::Database::Entity::Apps

@@ -16,7 +16,7 @@
 
 #include "awsmock/core/logging/LogStream.h"
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     /** Private implementation */
     class FtpServerImpl;
@@ -42,7 +42,8 @@ namespace AwsMock::FtpServer {
      */
     class FtpServer {
 
-    public:
+      public:
+
         /**
          * @brief Creates an FTP Server instance that will listen on the the given control port.
          *
@@ -156,8 +157,12 @@ namespace AwsMock::FtpServer {
          */
         [[nodiscard]] std::string getAddress() const;
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
+      private:
+
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
          * Actual implementation
@@ -210,4 +215,4 @@ namespace AwsMock::FtpServer {
         boost::asio::io_context &_awsIoc;
     };
 
-} // namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

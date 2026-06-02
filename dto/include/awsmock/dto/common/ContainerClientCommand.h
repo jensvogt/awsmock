@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
     /**
      * @brief Supported container client commands
      *
@@ -32,14 +32,14 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<ContainerCommandType, std::string> ContainerCommandTypeNames{
-        {ContainerCommandType::LIST_CONTAINERS, "list-containers"},
-        {ContainerCommandType::START_CONTAINER, "start-container"},
-        {ContainerCommandType::STOP_CONTAINER, "stop-container"},
-        {ContainerCommandType::RESTART_CONTAINER, "restart-container"},
-        {ContainerCommandType::KILL_CONTAINER, "kill-container"},
-        {ContainerCommandType::LIST_CONTAINER_STATS, "list-container-stats"},
-        {ContainerCommandType::DELETE_CONTAINER, "delete-container"},
-        {ContainerCommandType::UNKNOWN, "unknown"},
+            {ContainerCommandType::LIST_CONTAINERS, "list-containers"},
+            {ContainerCommandType::START_CONTAINER, "start-container"},
+            {ContainerCommandType::STOP_CONTAINER, "stop-container"},
+            {ContainerCommandType::RESTART_CONTAINER, "restart-container"},
+            {ContainerCommandType::KILL_CONTAINER, "kill-container"},
+            {ContainerCommandType::LIST_CONTAINER_STATS, "list-container-stats"},
+            {ContainerCommandType::DELETE_CONTAINER, "delete-container"},
+            {ContainerCommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string ContainerCommandTypeToString(const ContainerCommandType &commandType) {
@@ -99,10 +99,10 @@ namespace AwsMock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const ContainerClientCommand &i);
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
+      private:
 
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
-} // namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_CONTAINER_CLIENT_COMMAND_H

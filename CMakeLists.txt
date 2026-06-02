@@ -70,7 +70,8 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/include/awsmock/core/BsonConverter.h
         core/include/awsmock/core/BsonCursorRange.h dto/include/awsmock/dto/common/mapper/Mapper.h
-        core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp)
+        core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp
+        db/include/awsmock/repository/DatabaseBase.h)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -117,10 +118,11 @@ target_link_libraries(awsmockdto PRIVATE unofficial::libmagic::libmagic PCRE2::8
 # Build AWSMock Database library
 # -------------------------------------------------------------------------
 
-set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.cpp db/src/repository/SQSDatabase.cpp
-        db/src/memorydb/SQSMemoryDb.cpp db/src/entity/sqs/Queue.cpp db/src/entity/sqs/QueueAttribute.cpp
-        db/src/entity/sqs/RedrivePolicy.cpp db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp
-        db/src/entity/sns/Topic.cpp db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
+set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.cpp
+        db/src/repository/sqs/SQSMongoRepository.cpp db/src/repository/sqs/SQSMemoryRepository.cpp
+        db/src/entity/sqs/Queue.cpp db/src/entity/sqs/QueueAttribute.cpp db/src/entity/sqs/RedrivePolicy.cpp
+        db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp db/src/entity/sns/Topic.cpp
+        db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
         db/src/repository/SNSDatabase.cpp db/src/memorydb/SNSMemoryDb.cpp db/src/entity/s3/Bucket.cpp
         db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp db/src/repository/S3Database.cpp
         db/src/memorydb/S3MemoryDb.cpp db/src/entity/s3/FilterRule.cpp db/src/entity/s3/LifecycleTransition.cpp
@@ -132,8 +134,8 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/lambda/LambdaResult.cpp db/src/repository/TransferDatabase.cpp db/src/entity/transfer/User.cpp
         db/src/entity/transfer/Transfer.cpp db/src/memorydb/TransferMemoryDb.cpp db/src/entity/cognito/UserPool.cpp
         db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp db/src/entity/cognito/Group.cpp
-        db/src/memorydb/CognitoMemoryDb.cpp db/src/repository/CognitoDatabase.cpp db/src/entity/dynamodb/Item.cpp
-        db/src/entity/dynamodb/Table.cpp db/src/repository/DynamoDbDatabase.cpp
+        db/src/repository/cognito/CognitoMemoryRepository.cpp db/src/repository/cognito/CognitoMongoRepository.cpp
+        db/src/entity/dynamodb/Item.cpp db/src/entity/dynamodb/Table.cpp db/src/repository/DynamoDbDatabase.cpp
         db/src/entity/dynamodb/ProvisionedThroughput.cpp db/src/memorydb/DynamoDbMemoryDb.cpp db/src/entity/secretsmanager/Secret.cpp
         db/src/entity/secretsmanager/SecretVersion.cpp db/src/entity/secretsmanager/RotationRules.cpp
         db/src/repository/SecretsManagerDatabase.cpp db/src/memorydb/SecretsManagerMemoryDb.cpp db/src/entity/kms/Key.cpp

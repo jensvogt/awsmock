@@ -4,7 +4,7 @@
 #include <string>
 #include <utility>
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     struct FtpUser {
         FtpUser(std::string username, std::string password, std::string local_root_path, const Permission permissions)
@@ -15,4 +15,4 @@ namespace AwsMock::FtpServer {
         const std::string local_root_path_;
         const Permission permissions_;
     };
-}// namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

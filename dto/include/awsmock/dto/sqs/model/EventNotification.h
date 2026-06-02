@@ -18,7 +18,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/sqs/model/EventRecord.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief SQS event notification
@@ -73,6 +73,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_EVENT_NOTIFICATION_H

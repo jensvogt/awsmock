@@ -13,16 +13,17 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/memorydb/ApiGatewayMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief API gateway MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ApiGatewayDatabase : public DatabaseBase {
+    class ApiGatewayDatabase : public AwsMock::Database::DatabaseBase {
 
       public:
 
@@ -191,6 +192,6 @@ namespace AwsMock::Database {
         ApiGatewayMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_API_GATEWAY_DATABASE_H

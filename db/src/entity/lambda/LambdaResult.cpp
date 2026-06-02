@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/lambda/LambdaResult.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     view_or_value<view, value> LambdaResult::ToDocument() const {
 
@@ -45,4 +45,4 @@ namespace AwsMock::Database::Entity::Lambda {
         timestamp = Core::Bson::BsonUtils::GetDateValue(mResult, "timestamp");
     }
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda

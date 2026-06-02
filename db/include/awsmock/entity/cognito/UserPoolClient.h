@@ -11,7 +11,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
-namespace AwsMock::Database::Entity::Cognito {
+namespace Awsmock::Database::Entity::Cognito {
 
     /**
      * @brief Cognito user pool client entity
@@ -88,12 +88,12 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
+
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
-
     };
 
-}// namespace AwsMock::Database::Entity::Cognito
+}// namespace Awsmock::Database::Entity::Cognito
 
 #endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_CLIENT_H

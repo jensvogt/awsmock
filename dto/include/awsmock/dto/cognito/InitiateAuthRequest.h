@@ -12,7 +12,7 @@
 #include <awsmock/dto/cognito/model/AuthFlow.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Initiate authentication request
@@ -119,6 +119,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_INITIATE_AUTH_REQUEST_H

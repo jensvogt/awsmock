@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 
-namespace AwsMock::Dto::SSM {
+namespace Awsmock::Dto::SSM {
 
     /**
      * @brief SSM parameter type
@@ -45,6 +45,6 @@ namespace AwsMock::Dto::SSM {
         return os << ParameterTypeToString(t);
     }
 
-}// namespace AwsMock::Dto::SSM
+}// namespace Awsmock::Dto::SSM
 
 #endif// AWSMOCK_DTO_SSM_MODEL_PARAMETER_TYPE_H

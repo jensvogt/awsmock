@@ -14,7 +14,7 @@
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/dto/lambda/model/Function.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     /**
      * @brief Enable an application
@@ -109,6 +109,6 @@ namespace AwsMock::Dto::Lambda {
         }
     };
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_ENABLE_LAMBDA_REQUEST_H

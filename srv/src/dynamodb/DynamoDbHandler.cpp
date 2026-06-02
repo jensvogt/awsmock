@@ -2,7 +2,7 @@
 #include "awsmock/core/exception/UnauthorizedException.h"
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     http::response<http::dynamic_body> DynamoDbHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "DynamoDb POST request, URI: " << request.target() << " region: " << region << " user: " << user;
@@ -185,4 +185,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

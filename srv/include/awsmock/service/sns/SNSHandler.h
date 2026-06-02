@@ -15,7 +15,7 @@
 #define FORMAT_XML 0
 #define FORMAT_JSON 1
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief SNS request handler
@@ -24,7 +24,8 @@ namespace AwsMock::Service {
      */
     class SNSHandler final : public AbstractHandler, public std::enable_shared_from_this<SNSHandler> {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -42,7 +43,8 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
 
         /**
@@ -72,4 +74,4 @@ namespace AwsMock::Service {
         std::string _accountId;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

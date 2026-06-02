@@ -14,7 +14,7 @@ namespace {
 //std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::instance();
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     void TestBase::StartGateway() {
 
         // Define endpoint. This is the endpoint of the SQS server, not the gateway
@@ -129,7 +129,7 @@ namespace AwsMock::Service {
         _ios.stop();
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 // entry point:
 int main(const int argc, char *argv[]) {

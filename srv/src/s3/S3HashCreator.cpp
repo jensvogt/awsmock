@@ -4,7 +4,7 @@
 
 #include <awsmock/service/s3/S3HashCreator.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     void S3HashCreator::operator()(const std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const {
         const std::string dataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
@@ -21,4 +21,4 @@ namespace AwsMock::Service {
             log_debug << "Calculated hashes, key: " << object.key << " hash: " << algorithm;
         }
     }
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

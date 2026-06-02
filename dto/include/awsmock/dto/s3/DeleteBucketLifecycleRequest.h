@@ -15,7 +15,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/LifecycleRule.h>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct DeleteBucketLifecycleRequest final : Common::BaseCounter<DeleteBucketLifecycleRequest> {
 
@@ -42,6 +42,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_CORE_DTO_DELETE_BUCKET_LIFECYCLE_REQUEST_H

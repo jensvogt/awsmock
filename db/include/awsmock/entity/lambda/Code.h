@@ -16,7 +16,7 @@
 #include <bsoncxx/string/to_string.hpp>
 
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     using bsoncxx::view_or_value;
     using bsoncxx::builder::basic::kvp;
@@ -92,6 +92,6 @@ namespace AwsMock::Database::Entity::Lambda {
         friend std::ostream &operator<<(std::ostream &os, const Code &tag);
     };
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif// AWSMOCK_DB_ENTITY_LAMBDA_CODE_H

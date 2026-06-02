@@ -12,11 +12,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::SSM {
+namespace Awsmock::Database::Entity::SSM {
 
     using std::chrono::system_clock;
 
@@ -136,6 +136,6 @@ namespace AwsMock::Database::Entity::SSM {
 
     typedef std::vector<Parameter> ParameterList;
 
-}// namespace AwsMock::Database::Entity::SSM
+}// namespace Awsmock::Database::Entity::SSM
 
 #endif// AWSMOCK_DB_ENTITY_SSM_PARAMETER_TOPIC_H

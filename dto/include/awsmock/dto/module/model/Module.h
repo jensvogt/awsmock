@@ -14,7 +14,7 @@
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/entity/module/ModuleState.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     using std::chrono::system_clock;
 
@@ -121,6 +121,6 @@ namespace AwsMock::Dto::Module {
         friend std::ostream &operator<<(std::ostream &os, const Module &m);
     };
 
-} // namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module
 
 #endif// AWSMOCK_DTO_MODULE_MODULE_H

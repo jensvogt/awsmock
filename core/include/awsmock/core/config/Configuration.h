@@ -21,13 +21,13 @@
 #include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/logging/LogStream.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     // Forward declare for recursive variant
     struct ConfigObject;
 
     // Recursive variant â€” supports nested objects
-    using ConfigValue = std::variant<bool, long, double, std::string, std::shared_ptr<ConfigObject> >;
+    using ConfigValue = std::variant<bool, long, double, std::string, std::shared_ptr<ConfigObject>>;
 
     /**
      * @brief Represents a configurable object with properties and behavior.
@@ -125,7 +125,8 @@ namespace AwsMock::Core {
      */
     class Configuration {
 
-    public:
+      public:
+
         /**
          * @brief Provides a singleton instance of the Configuration class
          *
@@ -333,7 +334,7 @@ namespace AwsMock::Core {
          * @throws std::runtime_error if path not found or not an object
          */
         [[nodiscard]]
-        std::vector<std::pair<std::string, std::map<std::string, ConfigValue> > >
+        std::vector<std::pair<std::string, std::map<std::string, ConfigValue>>>
         getObjects(const std::string &path) const;
 
         /**
@@ -456,7 +457,8 @@ namespace AwsMock::Core {
          */
         static std::string getAppName() { return "awsmockmgr"; }
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
         /**
@@ -638,7 +640,9 @@ namespace AwsMock::Core {
             if (!elem.is_object()) continue;
             std::map<std::string, std::string> obj;
             for (const auto &kv: elem.get_object()) {
-                try { obj[std::string(kv.key())] = extractValue<std::string>(kv.value(), std::string(kv.key())); } catch (...) {}
+                try {
+                    obj[std::string(kv.key())] = extractValue<std::string>(kv.value(), std::string(kv.key()));
+                } catch (...) {}
             }
             result.push_back(std::move(obj));
         }
@@ -734,4 +738,4 @@ namespace AwsMock::Core {
         return std::nullopt;
     }
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

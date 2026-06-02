@@ -7,7 +7,7 @@
 
 #include <awsmock/dto/common/ApiGatewayClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void ApiGatewayClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
@@ -67,4 +67,4 @@ namespace AwsMock::Dto::Common {
         return os;
     }
 
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

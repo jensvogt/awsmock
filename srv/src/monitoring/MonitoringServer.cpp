@@ -4,7 +4,7 @@
 
 #include <awsmock/service/monitoring/MonitoringServer.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     MonitoringServer::MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("monitoring"), _scheduler(scheduler), _monitoringCollector(ioc) {
         const int systemPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.system-period");
         const int retentionPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.retention");
@@ -70,4 +70,4 @@ namespace AwsMock::Service {
         return std::ranges::find(_exclusions, name + "::" + labelName + "::" + labelValue) == _exclusions.end();
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

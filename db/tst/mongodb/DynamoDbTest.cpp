@@ -17,7 +17,7 @@ namespace {
 #define TEST_TABLE_NAME "test-table"
 #define TEST_TABLE_REGION "eu-cental-1"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Entity::DynamoDb::Item CreateDefaultItem(const std::string &region, const std::string &tableName) {
         Entity::DynamoDb::Item item;
@@ -175,4 +175,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

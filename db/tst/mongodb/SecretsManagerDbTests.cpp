@@ -19,7 +19,7 @@ namespace {
 #define SECRET_NAME "test-secret"
 #endif
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     struct SecretsManagerDatabaseTest {
 
@@ -339,6 +339,6 @@ namespace AwsMock::Database {
         BOOST_CHECK_EQUAL(secretList.empty(), true);
     }
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWMOCK_CORE_SECRETSMANAGER_DATABASE_TEST_H

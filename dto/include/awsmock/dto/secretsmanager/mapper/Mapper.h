@@ -13,7 +13,7 @@
 #include <awsmock/dto/secretsmanager/internal/GetSecretDetailsResponse.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 
-namespace AwsMock::Dto::SecretsManager {
+namespace Awsmock::Dto::SecretsManager {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -72,6 +72,6 @@ namespace AwsMock::Dto::SecretsManager {
         static Database::Entity::SecretsManager::RotationRules map(const RotationRules &rotationRule);
     };
 
-}// namespace AwsMock::Dto::SecretsManager
+}// namespace Awsmock::Dto::SecretsManager
 
 #endif//AWSMOCK_DTO_SECRETSMANAGER_MAPPER_H

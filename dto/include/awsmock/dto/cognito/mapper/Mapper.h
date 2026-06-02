@@ -29,7 +29,7 @@
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief Maps an entity to the corresponding DTO
@@ -230,6 +230,6 @@ namespace AwsMock::Dto::Cognito {
         static long GetMaxValidityToken(long validity, ValidityUnits validityUnits);
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_MAPPER_H

@@ -12,7 +12,7 @@
 #include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/utils/MongoUtils.h>
 
-namespace AwsMock::Database::Entity::Module {
+namespace Awsmock::Database::Entity::Module {
 
     /**
      * @brief AwsMock module entity
@@ -81,4 +81,4 @@ namespace AwsMock::Database::Entity::Module {
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
     };
 
-} // namespace AwsMock::Database::Entity::Module
+}// namespace Awsmock::Database::Entity::Module

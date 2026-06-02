@@ -11,7 +11,7 @@
 // MongoDB includes
 #include <awsmock/core/BsonUtils.h>
 
-namespace AwsMock::Database::Entity::Lambda {
+namespace Awsmock::Database::Entity::Lambda {
 
     /**
      * @brief Lambda event source mapping
@@ -81,6 +81,6 @@ namespace AwsMock::Database::Entity::Lambda {
         friend std::ostream &operator<<(std::ostream &os, const EventSourceMapping &e);
     };
 
-}// namespace AwsMock::Database::Entity::Lambda
+}// namespace Awsmock::Database::Entity::Lambda
 
 #endif// AWSMOCK_DB_ENTITY_LAMBDA_EVENT_SOURCE_MAPPING_H

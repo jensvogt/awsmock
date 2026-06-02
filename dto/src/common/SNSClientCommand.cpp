@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/common/SNSClientCommand.h>
 
-namespace AwsMock::Dto::Common {
+namespace Awsmock::Dto::Common {
 
     void SNSClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
 
@@ -83,4 +83,4 @@ namespace AwsMock::Dto::Common {
         os << "SNSClientCommand=" << r.ToJson();
         return os;
     }
-}// namespace AwsMock::Dto::Common
+}// namespace Awsmock::Dto::Common

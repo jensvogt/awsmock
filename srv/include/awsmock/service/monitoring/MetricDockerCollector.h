@@ -11,7 +11,7 @@
 #include <awsmock/dto/container/model/Container.h>
 #include <awsmock/service/container/ContainerService.h>
 
-namespace AwsMock::Monitoring {
+namespace Awsmock::Monitoring {
 
     /**
      * @brief Collect docker information like CPU and Memory.
@@ -22,7 +22,8 @@ namespace AwsMock::Monitoring {
      */
     class MetricDockerCollector {
 
-    public:
+      public:
+
         /**
          * @brief Constructor.
          */
@@ -33,12 +34,12 @@ namespace AwsMock::Monitoring {
          */
         void CollectDockerCounter();
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
-
     };
 
-} // namespace AwsMock::Monitoring
+}// namespace Awsmock::Monitoring

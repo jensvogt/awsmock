@@ -8,15 +8,16 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/ftpserver/FtpUser.h>
-#include <awsmock/repository/CognitoDatabase.h>
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     class UserDatabase {
 
-    public:
+      public:
+
         /**
          * Constructor
          */
@@ -42,8 +43,12 @@ namespace AwsMock::FtpServer {
          */
         std::shared_ptr<FtpUser> getUser(const std::string &username, const std::string &password) const;
 
-    private:
-        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
+      private:
+
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
          * Check whether the user is the anonymous user
@@ -68,7 +73,7 @@ namespace AwsMock::FtpServer {
         /**
          * User database
          */
-        std::map<std::string, std::shared_ptr<FtpUser> > database_;
+        std::map<std::string, std::shared_ptr<FtpUser>> database_;
 
         /**
          * Anonymous user
@@ -90,4 +95,4 @@ namespace AwsMock::FtpServer {
          */
         std::string _baseDir;
     };
-} // namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

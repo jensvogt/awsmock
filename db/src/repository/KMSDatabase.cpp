@@ -4,7 +4,7 @@
 
 #include <awsmock/repository/KMSDatabase.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     bool KMSDatabase::KeyExists(const std::string &keyId) const {
 
@@ -164,19 +164,15 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto result = _keyCollection.insert_one(key.ToDocument());
-                session.commit_transaction();
                 log_trace << "Key created, oid: " << result->inserted_id().get_oid().value.to_string();
                 key.oid = result->inserted_id().get_oid().value.to_string();
                 return key;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "KMS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -190,16 +186,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
-            auto session = client->start_session();
 
             try {
                 mongocxx::options::find_one_and_update opts{};
                 opts.return_document(mongocxx::options::return_document::k_after);
 
-                session.start_transaction();
                 const auto mResult = _keyCollection.find_one_and_update(make_document(kvp("keyId", key.keyId)), key.ToDocument(), opts);
                 log_trace << "Key updated: " << key;
-                session.commit_transaction();
 
                 if (mResult && !mResult->empty()) {
                     key.FromDocument(mResult->view());
@@ -208,7 +201,6 @@ namespace AwsMock::Database {
                 return key;
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "KMS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -231,17 +223,13 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
-            auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
                 const auto delete_many_result = _keyCollection.delete_one(make_document(kvp("keyId", key.keyId)));
-                session.commit_transaction();
                 log_debug << "KMS key deleted, count: " << delete_many_result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
@@ -272,4 +260,4 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteAllKeys();
     }
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

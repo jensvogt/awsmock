@@ -24,7 +24,7 @@
 #include <awsmock/entity/s3/Bucket.h>
 #include <boost/serialization/base_object.hpp>
 
-namespace AwsMock::Dto::S3 {
+namespace Awsmock::Dto::S3 {
 
     struct ListAllBucketResponse final : Common::BaseCounter<ListAllBucketResponse> {
 
@@ -77,6 +77,6 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
-}// namespace AwsMock::Dto::S3
+}// namespace Awsmock::Dto::S3
 
 #endif// AWSMOCK_DTO_S3_LIST_ALL_BUCKET_RESPONSE_H

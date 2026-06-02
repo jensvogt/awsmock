@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/transfer/Transfer.h>
 
-namespace AwsMock::Database::Entity::Transfer {
+namespace Awsmock::Database::Entity::Transfer {
 
     view_or_value<view, value> User::ToDocument() const {
 
@@ -40,4 +40,4 @@ namespace AwsMock::Database::Entity::Transfer {
         return os;
     }
 
-}// namespace AwsMock::Database::Entity::Transfer
+}// namespace Awsmock::Database::Entity::Transfer

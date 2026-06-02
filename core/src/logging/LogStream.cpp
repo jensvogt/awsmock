@@ -7,7 +7,7 @@ namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     long LogStream::logSize = DEFAULT_LOG_SIZE;
     int LogStream::logCount = DEFAULT_LOG_COUNT;
@@ -245,4 +245,4 @@ namespace AwsMock::Core {
     void LogStream::RemoveConsoleLogs() {
         boost::log::core::get()->remove_sink(console_sink);
     }
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

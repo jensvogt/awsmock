@@ -11,7 +11,7 @@
 
 #include <boost/beast/http.hpp>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB response from docker image
@@ -36,6 +36,6 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif//AWSMOCK_DTO_DYNAMODB_DYNAMODB_RESPONSE_H

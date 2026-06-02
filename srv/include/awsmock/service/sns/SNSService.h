@@ -85,7 +85,7 @@
 #define LAMBDA_ENDPOINT "lambda"
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     /**
      * @brief SNS service thread
@@ -94,11 +94,12 @@ namespace AwsMock::Service {
      */
     class SNSService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSMongoRepository::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
         }
 
         /**
@@ -430,7 +431,8 @@ namespace AwsMock::Service {
          */
         void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
 
         /**
@@ -503,7 +505,7 @@ namespace AwsMock::Service {
         /**
          * SQS database connection
          */
-        Database::SQSDatabase &_sqsDatabase;
+        Database::SQSMongoRepository &_sqsDatabase;
 
         /**
          * Lambda database connection
@@ -521,6 +523,6 @@ namespace AwsMock::Service {
         LambdaService _lambdaService;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_SNS_SERVICE_H

@@ -12,7 +12,7 @@
 #include <awsmock/dto/cognito/model/UserPoolClient.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::Cognito {
+namespace Awsmock::Dto::Cognito {
 
     /**
      * @brief List user pool clients response
@@ -64,6 +64,6 @@ namespace AwsMock::Dto::Cognito {
         }
     };
 
-}// namespace AwsMock::Dto::Cognito
+}// namespace Awsmock::Dto::Cognito
 
 #endif// AWSMOCK_DTO_COGNITO_LIST_USERPOOL_CLIENTS_RESPONSE_H

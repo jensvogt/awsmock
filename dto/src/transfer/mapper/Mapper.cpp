@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/transfer/mapper/Mapper.h>
 
-namespace AwsMock::Dto::Transfer {
+namespace Awsmock::Dto::Transfer {
 
     ListUsersResponse Mapper::map(const ListUsersRequest &request, const std::vector<Database::Entity::Transfer::User> &userList) {
 
@@ -22,4 +22,4 @@ namespace AwsMock::Dto::Transfer {
         return response;
     }
 
-}// namespace AwsMock::Dto::Transfer
+}// namespace Awsmock::Dto::Transfer

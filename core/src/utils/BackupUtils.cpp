@@ -4,7 +4,7 @@
 
 #include <awsmock/core/BackupUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     std::string BackupUtils::GetBackupFilename(const std::string &module) {
         const auto backupDir = Configuration::instance().get<std::string>("awsmock.backup-dir");
@@ -27,4 +27,4 @@ namespace AwsMock::Core {
         return fileList | std::views::take(fileList.size() - retention) | std::views::transform([](const std::filesystem::path &p) { return p.string(); }) | std::ranges::to<std::vector>();
     }
 
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

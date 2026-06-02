@@ -19,7 +19,7 @@ namespace {
 #define TEST_MESSAGE std::string("{\"testKey\": \"testValue\"}")
 #define TEST_PORT 10100
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     struct TestMessage {
 
@@ -369,4 +369,4 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(0, messageList.size());
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

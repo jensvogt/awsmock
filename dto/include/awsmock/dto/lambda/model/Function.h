@@ -15,7 +15,7 @@
 #include <awsmock/dto/lambda/model/DeadLetterConfig.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 
-namespace AwsMock::Dto::Lambda {
+namespace Awsmock::Dto::Lambda {
 
     struct Function final : Common::BaseCounter<Function> {
 
@@ -252,6 +252,6 @@ namespace AwsMock::Dto::Lambda {
 
     typedef std::vector<Function> FunctionList;
 
-}// namespace AwsMock::Dto::Lambda
+}// namespace Awsmock::Dto::Lambda
 
 #endif// AWSMOCK_DTO_LAMBDA_FUNCTION_H

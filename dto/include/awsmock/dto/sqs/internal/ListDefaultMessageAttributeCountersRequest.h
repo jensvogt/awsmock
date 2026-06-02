@@ -12,7 +12,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     struct ListDefaultMessageAttributeCountersRequest final : Common::BaseCounter<ListDefaultMessageAttributeCountersRequest> {
 
@@ -69,6 +69,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS_REQUEST_H

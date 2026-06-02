@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/s3/LifecycleConfiguration.h>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     LifecycleConfiguration::LifecycleConfiguration(const view &mResult) {
         FromDocument(mResult);
@@ -44,4 +44,4 @@ namespace AwsMock::Database::Entity::S3 {
         return l;
     }
 
-} // namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

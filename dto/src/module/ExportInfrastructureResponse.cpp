@@ -4,7 +4,7 @@
 
 #include <awsmock/dto/module/ExportInfrastructureResponse.h>
 
-namespace AwsMock::Dto::Module {
+namespace Awsmock::Dto::Module {
 
     std::string ExportInfrastructureResponse::ToJson() const {
 
@@ -33,4 +33,4 @@ namespace AwsMock::Dto::Module {
         return os;
     }
 
-}// namespace AwsMock::Dto::Module
+}// namespace Awsmock::Dto::Module

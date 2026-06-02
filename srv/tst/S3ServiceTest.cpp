@@ -24,7 +24,7 @@ namespace {
 #define TEST_COPY_KEY "test-key-copy.txt"
 #define TEST_CONTENT "Hello, S3!"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     Dto::S3::CreateBucketResponse CreateDefaultBucket(const Service::S3Service &s3Service) {
         Dto::S3::CreateBucketRequest request;
@@ -280,4 +280,4 @@ namespace AwsMock::Database {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

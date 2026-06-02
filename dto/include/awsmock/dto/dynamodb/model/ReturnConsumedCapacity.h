@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H
 #define AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Return consumed capacity
@@ -44,6 +44,6 @@ namespace AwsMock::Dto::DynamoDb {
         return ReturnConsumedCapacityType::NONE;
     }
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H

@@ -10,7 +10,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 
-namespace AwsMock::Dto::ApiGateway {
+namespace Awsmock::Dto::ApiGateway {
 
     /**
      * @brief Create API gateway key request
@@ -54,7 +54,8 @@ namespace AwsMock::Dto::ApiGateway {
          */
         std::string value;
 
-    private:
+      private:
+
         friend CreateApiKeyRequest tag_invoke(boost::json::value_to_tag<CreateApiKeyRequest>, boost::json::value const &v) {
             CreateApiKeyRequest r;
             r.customerId = Core::Json::GetStringValue(v, "customerId");
@@ -63,24 +64,24 @@ namespace AwsMock::Dto::ApiGateway {
             r.generateDistinct = Core::Json::GetBoolValue(v, "generateDistinct");
             r.name = Core::Json::GetStringValue(v, "name");
             if (Core::Json::AttributeExists(v, "tags")) {
-                r.tags = boost::json::value_to<std::map<std::string, std::string> >(v.at("tags"));
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateApiKeyRequest const &obj) {
             jv = {
-                {"Region", obj.region},
-                {"User", obj.user},
-                {"RequestId", obj.requestId},
-                {"customerId", obj.customerId},
-                {"description", obj.description},
-                {"enabled", obj.enabled},
-                {"generateDistinct", obj.generateDistinct},
-                {"name", obj.name},
-                {"tags", boost::json::value_from(obj.tags)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"customerId", obj.customerId},
+                    {"description", obj.description},
+                    {"enabled", obj.enabled},
+                    {"generateDistinct", obj.generateDistinct},
+                    {"name", obj.name},
+                    {"tags", boost::json::value_from(obj.tags)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::ApiGateway
+}// namespace Awsmock::Dto::ApiGateway

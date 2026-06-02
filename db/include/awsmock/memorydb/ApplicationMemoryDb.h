@@ -19,7 +19,7 @@
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief Application in-memory database.
@@ -31,7 +31,8 @@ namespace AwsMock::Database {
      */
     class ApplicationMemoryDb {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -140,7 +141,8 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllApplications();
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
@@ -154,6 +156,6 @@ namespace AwsMock::Database {
         static boost::mutex _applicationMutex;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H

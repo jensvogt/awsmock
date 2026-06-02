@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief Stream view type
@@ -50,6 +50,6 @@ namespace AwsMock::Dto::DynamoDb {
         return StreamViewType::UNKNOWN;
     }
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_STREAM_VIEW_TYPE_H

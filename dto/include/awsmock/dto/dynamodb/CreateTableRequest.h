@@ -15,7 +15,7 @@
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/Tag.h>
 
-namespace AwsMock::Dto::DynamoDb {
+namespace Awsmock::Dto::DynamoDb {
 
     /**
      * @brief DynamoDB create table request
@@ -102,6 +102,6 @@ namespace AwsMock::Dto::DynamoDb {
         }
     };
 
-}// namespace AwsMock::Dto::DynamoDb
+}// namespace Awsmock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_REQUEST_H

@@ -10,20 +10,16 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 
-namespace AwsMock::Database {
-
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using std::chrono::system_clock;
+namespace Awsmock::Database {
 
     /**
      * @brief Performance MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MonitoringDatabase : public DatabaseBase {
+    class MonitoringDatabase : public AwsMock::Database::DatabaseBase {
 
       public:
 
@@ -50,10 +46,10 @@ namespace AwsMock::Database {
          * @param labelName label name
          * @param labelValue labelValue
          * @param limit value limit
-         * @return list of counter values
+         * @return list of counter-values
          */
-        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {},
-                                                                                   long limit = 10) const;
+        [[nodiscard]]
+        std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit = 10) const;
 
         /**
          * @brief Saves the monitoring data to the database
@@ -122,4 +118,4 @@ namespace AwsMock::Database {
             labelValue = std::move(keys[2]);
         }
     }
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database

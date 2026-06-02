@@ -32,7 +32,7 @@
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     /**
      * @brief String utilities.
@@ -41,7 +41,8 @@ namespace AwsMock::Core {
      */
     class StringUtils {
 
-    public:
+      public:
+
         /**
          * @brief Generates a random string with the given length.
          *
@@ -162,7 +163,7 @@ namespace AwsMock::Core {
          * @param s string to split
          * @return string having all line endings removed
          */
-        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char> > s);
+        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> s);
 
         /**
          * @brief Strip beginning of string
@@ -465,4 +466,4 @@ namespace AwsMock::Core {
         return boost::algorithm::to_upper_copy(input);
     }
 
-} // namespace AwsMock::Core
+}// namespace Awsmock::Core

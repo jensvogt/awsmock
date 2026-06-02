@@ -14,7 +14,7 @@
 #include <awsmock/dto/kms/model/Key.h>
 #include <awsmock/dto/kms/model/KeyCounter.h>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief List all KMS keys request
@@ -66,6 +66,6 @@ namespace AwsMock::Dto::KMS {
         }
     };
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_LIST_KEY_COUNTERS_RESPONSE_H

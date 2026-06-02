@@ -10,22 +10,25 @@
 #include <vector>
 
 // AwsMock includes
+#include "DatabaseBase.h"
+
+
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/memorydb/SecretsManagerMemoryDb.h>
 #include <awsmock/repository/Database.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     /**
      * @brief Secrets manager MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SecretsManagerDatabase : public DatabaseBase {
+    class SecretsManagerDatabase : public AwsMock::Database::DatabaseBase {
 
       public:
 
@@ -203,6 +206,6 @@ namespace AwsMock::Database {
         SecretsManagerMemoryDb &_memoryDb;
     };
 
-}// namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H

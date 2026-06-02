@@ -7,7 +7,7 @@
 
 #include <awsmock/service/apigateway/ApiGatewayService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     Dto::ApiGateway::CreateApiKeyResponse ApiGatewayService::CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_api_key");
@@ -216,4 +216,4 @@ namespace AwsMock::Service {
         }
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

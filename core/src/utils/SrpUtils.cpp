@@ -4,7 +4,7 @@
 
 #include <awsmock/core/SrpUtils.h>
 
-namespace AwsMock::Core {
+namespace Awsmock::Core {
 
     SrpUtils::SrpUtils(const int nMFrom) : m_nMFrom(nMFrom) {
 
@@ -352,4 +352,4 @@ namespace AwsMock::Core {
         BN_free(m_pSalt);
         m_pSalt = pSalt;
     }
-}// namespace AwsMock::Core
+}// namespace Awsmock::Core

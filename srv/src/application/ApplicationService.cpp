@@ -5,7 +5,7 @@
 
 #include <awsmock/service/apps/ApplicationService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     ApplicationService::ApplicationService() : _database(Database::ApplicationDatabase::instance()) {
         _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
@@ -596,4 +596,4 @@ namespace AwsMock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service

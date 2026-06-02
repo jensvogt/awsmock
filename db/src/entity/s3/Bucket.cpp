@@ -6,7 +6,7 @@
 
 #include <ranges>
 
-namespace AwsMock::Database::Entity::S3 {
+namespace Awsmock::Database::Entity::S3 {
 
     // bool Bucket::HasNotification(const std::string &eventName) {
     //     return std::ranges::find_if(notifications, [eventName](const BucketNotification &eventNotification) {
@@ -236,4 +236,4 @@ namespace AwsMock::Database::Entity::S3 {
         return b;
     }
 
-}// namespace AwsMock::Database::Entity::S3
+}// namespace Awsmock::Database::Entity::S3

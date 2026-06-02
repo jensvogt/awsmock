@@ -1,6 +1,6 @@
 #pragma once
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     enum class Permission : int {
         FileRead = (1 << 0),   /**< Download files */
@@ -27,4 +27,4 @@ namespace AwsMock::FtpServer {
     inline Permission &operator&=(Permission &a, Permission b) { return reinterpret_cast<Permission &>(reinterpret_cast<int &>(a) &= static_cast<int>(b)); }
     inline Permission &operator^=(Permission &a, Permission b) { return reinterpret_cast<Permission &>(reinterpret_cast<int &>(a) ^= static_cast<int>(b)); }
 
-}// namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

@@ -4,7 +4,7 @@
 
 #include <awsmock/service/sns/SNSService.h>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
     Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "create_topic");
         log_trace << "Create topic request: " << request.ToString();
@@ -1041,7 +1041,7 @@ namespace AwsMock::Service {
         const std::string queueArn = Core::AwsUtils::ConvertToArn(request.region, subscription.endpoint);
 
         // Get queue by ARN
-        const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.GetQueueByArn(queueArn);
+        const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.getQueueByArn(queueArn);
         log_debug << "Found queue, queueUrl: " << sqsQueue.name;
 
         // Create a SQS notification request
@@ -1252,4 +1252,4 @@ namespace AwsMock::Service {
         return contentType;
     }
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service

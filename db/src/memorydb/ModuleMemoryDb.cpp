@@ -4,22 +4,22 @@
 
 #include <awsmock/memorydb/ModuleMemoryDb.h>
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     boost::mutex ModuleMemoryDb::_moduleMutex;
 
     bool ModuleMemoryDb::ModuleExists(const std::string &name) {
 
         return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
-            return module.second.name == name;
-        }) != _modules.end();
+                   return module.second.name == name;
+               }) != _modules.end();
     }
 
     bool ModuleMemoryDb::IsActive(const std::string &name) {
 
         return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
-            return module.second.name == name && module.second.status == Entity::Module::ModuleStatus::ACTIVE;
-        }) != _modules.end();
+                   return module.second.name == name && module.second.status == Entity::Module::ModuleStatus::ACTIVE;
+               }) != _modules.end();
     }
 
     Entity::Module::Module ModuleMemoryDb::GetModuleById(const std::string &oid) {
@@ -222,4 +222,4 @@ namespace AwsMock::Database {
         it->second.logLevel = level;
         _modules[it->first] = it->second;
     }
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database

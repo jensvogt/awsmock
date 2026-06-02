@@ -23,12 +23,13 @@
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/SortColumn.h>
 
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_counter"
 #define S3_SIZE_BY_BUCKET_COUNT "s3_size_by_bucket_counter"
 
-namespace AwsMock::Database {
+namespace Awsmock::Database {
 
     using std::chrono::system_clock;
 
@@ -37,9 +38,10 @@ namespace AwsMock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Database : public DatabaseBase {
+    class S3Database : public AwsMock::Database::DatabaseBase {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -458,13 +460,14 @@ namespace AwsMock::Database {
          */
         void AdjustObjectCounters() const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
         /**
          * Allowed event types
          */
-        static std::map<std::string, std::vector<std::string> > allowedEventTypes;
+        static std::map<std::string, std::vector<std::string>> allowedEventTypes;
 
         /**
          * Database name
@@ -487,6 +490,6 @@ namespace AwsMock::Database {
         S3MemoryDb &_memoryDb;
     };
 
-} // namespace AwsMock::Database
+}// namespace Awsmock::Database
 
 #endif// AWSMOCK_REPOSITORY_S3_DATABASE_H

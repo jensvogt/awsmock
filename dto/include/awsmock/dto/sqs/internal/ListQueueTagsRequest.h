@@ -14,7 +14,7 @@
 #include <awsmock/dto/sqs/model/QueueCounter.h>
 #include <awsmock/utils/SortColumn.h>
 
-namespace AwsMock::Dto::SQS {
+namespace Awsmock::Dto::SQS {
 
     /**
      * @brief List SQS queue tags request
@@ -69,6 +69,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace Awsmock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_LIST_QUEUE_TAGS_REQUEST_H

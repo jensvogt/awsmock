@@ -10,7 +10,7 @@
 #include <ostream>
 #include <string>
 
-namespace AwsMock::Dto::KMS {
+namespace Awsmock::Dto::KMS {
 
     /**
      * @brief KMS master key specification
@@ -63,6 +63,6 @@ namespace AwsMock::Dto::KMS {
         return os << KeySpecToString(keySpec);
     }
 
-}// namespace AwsMock::Dto::KMS
+}// namespace Awsmock::Dto::KMS
 
 #endif// AWSMOCK_DTO_KMS_MASTER_KEY_SPEC_H

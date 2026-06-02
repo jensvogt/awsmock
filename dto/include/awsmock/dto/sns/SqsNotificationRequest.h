@@ -13,7 +13,7 @@
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sns/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SNS {
+namespace Awsmock::Dto::SNS {
 
     struct NotificationMessageAttribute : Common::BaseCounter<NotificationMessageAttribute> {
 
@@ -27,7 +27,8 @@ namespace AwsMock::Dto::SNS {
          */
         std::string value;
 
-    private:
+      private:
+
         friend NotificationMessageAttribute tag_invoke(boost::json::value_to_tag<NotificationMessageAttribute>, boost::json::value const &v) {
             NotificationMessageAttribute r;
             r.type = Core::Json::GetStringValue(v, "Type");
@@ -37,8 +38,8 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, NotificationMessageAttribute const &obj) {
             jv = {
-                {"Type", obj.type},
-                {"Value", obj.value},
+                    {"Type", obj.type},
+                    {"Value", obj.value},
             };
         }
     };
@@ -119,7 +120,8 @@ namespace AwsMock::Dto::SNS {
          */
         std::map<std::string, NotificationMessageAttribute> messageAttributes;
 
-    private:
+      private:
+
         friend SqsNotificationRequest tag_invoke(boost::json::value_to_tag<SqsNotificationRequest>, boost::json::value const &v) {
             SqsNotificationRequest r;
             r.type = Core::Json::GetStringValue(v, "Type");
@@ -131,30 +133,30 @@ namespace AwsMock::Dto::SNS {
             r.signingCertURL = Core::Json::GetStringValue(v, "SigningCertURL");
             r.unsubscribeURL = Core::Json::GetStringValue(v, "UnsubscribeURL");
             if (Core::Json::AttributeExists(v, "MessageAttributes")) {
-                r.messageAttributes = boost::json::value_to<std::map<std::string, NotificationMessageAttribute> >(v.at("MessageAttributes"));
+                r.messageAttributes = boost::json::value_to<std::map<std::string, NotificationMessageAttribute>>(v.at("MessageAttributes"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SqsNotificationRequest const &obj) {
             jv = {
-                {"Region", obj.region},
-                {"User", obj.user},
-                {"RequestId", obj.requestId},
-                {"Type", obj.type},
-                {"TopicArn", obj.topicArn},
-                {"MessageId", obj.messageId},
-                {"Message", obj.message},
-                {"Timestamp", Core::DateTimeUtils::ToISO8601(obj.timestamp)},
-                {"Signature", obj.signature},
-                {"SignatureVersion", obj.signatureVersion},
-                {"SigningCertURL", obj.signingCertURL},
-                {"UnsubscribeURL", obj.unsubscribeURL},
-                {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Type", obj.type},
+                    {"TopicArn", obj.topicArn},
+                    {"MessageId", obj.messageId},
+                    {"Message", obj.message},
+                    {"Timestamp", Core::DateTimeUtils::ToISO8601(obj.timestamp)},
+                    {"Signature", obj.signature},
+                    {"SignatureVersion", obj.signatureVersion},
+                    {"SigningCertURL", obj.signingCertURL},
+                    {"UnsubscribeURL", obj.unsubscribeURL},
+                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
             };
         }
     };
 
-} // namespace AwsMock::Dto::SNS
+}// namespace Awsmock::Dto::SNS
 
 #endif// AWSMOCK_DTO_SNS_SQS_NOTIFICATION_REQUEST_H

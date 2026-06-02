@@ -17,7 +17,7 @@
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/ftpserver/UserDatabase.h>
 
-namespace AwsMock::FtpServer {
+namespace Awsmock::FtpServer {
 
     class FtpServerImpl {
 
@@ -99,7 +99,7 @@ namespace AwsMock::FtpServer {
         /**
          * Stop the manager
          */
-        void stop()const;
+        void stop() const;
 
         /**
          * Return the number of open connections
@@ -124,7 +124,10 @@ namespace AwsMock::FtpServer {
 
       private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "FtpServer"};
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
          * Accept FTP session
@@ -179,4 +182,4 @@ namespace AwsMock::FtpServer {
          */
         boost::asio::io_context &_awsIoc;
     };
-}// namespace AwsMock::FtpServer
+}// namespace Awsmock::FtpServer

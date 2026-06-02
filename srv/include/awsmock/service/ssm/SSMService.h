@@ -36,7 +36,7 @@
 
 #define DEFAULT_SSM_ACCOUNT_ID "000000000000"
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     using std::chrono::system_clock;
 
@@ -47,7 +47,8 @@ namespace AwsMock::Service {
      */
     class SSMService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -139,7 +140,8 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "SSM"};
 
         /**
@@ -158,6 +160,6 @@ namespace AwsMock::Service {
         KMSService _kmsService;
     };
 
-} // namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_SERVICE_H

@@ -4,7 +4,7 @@
 
 #include <awsmock/entity/kms/Key.h>
 
-namespace AwsMock::Database::Entity::KMS {
+namespace Awsmock::Database::Entity::KMS {
 
     view_or_value<view, value> Key::ToDocument() const {
 
@@ -109,4 +109,4 @@ namespace AwsMock::Database::Entity::KMS {
         return os;
     }
 
-}// namespace AwsMock::Database::Entity::KMS
+}// namespace Awsmock::Database::Entity::KMS

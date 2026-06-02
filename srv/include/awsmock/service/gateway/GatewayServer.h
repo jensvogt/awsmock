@@ -22,7 +22,7 @@ namespace http = beast::http;    // from <boost/beast/http.hpp>
 namespace net = boost::asio;     // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;// from <boost/asio/ip/tcp.hpp>
 
-namespace AwsMock::Service {
+namespace Awsmock::Service {
 
     namespace ip = boost::asio::ip;
 
@@ -83,6 +83,6 @@ namespace AwsMock::Service {
         boost::asio::io_context &_ios;
     };
 
-}// namespace AwsMock::Service
+}// namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVER_GATEWAY_SERVER_H
