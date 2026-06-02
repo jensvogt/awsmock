@@ -16,6 +16,7 @@ namespace AwsMock::Service {
 
         try {
             if (action == "get-config") {
+                log_info << "Get config request";
 
                 Core::Configuration &configuration = Core::Configuration::instance();
                 auto host = configuration.get<std::string>("awsmock.gateway.http.host");
@@ -39,14 +40,18 @@ namespace AwsMock::Service {
                 config.databaseActive = configuration.get<bool>("awsmock.mongodb.active");
                 return SendResponse(request, http::status::ok, config.ToJson());
             }
+
             if (action == "list-modules") {
 
+                log_info << "List modules";
                 std::vector<Database::Entity::Module::Module> modules = _moduleService.ListModules();
                 std::string body = Dto::Module::Module::ToJson(modules);
                 return SendResponse(request, http::status::ok, body);
             }
+
             if (action == "list-module-names") {
 
+                log_info << "List module names";
                 Dto::Module::ListModuleNamesResponse modulesResponse = _moduleService.ListModuleNames();
                 return SendResponse(request, http::status::ok, modulesResponse.ToJson());
             }
@@ -54,6 +59,7 @@ namespace AwsMock::Service {
             if (action == "get-infrastructure") {
 
                 // Get request body
+                log_info << "Get infrastructure";
                 Dto::Module::ExportInfrastructureRequest moduleRequest = Dto::Module::ExportInfrastructureRequest::FromJson(payload);
 
                 // Get modules
@@ -66,6 +72,8 @@ namespace AwsMock::Service {
             if (action == "ping") {
                 return SendResponse(request, http::status::ok);
             }
+
+            log_error << "Unknown action, target: " << target << ", action: " << action << ", method: GET";
             return SendResponse(request, http::status::bad_request, "Unknown action");
 
         } catch (Core::ServiceException &exc) {
@@ -152,6 +160,8 @@ namespace AwsMock::Service {
                 }
                 return SendResponse(request, http::status::ok);
             }
+
+            log_error << "Unknown action, target: " << target << ", action: " << action << ", method: POST";
             return SendResponse(request, http::status::bad_request, "Unknown action");
 
         } catch (Core::JsonException &exc) {

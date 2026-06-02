@@ -52,6 +52,8 @@
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
+#include <awsmock/dto/module/GetLogLevelRequest.h>
+#include <awsmock/dto/module/GetLogLevelResponse.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/SetLogLevelRequest.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
@@ -145,8 +147,8 @@ namespace AwsMock::Controller {
 
     static std::vector<std::string> validLogLevels = {"trace", "debug", "info", "warning", "error", "fatal"};
     static std::vector<std::string> validChannels = {
-        "Common", "Core", "Application", "S3", "SQS", "SNS", "Lambda", "SSM", "KMS", "SecretsManager", "DynamoDB", "Cognito",
-        "Module", "Monitoring", "Container"
+        "Core", "Application", "Cognito", "Container", "DynamoDB", "Gateway", "KMS", "Lambda", "Module",
+        "Monitoring", "S3", "SecretsManager", "SNS", "SQS", "SSM"
     };
 
     /**
@@ -309,6 +311,15 @@ namespace AwsMock::Controller {
          */
         void DeployApplication(const std::string &applicationName, const std::string &filename) const;
 
+        /**
+         * @brief Deploys a lambda function to the specified environment.
+         *
+         * This method handles the deployment process by transferring the lambda function code
+         * package to the target environment and performing the necessary setup and configuration.
+         *
+         * @param functionName The name of the lambda function to be deployed.
+         * @param filename The name of the file to deploy
+         */
         void DeployLambda(const std::string &functionName, const std::string &filename) const;
 
 #ifdef HAS_SYSTEMD
@@ -385,7 +396,7 @@ namespace AwsMock::Controller {
          * @brief Send a POST command to the manager and return the raw response.
          */
         [[nodiscard]]
-        Core::HttpSocketResponse SendCommand(const std::string &target, const std::string &action, const std::string &body = {}) const;
+        Core::HttpSocketResponse SendPostCommand(const std::string &target, const std::string &action, const std::string &body = {}) const;
 
         /**
          * @brief Send a GET command to the manager and return the raw response.

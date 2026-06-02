@@ -98,9 +98,9 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const ContainerClientCommand &i);
-      private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
     };
 } // namespace AwsMock::Dto::Common

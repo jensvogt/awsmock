@@ -3,9 +3,6 @@
 
 #include <awsmock/controller/Controller.h>
 
-#include "awsmock/dto/module/GetLogLevelRequest.h"
-#include "awsmock/dto/module/GetLogLevelResponse.h"
-
 namespace AwsMock::Controller {
 
     AwsMockCtl::AwsMockCtl() {
@@ -25,7 +22,7 @@ namespace AwsMock::Controller {
         _applications = GetAllApplications();
     }
 
-    Core::HttpSocketResponse AwsMockCtl::SendCommand(const std::string &target, const std::string &action, const std::string &body) const {
+    Core::HttpSocketResponse AwsMockCtl::SendPostCommand(const std::string &target, const std::string &action, const std::string &body) const {
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, target, action);
         return Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", body, headers);
@@ -286,7 +283,7 @@ namespace AwsMock::Controller {
             appRequest.region = _region;
             appRequest.application.name = application.name;
             appRequest.application.region = application.region;
-            if (const auto response = SendCommand("application", "enable-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("application", "enable-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -297,7 +294,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::EnableAllApplications() const {
         Dto::Apps::EnableAllApplicationsRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("application", "enable-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("application", "enable-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -310,7 +307,7 @@ namespace AwsMock::Controller {
             appRequest.region = _region;
             appRequest.application.name = application.name;
             appRequest.application.region = application.region;
-            if (const auto response = SendCommand("application", "disable-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("application", "disable-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -321,7 +318,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::DisableAllApplications() const {
         Dto::Apps::DisableAllApplicationsRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("application", "disable-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("application", "disable-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -334,7 +331,7 @@ namespace AwsMock::Controller {
             appRequest.region = _region;
             appRequest.application.name = application.name;
             appRequest.application.region = application.region;
-            if (const auto response = SendCommand("application", "start-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("application", "start-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -345,7 +342,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::StartAllApplications() const {
         Dto::Apps::StartAllApplicationsRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("application", "start-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("application", "start-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -358,7 +355,7 @@ namespace AwsMock::Controller {
             appRequest.region = _region;
             appRequest.application.name = application.name;
             appRequest.application.region = application.region;
-            if (const auto response = SendCommand("application", "restart-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("application", "restart-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -367,7 +364,7 @@ namespace AwsMock::Controller {
     }
 
     void AwsMockCtl::RestartAllApplications() const {
-        if (const auto response = SendCommand("application", "restart-all-applications"); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("application", "restart-all-applications"); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -380,7 +377,7 @@ namespace AwsMock::Controller {
             appRequest.region = _region;
             appRequest.application.name = application.name;
             appRequest.application.region = application.region;
-            if (const auto response = SendCommand("application", "stop-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("application", "stop-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -391,7 +388,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::StopAllApplications() const {
         Dto::Apps::StopAllApplicationsRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("application", "stop-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("application", "stop-all-applications", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -403,7 +400,7 @@ namespace AwsMock::Controller {
             Dto::Lambda::EnableLambdaRequest appRequest;
             appRequest.region = _region;
             appRequest.function.functionName = lambda.functionName;
-            if (const auto response = SendCommand("lambda", "enable-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("lambda", "enable-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: lambda: " << lambda.functionName << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -414,7 +411,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::EnableAllLambdas() const {
         Dto::Lambda::EnableAllLambdasRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("lambda", "enable-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("lambda", "enable-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -426,7 +423,7 @@ namespace AwsMock::Controller {
             Dto::Lambda::DisableLambdaRequest appRequest;
             appRequest.region = _region;
             appRequest.function.functionName = lambda.functionName;
-            if (const auto response = SendCommand("lambda", "disable-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("lambda", "disable-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: lambda: " << lambda.functionName << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -437,7 +434,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::DisableAllLambdas() const {
         Dto::Lambda::DisableAllLambdasRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("lambda", "disable-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("lambda", "disable-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -449,7 +446,7 @@ namespace AwsMock::Controller {
             Dto::Lambda::StartLambdaRequest appRequest;
             appRequest.region = _region;
             appRequest.functionArn = lambda.functionArn;
-            if (const auto response = SendCommand("lambda", "start-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("lambda", "start-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: lambda: " << lambda.functionName << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -460,7 +457,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::StartAllLambdas() const {
         Dto::Lambda::StartAllLambasRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("lambda", "start-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("lambda", "start-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -472,7 +469,7 @@ namespace AwsMock::Controller {
             Dto::Lambda::StartLambdaRequest appRequest;
             appRequest.region = _region;
             appRequest.functionArn = lambda.functionArn;
-            if (const auto response = SendCommand("lambda", "restart-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("lambda", "restart-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: lambda: " << lambda.functionName << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -483,7 +480,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::RestartAllLambdas() const {
         Dto::Lambda::StartAllLambasRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("lambda", "restart-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("lambda", "restart-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -495,7 +492,7 @@ namespace AwsMock::Controller {
             Dto::Lambda::StopLambdaRequest appRequest;
             appRequest.region = _region;
             appRequest.functionArn = lambda.functionArn;
-            if (const auto response = SendCommand("lambda", "stop-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+            if (const auto response = SendPostCommand("lambda", "stop-lambda", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: lambda: " << lambda.functionName << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
@@ -506,7 +503,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::StopAllLambdas() const {
         Dto::Lambda::StopAllLambasRequest appRequest;
         appRequest.region = _region;
-        if (const auto response = SendCommand("lambda", "stop-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("lambda", "stop-all-lambdas", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
@@ -526,7 +523,7 @@ namespace AwsMock::Controller {
         request.version = Core::FileUtils::ExtractVersionFromFileName(filename);
         request.applicationCode = Core::Crypto::Base64Encode(Core::FileUtils::ReadFile(filename));
         request.archive = Core::FileUtils::StripBasePath(filename);
-        if (const auto response = SendCommand("application", "upload-application", request.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("application", "upload-application", request.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: '" << response.statusCode << "', body: " << response.body << std::endl;
             return;
         }
@@ -545,7 +542,7 @@ namespace AwsMock::Controller {
         request.functionArn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, functionName);
         request.version = Core::FileUtils::ExtractVersionFromFileName(filename);
         request.functionCode = Core::Crypto::Base64Encode(Core::FileUtils::ReadFile(filename));
-        if (const auto response = SendCommand("lambda", "upload-function-code", request.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("lambda", "upload-function-code", request.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: '" << response.statusCode << "', body: " << response.body << std::endl;
             return;
         }
@@ -605,13 +602,15 @@ namespace AwsMock::Controller {
         if (!moduleName.empty()) {
             request.names.emplace_back(moduleName);
         }
-        const auto response = SendCommand("module", "get-log-level", request.ToJson());
+        const auto response = SendPostCommand("module", "get-log-level", request.ToJson());
         if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Could not get log level, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
+            std::cerr << "Could not get log level, httpStatus: " << response.statusCode << " body: " << response.body << std::endl;
             return;
         }
+        std::cout << std::left << std::setw(32) << "Name" << "Level" << std::endl;
+        std::cout << std::string(60, '-') << std::endl;
         for (const auto &[name, level]: Dto::Module::GetLogLevelResponse::FromJson(response.body).logLevels) {
-            std::cout << "  " << std::setw(16) << std::left << "Module: " << std::setw(32) << name << level << std::endl;
+            std::cout << std::left << std::setw(32) << name << level << std::endl;
         }
     }
 
@@ -630,7 +629,7 @@ namespace AwsMock::Controller {
         Dto::Module::SetLogLevelRequest request;
         request.level = level;
         request.channel = channel;
-        if (const auto response = SendCommand("module", "set-log-level", request.ToJson()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("module", "set-log-level", request.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not set log level, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
@@ -679,7 +678,7 @@ namespace AwsMock::Controller {
         }
         moduleRequest.exportType = exportType;
         moduleRequest.prettyPrint = pretty;
-        const auto response = SendCommand("module", "export", moduleRequest.ToJson());
+        const auto response = SendPostCommand("module", "export", moduleRequest.ToJson());
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not export objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
@@ -693,7 +692,7 @@ namespace AwsMock::Controller {
         while (std::getline(std::cin, line)) {
             jsonString << line;
         }
-        if (const auto response = SendCommand("module", "import", jsonString.str()); response.statusCode != boost::beast::http::status::ok) {
+        if (const auto response = SendPostCommand("module", "import", jsonString.str()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not import objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
         }
     }
@@ -732,7 +731,7 @@ namespace AwsMock::Controller {
         Dto::Apps::ListApplicationCountersRequest request;
         request.region = _region;
         request.user = _user;
-        const auto response = SendCommand("application", "list-applications", request.ToJson());
+        const auto response = SendPostCommand("application", "list-applications", request.ToJson());
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not get application list, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return {};
@@ -756,7 +755,7 @@ namespace AwsMock::Controller {
         Dto::Lambda::ListFunctionCountersRequest request;
         request.region = _region;
         request.user = _user;
-        const auto response = SendCommand("lambda", "list-function-counters", request.ToJson());
+        const auto response = SendPostCommand("lambda", "list-function-counters", request.ToJson());
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not get lambda list, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return {};
@@ -780,7 +779,7 @@ namespace AwsMock::Controller {
         request.region = _region;
         request.user = _user;
         request.lambdaArn = function.functionArn;
-        const auto response = SendCommand("lambda", "list-instance-counters", request.ToJson());
+        const auto response = SendPostCommand("lambda", "list-instance-counters", request.ToJson());
         if (response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not get lambda instance list, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return {};

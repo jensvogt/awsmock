@@ -44,25 +44,25 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<ApplicationCommandType, std::string> ApplicationCommandTypeNames{
-            {ApplicationCommandType::CREATE_APPLICATION, "create-application"},
-            {ApplicationCommandType::GET_APPLICATION, "get-application"},
-            {ApplicationCommandType::UPDATE_APPLICATION, "update-application"},
-            {ApplicationCommandType::UPLOAD_APPLICATION, "upload-application"},
-            {ApplicationCommandType::LIST_APPLICATIONS, "list-applications"},
-            {ApplicationCommandType::LIST_APPLICATION_NAMES, "list-application-names"},
-            {ApplicationCommandType::ENABLE_APPLICATION, "enable-application"},
-            {ApplicationCommandType::ENABLE_ALL_APPLICATIONS, "enable-all-applications"},
-            {ApplicationCommandType::DISABLE_APPLICATION, "disable-application"},
-            {ApplicationCommandType::DISABLE_ALL_APPLICATIONS, "disable-all-applications"},
-            {ApplicationCommandType::START_APPLICATION, "start-application"},
-            {ApplicationCommandType::START_ALL_APPLICATIONS, "start-all-applications"},
-            {ApplicationCommandType::STOP_APPLICATION, "stop-application"},
-            {ApplicationCommandType::STOP_ALL_APPLICATIONS, "stop-all-applications"},
-            {ApplicationCommandType::RESTART_APPLICATION, "restart-application"},
-            {ApplicationCommandType::RESTART_ALL_APPLICATIONS, "restart-all-applications"},
-            {ApplicationCommandType::REBUILD_APPLICATION, "rebuild-application"},
-            {ApplicationCommandType::DELETE_APPLICATION, "delete-application"},
-            {ApplicationCommandType::UNKNOWN, "unknown"},
+        {ApplicationCommandType::CREATE_APPLICATION, "create-application"},
+        {ApplicationCommandType::GET_APPLICATION, "get-application"},
+        {ApplicationCommandType::UPDATE_APPLICATION, "update-application"},
+        {ApplicationCommandType::UPLOAD_APPLICATION, "upload-application"},
+        {ApplicationCommandType::LIST_APPLICATIONS, "list-applications"},
+        {ApplicationCommandType::LIST_APPLICATION_NAMES, "list-application-names"},
+        {ApplicationCommandType::ENABLE_APPLICATION, "enable-application"},
+        {ApplicationCommandType::ENABLE_ALL_APPLICATIONS, "enable-all-applications"},
+        {ApplicationCommandType::DISABLE_APPLICATION, "disable-application"},
+        {ApplicationCommandType::DISABLE_ALL_APPLICATIONS, "disable-all-applications"},
+        {ApplicationCommandType::START_APPLICATION, "start-application"},
+        {ApplicationCommandType::START_ALL_APPLICATIONS, "start-all-applications"},
+        {ApplicationCommandType::STOP_APPLICATION, "stop-application"},
+        {ApplicationCommandType::STOP_ALL_APPLICATIONS, "stop-all-applications"},
+        {ApplicationCommandType::RESTART_APPLICATION, "restart-application"},
+        {ApplicationCommandType::RESTART_ALL_APPLICATIONS, "restart-all-applications"},
+        {ApplicationCommandType::REBUILD_APPLICATION, "rebuild-application"},
+        {ApplicationCommandType::DELETE_APPLICATION, "delete-application"},
+        {ApplicationCommandType::UNKNOWN, "unknown"},
     };
 
     [[maybe_unused]] static std::string ApplicationCommandTypeToString(const ApplicationCommandType &commandType) {
@@ -122,12 +122,12 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const ApplicationClientCommand &i);
-      private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_APPLICATION_CLIENT_COMMAND_H

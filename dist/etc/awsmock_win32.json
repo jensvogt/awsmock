@@ -305,7 +305,7 @@
       "file-count": 5,
       "channels": [
         {
-          "name": "Common",
+          "name": "Core",
           "level": "info"
         },
         {

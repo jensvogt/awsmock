@@ -573,10 +573,7 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::GetNetworkName() {
-        if (Core::Configuration::instance().get<bool>("awsmock.dockerized")) {
-            return Core::Configuration::instance().get<std::string>("awsmock.docker.network-name");
-        }
-        return Core::Configuration::instance().get<std::string>("awsmock.podman.network-name");
+        return Core::Configuration::instance().get<std::string>("awsmock.docker.network-name");
     }
 
     std::string ContainerService::GetHandlerFileNodeJs22(const std::string &handler) {

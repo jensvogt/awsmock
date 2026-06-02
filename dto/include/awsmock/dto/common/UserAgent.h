@@ -34,11 +34,11 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<UserAgentType, std::string> UserAgentTypeNames{
-            {UserAgentType::AWS_SDK_JAVA1, "aws-sdk-java/1"},
-            {UserAgentType::AWS_SDK_JAVA2, "aws-sdk-java/2"},
-            {UserAgentType::AWS_SDK_CPP, "aws-sdk-cpp/2"},
-            {UserAgentType::AWS_CLI, "aws-cli/2"},
-            {UserAgentType::AWS_SDK_UNKNOWN, ""},
+        {UserAgentType::AWS_SDK_JAVA1, "aws-sdk-java/1"},
+        {UserAgentType::AWS_SDK_JAVA2, "aws-sdk-java/2"},
+        {UserAgentType::AWS_SDK_CPP, "aws-sdk-cpp/2"},
+        {UserAgentType::AWS_CLI, "aws-cli/2"},
+        {UserAgentType::AWS_SDK_UNKNOWN, ""},
     };
 
     [[maybe_unused]] static std::string UserAgentTypeToString(UserAgentType userAgentType) {
@@ -133,12 +133,12 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const UserAgent &i);
-      private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_USER_AGENT_H

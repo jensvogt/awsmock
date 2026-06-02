@@ -39,8 +39,9 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<MonitoringCommandType, std::string> MonitoringCommandTypeNames{
-            {MonitoringCommandType::GET_COUNTERS, "get-counters"},
-            {MonitoringCommandType::GET_MULTI_COUNTERS, "get-multi-counters"}};
+        {MonitoringCommandType::GET_COUNTERS, "get-counters"},
+        {MonitoringCommandType::GET_MULTI_COUNTERS, "get-multi-counters"}
+    };
 
     [[maybe_unused]] static std::string MonitoringCommandTypeToString(MonitoringCommandType commandType) {
         return MonitoringCommandTypeNames[commandType];
@@ -98,12 +99,12 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const MonitoringClientCommand &i);
-      private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_MONITORING_CLIENT_COMMAND_H

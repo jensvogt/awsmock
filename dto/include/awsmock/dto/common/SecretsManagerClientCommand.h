@@ -49,20 +49,20 @@ namespace AwsMock::Dto::Common {
     };
 
     static std::map<SecretsManagerCommandType, std::string> SecretsManagerCommandTypeNames{
-            {SecretsManagerCommandType::CREATE_SECRET, "CreateSecret"},
-            {SecretsManagerCommandType::DELETE_SECRET, "DeleteSecret"},
-            {SecretsManagerCommandType::DESCRIBE_SECRET, "DescribeSecret"},
-            {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
-            {SecretsManagerCommandType::PUT_SECRET_VALUE, "PutSecretValue"},
-            {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
-            {SecretsManagerCommandType::ROTATE_SECRET, "RotateSecret"},
-            {SecretsManagerCommandType::LIST_SECRETS, "ListSecrets"},
-            {SecretsManagerCommandType::LIST_SECRET_VERSION_IDS, "ListSecretVersionIds"},
-            {SecretsManagerCommandType::LIST_SECRET_COUNTERS, "ListSecretCounters"},
-            {SecretsManagerCommandType::LIST_SECRET_VERSIONS, "ListSecretVersions"},
-            {SecretsManagerCommandType::GET_SECRET_DETAILS, "GetSecretDetails"},
-            {SecretsManagerCommandType::UPDATE_SECRET_DETAILS, "UpdateDetailsSecret"},
-            {SecretsManagerCommandType::UNKNOWN, "Unknown"},
+        {SecretsManagerCommandType::CREATE_SECRET, "CreateSecret"},
+        {SecretsManagerCommandType::DELETE_SECRET, "DeleteSecret"},
+        {SecretsManagerCommandType::DESCRIBE_SECRET, "DescribeSecret"},
+        {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
+        {SecretsManagerCommandType::PUT_SECRET_VALUE, "PutSecretValue"},
+        {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
+        {SecretsManagerCommandType::ROTATE_SECRET, "RotateSecret"},
+        {SecretsManagerCommandType::LIST_SECRETS, "ListSecrets"},
+        {SecretsManagerCommandType::LIST_SECRET_VERSION_IDS, "ListSecretVersionIds"},
+        {SecretsManagerCommandType::LIST_SECRET_COUNTERS, "ListSecretCounters"},
+        {SecretsManagerCommandType::LIST_SECRET_VERSIONS, "ListSecretVersions"},
+        {SecretsManagerCommandType::GET_SECRET_DETAILS, "GetSecretDetails"},
+        {SecretsManagerCommandType::UPDATE_SECRET_DETAILS, "UpdateDetailsSecret"},
+        {SecretsManagerCommandType::UNKNOWN, "Unknown"},
     };
 
     [[maybe_unused]] static std::string SecretsManagerCommandTypeToString(const SecretsManagerCommandType &commandType) {
@@ -121,12 +121,12 @@ namespace AwsMock::Dto::Common {
          * @return output stream
          */
         friend std::ostream &operator<<(std::ostream &os, const SecretsManagerClientCommand &i);
-      private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "Common"};
+    private:
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
     };
 
-}// namespace AwsMock::Dto::Common
+} // namespace AwsMock::Dto::Common
 
 #endif// AWSMOCK_DTO_COMMON_SECRETSMANAGER_CLIENT_COMMAND_H
