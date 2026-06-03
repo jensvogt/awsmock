@@ -7,8 +7,8 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../include/awsmock/repository/sns/SNSDatabase.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/repository/SNSDatabase.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};

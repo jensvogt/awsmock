@@ -123,8 +123,8 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/sqs/Queue.cpp db/src/entity/sqs/QueueAttribute.cpp db/src/entity/sqs/RedrivePolicy.cpp
         db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp db/src/entity/sns/Topic.cpp
         db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
-        db/src/repository/SNSDatabase.cpp db/src/memorydb/SNSMemoryDb.cpp db/src/entity/s3/Bucket.cpp
-        db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp db/src/repository/S3Database.cpp
+        db/src/repository/sns/SNSMongoRepository.cpp db/src/repository/sns/SNSMemoryRepository.cpp
+        db/src/entity/s3/Bucket.cpp db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp db/src/repository/S3Database.cpp
         db/src/memorydb/S3MemoryDb.cpp db/src/entity/s3/FilterRule.cpp db/src/entity/s3/LifecycleTransition.cpp
         db/src/entity/s3/QueueNotification.cpp db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp
         db/src/entity/s3/BucketEncryption.cpp db/src/entity/s3/LifecycleConfiguration.cpp
@@ -141,13 +141,13 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/repository/SecretsManagerDatabase.cpp db/src/memorydb/SecretsManagerMemoryDb.cpp db/src/entity/kms/Key.cpp
         db/src/repository/KMSDatabase.cpp db/src/memorydb/KMSMemoryDb.cpp db/src/entity/ssm/Parameter.cpp
         db/src/repository/SSMDatabase.cpp db/src/memorydb/SSMMemoryDb.cpp db/src/entity/module/Module.cpp
-        db/src/repository/ModuleDatabase.cpp db/src/memorydb/ModuleMemoryDb.cpp db/src/entity/apps/Application.cpp
-        db/src/repository/ApplicationDatabase.cpp db/src/memorydb/ApplicationMemoryDb.cpp db/src/utils/MongoUtils.cpp
-        db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/repository/ApiGatewayDatabase.cpp
-        db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp
-        db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp db/src/repository/Database.cpp
-        db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp db/src/entity/dynamodb/KeySchema.cpp
-        db/src/entity/dynamodb/Tag.cpp)
+        db/src/repository/module/ModuleMongoRepository.cpp db/src/repository/module/ModuleMemoryRepository.cpp
+        db/src/entity/apps/Application.cpp db/src/repository/ApplicationDatabase.cpp db/src/memorydb/ApplicationMemoryDb.cpp
+        db/src/utils/MongoUtils.cpp db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp
+        db/src/repository/ApiGatewayDatabase.cpp db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp
+        db/src/entity/apigateway/Rest.cpp db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp
+        db/src/repository/Database.cpp db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp
+        db/src/entity/dynamodb/KeySchema.cpp db/src/entity/dynamodb/Tag.cpp)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include

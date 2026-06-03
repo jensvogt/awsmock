@@ -34,7 +34,8 @@ namespace Awsmock::Service {
 
     void SNSServer::DeleteOldMessages() const {
         const int messageTimeout = Core::Configuration::instance().get<int>("awsmock.modules.sns.timeout");
-        _snsDatabase.DeleteOldMessages(messageTimeout);
+        _snsDatabase->deleteOldMessages(messageTimeout);
+        log_debug << "SNS delete old messages finished, messageTimeout: " << messageTimeout;
     }
 
     void SNSServer::UpdateCounter() const {
@@ -42,11 +43,11 @@ namespace Awsmock::Service {
         log_trace << "SNS counter update starting";
 
         // Reload the counters first
-        _snsDatabase.AdjustMessageCounters();
+        _snsDatabase->adjustMessageCounters();
 
         long totalMessages = 0;
         long totalSize = 0;
-        const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
+        const Database::Entity::SNS::TopicList topicList = _snsDatabase->listTopics({});
         for (auto &topic: topicList) {
 
             Core::EventBus::instance().sigMetricGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", topic.topicName, topic.messages);

@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/repository/ModuleDatabase.h>
+#include <../../../../../db/include/awsmock/repository/module/ModuleMongoRepository.h>
 
 namespace Awsmock::Service {
 
@@ -79,7 +79,7 @@ namespace Awsmock::Service {
         /**
          * Service database
          */
-        Database::ModuleDatabase &_moduleDatabase;
+        Database::ModuleMongoRepository &_moduleDatabase;
     };
 
 }// namespace Awsmock::Service

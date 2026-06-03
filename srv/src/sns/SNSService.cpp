@@ -10,10 +10,10 @@ namespace Awsmock::Service {
         log_trace << "Create topic request: " << request.ToString();
 
         // Check existence
-        if (_snsDatabase.TopicExists(request.region, request.topicName)) {
+        if (_snsDatabase->topicExists(request.region, request.topicName)) {
 
             log_warning << "SNS topic '" + request.topicName + "' exists already";
-            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByName(request.region, request.topicName);
+            const Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByName(request.region, request.topicName);
             log_debug << "Got topic: " << topic.topicArn;
 
             Dto::SNS::CreateTopicResponse response;
@@ -34,7 +34,7 @@ namespace Awsmock::Service {
             topic.owner = request.owner;
             topic.topicArn = topicArn;
 
-            topic = _snsDatabase.CreateTopic(topic);
+            topic = _snsDatabase->createTopic(topic);
             log_trace << "SNS topic created: " << topic.ToJson();
 
             Dto::SNS::CreateTopicResponse response;
@@ -56,7 +56,7 @@ namespace Awsmock::Service {
 
         try {
 
-            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase->listTopics(region);
             // TODO: Write mapper
             Dto::SNS::ListTopicsResponse listTopicsResponse;
             for (const auto &it: topicList) {
@@ -78,7 +78,7 @@ namespace Awsmock::Service {
 
         try {
 
-            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase->listTopics(region);
 
             Dto::SNS::ListTopicArnsResponse listTopicArnsResponse;
             for (const auto &it: topicList) {
@@ -100,9 +100,9 @@ namespace Awsmock::Service {
 
         try {
 
-            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns), request.region);
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase->listTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns), request.region);
             Dto::SNS::ListTopicCountersResponse response;
-            response.total = _snsDatabase.CountTopics(request.region, request.prefix);
+            response.total = _snsDatabase->countTopics(request.region, request.prefix);
             response.topicCounters = Dto::SNS::TopicCounterMapper::toDtoList(topicList);
             log_trace << "SNS list topic counters response: " << response.topicCounters.size();
             return response;
@@ -118,13 +118,13 @@ namespace Awsmock::Service {
         log_trace << "Get event source request, snsRequest: " << request.ToString();
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.eventSourceArn)) {
+        if (!_snsDatabase->topicExists(request.eventSourceArn)) {
             log_warning << "Topic does not exists, arn: " << request.eventSourceArn;
             throw Core::NotFoundException("Topic does not exists, arn: " + request.eventSourceArn);
         }
 
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.eventSourceArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.eventSourceArn);
             log_debug << "Topic returned, topic: " << topic.topicName;
 
             Dto::SNS::GetEventSourceResponse response;
@@ -144,17 +144,17 @@ namespace Awsmock::Service {
         log_trace << "Purge topic request, topicArn: " << request.topicArn;
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_warning << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::NotFoundException("Topic does not exist, topicArn" + request.topicArn);
         }
 
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
             log_debug << "Got topic: " << topic.topicArn;
 
             // Update database
-            const long deleted = _snsDatabase.PurgeTopic(topic);
+            const long deleted = _snsDatabase->purgeTopic(topic);
             log_debug << "SNS topic prune, deleted: " << deleted;
             return deleted;
 
@@ -171,7 +171,7 @@ namespace Awsmock::Service {
         try {
 
             long deleted = 0;
-            for (const auto &topic: _snsDatabase.ListTopics()) {
+            for (const auto &topic: _snsDatabase->listTopics({})) {
                 Dto::SNS::PurgeTopicRequest request;
                 request.topicArn = topic.topicArn;
                 request.region = topic.region;
@@ -190,7 +190,7 @@ namespace Awsmock::Service {
         log_trace << "Reload all counters";
 
         try {
-            _snsDatabase.AdjustMessageCounters();
+            _snsDatabase->adjustMessageCounters();
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -203,7 +203,7 @@ namespace Awsmock::Service {
         log_trace << "Resend topic request, region: " << request.region << " topicArn: " << request.topicArn;
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_warning << "Topic does not exist, arn: " << request.topicArn;
             throw Core::NotFoundException("Topic does not exist");
         }
@@ -211,10 +211,10 @@ namespace Awsmock::Service {
         try {
 
             // Get topic
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             // Resend messages
-            for (const auto &message: _snsDatabase.ListMessages(request.topicArn)) {
+            for (const auto &message: _snsDatabase->listMessages(request.topicArn, {}, 0, 0, {})) {
 
                 // Create publish request
                 Dto::SNS::PublishRequest publishRequest;
@@ -242,13 +242,13 @@ namespace Awsmock::Service {
         log_trace << "Resend message request, region: " << request.region << " topicArn: " << request.topicArn << ", messageId: " << request.messageId;
 
         // Check topic existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_warning << "Topic does not exist, arn: " << request.topicArn;
             throw Core::NotFoundException("Topic does not exist");
         }
 
         // Check message existence
-        if (!_snsDatabase.MessageExists(request.messageId)) {
+        if (!_snsDatabase->messageExists(request.messageId)) {
             log_warning << "Message does not exist, messageId: " << request.messageId;
             throw Core::NotFoundException("Message does not exist, messageId: " + request.messageId);
         }
@@ -256,10 +256,10 @@ namespace Awsmock::Service {
         try {
 
             // Get topic
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             // Get message
-            Database::Entity::SNS::Message message = _snsDatabase.GetMessageByMessageId(request.messageId);
+            Database::Entity::SNS::Message message = _snsDatabase->getMessageByMessageId(request.messageId);
 
             // Resend messages
 
@@ -288,7 +288,7 @@ namespace Awsmock::Service {
         log_trace << "Delete topic request, region: " << request.region << " topicArn: " << request.topicArn;
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_warning << "Topic does not exist, arn: " << request.topicArn;
             throw Core::NotFoundException("Topic does not exist");
         }
@@ -300,7 +300,7 @@ namespace Awsmock::Service {
             Database::Entity::SNS::Topic topic;
             topic.region = request.region;
             topic.topicArn = request.topicArn;
-            _snsDatabase.DeleteTopic(topic);
+            _snsDatabase->deleteTopic(topic);
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS delete topic failed, message: " << ex.what();
@@ -320,18 +320,18 @@ namespace Awsmock::Service {
         }
 
         // Check existence
-        if (!request.topicArn.empty() && !_snsDatabase.TopicExists(request.topicArn)) {
+        if (!request.topicArn.empty() && !_snsDatabase->topicExists(request.topicArn)) {
             log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
             throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
-        if (!request.targetArn.empty() && !_snsDatabase.TopicExists(request.targetArn)) {
+        if (!request.targetArn.empty() && !_snsDatabase->topicExists(request.targetArn)) {
             log_error << "SNS targetArn does not exists, targetArn: " << request.targetArn;
             throw Core::ServiceException("SNS targetArn does not exists, targetArn: " + request.targetArn);
         }
 
         try {
             // Get the topic by topic ARN or target ARN
-            const Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
+            const Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase->getTopicByArn(request.topicArn) : _snsDatabase->getTopicByTargetArn(request.targetArn);
 
             // Create entity
             Database::Entity::SNS::Message message = Dto::SNS::PublishRequestMapper::toEntity(request);
@@ -342,7 +342,7 @@ namespace Awsmock::Service {
             message.size = static_cast<long>(request.message.size());
 
             // Save message
-            message = _snsDatabase.CreateMessage(message);
+            message = _snsDatabase->createMessage(message);
 
             // Check subscriptions
             CheckSubscriptions(request, topic, message);
@@ -372,14 +372,14 @@ namespace Awsmock::Service {
             }
 
             // Check existence
-            if (!_snsDatabase.TopicExists(request.topicArn)) {
+            if (!_snsDatabase->topicExists(request.topicArn)) {
                 log_error << "SNS topic does not exists";
                 throw Core::ServiceException("SNS topic does not exists");
             }
 
             // Create a new subscription
             const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
             const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 
             if (const Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
@@ -388,7 +388,7 @@ namespace Awsmock::Service {
                 topic.subscriptions.push_back({.protocol = request.protocol, .endpoint = request.endpoint, .subscriptionArn = subscriptionArn});
 
                 // Save to the database
-                topic = _snsDatabase.UpdateTopic(topic);
+                topic = _snsDatabase->updateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToJson();
             }
 
@@ -416,7 +416,7 @@ namespace Awsmock::Service {
         }
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "SNS topic does not exists";
             throw Core::ServiceException("SNS topic does not exists");
         }
@@ -424,7 +424,7 @@ namespace Awsmock::Service {
         try {
 
             // Get topic
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             // Create new subscription
             if (!topic.HasSubscription(request.subscriptionArn)) {
@@ -437,7 +437,7 @@ namespace Awsmock::Service {
             topic.subscriptions.at(index).protocol = request.protocol;
 
             // Save to the database
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
             log_debug << "Subscription updated, topic: " << topic.ToJson();
 
             Dto::SNS::UpdateSubscriptionResponse response;
@@ -466,7 +466,7 @@ namespace Awsmock::Service {
             }
 
             // Create a new subscription
-            for (Database::Entity::SNS::TopicList topics = _snsDatabase.GetTopicsBySubscriptionArn(request.subscriptionArn); auto &topic: topics) {
+            for (Database::Entity::SNS::TopicList topics = _snsDatabase->getTopicsBySubscriptionArn(request.subscriptionArn); auto &topic: topics) {
 
                 // Remove subscription
                 const auto count = std::erase_if(topic.subscriptions, [request](const auto &item) {
@@ -475,7 +475,7 @@ namespace Awsmock::Service {
                 log_debug << "Subscription removed, count" << count;
 
                 // Save to the database
-                topic = _snsDatabase.UpdateTopic(topic);
+                topic = _snsDatabase->updateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToJson();
             }
             Dto::SNS::UnsubscribeResponse response;
@@ -496,14 +496,14 @@ namespace Awsmock::Service {
         log_trace << "List subscriptions request: " << request.ToString();
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
             throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
 
         try {
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionsByTopicResponse response;
             for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
@@ -528,14 +528,14 @@ namespace Awsmock::Service {
         log_trace << "List subscription counters request: " << request.ToString();
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
             throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
 
         try {
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionCountersResponse response;
             response.total = static_cast<long>(topic.subscriptions.size());
@@ -562,14 +562,14 @@ namespace Awsmock::Service {
         log_trace << "List topic attribute counters request: " << request.ToString();
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
             throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
 
         try {
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Dto::SNS::ListAttributeCountersResponse response;
             response.total = 11;
@@ -632,14 +632,14 @@ namespace Awsmock::Service {
         log_trace << "List tag counters request: " << request.ToString();
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
             throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
 
         try {
 
-            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            const Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Dto::SNS::ListTagCountersResponse response;
             response.total = static_cast<long>(topic.tags.size());
@@ -664,11 +664,11 @@ namespace Awsmock::Service {
         try {
 
             // Check existence
-            if (!_snsDatabase.TopicExists(request.topicArn)) {
+            if (!_snsDatabase->topicExists(request.topicArn)) {
                 throw Core::ServiceException("SNS topic does not exists");
             }
 
-            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            const Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
             Dto::SNS::GetTopicAttributesResponse response;
             response.region = topic.region;
             response.topicArn = topic.topicArn;
@@ -688,21 +688,18 @@ namespace Awsmock::Service {
         try {
 
             // Check existence
-            if (!_snsDatabase.TopicExists(request.topicArn)) {
+            if (!_snsDatabase->topicExists(request.topicArn)) {
                 log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
                 throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
             }
 
-            const long messageCount = _snsDatabase.CountMessages(request.topicArn);
-            const long messagesSize = _snsDatabase.CountMessagesSize(request.topicArn);
-
-            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            const Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
             Dto::SNS::GetTopicDetailsResponse response;
             response.region = topic.region;
             response.topicName = topic.topicName;
             response.topicArn = topic.topicArn;
-            response.messageCount = messageCount;
-            response.size = messagesSize;
+            response.messageCount = topic.messages;
+            response.size = topic.size;
             response.owner = topic.owner;
             response.created = topic.created;
             response.modified = topic.modified;
@@ -718,14 +715,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "get_message");
         log_trace << "Get message request, messageId: " << request.messageId;
 
-        if (!_snsDatabase.MessageExists(request.messageId)) {
+        if (!_snsDatabase->messageExists(request.messageId)) {
             log_error << "Message does not exist, messageId: " << request.messageId;
             throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
         }
 
         try {
 
-            Database::Entity::SNS::Message message = _snsDatabase.GetMessageByMessageId(request.messageId);
+            Database::Entity::SNS::Message message = _snsDatabase->getMessageByMessageId(request.messageId);
             log_debug << "Got message , messageId: " << request.messageId;
             Dto::SNS::GetMessageCountersResponse response;
             response.message = Dto::SNS::MessageMapper::toDto(message);
@@ -762,7 +759,7 @@ namespace Awsmock::Service {
                 SendLambdaMessage(it, request, message);
                 log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
             }
-            _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
+            _snsDatabase->setMessageStatus(message, Database::Entity::SNS::SEND);
         }
     }
 
@@ -773,17 +770,17 @@ namespace Awsmock::Service {
         try {
 
             // Check existence
-            if (!_snsDatabase.TopicExists(request.resourceArn)) {
+            if (!_snsDatabase->topicExists(request.resourceArn)) {
                 log_error << "SNS topic does not exists, topicArn: " << request.resourceArn;
                 throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.resourceArn);
             }
 
             // Get the topic
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.resourceArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.resourceArn);
 
             // Set tags and update database
             topic.tags = request.tags;
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
             log_debug << "SNS tags updated, count: " << topic.tags.size();
 
             Dto::SNS::TagResourceResponse response;
@@ -805,13 +802,13 @@ namespace Awsmock::Service {
         try {
 
             // Check existence
-            if (!_snsDatabase.TopicExists(request.resourceArn)) {
+            if (!_snsDatabase->topicExists(request.resourceArn)) {
                 log_error << "SNS topic does not exists, topicArn: " << request.resourceArn;
                 throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.resourceArn);
             }
 
             // Get the topic
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.resourceArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.resourceArn);
 
             // Set tags and update database
             int count = 0;
@@ -821,7 +818,7 @@ namespace Awsmock::Service {
                     return key == it;
                 }));
             }
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
             log_debug << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
 
             Dto::SNS::UntagResourceResponse response;
@@ -840,13 +837,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "list_default_message_attribute_counters");
         log_trace << "List message counters request";
 
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
         }
 
         try {
-            const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            const Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Dto::SNS::ListDefaultMessageAttributeCountersResponse response;
             response.total = static_cast<long>(topic.defaultMessageAttributes.size());
@@ -864,21 +861,21 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "add_default_message_attribute");
         log_trace << "Add default message attribute request, topicArn: " << request.topicArn;
 
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
         }
 
         Dto::SNS::ListDefaultMessageAttributeCountersResponse response;
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             // Add attributes
             Database::Entity::SNS::MessageAttribute messageAttribute;
             messageAttribute.stringValue = request.messageAttribute.stringValue;
             messageAttribute.dataType = Database::Entity::SNS::MessageAttributeTypeFromString(Dto::SNS::MessageAttributeDataTypeToString(request.messageAttribute.dataType));
             topic.defaultMessageAttributes[request.name] = messageAttribute;
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
 
             response.total = static_cast<long>(topic.defaultMessageAttributes.size());
             response.attributeCounters = Dto::SNS::MessageAttributeMapper::toDtoMap(topic.defaultMessageAttributes);
@@ -896,19 +893,19 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "update_default_message_attribute");
         log_trace << "Update default message attribute request, topicArn: " << request.topicArn;
 
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
         }
 
         Dto::SNS::ListDefaultMessageAttributeCountersResponse response;
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
-            // Delete a default message attributes
+            // Delete a default message attribute
             topic.defaultMessageAttributes[request.name].stringValue = request.value;
             topic.defaultMessageAttributes[request.name].dataType = Database::Entity::SNS::MessageAttributeTypeFromString(request.dataType);
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
 
             response.total = static_cast<long>(topic.defaultMessageAttributes.size());
             response.attributeCounters = Dto::SNS::MessageAttributeMapper::toDtoMap(topic.defaultMessageAttributes);
@@ -926,18 +923,18 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_default_message_attribute");
         log_trace << "Delete default message attribute request, topicArn: " << request.topicArn;
 
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
         }
 
         Dto::SNS::ListDefaultMessageAttributeCountersResponse response;
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
-            // Delete a default message attributes
+            // Delete a default message attribute
             topic.defaultMessageAttributes.erase(request.name);
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
 
             response.total = static_cast<long>(topic.defaultMessageAttributes.size());
             response.attributeCounters = Dto::SNS::MessageAttributeMapper::toDtoMap(topic.defaultMessageAttributes);
@@ -955,20 +952,20 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "add_subscription_counter");
         log_trace << "Get subscription request, topicArn: " << request.topicArn;
 
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
         }
 
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Database::Entity::SNS::Subscription subscription;
             subscription.endpoint = request.endpoint;
             subscription.protocol = request.protocol;
             subscription.subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, Core::Configuration::instance().getAccountId(), request.topicArn);
             topic.subscriptions.emplace_back(subscription);
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
             log_debug << "Add subscription to topic: " << request.topicArn << ", subscriptionArn: " << subscription.subscriptionArn;
 
         } catch (Core::DatabaseException &ex) {
@@ -981,13 +978,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "get_subscription_counter");
         log_trace << "Get subscription request, topicArn: " << request.topicArn << ", subscriptionArn: " << request.subscriptionArn;
 
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
         }
 
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             const auto it = std::ranges::find_if(topic.subscriptions, [request](const Database::Entity::SNS::Subscription &s) {
                 return s.subscriptionArn == request.subscriptionArn;
@@ -1014,18 +1011,18 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_subscription_counter");
         log_trace << "Delete subscription request, topicArn: " << request.topicArn << ", subscriptionArn: " << request.subscriptionArn;
 
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!_snsDatabase->topicExists(request.topicArn)) {
             log_error << "Topic does not exist, topicArn: " << request.topicArn;
             throw Core::ServiceException("Topic does not exist, topicArn: " + request.topicArn);
         }
 
         try {
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             std::erase_if(topic.subscriptions, [request](const Database::Entity::SNS::Subscription &s) {
                 return s.subscriptionArn == request.subscriptionArn;
             });
-            topic = _snsDatabase.UpdateTopic(topic);
+            topic = _snsDatabase->updateTopic(topic);
             log_debug << "SNS topic subscription deleted, topicArn: " << topic.topicArn << ", subscriptionArn: " << request.subscriptionArn;
 
         } catch (Core::DatabaseException &ex) {
@@ -1041,7 +1038,7 @@ namespace Awsmock::Service {
         const std::string queueArn = Core::AwsUtils::ConvertToArn(request.region, subscription.endpoint);
 
         // Get queue by ARN
-        const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase.getQueueByArn(queueArn);
+        const Database::Entity::SQS::Queue sqsQueue = _sqsDatabase->getQueueByArn(queueArn);
         log_debug << "Found queue, queueUrl: " << sqsQueue.name;
 
         // Create a SQS notification request
@@ -1178,8 +1175,8 @@ namespace Awsmock::Service {
         try {
 
             // Get database values
-            const long total = _snsDatabase.CountMessages(request.topicArn);
-            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex);
+            const long total = _snsDatabase->countMessages(request.topicArn);
+            const Database::Entity::SNS::MessageList messageList = _snsDatabase->listMessages(request.region, request.topicArn, request.pageSize, request.pageIndex, {});
 
             // Prepare response
             Dto::SNS::ListMessagesResponse response;
@@ -1201,9 +1198,9 @@ namespace Awsmock::Service {
 
         try {
 
-            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.topicArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const Database::Entity::SNS::MessageList messageList = _snsDatabase->listMessages(request.topicArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             Dto::SNS::ListMessageCountersResponse response;
-            response.total = _snsDatabase.CountMessages(request.topicArn);
+            response.total = _snsDatabase->countMessages(request.topicArn);
             response.messages = Dto::SNS::MessageCounterMapper::toDtoList(messageList);
             log_trace << "SNS list messages, count: " << response.messages.size();
 
@@ -1219,17 +1216,17 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_message");
         log_trace << "Delete a message request, messageId: " << request.messageId;
 
-        if (!_snsDatabase.MessageExists(request.messageId)) {
+        if (!_snsDatabase->messageExists(request.messageId)) {
             log_error << "SNS message does not exists, messageId: " << request.messageId;
             throw Core::ServiceException("SNS message does not exists, messageId: " + request.messageId);
         }
 
         try {
 
-            const long deleted = _snsDatabase.DeleteMessage(request.messageId);
+            const long deleted = _snsDatabase->deleteMessage(request.messageId);
             log_trace << "SNS message deleted, messageId: " << request.messageId << ", count: " << deleted;
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
             log_trace << "SNS topic counter adjusted, topicArn: " << request.topicArn;
 
         } catch (bsoncxx::exception &ex) {
@@ -1239,9 +1236,9 @@ namespace Awsmock::Service {
     }
 
     void SNSService::AdjustTopicCounters(Database::Entity::SNS::Topic &topic) const {
-        topic.topicAttribute.availableMessages = _snsDatabase.CountMessages(topic.topicArn);
-        topic.size = _snsDatabase.GetTopicSize(topic.topicArn);
-        topic = _snsDatabase.UpdateTopic(topic);
+        topic.topicAttribute.availableMessages = _snsDatabase->countMessages(topic.topicArn);
+        topic.size = _snsDatabase->getTopicSize(topic.topicArn);
+        topic = _snsDatabase->updateTopic(topic);
         log_debug << "Topic counters updated, queue: " << topic.topicArn;
     }
 

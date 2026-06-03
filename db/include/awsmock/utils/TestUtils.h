@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/09/2023.
 //
 
-#ifndef AWSMOCK_DB_TEST_UTILS_H
-#define AWSMOCK_DB_TEST_UTILS_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -11,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/entity/module/ModuleState.h>
-#include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/repository/module/ModuleMongoRepository.h>
 
 namespace Awsmock::Database {
 
@@ -31,5 +30,3 @@ namespace Awsmock::Database {
     };
 
 }//namespace Awsmock::Database
-
-#endif// AWSMOCK_DB_TEST_UTILS_H

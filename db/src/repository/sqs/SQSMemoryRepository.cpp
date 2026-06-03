@@ -4,10 +4,6 @@
 
 #include <awsmock/repository/sqs/SQSMemoryRepository.h>
 
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "SQS"};
-}
-
 namespace Awsmock::Database {
 
     boost::mutex SQSMemoryRepository::_sqsQueueMutex;

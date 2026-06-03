@@ -9,10 +9,11 @@ namespace Awsmock::Database {
     std::vector<std::string> TestUtils::_modules = {"s3", "sqs", "sns", "lambda", "transfer", "cognito", "gateway", "database", "kms", "dynamodb"};
 
     void TestUtils::CreateServices() {
-        ModuleDatabase &_serviceDatabase = ModuleDatabase::instance();
+        const ModuleMongoRepository &_serviceDatabase = ModuleMongoRepository::instance();
         for (const auto &it: _modules) {
             Entity::Module::Module module = {.oid = {}, .name = it, .state = Entity::Module::ModuleState::RUNNING, .status = Entity::Module::ModuleStatus::ACTIVE};
-            _serviceDatabase.CreateOrUpdateModule(module);
+            module = _serviceDatabase.createOrUpdateModule(module);
+            //log_debug << "Created module: " << module.name;
         }
     }
 }// namespace Awsmock::Database

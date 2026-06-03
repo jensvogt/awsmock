@@ -8,15 +8,22 @@
 #include <memory>
 
 // Awsmock includes
+#include "module/IModuleRepository.h"
+#include "module/ModuleMongoRepository.h"
+
+
 #include <awsmock/repository/cognito/CognitoMemoryRepository.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
+#include <awsmock/repository/module/IModuleRepository.h>
+#include <awsmock/repository/module/ModuleMemoryRepository.h>
+#include <awsmock/repository/module/ModuleMongoRepository.h>
+#include <awsmock/repository/sns/ISNSRepository.h>
+#include <awsmock/repository/sns/SNSMemoryRepository.h>
+#include <awsmock/repository/sns/SNSMongoRepository.h>
 #include <awsmock/repository/sqs/ISQSRepository.h>
 #include <awsmock/repository/sqs/SQSMemoryRepository.h>
 #include <awsmock/repository/sqs/SQSMongoRepository.h>
-// #include <awsmock/repository/module/IModuleRepository.h>
-// #include <awsmock/repository/module/MongoModuleRepository.h>
-// #include <awsmock/repository/module/MemoryModuleRepository.h>
 
 namespace Awsmock::Database {
 
@@ -35,12 +42,18 @@ namespace Awsmock::Database {
         void initialize(const BackendType type) {
             _backend = type;
         }
-        //
-        // [[nodiscard]]
-        // std::shared_ptr<IModuleRepository> moduleRepository() const {
-        //     static auto repo = createModuleRepository();
-        //     return repo;
-        // }
+
+        [[nodiscard]]
+        std::shared_ptr<IModuleRepository> moduleRepository() const {
+            static auto repo = createModuleRepository();
+            return repo;
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<ISNSRepository> snsRepository() const {
+            static auto repo = createSNSRepository();
+            return repo;
+        }
 
         [[nodiscard]]
         std::shared_ptr<ISQSRepository> sqsRepository() const {
@@ -57,17 +70,28 @@ namespace Awsmock::Database {
       private:
 
         BackendType _backend = BackendType::MONGODB;
-        //
-        // [[nodiscard]]
-        // std::shared_ptr<IModuleRepository> createModuleRepository() const {
-        //     switch (_backend) {
-        //         case BackendType::MONGODB:
-        //             return std::make_shared<MongoModuleRepository>();
-        //         case BackendType::MEMORY:
-        //             return std::make_shared<MemoryModuleRepository>();
-        //     }
-        //     return std::make_shared<MemoryModuleRepository>();
-        // }
+
+        [[nodiscard]]
+        std::shared_ptr<IModuleRepository> createModuleRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<ModuleMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<ModuleMemoryRepository>();
+            }
+            return std::make_shared<ModuleMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<ISNSRepository> createSNSRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<SNSMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<SNSMemoryRepository>();
+            }
+            return std::make_shared<SNSMemoryRepository>();
+        }
 
         [[nodiscard]]
         std::shared_ptr<ISQSRepository> createSQSRepository() const {

@@ -2,14 +2,13 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SQS_SERVER_H
-#define AWSMOCK_SERVICE_SQS_SERVER_H
+#pragma once
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -82,9 +81,9 @@ namespace Awsmock::Service {
         static void BackupSqs();
 
         /**
-         * SQS database
+         * @brief SQS database
          */
-        Database::SQSMongoRepository _sqsDatabase;
+        std::shared_ptr<Database::ISQSRepository> _sqsDatabase = Database::RepositoryFactory::instance().sqsRepository();
 
         /**
          * SQS monitoring period
@@ -97,7 +96,7 @@ namespace Awsmock::Service {
         int _resetPeriod;
 
         /**
-         * SQS adjust counter period
+         * SQS adjust counter-period
          */
         int _counterPeriod;
 
@@ -126,5 +125,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_SQS_SERVER_H

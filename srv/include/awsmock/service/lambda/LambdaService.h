@@ -12,6 +12,7 @@
 #include <boost/signals2/signal.hpp>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/sns/SNSMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -87,7 +88,6 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 
@@ -129,7 +129,7 @@ namespace Awsmock::Service {
          * @param ioc boost asio IO context
          */
         explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSMongoRepository::instance()),
-                                   _snsDatabase(Database::SNSDatabase::instance()) {
+                                   _snsDatabase(Database::SNSMongoRepository::instance()) {
         }
 
         /**
@@ -613,7 +613,7 @@ namespace Awsmock::Service {
         /**
          * @brief SQS database connection
          */
-        Database::SNSDatabase &_snsDatabase;
+        Database::SNSMongoRepository &_snsDatabase;
 
         /**
          * @brief Boost IO context

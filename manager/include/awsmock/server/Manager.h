@@ -8,6 +8,8 @@
 #include <boost/interprocess/interprocess_fwd.hpp>
 
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/apps/ApplicationServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
@@ -102,6 +104,9 @@ namespace Awsmock::Manager {
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Manager"};
 
         /**
@@ -110,7 +115,7 @@ namespace Awsmock::Manager {
         void InitializeWebsocketLogging() const;
 
         /**
-         * @brief Initialize database
+         * @brief Initialize the database
          */
         void InitializeDatabase() const;
 
@@ -132,7 +137,7 @@ namespace Awsmock::Manager {
          *
          * @param key module key
          */
-        static void EnsureModuleExisting(const std::string &key);
+        void EnsureModuleExisting(const std::string &key) const;
 
         /**
          * Thread group

@@ -6,8 +6,8 @@
 #define AWSMOCK_SERVICE_MODULE_MONITORING_H
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/module/ModuleMongoRepository.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 
 namespace Awsmock::Service {
@@ -45,7 +45,7 @@ namespace Awsmock::Service {
         /**
          * Module database connection
          */
-        Database::ModuleDatabase &_moduleDatabase = Database::ModuleDatabase::instance();
+        Database::ModuleMongoRepository &_moduleDatabase = Database::ModuleMongoRepository::instance();
     };
 
 }// namespace Awsmock::Service

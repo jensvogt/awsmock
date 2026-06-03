@@ -75,7 +75,7 @@
 #include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 #include <awsmock/dto/sns/model/EventNotification.h>
 #include <awsmock/dto/sns/model/EventRecord.h>
-#include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/sqs/SQSService.h>
 
@@ -99,7 +99,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSMongoRepository::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+        explicit SNSService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {
         }
 
         /**
@@ -107,7 +107,7 @@ namespace Awsmock::Service {
          *
          * <p>In case the topic exists already, return the existing topic.</p>
          *
-         * @param request create topic request
+         * @param request create a topic request
          * @return CreateTopicResponse
          */
         [[nodiscard]]
@@ -500,12 +500,12 @@ namespace Awsmock::Service {
         /**
          * SNS database connection
          */
-        Database::SNSDatabase &_snsDatabase;
+        std::shared_ptr<Database::ISNSRepository> _snsDatabase = Database::RepositoryFactory::instance().snsRepository();
 
         /**
          * SQS database connection
          */
-        Database::SQSMongoRepository &_sqsDatabase;
+        std::shared_ptr<Database::ISQSRepository> _sqsDatabase = Database::RepositoryFactory::instance().sqsRepository();
 
         /**
          * Lambda database connection
