@@ -2,8 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_MONITORING_HANDLER_H
-#define AWSMOCK_SERVICE_MONITORING_HANDLER_H
+#pragma once
 
 // Boost includes
 #include <boost/beast.hpp>
@@ -27,12 +26,12 @@ namespace Awsmock::Service {
      */
     class MonitoringHandler final : public AbstractHandler {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit MonitoringHandler(boost::asio::io_context &ioc) : AbstractHandler("monitoring-handler", ioc) {};
+        explicit MonitoringHandler(boost::asio::io_context &ioc) : AbstractHandler("monitoring-handler", ioc) {
+        };
 
         /**
          * @brief HTTP POST request.
@@ -45,8 +44,10 @@ namespace Awsmock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
 
         /**
@@ -55,6 +56,4 @@ namespace Awsmock::Service {
         MonitoringService _monitoringService;
     };
 
-}// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_SQS_HANDLER_H
+} // namespace Awsmock::Service

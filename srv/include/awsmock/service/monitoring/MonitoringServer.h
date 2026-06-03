@@ -25,8 +25,7 @@ namespace Awsmock::Service {
      */
     class MonitoringServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
@@ -48,8 +47,7 @@ namespace Awsmock::Service {
          */
         void Shutdown() override;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
 
         /**
@@ -80,7 +78,7 @@ namespace Awsmock::Service {
         /**
          * @brief Database connection
          */
-        Database::MonitoringDatabase &_monitoringDatabase = Database::MonitoringDatabase::instance();
+        std::shared_ptr<Database::IMonitoringRepository> _monitoringDatabase = Database::RepositoryFactory::instance().monitoringRepository();
 
         /**
          * @brief Database connection
@@ -96,6 +94,6 @@ namespace Awsmock::Service {
         std::vector<std::string> _exclusions;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_MONITORING_SERVER_H

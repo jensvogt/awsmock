@@ -14,7 +14,7 @@ namespace Awsmock::Service {
             response.name = request.name;
 
             // Get counters from the database
-            response.counters = Dto::Monitoring::Mapper::map(_database.GetMonitoringValues(request.name, request.start, request.end, request.step));
+            response.counters = Dto::Monitoring::Mapper::map(_database->GetMonitoringValues(request.name, request.start, request.end, request.step, {}, {}, 0));
             log_trace << "Monitoring get counter, count: " << response.counters.size();
             return response;
 
@@ -31,8 +31,8 @@ namespace Awsmock::Service {
             Dto::Monitoring::GetMultiCountersResponse response;
 
             // Get counters from the database
-            for (const std::vector<std::string> series = _database.GetDistinctLabelValues(request.name, request.labelName, request.limit, request.start, request.end); const auto &seria: series) {
-                response.counters[seria] = Dto::Monitoring::Mapper::map(_database.GetMonitoringValues(request.name, request.start, request.end, request.step, request.labelName, seria));
+            for (const std::vector<std::string> series = _database->GetDistinctLabelValues(request.name, request.labelName, request.limit, request.start, request.end); const auto &seria: series) {
+                response.counters[seria] = Dto::Monitoring::Mapper::map(_database->GetMonitoringValues(request.name, request.start, request.end, request.step, request.labelName, seria, 0));
             }
             log_debug << "Monitoring get counter, name: " << request.name << ", series: " << request.labelName << ", count: " << response.counters.size();
             return response;
@@ -42,4 +42,4 @@ namespace Awsmock::Service {
             throw Core::ServiceException(exc.what());
         }
     }
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

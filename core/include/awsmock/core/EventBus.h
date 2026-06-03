@@ -10,6 +10,7 @@
 #include <utility>
 
 // Boost includes
+#include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
 
 namespace Awsmock::Core {

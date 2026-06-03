@@ -1,0 +1,144 @@
+
+//
+// Created by vogje01 on 29/05/2023.
+//
+
+#include <awsmock/repository/monitoring/MonitoringMongoRepository.h>
+
+namespace Awsmock::Database {
+
+    MonitoringMongoRepository::MonitoringMongoRepository() {
+        _collectorConnection = Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> &values) {
+            this->UpdateMonitoringCounters(values);
+        });
+    }
+
+    std::vector<std::string> MonitoringMongoRepository::GetDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit, const system_clock::time_point start, const system_clock::time_point end) const {
+        log_trace << "Get distinct label values, labelName: " << labelName;
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
+
+        try {
+            std::vector<std::string> labels;
+
+            document query;
+            query.append(kvp("name", name));
+            query.append(kvp("labelName", labelName));
+
+            if (limit > 0) {
+                mongocxx::pipeline p{};
+                p.match(make_document(kvp("name", name), kvp("labelName", labelName),
+                                      kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end))))));
+                p.group(make_document(kvp("_id", "$labelValue"), kvp("totalSize", make_document(kvp("$sum", "$value")))));
+                p.sort(make_document(kvp("totalSize", -1)));
+                p.limit(static_cast<std::int32_t>(limit));
+                p.project(make_document(kvp("_id", "$_id"), kvp("value", "$labelValue"), kvp("total", "$totalSize")));
+                for (auto t = _monitoringCollection.aggregate(p); const auto s: t) {
+                    labels.emplace_back(s["_id"].get_string().value);
+                }
+            } else {
+
+                for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {
+                    for (const view eventsView = doc["values"].get_array().value; const bsoncxx::document::element &element: eventsView) {
+                        labels.emplace_back(element.get_string().value);
+                    }
+                }
+            }
+            return labels;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException(exc.what());
+        }
+    }
+
+    std::vector<Entity::Monitoring::Counter> MonitoringMongoRepository::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const long step, const std::string &labelName,
+                                                                                            const std::string &labelValue, const long limit) const {
+        log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
+
+        using namespace std::literals;
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
+
+        try {
+            document document;
+            document.append(kvp("name", name));
+            document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end)))));
+            if (!labelName.empty()) {
+                document.append(kvp("labelName", labelName));
+            }
+            if (!labelValue.empty()) {
+                document.append(kvp("labelValue", labelValue));
+            }
+
+            // Find and accumulate
+            std::vector<Entity::Monitoring::Counter> result;
+            for (auto cursor = _monitoringCollection.find(document.extract()); auto it: cursor) {
+                Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
+                result.emplace_back(Entity::Monitoring::Counter::FromDocument(it));
+            }
+            log_debug << "Counters, name: " << name << ", count: " << result.size() << ", start:" << start << ", end: " << end;
+            return result;
+
+        } catch (const mongocxx::exception &
+            exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException(exc.what());
+        }
+    }
+
+    void MonitoringMongoRepository::UpdateMonitoringCounters(const std::map<std::string, double> &values) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
+
+        try {
+
+            std::vector<value> documents;
+            for (auto &[key, val]: values) {
+
+                // Prepare insert query
+                std::string name, labelName, labelValue;
+                GetIdValues(key, name, labelName, labelValue);
+                document insertQuery;
+                insertQuery.append(kvp("name", name));
+                insertQuery.append(kvp("labelName", labelName));
+                insertQuery.append(kvp("labelValue", labelValue));
+                insertQuery.append(kvp("value", val));
+                insertQuery.append(kvp("created", bsoncxx::types::b_date(system_clock::now())));
+                documents.emplace_back(insertQuery.extract());
+            }
+
+            // Execute bulk update
+            if (!documents.empty()) {
+                monitoringCollection.insert_many(documents);
+            }
+            log_debug << "Imported monitoring values: " << documents.size();
+
+        } catch (mongocxx::exception &e) {
+            log_error << "Collection transaction exception: " << e.what();
+            throw Core::DatabaseException(e.what());
+        }
+    }
+
+    long MonitoringMongoRepository::DeleteOldMonitoringData(const int retentionPeriod) const {
+        log_trace << "Deleting old monitoring data, retention:: " << retentionPeriod;
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
+
+        try {
+            // Find and delete counters
+            const auto retention = Core::DateTimeUtils::UtcDateTimeNow() - std::chrono::days(retentionPeriod);
+            const auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
+            log_debug << "Counters deleted, count: " << mResult.value().deleted_count();
+            return mResult.value().deleted_count();
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException(exc.what());
+        }
+    }
+
+} // namespace Awsmock::Database
