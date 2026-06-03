@@ -70,6 +70,7 @@ namespace Awsmock::Manager {
             });
 
         } else {
+            Database::RepositoryFactory::instance().initialize(Database::BackendType::MEMORY);
             log_info << "In-memory database initialized";
         }
     }
