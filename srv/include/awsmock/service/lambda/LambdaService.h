@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDA_SERVICE_H
-#define AWSMOCK_SERVICE_LAMBDA_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -12,8 +11,6 @@
 #include <boost/signals2/signal.hpp>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/sns/SNSMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/EventBus.h>
@@ -88,6 +85,7 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 
@@ -121,15 +119,13 @@ namespace Awsmock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
          * @param ioc boost asio IO context
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSMongoRepository::instance()),
-                                   _snsDatabase(Database::SNSMongoRepository::instance()) {
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
         }
 
         /**
@@ -555,8 +551,7 @@ namespace Awsmock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-      private:
-
+    private:
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
          *
@@ -608,18 +603,12 @@ namespace Awsmock::Service {
         /**
          * @brief SQS database connection
          */
-        Database::SQSMongoRepository &_sqsDatabase;
+        std::shared_ptr<Database::ISQSRepository> _sqsDatabase = Database::RepositoryFactory::instance().sqsRepository();
 
         /**
          * @brief SQS database connection
          */
-        Database::SNSMongoRepository &_snsDatabase;
-
-        /**
-         * @brief Boost IO context
-         */
-        //boost::asio::io_context &_ioc;
+        std::shared_ptr<Database::ISNSRepository> _snsDatabase = Database::RepositoryFactory::instance().snsRepository();
     };
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
 
-#endif// AWSMOCK_SERVICE_LAMBDA_SERVICE_H

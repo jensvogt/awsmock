@@ -61,7 +61,8 @@ namespace Awsmock::Manager {
         // Get database variables
         if (Core::Configuration::instance().get<bool>("awsmock.mongodb.active")) {
 
-            Awsmock::Database::Database::instance().initialize();
+            Database::Database::instance().initialize();
+            Database::RepositoryFactory::instance().initialize(Database::BackendType::MONGODB);
 
             // Create database indexes in a background thread
             Core::Scheduler::instance().AddOneTimeTask("create-indexes", [] {
@@ -298,4 +299,4 @@ namespace Awsmock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-}// namespace Awsmock::Manager
+} // namespace Awsmock::Manager

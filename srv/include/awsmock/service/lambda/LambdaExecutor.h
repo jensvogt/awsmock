@@ -2,11 +2,9 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
-#define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
+#pragma once
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -14,6 +12,7 @@
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/container/ContainerService.h>
 
 namespace Awsmock::Service {
@@ -29,8 +28,7 @@ namespace Awsmock::Service {
      */
     class LambdaExecutor : public boost::enable_shared_from_this<LambdaExecutor> {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -45,8 +43,10 @@ namespace Awsmock::Service {
          */
         Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload) const;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
@@ -60,6 +60,4 @@ namespace Awsmock::Service {
         ContainerService &_containerService = ContainerService::instance();
     };
 
-}// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
+} // namespace Awsmock::Service

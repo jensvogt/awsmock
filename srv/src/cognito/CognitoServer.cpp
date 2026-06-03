@@ -30,20 +30,20 @@ namespace Awsmock::Service {
     void CognitoServer::UpdateCounter() const {
         log_trace << "Cognito monitoring starting";
 
-        const long users = _cognitoDatabase.countUsers({}, {}, {});
-        const long userPools = _cognitoDatabase.countUserPools({});
+        const long users = _cognitoDatabase->countUsers({}, {}, {});
+        const long userPools = _cognitoDatabase->countUserPools({});
         Core::EventBus::instance().sigMetricGauge(COGNITO_USER_COUNT, {}, {}, static_cast<double>(users));
         Core::EventBus::instance().sigMetricGauge(COGNITO_USERPOOL_COUNT, {}, {}, static_cast<double>(userPools));
 
         // Count users per user pool
-        for (auto &userPool: _cognitoDatabase.listUserPools({}, {}, 0, 0, {})) {
-            const long usersPerUserPool = _cognitoDatabase.countUsers(userPool.region, userPool.userPoolId, {});
+        for (auto &userPool: _cognitoDatabase->listUserPools({}, {}, 0, 0, {})) {
+            const long usersPerUserPool = _cognitoDatabase->countUsers(userPool.region, userPool.userPoolId, {});
             Core::EventBus::instance().sigMetricGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userPool", userPool.name, static_cast<double>(usersPerUserPool));
         }
 
         // Count users per user group
-        for (auto &group: _cognitoDatabase.listGroups({}, {})) {
-            const long usersPerGroup = _cognitoDatabase.countUsers(group.region, group.userPoolId, group.groupName);
+        for (auto &group: _cognitoDatabase->listGroups({}, {})) {
+            const long usersPerGroup = _cognitoDatabase->countUsers(group.region, group.userPoolId, group.groupName);
             Core::EventBus::instance().sigMetricGauge(COGNITO_USER_BY_GROUP_COUNT, "group", group.groupName, static_cast<double>(usersPerGroup));
         }
         log_trace << "Cognito monitoring finished";
@@ -58,4 +58,4 @@ namespace Awsmock::Service {
         _scheduler.Shutdown("cognito-backup");
         log_info << "Cognito server stopped";
     }
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

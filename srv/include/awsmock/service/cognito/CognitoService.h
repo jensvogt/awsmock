@@ -12,7 +12,6 @@
 #include <openssl/bn.h>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
@@ -78,6 +77,7 @@
 #include <awsmock/dto/cognito/internal/ListUserPoolCountersResponse.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace Awsmock::Service {
@@ -93,8 +93,7 @@ namespace Awsmock::Service {
      */
     class CognitoService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -379,8 +378,7 @@ namespace Awsmock::Service {
          */
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
@@ -402,7 +400,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::CognitoMongoRepository &_database;
+        std::shared_ptr<Database::ICognitoRepository> _cognitoDatabase = Database::RepositoryFactory::instance().cognitoRepository();
 
         /**
          * AWS account userPoolId
@@ -410,6 +408,6 @@ namespace Awsmock::Service {
         std::string _accountId;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_COGNITO_SERVICE_H

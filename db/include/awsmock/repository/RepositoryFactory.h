@@ -8,15 +8,13 @@
 #include <memory>
 
 // Awsmock includes
-#include "module/IModuleRepository.h"
-#include "module/ModuleMongoRepository.h"
-
-
 #include <awsmock/repository/cognito/CognitoMemoryRepository.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
 #include <awsmock/repository/module/IModuleRepository.h>
+#include <awsmock/repository/module/IModuleRepository.h>
 #include <awsmock/repository/module/ModuleMemoryRepository.h>
+#include <awsmock/repository/module/ModuleMongoRepository.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
 #include <awsmock/repository/sns/ISNSRepository.h>
 #include <awsmock/repository/sns/SNSMemoryRepository.h>
@@ -27,13 +25,19 @@
 
 namespace Awsmock::Database {
 
-    enum class BackendType { MONGODB,
-                             MEMORY };
+    enum class BackendType {
+        MONGODB,
+        MEMORY
+    };
 
+    /**
+     * @brief Repository factory
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class RepositoryFactory {
 
-      public:
-
+    public:
         static RepositoryFactory &instance() {
             static RepositoryFactory inst;
             return inst;
@@ -41,35 +45,30 @@ namespace Awsmock::Database {
 
         void initialize(const BackendType type) {
             _backend = type;
+            _moduleRepo = createModuleRepository();
+            _snsRepo = createSNSRepository();
+            _sqsRepo = createSQSRepository();
+            _cognitoRepo = createCognitoRepository();
         }
 
         [[nodiscard]]
-        std::shared_ptr<IModuleRepository> moduleRepository() const {
-            static auto repo = createModuleRepository();
-            return repo;
-        }
+        std::shared_ptr<IModuleRepository> moduleRepository() const { return _moduleRepo; }
 
         [[nodiscard]]
-        std::shared_ptr<ISNSRepository> snsRepository() const {
-            static auto repo = createSNSRepository();
-            return repo;
-        }
+        std::shared_ptr<ISNSRepository> snsRepository() const { return _snsRepo; }
 
         [[nodiscard]]
-        std::shared_ptr<ISQSRepository> sqsRepository() const {
-            static auto repo = createSQSRepository();
-            return repo;
-        }
+        std::shared_ptr<ISQSRepository> sqsRepository() const { return _sqsRepo; }
 
         [[nodiscard]]
-        std::shared_ptr<ICognitoRepository> cognitoRepository() const {
-            static auto repo = createCognitoRepository();
-            return repo;
-        }
+        std::shared_ptr<ICognitoRepository> cognitoRepository() const { return _cognitoRepo; }
 
-      private:
-
+    private:
         BackendType _backend = BackendType::MONGODB;
+        std::shared_ptr<IModuleRepository> _moduleRepo;
+        std::shared_ptr<ISNSRepository> _snsRepo;
+        std::shared_ptr<ISQSRepository> _sqsRepo;
+        std::shared_ptr<ICognitoRepository> _cognitoRepo;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> createModuleRepository() const {
@@ -116,4 +115,4 @@ namespace Awsmock::Database {
         }
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database
