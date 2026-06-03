@@ -2,7 +2,6 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#include <awsmock/core/EventBus.h>
 #include <awsmock/server/Manager.h>
 
 #ifdef _WIN32
@@ -32,7 +31,7 @@ namespace Awsmock::Manager {
     void Manager::InitializeLogging() const {
 
         // Initialize log channels from configuration
-        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
+        const std::shared_ptr<Database::IModuleRepository> moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
         if (Core::Configuration::instance().has("awsmock.logging.channels")) {
             for (const auto &channel: Core::Configuration::instance().getArrayOfObjects("awsmock.logging.channels")) {
                 if (!channel.contains("name") || !channel.contains("level")) continue;
@@ -41,8 +40,8 @@ namespace Awsmock::Manager {
                 std::string moduleName = channelName;
                 std::ranges::transform(moduleName, moduleName.begin(), ::tolower);
                 Core::LogStream::SetChannelSeverity(channelName, level);
-                if (moduleDatabase.ModuleExists(moduleName)) {
-                    moduleDatabase.SetModuleLogChannelAndLevel(moduleName, channelName, level);
+                if (moduleDatabase->moduleExists(moduleName)) {
+                    moduleDatabase->setModuleLogChannelAndLevel(moduleName, channelName, level);
                     log_trace << "Module log channel initialized, name: " << moduleName << " channel: " << channelName << " level: " << level;
                 }
             }
@@ -66,7 +65,7 @@ namespace Awsmock::Manager {
 
             // Create database indexes in a background thread
             Core::Scheduler::instance().AddOneTimeTask("create-indexes", [] {
-                Database::ModuleDatabase::instance().CreateIndexes();
+                //Database::RepositoryFactory::instance::instance().createIndexes();
             });
 
         } else {
@@ -131,11 +130,11 @@ namespace Awsmock::Manager {
         // Stop scheduler
         log_info << "Found modules, count: " << moduleMap.GetSize();
         int i = 0;
-        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (const std::vector<Database::Entity::Module::Module> modules = moduleDatabase.ListModules(); const auto &module: modules) {
+        const std::shared_ptr<Database::IModuleRepository> moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
+        for (std::vector<Database::Entity::Module::Module> modules = moduleDatabase->listModules(); auto &module: modules) {
             log_info << "Stopping module " << i << " module: " << module.name;
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
-                moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
+                moduleDatabase->setState(module.name, Database::Entity::Module::ModuleState::STOPPED);
                 if (moduleMap.HasModule(module.name)) {
                     moduleMap.GetModule(module.name)->Shutdown();
                     log_info << "Module " << i << ": " << module.name << " stopped";
@@ -150,31 +149,32 @@ namespace Awsmock::Manager {
 
         using Database::Entity::Module::ModuleStatus;
 
-        Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-
-        for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
+        const std::shared_ptr<Database::IModuleRepository> moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
+        for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleMongoRepository::getExisting(); const auto &key: existingModules | std::views::keys) {
             log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << Core::Configuration::instance().get<bool>("awsmock.modules." + key + ".active");
             EnsureModuleExisting(key);
-            Core::Configuration::instance().get<bool>("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
+            Core::Configuration::instance().get<bool>("awsmock.modules." + key + ".active") ? moduleDatabase->setStatus(key, ModuleStatus::ACTIVE) : moduleDatabase->setStatus(key, ModuleStatus::INACTIVE);
         }
 
         // Gateway
         EnsureModuleExisting("gateway");
-        moduleDatabase.SetStatus("gateway", Core::Configuration::instance().get<bool>("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase->setStatus("gateway", Core::Configuration::instance().get<bool>("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
 
         // Monitoring
         EnsureModuleExisting("monitoring");
-        moduleDatabase.SetStatus("monitoring", Core::Configuration::instance().get<bool>("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase->setStatus("monitoring", Core::Configuration::instance().get<bool>("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
     }
 
-    void Manager::EnsureModuleExisting(const std::string &key) {
+    void Manager::EnsureModuleExisting(const std::string &key) const {
 
         using Database::Entity::Module::ModuleState;
         using Database::Entity::Module::ModuleStatus;
 
-        if (!Database::ModuleDatabase::instance().ModuleExists(key)) {
+        const std::shared_ptr<Database::IModuleRepository> moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
+        if (!Database::ModuleMongoRepository::instance().moduleExists(key)) {
             Database::Entity::Module::Module m = {.name = key, .state = ModuleState::STOPPED, .status = ModuleStatus::ACTIVE};
-            Database::ModuleDatabase::instance().CreateOrUpdateModule(m);
+            m = moduleDatabase->createOrUpdateModule(m);
+            log_debug << "Created module, name: " << m.name;
         }
     }
 
@@ -194,8 +194,8 @@ namespace Awsmock::Manager {
         // Autoload the init files before modules start
         Core::Scheduler::instance().AddOneTimeTask("auto-loader", [this] { AutoLoad(); });
 
-        const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (const std::vector<Database::Entity::Module::Module> modules = moduleDatabase.ListModules(); const auto &module: modules) {
+        const Database::ModuleMongoRepository &moduleDatabase = Database::ModuleMongoRepository::instance();
+        for (const std::vector<Database::Entity::Module::Module> modules = moduleDatabase.listModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));

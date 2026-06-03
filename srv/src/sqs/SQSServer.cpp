@@ -38,11 +38,11 @@ namespace Awsmock::Service {
     }
 
     void SQSServer::AdjustCounter() const {
-        _sqsDatabase.adjustMessageCounters();
+        _sqsDatabase->adjustMessageCounters();
     }
 
     void SQSServer::ResetMessages() const {
-        Database::Entity::SQS::QueueList queueList = _sqsDatabase.listQueues({});
+        Database::Entity::SQS::QueueList queueList = _sqsDatabase->listQueues({});
         log_trace << "SQS reset messages starting, count: " << queueList.size();
 
         if (queueList.empty()) {
@@ -52,25 +52,25 @@ namespace Awsmock::Service {
         // Loop over queues and do some maintenance work
         for (auto &queue: queueList) {
 
-            if (const long messageCount = _sqsDatabase.countMessages(queue.arn, {}); messageCount > 0) {
+            if (const long messageCount = _sqsDatabase->countMessages(queue.arn, {}); messageCount > 0) {
 
                 // Check the retention period
                 if (queue.attributes.messageRetentionPeriod > 0) {
-                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.messageRetention(queue.url, queue.attributes.messageRetentionPeriod);
+                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase->messageRetention(queue.url, queue.attributes.messageRetentionPeriod);
                 }
 
                 // Check visibility timeout
                 if (queue.attributes.visibilityTimeout > 0) {
-                    queue.attributes.approximateNumberOfMessagesNotVisible -= _sqsDatabase.resetMessages(queue.arn, queue.attributes.visibilityTimeout);
+                    queue.attributes.approximateNumberOfMessagesNotVisible -= _sqsDatabase->resetMessages(queue.arn, queue.attributes.visibilityTimeout);
                 }
 
                 // Check delays
                 if (queue.attributes.delaySeconds > 0) {
-                    queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.resetDelayedMessages(queue.url, queue.attributes.delaySeconds);
+                    queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase->resetDelayedMessages(queue.url, queue.attributes.delaySeconds);
                 }
 
                 // Save results
-                queue = _sqsDatabase.updateQueue(queue);
+                queue = _sqsDatabase->updateQueue(queue);
                 log_trace << "Queue updated, queueName" << queue.name;
             }
         }
@@ -79,7 +79,7 @@ namespace Awsmock::Service {
 
     void SQSServer::SetUrl() const {
 
-        Database::Entity::SQS::QueueList queueList = _sqsDatabase.listQueues({});
+        Database::Entity::SQS::QueueList queueList = _sqsDatabase->listQueues({});
         log_trace << "SQS set URL task starting, count: " << queueList.size();
 
         if (queueList.empty()) {
@@ -91,7 +91,7 @@ namespace Awsmock::Service {
 
             queue.url = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.arn);
             queue.attributes.queueArn = queue.arn;
-            queue = _sqsDatabase.updateQueue(queue);
+            queue = _sqsDatabase->updateQueue(queue);
             log_trace << "SQS queue updated, queueName" << queue.name;
         }
         log_trace << "SQS URL task finished, count: " << queueList.size();
@@ -102,11 +102,11 @@ namespace Awsmock::Service {
         log_trace << "SQS counter update starting";
 
         // Reload the counters first
-        _sqsDatabase.adjustMessageCounters();
+        _sqsDatabase->adjustMessageCounters();
 
         long totalMessages = 0;
         long totalSize = 0;
-        const Database::Entity::SQS::QueueList queueList = _sqsDatabase.listQueues({});
+        const Database::Entity::SQS::QueueList queueList = _sqsDatabase->listQueues({});
         for (auto &queue: queueList) {
             Core::EventBus::instance().sigMetricGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, static_cast<double>(queue.attributes.approximateNumberOfMessages));
             Core::EventBus::instance().sigMetricGauge(SQS_QUEUE_SIZE, "queue", queue.name, static_cast<double>(queue.size));
@@ -121,7 +121,7 @@ namespace Awsmock::Service {
     void SQSServer::CollectWaitingTimeStatistics() const {
         log_trace << "SQS message wait time starting";
 
-        auto [waitTime] = _sqsDatabase.getAverageMessageWaitingTime();
+        auto [waitTime] = _sqsDatabase->getAverageMessageWaitingTime();
         log_trace << "SQS worker starting, count: " << waitTime.size();
 
         if (!waitTime.empty()) {

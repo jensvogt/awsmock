@@ -11,6 +11,9 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
+#include "IModuleRepository.h"
+
+
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -24,24 +27,29 @@ namespace Awsmock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ModuleMemoryDb {
+    class ModuleMemoryRepository final : public IModuleRepository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit ModuleMemoryDb() = default;
+        explicit ModuleMemoryRepository() = default;
 
         /**
          * @brief Singleton instance
          *
          * @return singleton instance
          */
-        static ModuleMemoryDb &instance() {
-            static ModuleMemoryDb moduleMemoryDb;
+        static ModuleMemoryRepository &instance() {
+            static ModuleMemoryRepository moduleMemoryDb;
             return moduleMemoryDb;
         }
+
+        /**
+         * @brief Initialize the database
+         */
+        void initialize() const override;
 
         /**
          * @brief Checks the active flag.
@@ -49,24 +57,33 @@ namespace Awsmock::Database {
          * @param name module name
          * @return true if active
          */
-        bool IsActive(const std::string &name);
+        bool isActive(const std::string &name) const override;
 
         /**
-         * @brief Check existence of name
+         * @brief Check the existence of a module
          *
-         * @param name name name
+         * @param name module name
          * @return created name
          */
-        bool ModuleExists(const std::string &name);
+        bool moduleExists(const std::string &name) const override;
 
         /**
-         * @brief Returns the module by userPoolId
+         * @brief Returns the module by ID
          *
          * @param oid module oid
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleById(const std::string &oid);
+        Entity::Module::Module getModuleById(const std::string &oid) const override;
+
+        /**
+         * @brief Returns the module OID
+         *
+         * @param oid module oid
+         * @return module, if existing
+         * @throws DatabaseException
+         */
+        Entity::Module::Module getModuleById(const bsoncxx::oid &oid) const override;
 
         /**
          * @brief Returns the module by userPoolId
@@ -75,7 +92,7 @@ namespace Awsmock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleByName(const std::string &name);
+        Entity::Module::Module getModuleByName(const std::string &name) const override;
 
         /**
          * @brief Returns all module names
@@ -83,7 +100,15 @@ namespace Awsmock::Database {
          * @return list of module names
          * @throws DatabaseException
          */
-        std::vector<std::string> GetAllModuleNames();
+        std::vector<std::string> getAllModuleNames() const override;
+
+        /**
+         * @brief Returns all module state
+         *
+         * @return module state
+         * @throws DatabaseException
+         */
+        Entity::Module::ModuleState getState(const std::string &name) const override;
 
         /**
          * @brief Creates a module
@@ -91,7 +116,15 @@ namespace Awsmock::Database {
          * @param module module entity
          * @return created module
          */
-        Entity::Module::Module CreateModule(const Entity::Module::Module &module);
+        Entity::Module::Module createModule(Entity::Module::Module &module) const override;
+
+        /**
+         * @brief Creates a module
+         *
+         * @param module module entity
+         * @return created module
+         */
+        Entity::Module::Module createOrUpdateModule(Entity::Module::Module &module) const override;
 
         /**
          * @brief Updates a module
@@ -100,7 +133,7 @@ namespace Awsmock::Database {
          * @return updated module
          */
         [[nodiscard]]
-        Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
+        Entity::Module::Module updateModule(Entity::Module::Module &module) const override;
 
         /**
          * @brief Sets the state of module.
@@ -112,8 +145,7 @@ namespace Awsmock::Database {
          * @return updated module
          * @see AwsMock::Database::Entity::Module::ModuleState()
          */
-        [[nodiscard]]
-        Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
+        void setState(const std::string &name, const Entity::Module::ModuleState &state) const override;
 
         /**
          * @brief Sets the status of module.
@@ -124,7 +156,7 @@ namespace Awsmock::Database {
          * @param status module status
          * @see AwsMock::Database::Entity::Module::ModuleStatus()
          */
-        void SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status);
+        void setStatus(const std::string &name, const Entity::Module::ModuleStatus &status) const override;
 
         /**
          * @brief Sets the port of module.
@@ -132,7 +164,7 @@ namespace Awsmock::Database {
          * @param name module name
          * @param port module port
          */
-        void SetModulePort(const std::string &name, int port);
+        void setModulePort(const std::string &name, int port) const override;
 
         /**
          * @brief Counts the number of modules
@@ -140,7 +172,7 @@ namespace Awsmock::Database {
          * @return total number of modules
          */
         [[nodiscard]]
-        int ModuleCount() const;
+        int moduleCount() const override;
 
         /**
          * @brief Returns a list of all modules
@@ -148,7 +180,7 @@ namespace Awsmock::Database {
          * @return list of all modules
          */
         [[nodiscard]]
-        std::vector<Entity::Module::Module> ListModules() const;
+        std::vector<Entity::Module::Module> listModules() const override;
 
         /**
          * @brief Updates the log level for a single module
@@ -157,7 +189,7 @@ namespace Awsmock::Database {
          * @param level log level for the module
          * @return number of modules updated
          */
-        long SetModuleLoglevel(const std::string &name, const std::string &level);
+        long setModuleLoglevel(const std::string &name, const std::string &level) const override;
 
         /**
          * @briwf Updates the log level for all modules.
@@ -165,7 +197,7 @@ namespace Awsmock::Database {
          * @param level log level for the modules
          * @return number of updated modules
          */
-        long SetAllModulesLoglevel(const std::string &level);
+        long setAllModulesLoglevel(const std::string &level) const override;
 
         /**
          * @brief Sets the log channel and log level for a single module.
@@ -174,30 +206,30 @@ namespace Awsmock::Database {
          * @param channel log channel name
          * @param level log level
          */
-        void SetModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level);
+        void setModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level) const override;
 
         /**
          * @brief Deletes module
          *
          * @param module module entity
          */
-        void DeleteModule(const Entity::Module::Module &module);
+        void deleteModule(const Entity::Module::Module &module) const override;
 
         /**
          * @brief Deletes all modules
          *
          * @return number of modules deleted
          */
-        long DeleteAllModules();
+        long deleteAllModules() const override;
 
       private:
 
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
-         * Modules map
+         * Module map
          */
-        std::map<std::string, Entity::Module::Module> _modules{};
+        mutable std::map<std::string, Entity::Module::Module> _modules{};
 
         /**
          * Existing modules

@@ -1,53 +1,38 @@
-﻿//
-// Created by vogje01 on 29/05/2023.
+//
+// Created by vogje01 on 5/24/26.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SNS_DATABASE_H
-#define AWSMOCK_REPOSITORY_SNS_DATABASE_H
+#pragma once
 
-// C++ standard includes
+// C++ includes
+#include <optional>
 #include <string>
 #include <vector>
 
-// AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/core/monitoring/MonitoringTimer.h>
+// Awsmock includes
 #include <awsmock/entity/sns/Message.h>
-#include <awsmock/entity/sns/MessageStatus.h>
 #include <awsmock/entity/sns/Topic.h>
-#include <awsmock/memorydb/SNSMemoryDb.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
 
-    using std::chrono::system_clock;
-
     /**
-     * @brief SNS MongoDB database.
+     * @brief Interface for SQS repository operations.
      *
-     * @author jens.vogt\@opitz-consulting.com
+     * Provides an abstraction for storing, retrieving, and managing
+     * SQS-related data.
      */
-    class SNSDatabase : public AwsMock::Database::DatabaseBase {
+    class ISNSRepository {
 
       public:
 
         /**
-         * @brief Constructor
+         * @brief Virtual destructor for the ISQSRepository interface.
+         *
+         * Ensures derived classes' destructor is invoked correctly
+         * during object destruction to release resources.
          */
-        explicit SNSDatabase();
-
-        /**
-         * Singleton instance
-         */
-        static SNSDatabase &instance() {
-            static SNSDatabase snsDatabase;
-            return snsDatabase;
-        }
+        virtual ~ISNSRepository() = default;
 
         /**
          * @brief Check the existence of a topic
@@ -57,7 +42,7 @@ namespace Awsmock::Database {
          * @return true if the topic already exists
          * @throws DatabaseException
          */
-        bool TopicExists(const std::string &region, const std::string &topicName) const;
+        virtual bool topicExists(const std::string &region, const std::string &topicName) const = 0;
 
         /**
          * @brief Check the existence of a topic
@@ -66,7 +51,7 @@ namespace Awsmock::Database {
          * @return true if the topic already exists
          * @throws DatabaseException
          */
-        bool TopicExists(const std::string &topicArn) const;
+        virtual bool topicExists(const std::string &topicArn) const = 0;
 
         /**
          * @brief Create a new topic in the SNS topic table
@@ -75,7 +60,7 @@ namespace Awsmock::Database {
          * @return created SNS topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic CreateTopic(Entity::SNS::Topic &topic) const;
+        virtual Entity::SNS::Topic createTopic(Entity::SNS::Topic &topic) const = 0;
 
         /**
          * @brief Returns a topic by primary key
@@ -84,7 +69,7 @@ namespace Awsmock::Database {
          * @return topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic GetTopicById(bsoncxx::oid oid) const;
+        virtual Entity::SNS::Topic getTopicById(bsoncxx::oid oid) const = 0;
 
         /**
          * @brief Returns a topic by primary key
@@ -93,7 +78,7 @@ namespace Awsmock::Database {
          * @return topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic GetTopicById(const std::string &oid) const;
+        virtual Entity::SNS::Topic getTopicById(const std::string &oid) const = 0;
 
         /**
          * @brief Returns a topic by is ARN
@@ -102,7 +87,7 @@ namespace Awsmock::Database {
          * @return topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic GetTopicByArn(const std::string &topicArn) const;
+        virtual Entity::SNS::Topic getTopicByArn(const std::string &topicArn) const = 0;
 
         /**
          * @brief Returns a topic by its region and name
@@ -112,7 +97,7 @@ namespace Awsmock::Database {
          * @return topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic GetTopicByName(const std::string &region, const std::string &topicName) const;
+        virtual Entity::SNS::Topic getTopicByName(const std::string &region, const std::string &topicName) const = 0;
 
         /**
          * @brief Return a topic by target ARN
@@ -120,7 +105,7 @@ namespace Awsmock::Database {
          * @param targetArn target ARN
          * @return topic with given target ARN
          */
-        Entity::SNS::Topic GetTopicByTargetArn(const std::string &targetArn) const;
+        virtual Entity::SNS::Topic getTopicByTargetArn(const std::string &targetArn) const = 0;
 
         /**
          * @brief Return a list of topics with the given subscription ARN
@@ -128,7 +113,7 @@ namespace Awsmock::Database {
          * @param subscriptionArn subscription ARN
          * @return topic with given topic ARN
          */
-        Entity::SNS::TopicList GetTopicsBySubscriptionArn(const std::string &subscriptionArn) const;
+        virtual Entity::SNS::TopicList getTopicsBySubscriptionArn(const std::string &subscriptionArn) const = 0;
 
         /**
          * @brief Updates an existing topic in the SNS topic table
@@ -137,7 +122,7 @@ namespace Awsmock::Database {
          * @return updated SNS topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic UpdateTopic(Entity::SNS::Topic &topic) const;
+        virtual Entity::SNS::Topic updateTopic(Entity::SNS::Topic &topic) const = 0;
 
         /**
          * @brief Create a new topic or updates an existing topic
@@ -146,7 +131,7 @@ namespace Awsmock::Database {
          * @return created or updated SNS topic entity
          * @throws DatabaseException
          */
-        Entity::SNS::Topic CreateOrUpdateTopic(Entity::SNS::Topic &topic) const;
+        virtual Entity::SNS::Topic createOrUpdateTopic(Entity::SNS::Topic &topic) const = 0;
 
         /**
          * @brief Imports a topic
@@ -154,7 +139,7 @@ namespace Awsmock::Database {
          * @param topic topic entity
          * @throws DatabaseException
          */
-        void ImportTopic(Entity::SNS::Topic &topic) const;
+        virtual void importTopic(Entity::SNS::Topic &topic) const = 0;
 
         /**
          * @brief List all available topics
@@ -163,7 +148,7 @@ namespace Awsmock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ListTopics(const std::string &region = {}) const;
+        virtual Entity::SNS::TopicList listTopics(const std::string &region) const = 0;
 
         /**
          * @brief List all available topics
@@ -176,7 +161,7 @@ namespace Awsmock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ListTopics(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region = {}) const;
+        virtual Entity::SNS::TopicList listTopics(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const = 0;
 
         /**
          * @brief Export all available topics
@@ -185,7 +170,7 @@ namespace Awsmock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ExportTopics(const std::vector<SortColumn> &sortColumns) const;
+        virtual Entity::SNS::TopicList exportTopics(const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
          * @brief Counts the number of topics
@@ -194,7 +179,7 @@ namespace Awsmock::Database {
          * @param prefix name prefix
          * @return number of topics
          */
-        long CountTopics(const std::string &region = {}, const std::string &prefix = {}) const;
+        virtual long countTopics(const std::string &region, const std::string &prefix) const = 0;
 
         /**
          * @brief Purge a topic.
@@ -203,7 +188,7 @@ namespace Awsmock::Database {
          * @return total number of deleted messages
          * @throws DatabaseException
          */
-        long PurgeTopic(const Entity::SNS::Topic &topic) const;
+        virtual long purgeTopic(const Entity::SNS::Topic &topic) const = 0;
 
         /**
          * @brief Calculates the total size of all messages in the topic
@@ -211,7 +196,7 @@ namespace Awsmock::Database {
          * @param topicArn AWS topic ARN
          * @return total size of the topic
          */
-        [[nodiscard]] long GetTopicSize(const std::string &topicArn) const;
+        virtual long getTopicSize(const std::string &topicArn) const = 0;
 
         /**
          * @brief Updates the counters of a topic
@@ -225,7 +210,7 @@ namespace Awsmock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        void UpdateTopicCounter(const std::string &topicArn, long messages, long size, long initial, long send, long resend) const;
+        virtual void updateTopicCounter(const std::string &topicArn, long messages, long size, long initial, long send, long resend) const = 0;
 
         /**
          * @brief Deletes a topic.
@@ -233,23 +218,23 @@ namespace Awsmock::Database {
          * @param topic topic entity
          * @throws DatabaseException
          */
-        void DeleteTopic(const Entity::SNS::Topic &topic) const;
+        virtual void deleteTopic(const Entity::SNS::Topic &topic) const = 0;
 
         /**
          * @brief Deletes all topics
          *
          * @return total number of deleted objects
          */
-        long DeleteAllTopics() const;
+        virtual long deleteAllTopics() const = 0;
 
         /**
-         * @brief Check the existence of message
+         * @brief Check the existence of the message
          *
          * @param messageId message ID
          * @return true if the message already exists
          * @throws DatabaseException
          */
-        bool MessageExists(const std::string &messageId) const;
+        virtual bool messageExists(const std::string &messageId) const = 0;
 
         /**
          * @brief Creates a new message in the SQS message table
@@ -258,7 +243,7 @@ namespace Awsmock::Database {
          * @return saved message entity
          * @throws Core::DatabaseException
          */
-        Entity::SNS::Message CreateMessage(Entity::SNS::Message &message) const;
+        virtual Entity::SNS::Message createMessage(Entity::SNS::Message &message) const = 0;
 
         /**
          * @brief Returns a message by ID.
@@ -267,7 +252,7 @@ namespace Awsmock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        Entity::SNS::Message GetMessageById(bsoncxx::oid oid) const;
+        virtual Entity::SNS::Message getMessageById(bsoncxx::oid oid) const = 0;
 
         /**
          * @brief Returns a message by ID.
@@ -276,7 +261,7 @@ namespace Awsmock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] Entity::SNS::Message GetMessageById(const std::string &oid) const;
+        virtual Entity::SNS::Message getMessageById(const std::string &oid) const = 0;
 
         /**
          * @brief Returns a message by message ID.
@@ -285,7 +270,7 @@ namespace Awsmock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] Entity::SNS::Message GetMessageByMessageId(const std::string &messageId) const;
+        virtual Entity::SNS::Message getMessageByMessageId(const std::string &messageId) const = 0;
 
         /**
          * @brief Count the number of messages by ARN
@@ -293,23 +278,15 @@ namespace Awsmock::Database {
          * @param topicArn URL of the topic
          * @return number of available messages
          */
-        [[nodiscard]] long CountMessages(const std::string &topicArn = {}) const;
-
-        /**
-         * @brief  Count the number of message by state
-         *
-         * @param topicArn ARN of the queue
-         * @return total message size
-         */
-        [[nodiscard]] long CountMessagesSize(const std::string &topicArn = {}) const;
-
+        virtual long countMessages(const std::string &topicArn) const = 0;
+        
         /**
          * @brief Count the number of messages by state
          *
          * @param topicArn ARN of the topic
          * @param status message status
          */
-        long CountMessagesByStatus(const std::string &topicArn, Entity::SNS::MessageStatus status) const;
+        virtual long countMessagesByStatus(const std::string &topicArn, Entity::SNS::MessageStatus status) const = 0;
 
         /**
          * @brief Paged list all available messages
@@ -322,7 +299,7 @@ namespace Awsmock::Database {
          * @return list of SNS messages
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::SNS::MessageList ListMessages(const std::string &topicArn = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        virtual Entity::SNS::MessageList listMessages(const std::string &topicArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
          * @brief Updates an existing message
@@ -331,7 +308,7 @@ namespace Awsmock::Database {
          * @return created or updated SNS message entity
          * @throws DatabaseException
          */
-        Entity::SNS::Message UpdateMessage(Entity::SNS::Message &message) const;
+        virtual Entity::SNS::Message updateMessage(Entity::SNS::Message &message) const = 0;
 
         /**
          * @brief Create a new queue or updates an existing message
@@ -340,7 +317,7 @@ namespace Awsmock::Database {
          * @return created or updated SNS message entity
          * @throws DatabaseException
          */
-        Entity::SNS::Message CreateOrUpdateMessage(Entity::SNS::Message &message) const;
+        virtual Entity::SNS::Message createOrUpdateMessage(Entity::SNS::Message &message) const = 0;
 
         /**
          * @brief Sets the message status
@@ -348,7 +325,7 @@ namespace Awsmock::Database {
          * @param message SNS message
          * @param status new status
          */
-        void SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const;
+        virtual void setMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const = 0;
 
         /**
          * @brief Deletes a message.
@@ -356,7 +333,7 @@ namespace Awsmock::Database {
          * @param message message to delete
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const Entity::SNS::Message &message) const;
+        virtual long deleteMessage(const Entity::SNS::Message &message) const = 0;
 
         /**
          * @brief Deletes a message by message ID.
@@ -364,7 +341,7 @@ namespace Awsmock::Database {
          * @param messageId message ID to delete
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const std::string &messageId) const;
+        virtual long deleteMessage(const std::string &messageId) const = 0;
 
         /**
          * @brief Bulk delete of resources.
@@ -374,54 +351,28 @@ namespace Awsmock::Database {
          * @param messageIds vector of receipts
          * @throws Core::DatabaseException
          */
-        long DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const;
+        virtual long deleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const = 0;
 
         /**
-         * @brief Deletes old resources message.
+         * @brief Deletes an old messages.
          *
          * @param timeout timeout in seconds
          * @throws Core::DatabaseException
          */
-        void DeleteOldMessages(long timeout) const;
+        virtual void deleteOldMessages(long timeout) const = 0;
 
         /**
-         * @brief Deletes a resources.
+         * @brief Deletes a message.
          *
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteAllMessages() const;
+        virtual long deleteAllMessages() const = 0;
 
         /**
          * @brief Adjust all topic counters
          */
-        void AdjustMessageCounters() const;
-
-      private:
-
-        mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
-
-        /**
-         * Database name
-         */
-        std::string _databaseName;
-
-        /**
-         * Topic collection name
-         */
-        std::string _topicCollectionName;
-
-        /**
-         * Message collection name
-         */
-        std::string _messageCollectionName;
-
-        /**
-         * SNS in-memory database
-         */
-        SNSMemoryDb &_memoryDb;
+        virtual void adjustMessageCounters() const = 0;
     };
 
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_SNS_DATABASE_H

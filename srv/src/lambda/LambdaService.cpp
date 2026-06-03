@@ -1313,12 +1313,12 @@ namespace Awsmock::Service {
 
         } else if (request.type == "SNS") {
 
-            if (!_snsDatabase.TopicExists(request.eventSourceArn)) {
+            if (!_snsDatabase.topicExists(request.eventSourceArn)) {
                 log_error << "SNS topic does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
             }
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.eventSourceArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase.getTopicByArn(request.eventSourceArn);
 
             // Convert filter rules
             Database::Entity::S3::FilterRule filterRule;
@@ -1334,7 +1334,7 @@ namespace Awsmock::Service {
             lambdaNotification.filterRules = filterRules;
 
             // Send S3 put notification request
-            topic = _snsDatabase.CreateOrUpdateTopic(topic);
+            topic = _snsDatabase.createOrUpdateTopic(topic);
             log_debug << "Topic updated, name: " << topic.topicName;
         }
     }

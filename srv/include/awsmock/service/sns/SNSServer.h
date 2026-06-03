@@ -9,7 +9,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -52,14 +52,14 @@ namespace Awsmock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Backup the SNS topics and messages
+         * @brief Back up the SNS topics and messages
          */
         static void BackupSns();
 
         /**
          * @brief Database connection
          */
-        Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+        std::shared_ptr<Database::ISNSRepository> _snsDatabase = Database::RepositoryFactory::instance().snsRepository();
 
         /**
          * @brief SNS server period

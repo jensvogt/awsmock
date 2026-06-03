@@ -24,7 +24,8 @@ namespace Awsmock::Dto::Module {
      * }
      * @endcode
      *
-     * When @p channel is empty the global log level is changed; otherwise only the
+     * @par
+     * When 'channel' is empty, the global log level is changed; otherwise only the
      * named channel is affected.
      *
      * @author jens.vogt\@opitz-consulting.com

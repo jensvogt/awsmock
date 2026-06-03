@@ -7,9 +7,9 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../db/include/awsmock/repository/sns/SNSMongoRepository.h>
 #include <../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
 
@@ -53,9 +53,9 @@ namespace Awsmock::Database {
         SNSServiceFixture() = default;
         ~SNSServiceFixture() {
             try {
-                const long deletedMessages = SNSDatabase::instance().DeleteAllMessages();
+                const long deletedMessages = SNSMongoRepository::instance().DeleteAllMessages();
                 log_debug << "SNS messages deleted, count: " << deletedMessages;
-                const long deletedTopics = SNSDatabase::instance().DeleteAllTopics();
+                const long deletedTopics = SNSMongoRepository::instance().DeleteAllTopics();
                 log_debug << "SNS topics deleted, count: " << deletedTopics;
                 const long deletedSqsMessages = SQSMongoRepository::instance().DeleteAllMessages();
                 log_debug << "SQS messages deleted, count: " << deletedSqsMessages;
@@ -116,7 +116,7 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(false, deleteResponse.requestId.empty());
-        BOOST_CHECK_EQUAL(0, SNSDatabase::instance().ListTopics(TEST_REGION).size());
+        BOOST_CHECK_EQUAL(0, SNSMongoRepository::instance().ListTopics(TEST_REGION).size());
     }
 
     BOOST_AUTO_TEST_CASE(TopicPurgeTest) {

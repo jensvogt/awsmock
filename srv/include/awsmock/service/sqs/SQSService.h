@@ -2,15 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SQS_SERVICE_H
-#define AWSMOCK_SERVICE_SQS_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
 #include <thread>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MagicDetector.h>
@@ -93,6 +91,7 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventRecord.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace Awsmock::Service {
@@ -109,7 +108,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSMongoRepository::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+        explicit SQSService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {
         }
 
         /**
@@ -117,7 +116,7 @@ namespace Awsmock::Service {
          *
          * <p>In case the queue exists already, return the existing queue.</p>
          *
-         * @param request create queue request
+         * @param request create a queue request
          * @return CreateQueueResponse
          */
         [[nodiscard]] Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request) const;
@@ -539,7 +538,7 @@ namespace Awsmock::Service {
         /**
          * SQS database connection
          */
-        Database::SQSMongoRepository &_sqsDatabase;
+        std::shared_ptr<Database::ISQSRepository> _sqsDatabase = Database::RepositoryFactory::instance().sqsRepository();
 
         /**
          * Lambda database connection
@@ -552,5 +551,3 @@ namespace Awsmock::Service {
         LambdaService _lambdaService;
     };
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_SQS_SERVICE_H

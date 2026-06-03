@@ -9,6 +9,8 @@
 
 // AwsMock includes
 #include <../../../../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
+#include <../../../../../db/include/awsmock/repository/module/ModuleMongoRepository.h>
+#include <../../../../../db/include/awsmock/repository/sns/SNSMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/BackupUtils.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -28,8 +30,6 @@
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
@@ -58,7 +58,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {
+        explicit ModuleService() : _moduleDatabase(Database::ModuleMongoRepository::instance()) {
                                    };
 
         /**
@@ -85,7 +85,7 @@ namespace Awsmock::Service {
          * @return updated module list
          */
         [[nodiscard]]
-        Dto::Module::Module::ModuleList StopModules(Dto::Module::Module::ModuleList &modules) const;
+        Dto::Module::Module::ModuleList StopModules(const Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief List module names
@@ -105,7 +105,7 @@ namespace Awsmock::Service {
          * @return JSON string
          */
         [[nodiscard]]
-        Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request = {});
+        static Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request = {});
 
         /**
          * @brief Import the infrastructure
@@ -115,7 +115,7 @@ namespace Awsmock::Service {
          *
          * @param request infrastructure import request
          */
-        void ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request);
+        void ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) const;
 
         /**
          * @brief Cleans the current infrastructure.
@@ -143,7 +143,7 @@ namespace Awsmock::Service {
          * @param module module name
          * @param exportType
          */
-        void BackupModule(const std::string &module, const Dto::Module::ExportType &exportType);
+        void BackupModule(const std::string &module, const Dto::Module::ExportType &exportType) const;
 
         /**
          * @brief Cleanup backups, keep only the number of backups which are defined in the module retention property
@@ -157,7 +157,7 @@ namespace Awsmock::Service {
          *
          * @param name lambda name
          */
-        void UpdateLambda(const std::string &name);
+        void UpdateLambda(const std::string &name) const;
 
         /**
          * @brief Update the log level for a module.
@@ -193,7 +193,7 @@ namespace Awsmock::Service {
         /**
          * @brief Module database
          */
-        Database::ModuleDatabase &_moduleDatabase;
+        Database::ModuleMongoRepository &_moduleDatabase;
     };
 
 }// namespace Awsmock::Service

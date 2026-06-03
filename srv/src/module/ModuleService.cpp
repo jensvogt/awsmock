@@ -10,14 +10,14 @@ namespace Awsmock::Service {
 
     std::vector<Database::Entity::Module::Module> ModuleService::ListModules() const {
 
-        std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.ListModules();
+        std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.listModules();
         log_debug << "Module list, count: " << modules.size();
         return modules;
     }
 
     Dto::Module::ListModuleNamesResponse ModuleService::ListModuleNames() const {
 
-        const std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.ListModules();
+        const std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.listModules();
         log_debug << "Module list, count: " << modules.size();
         Dto::Module::ListModuleNamesResponse moduleNamesResponse;
         for (const auto &module: modules) {
@@ -32,36 +32,36 @@ namespace Awsmock::Service {
         for (auto const &m: modules) {
 
             // Set state
-            if (Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name); module.state != Database::Entity::Module::ModuleState::RUNNING) {
+            if (Database::Entity::Module::Module module = _moduleDatabase.getModuleByName(m.name); module.state != Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Set state
-                module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::RUNNING);
+                _moduleDatabase.setState(m.name, Database::Entity::Module::ModuleState::RUNNING);
                 log_info << "Module " << module.name << " started";
             }
         }
 
         // Return updated list
-        return Dto::Module::Mapper::map(_moduleDatabase.ListModules());
+        return Dto::Module::Mapper::map(_moduleDatabase.listModules());
     }
 
-    Dto::Module::Module::ModuleList ModuleService::StopModules(Dto::Module::Module::ModuleList &modules) const {
+    Dto::Module::Module::ModuleList ModuleService::StopModules(const Dto::Module::Module::ModuleList &modules) const {
 
         for (auto const &m: modules) {
 
             // Set state
-            if (Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name); module.state == Database::Entity::Module::ModuleState::RUNNING) {
+            if (Database::Entity::Module::Module module = _moduleDatabase.getModuleByName(m.name); module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Send shutdown call
                 ModuleMap::instance().GetModuleMap()[m.name]->Shutdown();
 
                 // Set state
-                module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::STOPPED);
-                log_info << "Module " << module.name << " topped";
+                _moduleDatabase.setState(m.name, Database::Entity::Module::ModuleState::STOPPED);
+                log_info << "Module " << module.name << " stopped";
             }
             log_info << "Module " + m.name + " stopped";
         }
 
-        return Dto::Module::Mapper::map(_moduleDatabase.ListModules());
+        return Dto::Module::Mapper::map(_moduleDatabase.listModules());
     }
 
     Dto::Module::ExportInfrastructureResponse ModuleService::ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request) {
@@ -96,12 +96,12 @@ namespace Awsmock::Service {
 
             } else if (module == "sns") {
 
-                Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+                Database::SNSMongoRepository &_snsDatabase = Database::SNSMongoRepository::instance();
                 if (request.IsInfrastructure()) {
-                    infrastructure.snsTopics = _snsDatabase.ExportTopics({sortColumn});
+                    infrastructure.snsTopics = _snsDatabase.exportTopics({sortColumn});
                 }
                 if (request.IsObjects()) {
-                    infrastructure.snsMessages = _snsDatabase.ListMessages();
+                    infrastructure.snsMessages = _snsDatabase.listMessages({}, {}, 0, 0, {});
                 }
 
             } else if (module == "lambda") {
@@ -180,7 +180,7 @@ namespace Awsmock::Service {
         return response;
     }
 
-    void ModuleService::ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) {
+    void ModuleService::ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) const {
         log_info << "Importing modules, cleanFirst: " << std::boolalpha << request.cleanFirst;
 
         Dto::Module::Infrastructure infrastructure = request.infrastructure;
@@ -241,18 +241,18 @@ namespace Awsmock::Service {
 
         // SNS
         if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
-            const Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
+            const Database::SNSMongoRepository &_snsDatabase = Database::SNSMongoRepository::instance();
             if (!infrastructure.snsTopics.empty()) {
                 for (auto &topic: infrastructure.snsTopics) {
                     topic.modified = system_clock::now();
-                    _snsDatabase.CreateOrUpdateTopic(topic);
+                    topic = _snsDatabase.createOrUpdateTopic(topic);
                 }
                 log_info << "SNS topics imported, count: " << infrastructure.snsTopics.size();
             }
             if (!infrastructure.snsMessages.empty()) {
                 for (auto &message: infrastructure.snsMessages) {
                     message.modified = system_clock::now();
-                    _snsDatabase.CreateOrUpdateMessage(message);
+                    message = _snsDatabase.createOrUpdateMessage(message);
                 }
                 log_info << "SNS resources imported, count: " << infrastructure.snsMessages.size();
             }
@@ -387,7 +387,7 @@ namespace Awsmock::Service {
             } else if (m == "sqs") {
                 count += Database::SQSMongoRepository::instance().deleteAllQueues();
             } else if (m == "sns") {
-                count += Database::SNSDatabase::instance().DeleteAllTopics();
+                count += Database::SNSMongoRepository::instance().deleteAllTopics();
             } else if (m == "dynamodb") {
                 count += Database::DynamoDbDatabase::instance().DeleteAllTables();
             } else if (m == "transfer") {
@@ -408,7 +408,7 @@ namespace Awsmock::Service {
             } else if (m == "sqs") {
                 count += Database::SQSMongoRepository::instance().deleteAllMessages();
             } else if (m == "sns") {
-                count += Database::SNSDatabase::instance().DeleteAllMessages();
+                count += Database::SNSMongoRepository::instance().deleteAllMessages();
             } else if (m == "lambda") {
                 count += Database::LambdaDatabase::instance().DeleteAllLambdas();
             } else if (m == "cognito") {
@@ -443,7 +443,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void ModuleService::BackupModule(const std::string &module, const Dto::Module::ExportType &exportType) {
+    void ModuleService::BackupModule(const std::string &module, const Dto::Module::ExportType &exportType) const {
 
         // Backup file name
         std::string backupFilename = Core::BackupUtils::GetBackupFilename(module);
@@ -482,7 +482,7 @@ namespace Awsmock::Service {
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    void ModuleService::UpdateLambda(const std::string &name) {
+    void ModuleService::UpdateLambda(const std::string &name) const {
         const Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure();
         const auto filename = Core::Configuration::instance().get<std::string>("awsmock.autoload.file");
         std::ofstream ofs(filename, std::ios::trunc);
@@ -493,13 +493,13 @@ namespace Awsmock::Service {
 
     void ModuleService::setLogLevel(const Dto::Module::SetLogLevelRequest &request) const {
         if (request.channel.empty()) {
-            _moduleDatabase.SetAllModulesLoglevel(request.level);
+            const long modified = _moduleDatabase.setAllModulesLoglevel(request.level);
             Core::LogStream::SetSeverity(request.level);
-            log_info << "Log level set, channel: all, level: " << request.level;
+            log_info << "Log level set, channel: all, level: " << request.level << ", count: " << modified;
         } else {
-            _moduleDatabase.SetModuleLoglevel(request.channel, request.level);
+            const long modified = _moduleDatabase.setModuleLoglevel(request.channel, request.level);
             Core::LogStream::SetChannelSeverity(request.channel, request.level);
-            log_info << "Log level set, channel: " << request.channel << ", level: " << request.level;
+            log_info << "Log level set, channel: " << request.channel << ", level: " << request.level << ", count: " << modified;
         }
     }
 

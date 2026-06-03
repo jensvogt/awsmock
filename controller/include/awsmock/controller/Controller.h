@@ -23,6 +23,7 @@
 #include <boost/program_options/variables_map.hpp>
 
 // AwsMock includes
+#include <../../../../db/include/awsmock/repository/module/ModuleMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
@@ -61,7 +62,6 @@
 #include <awsmock/dto/transfer/model/Server.h>
 #include <awsmock/dto/transfer/model/User.h>
 #include <awsmock/entity/apps/Application.h>
-#include <awsmock/repository/ModuleDatabase.h>
 
 namespace Awsmock::Controller {
 

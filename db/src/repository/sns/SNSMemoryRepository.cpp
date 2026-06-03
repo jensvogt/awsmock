@@ -2,14 +2,14 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/SNSMemoryDb.h>
+#include <awsmock/repository/sns/SNSMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex SNSMemoryDb::_snsTopicMutex;
-    boost::mutex SNSMemoryDb::_snsMessageMutex;
+    boost::mutex SNSMemoryRepository::_snsTopicMutex;
+    boost::mutex SNSMemoryRepository::_snsMessageMutex;
 
-    bool SNSMemoryDb::TopicExists(const std::string &region, const std::string &name) {
+    bool SNSMemoryRepository::topicExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_topics,
                                     [region, name](const std::pair<std::string, Entity::SNS::Topic> &topic) {
@@ -17,14 +17,14 @@ namespace Awsmock::Database {
                                     }) != _topics.end();
     }
 
-    bool SNSMemoryDb::TopicExists(const std::string &topicName) {
+    bool SNSMemoryRepository::topicExists(const std::string &topicName) const {
 
         return std::ranges::find_if(_topics, [topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
                    return topic.second.topicArn == topicName;
                }) != _topics.end();
     }
 
-    Entity::SNS::Topic SNSMemoryDb::GetTopicById(const std::string &oid) {
+    Entity::SNS::Topic SNSMemoryRepository::getTopicById(const std::string &oid) const {
 
         const auto it = std::ranges::find_if(_topics, [oid](const std::pair<std::string, Entity::SNS::Topic> &topic) {
             return topic.first == oid;
@@ -39,7 +39,11 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SNS::Topic SNSMemoryDb::GetTopicByArn(const std::string &topicArn) {
+    Entity::SNS::Topic SNSMemoryRepository::getTopicById(bsoncxx::oid oid) const {
+        return getTopicById(oid.to_string());
+    }
+
+    Entity::SNS::Topic SNSMemoryRepository::getTopicByArn(const std::string &topicArn) const {
 
         const auto it =
                 std::ranges::find_if(_topics, [topicArn](const std::pair<std::string, Entity::SNS::Topic> &topic) {
@@ -54,7 +58,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SNS::Topic SNSMemoryDb::GetTopicByName(const std::string &region, const std::string &topicName) {
+    Entity::SNS::Topic SNSMemoryRepository::getTopicByName(const std::string &region, const std::string &topicName) const {
 
         const auto it = std::ranges::find_if(_topics, [region, topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
             return topic.second.region == region && topic.second.topicName == topicName;
@@ -69,7 +73,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SNS::Topic SNSMemoryDb::GetTopicByTargetArn(const std::string &targetArn) {
+    Entity::SNS::Topic SNSMemoryRepository::getTopicByTargetArn(const std::string &targetArn) const {
 
         const auto it =
                 std::ranges::find_if(_topics, [targetArn](const std::pair<std::string, Entity::SNS::Topic> &topic) {
@@ -84,7 +88,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SNS::TopicList SNSMemoryDb::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) const {
+    Entity::SNS::TopicList SNSMemoryRepository::getTopicsBySubscriptionArn(const std::string &subscriptionArn) const {
 
         Entity::SNS::TopicList topics;
         for (const auto &val: _topics | std::views::values) {
@@ -101,16 +105,23 @@ namespace Awsmock::Database {
         return topics;
     }
 
-    Entity::SNS::Topic SNSMemoryDb::CreateTopic(const Entity::SNS::Topic &topic) {
+    Entity::SNS::Topic SNSMemoryRepository::createTopic(Entity::SNS::Topic &topic) const {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _topics[oid] = topic;
         log_trace << "Topic created, oid: " << oid;
-        return GetTopicById(oid);
+        return _topics[oid];
     }
 
-    Entity::SNS::Topic SNSMemoryDb::UpdateTopic(Entity::SNS::Topic &topic) {
+    Entity::SNS::Topic SNSMemoryRepository::createOrUpdateTopic(Entity::SNS::Topic &topic) const {
+        if (topicExists(topic.region, topic.topicName)) {
+            return updateTopic(topic);
+        }
+        return createTopic(topic);
+    }
+
+    Entity::SNS::Topic SNSMemoryRepository::updateTopic(Entity::SNS::Topic &topic) const {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
         topic.modified = system_clock::now();
@@ -125,7 +136,7 @@ namespace Awsmock::Database {
         return _topics[it->first];
     }
 
-    Entity::SNS::TopicList SNSMemoryDb::ListTopics(const std::string &region) const {
+    Entity::SNS::TopicList SNSMemoryRepository::listTopics(const std::string &region) const {
 
         Entity::SNS::TopicList topicList;
         if (region.empty()) {
@@ -147,7 +158,29 @@ namespace Awsmock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSMemoryDb::ExportTopics(const std::vector<SortColumn> &sortColumns) const {
+    Entity::SNS::TopicList SNSMemoryRepository::listTopics(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
+
+        Entity::SNS::TopicList topicList;
+        if (region.empty()) {
+
+            for (const auto &val: _topics | std::views::values) {
+                topicList.emplace_back(val);
+            }
+
+        } else {
+
+            for (const auto &val: _topics | std::views::values) {
+                if (val.region == region) {
+                    topicList.emplace_back(val);
+                }
+            }
+        }
+
+        log_trace << "Got topic list, size: " << topicList.size();
+        return topicList;
+    }
+
+    Entity::SNS::TopicList SNSMemoryRepository::exportTopics(const std::vector<SortColumn> &sortColumns) const {
 
         Entity::SNS::TopicList topicList;
         for (const auto &val: _topics | std::views::values) {
@@ -161,7 +194,12 @@ namespace Awsmock::Database {
         return topicList;
     }
 
-    long SNSMemoryDb::CountTopics(const std::string &region) const {
+    void SNSMemoryRepository::importTopic(Entity::SNS::Topic &topic) const {
+
+        createOrUpdateTopic(topic);
+    }
+
+    long SNSMemoryRepository::countTopics(const std::string &region, const std::string &prefix) const {
 
         long count = 0;
         if (region.empty()) {
@@ -179,7 +217,7 @@ namespace Awsmock::Database {
         return count;
     }
 
-    long SNSMemoryDb::PurgeTopic(const Entity::SNS::Topic &topic) {
+    long SNSMemoryRepository::purgeTopic(const Entity::SNS::Topic &topic) const {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
         const auto count = std::erase_if(_messages, [topic](const auto &item) {
@@ -190,7 +228,7 @@ namespace Awsmock::Database {
         return static_cast<long>(count);
     }
 
-    long SNSMemoryDb::GetTopicSize(const std::string &topicArn) const {
+    long SNSMemoryRepository::getTopicSize(const std::string &topicArn) const {
 
         long sum = 0;
         std::for_each(_messages.rbegin(), _messages.rend(), [&](const std::pair<std::string, Entity::SNS::Message> &m) {
@@ -202,7 +240,7 @@ namespace Awsmock::Database {
         return sum;
     }
 
-    void SNSMemoryDb::UpdateTopicCounter(const std::string &topicArn, const long messages, const long size, long initial, const long send, const long resend) {
+    void SNSMemoryRepository::updateTopicCounter(const std::string &topicArn, const long messages, const long size, long initial, const long send, const long resend) const {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
         const auto it = std::ranges::find_if(_topics,
@@ -215,7 +253,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void SNSMemoryDb::DeleteTopic(const Entity::SNS::Topic &topic) {
+    void SNSMemoryRepository::deleteTopic(const Entity::SNS::Topic &topic) const {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
         std::string region = topic.region;
@@ -227,7 +265,7 @@ namespace Awsmock::Database {
         log_debug << "Topic deleted, count: " << count;
     }
 
-    long SNSMemoryDb::DeleteAllTopics() {
+    long SNSMemoryRepository::deleteAllTopics() const {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
         const long count = static_cast<long>(_topics.size());
@@ -236,23 +274,30 @@ namespace Awsmock::Database {
         return count;
     }
 
-    bool SNSMemoryDb::MessageExists(const std::string &id) {
+    bool SNSMemoryRepository::messageExists(const std::string &id) const {
 
         return std::ranges::find_if(_messages, [id](const std::pair<std::string, Entity::SNS::Message> &message) {
                    return message.first == id;
                }) != _messages.end();
     }
 
-    Entity::SNS::Message SNSMemoryDb::CreateMessage(const Entity::SNS::Message &message) {
+    Entity::SNS::Message SNSMemoryRepository::createMessage(Entity::SNS::Message &message) const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _messages[oid] = message;
         log_trace << "Message created, oid: " << oid;
-        return GetMessageById(oid);
+        return _messages[oid];
     }
 
-    Entity::SNS::Message SNSMemoryDb::GetMessageById(const std::string &oid) {
+    Entity::SNS::Message SNSMemoryRepository::createOrUpdateMessage(Entity::SNS::Message &message) const {
+        if (messageExists(message.messageId)) {
+            return updateMessage(message);
+        }
+        return createMessage(message);
+    }
+
+    Entity::SNS::Message SNSMemoryRepository::getMessageById(const std::string &oid) const {
 
         const auto it =
                 std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SNS::Message> &message) {
@@ -266,7 +311,24 @@ namespace Awsmock::Database {
         return {};
     }
 
-    long SNSMemoryDb::CountMessages(const std::string &topicArn) const {
+    Entity::SNS::Message SNSMemoryRepository::getMessageById(const bsoncxx::oid oid) const {
+        return getMessageById(oid.to_string());
+    }
+
+    Entity::SNS::Message SNSMemoryRepository::getMessageByMessageId(const std::string &messageId) const {
+
+        const auto it =
+                std::ranges::find_if(_messages, [messageId](const std::pair<std::string, Entity::SNS::Message> &message) {
+                    return message.first == messageId;
+                });
+
+        if (it != _messages.end()) {
+            return it->second;
+        }
+        return {};
+    }
+
+    long SNSMemoryRepository::countMessages(const std::string &topicArn) const {
 
         if (topicArn.empty()) {
             return static_cast<long>(_messages.size());
@@ -276,18 +338,15 @@ namespace Awsmock::Database {
         });
     }
 
-    long SNSMemoryDb::CountMessagesByStatus(const std::string &topicArn, const Entity::SNS::MessageStatus status) const {
+    long SNSMemoryRepository::countMessagesByStatus(const std::string &topicArn, const Entity::SNS::MessageStatus status) const {
         return std::ranges::count_if(_messages, [topicArn, status](const auto &pair) {
             return pair.second.topicArn == topicArn && pair.second.status == status;
         });
     }
 
-    Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) const {
+    Entity::SNS::MessageList SNSMemoryRepository::listMessages(const std::string &topicArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         auto q = Core::from(_messages | std::ranges::views::values | std::ranges::to<std::vector>());
-        if (!region.empty()) {
-            q = q.where([region](const Entity::SNS::Message &message) { return message.region == region; });
-        }
         if (!topicArn.empty()) {
             q = q.where([topicArn](const Entity::SNS::Message &message) { return message.topicArn == topicArn; });
         }
@@ -296,7 +355,7 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    Entity::SNS::Message SNSMemoryDb::UpdateMessage(Entity::SNS::Message &message) {
+    Entity::SNS::Message SNSMemoryRepository::updateMessage(Entity::SNS::Message &message) const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
         message.modified = system_clock::now();
@@ -311,7 +370,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    void SNSMemoryDb::SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) {
+    void SNSMemoryRepository::setMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
         const auto it = std::ranges::find_if(_messages, [message](const std::pair<std::string, Entity::SNS::Message> &m) {
@@ -323,11 +382,11 @@ namespace Awsmock::Database {
         }
     }
 
-    void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {
-        DeleteMessage(message.messageId);
+    long SNSMemoryRepository::deleteMessage(const Entity::SNS::Message &message) const {
+        return deleteMessage(message.messageId);
     }
 
-    long SNSMemoryDb::DeleteMessage(const std::string &messageId) {
+    long SNSMemoryRepository::deleteMessage(const std::string &messageId) const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
         return static_cast<long>(std::erase_if(_messages, [messageId](const auto &item) {
@@ -336,7 +395,7 @@ namespace Awsmock::Database {
         }));
     }
 
-    long SNSMemoryDb::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) {
+    long SNSMemoryRepository::deleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
         const std::unordered_set messageSet(messageIds.begin(), messageIds.end());
         return static_cast<long>(std::erase_if(_messages, [region, topicArn, messageSet](const auto &item) {
@@ -344,7 +403,7 @@ namespace Awsmock::Database {
         }));
     }
 
-    void SNSMemoryDb::DeleteOldMessages(const long timeout) {
+    void SNSMemoryRepository::deleteOldMessages(const long timeout) const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
         auto reset = system_clock::now() - std::chrono::seconds{timeout};
         std::erase_if(_messages, [reset](const auto &item) {
@@ -352,7 +411,7 @@ namespace Awsmock::Database {
         });
     }
 
-    long SNSMemoryDb::DeleteAllMessages() {
+    long SNSMemoryRepository::deleteAllMessages() const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
         const long deleted = static_cast<long>(_messages.size());
         _messages.clear();
@@ -360,13 +419,13 @@ namespace Awsmock::Database {
         return deleted;
     }
 
-    void SNSMemoryDb::AdjustMessageCounters() {
+    void SNSMemoryRepository::adjustMessageCounters() const {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
         for (const auto &topic: _topics | std::views::values) {
-            _topics[topic.oid].messages = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::INITIAL);
-            _topics[topic.oid].messagesSend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
-            _topics[topic.oid].messagesResend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::RESEND);
+            _topics[topic.oid].messages = countMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::INITIAL);
+            _topics[topic.oid].messagesSend = countMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
+            _topics[topic.oid].messagesResend = countMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::RESEND);
         }
         log_debug << "Topic counters updated, count: " << _topics.size();
     }

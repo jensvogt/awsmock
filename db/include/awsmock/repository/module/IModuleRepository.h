@@ -1,58 +1,44 @@
-﻿//
-// Created by vogje01 on 29/05/2023.
+//
+// Created by vogje01 on 5/24/26.
 //
 
 #pragma once
 
-// C++ standard includes
+// C++ includes
+#include <optional>
 #include <string>
+#include <vector>
 
-// AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
+// Awsmock includes
 #include <awsmock/entity/module/Module.h>
-#include <awsmock/memorydb/ModuleMemoryDb.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
-#include <awsmock/utils/ConnectionPool.h>
+#include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/Topic.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
 
     /**
-     * @brief Module MongoDB database.
+     * @brief Interface for SQS repository operations.
      *
-     * Controls all the AwsMock modules.
-     *
-     * @author jens.vogt\@opitz-consulting.com
+     * Provides an abstraction for storing, retrieving, and managing
+     * SQS-related data.
      */
-    class ModuleDatabase : public AwsMock::Database::DatabaseBase {
+    class IModuleRepository {
 
       public:
 
         /**
-         * @brief Constructor
+         * @brief Virtual destructor for the module repository interface.
+         *
+         * Ensures derived classes' destructor is invoked correctly
+         * during object destruction to release resources.
          */
-        explicit ModuleDatabase() : _databaseName(GetDatabaseName()), _moduleCollectionName("module") {
-        }
-
-        /**
-         * @brief Singleton instance
-         */
-        static ModuleDatabase &instance() {
-            static ModuleDatabase moduleDatabase;
-            return moduleDatabase;
-        }
+        virtual ~IModuleRepository() = default;
 
         /**
          * @brief Initialize the database
          */
-        void Initialize();
-
-        /**
-         * @brief Returns a list of existing modules.
-         *
-         * @return map of existing modules
-         */
-        static std::map<std::string, Entity::Module::Module> GetExisting();
+        virtual void initialize() const = 0;
 
         /**
          * @brief Checks the active flag.
@@ -60,7 +46,7 @@ namespace Awsmock::Database {
          * @param name module name
          * @return true if active
          */
-        bool IsActive(const std::string &name);
+        virtual bool isActive(const std::string &name) const = 0;
 
         /**
          * @brief Check the existence of a module
@@ -68,10 +54,10 @@ namespace Awsmock::Database {
          * @par
          * This method checks only the name of the module
          *
-         * @param name name name
+         * @param name module name
          * @return created name
          */
-        bool ModuleExists(const std::string &name);
+        virtual bool moduleExists(const std::string &name) const = 0;
 
         /**
          * @brief Returns the module by OID
@@ -80,7 +66,8 @@ namespace Awsmock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::Module::Module GetModuleById(const bsoncxx::oid &oid) const;
+        [[nodiscard]]
+        virtual Entity::Module::Module getModuleById(const bsoncxx::oid &oid) const = 0;
 
         /**
          * @brief Returns the module by OID as string value
@@ -89,7 +76,8 @@ namespace Awsmock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleById(const std::string &oid);
+        [[nodiscard]]
+        virtual Entity::Module::Module getModuleById(const std::string &oid) const = 0;
 
         /**
          * @brief Returns the module by name
@@ -98,7 +86,8 @@ namespace Awsmock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleByName(const std::string &name);
+        [[nodiscard]]
+        virtual Entity::Module::Module getModuleByName(const std::string &name) const = 0;
 
         /**
          * @brief Returns all module names
@@ -106,7 +95,8 @@ namespace Awsmock::Database {
          * @return list of module names
          * @throws DatabaseException
          */
-        std::vector<std::string> GetAllModuleNames();
+        [[nodiscard]]
+        virtual std::vector<std::string> getAllModuleNames() const = 0;
 
         /**
          * @brief Creates a new module
@@ -114,7 +104,8 @@ namespace Awsmock::Database {
          * @param module module entity
          * @return created module
          */
-        Entity::Module::Module CreateModule(Entity::Module::Module &module);
+        [[nodiscard]]
+        virtual Entity::Module::Module createModule(Entity::Module::Module &module) const = 0;
 
         /**
          * @brief Updates an existing module
@@ -122,7 +113,8 @@ namespace Awsmock::Database {
          * @param module module entity
          * @return updated module
          */
-        Entity::Module::Module UpdateModule(Entity::Module::Module &module);
+        [[nodiscard]]
+        virtual Entity::Module::Module updateModule(Entity::Module::Module &module) const = 0;
 
         /**
          * @brief Sets the state of a module.
@@ -131,10 +123,9 @@ namespace Awsmock::Database {
          *
          * @param name module name
          * @param state module state
-         * @return updated module
          * @see AwsMock::Database::Entity::Module::ModuleState()
          */
-        Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
+        virtual void setState(const std::string &name, const Entity::Module::ModuleState &state) const = 0;
 
         /**
          * @brief Sets the state of a module.
@@ -145,7 +136,8 @@ namespace Awsmock::Database {
          * @return module state
          * @see AwsMock::Database::Entity::Module::ModuleState()
          */
-        Entity::Module::ModuleState GetState(const std::string &name);
+        [[nodiscard]]
+        virtual Entity::Module::ModuleState getState(const std::string &name) const = 0;
 
         /**
          * @brief Sets the status of a module.
@@ -156,7 +148,7 @@ namespace Awsmock::Database {
          * @param status module status
          * @see AwsMock::Database::Entity::Module::ModuleStatus()
          */
-        void SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status);
+        virtual void setStatus(const std::string &name, const Entity::Module::ModuleStatus &status) const = 0;
 
         /**
          * @brief Sets the port of a module.
@@ -164,22 +156,24 @@ namespace Awsmock::Database {
          * @param name module name
          * @param port module port
          */
-        void SetModulePort(const std::string &name, int port);
+        virtual void setModulePort(const std::string &name, int port) const = 0;
 
         /**
-         * @brief Creates or updates a modules
+         * @brief Creates or updates a module
          *
-         * @param modules modules entity
+         * @param modules module entity
          * @return updated modules
          */
-        Entity::Module::Module CreateOrUpdateModule(Entity::Module::Module &modules);
+        [[nodiscard]]
+        virtual Entity::Module::Module createOrUpdateModule(Entity::Module::Module &modules) const = 0;
 
         /**
          * @brief Counts the number of modules
          *
          * @return total number of modules
          */
-        int ModuleCount() const;
+        [[nodiscard]]
+        virtual int moduleCount() const = 0;
 
         /**
          * @brief Returns a list of all modules
@@ -187,7 +181,7 @@ namespace Awsmock::Database {
          * @return list of all modules
          */
         [[nodiscard]]
-        std::vector<Entity::Module::Module> ListModules() const;
+        virtual std::vector<Entity::Module::Module> listModules() const = 0;
 
         /**
          * @brief Updates the log level for a single module
@@ -196,7 +190,8 @@ namespace Awsmock::Database {
          * @param level log level for the module
          * @return number of modules updated
          */
-        long SetModuleLoglevel(const std::string &name, const std::string &level);
+        [[nodiscard]]
+        virtual long setModuleLoglevel(const std::string &name, const std::string &level) const = 0;
 
         /**
          * @briwf Updates the log level for all modules.
@@ -204,7 +199,8 @@ namespace Awsmock::Database {
          * @param level log level for the modules
          * @return number of updated modules
          */
-        long SetAllModulesLoglevel(const std::string &level);
+        [[nodiscard]]
+        virtual long setAllModulesLoglevel(const std::string &level) const = 0;
 
         /**
          * @brief Sets the log channel and log level for a single module.
@@ -213,45 +209,22 @@ namespace Awsmock::Database {
          * @param channel log channel name
          * @param level log level
          */
-        void SetModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level);
+        virtual void setModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level) const = 0;
 
         /**
          * @brief Deletes module
          *
          * @param module module entity
          */
-        void DeleteModule(const Entity::Module::Module &module);
+        virtual void deleteModule(const Entity::Module::Module &module) const = 0;
 
         /**
          * @brief Deletes all modules
          *
          * @return number of modules deleted
          */
-        long DeleteAllModules();
-
-      private:
-
-        mutable logger_t _logger{boost::log::keywords::channel = "Module"};
-
-        /**
-         * Database name
-         */
-        std::string _databaseName;
-
-        /**
-         * Module collection name
-         */
-        std::string _moduleCollectionName;
-
-        /**
-         * Modules in-memory database
-         */
-        ModuleMemoryDb _memoryDb{};
-
-        /**
-         * Existing modules
-         */
-        static std::map<std::string, Entity::Module::Module> _existingModules;
+        [[nodiscard]]
+        virtual long deleteAllModules() const = 0;
     };
 
 }// namespace Awsmock::Database

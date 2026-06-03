@@ -2,27 +2,29 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/ModuleMemoryDb.h>
+#include <awsmock/repository/module/ModuleMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex ModuleMemoryDb::_moduleMutex;
+    boost::mutex ModuleMemoryRepository::_moduleMutex;
 
-    bool ModuleMemoryDb::ModuleExists(const std::string &name) {
+    void ModuleMemoryRepository::initialize() const {}
+
+    bool ModuleMemoryRepository::moduleExists(const std::string &name) const {
 
         return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                    return module.second.name == name;
                }) != _modules.end();
     }
 
-    bool ModuleMemoryDb::IsActive(const std::string &name) {
+    bool ModuleMemoryRepository::isActive(const std::string &name) const {
 
         return std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
                    return module.second.name == name && module.second.status == Entity::Module::ModuleStatus::ACTIVE;
                }) != _modules.end();
     }
 
-    Entity::Module::Module ModuleMemoryDb::GetModuleById(const std::string &oid) {
+    Entity::Module::Module ModuleMemoryRepository::getModuleById(const std::string &oid) const {
 
         const auto it =
                 std::ranges::find_if(_modules, [oid](const std::pair<std::string, Entity::Module::Module> &module) {
@@ -37,7 +39,11 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::Module::Module ModuleMemoryDb::GetModuleByName(const std::string &name) {
+    Entity::Module::Module ModuleMemoryRepository::getModuleById(const bsoncxx::oid &oid) const {
+        return getModuleById(oid.to_string());
+    }
+
+    Entity::Module::Module ModuleMemoryRepository::getModuleByName(const std::string &name) const {
 
         const auto it =
                 std::ranges::find_if(_modules, [name](const std::pair<std::string, Entity::Module::Module> &module) {
@@ -52,7 +58,7 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    std::vector<std::string> ModuleMemoryDb::GetAllModuleNames() {
+    std::vector<std::string> ModuleMemoryRepository::getAllModuleNames() const {
 
         std::vector<std::string> moduleNameList;
         for (const auto &val: _modules | std::views::values) {
@@ -63,16 +69,29 @@ namespace Awsmock::Database {
         return moduleNameList;
     }
 
-    Entity::Module::Module ModuleMemoryDb::CreateModule(const Entity::Module::Module &module) {
+    Entity::Module::ModuleState ModuleMemoryRepository::getState(const std::string &name) const {
+
+        const Entity::Module::Module module = getModuleByName(name);
+        return module.state;
+    }
+
+    Entity::Module::Module ModuleMemoryRepository::createModule(Entity::Module::Module &module) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _modules[oid] = module;
         log_trace << "Module created, oid: " << oid;
-        return GetModuleById(oid);
+        return _modules[oid];
     }
 
-    std::vector<Entity::Module::Module> ModuleMemoryDb::ListModules() const {
+    Entity::Module::Module ModuleMemoryRepository::createOrUpdateModule(Entity::Module::Module &module) const {
+        if (moduleExists(module.name)) {
+            return updateModule(module);
+        }
+        return createModule(module);
+    }
+
+    std::vector<Entity::Module::Module> ModuleMemoryRepository::listModules() const {
 
         std::vector<Entity::Module::Module> moduleList;
         for (const auto &val: _modules | std::views::values) {
@@ -83,7 +102,7 @@ namespace Awsmock::Database {
         return moduleList;
     }
 
-    Entity::Module::Module ModuleMemoryDb::UpdateModule(const Entity::Module::Module &module) {
+    Entity::Module::Module ModuleMemoryRepository::updateModule(Entity::Module::Module &module) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         std::string name = module.name;
@@ -101,7 +120,7 @@ namespace Awsmock::Database {
         return _modules[it->first];
     }
 
-    Entity::Module::Module ModuleMemoryDb::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
+    void ModuleMemoryRepository::setState(const std::string &name, const Entity::Module::ModuleState &state) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
@@ -115,11 +134,9 @@ namespace Awsmock::Database {
         }
 
         it->second.state = state;
-        _modules[it->first] = it->second;
-        return it->second;
     }
 
-    void ModuleMemoryDb::SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status) {
+    void ModuleMemoryRepository::setStatus(const std::string &name, const Entity::Module::ModuleStatus &status) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
@@ -136,7 +153,7 @@ namespace Awsmock::Database {
         _modules[it->first] = it->second;
     }
 
-    void ModuleMemoryDb::SetModulePort(const std::string &name, int port) {
+    void ModuleMemoryRepository::setModulePort(const std::string &name, int port) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
@@ -153,11 +170,11 @@ namespace Awsmock::Database {
         _modules[it->first] = it->second;
     }
 
-    int ModuleMemoryDb::ModuleCount() const {
+    int ModuleMemoryRepository::moduleCount() const {
         return static_cast<int>(_modules.size());
     }
 
-    void ModuleMemoryDb::DeleteModule(const Entity::Module::Module &module) {
+    void ModuleMemoryRepository::deleteModule(const Entity::Module::Module &module) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         std::string name = module.name;
@@ -168,7 +185,7 @@ namespace Awsmock::Database {
         log_debug << "Module deleted, count: " << count;
     }
 
-    long ModuleMemoryDb::SetModuleLoglevel(const std::string &name, const std::string &level) {
+    long ModuleMemoryRepository::setModuleLoglevel(const std::string &name, const std::string &level) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
@@ -186,7 +203,7 @@ namespace Awsmock::Database {
         return 1;
     }
 
-    long ModuleMemoryDb::SetAllModulesLoglevel(const std::string &level) {
+    long ModuleMemoryRepository::setAllModulesLoglevel(const std::string &level) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         for (auto &module: _modules | std::views::values) {
@@ -196,16 +213,16 @@ namespace Awsmock::Database {
         return static_cast<long>(_modules.size());
     }
 
-    long ModuleMemoryDb::DeleteAllModules() {
+    long ModuleMemoryRepository::deleteAllModules() const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
-        const long count = _modules.size();
+        const long count = static_cast<long>(_modules.size());
         log_debug << "All modules deleted, count: " << _modules.size();
         _modules.clear();
         return count;
     }
 
-    void ModuleMemoryDb::SetModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level) {
+    void ModuleMemoryRepository::setModuleLogChannelAndLevel(const std::string &name, const std::string &channel, const std::string &level) const {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
         const auto it =
