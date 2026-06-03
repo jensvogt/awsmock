@@ -8,7 +8,7 @@
 
 namespace Awsmock::Service {
 
-    KMSService::KMSService() : _kmsDatabase(Database::KMSDatabase::instance()) {
+    KMSService::KMSService() {
 
         // Initialize environment
         _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
@@ -20,7 +20,7 @@ namespace Awsmock::Service {
 
         try {
 
-            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys();
+            const Database::Entity::KMS::KeyList keyList = _kmsDatabase->listKeys({}, {}, 0, 0, {});
             Dto::KMS::ListKeysResponse listKeysResponse;
             for (const auto &k: keyList) {
                 Dto::KMS::Key key;
@@ -44,8 +44,8 @@ namespace Awsmock::Service {
 
         try {
             Dto::KMS::ListKeyCountersResponse listKeyCountersResponse;
-            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            listKeyCountersResponse.total = _kmsDatabase.CountKeys();
+            const Database::Entity::KMS::KeyList keyList = _kmsDatabase->listKeys(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            listKeyCountersResponse.total = _kmsDatabase->countKeys();
 
             for (const auto &k: keyList) {
                 Dto::KMS::KeyCounter key;
@@ -75,7 +75,7 @@ namespace Awsmock::Service {
 
         try {
             Dto::KMS::ListKeyArnsResponse listKeyArnsResponse;
-            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys();
+            const Database::Entity::KMS::KeyList keyList = _kmsDatabase->listKeys({}, {}, 0, 0, {});
 
             for (const auto &k: keyList) {
                 listKeyArnsResponse.keyArns.emplace_back(k.arn);
@@ -109,7 +109,7 @@ namespace Awsmock::Service {
             keyEntity.tags = request.tags;
 
             // Store in a database
-            keyEntity = _kmsDatabase.CreateKey(keyEntity);
+            keyEntity = _kmsDatabase->createKey(keyEntity);
             log_trace << "KMS keyEntity created: " << keyEntity;
 
             // Create key material asynchronously via scheduler; callers use WaitForAesKey/WaitForRsaKey to synchronize
@@ -166,7 +166,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "schedule_key_deletion");
         log_trace << "Schedule key deletion request: " << request;
 
-        if (!_kmsDatabase.KeyExists(request.keyId)) {
+        if (!_kmsDatabase->keyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
             throw Core::ServiceException("Key not found, keyId: " + request.keyId);
         }
@@ -174,14 +174,14 @@ namespace Awsmock::Service {
         try {
 
             // Get the key
-            Database::Entity::KMS::Key key = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
 
             key.pendingWindowInDays = request.pendingWindowInDays;
             key.scheduledDeletion = system_clock::now() + std::chrono::days(request.pendingWindowInDays);
             key.keyState = Dto::KMS::KeyStateToString(Dto::KMS::KeyState::PENDING_DELETION);
 
             // Store in a database
-            key = _kmsDatabase.UpdateKey(key);
+            key = _kmsDatabase->updateKey(key);
             log_trace << "KMS key updated: " << key;
             Dto::KMS::ScheduledKeyDeletionResponse response;
             response.keyId = request.keyId;
@@ -200,14 +200,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "describe_key");
         log_trace << "Create key request: " << request;
 
-        if (!_kmsDatabase.KeyExists(request.keyId)) {
+        if (!_kmsDatabase->keyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
             throw Core::ServiceException("Key not found, keyId: " + request.keyId);
         }
 
         try {
 
-            Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            Database::Entity::KMS::Key keyEntity = _kmsDatabase->getKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
             Dto::KMS::Key key;
@@ -237,14 +237,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "get_key_counter");
         log_trace << "Get key request: " << request;
 
-        if (!_kmsDatabase.KeyExists(request.keyId)) {
+        if (!_kmsDatabase->keyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
             throw Core::ServiceException("Key not found, keyId: " + request.keyId);
         }
 
         try {
 
-            Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            Database::Entity::KMS::Key keyEntity = _kmsDatabase->getKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
             // TODO: use mapper
@@ -279,14 +279,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "update_key_counter");
         log_trace << "Update key request: " << request;
 
-        if (!_kmsDatabase.KeyExists(request.keyCounter.keyId)) {
+        if (!_kmsDatabase->keyExists(request.keyCounter.keyId)) {
             log_error << "Key not found, keyId: " << request.keyCounter.keyId;
             throw Core::ServiceException("Key not found, keyId: " + request.keyCounter.keyId);
         }
 
         try {
 
-            Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyCounter.keyId);
+            Database::Entity::KMS::Key keyEntity = _kmsDatabase->getKeyByKeyId(request.keyCounter.keyId);
             log_trace << "KMS key entity received, key: " << keyEntity;
 
             keyEntity.keySpec = Dto::KMS::KeySpecToString(request.keyCounter.keySpec);
@@ -294,7 +294,7 @@ namespace Awsmock::Service {
             keyEntity.keyState = Dto::KMS::KeyStateToString(request.keyCounter.keyState);
             keyEntity.origin = Dto::KMS::OriginToString(request.keyCounter.origin);
             keyEntity.description = request.keyCounter.description;
-            _kmsDatabase.UpdateKey(keyEntity);
+            keyEntity = _kmsDatabase->updateKey(keyEntity);
             log_trace << "KMS key entity updated, key: " << keyEntity;
 
         } catch (Core::DatabaseException &exc) {
@@ -307,14 +307,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "encrypt");
         log_trace << "Encrypt plaintext request: " << request;
 
-        if (!_kmsDatabase.KeyExists(request.keyId)) {
+        if (!_kmsDatabase->keyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
             throw Core::ServiceException("Key not found, keyId: " + request.keyId);
         }
 
         try {
 
-            const Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            const Database::Entity::KMS::Key keyEntity = _kmsDatabase->getKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
             const std::string cipherText = EncryptPlaintext(keyEntity, request.plaintext);
@@ -336,14 +336,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "decrypt");
         log_trace << "Decrypt plaintext request, keyId: " << request.keyId;
 
-        if (!_kmsDatabase.KeyExists(request.keyId)) {
+        if (!_kmsDatabase->keyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
             throw Core::ServiceException("Key not found, keyId: " + request.keyId);
         }
 
         try {
 
-            const Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            const Database::Entity::KMS::Key keyEntity = _kmsDatabase->getKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
             const std::string plainText = DecryptPlaintext(keyEntity, request.ciphertext);
@@ -365,16 +365,16 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "delete_key");
         log_trace << "Delete key request: " << request;
 
-        if (!_kmsDatabase.KeyExists(request.keyId)) {
+        if (!_kmsDatabase->keyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
             throw Core::ServiceException("Key not found, keyId: " + request.keyId);
         }
 
         try {
 
-            const Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            const Database::Entity::KMS::Key keyEntity = _kmsDatabase->getKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity;
-            _kmsDatabase.DeleteKey(keyEntity);
+            _kmsDatabase->deleteKey(keyEntity);
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Delete KMS key failed, message: " << exc.message();
@@ -506,4 +506,4 @@ namespace Awsmock::Service {
         return {};
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

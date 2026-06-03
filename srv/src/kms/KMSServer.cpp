@@ -9,7 +9,7 @@
 
 namespace Awsmock::Service {
 
-    KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()), _scheduler((scheduler)) {
+    KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _scheduler((scheduler)) {
 
         // HTTP manager configuration
         _removePeriod = Core::Configuration::instance().get<int>("awsmock.modules.kms.remove-period");
@@ -39,7 +39,7 @@ namespace Awsmock::Service {
         log_trace << "KMS monitoring starting";
 
         // Get total counts
-        const long keys = _kmsDatabase.CountKeys();
+        const long keys = _kmsDatabase->countKeys();
         Core::EventBus::instance().sigMetricGauge(KMS_KEY_COUNT, {}, {}, keys);
 
         log_trace << "KMS monitoring finished";
@@ -48,9 +48,9 @@ namespace Awsmock::Service {
     void KMSServer::DeleteKeys() const {
         log_trace << "Starting delete keys";
 
-        for (const auto &key: _kmsDatabase.ListKeys()) {
+        for (const auto &key: _kmsDatabase->listKeys({}, {}, 0, 0, {})) {
             if (key.keyState == Dto::KMS::KeyStateToString(Dto::KMS::KeyState::PENDING_DELETION) && key.scheduledDeletion < system_clock::now()) {
-                _kmsDatabase.DeleteKey(key);
+                _kmsDatabase->deleteKey(key);
                 log_debug << "Key deleted, keyId: " << key.keyId;
             }
         }
@@ -68,4 +68,4 @@ namespace Awsmock::Service {
         _scheduler.Shutdown("kms-backup");
         log_info << "KMS server stopped";
     }
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

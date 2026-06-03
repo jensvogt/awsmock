@@ -11,10 +11,10 @@ namespace Awsmock::Service {
         log_debug << "Start creating KMS key, keyId: " << keyId;
 
         // Get database connection
-        const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
+        const std::shared_ptr<Database::IKMSRepository> kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
 
         // Make local copy
-        Database::Entity::KMS::Key key = kmsDatabase.GetKeyByKeyId(keyId);
+        Database::Entity::KMS::Key key = kmsDatabase->getKeyByKeyId(keyId);
         key.keyState = KeyStateToString(Dto::KMS::KeyState::CREATING);
 
         switch (Dto::KMS::KeySpecFromString(key.keySpec)) {
@@ -66,7 +66,7 @@ namespace Awsmock::Service {
 
         // Save to database
         key.keyState = KeyStateToString(Dto::KMS::KeyState::ENABLED);
-        key = kmsDatabase.UpdateKey(key);
+        key = kmsDatabase->updateKey(key);
 
         log_debug << "KMS key created, keyId: " << key.keyId;
     }
@@ -120,4 +120,4 @@ namespace Awsmock::Service {
         log_debug << "AES256 KMS key created, keyId: " << key.keyId;
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

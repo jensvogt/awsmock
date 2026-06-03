@@ -10,14 +10,14 @@ namespace Awsmock::Service {
 
     std::vector<Database::Entity::Module::Module> ModuleService::ListModules() const {
 
-        std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.listModules();
+        std::vector<Database::Entity::Module::Module> modules = _moduleDatabase->listModules();
         log_debug << "Module list, count: " << modules.size();
         return modules;
     }
 
     Dto::Module::ListModuleNamesResponse ModuleService::ListModuleNames() const {
 
-        const std::vector<Database::Entity::Module::Module> modules = _moduleDatabase.listModules();
+        const std::vector<Database::Entity::Module::Module> modules = _moduleDatabase->listModules();
         log_debug << "Module list, count: " << modules.size();
         Dto::Module::ListModuleNamesResponse moduleNamesResponse;
         for (const auto &module: modules) {
@@ -32,16 +32,16 @@ namespace Awsmock::Service {
         for (auto const &m: modules) {
 
             // Set state
-            if (Database::Entity::Module::Module module = _moduleDatabase.getModuleByName(m.name); module.state != Database::Entity::Module::ModuleState::RUNNING) {
+            if (Database::Entity::Module::Module module = _moduleDatabase->getModuleByName(m.name); module.state != Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Set state
-                _moduleDatabase.setState(m.name, Database::Entity::Module::ModuleState::RUNNING);
+                _moduleDatabase->setState(m.name, Database::Entity::Module::ModuleState::RUNNING);
                 log_info << "Module " << module.name << " started";
             }
         }
 
         // Return updated list
-        return Dto::Module::Mapper::map(_moduleDatabase.listModules());
+        return Dto::Module::Mapper::map(_moduleDatabase->listModules());
     }
 
     Dto::Module::Module::ModuleList ModuleService::StopModules(const Dto::Module::Module::ModuleList &modules) const {
@@ -49,19 +49,19 @@ namespace Awsmock::Service {
         for (auto const &m: modules) {
 
             // Set state
-            if (Database::Entity::Module::Module module = _moduleDatabase.getModuleByName(m.name); module.state == Database::Entity::Module::ModuleState::RUNNING) {
+            if (Database::Entity::Module::Module module = _moduleDatabase->getModuleByName(m.name); module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Send shutdown call
                 ModuleMap::instance().GetModuleMap()[m.name]->Shutdown();
 
                 // Set state
-                _moduleDatabase.setState(m.name, Database::Entity::Module::ModuleState::STOPPED);
+                _moduleDatabase->setState(m.name, Database::Entity::Module::ModuleState::STOPPED);
                 log_info << "Module " << module.name << " stopped";
             }
             log_info << "Module " + m.name + " stopped";
         }
 
-        return Dto::Module::Mapper::map(_moduleDatabase.listModules());
+        return Dto::Module::Mapper::map(_moduleDatabase->listModules());
     }
 
     Dto::Module::ExportInfrastructureResponse ModuleService::ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request) {
@@ -147,8 +147,8 @@ namespace Awsmock::Service {
             } else if (module == "kms") {
 
                 if (request.IsInfrastructure()) {
-                    Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
-                    infrastructure.kmsKeys = _kmsDatabase.ListKeys();
+                    const std::shared_ptr<Database::IKMSRepository> _kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
+                    infrastructure.kmsKeys = _kmsDatabase->listKeys({}, {}, 0, 0, {});
                 }
 
             } else if (module == "ssm") {
@@ -343,9 +343,9 @@ namespace Awsmock::Service {
 
         // KMS
         if (!infrastructure.kmsKeys.empty()) {
-            Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+            const std::shared_ptr<Database::IKMSRepository> _kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
             for (auto &key: infrastructure.kmsKeys) {
-                key = _kmsDatabase.UpsertKey(key);
+                key = _kmsDatabase->upsertKey(key);
             }
             log_info << "KMS keys imported, count: " << infrastructure.secrets.size();
         }
@@ -406,21 +406,21 @@ namespace Awsmock::Service {
             if (m == "s3") {
                 count += Database::S3Database::instance().DeleteAllObjects();
             } else if (m == "sqs") {
-                count += Database::SQSMongoRepository::instance().deleteAllMessages();
+                count += Database::RepositoryFactory::instance().sqsRepository()->deleteAllMessages();
             } else if (m == "sns") {
-                count += Database::SNSMongoRepository::instance().deleteAllMessages();
+                count += Database::RepositoryFactory::instance().snsRepository()->deleteAllMessages();
             } else if (m == "lambda") {
                 count += Database::LambdaDatabase::instance().DeleteAllLambdas();
             } else if (m == "cognito") {
-                count += Database::CognitoMongoRepository::instance().deleteAllUsers();
-                count += Database::CognitoMongoRepository::instance().deleteAllUserPools();
-                count += Database::CognitoMongoRepository::instance().deleteAllGroups({});
+                count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllUsers();
+                count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllUserPools();
+                count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllGroups({});
             } else if (m == "dynamodb") {
                 count += Database::DynamoDbDatabase::instance().DeleteAllItems();
             } else if (m == "secretsmanager") {
                 count += Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
             } else if (m == "kms") {
-                count += Database::KMSDatabase::instance().DeleteAllKeys();
+                count += Database::RepositoryFactory::instance().kmsRepository()->deleteAllKeys();
             } else if (m == "ssm") {
                 count += Database::SSMDatabase::instance().DeleteAllParameters();
             } else if (m == "transfer") {
@@ -493,11 +493,11 @@ namespace Awsmock::Service {
 
     void ModuleService::setLogLevel(const Dto::Module::SetLogLevelRequest &request) const {
         if (request.channel.empty()) {
-            const long modified = _moduleDatabase.setAllModulesLoglevel(request.level);
+            const long modified = _moduleDatabase->setAllModulesLoglevel(request.level);
             Core::LogStream::SetSeverity(request.level);
             log_info << "Log level set, channel: all, level: " << request.level << ", count: " << modified;
         } else {
-            const long modified = _moduleDatabase.setModuleLoglevel(request.channel, request.level);
+            const long modified = _moduleDatabase->setModuleLoglevel(request.channel, request.level);
             Core::LogStream::SetChannelSeverity(request.channel, request.level);
             log_info << "Log level set, channel: " << request.channel << ", level: " << request.level << ", count: " << modified;
         }
@@ -514,4 +514,4 @@ namespace Awsmock::Service {
         }
         return response;
     }
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
