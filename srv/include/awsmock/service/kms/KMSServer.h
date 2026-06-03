@@ -26,15 +26,21 @@ namespace Awsmock::Service {
      */
     class KMSServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit KMSServer(Core::Scheduler &scheduler);
 
-      private:
+        /**
+         * @brief Shutdown the server
+         */
+        void Shutdown() override;
 
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
@@ -53,14 +59,9 @@ namespace Awsmock::Service {
         static void BackupKms();
 
         /**
-         * @brief Shutdown the server
-         */
-        void Shutdown() override;
-
-        /**
          * KMS database
          */
-        Database::KMSDatabase &_kmsDatabase;
+        std::shared_ptr<Database::IKMSRepository> _kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
 
         /**
          * SNS monitoring
@@ -110,6 +111,6 @@ namespace Awsmock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
 
 #endif// AWSMOCK_SERVICE_KMS_SERVER_H

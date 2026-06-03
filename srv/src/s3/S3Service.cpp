@@ -1342,8 +1342,8 @@ namespace Awsmock::Service {
         const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectoryExists(dataS3Dir);
         if (bucket.HasEncryption()) {
-            const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
-            const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
+            const std::shared_ptr<Database::IKMSRepository> kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
+            const Database::Entity::KMS::Key kmsKey = kmsDatabase->getKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
             log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
             const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
             Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
@@ -1372,8 +1372,8 @@ namespace Awsmock::Service {
         const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectoryExists(dataS3Dir);
         if (bucket.HasEncryption()) {
-            const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
-            const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
+            const std::shared_ptr<Database::IKMSRepository> kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
+            const Database::Entity::KMS::Key kmsKey = kmsDatabase->getKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
             log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
             const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
             Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
@@ -1705,4 +1705,4 @@ namespace Awsmock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

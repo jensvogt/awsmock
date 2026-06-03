@@ -27,8 +27,8 @@
 #include <awsmock/repository/ApiGatewayDatabase.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
-#include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/repository/TransferDatabase.h>
@@ -56,8 +56,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleMongoRepository::instance()) {
-        };
+        explicit ModuleService() = default;
 
         /**
          * @brief Return a list of all modules
@@ -190,7 +189,7 @@ namespace Awsmock::Service {
         /**
          * @brief Module database
          */
-        Database::ModuleMongoRepository &_moduleDatabase;
+        std::shared_ptr<Database::ModuleMongoRepository> _moduleDatabase;
     };
 
 } // namespace Awsmock::Service

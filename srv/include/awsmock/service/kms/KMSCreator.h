@@ -8,15 +8,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/entity/kms/Key.h>
-#include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/kms/IKMSRepository.h>
 
 namespace Awsmock::Service {
 
@@ -27,8 +24,7 @@ namespace Awsmock::Service {
      */
     class KMSCreator {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -42,8 +38,7 @@ namespace Awsmock::Service {
          */
         void CreateKmsKey(const std::string &keyId) const;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
@@ -83,4 +78,4 @@ namespace Awsmock::Service {
         void GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length) const;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

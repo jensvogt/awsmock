@@ -41,7 +41,7 @@
 #include <awsmock/dto/kms/internal/ListKeyCountersResponse.h>
 #include <awsmock/dto/kms/model/Key.h>
 #include <awsmock/dto/kms/model/KeyCounter.h>
-#include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/kms/KMSCreator.h>
 
 #define DEFAULT_KMS_ACCOUNT_ID "000000000000"
@@ -57,8 +57,7 @@ namespace Awsmock::Service {
      */
     class KMSService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -73,7 +72,8 @@ namespace Awsmock::Service {
          * @see Dto::KMS::ListKeysRequest
          * @see Dto::KMS::ListKeysResponse
          */
-        [[nodiscard]] Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
 
         /**
          * @brief List all key counters
@@ -84,7 +84,8 @@ namespace Awsmock::Service {
          * @see Dto::KMS::ListKeysRequest
          * @see Dto::KMS::ListKeysResponse
          */
-        [[nodiscard]] Dto::KMS::ListKeyCountersResponse ListKeyCounters(const Dto::KMS::ListKeyCountersRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::ListKeyCountersResponse ListKeyCounters(const Dto::KMS::ListKeyCountersRequest &request) const;
 
         /**
          * @brief List all key ARNs
@@ -93,7 +94,8 @@ namespace Awsmock::Service {
          * @throws Core::DatabaseException
          * @see Dto::KMS::ListKeyArnsResponse
          */
-        [[nodiscard]] Dto::KMS::ListKeyArnsResponse ListKeyArns() const;
+        [[nodiscard]]
+        Dto::KMS::ListKeyArnsResponse ListKeyArns() const;
 
         /**
          * @brief Creates a new key
@@ -103,7 +105,8 @@ namespace Awsmock::Service {
          * @see Dto::KMS::CreateKeyRequest
          * @see Dto::KMS::CreateKeyResponse
          */
-        [[nodiscard]] Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request) const;
 
         /**
          * @brief Wait for the asynchronous key creation
@@ -129,7 +132,8 @@ namespace Awsmock::Service {
          * @throws Core::DatabaseException
          * @see Dto::KMS::ScheduledKeyDeletionResponse
          */
-        [[nodiscard]] Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
 
         /**
          * @brief Describe a key
@@ -140,7 +144,8 @@ namespace Awsmock::Service {
          * @see Dto::KMS::DescribeKeyRequest
          * @see Dto::KMS::DescribeKeyResponse
          */
-        [[nodiscard]] Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
 
         /**
          * @brief Get a key
@@ -151,7 +156,8 @@ namespace Awsmock::Service {
          * @see Dto::KMS::GetKeyCounterRequest
          * @see Dto::KMS::GetKeyCounterResponse
          */
-        [[nodiscard]] Dto::KMS::GetKeyCounterResponse GetKeyCounter(const Dto::KMS::GetKeyCounterRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::GetKeyCounterResponse GetKeyCounter(const Dto::KMS::GetKeyCounterRequest &request) const;
 
         /**
          * @brief Update a key
@@ -171,7 +177,8 @@ namespace Awsmock::Service {
          * @see Dto::KMS::EncryptRequest
          * @see Dto::KMS::EncryptResponse
          */
-        [[nodiscard]] Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
 
         /**
          * @brief Decrypts a cipher text using a given algorithm
@@ -182,7 +189,8 @@ namespace Awsmock::Service {
          * @see Dto::KMS::DecryptRequest
          * @see Dto::KMS::DecryptResponse
          */
-        [[nodiscard]] Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request) const;
+        [[nodiscard]]
+        Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request) const;
 
         /**
          * @brief Deletes a key
@@ -193,8 +201,10 @@ namespace Awsmock::Service {
          */
         void DeleteKey(const Dto::KMS::DeleteKeyRequest &request) const;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
@@ -231,13 +241,13 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::KMSDatabase &_kmsDatabase;
+        std::shared_ptr<Database::IKMSRepository> _kmsDatabase;
 
         /**
          * Per-key async creation futures
          */
-        mutable std::unordered_map<std::string, std::shared_future<void>> _keyCreationFutures;
+        mutable std::unordered_map<std::string, std::shared_future<void> > _keyCreationFutures;
         mutable std::mutex _futureMutex;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

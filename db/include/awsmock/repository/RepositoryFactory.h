@@ -11,6 +11,9 @@
 #include <awsmock/repository/cognito/CognitoMemoryRepository.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
+#include <awsmock/repository/kms/IKMSRepository.h>
+#include <awsmock/repository/kms/KMSMemoryRepository.h>
+#include <awsmock/repository/kms/KMSMongoRepository.h>
 #include <awsmock/repository/module/IModuleRepository.h>
 #include <awsmock/repository/module/ModuleMemoryRepository.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
@@ -51,6 +54,7 @@ namespace Awsmock::Database {
             _sqsRepo = createSQSRepository();
             _cognitoRepo = createCognitoRepository();
             _monitoringRepo = createMonitoringRepository();
+            _kmsRepo = createKMSRepository();
         }
 
         [[nodiscard]]
@@ -68,6 +72,9 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::shared_ptr<IMonitoringRepository> monitoringRepository() const { return _monitoringRepo; }
 
+        [[nodiscard]]
+        std::shared_ptr<IKMSRepository> kmsRepository() const { return _kmsRepo; }
+
     private:
         BackendType _backend = BackendType::MONGODB;
         std::shared_ptr<IModuleRepository> _moduleRepo;
@@ -75,6 +82,7 @@ namespace Awsmock::Database {
         std::shared_ptr<ISQSRepository> _sqsRepo;
         std::shared_ptr<ICognitoRepository> _cognitoRepo;
         std::shared_ptr<IMonitoringRepository> _monitoringRepo;
+        std::shared_ptr<IKMSRepository> _kmsRepo;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> createModuleRepository() const {
@@ -129,6 +137,17 @@ namespace Awsmock::Database {
                     return std::make_shared<MonitoringMemoryRepository>();
             }
             return std::make_shared<MonitoringMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<IKMSRepository> createKMSRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<KMSMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<KMSMemoryRepository>();
+            }
+            return std::make_shared<KMSMemoryRepository>();
         }
     };
 

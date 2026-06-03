@@ -2,12 +2,11 @@
 // Created by vogje01 on 4/21/24.
 //
 
-#ifndef AWSMOCK_SERVICE_KMS_MONITORING_H
-#define AWSMOCK_SERVICE_KMS_MONITORING_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 
 namespace Awsmock::Service {
 
@@ -20,8 +19,7 @@ namespace Awsmock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class KMSMonitoring {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -32,14 +30,11 @@ namespace Awsmock::Service {
          */
         void UpdateCounter();
 
-      private:
-
+    private:
         /**
          * @brief Database connection
          */
-        Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+        std::shared_ptr<Database::IKMSRepository> _kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
     };
 
-}// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_KMS_MONITORING_H
+} // namespace Awsmock::Service

@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_KMS_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_KMS_MEMORYDB_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -16,6 +15,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/kms/IKMSRepository.h>
 
 namespace Awsmock::Database {
 
@@ -24,21 +24,20 @@ namespace Awsmock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class KMSMemoryDb {
+    class KMSMemoryRepository final : public IKMSRepository {
 
-      public:
-
+    public:
         /**
          * Constructor
          */
-        KMSMemoryDb() = default;
+        KMSMemoryRepository() = default;
 
         /**
          * Singleton instance
          */
-        static KMSMemoryDb &instance() {
-            static KMSMemoryDb kmsMemoryDb;
-            return kmsMemoryDb;
+        static KMSMemoryRepository &instance() {
+            static KMSMemoryRepository instance;
+            return instance;
         }
 
         /**
@@ -48,7 +47,8 @@ namespace Awsmock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool KeyExists(const std::string &keyId);
+        [[nodiscard]]
+        bool keyExists(const std::string &keyId) const override;
 
         /**
          * @brief Returns a KMS key by primary key
@@ -57,7 +57,18 @@ namespace Awsmock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyById(const std::string &oid);
+        [[nodiscard]]
+        Entity::KMS::Key getKeyById(const std::string &oid) const override;
+
+        /**
+         * @brief Returns a KMS key by primary key
+         *
+         * @param oid key primary key
+         * @return key entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::KMS::Key getKeyById(const bsoncxx::oid &oid) const override;
 
         /**
          * @brief Returns a KMS key by key ID
@@ -66,16 +77,21 @@ namespace Awsmock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
+        [[nodiscard]]
+        Entity::KMS::Key getKeyByKeyId(const std::string &keyId) const override;
 
         /**
          * @brief List all keys
          *
          * @param region AWS region
+         * @param prefix key prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sorting
          * @return KeyList
-         * @see Database::Entity::KMS::Key
          */
-        Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
+        [[nodiscard]]
+        Entity::KMS::KeyList listKeys(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * Returns the total number of keys
@@ -83,7 +99,8 @@ namespace Awsmock::Database {
          * @return total number of keys
          * @throws DatabaseException
          */
-        long CountKeys() const;
+        [[nodiscard]]
+        long countKeys() const override;
 
         /**
          * @brief Create a new key in the KMS key table
@@ -92,7 +109,8 @@ namespace Awsmock::Database {
          * @return created KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key CreateKey(const Entity::KMS::Key &key);
+        [[nodiscard]]
+        Entity::KMS::Key createKey(Entity::KMS::Key &key) const override;
 
         /**
          * @brief Updates a key
@@ -101,7 +119,18 @@ namespace Awsmock::Database {
          * @return created key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key);
+        [[nodiscard]]
+        Entity::KMS::Key updateKey(Entity::KMS::Key &key) const override;
+
+        /**
+         * @brief Creates a new key or updates an existing key
+         *
+         * @param key key entity
+         * @return created or updated key entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::KMS::Key upsertKey(Entity::KMS::Key &key) const override;
 
         /**
          * @brief Delete a key
@@ -109,7 +138,7 @@ namespace Awsmock::Database {
          * @param key key entity
          * @throws DatabaseException
          */
-        void DeleteKey(const Entity::KMS::Key &key);
+        void deleteKey(const Entity::KMS::Key &key) const override;
 
         /**
          * @brief Delete all keys
@@ -117,16 +146,19 @@ namespace Awsmock::Database {
          * @return number of entities deleted
          * @throws DatabaseException
          */
-        long DeleteAllKeys();
+        [[nodiscard]]
+        long deleteAllKeys() const override;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
         /**
          * KMS topic vector, when running without database
          */
-        std::map<std::string, Entity::KMS::Key> _keys;
+        mutable std::map<std::string, Entity::KMS::Key> _keys;
 
         /**
          * Key mutex
@@ -134,6 +166,4 @@ namespace Awsmock::Database {
         static boost::mutex _keyMutex;
     };
 
-}// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_KMS_MEMORYDB_H
+} // namespace Awsmock::Database

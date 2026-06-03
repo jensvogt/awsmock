@@ -24,8 +24,7 @@ namespace Awsmock::Database {
      */
     class CognitoMongoRepository : public ICognitoRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -418,8 +417,10 @@ namespace Awsmock::Database {
         [[nodiscard]]
         bool clientIdExists(const std::string &region, const std::string &clientId) const override;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         static constexpr auto DATABASE_NAME = "awsmock";
@@ -446,4 +447,4 @@ namespace Awsmock::Database {
         }
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/21/24.
 //
 
-#ifndef AWSMOCK_SERVICE_KMS_WORKER_H
-#define AWSMOCK_SERVICE_KMS_WORKER_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -11,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/dto/kms/model/KeyState.h>
-#include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 
 namespace Awsmock::Service {
 
@@ -28,8 +27,7 @@ namespace Awsmock::Service {
      */
     class KMSWorker {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -40,14 +38,11 @@ namespace Awsmock::Service {
          */
         void DeleteKeys();
 
-      private:
-
+    private:
         /**
          * Database connection
          */
-        Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
+        std::shared_ptr<Database::IKMSRepository> _kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
     };
 
-}// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_KMS_WORKER_H
+} // namespace Awsmock::Service

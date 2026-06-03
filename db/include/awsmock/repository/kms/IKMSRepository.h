@@ -1,48 +1,40 @@
-﻿//
-// Created by vogje01 on 29/05/2023.
+//
+// Created by vogje01 on 5/24/26.
 //
 
-#ifndef AWSMOCK_REPOSITORY_KMS_DATABASE_H
-#define AWSMOCK_REPOSITORY_KMS_DATABASE_H
+#pragma once
 
-// C++ standard includes
+// C++ includes
 #include <string>
 #include <vector>
 
-// AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/entity/s3/Object.h>
-#include <awsmock/memorydb/KMSMemoryDb.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
+// Awsmock includes
+#include <awsmock/entity/monitoring/Counter.h>
+#include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/Topic.h>
 #include <awsmock/utils/SortColumn.h>
+
+#include "awsmock/entity/kms/Key.h"
 
 namespace Awsmock::Database {
 
     /**
-     * @brief KMS MongoDB database.
+     * @brief Interface for KMS repository operations.
      *
-     * @author jens.vogt\@opitz-consulting.com
+     * Provides an abstraction for storing, retrieving, and managing
+     * KMS-related data.
      */
-    class KMSDatabase : public AwsMock::Database::DatabaseBase {
+    class IKMSRepository {
 
-      public:
-
+    public:
         /**
-         * @brief Constructor
+         * @brief Virtual destructor for the ISQSRepository interface.
+         *
+         * Ensures derived classes' destructor is invoked correctly
+         * during object destruction to release resources.
          */
-        explicit KMSDatabase() : _databaseName(GetDatabaseName()), _keyCollectionName("kms_key"), _memoryDb(KMSMemoryDb::instance()) {}
+        virtual ~IKMSRepository() = default;
 
-        /**
-         * @brief Singleton instance
-         */
-        static KMSDatabase &instance() {
-            static KMSDatabase kmsDatabase;
-            return kmsDatabase;
-        }
 
         /**
          * @brief Check existence of key by keyId
@@ -51,7 +43,8 @@ namespace Awsmock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool KeyExists(const std::string &keyId) const;
+        [[nodiscard]]
+        virtual bool keyExists(const std::string &keyId) const = 0;
 
         /**
          * @brief Returns a KMS key by primary key
@@ -60,7 +53,8 @@ namespace Awsmock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyById(const std::string &oid) const;
+        [[nodiscard]]
+        virtual Entity::KMS::Key getKeyById(const std::string &oid) const = 0;
 
         /**
          * @brief Returns a KMS key by primary key
@@ -69,7 +63,8 @@ namespace Awsmock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyById(bsoncxx::oid oid) const;
+        [[nodiscard]]
+        virtual Entity::KMS::Key getKeyById(const bsoncxx::oid &oid) const = 0;
 
         /**
          * @brief Returns a KMS key by key ID
@@ -78,7 +73,8 @@ namespace Awsmock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyByKeyId(const std::string &keyId) const;
+        [[nodiscard]]
+        virtual Entity::KMS::Key getKeyByKeyId(const std::string &keyId) const = 0;
 
         /**
          * @brief List all keys
@@ -90,7 +86,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting
          * @return KeyList
          */
-        Entity::KMS::KeyList ListKeys(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        virtual Entity::KMS::KeyList listKeys(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
          * @brief Returns the total number of keys
@@ -98,7 +95,8 @@ namespace Awsmock::Database {
          * @return total number of keys
          * @throws DatabaseException
          */
-        long CountKeys() const;
+        [[nodiscard]]
+        virtual long countKeys() const = 0;
 
         /**
          * @brief Create a new key in the KMS key table
@@ -107,7 +105,8 @@ namespace Awsmock::Database {
          * @return created KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key CreateKey(Entity::KMS::Key &key) const;
+        [[nodiscard]]
+        virtual Entity::KMS::Key createKey(Entity::KMS::Key &key) const = 0;
 
         /**
          * @brief Create or update a key in the KMS key table
@@ -116,7 +115,8 @@ namespace Awsmock::Database {
          * @return created or updated KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpsertKey(Entity::KMS::Key &key) const;
+        [[nodiscard]]
+        virtual Entity::KMS::Key upsertKey(Entity::KMS::Key &key) const = 0;
 
         /**
          * @brief Updates a key
@@ -125,7 +125,8 @@ namespace Awsmock::Database {
          * @return created key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpdateKey(Entity::KMS::Key &key) const;
+        [[nodiscard]]
+        virtual Entity::KMS::Key updateKey(Entity::KMS::Key &key) const = 0;
 
         /**
          * @brief Delete a key
@@ -133,7 +134,7 @@ namespace Awsmock::Database {
          * @param key key entity
          * @throws DatabaseException
          */
-        void DeleteKey(const Entity::KMS::Key &key) const;
+        virtual void deleteKey(const Entity::KMS::Key &key) const = 0;
 
         /**
          * @brief Delete all keys
@@ -141,28 +142,8 @@ namespace Awsmock::Database {
          * @return number of entities deleted
          * @throws DatabaseException
          */
-        long DeleteAllKeys() const;
-
-      private:
-
-        mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
-
-        /**
-         * Database name
-         */
-        std::string _databaseName;
-
-        /**
-         * Key collection name
-         */
-        std::string _keyCollectionName;
-
-        /**
-         * KMS in-memory database
-         */
-        KMSMemoryDb &_memoryDb;
+        [[nodiscard]]
+        virtual long deleteAllKeys() const = 0;
     };
 
-}// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_KMS_DATABASE_H
+} // namespace Awsmock::Database

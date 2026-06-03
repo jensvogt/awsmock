@@ -2,20 +2,20 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/KMSMemoryDb.h>
+#include <awsmock/repository/kms/KMSMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex KMSMemoryDb::_keyMutex;
+    boost::mutex KMSMemoryRepository::_keyMutex;
 
-    bool KMSMemoryDb::KeyExists(const std::string &keyId) {
+    bool KMSMemoryRepository::keyExists(const std::string &keyId) const {
 
         return std::ranges::find_if(_keys, [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
-                   return topic.second.keyId == keyId;
-               }) != _keys.end();
+            return topic.second.keyId == keyId;
+        }) != _keys.end();
     }
 
-    Entity::KMS::Key KMSMemoryDb::GetKeyById(const std::string &oid) {
+    Entity::KMS::Key KMSMemoryRepository::getKeyById(const std::string &oid) const {
 
         const auto it = std::ranges::find_if(_keys, [oid](const std::pair<std::string, Entity::KMS::Key> &topic) {
             return topic.first == oid;
@@ -30,7 +30,11 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::KMS::Key KMSMemoryDb::GetKeyByKeyId(const std::string &keyId) {
+    Entity::KMS::Key KMSMemoryRepository::getKeyById(const bsoncxx::oid &oid) const {
+        return getKeyById(oid.to_string());
+    }
+    
+    Entity::KMS::Key KMSMemoryRepository::getKeyByKeyId(const std::string &keyId) const {
 
         const auto it = std::ranges::find_if(_keys, [keyId](const std::pair<std::string, Entity::KMS::Key> &topic) {
             return topic.second.keyId == keyId;
@@ -45,7 +49,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::KMS::KeyList KMSMemoryDb::ListKeys(const std::string &region) const {
+    Entity::KMS::KeyList KMSMemoryRepository::listKeys(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::KMS::KeyList keyList;
 
@@ -68,21 +72,20 @@ namespace Awsmock::Database {
         return keyList;
     }
 
-    long KMSMemoryDb::CountKeys() const {
-
+    long KMSMemoryRepository::countKeys() const {
         return static_cast<long>(_keys.size());
     }
 
-    Entity::KMS::Key KMSMemoryDb::CreateKey(const Entity::KMS::Key &topic) {
+    Entity::KMS::Key KMSMemoryRepository::createKey(Entity::KMS::Key &topic) const {
         boost::mutex::scoped_lock lock(_keyMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _keys[oid] = topic;
         log_trace << "Key created, oid: " << oid;
-        return GetKeyById(oid);
+        return _keys[oid];
     }
 
-    Entity::KMS::Key KMSMemoryDb::UpdateKey(const Entity::KMS::Key &key) {
+    Entity::KMS::Key KMSMemoryRepository::updateKey(Entity::KMS::Key &key) const {
         boost::mutex::scoped_lock lock(_keyMutex);
 
         std::string keyId = key.keyId;
@@ -98,7 +101,14 @@ namespace Awsmock::Database {
         return key;
     }
 
-    void KMSMemoryDb::DeleteKey(const Entity::KMS::Key &key) {
+    Entity::KMS::Key KMSMemoryRepository::upsertKey(Entity::KMS::Key &key) const {
+        if (keyExists(key.keyId)) {
+            return updateKey(key);
+        }
+        return createKey(key);
+    }
+
+    void KMSMemoryRepository::deleteKey(const Entity::KMS::Key &key) const {
         boost::mutex::scoped_lock lock(_keyMutex);
 
         std::string keyId = key.keyId;
@@ -109,7 +119,7 @@ namespace Awsmock::Database {
         log_debug << "Key deleted, count: " << count;
     }
 
-    long KMSMemoryDb::DeleteAllKeys() {
+    long KMSMemoryRepository::deleteAllKeys() const {
         boost::mutex::scoped_lock lock(_keyMutex);
         const long deleted = static_cast<long>(_keys.size());
         _keys.clear();
@@ -117,4 +127,4 @@ namespace Awsmock::Database {
         return deleted;
     }
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database
