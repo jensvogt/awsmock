@@ -145,7 +145,7 @@ namespace Awsmock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string>> environments;
+            std::vector<std::pair<std::string, std::string> > environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -442,7 +442,7 @@ namespace Awsmock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string>> tags;
+            std::vector<std::pair<std::string, std::string> > tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -607,12 +607,12 @@ namespace Awsmock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-            function.handler = lambda.handler,
-            function.runtime = lambda.runtime,
-            function.lastUpdateStatus = "Successful",
-            function.state = LambdaStateToString(lambda.state),
-            function.stateReason = lambda.stateReason,
-            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+                    function.handler = lambda.handler,
+                    function.runtime = lambda.runtime,
+                    function.lastUpdateStatus = "Successful",
+                    function.state = LambdaStateToString(lambda.state),
+                    function.stateReason = lambda.stateReason,
+                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -691,7 +691,7 @@ namespace Awsmock::Service {
 
         // REQUEST_RESPONSE
         if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
-            auto promise = std::make_shared<std::promise<std::pair<int, std::string>>>();
+            auto promise = std::make_shared<std::promise<std::pair<int, std::string> > >();
             auto future = promise->get_future();
             Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), promise);
             const auto [status, body] = future.get();
@@ -1287,12 +1287,12 @@ namespace Awsmock::Service {
 
         } else if (request.type == "SQS") {
 
-            if (!_sqsDatabase.queueArnExists(request.eventSourceArn)) {
+            if (!_sqsDatabase->queueArnExists(request.eventSourceArn)) {
                 log_error << "SQS queue does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
             }
 
-            Database::Entity::SQS::Queue queue = _sqsDatabase.getQueueByArn(request.eventSourceArn);
+            Database::Entity::SQS::Queue queue = _sqsDatabase->getQueueByArn(request.eventSourceArn);
 
             // Convert filter rules
             Database::Entity::S3::FilterRule filterRule;
@@ -1308,17 +1308,17 @@ namespace Awsmock::Service {
             lambdaNotification.filterRules = filterRules;
 
             // Send S3 put notification request
-            queue = _sqsDatabase.createOrUpdateQueue(queue);
+            queue = _sqsDatabase->createOrUpdateQueue(queue);
             log_debug << "Queue updated, name: " << queue.name;
 
         } else if (request.type == "SNS") {
 
-            if (!_snsDatabase.topicExists(request.eventSourceArn)) {
+            if (!_snsDatabase->topicExists(request.eventSourceArn)) {
                 log_error << "SNS topic does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
             }
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.getTopicByArn(request.eventSourceArn);
+            Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.eventSourceArn);
 
             // Convert filter rules
             Database::Entity::S3::FilterRule filterRule;
@@ -1334,7 +1334,7 @@ namespace Awsmock::Service {
             lambdaNotification.filterRules = filterRules;
 
             // Send S3 put notification request
-            topic = _snsDatabase.createOrUpdateTopic(topic);
+            topic = _snsDatabase->createOrUpdateTopic(topic);
             log_debug << "Topic updated, name: " << topic.topicName;
         }
     }
@@ -1349,4 +1349,4 @@ namespace Awsmock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

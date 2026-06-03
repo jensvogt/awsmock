@@ -6,27 +6,27 @@
 
 namespace Awsmock::Service {
 
-    AbstractServer::AbstractServer(std::string name) : _name(std::move(name)), _moduleDatabase(Database::ModuleMongoRepository::instance()) {
+    AbstractServer::AbstractServer(std::string name) : _name(std::move(name)) {
     }
 
     bool AbstractServer::IsActive(const std::string &name) const {
-        return _moduleDatabase.isActive(name);
+        return _moduleDatabase->isActive(name);
     }
 
     void AbstractServer::SetRunning() const {
-        _moduleDatabase.setState(_name, Database::Entity::Module::ModuleState::RUNNING);
+        _moduleDatabase->setState(_name, Database::Entity::Module::ModuleState::RUNNING);
     }
 
     void AbstractServer::SetStopped() const {
-        _moduleDatabase.setState(_name, Database::Entity::Module::ModuleState::STOPPED);
+        _moduleDatabase->setState(_name, Database::Entity::Module::ModuleState::STOPPED);
     }
 
     bool AbstractServer::IsRunning() const {
-        return _moduleDatabase.getState(_name) == Database::Entity::Module::ModuleState::RUNNING;
+        return _moduleDatabase->getState(_name) == Database::Entity::Module::ModuleState::RUNNING;
     }
 
     void AbstractServer::Shutdown() {
     }
 
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

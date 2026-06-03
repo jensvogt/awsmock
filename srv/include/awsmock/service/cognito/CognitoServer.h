@@ -2,16 +2,15 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITO_SERVER_H
-#define AWSMOCK_SERVICE_COGNITO_SERVER_H
+#pragma once
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -24,15 +23,13 @@ namespace Awsmock::Service {
      */
     class CognitoServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
         explicit CognitoServer(Core::Scheduler &scheduler);
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
@@ -53,7 +50,7 @@ namespace Awsmock::Service {
         /**
          * @brief Database connection
          */
-        Database::CognitoMongoRepository &_cognitoDatabase = Database::CognitoMongoRepository::instance();
+        std::shared_ptr<Database::ICognitoRepository> _cognitoDatabase = Database::RepositoryFactory::instance().cognitoRepository();
 
         /**
          * @brief Dynamo DB backup flag.
@@ -89,6 +86,4 @@ namespace Awsmock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_COGNITO_SERVER_H
+} // namespace Awsmock::Service

@@ -2,12 +2,11 @@
 // Created by vogje01 on 6/3/24.
 //
 
-#ifndef AWSMOCK_SERVICE_MODULE_MONITORING_H
-#define AWSMOCK_SERVICE_MODULE_MONITORING_H
+#pragma once
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/module/ModuleMongoRepository.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 
 namespace Awsmock::Service {
@@ -26,8 +25,7 @@ namespace Awsmock::Service {
      */
     class ModuleMonitoring {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -38,15 +36,16 @@ namespace Awsmock::Service {
          */
         void UpdateCounter() const;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Module"};
 
         /**
          * Module database connection
          */
-        Database::ModuleMongoRepository &_moduleDatabase = Database::ModuleMongoRepository::instance();
+        std::shared_ptr<Database::IModuleRepository> _moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
     };
 
-}// namespace Awsmock::Service
-#endif// AWSMOCK_SERVICE_MODULE_MONITORING_H
+} // namespace Awsmock::Service

@@ -142,11 +142,11 @@ DWORD WINAPI RunService(LPVOID lpParam) {
 
     try {
         
-        AwsMock::Service::Frontend::FrontendServer server;
+        Awsmock::Service::Frontend::FrontendServer server;
         boost::thread{boost::ref(server), true}.detach();
         log_info << "Frontend server started.";
         boost::asio::io_context ioc;
-        AwsMock::Manager::Manager awsMockManager{ioc};
+        Awsmock::Manager::Manager awsMockManager{ioc};
 
         // Set up endpoints, handlers, and the stop watcher
         awsMockManager.Initialize();

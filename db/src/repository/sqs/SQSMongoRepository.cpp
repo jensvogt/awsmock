@@ -271,19 +271,15 @@ namespace Awsmock::Database {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
-            session.start_transaction();
-            const auto result = col.delete_many(session, make_document(kvp("queueArn", queueArn)));
-            session.commit_transaction();
+            const auto result = col.delete_many(make_document(kvp("queueArn", queueArn)));
 
             log_debug << "Purged queue, count: " << result->deleted_count() << " queueArn: " << queueArn;
             return result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
@@ -347,20 +343,16 @@ namespace Awsmock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         auto qCol = (*client)[DATABASE_NAME][QUEUE_COLLECTION];
         auto mCol = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
-            session.start_transaction();
-            const auto result = qCol.delete_many(session, make_document(kvp("region", queue.region), kvp("url", queue.url)));
-            mCol.delete_many(session, make_document(kvp("queueArn", queue.arn)));
-            session.commit_transaction();
+            const auto result = qCol.delete_many(make_document(kvp("region", queue.region), kvp("url", queue.url)));
+            mCol.delete_many(make_document(kvp("queueArn", queue.arn)));
 
             log_debug << "Queue deleted, count: " << result->deleted_count();
             return result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
@@ -372,20 +364,16 @@ namespace Awsmock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         auto qCol = (*client)[DATABASE_NAME][QUEUE_COLLECTION];
         auto mCol = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
-            session.start_transaction();
-            const auto result = qCol.delete_many(session, {});
-            mCol.delete_many(session, {});
-            session.commit_transaction();
+            const auto result = qCol.delete_many({});
+            mCol.delete_many({});
 
             log_debug << "All queues deleted, count: " << result->deleted_count();
             return result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
@@ -577,23 +565,19 @@ namespace Awsmock::Database {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
-            session.start_transaction();
-            auto bulk = col.create_bulk_write(session);
+            auto bulk = col.create_bulk_write();
 
             for (const auto &message: messageArray) {
                 const mongocxx::model::insert_one insert_op{message.get_document().view()};
                 bulk.append(insert_op);
             }
             const auto result = bulk.execute();
-            session.commit_transaction();
             log_info << "Imported messages: " << result->inserted_count();
 
         } catch (mongocxx::exception &e) {
-            session.abort_transaction();
-            log_error << "Collection transaction exception: " << e.what();
+            log_error << "Collection exception: " << e.what();
             throw Core::DatabaseException(e.what());
         }
     }
@@ -655,7 +639,6 @@ namespace Awsmock::Database {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
             const auto filter = make_document(
@@ -669,16 +652,13 @@ namespace Awsmock::Database {
                     kvp("receiptHandle", ""),
                     kvp("reset", bsoncxx::types::b_date(system_clock::now() + std::chrono::seconds{visibility})))));
 
-            session.start_transaction();
-            const auto result = col.update_many(session, filter.view(), update.view());
-            session.commit_transaction();
+            const auto result = col.update_many(filter.view(), update.view());
 
             log_debug << "Message reset, updated: " << result->modified_count() << " queueArn: " << queueArn;
             return result->modified_count();
 
         } catch (mongocxx::exception &e) {
-            session.abort_transaction();
-            log_error << "Collection transaction exception: " << e.what();
+            log_error << "Collection exception: " << e.what();
             throw Core::DatabaseException(e.what());
         }
     }
@@ -688,7 +668,6 @@ namespace Awsmock::Database {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
             const auto filter = make_document(
@@ -700,16 +679,13 @@ namespace Awsmock::Database {
                 kvp("$set", make_document(
                     kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))));
 
-            session.start_transaction();
-            const auto result = col.update_many(session, filter.view(), update.view());
-            session.commit_transaction();
+            const auto result = col.update_many(filter.view(), update.view());
 
             log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
             return result->upserted_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
-            log_error << "Collection transaction exception: " << exc.what();
+            log_error << "Collection exception: " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
     }
@@ -720,7 +696,6 @@ namespace Awsmock::Database {
         const auto newReset = system_clock::now() + std::chrono::seconds{originalQueue.attributes.visibilityTimeout};
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
@@ -740,15 +715,12 @@ namespace Awsmock::Database {
             document updateQuery;
             updateQuery.append(kvp("$set", setQuery));
 
-            session.start_transaction();
-            const auto result = col.update_many(session, filterQuery.extract(), updateQuery.extract());
-            session.commit_transaction();
+            const auto result = col.update_many(filterQuery.extract(), updateQuery.extract());
 
             log_trace << "Message redrive, arn: " << dlqQueue.arn << ", messageId: " << messageId << ", updated: " << result->modified_count();
             return result->modified_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
@@ -760,7 +732,6 @@ namespace Awsmock::Database {
         const auto newReset = system_clock::now() + std::chrono::seconds{originalQueue.attributes.visibilityTimeout};
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
@@ -779,15 +750,12 @@ namespace Awsmock::Database {
             document updateQuery;
             updateQuery.append(kvp("$set", setQuery));
 
-            session.start_transaction();
-            const auto result = col.update_many(session, filterQuery.extract(), updateQuery.extract());
-            session.commit_transaction();
+            const auto result = col.update_many(filterQuery.extract(), updateQuery.extract());
 
             log_trace << "Message re-drive, arn: " << dlqQueue.arn << " updated: " << result->modified_count();
             return result->modified_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
@@ -799,7 +767,6 @@ namespace Awsmock::Database {
         const auto reset = system_clock::now() - std::chrono::seconds{retentionPeriod};
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
@@ -807,15 +774,12 @@ namespace Awsmock::Database {
             filterQuery.append(kvp("queueArn", queueArn));
             filterQuery.append(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset)))));
 
-            session.start_transaction();
-            const auto result = col.delete_many(session, filterQuery.extract());
-            session.commit_transaction();
+            const auto result = col.delete_many(filterQuery.extract());
 
             log_trace << "Message retention reset, deleted: " << result->deleted_count() << " queue: " << queueArn;
             return result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
@@ -883,19 +847,15 @@ namespace Awsmock::Database {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
-            session.start_transaction();
-            const auto result = col.delete_many(session, make_document(kvp("queueArn", queueArn)));
-            session.commit_transaction();
+            const auto result = col.delete_many(make_document(kvp("queueArn", queueArn)));
 
             log_debug << "Messages deleted, queueArn: " << queueArn << " count: " << result->deleted_count();
             return result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
@@ -925,20 +885,16 @@ namespace Awsmock::Database {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        auto session = client->start_session();
 
         try {
 
-            session.start_transaction();
-            const auto result = col.delete_many(session, {});
-            session.commit_transaction();
+            const auto result = col.delete_many({});
 
             const long deleted = result->deleted_count();
             log_debug << "All messages deleted, count: " << deleted;
             return deleted;
 
         } catch (const mongocxx::exception &exc) {
-            session.abort_transaction();
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
