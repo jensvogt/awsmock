@@ -8,9 +8,10 @@
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/dto/monitoring/Counter.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
+#include <awsmock/repository/monitoring/IMonitoringRepository.h>
 
 namespace Awsmock::Database {
 
@@ -19,21 +20,20 @@ namespace Awsmock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class MonitoringDatabase : public AwsMock::Database::DatabaseBase {
+    class MonitoringMongoRepository final : public IMonitoringRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit MonitoringDatabase();
+        explicit MonitoringMongoRepository();
 
         /**
          * @brief Singleton instance
          */
-        static MonitoringDatabase &instance() {
-            static MonitoringDatabase monitoringDatabase;
-            return monitoringDatabase;
+        static MonitoringMongoRepository &instance() {
+            static MonitoringMongoRepository instance;
+            return instance;
         }
 
         /**
@@ -49,14 +49,15 @@ namespace Awsmock::Database {
          * @return list of counter-values
          */
         [[nodiscard]]
-        std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit = 10) const;
+        std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {},
+                                                                     long limit = 10) const override;
 
         /**
          * @brief Saves the monitoring data to the database
          *
          * @param values key value map of values
          */
-        void UpdateMonitoringCounters(const std::map<std::string, double> &values) const;
+        void UpdateMonitoringCounters(const std::map<std::string, double> &values) const override;
 
         /**
          * @brief Returns list of label values by label name
@@ -69,7 +70,7 @@ namespace Awsmock::Database {
          * @return list of label values
          */
         [[nodiscard]]
-        std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit, system_clock::time_point start, system_clock::time_point end) const;
+        std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit, system_clock::time_point start, system_clock::time_point end) const override;
 
         /**
          * @brief Deletes old monitoring data
@@ -77,26 +78,30 @@ namespace Awsmock::Database {
          * @param retentionPeriod retention period in days
          * @return number of deleted data rows
          */
-        [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
+        [[nodiscard]]
+        long DeleteOldMonitoringData(int retentionPeriod) const override;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
+
+        /**
+         * Scoped signal connection — auto-disconnects on destruction so sigCollector
+         * never fires into a dangling this pointer.
+         */
+        boost::signals2::scoped_connection _collectorConnection;
 
         /**
          * Database name
          */
-        std::string _databaseName;
+        static constexpr auto _databaseName = "awsmock";
 
         /**
          * Performance collection name
          */
-        std::string _monitoringCollectionName;
-
-        /**
-         * Use rolling mean
-         */
-        bool _rollingMean;
+        static constexpr auto _monitoringCollectionName = "monitoring";
 
         /**
          * @brief Decompose the monitoring ID
@@ -109,7 +114,7 @@ namespace Awsmock::Database {
         static void GetIdValues(const std::string &id, std::string &name, std::string &labelName, std::string &labelValue);
     };
 
-    inline void MonitoringDatabase::GetIdValues(const std::string &id, std::string &name, std::string &labelName, std::string &labelValue) {
+    inline void MonitoringMongoRepository::GetIdValues(const std::string &id, std::string &name, std::string &labelName, std::string &labelValue) {
         if (std::vector<std::string> keys = Core::StringUtils::Split(id, ":"); keys.size() == 1) {
             name = std::move(keys[0]);
         } else {
@@ -118,4 +123,4 @@ namespace Awsmock::Database {
             labelValue = std::move(keys[2]);
         }
     }
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

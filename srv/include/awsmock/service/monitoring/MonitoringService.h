@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_MONITORING_SERVICE_H
-#define AWSMOCK_SERVICE_MONITORING_SERVICE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/exception/ServiceException.h>
@@ -11,7 +10,8 @@
 #include <awsmock/dto/monitoring/GetCountersResponse.h>
 #include <awsmock/dto/monitoring/GetMultiCountersResponse.h>
 #include <awsmock/dto/monitoring/mapper/Mapper.h>
-#include <awsmock/repository/MonitoringDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/monitoring/IMonitoringRepository.h>
 
 namespace Awsmock::Service {
 
@@ -22,13 +22,11 @@ namespace Awsmock::Service {
      */
     class MonitoringService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
-        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {
-                                       };
+        explicit MonitoringService() = default;
 
         /**
          * @brief Get counters request
@@ -48,16 +46,17 @@ namespace Awsmock::Service {
          */
         Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
 
         /**
          * Database connection
          */
-        Database::MonitoringDatabase &_database;
+        std::shared_ptr<Database::IMonitoringRepository> _database = Database::RepositoryFactory::instance().monitoringRepository();
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
 
-#endif// AWSMOCK_SERVICE_MONITORING_SERVICE_H

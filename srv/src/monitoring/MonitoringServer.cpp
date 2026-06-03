@@ -50,7 +50,7 @@ namespace Awsmock::Service {
         log_trace << "Monitoring worker starting";
 
         const int retentionPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.retention");
-        const long deletedCount = _monitoringDatabase.DeleteOldMonitoringData(retentionPeriod);
+        const long deletedCount = _monitoringDatabase->DeleteOldMonitoringData(retentionPeriod);
 
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;
     }
@@ -70,4 +70,4 @@ namespace Awsmock::Service {
         return std::ranges::find(_exclusions, name + "::" + labelName + "::" + labelValue) == _exclusions.end();
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

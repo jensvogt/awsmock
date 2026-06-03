@@ -12,10 +12,11 @@
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
 #include <awsmock/repository/module/IModuleRepository.h>
-#include <awsmock/repository/module/IModuleRepository.h>
 #include <awsmock/repository/module/ModuleMemoryRepository.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
-#include <awsmock/repository/module/ModuleMongoRepository.h>
+#include <awsmock/repository/monitoring/IMonitoringRepository.h>
+#include <awsmock/repository/monitoring/MonitoringMemoryRepository.h>
+#include <awsmock/repository/monitoring/MonitoringMongoRepository.h>
 #include <awsmock/repository/sns/ISNSRepository.h>
 #include <awsmock/repository/sns/SNSMemoryRepository.h>
 #include <awsmock/repository/sns/SNSMongoRepository.h>
@@ -39,8 +40,8 @@ namespace Awsmock::Database {
 
     public:
         static RepositoryFactory &instance() {
-            static RepositoryFactory inst;
-            return inst;
+            static RepositoryFactory instance;
+            return instance;
         }
 
         void initialize(const BackendType type) {
@@ -49,6 +50,7 @@ namespace Awsmock::Database {
             _snsRepo = createSNSRepository();
             _sqsRepo = createSQSRepository();
             _cognitoRepo = createCognitoRepository();
+            _monitoringRepo = createMonitoringRepository();
         }
 
         [[nodiscard]]
@@ -63,12 +65,16 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::shared_ptr<ICognitoRepository> cognitoRepository() const { return _cognitoRepo; }
 
+        [[nodiscard]]
+        std::shared_ptr<IMonitoringRepository> monitoringRepository() const { return _monitoringRepo; }
+
     private:
         BackendType _backend = BackendType::MONGODB;
         std::shared_ptr<IModuleRepository> _moduleRepo;
         std::shared_ptr<ISNSRepository> _snsRepo;
         std::shared_ptr<ISQSRepository> _sqsRepo;
         std::shared_ptr<ICognitoRepository> _cognitoRepo;
+        std::shared_ptr<IMonitoringRepository> _monitoringRepo;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> createModuleRepository() const {
@@ -112,6 +118,17 @@ namespace Awsmock::Database {
                     return std::make_shared<CognitoMemoryRepository>();
             }
             return std::make_shared<CognitoMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<IMonitoringRepository> createMonitoringRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<MonitoringMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<MonitoringMemoryRepository>();
+            }
+            return std::make_shared<MonitoringMemoryRepository>();
         }
     };
 

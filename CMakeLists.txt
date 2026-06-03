@@ -70,8 +70,7 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/include/awsmock/core/BsonConverter.h
         core/include/awsmock/core/BsonCursorRange.h dto/include/awsmock/dto/common/mapper/Mapper.h
-        core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp
-        db/include/awsmock/repository/DatabaseBase.h)
+        core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -143,11 +142,12 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/repository/SSMDatabase.cpp db/src/memorydb/SSMMemoryDb.cpp db/src/entity/module/Module.cpp
         db/src/repository/module/ModuleMongoRepository.cpp db/src/repository/module/ModuleMemoryRepository.cpp
         db/src/entity/apps/Application.cpp db/src/repository/ApplicationDatabase.cpp db/src/memorydb/ApplicationMemoryDb.cpp
-        db/src/utils/MongoUtils.cpp db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp
+        db/src/utils/MongoUtils.cpp db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/entity/dynamodb/Tag.cpp
         db/src/repository/ApiGatewayDatabase.cpp db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp
-        db/src/entity/apigateway/Rest.cpp db/src/entity/monitoring/Counter.cpp db/src/repository/MonitoringDatabase.cpp
+        db/src/entity/apigateway/Rest.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
+        db/src/repository/monitoring/MonitoringMongoRepository.cpp db/src/repository/monitoring/MonitoringMemoryRepository.cpp
         db/src/repository/Database.cpp db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp
-        db/src/entity/dynamodb/KeySchema.cpp db/src/entity/dynamodb/Tag.cpp)
+)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
