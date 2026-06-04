@@ -11,7 +11,7 @@ namespace {
 namespace Awsmock::Service {
 
     bool S3Service::BucketExists(const std::string &region, const std::string &bucket) const {
-        return _database.BucketExists(region, bucket);
+        return _s3Database->BucketExists(region, bucket);
     }
 
     Dto::S3::GetObjectMetadataResponse S3Service::GetBucketMetadata(const Dto::S3::GetObjectMetadataRequest &request) const {
@@ -22,7 +22,7 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         try {
-            const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+            const Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket);
             return Dto::S3::GetBucketMetadataResponseMapper::toDto(bucket);
 
         } catch (bsoncxx::exception &ex) {
@@ -39,7 +39,7 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucketName);
 
         try {
-            const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
+            const Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucketName);
             log_debug << "Bucket returned, bucket: " << request.bucketName;
 
             return Dto::S3::BucketGetResponseMapper::toDto(bucket);
@@ -58,13 +58,13 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Check existence. If it does not exist, log an info message as this method is also used to check the existence of the object
-        if (!request.key.empty() && !_database.ObjectExists(request.region, request.bucket, request.key)) {
+        if (!request.key.empty() && !_s3Database->ObjectExists(request.region, request.bucket, request.key)) {
             log_info << "Object does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
             throw Core::NotFoundException("Object does not exist, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
         }
 
         try {
-            const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+            const Database::Entity::S3::Object object = _s3Database->GetObject(request.region, request.bucket, request.key);
 
             Dto::S3::GetObjectMetadataResponse response = Dto::S3::GetObjectMetadataResponseMapper::toDto(object);
             log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
@@ -86,7 +86,7 @@ namespace Awsmock::Service {
         try {
             // Update database
             Database::Entity::S3::Bucket bucket = Dto::S3::BucketCreateRequestMapper::toEntity(request);
-            bucket = _database.CreateBucket(bucket);
+            bucket = _s3Database->CreateBucket(bucket);
             log_debug << "Bucket created, bucket: " << request.name;
             return Dto::S3::BucketCreateResponseMapper::toDto(bucket);
 
@@ -104,15 +104,15 @@ namespace Awsmock::Service {
 
         try {
             // Get bucket
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
+            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucketName);
 
             // Delete file system objects
-            for (const auto &object: _database.ListBucket(request.bucketName)) {
+            for (const auto &object: _s3Database->ListBucket(request.bucketName, {})) {
                 DeleteObject(object.bucket, object.key, object.internalName);
             }
 
             // Purge bucket
-            const long deleted = _database.PurgeBucket(bucket);
+            const long deleted = _s3Database->PurgeBucket(bucket);
             log_debug << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
             return deleted;
 
@@ -128,7 +128,7 @@ namespace Awsmock::Service {
 
         try {
             // Get bucket
-            const std::vector<Database::Entity::S3::Bucket> buckets = _database.ListBuckets();
+            const std::vector<Database::Entity::S3::Bucket> buckets = _s3Database->ListBuckets({}, {}, 0, 0, {});
 
             // Purge bucket
             long deleted{};
@@ -155,12 +155,12 @@ namespace Awsmock::Service {
 
         try {
             // Map DTO to entity
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket.bucketName);
+            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket.bucketName);
             bucket.defaultMetadata = request.bucket.defaultMetadata;
             bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(request.bucket.versionStatus);
 
             // Update database
-            _database.UpdateBucket(bucket);
+            bucket = _s3Database->UpdateBucket(bucket);
             log_debug << "Bucket updated, bucket: " << request.bucket.bucketName;
 
         } catch (Core::JsonException &exc) {
@@ -176,8 +176,8 @@ namespace Awsmock::Service {
         try {
 
             Dto::S3::ListAllBucketResponse listAllBucketResponse;
-            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
-            listAllBucketResponse.total = _database.BucketCount();
+            const Database::Entity::S3::BucketList bucketList = _s3Database->ListBuckets({}, {}, 0, 0, {});
+            listAllBucketResponse.total = _s3Database->BucketCount({}, {});
             listAllBucketResponse.bucketList = Dto::S3::BucketMapper::toDtoList(bucketList);
             log_debug << "Count all buckets, size: " << bucketList.size();
             return listAllBucketResponse;
@@ -193,7 +193,7 @@ namespace Awsmock::Service {
         log_trace << "List bucket request: " + s3Request.ToString();
 
         try {
-            const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket(s3Request.name, s3Request.prefix);
+            const std::vector<Database::Entity::S3::Object> objectList = _s3Database->ListBucket(s3Request.name, s3Request.prefix);
 
             // TODO: mapper implementation
             Dto::S3::ListBucketResponse listBucketResponse;
@@ -230,8 +230,8 @@ namespace Awsmock::Service {
 
             Dto::S3::ListBucketCounterResponse listAllBucketResponse;
 
-            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            listAllBucketResponse.total = _database.BucketCount(request.region, request.prefix);
+            const Database::Entity::S3::BucketList bucketList = _s3Database->ListBuckets(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            listAllBucketResponse.total = _s3Database->BucketCount(request.region, request.prefix);
             listAllBucketResponse.bucketCounters = Dto::S3::BucketCounterMapper::toDtoList(bucketList);
             log_debug << "List bucket counters, size: " << bucketList.size();
             return listAllBucketResponse;
@@ -247,7 +247,7 @@ namespace Awsmock::Service {
         log_trace << "List buckets ARNs request";
 
         try {
-            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+            const Database::Entity::S3::BucketList bucketList = _s3Database->ListBuckets({}, {}, 0, 0, {});
 
             Dto::S3::ListBucketArnsResponse listBucketArnsResponse;
             std::ranges::transform(bucketList, std::back_inserter(listBucketArnsResponse.bucketArns),
@@ -268,10 +268,10 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Update bucket
-        Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+        Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket);
         bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Core::StringUtils::ToLower(request.status));
 
-        _database.UpdateBucket(bucket);
+        _s3Database->UpdateBucket(bucket);
         log_debug << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status;
     }
 
@@ -283,10 +283,10 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Update bucket
-        Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+        Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket);
         //bucket.lifecycleConfigurations = Dto::S3::LifecycleMapper::toEntityList(request.rules);
 
-        _database.UpdateBucket(bucket);
+        _s3Database->UpdateBucket(bucket);
         log_debug << "Put bucket lifecycle configuration, bucket: " << request.bucket;
     }
 
@@ -298,7 +298,7 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Update bucket
-        const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+        const Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket);
 
         // Check rules length
         if (bucket.lifecycleConfigurations.empty()) {
@@ -324,10 +324,10 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Update bucket
-        Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+        Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket);
         bucket.lifecycleConfigurations.clear();
 
-        _database.UpdateBucket(bucket);
+        _s3Database->UpdateBucket(bucket);
         log_debug << "Delete bucket lifecycle configuration, bucket: " << request.bucket;
     }
 
@@ -345,7 +345,7 @@ namespace Awsmock::Service {
         Core::DirUtils::EnsureDirectoryExists(uploadDir);
 
         // Get the bucket
-        const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+        const Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket);
 
         // Create database object
         Database::Entity::S3::Object object;
@@ -362,7 +362,7 @@ namespace Awsmock::Service {
         object.metadata.merge(request.metadata);
 
         // Update database
-        object = _database.CreateOrUpdateObject(object);
+        object = _s3Database->CreateOrUpdateObject(object);
 
         log_debug << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
         Dto::S3::CreateMultipartUploadResult response;
@@ -397,7 +397,7 @@ namespace Awsmock::Service {
         log_trace << "UploadPart copy request, part: " << request.partNumber << " updateId: " << request.uploadId;
 
         const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
-        const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
+        const Database::Entity::S3::Object sourceObject = _s3Database->GetObject(request.region, request.sourceBucket, request.sourceKey);
 
         const std::string sourceFile = Core::FileUtils::appendPath(s3DataDir, sourceObject.internalName);
         const std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
@@ -426,7 +426,7 @@ namespace Awsmock::Service {
         log_trace << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region;
 
         // Get database object
-        Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+        Database::Entity::S3::Object object = _s3Database->GetObject(request.region, request.bucket, request.key);
 
         const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectoryExists(dataS3Dir);
@@ -460,7 +460,7 @@ namespace Awsmock::Service {
             object.md5sum = md5sum;
             object.internalName = filename;
             object.contentType = Core::MagicDetector::instance().fromFile(outFile);
-            object = _database.UpdateObject(object);
+            object = _s3Database->UpdateObject(object);
 
             // Calculate the hashes asynchronously
             if (!request.checksumAlgorithm.empty()) {
@@ -502,13 +502,13 @@ namespace Awsmock::Service {
         log_trace << "Get event source request, s3Request: " << request.ToString();
 
         // Check existence
-        if (!_database.BucketExists(request.eventSourceArn)) {
+        if (!_s3Database->BucketExists(request.eventSourceArn)) {
             log_warning << "Bucket does not exists, arn: " << request.eventSourceArn;
             throw Core::NotFoundException("Bucket does not exists, arn: " + request.eventSourceArn);
         }
 
         try {
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByArn(request.eventSourceArn);
+            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByArn(request.eventSourceArn);
             log_debug << "Bucket returned, bucket: " << bucket.name;
 
             Dto::S3::GetEventSourceResponse response;
@@ -531,24 +531,24 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         if (!request.key.empty()) {
-            if (!_database.ObjectExists(request.region, request.bucket, request.key)) {
+            if (!_s3Database->ObjectExists(request.region, request.bucket, request.key)) {
                 log_error << "Object " << request.key << " does not exist";
                 throw Core::NotFoundException("Object does not exist");
             }
         }
 
         try {
-            const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
+            const Database::Entity::S3::Bucket bucketEntity = _s3Database->GetBucketByRegionName(request.region, request.bucket);
 
             Database::Entity::S3::Object object;
             if (bucketEntity.IsVersioned() && !request.versionId.empty()) {
-                object = _database.GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
+                object = _s3Database->GetObjectVersion(request.region, request.bucket, request.key, request.versionId);
                 if (object.oid.empty()) {
                     log_error << "Object " << request.key << " does not exist";
                     throw Core::ServiceException("Object does not exist");
                 }
             } else {
-                object = _database.GetObject(request.region, request.bucket, request.key);
+                object = _s3Database->GetObject(request.region, request.bucket, request.key);
             }
 
             std::string filename = Core::FileUtils::appendPath(s3DataDir, object.internalName);
@@ -585,7 +585,7 @@ namespace Awsmock::Service {
 
         try {
             // Get bucket
-            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
+            if (const Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
                 return SaveVersionedObject(request, bucket, stream);
             } else {
                 return SaveUnversionedObject(request, bucket, stream, request.contentLength);
@@ -626,7 +626,7 @@ namespace Awsmock::Service {
         try {
             // Get bucket
             std::ifstream ifs(filename, std::ios::binary);
-            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
+            if (const Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
                 SaveVersionedObject(request, bucket, ifs);
             } else {
                 SaveUnversionedObject(request, bucket, ifs, request.contentLength);
@@ -645,14 +645,14 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Check existence
-        if (!_database.ObjectExists(request.region, request.bucket, request.key)) {
+        if (!_s3Database->ObjectExists(request.region, request.bucket, request.key)) {
             log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
             throw Core::NotFoundException("Bucket does not exist");
         }
 
         try {
             // Get the object
-            const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+            const Database::Entity::S3::Object object = _s3Database->GetObject(request.region, request.bucket, request.key);
 
             // Check notification
             CheckNotifications(object.region, object.bucket, object.key, object.size, "ObjectCreated");
@@ -671,21 +671,21 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Check existence
-        if (!_database.ObjectExists(request.region, request.bucket, request.key)) {
+        if (!_s3Database->ObjectExists(request.region, request.bucket, request.key)) {
             log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
             throw Core::NotFoundException("Bucket does not exist");
         }
 
         try {
             // Get the object
-            Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+            Database::Entity::S3::Object object = _s3Database->GetObject(request.region, request.bucket, request.key);
 
             // Change attributes
             object.metadata = request.metadata;
             object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
 
             // Update database
-            object = _database.UpdateObject(object);
+            object = _s3Database->UpdateObject(object);
             log_info << "Object updated, bucket: " << request.bucket << ", key: " << request.key;
 
         } catch (bsoncxx::exception &ex) {
@@ -706,7 +706,7 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.sourceBucket);
 
         // Check the existence of the source key
-        if (!_database.ObjectExists(request.region, request.sourceBucket, request.sourceKey)) {
+        if (!_s3Database->ObjectExists(request.region, request.sourceBucket, request.sourceKey)) {
             log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: " << request.sourceKey;
             throw Core::NotFoundException("Source object does not exist");
         }
@@ -717,14 +717,14 @@ namespace Awsmock::Service {
             const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
 
             // Check the existence of the target bucket
-            if (!_database.BucketExists(request.region, request.targetBucket)) {
+            if (!_s3Database->BucketExists(request.region, request.targetBucket)) {
                 log_error << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket;
                 throw Core::NotFoundException("Target bucket does not exist");
             }
 
             // Get the source object from the database
-            const Database::Entity::S3::Bucket targetBucket = _database.GetBucketByRegionName(request.region, request.targetBucket);
-            const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
+            const Database::Entity::S3::Bucket targetBucket = _s3Database->GetBucketByRegionName(request.region, request.targetBucket);
+            const Database::Entity::S3::Object sourceObject = _s3Database->GetObject(request.region, request.sourceBucket, request.sourceKey);
 
             // Copy the physical file
             const std::string targetFile = Core::AwsUtils::CreateS3FileName();
@@ -758,7 +758,7 @@ namespace Awsmock::Service {
             }
 
             // Create the object
-            targetObject = _database.CreateObject(targetObject);
+            targetObject = _s3Database->CreateObject(targetObject);
             log_debug << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key;
 
             // Check notification
@@ -788,7 +788,7 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.sourceBucket);
 
         // Check the existence of the source key
-        if (!_database.ObjectExists(request.region, request.sourceBucket, request.sourceKey)) {
+        if (!_s3Database->ObjectExists(request.region, request.sourceBucket, request.sourceKey)) {
             log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: " << request.sourceKey;
             throw Core::NotFoundException("Source object does not exist");
         }
@@ -796,14 +796,14 @@ namespace Awsmock::Service {
         Database::Entity::S3::Object targetObject;
         try {
             // Check the existence of the target bucket
-            if (!_database.BucketExists(request.region, request.targetBucket)) {
+            if (!_s3Database->BucketExists(request.region, request.targetBucket)) {
                 log_error << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket;
                 throw Core::ServiceException("Target bucket does not exist");
             }
 
             // Get the source object from the database
-            const Database::Entity::S3::Bucket targetBucket = _database.GetBucketByRegionName(request.region, request.targetBucket);
-            const Database::Entity::S3::Object sourceObject = _database.GetObject(request.region, request.sourceBucket, request.sourceKey);
+            const Database::Entity::S3::Bucket targetBucket = _s3Database->GetBucketByRegionName(request.region, request.targetBucket);
+            const Database::Entity::S3::Object sourceObject = _s3Database->GetObject(request.region, request.sourceBucket, request.sourceKey);
 
             // Copy the physical file
             const std::string targetFile = Core::AwsUtils::CreateS3FileName();
@@ -831,7 +831,7 @@ namespace Awsmock::Service {
             }
 
             // Create the object
-            targetObject = _database.CreateObject(targetObject);
+            targetObject = _s3Database->CreateObject(targetObject);
             log_debug << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key;
 
             // Check notification
@@ -860,10 +860,10 @@ namespace Awsmock::Service {
                 sortColumn.sortDirection = sc.sortDirection;
                 sortColumns.push_back(sortColumn);
             }
-            const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjects(s3Request.region, s3Request.prefix, s3Request.bucket, s3Request.pageSize, s3Request.pageIndex, sortColumns);
+            const std::vector<Database::Entity::S3::Object> objectList = _s3Database->ListObjects(s3Request.region, s3Request.prefix, s3Request.bucket, s3Request.pageSize, s3Request.pageIndex, sortColumns);
 
             Dto::S3::ListObjectCounterResponse listAllObjectResponse;
-            listAllObjectResponse.total = _database.ObjectCount(s3Request.region, s3Request.prefix, s3Request.bucket);
+            listAllObjectResponse.total = _s3Database->ObjectCount(s3Request.region, s3Request.prefix, s3Request.bucket);
 
             for (const auto &object: objectList) {
                 Dto::S3::ObjectCounter objectCounter;
@@ -891,13 +891,13 @@ namespace Awsmock::Service {
         log_trace << "Get objects counters request";
 
         // Check existence
-        if (!_database.ObjectExists(request.oid)) {
+        if (!_s3Database->ObjectExists(request.oid)) {
             log_error << "Object does not exists, name: " << request.oid;
             throw Core::NotFoundException("Object does not exists, id: " + request.oid);
         }
 
         try {
-            const Database::Entity::S3::Object object = _database.GetObjectById(request.oid);
+            const Database::Entity::S3::Object object = _s3Database->GetObjectById(request.oid);
 
             Dto::S3::GetObjectCounterResponse getObjectCounterResponse;
             auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
@@ -936,7 +936,7 @@ namespace Awsmock::Service {
         log_trace << "Upload objects counters request";
 
         // Check existence
-        if (!_database.BucketExists(request.bucketArn)) {
+        if (!_s3Database->BucketExists(request.bucketArn)) {
             log_error << "Bucket does not exists, bucketArn: " << request.bucketArn;
             throw Core::NotFoundException("Bucket does not exists, bucketArn: " + request.bucketArn);
         }
@@ -976,7 +976,7 @@ namespace Awsmock::Service {
             object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
 
             // Update database
-            object = _database.CreateOrUpdateObject(object);
+            object = _s3Database->CreateOrUpdateObject(object);
             log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
             // Check encryption
@@ -999,13 +999,13 @@ namespace Awsmock::Service {
         // Check existence
         CheckBucketExistence(request.region, request.bucket);
 
-        if (_database.ObjectExists(request.region, request.bucket, request.key)) {
+        if (_s3Database->ObjectExists(request.region, request.bucket, request.key)) {
             try {
                 // Get the object from the database
-                const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+                const Database::Entity::S3::Object object = _s3Database->GetObject(request.region, request.bucket, request.key);
 
                 // Delete from database
-                _database.DeleteObject(object);
+                _s3Database->DeleteObject(object);
                 log_debug << "Database object deleted, bucket: " + request.bucket + ", key: " << request.key;
 
                 // Delete the file system object
@@ -1036,7 +1036,7 @@ namespace Awsmock::Service {
             for (const auto &key: request.keys) {
                 if (!key.empty()) {
                     // Delete from database
-                    Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, key);
+                    Database::Entity::S3::Object object = _s3Database->GetObject(request.region, request.bucket, key);
                     log_debug << "Database object deleted, count: " << request.keys.size();
 
                     DeleteObject(object.bucket, object.key, object.internalName);
@@ -1048,7 +1048,7 @@ namespace Awsmock::Service {
             }
 
             // Delete from database
-            _database.DeleteObjects(request.region, request.bucket, request.keys);
+            _s3Database->DeleteObjects(request.region, request.bucket, request.keys);
             log_debug << "Database object deleted, count: " << request.keys.size();
 
         } catch (bsoncxx::exception &ex) {
@@ -1068,7 +1068,7 @@ namespace Awsmock::Service {
         try {
 
             // Get bucket
-            Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByRegionName(request.region, request.bucket);
             log_debug << "Bucket received, region:" << bucket.region << " bucket: " << bucket.name;
 
             // Add notification configurations
@@ -1083,7 +1083,7 @@ namespace Awsmock::Service {
             }
 
             // Update database
-            bucket = _database.UpdateBucket(bucket);
+            bucket = _s3Database->UpdateBucket(bucket);
             log_debug << "Bucket updated, region:" << bucket.region << " bucket: " << bucket.name;
 
             // Copy configurations
@@ -1107,14 +1107,14 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         try {
-            Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket);
+            Database::Entity::S3::Bucket bucketEntity = _s3Database->GetBucketByRegionName(request.region, request.bucket);
 
             Database::Entity::S3::BucketEncryption bucketEncryption;
             bucketEncryption.sseAlgorithm = request.sseAlgorithm;
             bucketEncryption.kmsKeyId = request.kmsKeyId;
 
             bucketEntity.bucketEncryption = bucketEncryption;
-            bucketEntity = _database.UpdateBucket(bucketEntity);
+            bucketEntity = _s3Database->UpdateBucket(bucketEntity);
             log_debug << "PutBucketEncryption succeeded, bucket: " << request.bucket;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 put bucket encryption request failed, message: " << ex.what();
@@ -1130,7 +1130,7 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Get bucket
-        if (const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket); !bucketEntity.IsVersioned()) {
+        if (const Database::Entity::S3::Bucket bucketEntity = _s3Database->GetBucketByRegionName(request.region, request.bucket); !bucketEntity.IsVersioned()) {
             log_error << "Bucket is not versioning";
             throw Core::NotFoundException("Bucket is not versioned");
         }
@@ -1138,7 +1138,7 @@ namespace Awsmock::Service {
         try {
 
             Dto::S3::ListObjectVersionsResponse response;
-            const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(request.region, request.bucket, request.prefix);
+            const std::vector<Database::Entity::S3::Object> objectList = _s3Database->ListObjectVersions(request.region, request.bucket, request.prefix);
             return Dto::S3::ListVersionsResponseMapper::toDto(objectList);
 
         } catch (bsoncxx::exception &ex) {
@@ -1159,7 +1159,7 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Check empty
-        if (_database.HasObjects(bucket)) {
+        if (_s3Database->HasObjects(bucket)) {
             log_error << "Bucket is not empty";
             throw Core::NotFoundException("Bucket is not empty");
         }
@@ -1169,7 +1169,7 @@ namespace Awsmock::Service {
             DeleteBucket(request.bucket);
 
             // Delete bucket from database
-            _database.DeleteBucket(bucket);
+            _s3Database->DeleteBucket(bucket);
             log_debug << "Bucket deleted, bucket: " << bucket.name;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 Delete Bucket failed, message: " << ex.what();
@@ -1225,7 +1225,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "check_notifications");
         log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
 
-        Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
+        Database::Entity::S3::Bucket bucketEntity = _s3Database->GetBucketByRegionName(region, bucket);
 
         // Create S3 bucket and object
         Dto::S3::Object s3Object;
@@ -1354,7 +1354,7 @@ namespace Awsmock::Service {
 
     void S3Service::CheckBucketExistence(const std::string &region, const std::string &name) {
         // Check existence
-        if (!Database::S3MongoRepository::instance().BucketExists(region, name)) {
+        if (!Database::RepositoryFactory::instance().s3Repository()->BucketExists(region, name)) {
             log_warning << "Bucket does not exists, region: " << region << " name: " << name;
             throw Core::NotFoundException("Bucket does not exists, region: " + region + " name: " + name);
         }
@@ -1362,7 +1362,7 @@ namespace Awsmock::Service {
 
     void S3Service::CheckBucketNonExistence(const std::string &region, const std::string &name) {
         // Check existence
-        if (Database::S3MongoRepository::instance().BucketExists(region, name)) {
+        if (Database::RepositoryFactory::instance().s3Repository()->BucketExists(region, name)) {
             log_warning << "Bucket exists already, region: " << region << " name: " << name;
             throw Core::NotFoundException("Bucket exists already, region: " + region + ", name: " + name);
         }
@@ -1389,7 +1389,7 @@ namespace Awsmock::Service {
     }
 
     void S3Service::ReloadAllCounters() const {
-        _database.AdjustObjectCounters();
+        _s3Database->AdjustObjectCounters();
     }
 
     void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
@@ -1445,7 +1445,7 @@ namespace Awsmock::Service {
 
         // Check existence by
         std::string md5sum = Core::Crypto::HexEncode(Core::Crypto::Base64Decode(request.md5Sum));
-        if (Database::Entity::S3::Object existingObject = _database.GetObjectMd5(request.region, request.bucket, request.key, md5sum); existingObject.oid.empty()) {
+        if (Database::Entity::S3::Object existingObject = _s3Database->GetObjectMd5(request.region, request.bucket, request.key, md5sum); existingObject.oid.empty()) {
             // Version ID
             std::string versionId = Core::AwsUtils::CreateS3VersionId();
 
@@ -1480,7 +1480,7 @@ namespace Awsmock::Service {
             }
 
             // Create a new version in the database
-            object = _database.CreateObject(object);
+            object = _s3Database->CreateObject(object);
             log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
             // Check encryption
@@ -1564,7 +1564,7 @@ namespace Awsmock::Service {
         }
 
         // Update database
-        object = _database.CreateOrUpdateObject(object);
+        object = _s3Database->CreateOrUpdateObject(object);
         log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
         // Check encryption
@@ -1681,7 +1681,7 @@ namespace Awsmock::Service {
 
         // Single Atomic Update (Better for stability and performance)
         if (modified) {
-            bucket = _database.UpdateBucket(bucket);
+            bucket = _s3Database->UpdateBucket(bucket);
             log_debug << "Bucket updated. Total lambda notifications: " << bucket.lambdaNotifications.size();
         }
     }
@@ -1705,4 +1705,4 @@ namespace Awsmock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

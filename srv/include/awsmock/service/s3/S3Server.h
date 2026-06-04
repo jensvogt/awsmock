@@ -2,8 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3_SERVER_H
-#define AWSMOCK_SERVICE_S3_SERVER_H
+#pragma once
 
 // C++ includes
 #include <sys/stat.h>
@@ -39,16 +38,25 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Server(Core::Scheduler &scheduler);
+        explicit S3Server();
+
+        /**
+         * @brief Shutdown module
+         */
+        void Shutdown() override;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
         /**
          * @brief Synchronize S3 object between filesystem and database.
          */
-        [[maybe_unused]] void SyncObjects() const;
+        [[maybe_unused]]
+        void SyncObjects() const;
 
         /**
          * Update counters
@@ -56,19 +64,14 @@ namespace Awsmock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Backup the S3 buckets and object
+         * @brief Back up the S3 buckets and object
          */
         static void BackupS3();
 
         /**
-         * @brief Shutdown module
-         */
-        void Shutdown() override;
-
-        /**
          * Database connection
          */
-        Database::S3MongoRepository &_s3Database = Database::S3MongoRepository::instance();
+        std::shared_ptr<Database::IS3Repository> _s3Database = Database::RepositoryFactory::instance().s3Repository();
 
         /**
          * Monitoring period
@@ -81,7 +84,7 @@ namespace Awsmock::Service {
         int _syncPeriod;
 
         /**
-         * S3 bucket counter period
+         * S3 bucket counter-period
          */
         int _counterPeriod;
 
@@ -118,13 +121,6 @@ namespace Awsmock::Service {
          * @see @link(https://github.com/mariusbancila/croncpp)croncpp
          */
         std::string _backupCron;
-
-        /**
-         * @brif Asynchronous tasks scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_S3_SERVER_H

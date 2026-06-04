@@ -2,13 +2,13 @@
 // Created by vogje01 on 5/12/24.
 //
 
-#ifndef AWSMOCK_SERVICE_S3_HASH_CREATOR_H
-#define AWSMOCK_SERVICE_S3_HASH_CREATOR_H
+#pragma once
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/entity/s3/Object.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/s3/S3MongoRepository.h>
 
 #define DEFAULT_DATA_DIR "/home/awsmock/data"
 
@@ -55,5 +55,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_S3_HASH_CREATOR_H

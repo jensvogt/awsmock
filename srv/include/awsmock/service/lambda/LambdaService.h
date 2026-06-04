@@ -124,8 +124,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _s3Database(Database::S3Database::instance()) {
-        }
+        explicit LambdaService() = default;
 
         /**
          * @brief Create lambda function
@@ -209,6 +208,7 @@ namespace Awsmock::Service {
          * @see Dto::Lambda::UpdateFunctionCodeRequest
          * @see Dto::Lambda::UpdateFunctionCodeResponse
          */
+        [[nodiscard]]
         Dto::Lambda::UpdateFunctionCodeResponse UpdateFunctionCode(const Dto::Lambda::UpdateFunctionCodeRequest &request) const;
 
         /**
@@ -598,7 +598,7 @@ namespace Awsmock::Service {
         /**
          * @brief S3 database connection
          */
-        Database::S3Database &_s3Database;
+        std::shared_ptr<Database::IS3Repository> _s3Database = Database::RepositoryFactory::instance().s3Repository();
 
         /**
          * @brief SQS database connection

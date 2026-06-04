@@ -76,12 +76,13 @@ namespace Awsmock::Service {
 
             if (module == "s3") {
 
-                Database::S3Database &_s3Database = Database::S3Database::instance();
+                const std::shared_ptr<Database::IS3Repository> _s3Database = Database::RepositoryFactory::instance().s3Repository();
                 if (request.IsInfrastructure()) {
-                    infrastructure.s3Buckets = _s3Database.ExportBuckets({sortColumn});
+                    infrastructure.s3Buckets = _s3Database->ExportBuckets({sortColumn});
                 }
                 if (request.IsObjects()) {
-                    infrastructure.s3Objects = _s3Database.ListObjects();
+                    infrastructure.s3Objects = _s3Database->ListObjects({}, {}, {}, 0, 0, {});
+                    infrastructure.s3Objects = _s3Database->ListObjects({}, {}, {}, 0, 0, {});
                 }
 
             } else if (module == "sqs") {
@@ -195,11 +196,11 @@ namespace Awsmock::Service {
 
         // S3
         if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {
-            const auto _s3Database = std::make_shared<Database::S3Database>();
+            const std::shared_ptr<Database::IS3Repository> _s3Database = Database::RepositoryFactory::instance().s3Repository();
             if (!infrastructure.s3Buckets.empty()) {
                 for (auto &bucket: infrastructure.s3Buckets) {
                     bucket.modified = system_clock::now();
-                    _s3Database->CreateOrUpdateBucket(bucket);
+                    bucket = _s3Database->CreateOrUpdateBucket(bucket);
                 }
                 log_info << "S3 buckets imported, count: " << infrastructure.s3Buckets.size();
             }
@@ -208,7 +209,7 @@ namespace Awsmock::Service {
 
                     // Create objects
                     object.modified = system_clock::now();
-                    _s3Database->CreateOrUpdateObject(object);
+                    object = _s3Database->CreateOrUpdateObject(object);
 
                     // Load local files
                     if (!object.localName.empty()) {
@@ -382,7 +383,7 @@ namespace Awsmock::Service {
         for (const auto &m: request.modules) {
 
             if (m == "s3") {
-                count += Database::S3Database::instance().DeleteAllBuckets();
+                count += Database::RepositoryFactory::instance().s3Repository()->DeleteAllBuckets();
             } else if (m == "sqs") {
                 count += Database::RepositoryFactory::instance().sqsRepository()->deleteAllQueues();
             } else if (m == "sns") {
@@ -403,7 +404,7 @@ namespace Awsmock::Service {
         long count = 0;
         for (const auto &m: request.modules) {
             if (m == "s3") {
-                count += Database::S3Database::instance().DeleteAllObjects();
+                count += Database::RepositoryFactory::instance().s3Repository()->DeleteAllObjects();
             } else if (m == "sqs") {
                 count += Database::RepositoryFactory::instance().sqsRepository()->deleteAllMessages();
             } else if (m == "sns") {
@@ -423,7 +424,7 @@ namespace Awsmock::Service {
             } else if (m == "ssm") {
                 count += Database::RepositoryFactory::instance().ssmRepository()->deleteAllParameters();
             } else if (m == "transfer") {
-                Database::S3Database::instance().DeleteObjects("eu-central-1", "transfer-server");
+                count += Database::RepositoryFactory::instance().s3Repository()->DeleteObjects("eu-central-1", "transfer-server", {});
                 count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "apigateway") {
                 count += Database::ApiGatewayDatabase::instance().DeleteAllKeys();

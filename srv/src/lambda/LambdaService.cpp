@@ -1231,7 +1231,7 @@ namespace Awsmock::Service {
     std::string LambdaService::GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const {
         const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
-        const Database::Entity::S3::Object object = _s3Database.GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
+        const Database::Entity::S3::Object object = _s3Database->GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
         return Core::FileUtils::appendPath(s3DataDir, object.internalName);
     }
 
@@ -1256,11 +1256,11 @@ namespace Awsmock::Service {
 
         if (request.type == "S3") {
 
-            if (!_s3Database.BucketExists(request.eventSourceArn)) {
+            if (!_s3Database->BucketExists(request.eventSourceArn)) {
                 log_error << "S3 bucket does not exist: " << request.eventSourceArn;
                 throw Core::ServiceException("S3 bucket does not exist: " + request.eventSourceArn);
             }
-            Database::Entity::S3::Bucket bucket = _s3Database.GetBucketByArn(request.eventSourceArn);
+            Database::Entity::S3::Bucket bucket = _s3Database->GetBucketByArn(request.eventSourceArn);
 
             if (bucket.HasLambdaNotification(request.functionArn)) {
                 log_error << "S3 bucket has already notification to function: " << request.functionArn;
@@ -1282,7 +1282,7 @@ namespace Awsmock::Service {
 
             // Send S3 put notification request
             bucket.lambdaNotifications.emplace_back(lambdaNotification);
-            bucket = _s3Database.CreateOrUpdateBucket(bucket);
+            bucket = _s3Database->CreateOrUpdateBucket(bucket);
             log_debug << "Bucket updated, name: " << bucket.name;
 
         } else if (request.type == "SQS") {

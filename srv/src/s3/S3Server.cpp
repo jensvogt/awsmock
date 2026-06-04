@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _scheduler(scheduler) {
+    S3Server::S3Server() : AbstractServer("s3") {
 
         // Get HTTP configuration values
         _syncPeriod = Core::Configuration::instance().get<int>("awsmock.modules.s3.sync-period");
@@ -15,14 +15,14 @@ namespace Awsmock::Service {
         _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.backup.cron");
 
         // Start S3 monitoring counters updates
-        _scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, 0);
+        Core::Scheduler::instance().AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, 0);
 
         // Start synchronization of objects
-        _scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod, _syncPeriod);
+        Core::Scheduler::instance().AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod, _syncPeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("s3-backup", [] { BackupS3(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("s3-backup", [] { BackupS3(); }, _backupCron);
         }
 
         // Connect shutdown signal
@@ -37,7 +37,7 @@ namespace Awsmock::Service {
         const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
         // Get the bucket list
-        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        const Database::Entity::S3::BucketList buckets = _s3Database->ListBuckets({}, {}, 0, 0, {});
         log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
 
         if (buckets.empty()) {
@@ -48,23 +48,23 @@ namespace Awsmock::Service {
         int filesDeleted = 0, objectsDeleted = 0;
         for (auto &bucket: buckets) {
             // Get objects and delete objects, where the file is not existing anymore, The files are identified by internal name.
-            std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000);
+            std::vector objects = _s3Database->GetBucketObjectList(region, bucket.name, 1000);
             while (!objects.empty()) {
                 for (const auto &object: objects) {
                     if (!Core::FileUtils::FileExists(Core::FileUtils::appendPath(s3DataDir, object.internalName))) {
-                        const long deleted = _s3Database.DeleteObject(object);
+                        const long deleted = _s3Database->DeleteObject(object);
                         log_debug << "Object deleted, internalName: " << object.internalName << ", count: " << deleted;
                         objectsDeleted++;
                     }
                 }
-                objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000);
+                objects = _s3Database->GetBucketObjectList(region, bucket.name, 1000);
             }
         }
 
         // Loop over files and check the database for internal name
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
-                if (!_s3Database.ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
+                if (!_s3Database->ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::RemoveFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
                     filesDeleted++;
@@ -79,10 +79,10 @@ namespace Awsmock::Service {
         log_trace << "S3 Monitoring starting";
 
         // Reload the counters first
-        _s3Database.AdjustObjectCounters();
+        _s3Database->AdjustObjectCounters();
 
         long totalKeys = 0, totalSize = 0;
-        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        const Database::Entity::S3::BucketList buckets = _s3Database->ListBuckets({}, {}, 0, 0, {});
         for (const auto &bucket: buckets) {
 
             Core::EventBus::instance().sigMetricGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, bucket.keys);
@@ -98,14 +98,14 @@ namespace Awsmock::Service {
 
     void S3Server::BackupS3() {
 
-        // Backup S3 buckets and objects
+        // Back up S3 buckets and objects
         ModuleService{}.BackupModule("s3", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void S3Server::Shutdown() {
         log_info << "S3 server shutting down";
-        _scheduler.Shutdown("s3-monitoring");
-        _scheduler.Shutdown("s3-sync-objects");
-        _scheduler.Shutdown("s3-backup");
+        Core::Scheduler::instance().Shutdown("s3-monitoring");
+        Core::Scheduler::instance().Shutdown("s3-sync-objects");
+        Core::Scheduler::instance().Shutdown("s3-backup");
     }
 }// namespace Awsmock::Service

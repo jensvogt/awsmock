@@ -4,6 +4,7 @@
 
 #include <awsmock/service/s3/S3HashCreator.h>
 
+
 namespace Awsmock::Service {
     void S3HashCreator::operator()(const std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const {
         const std::string dataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
@@ -17,7 +18,7 @@ namespace Awsmock::Service {
             } else if (algorithm == "MD5") {
                 object.sha256sum = Core::Crypto::GetMd5FromFile(filename);
             }
-            Database::S3MongoRepository::instance().UpdateObject(object);
+            object = Database::RepositoryFactory::instance().s3Repository()->UpdateObject(object);
             log_debug << "Calculated hashes, key: " << object.key << " hash: " << algorithm;
         }
     }

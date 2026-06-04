@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3_SERVICE_H
-#define AWSMOCK_SERVICE_S3_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -101,8 +100,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3MongoRepository::instance()) {
-        }
+        explicit S3Service() = default;
 
         /**
          * @brief Checks whether a bucket exists
@@ -587,7 +585,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::S3MongoRepository &_database;
+        std::shared_ptr<Database::IS3Repository> _s3Database = Database::RepositoryFactory::instance().s3Repository();
 
         /**
          * Lambda service
@@ -596,5 +594,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_S3_SERVICE_H
