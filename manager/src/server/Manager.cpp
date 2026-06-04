@@ -190,7 +190,7 @@ namespace Awsmock::Manager {
         log_info << "Scheduler initialized";
 
         // Initialize monitoring
-        const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler, _ioc);
+        const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
 
         // Autoload the init files before modules start
