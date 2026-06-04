@@ -10,12 +10,10 @@
 #include <vector>
 
 // Awsmock includes
-#include "awsmock/utils/SortColumn.h"
-
-
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
 

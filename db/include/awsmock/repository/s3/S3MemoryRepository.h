@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_S3_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_S3_MEMORYDB_H
+#pragma once
 
 // C++ includes
 #include <ranges>
@@ -22,6 +21,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
+#include <awsmock/repository/s3/IS3Repository.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -31,24 +31,14 @@ namespace Awsmock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3MemoryDb {
+    class S3MemoryRepository final : public IS3Repository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        S3MemoryDb() = default;
-
-        /**
-         * @brief Singleton instance
-         *
-         * @return singleton instance
-         */
-        static S3MemoryDb &instance() {
-            static S3MemoryDb s3MemoryDb;
-            return s3MemoryDb;
-        }
+        S3MemoryRepository() = default;
 
         /**
          * @brief Bucket exists
@@ -58,7 +48,8 @@ namespace Awsmock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool BucketExists(const std::string &region, const std::string &name);
+        [[nodiscard]]
+        bool BucketExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Bucket exists
@@ -67,7 +58,8 @@ namespace Awsmock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool BucketExists(const Entity::S3::Bucket &bucket);
+        [[nodiscard]]
+        bool BucketExists(const Entity::S3::Bucket &bucket) const override;
 
         /**
          * @brief Bucket exists by ARN
@@ -76,7 +68,8 @@ namespace Awsmock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool BucketExists(const std::string &bucketArn) const;
+        [[nodiscard]]
+        bool BucketExists(const std::string &bucketArn) const override;
 
         /**
          * @brief Returns the bucket by userPoolId
@@ -85,7 +78,18 @@ namespace Awsmock::Database {
          * @return bucket, if existing
          * @throws DatabaseException
          */
-        Entity::S3::Bucket GetBucketById(const std::string &oid);
+        [[nodiscard]]
+        Entity::S3::Bucket GetBucketById(const std::string &oid) const override;
+
+        /**
+         * @brief Returns the bucket by userPoolId
+         *
+         * @param oid bucket oid
+         * @return bucket, if existing
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::S3::Bucket GetBucketById(const bsoncxx::oid &oid) const override;
 
         /**
          * @brief Returns the bucket by region and name.
@@ -94,7 +98,8 @@ namespace Awsmock::Database {
          * @param name bucket name
          * @return bucket entity
          */
-        Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name);
+        [[nodiscard]]
+        Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Returns the bucket by AWS ARN
@@ -102,7 +107,8 @@ namespace Awsmock::Database {
          * @param bucketArn AWS region
          * @return bucket entity
          */
-        Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn);
+        [[nodiscard]]
+        Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn) const override;
 
         /**
          * @brief Create a new bucket in the S3 bucket table
@@ -111,14 +117,21 @@ namespace Awsmock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateBucket(const Entity::S3::Bucket &bucket);
+        [[nodiscard]]
+        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket) const override;
 
         /**
-         *  List all buckets
+         * @brief List all buckets
          *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @param maxResults maximal number of results
+         * @param skip number of records to skip
+         * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ListBuckets();
+        [[nodiscard]]
+        Entity::S3::BucketList ListBuckets(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Export all buckets
@@ -126,7 +139,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ExportBuckets(const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        Entity::S3::BucketList ExportBuckets(const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Check whether the bucket has still objected
@@ -135,7 +149,8 @@ namespace Awsmock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool HasObjects(const Entity::S3::Bucket &bucket) const;
+        [[nodiscard]]
+        bool HasObjects(const Entity::S3::Bucket &bucket) const override;
 
         /**
          * @brief List objects in a bucket.
@@ -145,7 +160,8 @@ namespace Awsmock::Database {
          * @param maxKeys maximal number of return elements
          * @return list of S3 objects
          */
-        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys);
+        [[nodiscard]]
+        std::vector<Entity::S3::Object> GetBucketObjectList(const std::string &region, const std::string &bucket, long maxKeys) const override;
 
         /**
          * @brief Count objects in a bucket.
@@ -154,7 +170,8 @@ namespace Awsmock::Database {
          * @param bucket bucket name
          * @return number of S3 objects
          */
-        long GetBucketObjectCount(const std::string &region, const std::string &bucket) const;
+        [[nodiscard]]
+        long GetBucketObjectCount(const std::string &region, const std::string &bucket) const override;
 
         /**
          * @brief Sum of all object sizes in bytes.
@@ -163,7 +180,8 @@ namespace Awsmock::Database {
          * @param bucket bucket name
          * @return size of S3 objects in bytes
          */
-        long GetBucketSize(const std::string &region, const std::string &bucket) const;
+        [[nodiscard]]
+        long GetBucketSize(const std::string &region, const std::string &bucket) const override;
 
         /**
          * @brief List all objects of a bucket
@@ -172,15 +190,19 @@ namespace Awsmock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        std::vector<Entity::S3::Object> ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
+        [[nodiscard]]
+        std::vector<Entity::S3::Object> ListBucket(const std::string &bucket, const std::string &prefix) const override;
 
         /**
          * @brief Returns the total number of buckets
          *
+         * @param region AWS region
+         * @param prefix name prefix
          * @return total number of buckets
          * @throws DatabaseException
          */
-        long BucketCount() const;
+        [[nodiscard]]
+        long BucketCount(const std::string &region, const std::string &prefix) const override;
 
         /**
          * @brief Purges a bucket
@@ -189,7 +211,8 @@ namespace Awsmock::Database {
          * @return number of deleted objects
          * @throws DatabaseException
          */
-        long PurgeBucket(const Entity::S3::Bucket &bucket);
+        [[nodiscard]]
+        long PurgeBucket(Entity::S3::Bucket &bucket) const override;
 
         /**
          * @brief Updates a bucket
@@ -198,7 +221,8 @@ namespace Awsmock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
+        [[nodiscard]]
+        Entity::S3::Bucket UpdateBucket(Entity::S3::Bucket &bucket) const override;
 
         /**
          * @brief Updates the counters of a bucket
@@ -209,7 +233,7 @@ namespace Awsmock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        void UpdateBucketCounter(const std::string &bucketArn, long keys, long size);
+        void UpdateBucketCounter(const std::string &bucketArn, long keys, long size) const override;
 
         /**
          * @brief List all objects.
@@ -222,7 +246,8 @@ namespace Awsmock::Database {
          * @param sortColumns list of sort columns
          * @return ObjectList
          */
-        [[nodiscard]] std::vector<Entity::S3::Object> ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {});
+        [[nodiscard]]
+        std::vector<Entity::S3::Object> ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Gets a list of versioned objects
@@ -233,7 +258,8 @@ namespace Awsmock::Database {
          * @return list of S3 object
          * @throws DatabaseException
          */
-        [[nodiscard]] std::vector<Entity::S3::Object> ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
+        [[nodiscard]]
+        std::vector<Entity::S3::Object> ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const override;
 
         /**
          * @brief Delete a bucket.
@@ -241,14 +267,15 @@ namespace Awsmock::Database {
          * @param bucket bucket entity
          * @throws DatabaseException
          */
-        void DeleteBucket(const Entity::S3::Bucket &bucket);
+        void DeleteBucket(const Entity::S3::Bucket &bucket) const override;
 
         /**
          * @brief Deletes all buckets
          *
          * @return total number of deleted objects
          */
-        long DeleteAllBuckets();
+        [[nodiscard]]
+        long DeleteAllBuckets() const override;
 
         /**
          * Check the existence of an object
@@ -257,7 +284,8 @@ namespace Awsmock::Database {
          * @return true if existing otherwise false
          * @throws DatabaseException
          */
-        bool ObjectExists(const Entity::S3::Object &object);
+        [[nodiscard]]
+        bool ObjectExists(const Entity::S3::Object &object) const override;
 
         /**
          * @brief Check the existence of an object by internal name
@@ -266,7 +294,8 @@ namespace Awsmock::Database {
          * @return true if existing otherwise false
          * @throws DatabaseException
          */
-        bool ObjectExistsInternalName(const std::string &filename);
+        [[nodiscard]]
+        bool ObjectExistsInternalName(const std::string &filename) const override;
 
         /**
          * @brief Check the existence of an object by OID
@@ -275,7 +304,8 @@ namespace Awsmock::Database {
          * @return true if existing otherwise false
          * @throws DatabaseException
          */
-        bool ObjectExists(const std::string &oid) const;
+        [[nodiscard]]
+        bool ObjectExists(const std::string &oid) const override;
 
         /**
          * @brief Bucket exists
@@ -286,7 +316,8 @@ namespace Awsmock::Database {
          * @return true if object exists
          * @throws DatabaseException
          */
-        bool ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const;
+        [[nodiscard]]
+        bool ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const override;
 
         /**
          * @brief Create a new S3 object in the S3 object table
@@ -295,7 +326,8 @@ namespace Awsmock::Database {
          * @return created object entity
          * @throws DatabaseException
          */
-        Entity::S3::Object CreateObject(const Entity::S3::Object &object);
+        [[nodiscard]]
+        Entity::S3::Object CreateObject(Entity::S3::Object &object) const override;
 
         /**
          * @brief Updates an existing object in the S3 object table
@@ -304,16 +336,78 @@ namespace Awsmock::Database {
          * @return updated object entity
          * @throws DatabaseException
          */
-        Entity::S3::Object UpdateObject(const Entity::S3::Object &object);
+        [[nodiscard]]
+        Entity::S3::Object UpdateObject(Entity::S3::Object &object) const override;
 
         /**
-         * @brief Gets an object from an bucket
+         * @brief Gets an object from a bucket
          *
          * @param oid object ID
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObjectById(const std::string &oid);
+        [[nodiscard]]
+        Entity::S3::Object GetObjectById(const std::string &oid) const override;
+
+        /**
+         * @brief Gets an object from a bucket
+         *
+         * @param oid object ID
+         * @return S3 object
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::S3::Object GetObjectById(bsoncxx::oid oid) const override;
+
+        /**
+         * @brief Create a new bucket or update an existing bucket
+         *
+         * @param bucket bucket entity
+         * @return created or updated bucket entity
+         */
+        [[nodiscard]]
+        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const override;
+
+        /**
+         * @brief Create a new S3 object or update an existing one
+         *
+         * @param object object entity
+         * @return created or updated object entity
+         */
+        [[nodiscard]]
+        Entity::S3::Object CreateOrUpdateObject(Entity::S3::Object &object) const override;
+
+        /**
+         * @brief Gets an object by version
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @param key object key
+         * @param version version ID
+         * @return S3 object
+         */
+        [[nodiscard]]
+        Entity::S3::Object GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version) const override;
+
+        /**
+         * @brief Creates a bucket notification
+         *
+         * @param bucket S3 bucket
+         * @param bucketNotification bucket notification
+         * @return updated Bucket entity
+         */
+        [[nodiscard]]
+        Entity::S3::Bucket CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const override;
+
+        /**
+         * @brief Deletes bucket notifications
+         *
+         * @param bucket S3 bucket
+         * @param bucketNotification bucket notification
+         * @return updated Bucket entity
+         */
+        [[nodiscard]]
+        Entity::S3::Bucket DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const override;
 
         /**
          * @brief Gets an object from an bucket
@@ -324,7 +418,8 @@ namespace Awsmock::Database {
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key);
+        [[nodiscard]]
+        Entity::S3::Object GetObject(const std::string &region, const std::string &bucket, const std::string &key) const override;
 
         /**
          * @brief Gets an object from a bucket using the bucket, key and MD5 sum as query parameter
@@ -336,17 +431,20 @@ namespace Awsmock::Database {
          * @return S3 object
          * @throws DatabaseException
          */
-        Entity::S3::Object GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum);
+        [[nodiscard]]
+        Entity::S3::Object GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) const override;
 
         /**
          * @brief Counts the number of keys in a bucket
          *
          * @param region AWS region
+         * @param prefix name prefix
          * @param bucket bucket name
-         * @return number of object in bucket
+         * @return number of objects in the bucket
          * @throws DatabaseException
          */
-        long ObjectCount(const std::string &region = {}, const std::string &bucket = {});
+        [[nodiscard]]
+        long ObjectCount(const std::string &region, const std::string &prefix, const std::string &bucket) const override;
 
         /**
          * @brief Delete an object.
@@ -355,56 +453,49 @@ namespace Awsmock::Database {
          * @return number of objects deleted
          * @throws DatabaseException
          */
-        long DeleteObject(const Entity::S3::Object &object);
+        [[nodiscard]]
+        long DeleteObject(const Entity::S3::Object &object) const override;
 
         /**
          * @brief Updates an existing object in the S3 object table
          *
+         * @param region AWS region
          * @param bucket bucket to delete from
          * @param keys vector of object keys
          * @throws DatabaseException
          */
-        void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys);
+        [[nodiscard]]
+        long DeleteObjects(const std::string &region, const std::string &bucket, const std::vector<std::string> &keys) const override;
 
         /**
          * @brief Deletes all objects
          *
          * @retrun number of objects deleted.
          */
-        long DeleteAllObjects();
+        [[nodiscard]]
+        long DeleteAllObjects() const override;
 
         /**
          * Recalculate the object counters
          */
-        void AdjustObjectCounters();
+        void AdjustObjectCounters() const override;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "S3"};
 
         /**
-         * @brief Convert the bucket map to a vector
-         *
-         * @return vector of buckets
+         * S3 bucket map when running without a database
          */
-        std::vector<Entity::S3::Bucket> BucketsToVector();
+        mutable std::unordered_map<std::string, Entity::S3::Bucket> _buckets{};
 
         /**
-         * @brief Convert the object map to a vector
-         *
-         * @return vector of objects
+         * S3 object map when running without a database
          */
-        std::vector<Entity::S3::Object> ObjectsToVector();
-
-        /**
-         * S3 bucket map, when running without database
-         */
-        std::map<std::string, Entity::S3::Bucket> _buckets{};
-
-        /**
-         * S3 object map, when running without database
-         */
-        std::map<std::string, Entity::S3::Object> _objects{};
+        mutable std::unordered_map<std::string, Entity::S3::Object> _objects{};
 
         /**
          * Bucket mutex
@@ -418,5 +509,3 @@ namespace Awsmock::Database {
     };
 
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_S3_MEMORYDB_H

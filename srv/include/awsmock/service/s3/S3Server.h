@@ -68,7 +68,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::S3Database &_s3Database = Database::S3Database::instance();
+        Database::S3MongoRepository &_s3Database = Database::S3MongoRepository::instance();
 
         /**
          * Monitoring period

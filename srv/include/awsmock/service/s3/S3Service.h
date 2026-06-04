@@ -15,6 +15,7 @@
 #endif
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/core/BsonConverter.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MagicDetector.h>
@@ -80,7 +81,6 @@
 #include <awsmock/entity/s3/LambdaNotification.h>
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
-#include <awsmock/repository/S3Database.h>
 #include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
@@ -101,7 +101,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()) {
+        explicit S3Service() : _database(Database::S3MongoRepository::instance()) {
         }
 
         /**
@@ -587,7 +587,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::S3Database &_database;
+        Database::S3MongoRepository &_database;
 
         /**
          * Lambda service

@@ -131,9 +131,10 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp db/src/entity/sns/Topic.cpp
         db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
         db/src/repository/sns/SNSMongoRepository.cpp db/src/repository/sns/SNSMemoryRepository.cpp
-        db/src/entity/s3/Bucket.cpp db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp db/src/repository/S3Database.cpp
-        db/src/memorydb/S3MemoryDb.cpp db/src/entity/s3/FilterRule.cpp db/src/entity/s3/LifecycleTransition.cpp
-        db/src/entity/s3/QueueNotification.cpp db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp
+        db/src/entity/s3/Bucket.cpp db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp
+        db/src/repository/s3/S3MongoRepository.cpp db/src/repository/s3/S3MemoryRepository.cpp
+        db/src/entity/s3/FilterRule.cpp db/src/entity/s3/LifecycleTransition.cpp db/src/entity/s3/QueueNotification.cpp
+        db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp
         db/src/entity/s3/BucketEncryption.cpp db/src/entity/s3/LifecycleConfiguration.cpp
         db/src/entity/lambda/Tags.cpp db/src/entity/lambda/Environment.cpp db/src/entity/lambda/Lambda.cpp
         db/src/entity/lambda/Code.cpp db/src/entity/lambda/EphemeralStorage.cpp db/src/repository/lambda/LambdaMongoRepository.cpp

@@ -2,14 +2,14 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/S3MemoryDb.h>
+#include <awsmock/repository/s3/S3MemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex S3MemoryDb::_bucketMutex;
-    boost::mutex S3MemoryDb::_objectMutex;
+    boost::mutex S3MemoryRepository::_bucketMutex;
+    boost::mutex S3MemoryRepository::_objectMutex;
 
-    bool S3MemoryDb::BucketExists(const std::string &region, const std::string &name) {
+    bool S3MemoryRepository::BucketExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_buckets,
                                     [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
@@ -17,11 +17,11 @@ namespace Awsmock::Database {
                                     }) != _buckets.end();
     }
 
-    bool S3MemoryDb::BucketExists(const Entity::S3::Bucket &bucket) {
+    bool S3MemoryRepository::BucketExists(const Entity::S3::Bucket &bucket) const {
         return BucketExists(bucket.region, bucket.name);
     }
 
-    bool S3MemoryDb::BucketExists(const std::string &bucketArn) const {
+    bool S3MemoryRepository::BucketExists(const std::string &bucketArn) const {
 
         return std::ranges::find_if(_buckets,
                                     [bucketArn](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
@@ -29,7 +29,7 @@ namespace Awsmock::Database {
                                     }) != _buckets.end();
     }
 
-    Entity::S3::Bucket S3MemoryDb::GetBucketById(const std::string &oid) {
+    Entity::S3::Bucket S3MemoryRepository::GetBucketById(const std::string &oid) const {
 
         const auto it = std::ranges::find_if(_buckets, [oid](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
             return bucket.first == oid;
@@ -42,13 +42,16 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::Bucket S3MemoryDb::GetBucketByRegionName(const std::string &region, const std::string &name) {
+    Entity::S3::Bucket S3MemoryRepository::GetBucketById(const bsoncxx::oid &oid) const {
+        return GetBucketById(oid.to_string());
+    }
+
+    Entity::S3::Bucket S3MemoryRepository::GetBucketByRegionName(const std::string &region, const std::string &name) const {
 
         const auto it = std::ranges::find_if(_buckets,
                                              [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
                                                  return bucket.second.region == region && bucket.second.name == name;
                                              });
-
         if (it != _buckets.end()) {
             it->second.oid = it->first;
             return it->second;
@@ -56,7 +59,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::Bucket S3MemoryDb::GetBucketByArn(const std::string &bucketArn) {
+    Entity::S3::Bucket S3MemoryRepository::GetBucketByArn(const std::string &bucketArn) const {
 
         const auto it = std::ranges::find_if(_buckets,
                                              [bucketArn](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
@@ -70,7 +73,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::Bucket S3MemoryDb::CreateBucket(const Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3MemoryRepository::CreateBucket(Entity::S3::Bucket &bucket) const {
         boost::mutex::scoped_lock lock(_bucketMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
@@ -79,12 +82,41 @@ namespace Awsmock::Database {
         return GetBucketById(oid);
     }
 
-    Entity::S3::BucketList S3MemoryDb::ListBuckets() {
+    Entity::S3::BucketList S3MemoryRepository::ListBuckets(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<SortColumn> &sortColumns) const {
         boost::mutex::scoped_lock lock(_bucketMutex);
-        return Core::NumberUtils::toVector(_buckets);
+
+        auto q = Core::from(_buckets | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q = q.where([region](const Entity::S3::Bucket &b) { return b.region == region; });
+        }
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::S3::Bucket &b) { return Core::StringUtils::StartsWith(b.name, prefix); });
+        }
+        for (const auto &col: sortColumns) {
+            q = q.order_by([col](const Entity::S3::Bucket &a, const Entity::S3::Bucket &b) {
+                if (col.column == "name") {
+                    return col.sortDirection == 1 ? a.name < b.name : b.name < a.name;
+                }
+                if (col.column == "size") {
+                    return col.sortDirection == 1 ? a.size < b.size : b.size < a.size;
+                }
+                if (col.column == "keys") {
+                    return col.sortDirection == 1 ? a.keys < b.keys : b.keys < a.keys;
+                }
+                return false;
+            });
+        }
+        auto result = q.to_vector();
+        if (skip > 0) {
+            result = result | std::views::drop(skip) | std::ranges::to<std::vector>();
+        }
+        if (maxResults > 0) {
+            result = result | std::views::take(maxResults) | std::ranges::to<std::vector>();
+        }
+        return result;
     }
 
-    Entity::S3::BucketList S3MemoryDb::ExportBuckets(const std::vector<SortColumn> &sortColumns) const {
+    Entity::S3::BucketList S3MemoryRepository::ExportBuckets(const std::vector<SortColumn> &sortColumns) const {
 
         auto q = Core::from(_buckets | std::views::values | std::ranges::to<std::vector>());
         for (const auto &col: sortColumns) {
@@ -104,13 +136,13 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) const {
+    bool S3MemoryRepository::HasObjects(const Entity::S3::Bucket &bucket) const {
         return std::ranges::count_if(_objects, [bucket](const auto &object) {
                    return object.second.region == bucket.region && object.second.bucket == bucket.name;
                }) > 0;
     }
 
-    std::vector<Entity::S3::Object> S3MemoryDb::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) {
+    std::vector<Entity::S3::Object> S3MemoryRepository::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) const {
 
         auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -125,26 +157,26 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    long S3MemoryDb::GetBucketObjectCount(const std::string &region, const std::string &bucket) const {
+    long S3MemoryRepository::GetBucketObjectCount(const std::string &region, const std::string &bucket) const {
 
         return std::ranges::count_if(_objects, [region, bucket](const auto &object) {
             return object.second.region == region && object.second.bucket == bucket;
         });
     }
 
-    long S3MemoryDb::GetBucketSize(const std::string &region, const std::string &bucket) const {
+    long S3MemoryRepository::GetBucketSize(const std::string &region, const std::string &bucket) const {
         return std::accumulate(_objects.begin(), _objects.end(), 0L,
                                [region, bucket](long sum, const auto &item) {
                                    return item.second.region == region && item.second.bucket == bucket ? sum + item.second.size : sum;
                                });
     }
 
-    long S3MemoryDb::BucketCount() const {
+    long S3MemoryRepository::BucketCount(const std::string &region, const std::string &prefix) const {
 
         return static_cast<long>(_buckets.size());
     }
 
-    std::vector<Entity::S3::Object> S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3MemoryRepository::ListBucket(const std::string &bucket, const std::string &prefix) const {
 
         auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!bucket.empty()) {
@@ -158,7 +190,7 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    long S3MemoryDb::PurgeBucket(const Entity::S3::Bucket &bucket) {
+    long S3MemoryRepository::PurgeBucket(Entity::S3::Bucket &bucket) const {
         boost::mutex::scoped_lock lock(_bucketMutex);
 
         const auto count = std::erase_if(_objects, [bucket](const auto &item) {
@@ -167,7 +199,7 @@ namespace Awsmock::Database {
         return static_cast<long>(count);
     }
 
-    Entity::S3::Bucket S3MemoryDb::UpdateBucket(const Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3MemoryRepository::UpdateBucket(Entity::S3::Bucket &bucket) const {
         boost::mutex::scoped_lock lock(_bucketMutex);
         const auto it = std::ranges::find_if(_buckets,
                                              [bucket](const std::pair<std::string, Entity::S3::Bucket> &b) {
@@ -177,7 +209,7 @@ namespace Awsmock::Database {
         return _buckets[it->first];
     }
 
-    void S3MemoryDb::UpdateBucketCounter(const std::string &bucketArn, const long keys, const long size) {
+    void S3MemoryRepository::UpdateBucketCounter(const std::string &bucketArn, const long keys, const long size) const {
 
         boost::mutex::scoped_lock lock(_bucketMutex);
 
@@ -191,7 +223,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void S3MemoryDb::DeleteBucket(const Entity::S3::Bucket &bucket) {
+    void S3MemoryRepository::DeleteBucket(const Entity::S3::Bucket &bucket) const {
         boost::mutex::scoped_lock lock(_bucketMutex);
 
         const auto count = std::erase_if(_buckets, [bucket](const auto &item) {
@@ -200,7 +232,7 @@ namespace Awsmock::Database {
         log_debug << "Bucket deleted, count: " << count;
     }
 
-    long S3MemoryDb::DeleteAllBuckets() {
+    long S3MemoryRepository::DeleteAllBuckets() const {
         boost::mutex::scoped_lock lock(_bucketMutex);
 
         const long count = static_cast<long>(_buckets.size());
@@ -209,7 +241,7 @@ namespace Awsmock::Database {
         return count;
     }
 
-    bool S3MemoryDb::ObjectExists(const Entity::S3::Object &object) {
+    bool S3MemoryRepository::ObjectExists(const Entity::S3::Object &object) const {
 
         return std::ranges::find_if(_objects,
                                     [object](const std::pair<std::string, Entity::S3::Object> &o) {
@@ -217,7 +249,7 @@ namespace Awsmock::Database {
                                     }) != _objects.end();
     }
 
-    bool S3MemoryDb::ObjectExists(const std::string &oid) const {
+    bool S3MemoryRepository::ObjectExists(const std::string &oid) const {
 
         return std::ranges::find_if(_objects,
                                     [oid](const std::pair<std::string, Entity::S3::Object> &o) {
@@ -225,7 +257,7 @@ namespace Awsmock::Database {
                                     }) != _objects.end();
     }
 
-    bool S3MemoryDb::ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const {
+    bool S3MemoryRepository::ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const {
 
         return std::ranges::find_if(_objects,
                                     [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &o) {
@@ -233,7 +265,7 @@ namespace Awsmock::Database {
                                     }) != _objects.end();
     }
 
-    bool S3MemoryDb::ObjectExistsInternalName(const std::string &filename) {
+    bool S3MemoryRepository::ObjectExistsInternalName(const std::string &filename) const {
 
         return std::ranges::find_if(_objects,
                                     [filename](const std::pair<std::string, Entity::S3::Object> &object) {
@@ -241,7 +273,7 @@ namespace Awsmock::Database {
                                     }) != _objects.end();
     }
 
-    Entity::S3::Object S3MemoryDb::CreateObject(const Entity::S3::Object &object) {
+    Entity::S3::Object S3MemoryRepository::CreateObject(Entity::S3::Object &object) const {
         boost::mutex::scoped_lock lock(_objectMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
@@ -250,7 +282,7 @@ namespace Awsmock::Database {
         return GetObjectById(oid);
     }
 
-    Entity::S3::Object S3MemoryDb::UpdateObject(const Entity::S3::Object &object) {
+    Entity::S3::Object S3MemoryRepository::UpdateObject(Entity::S3::Object &object) const {
         boost::mutex::scoped_lock lock(_objectMutex);
 
         const auto it = std::ranges::find_if(_objects,
@@ -264,7 +296,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::Object S3MemoryDb::GetObjectById(const std::string &oid) {
+    Entity::S3::Object S3MemoryRepository::GetObjectById(const std::string &oid) const {
 
         const auto it = std::ranges::find_if(_objects, [oid](const std::pair<std::string, Entity::S3::Object> &object) {
             return object.first == oid;
@@ -277,7 +309,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::Object S3MemoryDb::GetObject(const std::string &region, const std::string &bucket, const std::string &key) {
+    Entity::S3::Object S3MemoryRepository::GetObject(const std::string &region, const std::string &bucket, const std::string &key) const {
 
         const auto it = std::ranges::find_if(_objects,
                                              [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
@@ -291,7 +323,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::Object S3MemoryDb::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) {
+    Entity::S3::Object S3MemoryRepository::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) const {
 
         const auto it = std::ranges::find_if(_objects,
                                              [region, bucket, key, md5sum](const std::pair<std::string, Entity::S3::Object> &object) {
@@ -305,12 +337,15 @@ namespace Awsmock::Database {
         return {};
     }
 
-    long S3MemoryDb::ObjectCount(const std::string &region, const std::string &bucket) {
+    long S3MemoryRepository::ObjectCount(const std::string &region, const std::string &prefix, const std::string &bucket) const {
         boost::mutex::scoped_lock lock(_objectMutex);
 
         auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
             q = q.where([region](const Entity::S3::Object &object) { return object.region == region; });
+        }
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::S3::Object &object) { return Core::StringUtils::StartsWith(object.key, prefix); });
         }
         if (!bucket.empty()) {
             q = q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
@@ -319,7 +354,7 @@ namespace Awsmock::Database {
         return static_cast<long>(q.count());
     }
 
-    std::vector<Entity::S3::Object> S3MemoryDb::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) {
+    std::vector<Entity::S3::Object> S3MemoryRepository::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -354,7 +389,7 @@ namespace Awsmock::Database {
         return Core::PageVector(q.to_vector(), pageSize, pageIndex);
     }
 
-    std::vector<Entity::S3::Object> S3MemoryDb::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3MemoryRepository::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
 
         auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -370,7 +405,7 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    long S3MemoryDb::DeleteObject(const Entity::S3::Object &object) {
+    long S3MemoryRepository::DeleteObject(const Entity::S3::Object &object) const {
         boost::mutex::scoped_lock lock(_objectMutex);
 
         const auto count = std::erase_if(_objects, [object](const auto &item) {
@@ -380,7 +415,7 @@ namespace Awsmock::Database {
         return count;
     }
 
-    void S3MemoryDb::DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys) {
+    long S3MemoryRepository::DeleteObjects(const std::string &region, const std::string &bucket, const std::vector<std::string> &keys) const {
         const std::unordered_set keySet(keys.begin(), keys.end());
         long count = 0;
         {
@@ -388,13 +423,14 @@ namespace Awsmock::Database {
             boost::mutex::scoped_lock lock(_objectMutex);
 
             count = static_cast<long>(std::erase_if(_objects, [&](const auto &item) {
-                return item.second.bucket == bucket && keySet.contains(item.second.key);
+                return item.second.region == region && item.second.bucket == bucket && keySet.contains(item.second.key);
             }));
         }
         log_debug << "Objects deleted, count: " << count;
+        return count;
     }
 
-    long S3MemoryDb::DeleteAllObjects() {
+    long S3MemoryRepository::DeleteAllObjects() const {
         boost::mutex::scoped_lock lock(_objectMutex);
 
         const long count = static_cast<long>(_objects.size());
@@ -403,9 +439,52 @@ namespace Awsmock::Database {
         return count;
     }
 
-    void S3MemoryDb::AdjustObjectCounters() {
+    Entity::S3::Object S3MemoryRepository::GetObjectById(bsoncxx::oid oid) const {
+        return GetObjectById(oid.to_string());
+    }
+
+    Entity::S3::Bucket S3MemoryRepository::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const {
+        if (BucketExists(bucket)) {
+            return UpdateBucket(bucket);
+        }
+        return CreateBucket(bucket);
+    }
+
+    Entity::S3::Object S3MemoryRepository::CreateOrUpdateObject(Entity::S3::Object &object) const {
+        if (ObjectExists(object)) {
+            return UpdateObject(object);
+        }
+        return CreateObject(object);
+    }
+
+    Entity::S3::Object S3MemoryRepository::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version) const {
+
+        const auto it = std::ranges::find_if(_objects,
+                                             [region, bucket, key, version](const std::pair<std::string, Entity::S3::Object> &object) {
+                                                 return object.second.region == region && object.second.bucket == bucket && object.second.key == key && object.second.versionId == version;
+                                             });
+        if (it != _objects.end()) {
+            it->second.oid = it->first;
+            return it->second;
+        }
+        return {};
+    }
+
+    Entity::S3::Bucket S3MemoryRepository::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const {
+        Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
+        log_debug << "Bucket notification added, notification: " << bucketNotification.ToString();
+        return UpdateBucket(internBucket);
+    }
+
+    Entity::S3::Bucket S3MemoryRepository::DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const {
+        Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
+        log_trace << "Bucket notification deleted, notification: " << bucketNotification.ToString();
+        return UpdateBucket(internBucket);
+    }
+
+    void S3MemoryRepository::AdjustObjectCounters() const {
         for (const auto &bucket: _buckets | std::views::values) {
-            _buckets[bucket.oid].keys = ObjectCount(bucket.region, bucket.name);
+            _buckets[bucket.oid].keys = ObjectCount(bucket.region, {}, bucket.name);
         }
         log_debug << "All object counters updated, count: " << _buckets.size();
     }
