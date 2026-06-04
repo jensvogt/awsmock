@@ -29,10 +29,9 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          *
-         * @param scheduler boost periodic scheduler
-         * @param ioc boost io context boost periodic scheduler
+         * @param scheduler periodic task scheduler
          */
-        explicit MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
+        explicit MonitoringServer(Core::Scheduler &scheduler);
 
         /**
          * @brief Delete monitoring data older than the retention period.

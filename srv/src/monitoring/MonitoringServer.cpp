@@ -5,9 +5,10 @@
 #include <awsmock/service/monitoring/MonitoringServer.h>
 
 namespace Awsmock::Service {
-    MonitoringServer::MonitoringServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("monitoring"), _scheduler(scheduler), _monitoringCollector(ioc) {
+    MonitoringServer::MonitoringServer(Core::Scheduler &scheduler) : AbstractServer("monitoring"), _scheduler(scheduler) {
         const int systemPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.system-period");
         const int retentionPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.retention");
+        const int averagePeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.average-period");
 
         // Start monitoring system collector
         _scheduler.AddTask("monitoring-system-collector", [this] { _metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
@@ -15,6 +16,10 @@ namespace Awsmock::Service {
 
         _scheduler.AddTask("monitoring-docker-collector", [] { Monitoring::MetricDockerCollector{}.CollectDockerCounter(); }, systemPeriod);
         log_debug << "Docker collector started";
+
+        // Start the metric aggregation and emit cycle
+        _scheduler.AddTask("monitoring-average-collector", [this] { _monitoringCollector.Collect(); }, averagePeriod);
+        log_debug << "Average collector started";
 
         // Start the database cleanup worker thread every day
         _scheduler.AddTask("monitoring-cleanup-database", [this] { DeleteMonitoringData(); }, retentionPeriod * 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
@@ -59,6 +64,7 @@ namespace Awsmock::Service {
         log_debug << "Monitoring server shutdown";
         _scheduler.Shutdown("monitoring-system-collector");
         _scheduler.Shutdown("monitoring-docker-collector");
+        _scheduler.Shutdown("monitoring-average-collector");
         _scheduler.Shutdown("monitoring-cleanup-database");
         log_info << "Monitoring server stopped";
     }
