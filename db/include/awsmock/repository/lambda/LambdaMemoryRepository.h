@@ -46,6 +46,7 @@ namespace Awsmock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         bool lambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const override;
 
         /**
@@ -55,6 +56,7 @@ namespace Awsmock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         bool lambdaExists(const Entity::Lambda::Lambda &lambda) const override;
 
         /**
@@ -211,7 +213,7 @@ namespace Awsmock::Database {
          * @return imported lambda entity.
          */
         [[nodiscard]]
-        Entity::Lambda::Lambda importLambda(Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda importLambda(Entity::Lambda::Lambda &lambda) const override;
 
         /**
          * @brief Export a list of lambdas
@@ -220,7 +222,7 @@ namespace Awsmock::Database {
          * @return Ã¶list of lambda entries
          */
         [[nodiscard]]
-        std::vector<Entity::Lambda::Lambda> exportLambdas(const std::vector<SortColumn> &sortColumns) const;
+        std::vector<Entity::Lambda::Lambda> exportLambdas(const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Creates a new lambda result
