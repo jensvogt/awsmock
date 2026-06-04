@@ -202,7 +202,7 @@ namespace Awsmock::Manager {
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::S3Server>());
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {

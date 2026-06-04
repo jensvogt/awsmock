@@ -2,8 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_MONITORING_SERVER_H
-#define AWSMOCK_SERVICE_MONITORING_SERVER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
@@ -25,7 +24,8 @@ namespace Awsmock::Service {
      */
     class MonitoringServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -47,7 +47,11 @@ namespace Awsmock::Service {
          */
         void Shutdown() override;
 
-    private:
+      private:
+
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Monitoring"};
 
         /**
@@ -94,6 +98,4 @@ namespace Awsmock::Service {
         std::vector<std::string> _exclusions;
     };
 
-} // namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_MONITORING_SERVER_H
+}// namespace Awsmock::Service

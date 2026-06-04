@@ -162,6 +162,8 @@ namespace Awsmock::Database {
         // assert
         BOOST_CHECK_EQUAL(result1.size(), 2);
         BOOST_CHECK_EQUAL(result2.size(), 1);
+        BOOST_CHECK_EQUAL(false, object1.oid.empty());
+        BOOST_CHECK_EQUAL(false, object2.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(BucketHasObjets) {
@@ -180,6 +182,8 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
+        BOOST_CHECK_EQUAL(false, object1.oid.empty());
+        BOOST_CHECK_EQUAL(false, object2.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(BucketSize) {
@@ -198,6 +202,8 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(totalSize, 10);
+        BOOST_CHECK_EQUAL(false, object1.oid.empty());
+        BOOST_CHECK_EQUAL(false, object2.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(BucketDelete) {
@@ -244,6 +250,8 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
+        BOOST_CHECK_EQUAL(false, bucket.oid.empty());
+        BOOST_CHECK_EQUAL(false, object.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectCreate) {
@@ -260,6 +268,8 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(result.key, object.key);
+        BOOST_CHECK_EQUAL(false, bucket.oid.empty());
+        BOOST_CHECK_EQUAL(false, object.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectUpdate) {
@@ -281,6 +291,8 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(15, result.size);
+        BOOST_CHECK_EQUAL(false, bucket.oid.empty());
+        BOOST_CHECK_EQUAL(false, object.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectById) {
@@ -297,6 +309,8 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(result.oid, object.oid);
+        BOOST_CHECK_EQUAL(false, bucket.oid.empty());
+        BOOST_CHECK_EQUAL(false, object.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectDelete) {
@@ -309,11 +323,13 @@ namespace Awsmock::Database {
         object = s3Database->CreateObject(object);
 
         // act
-        BOOST_CHECK_NO_THROW({ s3Database->DeleteObject(object); });
+        BOOST_CHECK_NO_THROW({ long deleted = s3Database->DeleteObject(object); });
         const bool result = s3Database->ObjectExists(object.region, object.bucket, object.key);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
+        BOOST_CHECK_EQUAL(false, bucket.oid.empty());
+        BOOST_CHECK_EQUAL(false, object.oid.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectBucketCount) {
