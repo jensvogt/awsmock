@@ -2,13 +2,13 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/ApplicationMemoryDb.h>
+#include <awsmock/repository/application/ApplicationMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex ApplicationMemoryDb::_applicationMutex;
+    boost::mutex ApplicationMemoryRepository::_applicationMutex;
 
-    bool ApplicationMemoryDb::ApplicationExists(const std::string &region, const std::string &name) {
+    bool ApplicationMemoryRepository::ApplicationExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_applications,
                                     [region, name](const std::pair<std::string, Entity::Apps::Application> &application) {
@@ -16,23 +16,7 @@ namespace Awsmock::Database {
                                     }) != _applications.end();
     }
 
-    Entity::Apps::Application ApplicationMemoryDb::GetApplicationByOid(const std::string &oid) {
-
-        const auto it = std::ranges::find_if(_applications,
-                                             [oid](const std::pair<std::string, Entity::Apps::Application> &application) {
-                                                 return application.first == oid;
-                                             });
-
-        if (it == _applications.end()) {
-            log_error << "Get application by oid failed, oid: " << oid;
-            throw Core::DatabaseException("Get application by oid failed, oid: " + oid);
-        }
-
-        it->second.oid = oid;
-        return it->second;
-    }
-
-    Entity::Apps::Application ApplicationMemoryDb::GetApplication(const std::string &region, const std::string &name) const {
+    Entity::Apps::Application ApplicationMemoryRepository::GetApplication(const std::string &region, const std::string &name) const {
 
         const auto it = std::ranges::find_if(_applications,
                                              [region, name](const std::pair<std::string, Entity::Apps::Application> &application) {
@@ -46,16 +30,16 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::Apps::Application ApplicationMemoryDb::CreateApplication(const Entity::Apps::Application &application) {
+    Entity::Apps::Application ApplicationMemoryRepository::CreateApplication(Entity::Apps::Application &application) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _applications[oid] = application;
-        log_trace << "Application created, oid: " << oid;
-        return GetApplicationByOid(oid);
+        application.oid = Core::StringUtils::CreateRandomUuid();
+        _applications[application.oid] = application;
+        log_trace << "Application created, oid: " << application.oid;
+        return _applications[application.oid];
     }
 
-    Entity::Apps::Application ApplicationMemoryDb::UpdateApplication(Entity::Apps::Application &application) {
+    Entity::Apps::Application ApplicationMemoryRepository::UpdateApplication(Entity::Apps::Application &application) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const auto it = std::ranges::find_if(_applications,
@@ -71,7 +55,7 @@ namespace Awsmock::Database {
         return _applications[it->first];
     }
 
-    void ApplicationMemoryDb::SetEnabled(const std::string &region, const std::string &name, const bool enabled) {
+    void ApplicationMemoryRepository::SetEnabled(const std::string &region, const std::string &name, const bool enabled) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const auto it = std::ranges::find_if(_applications, [&region, &name](const std::pair<std::string, Entity::Apps::Application> &a) {
@@ -86,7 +70,7 @@ namespace Awsmock::Database {
         it->second.modified = system_clock::now();
     }
 
-    std::vector<Entity::Apps::Application> ApplicationMemoryDb::ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
+    std::vector<Entity::Apps::Application> ApplicationMemoryRepository::ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -110,7 +94,7 @@ namespace Awsmock::Database {
         return Core::PageVector<Entity::Apps::Application>(q.to_vector(), pageSize, pageIndex);
     }
 
-    long ApplicationMemoryDb::CountApplications(const std::string &region, const std::string &prefix) const {
+    long ApplicationMemoryRepository::CountApplications(const std::string &region, const std::string &prefix) const {
 
         auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -122,7 +106,14 @@ namespace Awsmock::Database {
         return static_cast<long>(q.count());
     }
 
-    long ApplicationMemoryDb::DeleteApplication(const std::string &region, const std::string &name) {
+    Entity::Apps::Application ApplicationMemoryRepository::ImportApplication(Entity::Apps::Application &application) const {
+        if (ApplicationExists(application.region, application.name)) {
+            return UpdateApplication(application);
+        }
+        return CreateApplication(application);
+    }
+
+    long ApplicationMemoryRepository::DeleteApplication(const std::string &region, const std::string &name) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const auto count = std::erase_if(_applications, [region, name](const std::pair<std::string, Entity::Apps::Application> &a) {
@@ -132,7 +123,7 @@ namespace Awsmock::Database {
         return static_cast<long>(count);
     }
 
-    long ApplicationMemoryDb::DeleteAllApplications() {
+    long ApplicationMemoryRepository::DeleteAllApplications() const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const long count = _applications.size();

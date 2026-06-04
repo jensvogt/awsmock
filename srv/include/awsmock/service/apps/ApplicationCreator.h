@@ -9,13 +9,14 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/ZipUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/entity/apps/Application.h>
-#include <awsmock/repository/ApplicationDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/container/ContainerService.h>
 
 namespace Awsmock::Service {

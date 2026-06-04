@@ -8,12 +8,12 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/apps/model/Status.h>
-#include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/apps/ApplicationLogServer.h>
 #include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -96,7 +96,7 @@ namespace Awsmock::Service {
         /**
          * @brief Database connection
          */
-        Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+        std::shared_ptr<Database::IApplicationRepository> _applicationDatabase = Database::RepositoryFactory::instance().applicationRepository();
 
         /**
          * Application service module

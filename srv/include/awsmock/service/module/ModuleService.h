@@ -8,6 +8,7 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/ssm/SSMMongoRepository.h>
@@ -29,7 +30,6 @@
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ApiGatewayDatabase.h>
-#include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>

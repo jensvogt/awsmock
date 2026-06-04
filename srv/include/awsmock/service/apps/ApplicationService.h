@@ -12,6 +12,7 @@
 #include <boost/asio/strand.hpp>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
@@ -41,7 +42,6 @@
 #include <awsmock/dto/apps/mapper/Mapper.h>
 #include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
-#include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/apps/ApplicationCreator.h>
 
 namespace Awsmock::Service {
@@ -251,7 +251,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::ApplicationDatabase &_database;
+        std::shared_ptr<Database::IApplicationRepository> _applicationDatabase = Database::RepositoryFactory::instance().applicationRepository();
 
         /**
          * AWS account userPoolId
