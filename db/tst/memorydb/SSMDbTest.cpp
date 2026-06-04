@@ -6,8 +6,9 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../include/awsmock/repository/ssm/SSMDatabase.h>
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/ssm/ISSMRepository.h>
 #include <boost/test/utils/runtime/modifier.hpp>
 
 namespace {
@@ -33,70 +34,72 @@ namespace Awsmock::Database {
     }
 
     struct SsmMemoryDbFixture {
-        SsmMemoryDbFixture() = default;
+        SsmMemoryDbFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+        }
         ~SsmMemoryDbFixture() {
-            const long messageCount = SSMDatabase::instance().DeleteAllParameters();
+            const long messageCount = RepositoryFactory::instance().ssmRepository()->deleteAllParameters();
             log_debug << "Parameters deleted " << messageCount;
         }
     };
 
     BOOST_FIXTURE_TEST_SUITE(SsmMemoryDbTests, SsmMemoryDbFixture)
 
-    BOOST_AUTO_TEST_CASE(CreateParameterTest) {
+    BOOST_AUTO_TEST_CASE(createParameterTest) {
 
         // arrange
-        const SSMDatabase &ssmDatabase = SSMDatabase::instance();
+        const std::shared_ptr<ISSMRepository> ssmDatabase = RepositoryFactory::instance().ssmRepository();
         Entity::SSM::Parameter parameter = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
 
         // act
-        const Entity::SSM::Parameter result = ssmDatabase.CreateParameter(parameter);
+        const Entity::SSM::Parameter result = ssmDatabase->createParameter(parameter);
 
         // assert
         BOOST_CHECK_EQUAL(result.oid.empty(), false);
         BOOST_CHECK_EQUAL(result.parameterName, "parameter-name");
         BOOST_CHECK_EQUAL(result.parameterValue, "parameter-value");
-        BOOST_CHECK_EQUAL(1, ssmDatabase.CountParameters());
+        BOOST_CHECK_EQUAL(1, ssmDatabase->countParameters({}, {}));
     }
 
     BOOST_AUTO_TEST_CASE(ExistsParameterTest) {
 
         // arrange
-        const SSMDatabase &ssmDatabase = SSMDatabase::instance();
+        const std::shared_ptr<ISSMRepository> ssmDatabase = RepositoryFactory::instance().ssmRepository();
         Entity::SSM::Parameter parameter = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
-        parameter = ssmDatabase.CreateParameter(parameter);
+        parameter = ssmDatabase->createParameter(parameter);
 
         // act
-        const bool result1 = ssmDatabase.ParameterExists(parameter.parameterName);
-        const bool result2 = ssmDatabase.ParameterExists("blabla");
+        const bool result1 = ssmDatabase->parameterExists(parameter.parameterName);
+        const bool result2 = ssmDatabase->parameterExists("blabla");
 
         // assert
         BOOST_CHECK_EQUAL(true, result1);
         BOOST_CHECK_EQUAL(false, result2);
     }
 
-    BOOST_AUTO_TEST_CASE(GetParameterByNameMTest) {
+    BOOST_AUTO_TEST_CASE(getParameterByNameMTest) {
 
         // arrange
-        const SSMDatabase &ssmDatabase = SSMDatabase::instance();
+        const std::shared_ptr<ISSMRepository> ssmDatabase = RepositoryFactory::instance().ssmRepository();
         Entity::SSM::Parameter parameter = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
-        parameter = ssmDatabase.CreateParameter(parameter);
+        parameter = ssmDatabase->createParameter(parameter);
 
         // act
-        const Entity::SSM::Parameter result = ssmDatabase.GetParameterByName(parameter.parameterName);
+        const Entity::SSM::Parameter result = ssmDatabase->getParameterByName(parameter.parameterName);
 
         // assert
         BOOST_CHECK_EQUAL(result.parameterName, "parameter-name");
     }
 
-    BOOST_AUTO_TEST_CASE(GetParameterByIdTest) {
+    BOOST_AUTO_TEST_CASE(getParameterByIdTest) {
 
         // arrange
-        const SSMDatabase &ssmDatabase = SSMDatabase::instance();
+        const std::shared_ptr<ISSMRepository> ssmDatabase = RepositoryFactory::instance().ssmRepository();
         Entity::SSM::Parameter parameter = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
-        parameter = ssmDatabase.CreateParameter(parameter);
+        parameter = ssmDatabase->createParameter(parameter);
 
         // act
-        const Entity::SSM::Parameter result = ssmDatabase.GetParameterById(parameter.oid);
+        const Entity::SSM::Parameter result = ssmDatabase->getParameterById(parameter.oid);
 
         // assert
         BOOST_CHECK_EQUAL(result.parameterName, "parameter-name");
@@ -105,13 +108,13 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(UpdateParameterTest) {
 
         // arrange
-        const SSMDatabase &ssmDatabase = SSMDatabase::instance();
+        const std::shared_ptr<ISSMRepository> ssmDatabase = RepositoryFactory::instance().ssmRepository();
         Entity::SSM::Parameter parameter = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
-        parameter = ssmDatabase.CreateParameter(parameter);
+        parameter = ssmDatabase->createParameter(parameter);
         parameter.description = "new description";
 
         // act
-        const Entity::SSM::Parameter result = ssmDatabase.UpdateParameter(parameter);
+        const Entity::SSM::Parameter result = ssmDatabase->updateParameter(parameter);
 
         // assert
         BOOST_CHECK_EQUAL(result.description, "new description");
@@ -120,12 +123,12 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteParameterTest) {
 
         // arrange
-        const SSMDatabase &ssmDatabase = SSMDatabase::instance();
+        const std::shared_ptr<ISSMRepository> ssmDatabase = RepositoryFactory::instance().ssmRepository();
         Entity::SSM::Parameter parameter = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
-        parameter = ssmDatabase.CreateParameter(parameter);
+        parameter = ssmDatabase->createParameter(parameter);
 
         // act
-        const long result = ssmDatabase.DeleteParameter(parameter);
+        const long result = ssmDatabase->deleteParameter(parameter);
 
         // assert
         BOOST_CHECK_EQUAL(1, result);
@@ -134,16 +137,16 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteAllParameterTest) {
 
         // arrange
-        const SSMDatabase &ssmDatabase = SSMDatabase::instance();
+        const std::shared_ptr<ISSMRepository> ssmDatabase = RepositoryFactory::instance().ssmRepository();
         Entity::SSM::Parameter parameter1 = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
-        parameter1 = ssmDatabase.CreateParameter(parameter1);
+        parameter1 = ssmDatabase->createParameter(parameter1);
         BOOST_CHECK_EQUAL(false, parameter1.oid.empty());
         Entity::SSM::Parameter parameter2 = CreateDefaultParameter(TEST_REGION, "parameter-name", "parameter-value");
-        parameter2 = ssmDatabase.CreateParameter(parameter2);
+        parameter2 = ssmDatabase->createParameter(parameter2);
         BOOST_CHECK_EQUAL(false, parameter2.oid.empty());
 
         // act
-        const long result = ssmDatabase.DeleteAllParameters();
+        const long result = ssmDatabase->deleteAllParameters();
 
         // assert
         BOOST_CHECK_EQUAL(2, result);

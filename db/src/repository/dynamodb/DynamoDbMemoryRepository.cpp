@@ -53,10 +53,10 @@ namespace Awsmock::Database {
     Entity::DynamoDb::Table DynamoDbMemoryRepository::createTable(Entity::DynamoDb::Table &table) const {
         boost::mutex::scoped_lock lock(_tableMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _tables[oid] = table;
-        log_trace << "Lambda created, oid: " << oid;
-        return _tables[oid];
+        table.oid = Core::StringUtils::CreateRandomUuid();
+        _tables[table.oid] = table;
+        log_trace << "DynamoDB table created, oid: " << table.oid;
+        return _tables[table.oid];
     }
 
     Entity::DynamoDb::Table DynamoDbMemoryRepository::getTableById(const std::string &oid) const {
@@ -227,10 +227,10 @@ namespace Awsmock::Database {
     Entity::DynamoDb::Item DynamoDbMemoryRepository::createItem(Entity::DynamoDb::Item &item) const {
         boost::mutex::scoped_lock lock(_itemMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _items[oid] = item;
-        log_trace << "Item created, oid: " << oid;
-        return _items[oid];
+        item.oid = Core::StringUtils::CreateRandomUuid();
+        _items[item.oid] = item;
+        log_trace << "DynamoDB item created, oid: " << item.oid;
+        return _items[item.oid];
     }
 
     Entity::DynamoDb::Item DynamoDbMemoryRepository::updateItem(Entity::DynamoDb::Item &item) const {

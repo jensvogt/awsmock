@@ -86,7 +86,9 @@ namespace Awsmock::Database {
     }
 
     struct DynamoDbServiceFixture {
-        DynamoDbServiceFixture() = default;
+        DynamoDbServiceFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+        }
         ~DynamoDbServiceFixture() {
             try {
                 const Service::DynamoDbService _dynamoDbService;

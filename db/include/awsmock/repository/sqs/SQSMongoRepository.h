@@ -109,7 +109,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Queue getQueueById(bsoncxx::oid oid) const override;
+        Entity::SQS::Queue getQueueById(const bsoncxx::oid &oid) const override;
 
         /**
          * @brief Returns a queue by primary key

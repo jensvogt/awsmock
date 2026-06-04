@@ -6,8 +6,9 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../include/awsmock/repository/sqs/SQSDatabase.h>
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/sqs/ISQSRepository.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};
@@ -39,25 +40,27 @@ namespace Awsmock::Database {
     }
 
     struct SqsDbFixture {
-        SqsDbFixture() = default;
+        SqsDbFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+        }
         ~SqsDbFixture() {
-            const long messageCount = SQSDatabase::instance().DeleteAllMessages();
+            const long messageCount = RepositoryFactory::instance().sqsRepository()->deleteAllMessages();
             log_debug << "Messages deleted " << messageCount;
-            const long queueCount = SQSDatabase::instance().DeleteAllQueues();
+            const long queueCount = RepositoryFactory::instance().sqsRepository()->deleteAllQueues();
             log_debug << "Queues deleted " << queueCount;
         }
     };
 
     BOOST_FIXTURE_TEST_SUITE(SqsDbTests, SqsDbFixture)
 
-    BOOST_AUTO_TEST_CASE(CreateQueueTest) {
+    BOOST_AUTO_TEST_CASE(createQueueTest) {
 
         // arrange
-        const SQSDatabase &sqsDatabase = SQSDatabase::instance();
+        const std::shared_ptr<ISQSRepository> sqsRepository = RepositoryFactory::instance().sqsRepository();
         Entity::SQS::Queue queue = CreateDefaultTopic(TEST_REGION, TEST_QUEUE_NAME);
 
         // act
-        queue = sqsDatabase.CreateQueue(queue);
+        queue = sqsRepository->createQueue(queue);
 
         // assert
         BOOST_CHECK_EQUAL(false, queue.arn.empty());
@@ -68,18 +71,18 @@ namespace Awsmock::Database {
         BOOST_CHECK_EQUAL(0, queue.attributes.approximateNumberOfMessagesDelayed);
     }
 
-    BOOST_AUTO_TEST_CASE(DeleteQueueTest) {
+    BOOST_AUTO_TEST_CASE(deleteQueueTest) {
 
         // arrange
-        const SQSDatabase &sqsDatabase = SQSDatabase::instance();
+        const std::shared_ptr<ISQSRepository> sqsRepository = RepositoryFactory::instance().sqsRepository();
         Entity::SQS::Queue queue = CreateDefaultTopic(TEST_REGION, TEST_QUEUE_NAME);
-        queue = sqsDatabase.CreateQueue(queue);
+        queue = sqsRepository->createQueue(queue);
         BOOST_CHECK_EQUAL(false, queue.arn.empty());
         BOOST_CHECK_EQUAL(false, queue.oid.empty());
         BOOST_CHECK_EQUAL(false, queue.name.empty());
 
         // act
-        const long result = sqsDatabase.DeleteQueue(queue);
+        const long result = sqsRepository->deleteQueue(queue);
 
         // assert
         BOOST_CHECK_EQUAL(1, result);
@@ -88,20 +91,20 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteAllQueueTest) {
 
         // arrange
-        const SQSDatabase &sqsDatabase = SQSDatabase::instance();
+        const std::shared_ptr<ISQSRepository> sqsRepository = RepositoryFactory::instance().sqsRepository();
         Entity::SQS::Queue queue1 = CreateDefaultTopic(TEST_REGION, TEST_QUEUE_NAME);
-        queue1 = sqsDatabase.CreateQueue(queue1);
+        queue1 = sqsRepository->createQueue(queue1);
         BOOST_CHECK_EQUAL(false, queue1.arn.empty());
         BOOST_CHECK_EQUAL(false, queue1.oid.empty());
         BOOST_CHECK_EQUAL(false, queue1.name.empty());
         Entity::SQS::Queue queue2 = CreateDefaultTopic(TEST_REGION, std::string(TEST_QUEUE_NAME) + "_1");
-        queue2 = sqsDatabase.CreateQueue(queue2);
+        queue2 = sqsRepository->createQueue(queue2);
         BOOST_CHECK_EQUAL(false, queue2.arn.empty());
         BOOST_CHECK_EQUAL(false, queue2.oid.empty());
         BOOST_CHECK_EQUAL(false, queue2.name.empty());
 
         // act
-        const long result = sqsDatabase.DeleteAllQueues();
+        const long result = sqsRepository->deleteAllQueues();
 
         // assert
         BOOST_CHECK_EQUAL(2, result);
@@ -110,18 +113,18 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(SendMessageTest) {
 
         // arrange
-        const SQSDatabase &sqsDatabase = SQSDatabase::instance();
+        const std::shared_ptr<ISQSRepository> sqsRepository = RepositoryFactory::instance().sqsRepository();
         Entity::SQS::Queue queue = CreateDefaultTopic(TEST_REGION, TEST_QUEUE_NAME);
-        queue = sqsDatabase.CreateQueue(queue);
+        queue = sqsRepository->createQueue(queue);
         BOOST_CHECK_EQUAL(false, queue.arn.empty());
         BOOST_CHECK_EQUAL(false, queue.oid.empty());
         BOOST_CHECK_EQUAL(false, queue.name.empty());
         Entity::SQS::Message message = CreateDefaultSNSMessage(TEST_REGION, queue.name);
 
         // act
-        message = sqsDatabase.CreateMessage(message);
-        sqsDatabase.AdjustMessageCounters();
-        queue = sqsDatabase.GetQueueByArn(queue.arn);
+        message = sqsRepository->createMessage(message);
+        sqsRepository->adjustMessageCounters();
+        queue = sqsRepository->getQueueByArn(queue.arn);
 
         // assert
         BOOST_CHECK_EQUAL(true, message.receiptHandle.empty());
@@ -132,21 +135,21 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteMessageTest) {
 
         // arrange
-        const SQSDatabase &sqsDatabase = SQSDatabase::instance();
+        const std::shared_ptr<ISQSRepository> sqsRepository = RepositoryFactory::instance().sqsRepository();
         Entity::SQS::Queue queue = CreateDefaultTopic(TEST_REGION, TEST_QUEUE_NAME);
-        queue = sqsDatabase.CreateQueue(queue);
+        queue = sqsRepository->createQueue(queue);
         BOOST_CHECK_EQUAL(false, queue.arn.empty());
         BOOST_CHECK_EQUAL(false, queue.oid.empty());
         BOOST_CHECK_EQUAL(false, queue.name.empty());
         Entity::SQS::Message message = CreateDefaultSNSMessage(TEST_REGION, queue.name);
-        message = sqsDatabase.CreateMessage(message);
+        message = sqsRepository->createMessage(message);
         BOOST_CHECK_EQUAL(true, message.receiptHandle.empty());
         BOOST_CHECK_EQUAL(false, message.messageId.empty());
 
         // act
-        const long count = sqsDatabase.DeleteMessage(message);
-        sqsDatabase.AdjustMessageCounters();
-        queue = sqsDatabase.GetQueueByArn(queue.arn);
+        const long count = sqsRepository->deleteMessage(message);
+        sqsRepository->adjustMessageCounters();
+        queue = sqsRepository->getQueueByArn(queue.arn);
 
         // assert
         BOOST_CHECK_EQUAL(1, count);

@@ -6,9 +6,9 @@
 #include <boost/test/included/unit_test.hpp>
 
 // Awsmock includes
-#include <../../include/awsmock/repository/dynamodb/DynamoDbDatabase.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/repository/RepositoryFactory.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};
@@ -19,17 +19,17 @@ struct GlobalTestFixture {
     GlobalTestFixture() {
 
         // Initialize logging
-        AwsMock::Core::LogStream::Initialize();
-        AwsMock::Core::LogStream::RemoveConsoleLogs();
+        Awsmock::Core::LogStream::Initialize();
+        Awsmock::Core::LogStream::RemoveConsoleLogs();
 
         // Create test configuration
-        AwsMock::Core::TestUtils::CreateTestConfigurationFile(false);
+        Awsmock::Core::TestUtils::CreateTestConfigurationFile(false);
     }
 
     ~GlobalTestFixture() {
-        const long itemCount = AwsMock::Database::DynamoDbDatabase::instance().DeleteAllItems();
+        const long itemCount = Awsmock::Database::RepositoryFactory::instance().dynamodbRepository()->deleteAllItems();
         log_debug << "Items deleted, count: " << itemCount;
-        const long tableCount = AwsMock::Database::DynamoDbDatabase::instance().DeleteAllTables();
+        const long tableCount = Awsmock::Database::RepositoryFactory::instance().dynamodbRepository()->deleteAllTables();
         log_debug << "Tables deleted, count: " << tableCount;
     }
 };

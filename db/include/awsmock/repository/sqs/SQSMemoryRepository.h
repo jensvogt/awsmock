@@ -124,7 +124,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::SQS::Queue getQueueById(bsoncxx::oid oid) const override;
+        Entity::SQS::Queue getQueueById(const bsoncxx::oid &oid) const override;
 
         /**
          * @brief Get a paged and sorted list of all available queues
@@ -492,7 +492,19 @@ namespace Awsmock::Database {
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
+
+        /**
+         * @brief Return the total number of message for a queue with the given status
+         *
+         * @param queueArn queue AWS ARN
+         * @param status status
+         * @return number of messages with the given status
+         */
+        long countMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) const;
 
         /**
          * SQS queue map when running without a database

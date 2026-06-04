@@ -65,7 +65,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::SQS::Queue SQSMongoRepository::getQueueById(bsoncxx::oid oid) const {
+    Entity::SQS::Queue SQSMongoRepository::getQueueById(const bsoncxx::oid &oid) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();

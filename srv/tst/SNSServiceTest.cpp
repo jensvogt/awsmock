@@ -7,9 +7,10 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../db/include/awsmock/repository/sns/SNSMongoRepository.h>
-#include <../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/sns/SNSMongoRepository.h>
+#include <awsmock/repository/sqs/SQSMongoRepository.h>
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
 
@@ -53,13 +54,13 @@ namespace Awsmock::Database {
         SNSServiceFixture() = default;
         ~SNSServiceFixture() {
             try {
-                const long deletedMessages = SNSMongoRepository::instance().DeleteAllMessages();
+                const long deletedMessages = RepositoryFactory::instance().snsRepository()->deleteAllMessages();
                 log_debug << "SNS messages deleted, count: " << deletedMessages;
-                const long deletedTopics = SNSMongoRepository::instance().DeleteAllTopics();
+                const long deletedTopics = RepositoryFactory::instance().snsRepository()->deleteAllTopics();
                 log_debug << "SNS topics deleted, count: " << deletedTopics;
-                const long deletedSqsMessages = SQSMongoRepository::instance().DeleteAllMessages();
+                const long deletedSqsMessages = RepositoryFactory::instance().sqsRepository()->deleteAllMessages();
                 log_debug << "SQS messages deleted, count: " << deletedSqsMessages;
-                const long deletedQueues = SQSMongoRepository::instance().DeleteAllQueues();
+                const long deletedQueues = RepositoryFactory::instance().sqsRepository()->deleteAllQueues();
                 log_debug << "SQS queues deleted, count: " << deletedQueues;
             } catch (const std::exception &exc) {
                 log_error << "SNS fixture cleanup failed: " << exc.what();
@@ -116,7 +117,7 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(false, deleteResponse.requestId.empty());
-        BOOST_CHECK_EQUAL(0, SNSMongoRepository::instance().ListTopics(TEST_REGION).size());
+        BOOST_CHECK_EQUAL(0, RepositoryFactory::instance().snsRepository()->listTopics(TEST_REGION).size());
     }
 
     BOOST_AUTO_TEST_CASE(TopicPurgeTest) {

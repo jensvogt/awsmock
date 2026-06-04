@@ -6,8 +6,10 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../include/awsmock/repository/dynamodb/DynamoDbDatabase.h>
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/dynamodb/IDynamoDbRepository.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};
@@ -55,25 +57,27 @@ namespace Awsmock::Database {
     }
 
     struct DynamoDbFixture {
-        DynamoDbFixture() = default;
+        DynamoDbFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+        }
         ~DynamoDbFixture() {
-            const long deletedItems = DynamoDbDatabase::instance().DeleteAllItems();
+            const long deletedItems = RepositoryFactory::instance().dynamodbRepository()->deleteAllItems();
             log_debug << "Items deleted, count: " << deletedItems;
-            const long deletedTables = DynamoDbDatabase::instance().DeleteAllTables();
+            const long deletedTables = RepositoryFactory::instance().dynamodbRepository()->deleteAllTables();
             log_debug << "Tables deleted, count: " << deletedTables;
         }
     };
 
     BOOST_FIXTURE_TEST_SUITE(DynamoMemoryDbTests, DynamoDbFixture)
 
-    BOOST_AUTO_TEST_CASE(CreateTableTest) {
+    BOOST_AUTO_TEST_CASE(createTableTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
 
         // act
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
 
         // assert
         BOOST_CHECK_EQUAL(false, table.arn.empty());
@@ -85,14 +89,14 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ListTableTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
         BOOST_CHECK_EQUAL(false, table.arn.empty());
         BOOST_CHECK_EQUAL(false, table.oid.empty());
 
         // act
-        const std::vector<Entity::DynamoDb::Table> tables = dynamoDbDatabase.ListTables();
+        const std::vector<Entity::DynamoDb::Table> tables = dynamodbRepository->listTables({}, {}, 0, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(false, tables.empty());
@@ -101,14 +105,14 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteAllTablesTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
         BOOST_CHECK_EQUAL(false, table.arn.empty());
         BOOST_CHECK_EQUAL(false, table.oid.empty());
 
         // act
-        const long result = dynamoDbDatabase.DeleteAllTables();
+        const long result = dynamodbRepository->deleteAllTables();
 
         // assert
         BOOST_CHECK_EQUAL(true, result > 0);
@@ -117,15 +121,15 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(CreateItemTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
         BOOST_CHECK_EQUAL(false, table.arn.empty());
         BOOST_CHECK_EQUAL(false, table.oid.empty());
         Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
 
         // act
-        item = dynamoDbDatabase.CreateItem(item);
+        item = dynamodbRepository->createItem(item);
 
         // assert
         BOOST_CHECK_EQUAL(false, item.attributes.empty());
@@ -135,16 +139,16 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ExistsItemTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
         BOOST_CHECK_EQUAL(false, table.arn.empty());
         BOOST_CHECK_EQUAL(false, table.oid.empty());
         Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
-        item = dynamoDbDatabase.CreateItem(item);
+        item = dynamodbRepository->createItem(item);
 
         // act
-        const bool result = dynamoDbDatabase.ItemExists(item);
+        const bool result = dynamodbRepository->itemExists(item);
 
         // assert
         BOOST_CHECK_EQUAL(true, result);
@@ -153,17 +157,17 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(GetItemTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
         BOOST_CHECK_EQUAL(false, table.arn.empty());
         BOOST_CHECK_EQUAL(false, table.oid.empty());
         Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
-        item = dynamoDbDatabase.CreateItem(item);
+        item = dynamodbRepository->createItem(item);
         BOOST_CHECK_EQUAL(false, item.oid.empty());
 
         // act
-        item = dynamoDbDatabase.GetItemByKeys(table.region, table.name, "key-value-1");
+        item = dynamodbRepository->getItemByKeys(table.region, table.name, "key-value-1", {});
 
         // assert
         BOOST_CHECK_EQUAL(false, item.attributes.empty());
@@ -173,17 +177,17 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ListItemTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
         BOOST_CHECK_EQUAL(false, table.arn.empty());
         BOOST_CHECK_EQUAL(false, table.oid.empty());
         Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
-        item = dynamoDbDatabase.CreateItem(item);
+        item = dynamodbRepository->createItem(item);
         BOOST_CHECK_EQUAL(false, item.oid.empty());
 
         // act
-        const std::vector<Entity::DynamoDb::Item> items = dynamoDbDatabase.ListItems(table.region, table.name);
+        const std::vector<Entity::DynamoDb::Item> items = dynamodbRepository->listItems(table.region, table.name, 0, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(false, items.empty());
@@ -192,18 +196,18 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteItemTest) {
 
         // arrange
-        const DynamoDbDatabase &dynamoDbDatabase = DynamoDbDatabase::instance();
+        const std::shared_ptr<IDynamoDbRepository> dynamodbRepository = RepositoryFactory::instance().dynamodbRepository();
         Entity::DynamoDb::Table table = CreateDefaultTable();
-        table = dynamoDbDatabase.CreateTable(table);
+        table = dynamodbRepository->createTable(table);
         BOOST_CHECK_EQUAL(false, table.arn.empty());
         BOOST_CHECK_EQUAL(false, table.oid.empty());
         Entity::DynamoDb::Item item = CreateDefaultItem(table.region, table.name);
-        item = dynamoDbDatabase.CreateItem(item);
+        item = dynamodbRepository->createItem(item);
         BOOST_CHECK_EQUAL(false, item.oid.empty());
 
         // act
-        dynamoDbDatabase.DeleteItem(TEST_TABLE_REGION, TEST_TABLE_NAME, "key-value-1");
-        const long count = dynamoDbDatabase.CountItems(TEST_TABLE_REGION, TEST_TABLE_NAME);
+        dynamodbRepository->deleteItem(TEST_TABLE_REGION, TEST_TABLE_NAME, "key-value-1", {});
+        const long count = dynamodbRepository->countItems(TEST_TABLE_REGION, TEST_TABLE_NAME, {});
 
         // assert
         BOOST_CHECK_EQUAL(0, count);

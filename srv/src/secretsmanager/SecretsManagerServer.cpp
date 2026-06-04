@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    SecretsManagerServer::SecretsManagerServer(Core::Scheduler &scheduler) : AbstractServer("secretsmanager"), _scheduler(scheduler) {
+    SecretsManagerServer::SecretsManagerServer() : AbstractServer("secretsmanager") {
 
         // Manager configuration
         _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.secretsmanager.monitoring-period");
@@ -15,11 +15,11 @@ namespace Awsmock::Service {
         log_debug << "SecretsManager rest module initialized";
 
         // Start secrets manager monitoring update counters
-        _scheduler.AddTask("secretsmanager-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("secretsmanager-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, _backupCron);
         }
 
         // Connect stop signal
@@ -40,7 +40,7 @@ namespace Awsmock::Service {
 
     void SecretsManagerServer::Shutdown() {
         log_info << "Secrets manager server shutting down";
-        _scheduler.Shutdown("secretsmanager-monitoring");
-        _scheduler.Shutdown("secretsmanager-backup");
+        Core::Scheduler::instance().Shutdown("secretsmanager-monitoring");
+        Core::Scheduler::instance().Shutdown("secretsmanager-backup");
     }
 }// namespace Awsmock::Service

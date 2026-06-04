@@ -44,6 +44,7 @@ namespace Awsmock::Database {
          * @return true if cognito user pool exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual bool userPoolExists(const std::string &region, const std::string &name) const = 0;
 
         /**
@@ -53,6 +54,7 @@ namespace Awsmock::Database {
          * @return true if cognito user pool exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual bool userPoolExists(const std::string &userPoolId) const = 0;
 
         /**
@@ -61,6 +63,7 @@ namespace Awsmock::Database {
          * @param userPool cognito user pool entity to create
          * @return created cognito entity.
          */
+        [[nodiscard]]
         virtual Entity::Cognito::UserPool createUserPool(Entity::Cognito::UserPool &userPool) const = 0;
 
         /**
@@ -69,6 +72,7 @@ namespace Awsmock::Database {
          * @param region aws-mock region.
          * @return total number of user pools.
          */
+        [[nodiscard]]
         virtual long countUserPools(const std::string &region) const = 0;
 
         /**
@@ -77,6 +81,7 @@ namespace Awsmock::Database {
          * @param userPool user pool entity
          * @return updated cognito user pool entity.
          */
+        [[nodiscard]]
         virtual Entity::Cognito::UserPool updateUserPool(Entity::Cognito::UserPool &userPool) const = 0;
 
         /**
@@ -86,6 +91,7 @@ namespace Awsmock::Database {
          * @return created or updated Cognito user pool entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::UserPool createOrUpdateUserPool(Entity::Cognito::UserPool &userPool) const = 0;
 
         /**
@@ -95,6 +101,7 @@ namespace Awsmock::Database {
          * @return cognito user pool entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::UserPool getUserPoolById(bsoncxx::oid oid) const = 0;
 
         /**
@@ -104,6 +111,7 @@ namespace Awsmock::Database {
          * @return cognito user pool entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::UserPool getUserPoolByUserPoolId(const std::string &userPoolId) const = 0;
 
         /**
@@ -113,6 +121,7 @@ namespace Awsmock::Database {
          * @return cognito user pool entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::UserPool getUserPoolByClientId(const std::string &clientId) const = 0;
 
         /**
@@ -123,6 +132,7 @@ namespace Awsmock::Database {
          * @return cognito entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::UserPool getUserPoolByRegionName(const std::string &region, const std::string &name) const = 0;
 
         /**
@@ -135,6 +145,7 @@ namespace Awsmock::Database {
          * @param sortColumns columns list of sort columns
          * @return list of cognito user pools
          */
+        [[nodiscard]]
         virtual std::vector<Entity::Cognito::UserPool> listUserPools(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
@@ -143,6 +154,7 @@ namespace Awsmock::Database {
          * @param sortColumns sort columns
          * @return list of cognito user pools
          */
+        [[nodiscard]]
         virtual std::vector<Entity::Cognito::UserPool> exportUserPools(const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
@@ -159,6 +171,7 @@ namespace Awsmock::Database {
          * @return number of user pools deleted
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteAllUserPools() const = 0;
 
         /**
@@ -170,6 +183,7 @@ namespace Awsmock::Database {
          * @return true if the cognito user exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual bool userExists(const std::string &region, const std::string &userPoolId, const std::string &userName) const = 0;
 
         /**
@@ -180,6 +194,7 @@ namespace Awsmock::Database {
          * @return true if a cognito user exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual bool userExists(const std::string &region, const std::string &userName) const = 0;
 
         /**
@@ -188,6 +203,7 @@ namespace Awsmock::Database {
          * @param user cognito user entity to create
          * @return created cognito user entity.
          */
+        [[nodiscard]]
         virtual Entity::Cognito::User createUser(Entity::Cognito::User &user) const = 0;
 
         /**
@@ -197,6 +213,7 @@ namespace Awsmock::Database {
          * @return cognito user entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::User getUserById(bsoncxx::oid oid) const = 0;
 
         /**
@@ -206,6 +223,7 @@ namespace Awsmock::Database {
          * @return cognito user entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::User getUserById(const std::string &oid) const = 0;
 
         /**
@@ -217,6 +235,7 @@ namespace Awsmock::Database {
          * @return cognito user entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::User getUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) const = 0;
 
         /**
@@ -227,6 +246,7 @@ namespace Awsmock::Database {
          * @param groupName group name
          * @return total number of users.
          */
+        [[nodiscard]]
         virtual long countUsers(const std::string &region, const std::string &userPoolId, const std::string &groupName) const = 0;
 
         /**
@@ -240,6 +260,7 @@ namespace Awsmock::Database {
          * @param sortColumns columns list of sort columns
          * @return list of cognito users
          */
+        [[nodiscard]]
         virtual std::vector<Entity::Cognito::User> listUsers(const std::string &region, const std::string &userPoolId, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
@@ -248,6 +269,7 @@ namespace Awsmock::Database {
          * @param sortColumns sort columns
          * @return list of cognito groups
          */
+        [[nodiscard]]
         virtual std::vector<Entity::Cognito::User> exportUsers(const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
@@ -258,6 +280,7 @@ namespace Awsmock::Database {
          * @param groupName name of the group
          * @return list of cognito users
          */
+        [[nodiscard]]
         virtual std::vector<Entity::Cognito::User> listUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const = 0;
 
         /**
@@ -266,6 +289,7 @@ namespace Awsmock::Database {
          * @param user user entity
          * @return updated cognito user entity.
          */
+        [[nodiscard]]
         virtual Entity::Cognito::User updateUser(Entity::Cognito::User &user) const = 0;
 
         /**
@@ -275,6 +299,7 @@ namespace Awsmock::Database {
          * @return created or updated Cognito user entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::User createOrUpdateUser(Entity::Cognito::User &user) const = 0;
 
         /**
@@ -284,6 +309,7 @@ namespace Awsmock::Database {
          * @return number of users deleted
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteUser(const Entity::Cognito::User &user) const = 0;
 
         /**
@@ -292,6 +318,7 @@ namespace Awsmock::Database {
          * @return number of users deleted
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteAllUsers() const = 0;
 
         /**
@@ -302,6 +329,7 @@ namespace Awsmock::Database {
          * @return true if cognito group exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual bool groupExists(const std::string &region, const std::string &groupName) const = 0;
 
         /**
@@ -311,6 +339,7 @@ namespace Awsmock::Database {
          * @return cognito group entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::Group getGroupById(bsoncxx::oid oid) const = 0;
 
         /**
@@ -322,6 +351,7 @@ namespace Awsmock::Database {
          * @return cognito group entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::Cognito::Group getGroupByGroupName(const std::string &region, const std::string &userPoolId, const std::string &groupName) const = 0;
 
         /**
@@ -330,6 +360,7 @@ namespace Awsmock::Database {
          * @param group cognito group entity to create
          * @return created cognito group entity.
          */
+        [[nodiscard]]
         virtual Entity::Cognito::Group createGroup(Entity::Cognito::Group &group) const = 0;
 
         /**
@@ -339,6 +370,7 @@ namespace Awsmock::Database {
          * @param userPoolId user pool ID
          * @return list of cognito groups
          */
+        [[nodiscard]]
         virtual std::vector<Entity::Cognito::Group> listGroups(const std::string &region, const std::string &userPoolId) const = 0;
 
         /**
@@ -347,6 +379,7 @@ namespace Awsmock::Database {
          * @param sortColumns sort columns
          * @return list of cognito groups
          */
+        [[nodiscard]]
         virtual std::vector<Entity::Cognito::Group> exportGroups(const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
@@ -358,6 +391,7 @@ namespace Awsmock::Database {
          * @return number of groups deleted
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const = 0;
 
         /**
@@ -367,6 +401,7 @@ namespace Awsmock::Database {
          * @return number of groups deleted
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteAllGroups(const std::string &region) const = 0;
 
         /**
@@ -377,6 +412,7 @@ namespace Awsmock::Database {
          * @return true if cognito client ID exists
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual bool clientIdExists(const std::string &region, const std::string &clientId) const = 0;
     };
 

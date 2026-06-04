@@ -57,7 +57,8 @@ namespace Awsmock::Service {
      */
     class KMSService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -201,7 +202,8 @@ namespace Awsmock::Service {
          */
         void DeleteKey(const Dto::KMS::DeleteKeyRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -241,13 +243,13 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        std::shared_ptr<Database::IKMSRepository> _kmsDatabase;
+        std::shared_ptr<Database::IKMSRepository> _kmsDatabase = Database::RepositoryFactory::instance().kmsRepository();
 
         /**
          * Per-key async creation futures
          */
-        mutable std::unordered_map<std::string, std::shared_future<void> > _keyCreationFutures;
+        mutable std::unordered_map<std::string, std::shared_future<void>> _keyCreationFutures;
         mutable std::mutex _futureMutex;
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

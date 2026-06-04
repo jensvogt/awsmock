@@ -35,10 +35,10 @@ namespace Awsmock::Database {
     Entity::SQS::Queue SQSMemoryRepository::createQueue(Entity::SQS::Queue &queue) const {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
-        std::string oid = Core::StringUtils::CreateRandomUuid();
-        _queues[oid] = queue;
-        log_trace << "Queue created, oid: " << oid;
-        return _queues[oid];
+        queue.oid = Core::StringUtils::CreateRandomUuid();
+        _queues[queue.oid] = queue;
+        log_trace << "Queue created, oid: " << queue.oid;
+        return _queues[queue.oid];
     }
 
     Entity::SQS::Queue SQSMemoryRepository::createOrUpdateQueue(Entity::SQS::Queue &queue) const {
@@ -61,7 +61,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SQS::Queue SQSMemoryRepository::getQueueById(bsoncxx::oid oid) const {
+    Entity::SQS::Queue SQSMemoryRepository::getQueueById(const bsoncxx::oid &oid) const {
         return getQueueById(oid.to_string());
     }
 
@@ -260,10 +260,10 @@ namespace Awsmock::Database {
     Entity::SQS::Message SQSMemoryRepository::createMessage(Entity::SQS::Message &message) const {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _messages[oid] = message;
-        log_trace << "Message created, oid: " << oid;
-        return _messages[oid];
+        message.oid = Core::StringUtils::CreateRandomUuid();
+        _messages[message.oid] = message;
+        log_trace << "Message created, oid: " << message.oid;
+        return _messages[message.oid];
     }
 
     Entity::SQS::Message SQSMemoryRepository::createOrUpdateMessage(Entity::SQS::Message &message) const {
@@ -586,14 +586,20 @@ namespace Awsmock::Database {
         return count;
     }
 
+    long SQSMemoryRepository::countMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) const {
+        return std::ranges::count_if(_messages, [queueArn, status](const auto &pair) {
+            return pair.second.queueArn == queueArn && pair.second.status == status;
+        });
+    }
+
     void SQSMemoryRepository::adjustMessageCounters() const {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        // for (const auto &queue: _queues | std::views::values) {
-        //     _queues[queue.oid].attributes.approximateNumberOfMessages = CountMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::INITIAL);
-        //     _queues[queue.oid].attributes.approximateNumberOfMessagesNotVisible = CountMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::INVISIBLE);
-        //     _queues[queue.oid].attributes.approximateNumberOfMessagesDelayed = CountMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::DELAYED);
-        // }
+        for (const auto &queue: _queues | std::views::values) {
+            _queues[queue.oid].attributes.approximateNumberOfMessages = countMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::INITIAL);
+            _queues[queue.oid].attributes.approximateNumberOfMessagesNotVisible = countMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::INVISIBLE);
+            _queues[queue.oid].attributes.approximateNumberOfMessagesDelayed = countMessagesByStatus(queue.arn, Entity::SQS::MessageStatus::DELAYED);
+        }
         log_debug << "All message counters updated, count: " << _queues.size();
     }
 

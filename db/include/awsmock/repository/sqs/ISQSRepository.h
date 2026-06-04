@@ -47,6 +47,7 @@ namespace Awsmock::Database {
          * @param region The name of the AWS region.
          * @param name The bane of the queue.
          */
+        [[nodiscard]]
         virtual bool queueExists(const std::string &region, const std::string &name) const = 0;
 
         /**
@@ -56,6 +57,7 @@ namespace Awsmock::Database {
          * @param queueUrl The URL of the queue.
          * @return true if the queue already exists.
          */
+        [[nodiscard]]
         virtual bool queueUrlExists(const std::string &region, const std::string &queueUrl) const = 0;
 
         /**
@@ -65,6 +67,7 @@ namespace Awsmock::Database {
          * @return true in case the queue exists.
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual bool queueArnExists(const std::string &queueArn) const = 0;
 
         /**
@@ -74,6 +77,7 @@ namespace Awsmock::Database {
          * @return created SQS queue entity.
          * @throws DatabaseException.
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue createQueue(Entity::SQS::Queue &queue) const = 0;
 
         /**
@@ -83,7 +87,8 @@ namespace Awsmock::Database {
          * @return The queue entity.
          * @throws DatabaseException
          */
-        virtual Entity::SQS::Queue getQueueById(bsoncxx::oid oid) const = 0;
+        [[nodiscard]]
+        virtual Entity::SQS::Queue getQueueById(const bsoncxx::oid &oid) const = 0;
 
         /**
          * @brief Returns a queue by primary key
@@ -92,6 +97,7 @@ namespace Awsmock::Database {
          * @return The queue entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue getQueueById(const std::string &oid) const = 0;
 
         /**
@@ -101,6 +107,7 @@ namespace Awsmock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue getQueueByArn(const std::string &queueArn) const = 0;
 
         /**
@@ -110,6 +117,7 @@ namespace Awsmock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue getQueueByDlq(const std::string &dlqQueueArn) const = 0;
 
         /**
@@ -118,6 +126,7 @@ namespace Awsmock::Database {
          * @param queueArn queue ARN
          * @return list of main queues
          */
+        [[nodiscard]]
         virtual std::vector<Entity::SQS::Queue> isDlq(const std::string &queueArn) const = 0;
 
         /**
@@ -128,6 +137,7 @@ namespace Awsmock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue getQueueByName(const std::string &region, const std::string &queueName) const = 0;
 
         /**
@@ -138,6 +148,7 @@ namespace Awsmock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue getQueueByUrl(const std::string &region, const std::string &queueUrl) const = 0;
 
         /**
@@ -151,6 +162,7 @@ namespace Awsmock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::QueueList listQueues(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const = 0;
 
         /**
@@ -160,6 +172,7 @@ namespace Awsmock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::QueueList exportQueues(const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
@@ -181,6 +194,7 @@ namespace Awsmock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::QueueList listQueues(const std::string &region) const = 0;
 
         /**
@@ -189,6 +203,7 @@ namespace Awsmock::Database {
          * @param queueArn queue ARN
          * @return total number of deleted messages
          */
+        [[nodiscard]]
         virtual long purgeQueue(const std::string &queueArn) const = 0;
 
         /**
@@ -197,6 +212,7 @@ namespace Awsmock::Database {
          * @param queue The name of the queue
          * @return updated queue
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue updateQueue(Entity::SQS::Queue &queue) const = 0;
 
         /**
@@ -206,6 +222,7 @@ namespace Awsmock::Database {
          * @return created SQS queue entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Queue createOrUpdateQueue(Entity::SQS::Queue &queue) const = 0;
 
         /**
@@ -215,6 +232,7 @@ namespace Awsmock::Database {
          * @param prefix queue name prefix
          * @return number of queues in the given region.
          */
+        [[nodiscard]]
         virtual long countQueues(const std::string &region, const std::string &prefix) const = 0;
 
         /**
@@ -224,6 +242,7 @@ namespace Awsmock::Database {
          * @return number of deleted queues
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteQueue(const Entity::SQS::Queue &queue) const = 0;
 
         /**
@@ -231,6 +250,7 @@ namespace Awsmock::Database {
          *
          * @return number of deleted queues
          */
+        [[nodiscard]]
         virtual long deleteAllQueues() const = 0;
 
         /**
@@ -240,6 +260,7 @@ namespace Awsmock::Database {
          * @return saved message entity
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Message createMessage(Entity::SQS::Message &message) const = 0;
 
         /**
@@ -249,6 +270,7 @@ namespace Awsmock::Database {
          * @return true, if the message exists, otherwise false
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual bool messageExists(const std::string &receiptHandle) const = 0;
 
         /**
@@ -258,6 +280,7 @@ namespace Awsmock::Database {
          * @return true if the message exists, otherwise false
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual bool messageExistsByMessageId(const std::string &messageId) const = 0;
 
         /**
@@ -267,6 +290,7 @@ namespace Awsmock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Message getMessageById(bsoncxx::oid oid) const = 0;
 
         /**
@@ -276,6 +300,7 @@ namespace Awsmock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Message getMessageById(const std::string &oid) const = 0;
 
         /**
@@ -285,6 +310,7 @@ namespace Awsmock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Message getMessageByReceiptHandle(const std::string &receiptHandle) const = 0;
 
         /**
@@ -294,6 +320,7 @@ namespace Awsmock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Message getMessageByMessageId(const std::string &messageId) const = 0;
 
         /**
@@ -302,6 +329,7 @@ namespace Awsmock::Database {
          * @param message SQS message
          * @return updated message
          */
+        [[nodiscard]]
         virtual Entity::SQS::Message updateMessage(Entity::SQS::Message &message) const = 0;
 
         /**
@@ -311,6 +339,7 @@ namespace Awsmock::Database {
          * @return created or updated SQS message entity
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::Message createOrUpdateMessage(Entity::SQS::Message &message) const = 0;
 
         /**
@@ -320,6 +349,7 @@ namespace Awsmock::Database {
          * @return list of SQS resources
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::MessageList listMessages(const std::string &region) const = 0;
 
         /**
@@ -333,6 +363,7 @@ namespace Awsmock::Database {
          * @return list of SQS messages
          * @throws DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::MessageList listMessages(const std::string &queueArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
@@ -354,6 +385,7 @@ namespace Awsmock::Database {
          * @param visibility visibilityTimeout period in seconds
          * @return number of message resets
          */
+        [[nodiscard]]
         virtual long resetMessages(const std::string &queueArn, long visibility) const = 0;
 
         /**
@@ -363,6 +395,7 @@ namespace Awsmock::Database {
          * @param delay delay in seconds.
          * @return number of updated queues
          */
+        [[nodiscard]]
         virtual long resetDelayedMessages(const std::string &queueArn, long delay) const = 0;
 
         /**
@@ -373,6 +406,7 @@ namespace Awsmock::Database {
          * @param messageId message ID
          * @return total number of redriven messages
          */
+        [[nodiscard]]
         virtual long redriveMessage(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue, const std::string &messageId) const = 0;
 
         /**
@@ -382,15 +416,17 @@ namespace Awsmock::Database {
          * @param dlqQueue DLQ queue
          * @return total number of redriven messages
          */
+        [[nodiscard]]
         virtual long redriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const = 0;
 
         /**
-         * @brief Any messages, which has is older than the retention period is deleted.
+         * @brief Any messages that have is older than the retention period are deleted.
          *
          * @param queueArn queue ARN.
          * @param retentionPeriod retention period in seconds.
          * @return number of messages deleted.
          */
+        [[nodiscard]]
         virtual long messageRetention(const std::string &queueArn, long retentionPeriod) const = 0;
 
         /**
@@ -400,6 +436,7 @@ namespace Awsmock::Database {
          * @param prefix message ID prefix
          * @return total number of messages
          */
+        [[nodiscard]]
         virtual long countMessages(const std::string &queueArn, const std::string &prefix) const = 0;
 
         /**
@@ -412,6 +449,7 @@ namespace Awsmock::Database {
          * @return map of average message waiting time per queue
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual Entity::SQS::MessageWaitTime getAverageMessageWaitingTime() const = 0;
 
         /**
@@ -429,6 +467,7 @@ namespace Awsmock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteMessages(const std::string &queueArn) const = 0;
 
         /**
@@ -438,6 +477,7 @@ namespace Awsmock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteMessage(const Entity::SQS::Message &message) const = 0;
 
         /**
@@ -447,6 +487,7 @@ namespace Awsmock::Database {
          * @return number of messages deleted.
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteMessage(const std::string &receiptHandle) const = 0;
 
         /**
@@ -455,6 +496,7 @@ namespace Awsmock::Database {
          * @return total number of messages deleted.
          * @throws Core::DatabaseException
          */
+        [[nodiscard]]
         virtual long deleteAllMessages() const = 0;
 
         /**

@@ -7,7 +7,8 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/kms/IKMSRepository.h>
 #include <awsmock/service/kms/KMSService.h>
 
 namespace {
@@ -38,10 +39,12 @@ namespace Awsmock::Database {
     }
 
     struct KMSServiceFixture {
-        KMSServiceFixture() = default;
+        KMSServiceFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+        }
         ~KMSServiceFixture() {
             try {
-                const long count = KMSDatabase::instance().DeleteAllKeys();
+                const long count = RepositoryFactory::instance().kmsRepository()->deleteAllKeys();
                 log_debug << "KMS keys deleted, count: " << count;
             } catch (const std::exception &exc) {
                 log_error << "KMS fixture cleanup failed: " << exc.what();
