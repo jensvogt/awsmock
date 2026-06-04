@@ -33,14 +33,6 @@ namespace Awsmock::Database {
         explicit TransferMongoRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static TransferMongoRepository &instance() {
-            static TransferMongoRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check the existence of a transfer server
          *
          * @param region AWS region name

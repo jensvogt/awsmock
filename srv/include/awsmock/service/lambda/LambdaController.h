@@ -24,7 +24,8 @@
 #include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/StopLambdaRequest.h>
 #include <awsmock/dto/lambda/model/InvocationType.h>
-#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/lambda/ILambdaRepository.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
@@ -55,10 +56,8 @@ namespace Awsmock::Service {
          * @brief Constructor
          *
          * Connects all EventBus lambda signals and registers the periodic health-check task.
-         *
-         * @param scheduler async task scheduler
          */
-        explicit LambdaController(Core::Scheduler &scheduler);
+        explicit LambdaController();
 
         /**
          * @brief Shutdown controller and deregister scheduled tasks
@@ -137,7 +136,7 @@ namespace Awsmock::Service {
         /**
          * @brief Lambda database
          */
-        Database::LambdaDatabase &_lambdaDatabase;
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * @brief Lambda service
@@ -148,11 +147,6 @@ namespace Awsmock::Service {
          * @brief Container (Docker/Podman) service
          */
         ContainerService &_containerService;
-
-        /**
-         * @brief Async task scheduler
-         */
-        Core::Scheduler &_scheduler;
 
         /**
          * @brief AWS region read from configuration

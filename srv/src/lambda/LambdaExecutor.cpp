@@ -22,8 +22,8 @@ namespace Awsmock::Service {
         // update lambda
         lambda.invocations++;
         lambda.averageRuntime = static_cast<long>(std::ceil((lambda.averageRuntime + runtime) / lambda.invocations));
-        _lambdaDatabase.SetInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceIdle);
-        _lambdaDatabase.SetLambdaValues(lambda, lambda.invocations, lambda.averageRuntime);
+        _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceIdle);
+        _lambdaDatabase->setLambdaValues(lambda, lambda.invocations, lambda.averageRuntime);
 
         // Sanitize logs
         logs = Core::StringUtils::RemoveColorCoding(logs);
@@ -43,7 +43,7 @@ namespace Awsmock::Service {
         lambdaResult.lambdaName = lambda.function;
         lambdaResult.lambdaArn = lambda.arn;
         lambdaResult.duration = runtime;
-        _lambdaDatabase.CreateLambdaResult(lambdaResult);
+        lambdaResult = _lambdaDatabase->createLambdaResult(lambdaResult);
 
         // Set Counters
         Core::EventBus::instance().sigMetricGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, runtime);

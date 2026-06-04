@@ -30,7 +30,7 @@ namespace Awsmock::Service {
         /**
          * Constructor
          */
-        explicit SecretsManagerHandler(boost::asio::io_context &ioc) : AbstractHandler("secretsmanager-handler", ioc), _secretsManagerService(ioc) {
+        explicit SecretsManagerHandler(boost::asio::io_context &ioc) : AbstractHandler("secretsmanager-handler", ioc) {
         }
 
         /**

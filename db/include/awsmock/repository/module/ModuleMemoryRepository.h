@@ -37,16 +37,6 @@ namespace Awsmock::Database {
         explicit ModuleMemoryRepository() = default;
 
         /**
-         * @brief Singleton instance
-         *
-         * @return singleton instance
-         */
-        static ModuleMemoryRepository &instance() {
-            static ModuleMemoryRepository moduleMemoryDb;
-            return moduleMemoryDb;
-        }
-
-        /**
          * @brief Initialize the database
          */
         void initialize() const override;

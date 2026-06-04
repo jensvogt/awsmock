@@ -86,38 +86,38 @@ namespace Awsmock::Service {
 
             } else if (module == "sqs") {
 
-                Database::SQSMongoRepository &_sqsDatabase = Database::SQSMongoRepository::instance();
+                std::shared_ptr<Database::ISQSRepository> _sqsDatabase = Database::RepositoryFactory::instance().sqsRepository();
                 if (request.IsInfrastructure()) {
-                    infrastructure.sqsQueues = _sqsDatabase.exportQueues({sortColumn});
+                    infrastructure.sqsQueues = _sqsDatabase->exportQueues({sortColumn});
                 }
                 if (request.IsObjects()) {
-                    infrastructure.sqsMessages = _sqsDatabase.listMessages({});
+                    infrastructure.sqsMessages = _sqsDatabase->listMessages({});
                 }
 
             } else if (module == "sns") {
 
-                Database::SNSMongoRepository &_snsDatabase = Database::SNSMongoRepository::instance();
+                const std::shared_ptr<Database::ISNSRepository> _snsDatabase = Database::RepositoryFactory::instance().snsRepository();
                 if (request.IsInfrastructure()) {
-                    infrastructure.snsTopics = _snsDatabase.exportTopics({sortColumn});
+                    infrastructure.snsTopics = _snsDatabase->exportTopics({sortColumn});
                 }
                 if (request.IsObjects()) {
-                    infrastructure.snsMessages = _snsDatabase.listMessages({}, {}, 0, 0, {});
+                    infrastructure.snsMessages = _snsDatabase->listMessages({}, {}, 0, 0, {});
                 }
 
             } else if (module == "lambda") {
 
-                Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+                const std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
                 if (request.IsInfrastructure()) {
-                    infrastructure.lambdas = _lambdaDatabase.ExportLambdas({sortColumn});
+                    infrastructure.lambdas = _lambdaDatabase->exportLambdas({sortColumn});
                 }
 
             } else if (module == "cognito") {
 
-                Database::CognitoMongoRepository &_cognitoDatabase = Database::CognitoMongoRepository::instance();
+                const std::shared_ptr<Database::ICognitoRepository> _cognitoDatabase = Database::RepositoryFactory::instance().cognitoRepository();
                 if (request.IsInfrastructure()) {
-                    infrastructure.cognitoUserPools = _cognitoDatabase.exportUserPools({sortColumn});
-                    infrastructure.cognitoUserGroups = _cognitoDatabase.exportGroups({sortColumn});
-                    infrastructure.cognitoUsers = _cognitoDatabase.exportUsers({sortColumn});
+                    infrastructure.cognitoUserPools = _cognitoDatabase->exportUserPools({sortColumn});
+                    infrastructure.cognitoUserGroups = _cognitoDatabase->exportGroups({sortColumn});
+                    infrastructure.cognitoUsers = _cognitoDatabase->exportUsers({sortColumn});
                 }
 
             } else if (module == "dynamodb") {
@@ -154,8 +154,8 @@ namespace Awsmock::Service {
             } else if (module == "ssm") {
 
                 if (request.IsInfrastructure()) {
-                    Database::SSMMongoRepository &_ssmDatabase = Database::SSMMongoRepository::instance();
-                    infrastructure.ssmParameters = _ssmDatabase.listParameters({}, {}, 0, 0, {});
+                    const std::shared_ptr<Database::ISSMRepository> _ssmDatabase = Database::RepositoryFactory::instance().ssmRepository();
+                    infrastructure.ssmParameters = _ssmDatabase->listParameters({}, {}, 0, 0, {});
                 }
 
             } else if (module == "application") {
@@ -221,10 +221,10 @@ namespace Awsmock::Service {
 
         // SQS
         if (!infrastructure.sqsQueues.empty() || !infrastructure.sqsMessages.empty()) {
-            const Database::SQSMongoRepository &_sqsDatabase = Database::SQSMongoRepository::instance();
+            const std::shared_ptr<Database::ISQSRepository> _sqsDatabase = Database::RepositoryFactory::instance().sqsRepository();
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
-                    _sqsDatabase.importQueue(queue);
+                    _sqsDatabase->importQueue(queue);
                     log_debug << "SQS queues imported, name: " << queue.name;
                 }
                 log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();
@@ -232,7 +232,7 @@ namespace Awsmock::Service {
             if (!infrastructure.sqsMessages.empty()) {
                 for (auto &message: infrastructure.sqsMessages) {
                     message.modified = system_clock::now();
-                    message = _sqsDatabase.createOrUpdateMessage(message);
+                    message = _sqsDatabase->createOrUpdateMessage(message);
                     log_debug << "SQS queues imported, queueArn: " << message.queueArn;
                 }
                 log_info << "SQS resources imported, count: " << infrastructure.sqsMessages.size();
@@ -241,18 +241,18 @@ namespace Awsmock::Service {
 
         // SNS
         if (!infrastructure.snsTopics.empty() || !infrastructure.snsMessages.empty()) {
-            const Database::SNSMongoRepository &_snsDatabase = Database::SNSMongoRepository::instance();
+            const std::shared_ptr<Database::ISNSRepository> _snsDatabase = Database::RepositoryFactory::instance().snsRepository();
             if (!infrastructure.snsTopics.empty()) {
                 for (auto &topic: infrastructure.snsTopics) {
                     topic.modified = system_clock::now();
-                    topic = _snsDatabase.createOrUpdateTopic(topic);
+                    topic = _snsDatabase->createOrUpdateTopic(topic);
                 }
                 log_info << "SNS topics imported, count: " << infrastructure.snsTopics.size();
             }
             if (!infrastructure.snsMessages.empty()) {
                 for (auto &message: infrastructure.snsMessages) {
                     message.modified = system_clock::now();
-                    message = _snsDatabase.createOrUpdateMessage(message);
+                    message = _snsDatabase->createOrUpdateMessage(message);
                 }
                 log_info << "SNS resources imported, count: " << infrastructure.snsMessages.size();
             }
@@ -260,9 +260,9 @@ namespace Awsmock::Service {
 
         // Lambdas
         if (!infrastructure.lambdas.empty()) {
-            const Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+            const std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
             for (auto &lambda: infrastructure.lambdas) {
-                _lambdaDatabase.ImportLambda(lambda);
+                lambda = _lambdaDatabase->importLambda(lambda);
             }
             log_info << "Lambda functions imported, count: " << infrastructure.lambdas.size();
         }
@@ -279,18 +279,18 @@ namespace Awsmock::Service {
 
         // Cognito
         if (!infrastructure.cognitoUserPools.empty() || !infrastructure.cognitoUsers.empty()) {
-            Database::CognitoMongoRepository &_cognitoDatabase = Database::CognitoMongoRepository::instance();
+            const std::shared_ptr<Database::ICognitoRepository> _cognitoDatabase = Database::RepositoryFactory::instance().cognitoRepository();
             if (!infrastructure.cognitoUserPools.empty()) {
                 for (auto &userPool: infrastructure.cognitoUserPools) {
                     userPool.modified = system_clock::now();
-                    userPool = _cognitoDatabase.createOrUpdateUserPool(userPool);
+                    userPool = _cognitoDatabase->createOrUpdateUserPool(userPool);
                 }
                 log_info << "Cognito user pools imported, count: " << infrastructure.cognitoUserPools.size();
             }
             if (!infrastructure.cognitoUsers.empty()) {
                 for (auto &user: infrastructure.cognitoUsers) {
                     user.modified = system_clock::now();
-                    user = _cognitoDatabase.createOrUpdateUser(user);
+                    user = _cognitoDatabase->createOrUpdateUser(user);
                 }
                 log_info << "Cognito users imported, count: " << infrastructure.cognitoUsers.size();
             }
@@ -299,11 +299,11 @@ namespace Awsmock::Service {
         try {
             // DynamoDB
             if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
-                const Database::DynamoDbMongoRepository &_dynamoDatabase = Database::DynamoDbMongoRepository::instance();
+                const std::shared_ptr<Database::IDynamoDbRepository> _dynamoDatabase = Database::RepositoryFactory::instance().dynamodbRepository();
                 if (!infrastructure.dynamoDbTables.empty()) {
                     for (auto &table: infrastructure.dynamoDbTables) {
                         table.modified = system_clock::now();
-                        table = _dynamoDatabase.createOrUpdateTable(table);
+                        table = _dynamoDatabase->createOrUpdateTable(table);
                     }
                     log_info << "DynamoDB table imported, count: " << infrastructure.cognitoUserPools.size();
                 }
@@ -312,12 +312,11 @@ namespace Awsmock::Service {
                     for (auto &item: infrastructure.dynamoDbItems) {
                         item.modified = system_clock::now();
                         item.size = sizeof(item) + sizeof(long);
-                        item = _dynamoDatabase.createOrUpdateItem(item);
+                        item = _dynamoDatabase->createOrUpdateItem(item);
                     }
                     log_info << "DynamoDB item imported, count: " << infrastructure.cognitoUserPools.size();
                 }
-
-                _dynamoDatabase.adjustItemCounters();
+                _dynamoDatabase->adjustItemCounters();
             }
 
             // Applications
@@ -352,9 +351,9 @@ namespace Awsmock::Service {
 
         // SSM
         if (!infrastructure.ssmParameters.empty()) {
-            const Database::SSMMongoRepository &_ssmDatabase = Database::SSMMongoRepository::instance();
+            const std::shared_ptr<Database::ISSMRepository> _ssmDatabase = Database::RepositoryFactory::instance().ssmRepository();
             for (auto &parameter: infrastructure.ssmParameters) {
-                parameter = _ssmDatabase.importParameter(parameter);
+                parameter = _ssmDatabase->importParameter(parameter);
             }
             log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
         }
@@ -389,7 +388,7 @@ namespace Awsmock::Service {
             } else if (m == "sns") {
                 count += Database::RepositoryFactory::instance().snsRepository()->deleteAllTopics();
             } else if (m == "dynamodb") {
-                count += Database::DynamoDbMongoRepository::instance().deleteAllTables();
+                count += Database::RepositoryFactory::instance().dynamodbRepository()->deleteAllTables();
             } else if (m == "transfer") {
                 count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "application") {
@@ -410,13 +409,13 @@ namespace Awsmock::Service {
             } else if (m == "sns") {
                 count += Database::RepositoryFactory::instance().snsRepository()->deleteAllMessages();
             } else if (m == "lambda") {
-                count += Database::LambdaDatabase::instance().DeleteAllLambdas();
+                count += Database::RepositoryFactory::instance().lambdaRepository()->deleteAllLambdas();
             } else if (m == "cognito") {
                 count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllUsers();
                 count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllUserPools();
                 count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllGroups({});
             } else if (m == "dynamodb") {
-                count += Database::DynamoDbMongoRepository::instance().deleteAllItems();
+                count += Database::RepositoryFactory::instance().dynamodbRepository()->deleteAllItems();
             } else if (m == "secretsmanager") {
                 count += Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
             } else if (m == "kms") {

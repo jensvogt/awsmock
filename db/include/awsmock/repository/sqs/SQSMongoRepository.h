@@ -52,14 +52,6 @@ namespace Awsmock::Database {
         explicit SQSMongoRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static SQSMongoRepository &instance() {
-            static SQSMongoRepository sqsDatabase;
-            return sqsDatabase;
-        }
-
-        /**
          * @brief Check the existence of a queue
          *
          * @param region AWS region

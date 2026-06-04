@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    SecretsManagerService::SecretsManagerService(boost::asio::io_context &ioc) : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService() {
+    SecretsManagerService::SecretsManagerService() : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()) {
 
         // Initialize environment
         _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");

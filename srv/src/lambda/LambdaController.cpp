@@ -6,11 +6,7 @@
 
 namespace Awsmock::Service {
 
-    LambdaController::LambdaController(Core::Scheduler &scheduler)
-        : AbstractServer("lambda-controller"),
-          _lambdaDatabase(Database::LambdaDatabase::instance()),
-          _containerService(ContainerService::instance()),
-          _scheduler(scheduler) {
+    LambdaController::LambdaController() : AbstractServer("lambda-controller"), _containerService(ContainerService::instance()) {
 
         const Core::Configuration &config = Core::Configuration::instance();
         _region = config.get<std::string>("awsmock.region");
@@ -49,13 +45,13 @@ namespace Awsmock::Service {
                         &LambdaController::OnCheckLambda, this, std::placeholders::_1));
 
         // Periodic health check task ----------------------------------------------
-        _scheduler.AddTask("lambda-controller-health", [this] { CheckContainerHealth(); }, _healthCheckPeriod, _healthCheckPeriod);
+        Core::Scheduler::instance().AddTask("lambda-controller-health", [this] { CheckContainerHealth(); }, _healthCheckPeriod, _healthCheckPeriod);
 
         log_debug << "Lambda controller initialized";
     }
 
     void LambdaController::Shutdown() {
-        _scheduler.Shutdown("lambda-controller-health");
+        Core::Scheduler::instance().Shutdown("lambda-controller-health");
         log_info << "Lambda controller stopped";
     }
 
@@ -116,7 +112,7 @@ namespace Awsmock::Service {
             const auto accountId = Core::Configuration::instance().getAccountId();
             const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
             if (!lambda.enabled) {
                 log_warning << "Lambda disabled, function: " << functionName;
                 return;
@@ -128,7 +124,7 @@ namespace Awsmock::Service {
                 boost::mutex::scoped_lock lock(*GetOrCreateMutex(functionName));
 
                 // Re-fetch after acquiring the lock to get the latest instance state
-                lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
+                lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
 
                 if (lambda.HasIdleInstance()) {
                     // Step 1 — use an existing idle container
@@ -149,7 +145,7 @@ namespace Awsmock::Service {
                     const auto deadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
                     do {
                         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                        lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
+                        lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
                     } while (!lambda.HasIdleInstance() && system_clock::now() < deadline);
 
                     if (!lambda.HasIdleInstance()) {
@@ -161,7 +157,7 @@ namespace Awsmock::Service {
                 }
 
                 // Step 3 — claim the instance before releasing the lock
-                _lambdaDatabase.SetInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceRunning);
+                _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceRunning);
             }
 
             // Invoke outside the lock so other requests can claim their own instance in parallel
@@ -196,7 +192,7 @@ namespace Awsmock::Service {
     void LambdaController::OnCheckLambda(const std::string &functionArn) const {
         log_debug << "Lambda check requested, arn: " << functionArn;
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(functionArn);
 
             bool updated = false;
             for (auto it = lambda.instances.begin(); it != lambda.instances.end();) {
@@ -217,7 +213,7 @@ namespace Awsmock::Service {
                 if (lambda.instances.empty()) {
                     lambda.state = Database::Entity::Lambda::Inactive;
                 }
-                _lambdaDatabase.UpdateLambda(lambda);
+                lambda = _lambdaDatabase->updateLambda(lambda);
             }
             Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
         } catch (std::exception &e) {
@@ -232,7 +228,7 @@ namespace Awsmock::Service {
     void LambdaController::CheckContainerHealth() const {
         log_trace << "Lambda controller health-check starting";
         try {
-            for (Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
+            for (Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase->listLambdas(_region); auto &lambda: lambdas) {
                 if (lambda.instances.empty()) {
                     continue;
                 }
@@ -258,7 +254,7 @@ namespace Awsmock::Service {
                     if (lambda.instances.empty()) {
                         lambda.state = Database::Entity::Lambda::Inactive;
                     }
-                    _lambdaDatabase.UpdateLambda(lambda);
+                    _lambdaDatabase->updateLambda(lambda);
                     log_debug << "Health-check: lambda updated, function: " << lambda.function << ", remaining instances: " << lambda.instances.size();
                 }
                 Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));

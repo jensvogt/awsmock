@@ -29,14 +29,6 @@ namespace Awsmock::Database {
         explicit MonitoringMemoryRepository();
 
         /**
-         * @brief Singleton instance
-         */
-        static MonitoringMemoryRepository &instance() {
-            static MonitoringMemoryRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Returns the rolling mean
          *
          * @param name counter name

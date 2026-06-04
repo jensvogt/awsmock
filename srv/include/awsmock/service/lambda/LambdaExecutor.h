@@ -5,13 +5,13 @@
 #pragma once
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/lambda/model/LambdaResult.h>
-#include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/container/ContainerService.h>
 
@@ -28,7 +28,8 @@ namespace Awsmock::Service {
      */
     class LambdaExecutor : public boost::enable_shared_from_this<LambdaExecutor> {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -43,7 +44,8 @@ namespace Awsmock::Service {
          */
         Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload) const;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -52,7 +54,7 @@ namespace Awsmock::Service {
         /**
          * Lambda database connection
          */
-        Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * Docker module
@@ -60,4 +62,4 @@ namespace Awsmock::Service {
         ContainerService &_containerService = ContainerService::instance();
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

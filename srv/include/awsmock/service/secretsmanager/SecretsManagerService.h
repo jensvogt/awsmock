@@ -66,7 +66,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerService(boost::asio::io_context &ioc);
+        explicit SecretsManagerService();
 
         /**
          * @brief Create a new secret
@@ -87,7 +87,7 @@ namespace Awsmock::Service {
         /**
          * @brief Returns the secret value
          *
-         * @param request get secret value request
+         * @param request get a secret value request
          * @return GetSecretValueResponse
          */
         [[nodiscard]] Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
@@ -269,7 +269,7 @@ namespace Awsmock::Service {
         /**
          * Lambda database connection
          */
-        Database::LambdaDatabase &_lambdaDatabase;
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * Lambda service

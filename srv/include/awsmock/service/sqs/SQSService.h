@@ -9,6 +9,7 @@
 #include <thread>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MagicDetector.h>
@@ -90,7 +91,6 @@
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventRecord.h>
-#include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
@@ -108,8 +108,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {
-        }
+        explicit SQSService() = default;
 
         /**
          * @brief Creates a new queue.
@@ -543,7 +542,7 @@ namespace Awsmock::Service {
         /**
          * Lambda database connection
          */
-        Database::LambdaDatabase &_lambdaDatabase;
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * Lambda service

@@ -136,8 +136,8 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/s3/QueueNotification.cpp db/src/entity/s3/TopicNotification.cpp db/src/entity/s3/LambdaNotification.cpp
         db/src/entity/s3/BucketEncryption.cpp db/src/entity/s3/LifecycleConfiguration.cpp
         db/src/entity/lambda/Tags.cpp db/src/entity/lambda/Environment.cpp db/src/entity/lambda/Lambda.cpp
-        db/src/entity/lambda/Code.cpp db/src/entity/lambda/EphemeralStorage.cpp db/src/repository/LambdaDatabase.cpp
-        db/src/memorydb/LambdaMemoryDb.cpp db/src/entity/lambda/Instance.cpp db/src/entity/lambda/EventSourceMapping.cpp
+        db/src/entity/lambda/Code.cpp db/src/entity/lambda/EphemeralStorage.cpp db/src/repository/lambda/LambdaMongoRepository.cpp
+        db/src/repository/lambda/LambdaMemoryRepository.cpp db/src/entity/lambda/Instance.cpp db/src/entity/lambda/EventSourceMapping.cpp
         db/src/entity/lambda/LambdaResult.cpp db/src/repository/transfer/TransferMongoRepository.cpp
         db/src/entity/transfer/User.cpp db/src/entity/transfer/Transfer.cpp db/src/repository/transfer/TransferMemoryRepository.cpp
         db/src/entity/cognito/UserPool.cpp db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp

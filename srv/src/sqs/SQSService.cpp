@@ -252,7 +252,7 @@ namespace Awsmock::Service {
         }
 
         try {
-            const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(request.queueArn);
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::RepositoryFactory::instance().lambdaRepository()->listLambdasWithEventSource(request.queueArn);
 
             Dto::SQS::ListLambdaTriggerCountersResponse response;
             response.total = static_cast<long>(lambdas.size());
@@ -1414,7 +1414,7 @@ namespace Awsmock::Service {
     }
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
-        if (const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
+        if (const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::RepositoryFactory::instance().lambdaRepository()->listLambdasWithEventSource(queueArn); !lambdas.empty()) {
             log_debug << "Found lambda notification events, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
                 SendLambdaInvocationRequest(lambda, message, queueArn);

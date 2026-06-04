@@ -84,8 +84,8 @@
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/sqs/Message.h>
-#include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 
@@ -94,7 +94,7 @@
 
 namespace Awsmock::Service {
     /**
-     * @brief Lambda service module. Handles all lambda related requests:
+     * @brief Lambda service module. Handles all lambda-related requests:
      *
      * <ul>
      * <li>Create a lambda function.</li>
@@ -103,7 +103,7 @@ namespace Awsmock::Service {
      * <li>Create lambda function tags.</li>
      * <li>List lambda function tags.</li>
      * <li>Delete lambda function tags.</li>
-     * <li>Invoke a lambda function with AWS S3 notification payload.</li>
+     * <li>Invoke a lambda function with the AWS S3 notification payload.</li>
      * <li>Invoke a lambda function with AWS SQS notification payload.</li>
      * </ul>
      *
@@ -119,13 +119,12 @@ namespace Awsmock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class LambdaService {
-    public:
+      public:
+
         /**
          * @brief Constructor
-         *
-         * @param ioc boost asio IO context
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {
+        explicit LambdaService() : _s3Database(Database::S3Database::instance()) {
         }
 
         /**
@@ -551,7 +550,8 @@ namespace Awsmock::Service {
          */
         boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
 
-    private:
+      private:
+
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
          *
@@ -593,7 +593,7 @@ namespace Awsmock::Service {
         /**
          * @brief Lambda database connection
          */
-        Database::LambdaDatabase &_lambdaDatabase;
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * @brief S3 database connection
@@ -610,5 +610,4 @@ namespace Awsmock::Service {
          */
         std::shared_ptr<Database::ISNSRepository> _snsDatabase = Database::RepositoryFactory::instance().snsRepository();
     };
-} // namespace Awsmock::Service
-
+}// namespace Awsmock::Service

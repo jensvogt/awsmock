@@ -44,14 +44,6 @@ namespace Awsmock::Database {
         SSMMemoryRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static SSMMemoryRepository &instance() {
-            static SSMMemoryRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check the existence of a parameter by name
          *
          * @param name parameter name

@@ -29,14 +29,6 @@ namespace Awsmock::Database {
         explicit MonitoringMongoRepository();
 
         /**
-         * @brief Singleton instance
-         */
-        static MonitoringMongoRepository &instance() {
-            static MonitoringMongoRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Returns the rolling mean
          *
          * @param name counter name

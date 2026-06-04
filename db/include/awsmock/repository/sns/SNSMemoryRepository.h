@@ -39,14 +39,6 @@ namespace Awsmock::Database {
         SNSMemoryRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static SNSMemoryRepository &instance() {
-            static SNSMemoryRepository snsMemoryDb;
-            return snsMemoryDb;
-        }
-
-        /**
          * @brief Check the existence of the topic
          *
          * @param region AWS region

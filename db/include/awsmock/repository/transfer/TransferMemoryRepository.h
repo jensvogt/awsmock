@@ -40,14 +40,6 @@ namespace Awsmock::Database {
         TransferMemoryRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static TransferMemoryRepository &instance() {
-            static TransferMemoryRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check the existence of transfer servers
          *
          * @param region AWS region name

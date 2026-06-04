@@ -35,14 +35,6 @@ namespace Awsmock::Database {
         explicit SSMMongoRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static SSMMongoRepository &instance() {
-            static SSMMongoRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check the existence of a parameter by name
          *
          * @param name parameter name

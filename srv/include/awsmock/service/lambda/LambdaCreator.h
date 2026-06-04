@@ -14,7 +14,8 @@
 #include <awsmock/core/exception/ContainerException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
-#include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/service/container/ContainerService.h>
 
 namespace Awsmock::Service {
@@ -23,7 +24,7 @@ namespace Awsmock::Service {
      * @brief Lambda async creator
      *
      * @par
-     * First it writes a base64 encoded file to the lambda directory (<i>/home/awsmock/data/lambda</i>). If the lambda code comes from the AWS CLI it is already a base64 encoded
+     * First, it writes a base64 encoded file to the lambda directory (<i>/home/awsmock/data/lambda</i>). If the lambda code comes from the AWS CLI it is already a base64 encoded
      * zip-file, so we only write the base64 encoded code to the lambda directory. In case the lambda code comes from S3 bucket/key we need to encode the file and write it
      * to the lambda directory. This is needed, as the lambda server runs through all lambda entity in the database and starts the lambdas from the lambda directory.
      *
@@ -177,7 +178,7 @@ namespace Awsmock::Service {
         /**
          * Lambda database connection
          */
-        Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * Dockerized flag

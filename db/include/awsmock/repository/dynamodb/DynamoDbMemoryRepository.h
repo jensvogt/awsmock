@@ -36,16 +36,6 @@ namespace Awsmock::Database {
         DynamoDbMemoryRepository() = default;
 
         /**
-         * @brief Singleton instance
-         *
-         * @return singleton instance
-         */
-        static DynamoDbMemoryRepository &instance() {
-            static DynamoDbMemoryRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check the existence of the DynamoDb table
          *
          * @param region AWS region name

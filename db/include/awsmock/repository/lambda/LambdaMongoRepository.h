@@ -14,34 +14,26 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
-#include <awsmock/memorydb/LambdaMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/lambda/ILambdaRepository.h>
 
 namespace Awsmock::Database {
 
     using std::chrono::system_clock;
 
     /**
-     * Lambda MongoDB database.
+     * @brief Lambda MongoDB database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaDatabase : public AwsMock::Database::DatabaseBase {
+    class LambdaMongoRepository final : public ILambdaRepository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit LambdaDatabase();
-
-        /**
-         * @brief Singleton instance
-         */
-        static LambdaDatabase &instance() {
-            static LambdaDatabase lambdaDatabase;
-            return lambdaDatabase;
-        }
+        explicit LambdaMongoRepository() = default;
 
         /**
          * @brief Check the existence of lambda
@@ -52,7 +44,8 @@ namespace Awsmock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const;
+        [[nodiscard]]
+        bool lambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const override;
 
         /**
          * Check the existence of lambda
@@ -61,7 +54,8 @@ namespace Awsmock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool LambdaExists(const Entity::Lambda::Lambda &lambda) const;
+        [[nodiscard]]
+        bool lambdaExists(const Entity::Lambda::Lambda &lambda) const override;
 
         /**
          * @brief Check the existence of lambda
@@ -70,7 +64,8 @@ namespace Awsmock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool LambdaExists(const std::string &functionName) const;
+        [[nodiscard]]
+        bool lambdaExists(const std::string &functionName) const override;
 
         /**
          * @brief Check the existence of lambda
@@ -79,7 +74,8 @@ namespace Awsmock::Database {
          * @return true if lambda exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool LambdaExistsByArn(const std::string &arn) const;
+        [[nodiscard]]
+        bool lambdaExistsByArn(const std::string &arn) const override;
 
         /**
          * @brief Create a new lambda function
@@ -87,7 +83,8 @@ namespace Awsmock::Database {
          * @param lambda lambda entity
          * @return created lambda entity.
          */
-        Entity::Lambda::Lambda CreateLambda(Entity::Lambda::Lambda &lambda) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda createLambda(Entity::Lambda::Lambda &lambda) const override;
 
         /**
          * @brief Count all lambdas
@@ -95,15 +92,17 @@ namespace Awsmock::Database {
          * @param region aws-mock region.
          * @return total number of lambdas.
          */
-        [[nodiscard]] long LambdaCount(const std::string &region = {}) const;
+        [[nodiscard]] long
+        lambdaCount(const std::string &region) const override;
 
         /**
-         * @brief Updates an existing lambda lambda function
+         * @brief Updates an existing lambda function
          *
          * @param lambda lambda entity
          * @return updated lambda entity.
          */
-        Entity::Lambda::Lambda UpdateLambda(Entity::Lambda::Lambda &lambda) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda updateLambda(Entity::Lambda::Lambda &lambda) const override;
 
         /**
          * @brief Created or updates an existing lambda function
@@ -111,7 +110,8 @@ namespace Awsmock::Database {
          * @param lambda lambda entity
          * @return created or updated lambda entity.
          */
-        Entity::Lambda::Lambda CreateOrUpdateLambda(Entity::Lambda::Lambda &lambda) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda createOrUpdateLambda(Entity::Lambda::Lambda &lambda) const override;
 
         /**
          * @brief Import a lambda function
@@ -119,7 +119,8 @@ namespace Awsmock::Database {
          * @param lambda lambda entity
          * @return imported lambda entity.
          */
-        Entity::Lambda::Lambda ImportLambda(Entity::Lambda::Lambda &lambda) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda importLambda(Entity::Lambda::Lambda &lambda) const override;
 
         /**
          * @brief Returns a lambda entity by primary key
@@ -128,7 +129,8 @@ namespace Awsmock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda getLambdaById(const bsoncxx::oid &oid) const override;
 
         /**
          * @brief Returns a lambda entity by primary key
@@ -137,7 +139,8 @@ namespace Awsmock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::Lambda::Lambda GetLambdaById(const std::string &oid) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda getLambdaById(const std::string &oid) const override;
 
         /**
          * @brief Returns a lambda entity by ARN
@@ -146,7 +149,8 @@ namespace Awsmock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda getLambdaByArn(const std::string &arn) const override;
 
         /**
          * @brief Returns a lambda entity by name
@@ -156,7 +160,8 @@ namespace Awsmock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        Entity::Lambda::Lambda getLambdaByName(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Sets the status of a lambda instance
@@ -165,7 +170,7 @@ namespace Awsmock::Database {
          * @param status lambda instance status
          * @throws DatabaseException
          */
-        void SetInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const;
+        void setInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const override;
 
         /**
          * @brief Sets the status of a lambda instance
@@ -175,7 +180,7 @@ namespace Awsmock::Database {
          * @param avgRuntime average runtime
          * @throws DatabaseException
          */
-        void SetLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) const;
+        void setLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) const override;
 
         /**
          * @brief Returns a list of lambda functions.
@@ -183,7 +188,8 @@ namespace Awsmock::Database {
          * @param region AWS region name
          * @return list of lambda functions
          */
-        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {}) const;
+        [[nodiscard]]
+        std::vector<Entity::Lambda::Lambda> listLambdas(const std::string &region = {}) const override;
 
         /**
          * @brief Returns a list of lambda functions.
@@ -195,7 +201,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting columns
          * @return list of lambda function counters
          */
-        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        std::vector<Entity::Lambda::Lambda> listLambdaCounters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Export a list of lambdas
@@ -203,7 +210,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting columns
          * @return Ã¶list of lambda entries
          */
-        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        std::vector<Entity::Lambda::Lambda> exportLambdas(const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.
@@ -211,7 +219,8 @@ namespace Awsmock::Database {
          * @param eventSourceArn event source ARN
          * @return list of lambda functions
          */
-        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn) const;
+        [[nodiscard]]
+        std::vector<Entity::Lambda::Lambda> listLambdasWithEventSource(const std::string &eventSourceArn) const override;
 
         /**
          * @brief Creates a new lambda result
@@ -219,7 +228,8 @@ namespace Awsmock::Database {
          * @param lambdaResult lambda result record
          * @return created lambdaResult entity
          */
-        Entity::Lambda::LambdaResult CreateLambdaResult(Entity::Lambda::LambdaResult &lambdaResult) const;
+        [[nodiscard]]
+        Entity::Lambda::LambdaResult createLambdaResult(Entity::Lambda::LambdaResult &lambdaResult) const override;
 
         /**
          * @brief Returns the existence of a lambda result
@@ -227,7 +237,8 @@ namespace Awsmock::Database {
          * @param oid lambda result record OID
          * @return true if the result with the given OID exists
          */
-        [[nodiscard]] bool LambdaResultExists(const std::string &oid) const;
+        [[nodiscard]]
+        bool lambdaResultExists(const std::string &oid) const override;
 
         /**
          * @brief Removes old lambda logs
@@ -235,7 +246,8 @@ namespace Awsmock::Database {
          * @param cutOff cut off time point
          * @return numberof logs removed
          */
-        [[nodiscard]] long RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) const;
+        [[nodiscard]]
+        long removeExpiredLambdaLogs(const system_clock::time_point &cutOff) const override;
 
         /**
          * @brief Returns a lambda function result.
@@ -243,7 +255,8 @@ namespace Awsmock::Database {
          * @param oid lambda result OID
          * @return lambda function result counter
          */
-        [[nodiscard]] Entity::Lambda::LambdaResult GetLambdaResultCounter(const std::string &oid) const;
+        [[nodiscard]]
+        Entity::Lambda::LambdaResult getLambdaResultCounter(const std::string &oid) const override;
 
         /**
          * @brief Returns a list of lambda function results.
@@ -255,7 +268,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting columns
          * @return list of lambda function result counters
          */
-        [[nodiscard]] std::vector<Entity::Lambda::LambdaResult> ListLambdaResultCounters(const std::string &lambdaArn, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        std::vector<Entity::Lambda::LambdaResult> listLambdaResultCounters(const std::string &lambdaArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns the total number of lambda results
@@ -263,7 +277,8 @@ namespace Awsmock::Database {
          * @param lambdaArn lambda function ARN
          * @return total number of results
          */
-        [[nodiscard]] long LambdaResultsCount(const std::string &lambdaArn) const;
+        [[nodiscard]]
+        long lambdaResultsCount(const std::string &lambdaArn) const override;
 
         /**
          * @brief Deletes a lambda result counter
@@ -271,7 +286,8 @@ namespace Awsmock::Database {
          * @param oid lambda function oid
          * @return number of results deleted
          */
-        [[nodiscard]] long DeleteResultsCounter(const std::string &oid) const;
+        [[nodiscard]]
+        long deleteResultsCounter(const std::string &oid) const override;
 
         /**
          * @brief Deletes all lambda result counter for a lambda function
@@ -279,14 +295,16 @@ namespace Awsmock::Database {
          * @param lambdaArn lambda function ARN
          * @return number of results deleted
          */
-        [[nodiscard]] long DeleteResultsCounters(const std::string &lambdaArn) const;
+        [[nodiscard]]
+        long deleteResultsCounters(const std::string &lambdaArn) const override;
 
         /**
          * @brief Deletes all lambda result counters
          *
          * @return number of results deleted
          */
-        [[nodiscard]] long DeleteAllResultsCounters() const;
+        [[nodiscard]]
+        long deleteAllResultsCounters() const override;
 
         /**
          * @brief Deletes an existing lambda function
@@ -294,7 +312,7 @@ namespace Awsmock::Database {
          * @param functionName lambda function name
          * @throws DatabaseException
          */
-        void DeleteLambda(const std::string &functionName) const;
+        void deleteLambda(const std::string &functionName) const override;
 
         /**
          * @brief Deletes all existing lambda functions
@@ -302,31 +320,30 @@ namespace Awsmock::Database {
          * @return number of lambda objects deleted
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteAllLambdas() const;
+        [[nodiscard]]
+        long deleteAllLambdas() const override;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
-         * Database name
+         * @brief Database name
          */
-        std::string _databaseName;
+        static constexpr auto _databaseName = "awsmock";
 
         /**
-         * Lambda collection name
+         * @brief Queue collection name
          */
-        std::string _lambdaCollectionName;
+        static constexpr auto _lambdaCollectionName = "lambda";
 
         /**
-         * Lambda result collection name
+         * @brief Message collection name
          */
-        std::string _lambdaResultCollectionName;
-
-        /**
-         * Lambda in-memory database
-         */
-        LambdaMemoryDb &_memoryDb;
+        static constexpr auto _lambdaResultCollectionName = "lambda_result";
     };
 
 }// namespace Awsmock::Database
