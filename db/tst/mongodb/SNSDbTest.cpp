@@ -7,8 +7,9 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../include/awsmock/repository/sns/SNSDatabase.h>
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/sns/ISNSRepository.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};
@@ -40,23 +41,23 @@ namespace Awsmock::Database {
     struct SnsDbFixture {
         SnsDbFixture() = default;
         ~SnsDbFixture() {
-            const long messageCount = SNSDatabase::instance().DeleteAllMessages();
+            const long messageCount = RepositoryFactory::instance().snsRepository()->deleteAllMessages();
             log_debug << "Messages deleted " << messageCount;
-            const long topicCount = SNSDatabase::instance().DeleteAllTopics();
+            const long topicCount = RepositoryFactory::instance().snsRepository()->deleteAllTopics();
             log_debug << "Topics deleted " << topicCount;
         }
     };
 
     BOOST_FIXTURE_TEST_SUITE(SnsDbTests, SnsDbFixture)
 
-    BOOST_AUTO_TEST_CASE(CreateTopicTest) {
+    BOOST_AUTO_TEST_CASE(createTopicTest) {
 
         // arrange
-        const SNSDatabase &snsDatabase = SNSDatabase::instance();
+        const std::shared_ptr<ISNSRepository> snsRepository = RepositoryFactory::instance().snsRepository();
         Entity::SNS::Topic topic = CreateDefaultQueue(TEST_REGION, TEST_TOPIC_NAME);
 
         // act
-        topic = snsDatabase.CreateTopic(topic);
+        topic = snsRepository->createTopic(topic);
 
         // assert
         BOOST_CHECK_EQUAL(false, topic.topicArn.empty());
@@ -66,42 +67,42 @@ namespace Awsmock::Database {
         BOOST_CHECK_EQUAL(0, topic.messagesResend);
     }
 
-    BOOST_AUTO_TEST_CASE(CreateMessageTest) {
+    BOOST_AUTO_TEST_CASE(createMessageTest) {
 
         // arrange
-        const SNSDatabase &snsDatabase = SNSDatabase::instance();
+        const std::shared_ptr<ISNSRepository> snsRepository = RepositoryFactory::instance().snsRepository();
         Entity::SNS::Topic topic = CreateDefaultQueue(TEST_REGION, TEST_TOPIC_NAME);
-        topic = snsDatabase.CreateTopic(topic);
+        topic = snsRepository->createTopic(topic);
         BOOST_CHECK_EQUAL(false, topic.topicArn.empty());
         BOOST_CHECK_EQUAL(false, topic.oid.empty());
         Entity::SNS::Message message = CreateDefaultSQSMessage(topic.topicArn);
 
         // act
-        message = snsDatabase.CreateMessage(message);
-        snsDatabase.AdjustMessageCounters();
-        topic = snsDatabase.GetTopicByArn(topic.topicArn);
+        message = snsRepository->createMessage(message);
+        snsRepository->adjustMessageCounters();
+        topic = snsRepository->getTopicByArn(topic.topicArn);
 
         // assert
         BOOST_CHECK_EQUAL(false, message.messageId.empty());
         BOOST_CHECK_EQUAL(1, topic.messages);
     }
 
-    BOOST_AUTO_TEST_CASE(DeleteMessageTest) {
+    BOOST_AUTO_TEST_CASE(deleteMessageTest) {
 
         // arrange
-        const SNSDatabase &snsDatabase = SNSDatabase::instance();
+        const std::shared_ptr<ISNSRepository> snsRepository = RepositoryFactory::instance().snsRepository();
         Entity::SNS::Topic topic = CreateDefaultQueue(TEST_REGION, TEST_TOPIC_NAME);
-        topic = snsDatabase.CreateTopic(topic);
+        topic = snsRepository->createTopic(topic);
         BOOST_CHECK_EQUAL(false, topic.topicArn.empty());
         BOOST_CHECK_EQUAL(false, topic.oid.empty());
         Entity::SNS::Message message = CreateDefaultSQSMessage(topic.topicArn);
-        message = snsDatabase.CreateMessage(message);
+        message = snsRepository->createMessage(message);
         BOOST_CHECK_EQUAL(false, message.messageId.empty());
 
         // act
-        const long count = snsDatabase.DeleteMessage(message);
-        snsDatabase.AdjustMessageCounters();
-        topic = snsDatabase.GetTopicByArn(topic.topicArn);
+        const long count = snsRepository->deleteMessage(message);
+        snsRepository->adjustMessageCounters();
+        topic = snsRepository->getTopicByArn(topic.topicArn);
 
         // assert
         BOOST_CHECK_EQUAL(1, count);
@@ -111,19 +112,19 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteAllMessagesTest) {
 
         // arrange
-        const SNSDatabase &snsDatabase = SNSDatabase::instance();
+        const std::shared_ptr<ISNSRepository> snsRepository = RepositoryFactory::instance().snsRepository();
         Entity::SNS::Topic topic = CreateDefaultQueue(TEST_REGION, TEST_TOPIC_NAME);
-        topic = snsDatabase.CreateTopic(topic);
+        topic = snsRepository->createTopic(topic);
         BOOST_CHECK_EQUAL(false, topic.topicArn.empty());
         BOOST_CHECK_EQUAL(false, topic.oid.empty());
         Entity::SNS::Message message = CreateDefaultSQSMessage(topic.topicArn);
-        message = snsDatabase.CreateMessage(message);
+        message = snsRepository->createMessage(message);
         BOOST_CHECK_EQUAL(false, message.messageId.empty());
 
         // act
-        const long count = snsDatabase.DeleteAllMessages();
-        snsDatabase.AdjustMessageCounters();
-        topic = snsDatabase.GetTopicByArn(topic.topicArn);
+        const long count = snsRepository->deleteAllMessages();
+        snsRepository->adjustMessageCounters();
+        topic = snsRepository->getTopicByArn(topic.topicArn);
 
         // assert
         BOOST_CHECK_EQUAL(1, count);

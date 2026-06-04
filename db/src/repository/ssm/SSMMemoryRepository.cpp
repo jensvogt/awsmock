@@ -86,26 +86,26 @@ namespace Awsmock::Database {
     long SSMMemoryRepository::countParameters(const std::string &region, const std::string &prefix) const {
 
         Entity::SSM::ParameterList result;
-        const auto q = Core::from(result);
         for (auto &val: _parameters | std::views::values) {
             result.push_back(val);
         }
+        const auto q = Core::from(result);
         if (!region.empty()) {
             q.where([region](const Entity::SSM::Parameter &item) { return item.region == region; });
         }
         if (!prefix.empty()) {
             q.where([prefix](const Entity::SSM::Parameter &item) { return Core::StringUtils::StartsWith(item.parameterName, prefix); });
         }
-        return q.count();
+        return static_cast<long>(q.count());
     }
 
     Entity::SSM::Parameter SSMMemoryRepository::createParameter(Entity::SSM::Parameter &parameter) const {
         boost::mutex::scoped_lock loc(_parameterMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _parameters[oid] = parameter;
-        log_trace << "Parameter created, oid: " << oid;
-        return _parameters[oid];
+        parameter.oid = Core::StringUtils::CreateRandomUuid();
+        _parameters[parameter.oid] = parameter;
+        log_trace << "Parameter created, oid: " << parameter.oid;
+        return _parameters[parameter.oid];
     }
 
     Entity::SSM::Parameter SSMMemoryRepository::updateParameter(Entity::SSM::Parameter &parameter) const {

@@ -9,9 +9,9 @@
 
 struct GlobalTestFixture {
     GlobalTestFixture() {
-        AwsMock::Core::LogStream::Initialize();
-        AwsMock::Core::LogStream::RemoveConsoleLogs();
-        AwsMock::Core::TestUtils::CreateTestConfigurationFile(false);
+        Awsmock::Core::LogStream::Initialize();
+        Awsmock::Core::LogStream::RemoveConsoleLogs();
+        Awsmock::Core::TestUtils::CreateTestConfigurationFile(false);
     }
 
     ~GlobalTestFixture() {

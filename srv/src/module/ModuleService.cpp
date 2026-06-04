@@ -303,7 +303,7 @@ namespace Awsmock::Service {
                 if (!infrastructure.dynamoDbTables.empty()) {
                     for (auto &table: infrastructure.dynamoDbTables) {
                         table.modified = system_clock::now();
-                        _dynamoDatabase.createOrUpdateTable(table);
+                        table = _dynamoDatabase.createOrUpdateTable(table);
                     }
                     log_info << "DynamoDB table imported, count: " << infrastructure.cognitoUserPools.size();
                 }
@@ -312,7 +312,7 @@ namespace Awsmock::Service {
                     for (auto &item: infrastructure.dynamoDbItems) {
                         item.modified = system_clock::now();
                         item.size = sizeof(item) + sizeof(long);
-                        _dynamoDatabase.createOrUpdateItem(item);
+                        item = _dynamoDatabase.createOrUpdateItem(item);
                     }
                     log_info << "DynamoDB item imported, count: " << infrastructure.cognitoUserPools.size();
                 }

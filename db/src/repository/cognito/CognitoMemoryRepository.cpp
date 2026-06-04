@@ -78,10 +78,10 @@ namespace Awsmock::Database {
     Entity::Cognito::UserPool CognitoMemoryRepository::createUserPool(Entity::Cognito::UserPool &userPool) const {
         boost::mutex::scoped_lock lock(_userPoolMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _userPools[oid] = userPool;
-        log_trace << "Cognito user pool created, oid: " << oid;
-        return _userPools[oid];
+        userPool.oid = Core::StringUtils::CreateRandomUuid();
+        _userPools[userPool.oid] = userPool;
+        log_trace << "Cognito user pool created, oid: " << userPool.oid;
+        return _userPools[userPool.oid];
     }
 
     Entity::Cognito::UserPool CognitoMemoryRepository::createOrUpdateUserPool(Entity::Cognito::UserPool &userPool) const {
@@ -247,10 +247,10 @@ namespace Awsmock::Database {
     Entity::Cognito::User CognitoMemoryRepository::createUser(Entity::Cognito::User &user) const {
         boost::mutex::scoped_lock lock(_userMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _users[oid] = user;
-        log_trace << "Cognito user created, oid: " << oid;
-        return _users[oid];
+        user.oid = Core::StringUtils::CreateRandomUuid();
+        _users[user.oid] = user;
+        log_trace << "Cognito user created, oid: " << user.oid;
+        return _users[user.oid];
     }
 
     Entity::Cognito::User CognitoMemoryRepository::createOrUpdateUser(Entity::Cognito::User &user) const {

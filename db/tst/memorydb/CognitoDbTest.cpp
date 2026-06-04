@@ -6,14 +6,20 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../include/awsmock/repository/cognito/CognitoDatabase.h>
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/cognito/ICognitoRepository.h>
 
 #define TEST_ACCOUNT_ID "000000000000"
 #define TEST_REGION "eu-central-1"
 #define TEST_USER_POOL_NAME "test-user-pool"
 #define TEST_USER_NAME "test-user"
 #define TEST_USER_GROUP_NAME "test-user-group"
+
+namespace {
+    logger_t _logger{boost::log::keywords::channel = "Test"};
+}
 
 namespace Awsmock::Database {
 
@@ -44,24 +50,29 @@ namespace Awsmock::Database {
     }
 
     struct CognitoMemoryDbFixture {
-        CognitoMemoryDbFixture() = default;
+        CognitoMemoryDbFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+        }
         ~CognitoMemoryDbFixture() {
-            CognitoDatabase::instance().DeleteAllUsers();
-            CognitoDatabase::instance().DeleteAllGroups();
-            CognitoDatabase::instance().DeleteAllUserPools();
+            long deleted = RepositoryFactory::instance().cognitoRepository()->deleteAllUsers();
+            log_debug << "Users deleted " << deleted;
+            deleted = RepositoryFactory::instance().cognitoRepository()->deleteAllGroups({});
+            log_debug << "Groups deleted " << deleted;
+            deleted = RepositoryFactory::instance().cognitoRepository()->deleteAllUserPools();
+            log_debug << "UserPools deleted " << deleted;
         }
     };
 
     BOOST_FIXTURE_TEST_SUITE(CognitoMemoryDbTests, CognitoMemoryDbFixture)
 
-    BOOST_AUTO_TEST_CASE(CreateUserPoolTest) {
+    BOOST_AUTO_TEST_CASE(createUserPoolTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
 
         // act
-        userPool = cognitoDatabase.CreateUserPool(userPool);
+        userPool = cognitoDatabase->createUserPool(userPool);
 
         // assert
         BOOST_CHECK_EQUAL(false, userPool.arn.empty());
@@ -72,15 +83,15 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(GetUserPoolByUserPoolIdTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
-        userPool = cognitoDatabase.CreateUserPool(userPool);
+        userPool = cognitoDatabase->createUserPool(userPool);
         BOOST_CHECK_EQUAL(false, userPool.arn.empty());
         BOOST_CHECK_EQUAL(false, userPool.oid.empty());
         BOOST_CHECK_EQUAL(false, userPool.name.empty());
 
         // act
-        Entity::Cognito::UserPool result = cognitoDatabase.GetUserPoolByUserPoolId(userPool.userPoolId);
+        const Entity::Cognito::UserPool result = cognitoDatabase->getUserPoolByUserPoolId(userPool.userPoolId);
 
         // assert
         BOOST_CHECK_EQUAL(userPool.userPoolId, result.userPoolId);
@@ -89,12 +100,12 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ExistsByUserPoolIdTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
-        userPool = cognitoDatabase.CreateUserPool(userPool);
+        userPool = cognitoDatabase->createUserPool(userPool);
 
         // act
-        const bool result = cognitoDatabase.UserPoolExists(userPool.userPoolId);
+        const bool result = cognitoDatabase->userPoolExists(userPool.userPoolId);
 
         // assert
         BOOST_CHECK_EQUAL(true, result);
@@ -103,14 +114,14 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ListUserPoolTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
-        userPool = cognitoDatabase.CreateUserPool(userPool);
+        userPool = cognitoDatabase->createUserPool(userPool);
         BOOST_CHECK_EQUAL(false, userPool.arn.empty());
         BOOST_CHECK_EQUAL(false, userPool.oid.empty());
 
         // act
-        const std::vector<Entity::Cognito::UserPool> userPools = cognitoDatabase.ListUserPools();
+        const std::vector<Entity::Cognito::UserPool> userPools = cognitoDatabase->listUserPools({}, {}, 0, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, userPools.size());
@@ -120,45 +131,45 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(CountUserPoolTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
-        userPool = cognitoDatabase.CreateUserPool(userPool);
+        userPool = cognitoDatabase->createUserPool(userPool);
         BOOST_CHECK_EQUAL(false, userPool.arn.empty());
         BOOST_CHECK_EQUAL(false, userPool.oid.empty());
 
         // act
-        const long count = cognitoDatabase.CountUserPools();
+        const long count = cognitoDatabase->countUserPools({});
 
         // assert
         BOOST_CHECK_EQUAL(true, count > 0);
     }
 
-    BOOST_AUTO_TEST_CASE(DeleteUserPoolTest) {
+    BOOST_AUTO_TEST_CASE(deleteUserPoolTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
-        userPool = cognitoDatabase.CreateUserPool(userPool);
+        userPool = cognitoDatabase->createUserPool(userPool);
         BOOST_CHECK_EQUAL(false, userPool.arn.empty());
         BOOST_CHECK_EQUAL(false, userPool.oid.empty());
 
         // act
-        cognitoDatabase.DeleteUserPool(userPool.userPoolId);
-        const long count = cognitoDatabase.CountUserPools();
+        cognitoDatabase->deleteUserPool(userPool.userPoolId);
+        const long count = cognitoDatabase->countUserPools({});
 
         // assert
         BOOST_CHECK_EQUAL(0, count);
     }
 
-    BOOST_AUTO_TEST_CASE(CreateUserTest) {
+    BOOST_AUTO_TEST_CASE(createUserTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::User user = CreateDefaultUser(TEST_REGION, userPool.userPoolId);
 
         // act
-        user = cognitoDatabase.CreateUser(user);
+        user = cognitoDatabase->createUser(user);
 
         // assert
         BOOST_CHECK_EQUAL(false, user.oid.empty());
@@ -168,15 +179,15 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ExistsUserTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::User user = CreateDefaultUser(TEST_REGION, userPool.userPoolId);
-        user = cognitoDatabase.CreateUser(user);
+        user = cognitoDatabase->createUser(user);
         BOOST_CHECK_EQUAL(false, user.oid.empty());
         BOOST_CHECK_EQUAL(false, user.userName.empty());
 
         // act
-        const bool result = cognitoDatabase.UserExists(user.region, user.userName);
+        const bool result = cognitoDatabase->userExists(user.region, user.userName);
 
         // assert
         BOOST_CHECK_EQUAL(true, result);
@@ -185,15 +196,15 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(CountUserTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::User user = CreateDefaultUser(TEST_REGION, userPool.userPoolId);
-        user = cognitoDatabase.CreateUser(user);
+        user = cognitoDatabase->createUser(user);
         BOOST_CHECK_EQUAL(false, user.oid.empty());
         BOOST_CHECK_EQUAL(false, user.userName.empty());
 
         // act
-        const long count = cognitoDatabase.CountUsers();
+        const long count = cognitoDatabase->countUsers({}, {}, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, count);
@@ -202,15 +213,15 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ListUserTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::User user = CreateDefaultUser(TEST_REGION, userPool.userPoolId);
-        user = cognitoDatabase.CreateUser(user);
+        user = cognitoDatabase->createUser(user);
         BOOST_CHECK_EQUAL(false, user.oid.empty());
         BOOST_CHECK_EQUAL(false, user.userName.empty());
 
         // act
-        const std::vector<Entity::Cognito::User> users = cognitoDatabase.ListUsers();
+        const std::vector<Entity::Cognito::User> users = cognitoDatabase->listUsers({}, {}, {}, 0, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, users.size());
@@ -219,31 +230,31 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteUserTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::User user = CreateDefaultUser(TEST_REGION, userPool.userPoolId);
-        user = cognitoDatabase.CreateUser(user);
+        user = cognitoDatabase->createUser(user);
         BOOST_CHECK_EQUAL(false, user.oid.empty());
         BOOST_CHECK_EQUAL(false, user.userName.empty());
 
         // act
-        const long deleted = cognitoDatabase.DeleteUser(user);
-        const long count = cognitoDatabase.CountUsers();
+        const long deleted = cognitoDatabase->deleteUser(user);
+        const long count = cognitoDatabase->countUsers({}, {}, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, deleted);
         BOOST_CHECK_EQUAL(0, count);
     }
 
-    BOOST_AUTO_TEST_CASE(CreateUserGroupTest) {
+    BOOST_AUTO_TEST_CASE(createUserGroupTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::Group userGroup = CreateDefaultUserGroup(TEST_REGION, userPool.userPoolId);
 
         // act
-        userGroup = cognitoDatabase.CreateGroup(userGroup);
+        userGroup = cognitoDatabase->createGroup(userGroup);
 
         // assert
         BOOST_CHECK_EQUAL(false, userGroup.oid.empty());
@@ -253,13 +264,13 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ExistsUserGroupTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::Group userGroup = CreateDefaultUserGroup(TEST_REGION, userPool.userPoolId);
-        userGroup = cognitoDatabase.CreateGroup(userGroup);
+        userGroup = cognitoDatabase->createGroup(userGroup);
 
         // act
-        const bool result = cognitoDatabase.GroupExists(userGroup.region, userGroup.groupName);
+        const bool result = cognitoDatabase->groupExists(userGroup.region, userGroup.groupName);
 
         // assert
         BOOST_CHECK_EQUAL(true, result);
@@ -268,15 +279,15 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(ListUserGroupTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::Group userGroup = CreateDefaultUserGroup(TEST_REGION, userPool.userPoolId);
-        userGroup = cognitoDatabase.CreateGroup(userGroup);
+        userGroup = cognitoDatabase->createGroup(userGroup);
         BOOST_CHECK_EQUAL(false, userGroup.oid.empty());
         BOOST_CHECK_EQUAL(false, userGroup.groupName.empty());
 
         // act
-        const std::vector<Entity::Cognito::Group> userGroups = cognitoDatabase.ListGroups();
+        const std::vector<Entity::Cognito::Group> userGroups = cognitoDatabase->listGroups({}, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, userGroups.size());
@@ -285,15 +296,15 @@ namespace Awsmock::Database {
     BOOST_AUTO_TEST_CASE(DeleteUserGroupTest) {
 
         // arrange
-        const CognitoDatabase &cognitoDatabase = CognitoDatabase::instance();
+        const std::shared_ptr<ICognitoRepository> cognitoDatabase = RepositoryFactory::instance().cognitoRepository();
         const Entity::Cognito::UserPool userPool = CreateDefaultUserPool(TEST_REGION, TEST_USER_POOL_NAME);
         Entity::Cognito::Group userGroup = CreateDefaultUserGroup(TEST_REGION, userPool.userPoolId);
-        userGroup = cognitoDatabase.CreateGroup(userGroup);
+        userGroup = cognitoDatabase->createGroup(userGroup);
         BOOST_CHECK_EQUAL(false, userGroup.oid.empty());
         BOOST_CHECK_EQUAL(false, userGroup.groupName.empty());
 
         // act
-        const long count = cognitoDatabase.DeleteGroup(userGroup.region, userGroup.userPoolId, userGroup.groupName);
+        const long count = cognitoDatabase->deleteGroup(userGroup.region, userGroup.userPoolId, userGroup.groupName);
 
         // assert
         BOOST_CHECK_EQUAL(1, count);

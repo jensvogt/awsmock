@@ -32,7 +32,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerServer(Core::Scheduler &scheduler);
+        explicit SecretsManagerServer();
 
         /**
          * @brief Shutdown server
@@ -80,10 +80,6 @@ namespace Awsmock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
-        /**
-         * Asynchronous task scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service

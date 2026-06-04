@@ -108,10 +108,10 @@ namespace Awsmock::Database {
     Entity::SNS::Topic SNSMemoryRepository::createTopic(Entity::SNS::Topic &topic) const {
         boost::mutex::scoped_lock lock(_snsTopicMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _topics[oid] = topic;
-        log_trace << "Topic created, oid: " << oid;
-        return _topics[oid];
+        topic.oid = Core::StringUtils::CreateRandomUuid();
+        _topics[topic.oid] = topic;
+        log_trace << "Topic created, oid: " << topic.oid;
+        return _topics[topic.oid];
     }
 
     Entity::SNS::Topic SNSMemoryRepository::createOrUpdateTopic(Entity::SNS::Topic &topic) const {

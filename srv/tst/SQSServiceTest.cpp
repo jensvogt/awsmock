@@ -7,7 +7,7 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../db/include/awsmock/repository/sqs/SQSMongoRepository.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/sqs/SQSService.h>
 
 namespace {
@@ -40,9 +40,9 @@ namespace Awsmock::Database {
         SQSServiceFixture() = default;
         ~SQSServiceFixture() {
             try {
-                const long deletedQueues = SQSMongoRepository::instance().DeleteAllQueues();
+                const long deletedQueues = RepositoryFactory::instance().sqsRepository()->deleteAllQueues();
                 log_debug << "Queues deleted, count: " << deletedQueues;
-                const long deletedMessages = SQSMongoRepository::instance().DeleteAllMessages();
+                const long deletedMessages = RepositoryFactory::instance().sqsRepository()->deleteAllMessages();
                 log_debug << "Messages deleted, count: " << deletedMessages;
             } catch (const std::exception &exc) {
                 log_error << "SQS fixture cleanup failed: " << exc.what();

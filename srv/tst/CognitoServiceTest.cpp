@@ -7,7 +7,7 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/cognito/CognitoService.h>
 
 namespace {
@@ -48,15 +48,17 @@ namespace Awsmock::Database {
     }
 
     struct CognitoServiceFixture {
-        CognitoServiceFixture() = default;
+        CognitoServiceFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+        }
         ~CognitoServiceFixture() {
             try {
-                CognitoMongoRepository::instance().DeleteAllGroups();
-                log_debug << "Cognito groups deleted";
-                CognitoMongoRepository::instance().DeleteAllUsers();
-                log_debug << "Cognito users deleted";
-                CognitoMongoRepository::instance().DeleteAllUserPools();
-                log_debug << "Cognito user pools deleted";
+                long deleted = RepositoryFactory::instance().cognitoRepository()->deleteAllGroups({});
+                log_debug << "Cognito groups deleted, count: " << deleted;
+                deleted = RepositoryFactory::instance().cognitoRepository()->deleteAllUsers();
+                log_debug << "Cognito users deleted, count: " << deleted;
+                deleted = RepositoryFactory::instance().cognitoRepository()->deleteAllUserPools();
+                log_debug << "Cognito user pools deleted, count: " << deleted;
             } catch (const std::exception &exc) {
                 log_error << "Cognito fixture cleanup failed: " << exc.what();
             }
