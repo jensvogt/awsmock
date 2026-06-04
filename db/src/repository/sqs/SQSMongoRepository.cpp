@@ -10,16 +10,18 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "queue_exists");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
         mongocxx::options::count options;
         options.limit(1);
 
-        return queueCollection(client).count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
+        return queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
     }
 
     bool SQSMongoRepository::queueUrlExists(const std::string &region, const std::string &queueUrl) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "queue_exists");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
         mongocxx::options::count options;
         options.limit(1);
 
@@ -31,17 +33,18 @@ namespace Awsmock::Database {
             query.append(kvp("url", queueUrl));
         }
 
-        return queueCollection(client).count_documents(query.view(), options) > 0;
+        return queueCollection.count_documents(query.view(), options) > 0;
     }
 
     bool SQSMongoRepository::queueArnExists(const std::string &queueArn) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "queue_exists");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
         mongocxx::options::count options;
         options.limit(1);
 
-        return queueCollection(client).count_documents(make_document(kvp("arn", queueArn)), options) > 0;
+        return queueCollection.count_documents(make_document(kvp("arn", queueArn)), options) > 0;
     }
 
     Entity::SQS::Queue SQSMongoRepository::createQueue(Entity::SQS::Queue &queue) const {
@@ -50,7 +53,8 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            const auto result = queueCollection(client).insert_one(queue.ToDocument());
+            auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+            const auto result = queueCollection.insert_one(queue.ToDocument());
             log_trace << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string();
 
             queue.oid = result->inserted_id().get_oid().value.to_string();
@@ -65,7 +69,8 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        const auto mResult = queueCollection(client).find_one(make_document(kvp("_id", oid)));
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+        const auto mResult = queueCollection.find_one(make_document(kvp("_id", oid)));
         if (mResult->empty()) {
             log_error << "Queue not found, oid: " << oid.to_string();
             throw Core::DatabaseException("Queue not found, oid: " + oid.to_string());
@@ -84,6 +89,7 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
         document query;
         if (!region.empty()) {
             query.append(kvp("region", region));
@@ -91,7 +97,7 @@ namespace Awsmock::Database {
         if (!queueUrl.empty()) {
             query.append(kvp("url", queueUrl));
         }
-        if (const auto mResult = queueCollection(client).find_one(query.extract()); !mResult) {
+        if (const auto mResult = queueCollection.find_one(query.extract()); !mResult) {
             log_error << "Queue not found, region: " << region << " queueUrl: " << queueUrl;
             throw Core::DatabaseException("Queue not found, region: " + region + " queueUrl: " + queueUrl);
         } else {
@@ -104,7 +110,8 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        if (const auto mResult = queueCollection(client).find_one(make_document(kvp("arn", queueArn)))) {
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+        if (const auto mResult = queueCollection.find_one(make_document(kvp("arn", queueArn)))) {
             Entity::SQS::Queue queue;
             queue.FromDocument(mResult->view());
             return queue;
@@ -117,8 +124,9 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
         Entity::SQS::Queue result;
-        const auto mResult = queueCollection(client).find_one(make_document(kvp("attributes.redrivePolicy.deadLetterTargetArn", dlqQueueArn)));
+        const auto mResult = queueCollection.find_one(make_document(kvp("attributes.redrivePolicy.deadLetterTargetArn", dlqQueueArn)));
 
         if (!mResult) {
             log_error << "Queue not found, queueArn: " << dlqQueueArn;
@@ -131,13 +139,14 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "is_dlq");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
         document query = {};
         if (!queueArn.empty()) {
             query.append(kvp("attributes.redrivePolicy.deadLetterTargetArn", queueArn));
         }
 
         Entity::SQS::QueueList queueList;
-        for (auto queueCursor = queueCollection(client).find(query.view()); auto queue: queueCursor) {
+        for (auto queueCursor = queueCollection.find(query.view()); auto queue: queueCursor) {
             Entity::SQS::Queue result;
             result.FromDocument(queue);
             queueList.push_back(result);
@@ -149,6 +158,7 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
         document query;
         if (!region.empty()) {
             query.append(kvp("region", region));
@@ -157,7 +167,7 @@ namespace Awsmock::Database {
             query.append(kvp("name", queueName));
         }
 
-        if (const auto mResult = queueCollection(client).find_one(query.extract()); !mResult) {
+        if (const auto mResult = queueCollection.find_one(query.extract()); !mResult) {
 
             log_warning << "GetQueueByName failed, region: " << region << " name: " << queueName;
             throw Core::DatabaseException("Queue not found, region: " + region + " name: " + queueName);
@@ -173,6 +183,8 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_queues");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+
         document query = {};
         if (!prefix.empty()) {
             query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
@@ -198,7 +210,7 @@ namespace Awsmock::Database {
         }
 
         Entity::SQS::QueueList queueList;
-        for (auto queueCursor = queueCollection(client).find(query.view(), opts); auto queue: queueCursor) {
+        for (auto queueCursor = queueCollection.find(query.view(), opts); auto queue: queueCursor) {
             Entity::SQS::Queue result;
             result.FromDocument(queue);
             queueList.push_back(result);
@@ -211,6 +223,7 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "export_queues");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
 
         const document query = {};
 
@@ -226,7 +239,7 @@ namespace Awsmock::Database {
         }
 
         Entity::SQS::QueueList queueList;
-        for (auto queueCursor = queueCollection(client).find(query.view(), opts); auto queue: queueCursor) {
+        for (auto queueCursor = queueCollection.find(query.view(), opts); auto queue: queueCursor) {
             Entity::SQS::Queue result;
             result.FromDocument(queue);
             queueList.push_back(result);
@@ -251,13 +264,15 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_queues");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+
         document query = {};
         if (!region.empty()) {
             query.append(kvp("region", region));
         }
 
         Entity::SQS::QueueList queueList;
-        for (auto queueCursor = queueCollection(client).find(query.view()); auto queue: queueCursor) {
+        for (auto queueCursor = queueCollection.find(query.view()); auto queue: queueCursor) {
             Entity::SQS::Queue result;
             result.FromDocument(queue);
             queueList.push_back(result);
@@ -270,11 +285,11 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "purge_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
-            const auto result = col.delete_many(make_document(kvp("queueArn", queueArn)));
+            const auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
 
             log_debug << "Purged queue, count: " << result->deleted_count() << " queueArn: " << queueArn;
             return result->deleted_count();
@@ -296,7 +311,9 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            const auto mResult = queueCollection(client).find_one_and_update(make_document(kvp("arn", queue.arn)), queue.ToDocument(), opts);
+            auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+
+            const auto mResult = queueCollection.find_one_and_update(make_document(kvp("arn", queue.arn)), queue.ToDocument(), opts);
             log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
             if (mResult) {
@@ -324,6 +341,8 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "count_queues");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+
         auto builder = document{};
 
         if (!prefix.empty()) {
@@ -334,20 +353,20 @@ namespace Awsmock::Database {
             builder.append(kvp("region", region));
         }
 
-        return queueCollection(client).count_documents(builder.view());
+        return queueCollection.count_documents(builder.view());
     }
 
     long SQSMongoRepository::deleteQueue(const Entity::SQS::Queue &queue) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto qCol = (*client)[DATABASE_NAME][QUEUE_COLLECTION];
-        auto mCol = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
-            const auto result = qCol.delete_many(make_document(kvp("region", queue.region), kvp("url", queue.url)));
-            mCol.delete_many(make_document(kvp("queueArn", queue.arn)));
+            const auto result = queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("url", queue.url)));
+            messageCollection.delete_many(make_document(kvp("queueArn", queue.arn)));
 
             log_debug << "Queue deleted, count: " << result->deleted_count();
             return result->deleted_count();
@@ -362,13 +381,13 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_all_queues");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto qCol = (*client)[DATABASE_NAME][QUEUE_COLLECTION];
-        auto mCol = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
-            const auto result = qCol.delete_many({});
-            mCol.delete_many({});
+            const auto result = queueCollection.delete_many({});
+            messageCollection.delete_many({});
 
             log_debug << "All queues deleted, count: " << result->deleted_count();
             return result->deleted_count();
@@ -385,7 +404,9 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            const auto result = messageCollection(client).insert_one(message.ToDocument());
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
+            const auto result = messageCollection.insert_one(message.ToDocument());
             log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
 
             message.oid = result->inserted_id().get_oid().value.to_string();
@@ -401,13 +422,15 @@ namespace Awsmock::Database {
 
         try {
             const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
             mongocxx::options::count options;
             options.limit(1);
 
             document query;
             query.append(kvp("receiptHandle", receiptHandle));
 
-            return messageCollection(client).count_documents(query.view(), options) > 0;
+            return messageCollection.count_documents(query.view(), options) > 0;
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
@@ -421,10 +444,12 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
             mongocxx::options::count options;
             options.limit(1);
 
-            return messageCollection(client).count_documents(make_document(kvp("messageId", messageId)), options) > 0;
+            return messageCollection.count_documents(make_document(kvp("messageId", messageId)), options) > 0;
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
@@ -436,7 +461,9 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_message");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        const auto mResult = messageCollection(client).find_one(make_document(kvp("_id", oid)));
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
+        const auto mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
         result.FromDocument(mResult->view());
 
@@ -447,7 +474,9 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_message");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        if (const auto mResult = messageCollection(client).find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
+        if (const auto mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
             Entity::SQS::Message result;
             result.FromDocument(mResult->view());
             return result;
@@ -459,7 +488,9 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_message");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        if (const auto mResult = messageCollection(client).find_one(make_document(kvp("messageId", messageId)))) {
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
+        if (const auto mResult = messageCollection.find_one(make_document(kvp("messageId", messageId)))) {
             Entity::SQS::Message result;
             result.FromDocument(mResult->view());
             return result;
@@ -480,8 +511,10 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
             message.modified = system_clock::now();
-            if (const auto mResult = messageCollection(client).find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts)) {
+            if (const auto mResult = messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts)) {
                 message.FromDocument(mResult->view());
                 log_trace << "Message updated: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
                 return message;
@@ -507,13 +540,15 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
         document query;
         if (!region.empty()) {
             query.append(kvp("region", region));
         }
 
         Entity::SQS::MessageList messageList;
-        for (auto messageCursor = messageCollection(client).find(query.view()); auto &message: messageCursor) {
+        for (auto messageCursor = messageCollection.find(query.view()); auto &message: messageCursor) {
             Entity::SQS::Message result;
             result.FromDocument(message);
             messageList.push_back(result);
@@ -526,6 +561,8 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
         mongocxx::options::find opts;
         if (pageSize > 0) {
             opts.limit(pageSize);
@@ -552,7 +589,7 @@ namespace Awsmock::Database {
         }
 
         Entity::SQS::MessageList messageList;
-        for (auto messageCursor = messageCollection(client).find(query.extract(), opts); auto message: messageCursor) {
+        for (auto messageCursor = messageCollection.find(query.extract(), opts); auto message: messageCursor) {
             Entity::SQS::Message result;
             result.FromDocument(message);
             messageList.push_back(result);
@@ -564,10 +601,10 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "import_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
-            auto bulk = col.create_bulk_write();
+            auto bulk = messageCollection.create_bulk_write();
 
             for (const auto &message: messageArray) {
                 const mongocxx::model::insert_one insert_op{message.get_document().view()};
@@ -577,7 +614,7 @@ namespace Awsmock::Database {
             log_info << "Imported messages: " << result->inserted_count();
 
         } catch (mongocxx::exception &e) {
-            log_error << "Collection exception: " << e.what();
+            log_error << "queueCollection exception: " << e.what();
             throw Core::DatabaseException(e.what());
         }
     }
@@ -587,7 +624,7 @@ namespace Awsmock::Database {
 
         const auto reset = system_clock::now() + std::chrono::seconds(visibility);
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
             mongocxx::options::find_one_and_update opts{};
@@ -596,7 +633,7 @@ namespace Awsmock::Database {
             while (maxResult <= 0 || static_cast<long>(messageList.size()) < maxResult) {
 
                 // Atomically claim one INITIAL message: increment retries and mark INVISIBLE
-                const auto mResult = col.find_one_and_update(
+                const auto mResult = messageCollection.find_one_and_update(
                         make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))),
                         make_document(
                                 kvp("$set", make_document(
@@ -614,7 +651,7 @@ namespace Awsmock::Database {
                 result.FromDocument(mResult->view());
 
                 if (!dlQueueArn.empty() && maxRetries > 0 && result.retries >= maxRetries) {
-                    col.update_one(
+                    messageCollection.update_one(
                             make_document(kvp("_id", bsoncxx::oid{result.oid})),
                             make_document(kvp("$set", make_document(
                                                               kvp("queueArn", dlQueueArn),
@@ -630,7 +667,7 @@ namespace Awsmock::Database {
             log_trace << "Messages received, queueArn: " << queueArn << " count: " << messageList.size();
 
         } catch (mongocxx::exception &e) {
-            log_error << "Collection exception: " << e.what();
+            log_error << "queueCollection exception: " << e.what();
         }
     }
 
@@ -638,27 +675,27 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "reset_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
             const auto filter = make_document(
-                kvp("queueArn", queueArn),
-                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
+                    kvp("queueArn", queueArn),
+                    kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+                    kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
 
             const auto update = make_document(
-                kvp("$set", make_document(
-                    kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
-                    kvp("receiptHandle", ""),
-                    kvp("reset", bsoncxx::types::b_date(system_clock::now() + std::chrono::seconds{visibility})))));
+                    kvp("$set", make_document(
+                                        kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                                        kvp("receiptHandle", ""),
+                                        kvp("reset", bsoncxx::types::b_date(system_clock::now() + std::chrono::seconds{visibility})))));
 
-            const auto result = col.update_many(filter.view(), update.view());
+            const auto result = messageCollection.update_many(filter.view(), update.view());
 
             log_debug << "Message reset, updated: " << result->modified_count() << " queueArn: " << queueArn;
             return result->modified_count();
 
         } catch (mongocxx::exception &e) {
-            log_error << "Collection exception: " << e.what();
+            log_error << "queueCollection exception: " << e.what();
             throw Core::DatabaseException(e.what());
         }
     }
@@ -667,25 +704,25 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "reset_delayed_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
             const auto filter = make_document(
-                kvp("arn", queueArn),
-                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
-                kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
+                    kvp("arn", queueArn),
+                    kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+                    kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
 
             const auto update = make_document(
-                kvp("$set", make_document(
-                    kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))));
+                    kvp("$set", make_document(
+                                        kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))));
 
-            const auto result = col.update_many(filter.view(), update.view());
+            const auto result = messageCollection.update_many(filter.view(), update.view());
 
             log_trace << "Delayed message reset, updated: " << result->upserted_count() << " queueArn: " << queueArn;
             return result->upserted_count();
 
         } catch (const mongocxx::exception &exc) {
-            log_error << "Collection exception: " << exc.what();
+            log_error << "queueCollection exception: " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
     }
@@ -695,7 +732,7 @@ namespace Awsmock::Database {
 
         const auto newReset = system_clock::now() + std::chrono::seconds{originalQueue.attributes.visibilityTimeout};
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
@@ -715,7 +752,7 @@ namespace Awsmock::Database {
             document updateQuery;
             updateQuery.append(kvp("$set", setQuery));
 
-            const auto result = col.update_many(filterQuery.extract(), updateQuery.extract());
+            const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
 
             log_trace << "Message redrive, arn: " << dlqQueue.arn << ", messageId: " << messageId << ", updated: " << result->modified_count();
             return result->modified_count();
@@ -731,7 +768,7 @@ namespace Awsmock::Database {
 
         const auto newReset = system_clock::now() + std::chrono::seconds{originalQueue.attributes.visibilityTimeout};
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
@@ -750,7 +787,7 @@ namespace Awsmock::Database {
             document updateQuery;
             updateQuery.append(kvp("$set", setQuery));
 
-            const auto result = col.update_many(filterQuery.extract(), updateQuery.extract());
+            const auto result = messageCollection.update_many(filterQuery.extract(), updateQuery.extract());
 
             log_trace << "Message re-drive, arn: " << dlqQueue.arn << " updated: " << result->modified_count();
             return result->modified_count();
@@ -766,7 +803,7 @@ namespace Awsmock::Database {
 
         const auto reset = system_clock::now() - std::chrono::seconds{retentionPeriod};
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
@@ -774,7 +811,7 @@ namespace Awsmock::Database {
             filterQuery.append(kvp("queueArn", queueArn));
             filterQuery.append(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset)))));
 
-            const auto result = col.delete_many(filterQuery.extract());
+            const auto result = messageCollection.delete_many(filterQuery.extract());
 
             log_trace << "Message retention reset, deleted: " << result->deleted_count() << " queue: " << queueArn;
             return result->deleted_count();
@@ -789,6 +826,8 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "count_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
         document query = {};
         if (!queueArn.empty()) {
             query.append(kvp("queueArn", queueArn));
@@ -796,7 +835,7 @@ namespace Awsmock::Database {
         if (!prefix.empty()) {
             query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
         }
-        return messageCollection(client).count_documents(query.view());
+        return messageCollection.count_documents(query.view());
     }
 
     Entity::SQS::MessageWaitTime SQSMongoRepository::getAverageMessageWaitingTime() const {
@@ -804,6 +843,8 @@ namespace Awsmock::Database {
 
         try {
             const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
             Entity::SQS::MessageWaitTime waitTime;
             const auto now = system_clock::now();
 
@@ -813,7 +854,7 @@ namespace Awsmock::Database {
                     kvp("minCreated", make_document(kvp("$min", "$created"))),
                     kvp("maxCreated", make_document(kvp("$max", "$created")))));
             p.lookup(make_document(
-                    kvp("from", QUEUE_COLLECTION),
+                    kvp("from", _queueCollectionName),
                     kvp("localField", "_id"),
                     kvp("foreignField", "arn"),
                     kvp("as", "queue")));
@@ -824,7 +865,7 @@ namespace Awsmock::Database {
                     kvp("minCreated", 1),
                     kvp("maxCreated", 1)));
 
-            for (auto cursor = messageCollection(client).aggregate(p); const auto &t: cursor) {
+            for (auto cursor = messageCollection.aggregate(p); const auto &t: cursor) {
                 const auto queueName = Core::Bson::BsonUtils::GetStringValue(t, "queueName");
                 const auto newestCreated = system_clock::time_point(std::chrono::milliseconds(t["maxCreated"].get_date().value));
                 const auto oldestCreated = system_clock::time_point(std::chrono::milliseconds(t["minCreated"].get_date().value));
@@ -846,11 +887,11 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
-            const auto result = col.delete_many(make_document(kvp("queueArn", queueArn)));
+            const auto result = messageCollection.delete_many(make_document(kvp("queueArn", queueArn)));
 
             log_debug << "Messages deleted, queueArn: " << queueArn << " count: " << result->deleted_count();
             return result->deleted_count();
@@ -871,7 +912,9 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            auto result = messageCollection(client).delete_one(make_document(kvp("receiptHandle", receiptHandle)));
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+
+            auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
             return result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
@@ -884,11 +927,11 @@ namespace Awsmock::Database {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_messages");
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto col = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
 
-            const auto result = col.delete_many({});
+            const auto result = messageCollection.delete_many({});
 
             const long deleted = result->deleted_count();
             log_debug << "All messages deleted, count: " << deleted;
@@ -906,8 +949,8 @@ namespace Awsmock::Database {
         using bsoncxx::builder::basic::make_array;
 
         const auto client = ConnectionPool::instance().GetConnection();
-        auto qCol = (*client)[DATABASE_NAME][QUEUE_COLLECTION];
-        auto mCol = (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+        auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
         try {
             mongocxx::pipeline p{};
@@ -934,8 +977,8 @@ namespace Awsmock::Database {
 
             // Get all queue ARNs from the aggregation result
             std::set<std::string> queuesWithMessages;
-            auto bulk = qCol.create_bulk_write();
-            for (auto cursor = mCol.aggregate(p); const auto t: cursor) {
+            auto bulk = queueCollection.create_bulk_write();
+            for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                 const auto queueArn = Core::Bson::BsonUtils::GetStringValue(t, "queueArn");
                 queuesWithMessages.insert(queueArn);
                 bulk.append(mongocxx::model::update_one(
@@ -948,7 +991,7 @@ namespace Awsmock::Database {
             }
 
             // Zero out queues with no messages
-            for (auto queueCursor = qCol.find({}); const auto &q: queueCursor) {
+            for (auto queueCursor = queueCollection.find({}); const auto &q: queueCursor) {
                 if (const auto queueArn = Core::Bson::BsonUtils::GetStringValue(q, "arn"); !queuesWithMessages.contains(queueArn)) {
                     bulk.append(mongocxx::model::update_one(
                             make_document(kvp("arn", queueArn)),

@@ -24,7 +24,8 @@ namespace Awsmock::Database {
      */
     class CognitoMongoRepository : public ICognitoRepository {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -117,7 +118,7 @@ namespace Awsmock::Database {
         Entity::Cognito::UserPool getUserPoolByUserPoolId(const std::string &userPoolId) const override;
 
         /**
-         * @brief Returns a cognito user pool entity by client Id
+         * @brief Returns a cognito user pool entity by client ID
          *
          * @param clientId cognito client ID
          * @return cognito user pool entity
@@ -417,34 +418,32 @@ namespace Awsmock::Database {
         [[nodiscard]]
         bool clientIdExists(const std::string &region, const std::string &clientId) const override;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
-        static constexpr auto DATABASE_NAME = "awsmock";
-        static constexpr auto USERPOOL_COLLECTION = "cognito_userpool";
-        static constexpr auto USER_COLLECTION = "cognito_user";
-        static constexpr auto GROUP_COLLECTION = "cognito_group";
+        /**
+         * @brief Database name
+         */
+        static constexpr auto _dataName = "awsmock";
 
-        [[nodiscard]]
-        static mongocxx::collection userpoolCollection() {
-            const auto entry = Database::instance().client();
-            return (*entry)[Database::instance().databaseName()][USERPOOL_COLLECTION];
-        }
+        /**
+         * @brief User pool collection name
+         */
+        static constexpr auto _userpoolCollection = "cognito_userpool";
 
-        [[nodiscard]]
-        static mongocxx::collection userCollection() {
-            const auto entry = ConnectionPool::instance().GetConnection();
-            return (*entry)[Database::instance().databaseName()][USER_COLLECTION];
-        }
+        /**
+         * @brief User collection name
+         */
+        static constexpr auto _userCollection = "cognito_user";
 
-        [[nodiscard]]
-        static mongocxx::collection groupCollection() {
-            const auto entry = ConnectionPool::instance().GetConnection();
-            return (*entry)[Database::instance().databaseName()][GROUP_COLLECTION];
-        }
+        /**
+         * @brief User group collection name
+         */
+        static constexpr auto _groupCollection = "cognito_group";
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

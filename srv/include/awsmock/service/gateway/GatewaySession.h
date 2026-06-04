@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_SERVICES_GATEWAY_SESSION_H
-#define AWSMOCK_SERVICES_GATEWAY_SESSION_H
+#pragma once
 
 // C++ includes
 #include <memory>
@@ -33,7 +32,8 @@
 
 namespace Awsmock::Service {
 
-    namespace http = boost::beast::http;
+    namespace beast = boost::beast;
+    namespace http = beast::http;
     namespace ip = boost::asio::ip;
 
     /**
@@ -277,5 +277,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICES_GATEWAY_SESSION_H

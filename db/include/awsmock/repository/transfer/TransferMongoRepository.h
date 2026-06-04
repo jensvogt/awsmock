@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_TRANSFER_DATABASE_H
-#define AWSMOCK_REPOSITORY_TRANSFER_DATABASE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -11,12 +10,10 @@
 
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/transfer/Transfer.h>
-#include <awsmock/memorydb/TransferMemoryDb.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
+#include <awsmock/repository/transfer/ITransferRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -26,21 +23,21 @@ namespace Awsmock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class TransferDatabase : public AwsMock::Database::DatabaseBase {
+    class TransferMongoRepository final : public ITransferRepository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit TransferDatabase();
+        explicit TransferMongoRepository() = default;
 
         /**
          * @brief Singleton instance
          */
-        static TransferDatabase &instance() {
-            static TransferDatabase transferDatabase;
-            return transferDatabase;
+        static TransferMongoRepository &instance() {
+            static TransferMongoRepository instance;
+            return instance;
         }
 
         /**
@@ -51,7 +48,7 @@ namespace Awsmock::Database {
          * @return true if the transfer server already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &region, const std::string &serverId) const;
+        bool transferExists(const std::string &region, const std::string &serverId) const override;
 
         /**
          * @brief Check the existence of a transfer server
@@ -60,7 +57,7 @@ namespace Awsmock::Database {
          * @return true if the transfer server already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const Entity::Transfer::Transfer &transfer) const;
+        bool transferExists(const Entity::Transfer::Transfer &transfer) const override;
 
         /**
          * @brief Check the existence of the transfer server
@@ -69,7 +66,7 @@ namespace Awsmock::Database {
          * @return true if the transfer server already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &serverId) const;
+        bool transferExists(const std::string &serverId) const override;
 
         /**
          * @brief Check the existence of a transfer server
@@ -79,7 +76,7 @@ namespace Awsmock::Database {
          * @return true if the transfer server already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) const;
+        bool transferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) const override;
 
         /**
          * @brief Create a new transfer server
@@ -87,7 +84,7 @@ namespace Awsmock::Database {
          * @param transfer transfer entity
          * @return created transfer entity.
          */
-        Entity::Transfer::Transfer CreateTransfer(const Entity::Transfer::Transfer &transfer) const;
+        Entity::Transfer::Transfer createTransfer(const Entity::Transfer::Transfer &transfer) const override;
 
         /**
          * @brief Updates an existing transfer manager
@@ -95,7 +92,7 @@ namespace Awsmock::Database {
          * @param transfer transfer entity
          * @return updated transfer entity.
          */
-        Entity::Transfer::Transfer UpdateTransfer(const Entity::Transfer::Transfer &transfer) const;
+        Entity::Transfer::Transfer updateTransfer(const Entity::Transfer::Transfer &transfer) const override;
 
         /**
          * @brief Created or updates an existing transfer manager
@@ -103,7 +100,7 @@ namespace Awsmock::Database {
          * @param transfer transfer entity
          * @return created or updated transfer entity.
          */
-        Entity::Transfer::Transfer CreateOrUpdateTransfer(const Entity::Transfer::Transfer &transfer) const;
+        Entity::Transfer::Transfer createOrUpdateTransfer(const Entity::Transfer::Transfer &transfer) const override;
 
         /**
          * @brief Returns a transfer manager entity by primary key
@@ -112,7 +109,7 @@ namespace Awsmock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        Entity::Transfer::Transfer GetTransferById(bsoncxx::oid oid) const;
+        Entity::Transfer::Transfer getTransferById(const bsoncxx::oid &oid) const override;
 
         /**
          * @brief Returns a transfer manager entity by primary key
@@ -121,7 +118,7 @@ namespace Awsmock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        Entity::Transfer::Transfer GetTransferById(const std::string &oid) const;
+        Entity::Transfer::Transfer getTransferById(const std::string &oid) const override;
 
         /**
          * @brief Returns a transfer manager entity by manager ID
@@ -131,7 +128,7 @@ namespace Awsmock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        Entity::Transfer::Transfer GetTransferByServerId(const std::string &region, const std::string &serverId) const;
+        Entity::Transfer::Transfer getTransferByServerId(const std::string &region, const std::string &serverId) const override;
 
         /**
          * @brief Returns a transfer manager entity by ARN
@@ -140,7 +137,7 @@ namespace Awsmock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        Entity::Transfer::Transfer GetTransferByArn(const std::string &arn) const;
+        Entity::Transfer::Transfer getTransferByArn(const std::string &arn) const override;
 
         /**
          * @brief Returns a list of transfer manager.
@@ -152,7 +149,7 @@ namespace Awsmock::Database {
          * @param sortColumns sorting
          * @return list of transfer manager
          */
-        [[nodiscard]] std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] std::vector<Entity::Transfer::Transfer> listServers(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns a list of transfer users.
@@ -165,7 +162,7 @@ namespace Awsmock::Database {
          * @param sortColumns sorting column names
          * @return list of transfer users
          */
-        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Transfer::User> listUsers(const std::string &region, const std::string &serverId, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns a list of transfer users.
@@ -175,7 +172,7 @@ namespace Awsmock::Database {
          * @param nextToken next token
          * @return list of transfer users
          */
-        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region, std::string &nextToken, long maxResults = -1) const;
+        std::vector<Entity::Transfer::Transfer> listServers(const std::string &region, std::string &nextToken, long maxResults) const override;
 
         /**
          * @brief Returns the total number of servers.
@@ -183,7 +180,7 @@ namespace Awsmock::Database {
          * @param region AWS region name
          * @return total number of transfer servers
          */
-        long CountServers(const std::string &region = {}) const;
+        long countServers(const std::string &region) const override;
 
         /**
          * @brief Returns the total number of users for a server.
@@ -192,7 +189,7 @@ namespace Awsmock::Database {
          * @param serverId server ID
          * @return total number of transfer server users
          */
-        long CountUsers(const std::string &region = {}, const std::string &serverId = {}) const;
+        long countUsers(const std::string &region = {}, const std::string &serverId = {}) const override;
 
         /**
          * @brief Deletes an existing transfer manager
@@ -200,7 +197,7 @@ namespace Awsmock::Database {
          * @param serverId transfer serverID
          * @throws DatabaseException
          */
-        void DeleteTransfer(const std::string &serverId) const;
+        void deleteTransfer(const std::string &serverId) const override;
 
         /**
          * @brief Deletes all existing transfer server
@@ -208,28 +205,24 @@ namespace Awsmock::Database {
          * @return total number of deleted objects
          * @throws DatabaseException
          */
-        long DeleteAllTransfers() const;
+        long deleteAllTransfers() const override;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
          * Database name
          */
-        std::string _databaseName;
+        static constexpr std::string _databaseName = "awsmock";
 
         /**
          * Server collection name
          */
-        std::string _serverCollectionName;
-
-        /**
-         * Transfer in-memory database
-         */
-        TransferMemoryDb &_memoryDb;
+        static constexpr std::string _serverCollectionName = "transfer";
     };
 
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_TRANSFER_DATABASE_H

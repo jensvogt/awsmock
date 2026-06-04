@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _scheduler(scheduler) {
+    DynamoDbServer::DynamoDbServer() : AbstractServer("dynamodb"), _containerService(ContainerService::instance()) {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
@@ -21,11 +21,11 @@ namespace Awsmock::Service {
         CreateLocalNetwork();
 
         // Start DynamoDB monitoring update counters
-        _scheduler.AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("dynamodb-backup", [] { BackupDynamoDb(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("dynamodb-backup", [] { BackupDynamoDb(); }, _backupCron);
         }
 
         // Connect stop signal
@@ -52,13 +52,13 @@ namespace Awsmock::Service {
     void DynamoDbServer::UpdateCounter() const {
         log_trace << "Dynamodb monitoring starting";
 
-        const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables();
+        const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase->listTables({}, {}, 0, 0, {});
         if (tables.empty()) {
             return;
         }
 
         // Reload the counters first
-        _dynamoDbDatabase.AdjustItemCounters();
+        _dynamoDbDatabase->adjustItemCounters();
 
         long totalItems = 0;
         long totalSize = 0;
@@ -83,8 +83,8 @@ namespace Awsmock::Service {
 
     void DynamoDbServer::Shutdown() {
         log_debug << "DynamoDb server shutdown, region: " << _region;
-        _scheduler.Shutdown("dynamodb-monitoring");
-        _scheduler.Shutdown("dynamodb-backup");
+        Core::Scheduler::instance().Shutdown("dynamodb-monitoring");
+        Core::Scheduler::instance().Shutdown("dynamodb-backup");
         log_info << "DynamoDB server stopped";
     }
 

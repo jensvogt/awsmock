@@ -2,8 +2,7 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#ifndef AWSMOCK_SERVER_DYNAMODB_SERVER_H
-#define AWSMOCK_SERVER_DYNAMODB_SERVER_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -18,7 +17,7 @@
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
-#include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/repository/dynamodb/IDynamoDbRepository.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
@@ -38,7 +37,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbServer(Core::Scheduler &scheduler);
+        explicit DynamoDbServer();
 
         /**
          * @brief Gracefully shutdown the server
@@ -63,7 +62,7 @@ namespace Awsmock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Backup the dynamoDb tables and items
+         * @brief Back up the dynamoDb tables and items
          */
         static void BackupDynamoDb();
 
@@ -80,7 +79,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::DynamoDbDatabase &_dynamoDbDatabase;
+        std::shared_ptr<Database::IDynamoDbRepository> _dynamoDbDatabase = Database::RepositoryFactory::instance().dynamodbRepository();
 
         /**
          * @brief Dynamo DB backup flag.
@@ -119,13 +118,6 @@ namespace Awsmock::Service {
          * Data directory
          */
         std::string _dataDir;
-
-        /**
-         * Asynchronous task scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVER_DYNAMODB_SERVER_H

@@ -214,7 +214,7 @@ namespace Awsmock::Manager {
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::DynamoDbServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::DynamoDbServer>());
             } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::KMSServer>(scheduler));
             } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -222,7 +222,7 @@ namespace Awsmock::Manager {
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>());
             }
         }
         log_info << "Modules started, count: " << Service::ModuleMap::instance().GetSize();
@@ -300,4 +300,4 @@ namespace Awsmock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-} // namespace Awsmock::Manager
+}// namespace Awsmock::Manager

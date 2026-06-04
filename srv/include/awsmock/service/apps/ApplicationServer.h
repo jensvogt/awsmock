@@ -33,7 +33,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit ApplicationServer(Core::Scheduler &scheduler);
+        explicit ApplicationServer();
 
         /**
          * @brief Shutdown server
@@ -145,11 +145,6 @@ namespace Awsmock::Service {
          * Application log server port
          */
         int _logServerPort;
-
-        /**
-         * Asynchronous task scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service

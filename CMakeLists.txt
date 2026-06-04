@@ -19,6 +19,14 @@ set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
 enable_testing()
 
 # -------------------------------------------------------------------------
+# Include what you use
+# -------------------------------------------------------------------------
+#find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+#if (IWYU_PATH)
+#    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "${IWYU_PATH};-Xiwyu;--mapping_file=${CMAKE_SOURCE_DIR}/.iwyu.imp")
+#endif ()
+
+# -------------------------------------------------------------------------
 # Current version
 # -------------------------------------------------------------------------
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/core/include/awsmock/core/Version.h)
@@ -130,16 +138,17 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/entity/lambda/Tags.cpp db/src/entity/lambda/Environment.cpp db/src/entity/lambda/Lambda.cpp
         db/src/entity/lambda/Code.cpp db/src/entity/lambda/EphemeralStorage.cpp db/src/repository/LambdaDatabase.cpp
         db/src/memorydb/LambdaMemoryDb.cpp db/src/entity/lambda/Instance.cpp db/src/entity/lambda/EventSourceMapping.cpp
-        db/src/entity/lambda/LambdaResult.cpp db/src/repository/TransferDatabase.cpp db/src/entity/transfer/User.cpp
-        db/src/entity/transfer/Transfer.cpp db/src/memorydb/TransferMemoryDb.cpp db/src/entity/cognito/UserPool.cpp
-        db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp db/src/entity/cognito/Group.cpp
-        db/src/repository/cognito/CognitoMemoryRepository.cpp db/src/repository/cognito/CognitoMongoRepository.cpp
-        db/src/entity/dynamodb/Item.cpp db/src/entity/dynamodb/Table.cpp db/src/repository/DynamoDbDatabase.cpp
-        db/src/entity/dynamodb/ProvisionedThroughput.cpp db/src/memorydb/DynamoDbMemoryDb.cpp db/src/entity/secretsmanager/Secret.cpp
+        db/src/entity/lambda/LambdaResult.cpp db/src/repository/transfer/TransferMongoRepository.cpp
+        db/src/entity/transfer/User.cpp db/src/entity/transfer/Transfer.cpp db/src/repository/transfer/TransferMemoryRepository.cpp
+        db/src/entity/cognito/UserPool.cpp db/src/entity/cognito/User.cpp db/src/entity/cognito/UserPoolClient.cpp
+        db/src/entity/cognito/Group.cpp db/src/repository/cognito/CognitoMemoryRepository.cpp
+        db/src/repository/cognito/CognitoMongoRepository.cpp db/src/entity/dynamodb/Item.cpp db/src/entity/dynamodb/Table.cpp
+        db/src/repository/dynamodb/DynamoDbMongoRepository.cpp db/src/entity/dynamodb/ProvisionedThroughput.cpp
+        db/src/repository/dynamodb/DynamoDbMemoryRepository.cpp db/src/entity/secretsmanager/Secret.cpp
         db/src/entity/secretsmanager/SecretVersion.cpp db/src/entity/secretsmanager/RotationRules.cpp
         db/src/repository/SecretsManagerDatabase.cpp db/src/memorydb/SecretsManagerMemoryDb.cpp db/src/entity/kms/Key.cpp
         db/src/repository/kms/KMSMongoRepository.cpp db/src/repository/kms/KMSMemoryRepository.cpp db/src/entity/ssm/Parameter.cpp
-        db/src/repository/SSMDatabase.cpp db/src/memorydb/SSMMemoryDb.cpp db/src/entity/module/Module.cpp
+        db/src/repository/ssm/SSMMongoRepository.cpp db/src/repository/ssm/SSMMemoryRepository.cpp db/src/entity/module/Module.cpp
         db/src/repository/module/ModuleMongoRepository.cpp db/src/repository/module/ModuleMemoryRepository.cpp
         db/src/entity/apps/Application.cpp db/src/repository/ApplicationDatabase.cpp db/src/memorydb/ApplicationMemoryDb.cpp
         db/src/utils/MongoUtils.cpp db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/entity/dynamodb/Tag.cpp

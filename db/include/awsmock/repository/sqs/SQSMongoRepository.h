@@ -527,19 +527,20 @@ namespace Awsmock::Database {
          */
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
 
-        static constexpr auto DATABASE_NAME = "awsmock";
-        static constexpr auto QUEUE_COLLECTION = "sqs_queue";
-        static constexpr auto MESSAGE_COLLECTION = "sqs_message";
+        /**
+         * @brief Database name
+         */
+        static constexpr auto _databaseName = "awsmock";
 
-        [[nodiscard]]
-        static mongocxx::collection queueCollection(const mongocxx::pool::entry &client) {
-            return (*client)[DATABASE_NAME][QUEUE_COLLECTION];
-        }
+        /**
+         * @brief Queue collection name
+         */
+        static constexpr auto _queueCollectionName = "sqs_queue";
 
-        [[nodiscard]]
-        static mongocxx::collection messageCollection(const mongocxx::pool::entry &client) {
-            return (*client)[DATABASE_NAME][MESSAGE_COLLECTION];
-        }
+        /**
+         * @brief Message collection name
+         */
+        static constexpr auto _messageCollectionName = "sqs_message";
     };
 
 }// namespace Awsmock::Database

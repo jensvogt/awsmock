@@ -4,8 +4,6 @@
 
 #include <awsmock/service/ssm/SSMServer.h>
 
-#include "awsmock/core/EventBus.h"
-
 namespace Awsmock::Service {
 
     SSMServer::SSMServer(Core::Scheduler &scheduler) : AbstractServer("ssm"), _scheduler(scheduler) {
@@ -35,7 +33,7 @@ namespace Awsmock::Service {
         log_trace << "SSM monitoring starting";
 
         // Get total counts
-        const long parameters = _ssmDatabase.CountParameters();
+        const long parameters = _ssmDatabase->countParameters("", "");
         // TODO: fix and use new monitoring counters
         //_metricService.SetGauge(SSM_PARAMETER_COUNT, {}, {}, parameters);
 

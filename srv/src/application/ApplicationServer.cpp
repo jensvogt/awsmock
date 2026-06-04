@@ -8,7 +8,7 @@
 
 namespace Awsmock::Service {
 
-    ApplicationServer::ApplicationServer(Core::Scheduler &scheduler) : AbstractServer("application"), _module("application"), _scheduler(scheduler) {
+    ApplicationServer::ApplicationServer() : AbstractServer("application"), _module("application") {
 
         // Get configuration values
         _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.application.monitoring-period");
@@ -19,13 +19,13 @@ namespace Awsmock::Service {
         _logServerPort = Core::Configuration::instance().get<int>("awsmock.modules.application.log-server-port");
 
         // Start application background threads
-        _scheduler.AddTask("application-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
-        _scheduler.AddTask("application-restart", [this] { RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod);
+        Core::Scheduler::instance().AddTask("application-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("application-restart", [this] { RestartApplications(); }, -1);
+        Core::Scheduler::instance().AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
         }
 
         // Start the application log server (websocket)
@@ -229,10 +229,10 @@ namespace Awsmock::Service {
 
     void ApplicationServer::Shutdown() {
         log_info << "Application server shutdown";
-        _scheduler.Shutdown("application-monitoring");
-        _scheduler.Shutdown("application-restart");
-        _scheduler.Shutdown("application-watchdog");
-        _scheduler.Shutdown("application-backup");
+        Core::Scheduler::instance().Shutdown("application-monitoring");
+        Core::Scheduler::instance().Shutdown("application-restart");
+        Core::Scheduler::instance().Shutdown("application-watchdog");
+        Core::Scheduler::instance().Shutdown("application-backup");
 
         for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase.ListApplications(); auto &application: applications) {
             ContainerService::instance().KillContainer(application.containerId);

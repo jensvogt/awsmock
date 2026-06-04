@@ -26,9 +26,10 @@ namespace Awsmock::Database {
      */
     class IKMSRepository {
 
-    public:
+      public:
+
         /**
-         * @brief Virtual destructor for the ISQSRepository interface.
+         * @brief Virtual destructor for the IKMSRepository interface.
          *
          * Ensures derived classes' destructor is invoked correctly
          * during object destruction to release resources.
@@ -37,10 +38,10 @@ namespace Awsmock::Database {
 
 
         /**
-         * @brief Check existence of key by keyId
+         * @brief Check existence of a key by keyId
          *
          * @param keyId key ID
-         * @return true if key already exists
+         * @return true if the key already exists
          * @throws DatabaseException
          */
         [[nodiscard]]
@@ -146,4 +147,4 @@ namespace Awsmock::Database {
         virtual long deleteAllKeys() const = 0;
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

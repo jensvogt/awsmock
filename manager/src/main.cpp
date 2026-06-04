@@ -87,20 +87,20 @@ int main(const int argc, char *argv[]) {
     // Show usage
     if (vm.contains("help")) {
         std::cout << std::endl
-                << "AwsMock manager v" << Awsmock::Core::Configuration::getVersion() << std::endl
-                << std::endl
-                << "Usage: " << std::endl
-                << "  awsmockmgr [Options]" << std::endl
-                << std::endl
-                << desc << std::endl;
+                  << "AwsMock manager v" << Awsmock::Core::Configuration::getVersion() << std::endl
+                  << std::endl
+                  << "Usage: " << std::endl
+                  << "  awsmockmgr [Options]" << std::endl
+                  << std::endl
+                  << desc << std::endl;
         return 0;
     }
 
     // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
-                << "AwsMock manager v" << Awsmock::Core::Configuration::getVersion() << std::endl
-                << std::endl;
+                  << "AwsMock manager v" << Awsmock::Core::Configuration::getVersion() << std::endl
+                  << std::endl;
         return 0;
     }
 
@@ -127,7 +127,7 @@ int main(const int argc, char *argv[]) {
 #endif
 
     // Read configuration, log to stderr, as we do not have logging yet
-    auto configFilename = DEFAULT_CONFIG_FILE;
+    auto configFilename = std::string(DEFAULT_CONFIG_FILE);
     if (vm.contains("config")) {
         configFilename = vm["config"].as<std::string>();
     }
@@ -181,9 +181,8 @@ int main(const int argc, char *argv[]) {
 
     // Windows service table entries
     constexpr SERVICE_TABLE_ENTRY serviceTable[] = {
-        {const_cast<LPSTR>(DEFAULT_SERVICE_NAME), static_cast<LPSERVICE_MAIN_FUNCTIONA>(ServiceMain)},
-        {nullptr, nullptr}
-    };
+            {const_cast<LPSTR>(DEFAULT_SERVICE_NAME), static_cast<LPSERVICE_MAIN_FUNCTIONA>(ServiceMain)},
+            {nullptr, nullptr}};
 
     // Windows service start
     if (!StartServiceCtrlDispatcher(serviceTable)) {

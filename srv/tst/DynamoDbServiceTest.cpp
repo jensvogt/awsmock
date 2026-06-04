@@ -6,8 +6,8 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../db/include/awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
-#include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
 namespace {

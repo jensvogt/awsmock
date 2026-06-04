@@ -9,10 +9,11 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/repository/SSMDatabase.h>
+#include <awsmock/repository/ssm/ISSMRepository.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -54,7 +55,7 @@ namespace Awsmock::Service {
         /**
          * @brief Database connection
          */
-        Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+        std::shared_ptr<Database::ISSMRepository> _ssmDatabase = Database::RepositoryFactory::instance().ssmRepository();
 
         /**
          * @brief SSM server backup flag.

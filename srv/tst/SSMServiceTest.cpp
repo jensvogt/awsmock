@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <awsmock/repository/SSMDatabase.h>
+#include <../../db/include/awsmock/repository/ssm/SSMMongoRepository.h>
 #include <awsmock/service/ssm/SSMService.h>
 
 namespace {
@@ -34,7 +34,7 @@ namespace Awsmock::Database {
         SSMServiceFixture() = default;
         ~SSMServiceFixture() {
             try {
-                const long count = SSMDatabase::instance().DeleteAllParameters();
+                const long count = SSMMongoRepository::instance().DeleteAllParameters();
                 log_debug << "SSM parameters deleted, count: " << count;
             } catch (const std::exception &exc) {
                 log_error << "SSM fixture cleanup failed: " << exc.what();

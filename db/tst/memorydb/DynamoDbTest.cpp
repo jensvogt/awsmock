@@ -6,8 +6,8 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../include/awsmock/repository/dynamodb/DynamoDbDatabase.h>
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
-#include <awsmock/repository/DynamoDbDatabase.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};

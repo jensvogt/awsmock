@@ -2,12 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFER_SERVICE_H
-#define AWSMOCK_SERVICE_TRANSFER_SERVICE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
+#include <awsmock/dto/common/mapper/SortColumnMapper.h>
+#include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/dto/transfer/CreateProtocolRequest.h>
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 #include <awsmock/dto/transfer/CreateServerResponse.h>
@@ -33,7 +34,9 @@
 #include <awsmock/dto/transfer/internal/ListUserCountersRequest.h>
 #include <awsmock/dto/transfer/internal/ListUserCountersResponse.h>
 #include <awsmock/dto/transfer/mapper/Mapper.h>
-#include <awsmock/repository/TransferDatabase.h>
+#include <awsmock/dto/transfer/model/Tag.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/transfer/TransferMongoRepository.h>
 
 #define TRANSFER_DEFAULT_FTP_PORT 21
 
@@ -179,14 +182,15 @@ namespace Awsmock::Service {
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
          * Transfer database connection
          */
-        Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+        std::shared_ptr<Database::ITransferRepository> _transferDatabase = Database::RepositoryFactory::instance().transferRepository();
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_TRANSFER_SERVICE_H

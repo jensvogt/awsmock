@@ -1,47 +1,39 @@
-﻿//
-// Created by vogje01 on 29/05/2023.
+//
+// Created by vogje01 on 5/24/26.
 //
 
 #pragma once
 
-// AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/memorydb/DynamoDbMemoryDb.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
-#include <awsmock/repository/DynamoDbToMongoTranslator.h>
-#include <awsmock/utils/SortColumn.h>
+// C++ includes
+#include <optional>
+#include <string>
+#include <vector>
 
-#define QUERY_SIZE_LIMIT (1024 * 1024)
+// Awsmock includes
+#include <awsmock/entity/dynamodb/Item.h>
+#include <awsmock/entity/dynamodb/Table.h>
+#include <awsmock/repository/dynamodb/DynamoDbToMongoTranslator.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
 
     /**
-     * @brief DynamoDB MongoDB database.
+     * @brief Interface for SQS repository operations.
      *
-     * @author jens.vogt\@opitz-consulting.com
+     * Provides an abstraction for storing, retrieving, and managing
+     * SQS-related data.
      */
-    class DynamoDbDatabase : public AwsMock::Database::DatabaseBase {
+    class IDynamoDbRepository {
 
       public:
 
         /**
-         * @brief Constructor
+         * @brief Virtual destructor for the ISQSRepository interface.
+         *
+         * Ensures derived classes' destructor is invoked correctly
+         * during object destruction to release resources.
          */
-        explicit DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {
-        }
-
-        /**
-         * @brief Singleton instance
-         */
-        static DynamoDbDatabase &instance() {
-            static DynamoDbDatabase dynamoDbDatabase;
-            return dynamoDbDatabase;
-        }
+        virtual ~IDynamoDbRepository() = default;
 
         /**
          * @brief Check the existence of a DynamoDb table
@@ -51,7 +43,8 @@ namespace Awsmock::Database {
          * @return true if the DynamoDb table already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool TableExists(const std::string &region, const std::string &tableName) const;
+        [[nodiscard]]
+        virtual bool tableExists(const std::string &region, const std::string &tableName) const = 0;
 
         /**
          * @brief Create a new DynamoDb table
@@ -59,7 +52,8 @@ namespace Awsmock::Database {
          * @param table DynamoDb table
          * @return created DynamoDb table.
          */
-        Entity::DynamoDb::Table CreateTable(Entity::DynamoDb::Table &table) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Table createTable(Entity::DynamoDb::Table &table) const = 0;
 
         /**
          * @brief Updates a DynamoDb table
@@ -67,7 +61,8 @@ namespace Awsmock::Database {
          * @param table DynamoDb table
          * @return updated DynamoDb table.
          */
-        Entity::DynamoDb::Table UpdateTable(Entity::DynamoDb::Table &table) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Table updateTable(Entity::DynamoDb::Table &table) const = 0;
 
         /**
          * @brief Create a new DynamoDb table or update an existing one
@@ -75,7 +70,8 @@ namespace Awsmock::Database {
          * @param table DynamoDb table
          * @return created or updated DynamoDb table.
          */
-        Entity::DynamoDb::Table CreateOrUpdateTable(Entity::DynamoDb::Table &table) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Table createOrUpdateTable(Entity::DynamoDb::Table &table) const = 0;
 
         /**
          * @brief Update table counters
@@ -85,7 +81,7 @@ namespace Awsmock::Database {
          * @param size table size
          * @throws DatabaseException
          */
-        void UpdateTableCounter(const std::string &tableArn, long items, long size) const;
+        virtual void updateTableCounter(const std::string &tableArn, long items, long size) const = 0;
 
         /**
          * @brief Returns a table entity by primary key
@@ -94,7 +90,8 @@ namespace Awsmock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Table GetTableById(bsoncxx::oid oid) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Table getTableById(const bsoncxx::oid &oid) const = 0;
 
         /**
          * @brief Returns a table entity by primary key
@@ -103,7 +100,8 @@ namespace Awsmock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Table GetTableById(const std::string &oid) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Table getTableById(const std::string &oid) const = 0;
 
         /**
          * @brief Returns a table entity by primary key
@@ -113,7 +111,8 @@ namespace Awsmock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Table getTableByRegionName(const std::string &region, const std::string &name) const = 0;
 
         /**
          * @brief Returns a list of DynamoDB tables
@@ -125,16 +124,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting columns
          * @return list of DynamoDB tables
          */
-        [[nodiscard]] Entity::DynamoDb::TableList ListTables(const std::string &region = {}, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
-
-        /**
-         * @brief Returns the approximate size of a table in bytes
-         *
-         * @param region AWS region
-         * @param tableName name of the table
-         * @return approximate table size in bytes
-         */
-        [[nodiscard]] long GetTableSize(const std::string &region = {}, const std::string &tableName = {}) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::TableList listTables(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
          * @brief Returns the number of DynamoDB tables
@@ -143,7 +134,8 @@ namespace Awsmock::Database {
          * @param prefix table name prefix
          * @return number of DynamoDB tables
          */
-        [[nodiscard]] long CountTables(const std::string &region = {}, const std::string &prefix = {}) const;
+        [[nodiscard]]
+        virtual long countTables(const std::string &region, const std::string &prefix) const = 0;
 
         /**
          * @brief Deletes an existing DynamoDB table
@@ -152,7 +144,7 @@ namespace Awsmock::Database {
          * @param tableName name of the table
          * @throws DatabaseException
          */
-        void DeleteTable(const std::string &region, const std::string &tableName) const;
+        virtual void deleteTable(const std::string &region, const std::string &tableName) const = 0;
 
         /**
          * @brief Deletes all existing DynamoDB tables
@@ -160,7 +152,8 @@ namespace Awsmock::Database {
          * @return total number of deleted objects
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteAllTables() const;
+        [[nodiscard]]
+        virtual long deleteAllTables() const = 0;
 
         /**
          * @brief Checks the existence of an item.
@@ -169,7 +162,8 @@ namespace Awsmock::Database {
          * @return true if the database exists, otherwise false
          * @throws DatabaseException
          */
-        [[nodiscard]] bool ItemExists(const Entity::DynamoDb::Item &item) const;
+        [[nodiscard]]
+        virtual bool itemExists(const Entity::DynamoDb::Item &item) const = 0;
 
         /**
          * @brief Checks the existence of an item.
@@ -183,7 +177,8 @@ namespace Awsmock::Database {
          * @return true if the database exists, otherwise false
          * @throws DatabaseException
          */
-        bool ItemExists(const std::string &region, const std::string &tableName, std::string &partitionKey, const std::string &sortKey) const;
+        [[nodiscard]]
+        virtual bool itemExists(const std::string &region, const std::string &tableName, std::string &partitionKey, const std::string &sortKey) const = 0;
 
         /**
          * @brief Returns a list of DynamoDB items
@@ -196,7 +191,18 @@ namespace Awsmock::Database {
          * @return list of DynamoDB tables
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::ItemList listItems(const std::string &region, const std::string &tableName, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
+
+        /**
+         * @brief Returns an item entity by primary key
+         *
+         * @param oid item primary key
+         * @return item entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Item getItemById(const bsoncxx::oid &oid) const = 0;
 
 
         /**
@@ -206,7 +212,8 @@ namespace Awsmock::Database {
          * @return item entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Item GetItemById(bsoncxx::oid oid) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Item getItemById(const std::string &oid) const = 0;
 
         /**
          * @brief Returns an item entity by primary key
@@ -214,11 +221,12 @@ namespace Awsmock::Database {
          * @param region AWS region
          * @param tableName name of the table
          * @param partitionKey partition key
-         * @param sortKey sort key, default = {}
+         * @param sortKey sort key
          * @return item entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::DynamoDb::Item GetItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey = {}) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Item getItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) const = 0;
 
         /**
          * @brief Creates a new item
@@ -227,7 +235,8 @@ namespace Awsmock::Database {
          * @return created item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item CreateItem(Entity::DynamoDb::Item &item) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Item createItem(Entity::DynamoDb::Item &item) const = 0;
 
         /**
          * @brief Updates an existing item
@@ -236,7 +245,8 @@ namespace Awsmock::Database {
          * @return updated item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item UpdateItem(Entity::DynamoDb::Item &item) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Item updateItem(Entity::DynamoDb::Item &item) const = 0;
 
         /**
          * @brief Create or update an item
@@ -245,7 +255,18 @@ namespace Awsmock::Database {
          * @return created or updated item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item CreateOrUpdateItem(Entity::DynamoDb::Item &item) const;
+        [[nodiscard]]
+        virtual Entity::DynamoDb::Item createOrUpdateItem(Entity::DynamoDb::Item &item) const = 0;
+
+        /**
+         * @brief Get a list of all items of a table
+         *
+         * @param region AWS region
+         * @param tableName table name
+         * @return list of items;
+         */
+        [[nodiscard]]
+        virtual std::vector<Entity::DynamoDb::Item> getItems(const std::string &region, const std::string &tableName) const = 0;
 
         /**
          * @brief Returns the number of DynamoDB items.
@@ -255,10 +276,11 @@ namespace Awsmock::Database {
          * @param prefix key prefix
          * @return number of DynamoDB items
          */
-        [[nodiscard]] long CountItems(const std::string &region = {}, const std::string &tableName = {}, const std::string &prefix = {}) const;
+        [[nodiscard]]
+        virtual long countItems(const std::string &region, const std::string &tableName, const std::string &prefix) const = 0;
 
         /**
-         * @brief Execute query
+         * @brief Execute a query
          *
          * @param req request
          * @param scanIndexForward scan forward
@@ -266,10 +288,11 @@ namespace Awsmock::Database {
          * @return list of items
          * @throws DatabaseException
          */
-        [[nodiscard]] std::vector<Entity::DynamoDb::Item> ExecuteQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const;
+        [[nodiscard]]
+        virtual std::vector<Entity::DynamoDb::Item> executeQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const = 0;
 
         /**
-         * @brief Execute query
+         * @brief Execute a query
          *
          * @param filter query filter
          * @param scanIndexForward scan forward
@@ -277,12 +300,13 @@ namespace Awsmock::Database {
          * @return list of items
          * @throws DatabaseException
          */
-        std::vector<Entity::DynamoDb::Item> ExecuteQuery(const value &filter, bool scanIndexForward, int limit = 0) const;
+        [[nodiscard]]
+        virtual std::vector<Entity::DynamoDb::Item> executeQuery(const value &filter, bool scanIndexForward, int limit = 0) const = 0;
 
         /**
          * @brief Adjust the item counters and updates the table entities.
          */
-        void AdjustItemCounters() const;
+        virtual void adjustItemCounters() const = 0;
 
         /**
          * @brief Deletes an item by its primary key
@@ -293,7 +317,7 @@ namespace Awsmock::Database {
          * @param sortKey sort key, default = {}
          * @throws DatabaseException
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey = {}) const;
+        virtual void deleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const = 0;
 
         /**
          * @brief Deletes all item of a table
@@ -303,7 +327,8 @@ namespace Awsmock::Database {
          * @return number of items deleted
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteItems(const std::string &region, const std::string &tableName) const;
+        [[nodiscard]]
+        virtual long deleteItems(const std::string &region, const std::string &tableName) const = 0;
 
         /**
          * @brief Deletes all items
@@ -311,48 +336,8 @@ namespace Awsmock::Database {
          * @return number of items deleted
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteAllItems() const;
-
-        /**
-         * @brief Get a list of all items of a table
-         *
-         * @param region AWS region
-         * @param tableName table name
-         * @return list of items;
-         */
-        std::vector<Entity::DynamoDb::Item> GetItems(const std::string &region, const std::string &tableName) const;
-
-      private:
-
-        mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
-
-        Entity::DynamoDb::KeyValue DynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const;
-        void DumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) const;
-
-        /**
-         * @brief Database name
-         */
-        std::string _databaseName;
-
-        /**
-         * @brief Table collection name
-         */
-        std::string _tableCollectionName;
-
-        /**
-         * @brief Item collection name
-         */
-        std::string _itemCollectionName;
-
-        /**
-         * @brief AWS account ID
-         */
-        std::string _accountId;
-
-        /**
-         * @brief DynamoDB in-memory database
-         */
-        DynamoDbMemoryDb &_memoryDb;
+        [[nodiscard]]
+        virtual long deleteAllItems() const = 0;
     };
 
 }// namespace Awsmock::Database

@@ -2,16 +2,14 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_DYNAMODB_SERVICE_H
-#define AWSMOCK_SERVICE_DYNAMODB_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <sstream>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/dynamodb/internal/ExportItemsResponse.h"
-#include "awsmock/repository/DynamoDbToMongoTranslator.h"
+#include "awsmock/repository/RepositoryFactory.h"
 
 
 #include <awsmock/core/AwsUtils.h>
@@ -50,6 +48,7 @@
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
 #include <awsmock/dto/dynamodb/internal/ExportItemsRequest.h>
+#include <awsmock/dto/dynamodb/internal/ExportItemsResponse.h>
 #include <awsmock/dto/dynamodb/internal/GetItemCounterRequest.h>
 #include <awsmock/dto/dynamodb/internal/GetItemCounterResponse.h>
 #include <awsmock/dto/dynamodb/internal/GetTableDetailCountersRequest.h>
@@ -60,7 +59,8 @@
 #include <awsmock/dto/dynamodb/internal/ListTableCountersRequest.h>
 #include <awsmock/dto/dynamodb/internal/ListTableCountersResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
-#include <awsmock/repository/DynamoDbDatabase.h>
+#include <awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
+#include <awsmock/repository/dynamodb/DynamoDbToMongoTranslator.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/dynamodb/DynamoDbQueryHelper.h>
 
@@ -83,7 +83,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _accountId(Core::Configuration::instance().get<std::string>("awsmock.access.account-id")) {
+        explicit DynamoDbService() : _accountId(Core::Configuration::instance().get<std::string>("awsmock.access.account-id")) {
         }
 
         /**
@@ -95,7 +95,7 @@ namespace Awsmock::Service {
         [[nodiscard]] Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const;
 
         /**
-         * @brief check existence of table in DynamoDB docker image.
+         * @brief check the existence of the table in DynamoDB docker image.
          *
          * @param region AWS region
          * @param tableName table name
@@ -243,10 +243,13 @@ namespace Awsmock::Service {
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 
         /**
-         * @brief create query expression.
+         * @brief Create a query expression.
          *
          * @param inputExpression input expression from request
          * @return DynamodBD query expression
@@ -254,12 +257,13 @@ namespace Awsmock::Service {
         static std::string CreateExpression(const std::string &inputExpression);
 
         /**
-         * @brief Create the attributes value map
+         * @brief Create the attribute value map
          *
          * @par
          * Adds also the table name as attribute values
          *
-         * @param expressionAttributeValues expression attributes from request
+         * @param tableName name of the table
+         * @param expressionAttributeValues expression attributes from a request
          * @return attribute value map
          */
         static ExpressionAttributeValues CreateAttributeValues(const std::string &tableName, std::map<std::string, Dto::DynamoDb::AttributeValue> expressionAttributeValues);
@@ -267,7 +271,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::DynamoDbDatabase &_dynamoDbDatabase;
+        std::shared_ptr<Database::IDynamoDbRepository> _dynamoDbDatabase = Database::RepositoryFactory::instance().dynamodbRepository();
 
         /**
          * AWS account ID
@@ -276,5 +280,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_DYNAMODB_SERVICE_H

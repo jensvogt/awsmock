@@ -12,13 +12,13 @@ namespace Awsmock::Service {
         _timeout = configuration.get<int>("awsmock.gateway.http.timeout");
         _verifySignature = configuration.get<bool>("awsmock.aws.signature.verify");
 
-        // Defaults for region and user; will be overwritten by authorized requests
+        // Authorized requests; will overwrite defaults for region and user
         _region = Core::Configuration::instance().get<std::string>("awsmock.region");
         _user = Core::Configuration::instance().get<std::string>("awsmock.user");
     };
 
     void GatewaySession::Run() {
-        dispatch(_stream.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
+        dispatch(_stream.get_executor(), beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
     }
 
     void GatewaySession::DoRead() {
@@ -35,8 +35,7 @@ namespace Awsmock::Service {
         _stream.expires_after(std::chrono::seconds(_timeout));
 
         // Read only the metadata first
-        http::async_read_header(_stream, _buffer, *_parser,
-                                boost::beast::bind_front_handler(&GatewaySession::OnReadHeader, shared_from_this()));
+        http::async_read_header(_stream, _buffer, *_parser, beast::bind_front_handler(&GatewaySession::OnReadHeader, shared_from_this()));
     }
 
     void GatewaySession::OnReadHeader(const beast::error_code &ec, std::size_t) {
