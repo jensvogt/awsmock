@@ -26,19 +26,12 @@ namespace Awsmock::Database {
      */
     class KMSMemoryRepository final : public IKMSRepository {
 
-    public:
+      public:
+
         /**
          * Constructor
          */
         KMSMemoryRepository() = default;
-
-        /**
-         * Singleton instance
-         */
-        static KMSMemoryRepository &instance() {
-            static KMSMemoryRepository instance;
-            return instance;
-        }
 
         /**
          * @brief Check existence of key by keyId
@@ -149,7 +142,8 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllKeys() const override;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -166,4 +160,4 @@ namespace Awsmock::Database {
         static boost::mutex _keyMutex;
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

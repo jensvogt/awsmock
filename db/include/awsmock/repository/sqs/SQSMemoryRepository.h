@@ -47,14 +47,6 @@ namespace Awsmock::Database {
         explicit SQSMemoryRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static SQSMemoryRepository &instance() {
-            static SQSMemoryRepository sqsMemoryDb;
-            return sqsMemoryDb;
-        }
-
-        /**
          * @brief Check the existence of the queue
          *
          * @param region AWS region

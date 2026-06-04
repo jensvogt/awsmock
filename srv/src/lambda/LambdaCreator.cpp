@@ -24,7 +24,7 @@ namespace Awsmock::Service {
             lambda.state = Database::Entity::Lambda::LambdaState::Active;
             lambda.stateReason = "Activated";
             lambda.codeSize = static_cast<long>(lambda.code.zipFile.size());
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
 
             log_info << "Lambda function instance created: " << lambda.function << " instanceId: " << instanceId << ", instances: " << lambda.instances.size();
             return lambda;
@@ -95,7 +95,7 @@ namespace Awsmock::Service {
             CreateInstance(instanceId, lambda, lambda.code.zipFile);
             lambda.lastStarted = system_clock::now();
             lambda.state = Database::Entity::Lambda::LambdaState::Active;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_info << "Lambda instance added, function: " << lambda.function << ", instanceId: " << instanceId << ", total instances: " << lambda.instances.size();
             return lambda;
         } catch (const Core::ContainerException &e) {
@@ -155,7 +155,7 @@ namespace Awsmock::Service {
 
         // Set status and update database
         lambda.state = Database::Entity::Lambda::LambdaState::Active;
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
     }
 
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {

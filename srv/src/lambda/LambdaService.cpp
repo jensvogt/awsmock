@@ -32,7 +32,7 @@ namespace Awsmock::Service {
         lambda.state = Database::Entity::Lambda::LambdaState::Pending;
         lambda.stateReason = "Initializing";
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
-        lambda = _lambdaDatabase.CreateOrUpdateLambda(lambda);
+        lambda = _lambdaDatabase->createOrUpdateLambda(lambda);
 
         // Create instance
         Database::Entity::Lambda::Instance instance;
@@ -50,7 +50,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "upload_function_code");
         log_debug << "Upload function code request, arn: " << request.functionArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
@@ -61,7 +61,7 @@ namespace Awsmock::Service {
         }
 
         // Get lambda function
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
         // Stop and delete all containers/images
         CleanupDocker(lambda);
@@ -79,10 +79,10 @@ namespace Awsmock::Service {
         lambda.tags["dockerTag"] = request.version;
         lambda.stateReason = "Initializing";
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Clear lambda results
-        const long count = _lambdaDatabase.DeleteResultsCounters(lambda.arn);
+        const long count = _lambdaDatabase->deleteResultsCounters(lambda.arn);
         log_debug << "Lambda results cleared, arn: " << lambda.arn << " count: " << count;
 
         // Create instance
@@ -102,7 +102,7 @@ namespace Awsmock::Service {
         log_debug << "List functions request, region: " << region;
 
         try {
-            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->listLambdas(region);
 
             Dto::Lambda::ListFunctionResponse response;
             for (const auto &lambda: lambdas) {
@@ -121,8 +121,8 @@ namespace Awsmock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            const long count = _lambdaDatabase.LambdaCount(request.region);
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->listLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const long count = _lambdaDatabase->lambdaCount(request.region);
 
             Dto::Lambda::ListFunctionCountersResponse response = Dto::Lambda::Mapper::map(lambdas);
             response.total = count;
@@ -140,12 +140,12 @@ namespace Awsmock::Service {
         log_debug << "List lambda environment counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string> > environments;
+            std::vector<std::pair<std::string, std::string>> environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -190,7 +190,7 @@ namespace Awsmock::Service {
         log_debug << "List lambda event source counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaEventSourceCountersResponse response;
             response.total = static_cast<long>(lambda.eventSources.size());
@@ -234,14 +234,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "add_lambda_environment");
         log_debug << "List lambda environment counters request, functionArn: " << request.functionArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             lambda.environment.variables[request.environmentKey] = request.environmentValue;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda environments added, lambdaArn: " << lambda.arn;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -253,14 +253,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda_environment");
         log_debug << "Update lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey << ", value: " << request.environmentValue;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             lambda.environment.variables[request.environmentKey] = request.environmentValue;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda environments updated, lambdaArn: " << lambda.arn;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -272,19 +272,19 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_environment");
         log_debug << "Delete lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             std::string environmentKey = request.environmentKey;
             const auto count = std::erase_if(lambda.environment.variables, [environmentKey](const auto &item) {
                 auto const &[key, value] = item;
                 return key == environmentKey;
             });
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda environments deleted, lambdaArn: " << lambda.arn << " count: " << count;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -296,15 +296,15 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda");
         log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             lambda.enabled = request.enabled;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda updated, lambdaArn: " << lambda.arn;
 
             if (!request.enabled) {
@@ -330,18 +330,18 @@ namespace Awsmock::Service {
 
         std::string functionArn = Core::AwsUtils::ConvertLambdaNameToArn(request.region, Core::AwsUtils::GetDefaultAccountId(), request.functionName);
 
-        std::vector<Database::Entity::Lambda::Lambda> lambads = _lambdaDatabase.ListLambdas();
+        std::vector<Database::Entity::Lambda::Lambda> lambads = _lambdaDatabase->listLambdas({});
 
-        if (!_lambdaDatabase.LambdaExistsByArn(functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + functionArn);
         }
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(functionArn);
             lambda.enabled = true;
             lambda.modified = system_clock::now();
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda updated, lambdaArn: " << lambda.arn;
 
             // Write the base64 file
@@ -382,13 +382,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "add_event_source");
         log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             Database::Entity::Lambda::EventSourceMapping eventSourceMapping;
             eventSourceMapping.type = request.type;
             eventSourceMapping.eventSourceArn = request.eventSourceArn;
@@ -401,7 +401,7 @@ namespace Awsmock::Service {
             CreateResourceNotification(request);
 
             lambda.eventSources.emplace_back(eventSourceMapping);
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda event sources added, lambdaArn: " << lambda.arn;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -413,18 +413,18 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_event_source");
         log_debug << "Delete lambda event source request, functionArn: " << request.functionArn << ", eventSourceArn: " << request.eventSourceArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             std::string eventSourceArn = request.eventSourceArn;
             const auto count = std::erase_if(lambda.eventSources, [eventSourceArn](const auto &item) {
                 return item.eventSourceArn == eventSourceArn;
             });
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda event sources deleted, lambdaArn: " << lambda.arn << " count: " << count;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -437,12 +437,12 @@ namespace Awsmock::Service {
         log_debug << "List lambda tag counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string> > tags;
+            std::vector<std::pair<std::string, std::string>> tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -484,7 +484,7 @@ namespace Awsmock::Service {
         log_debug << "List lambda instance counters request, lambdaArn: " << request.lambdaArn;
 
         try {
-            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaInstanceCountersResponse response;
             response.total = static_cast<long>(lambda.instances.size());
@@ -549,9 +549,9 @@ namespace Awsmock::Service {
         log_debug << "List lambda tag counters request, functionArn: " << request.functionArn;
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             lambda.tags[request.tagKey] = request.tagValue;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda tags added, lambdaArn: " << lambda.arn;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -563,15 +563,15 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda_tag");
         log_debug << "Update lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey << ", value: " << request.tagValue;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_warning << "Lambda function does not exist, arn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
         }
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             lambda.tags[request.tagKey] = request.tagValue;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda tags updated, lambdaArn: " << lambda.arn;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -584,13 +584,13 @@ namespace Awsmock::Service {
         log_debug << "Delete lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey;
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
             std::string tagKey = request.tagKey;
             const auto count = std::erase_if(lambda.tags, [tagKey](const auto &item) {
                 auto const &[key, value] = item;
                 return key == tagKey;
             });
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda tags deleted, lambdaArn: " << lambda.arn << " count: " << count;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -603,16 +603,16 @@ namespace Awsmock::Service {
         log_debug << "Get function request, region: " << region << " name: " << name;
 
         try {
-            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(region, name);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(region, name);
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-                    function.handler = lambda.handler,
-                    function.runtime = lambda.runtime,
-                    function.lastUpdateStatus = "Successful",
-                    function.state = LambdaStateToString(lambda.state),
-                    function.stateReason = lambda.stateReason,
-                    function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+            function.handler = lambda.handler,
+            function.runtime = lambda.runtime,
+            function.lastUpdateStatus = "Successful",
+            function.state = LambdaStateToString(lambda.state),
+            function.stateReason = lambda.stateReason,
+            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
             function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
@@ -633,7 +633,7 @@ namespace Awsmock::Service {
         log_debug << "Get function request, functionArn: " << request.functionArn;
 
         try {
-            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
             Dto::Lambda::GetFunctionCountersResponse response;
             response.id = lambda.oid;
@@ -674,10 +674,10 @@ namespace Awsmock::Service {
         log_debug << "Reset function counters request, region: " << request.region << " name: " << request.functionName;
 
         try {
-            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(request.region, request.functionName);
             lambda.averageRuntime = 0;
             lambda.invocations = 0;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
             log_info << "Reset lambda function counters, function: " << lambda.function;
         } catch (bsoncxx::exception &ex) {
             log_error << "Reset function counters request failed, message: " << ex.what();
@@ -691,7 +691,7 @@ namespace Awsmock::Service {
 
         // REQUEST_RESPONSE
         if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
-            auto promise = std::make_shared<std::promise<std::pair<int, std::string> > >();
+            auto promise = std::make_shared<std::promise<std::pair<int, std::string>>>();
             auto future = promise->get_future();
             Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), promise);
             const auto [status, body] = future.get();
@@ -710,17 +710,17 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_tag");
         log_debug << "Create tag request, arn: " << request.arn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.arn)) {
             log_warning << "Lambda function does not exist, arn: " << request.arn;
             throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Get the existing entity
-        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByArn(request.arn);
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->getLambdaByArn(request.arn);
         for (const auto &[fst, snd]: request.tags) {
             lambdaEntity.tags.emplace(fst, snd);
         }
-        lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
+        lambdaEntity = _lambdaDatabase->updateLambda(lambdaEntity);
         log_debug << "Create tag request succeeded, arn: " + request.arn << " size: " << lambdaEntity.tags.size();
     }
 
@@ -728,14 +728,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_tags");
         log_debug << "List tags request, arn: " << arn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(arn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(arn)) {
             log_warning << "Lambda function does not exist, arn: " << arn;
             throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Get the existing entity
         Dto::Lambda::ListTagsResponse response;
-        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByArn(arn);
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->getLambdaByArn(arn);
         for (const auto &[fst, snd]: lambdaEntity.tags) {
             response.tags.emplace(fst, snd);
         }
@@ -763,7 +763,7 @@ namespace Awsmock::Service {
 
         // 75 GB
         response.accountUsage.totalCodeSize = 10 * 1024 * 1024L;
-        response.accountUsage.functionCount = _lambdaDatabase.LambdaCount();
+        response.accountUsage.functionCount = _lambdaDatabase->lambdaCount({});
 
         return response;
     }
@@ -772,13 +772,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_event_source_mapping");
         log_debug << "Create event source mapping, arn: " << request.functionName << " sourceArn: " << request.eventSourceArn;
 
-        if (!_lambdaDatabase.LambdaExists(request.functionName)) {
+        if (!_lambdaDatabase->lambdaExists(request.functionName)) {
             log_warning << "Lambda function does not exist, function: " << request.functionName;
             throw Core::NotFoundException("Lambda function does not exist");
         }
 
         // Get the existing entity
-        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->getLambdaByName(request.region, request.functionName);
 
         // Map request to entity
         Database::Entity::Lambda::EventSourceMapping eventSourceMapping = Dto::Lambda::Mapper::map(request);
@@ -792,7 +792,7 @@ namespace Awsmock::Service {
 
         // Update database
         lambdaEntity.eventSources.emplace_back(eventSourceMapping);
-        lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
+        lambdaEntity = _lambdaDatabase->updateLambda(lambdaEntity);
         log_debug << "Lambda function updated, function: " << lambdaEntity.function;
 
         // Create a response (which is actually the request)
@@ -813,13 +813,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_event_source_mapping");
         log_debug << "List event source mappings, functionName: " << request.functionName << " sourceArn: " << request.eventSourceArn;
 
-        if (!_lambdaDatabase.LambdaExists(request.functionName)) {
+        if (!_lambdaDatabase->lambdaExists(request.functionName)) {
             log_warning << "Lambda function does not exist, function: " << request.functionName;
             throw Core::NotFoundException("Lambda function does not exist");
         }
 
         // Get the existing entity
-        const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+        const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->getLambdaByName(request.region, request.functionName);
 
         return Dto::Lambda::Mapper::map(lambdaEntity.eventSources);
     }
@@ -829,7 +829,7 @@ namespace Awsmock::Service {
         log_trace << "List all queues ARNs request";
 
         try {
-            const std::vector<Database::Entity::Lambda::Lambda> lambdaList = _lambdaDatabase.ListLambdas();
+            const std::vector<Database::Entity::Lambda::Lambda> lambdaList = _lambdaDatabase->listLambdas({});
             Dto::Lambda::ListLambdaArnsResponse listLambdaArnsResponse;
             for (const auto &lambda: lambdaList) {
                 listLambdaArnsResponse.lambdaArns.emplace_back(lambda.arn);
@@ -846,12 +846,12 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "get_lambda_result");
         log_debug << "Get lambda result counter request, region: " << request.region << ", oid: " << request.oid;
 
-        if (!_lambdaDatabase.LambdaResultExists(request.oid)) {
+        if (!_lambdaDatabase->lambdaResultExists(request.oid)) {
             log_warning << "Lambda function result does not exist, oid: " << request.oid;
             throw Core::NotFoundException("Lambda function result does not exist, oid: " + request.oid);
         }
 
-        Database::Entity::Lambda::LambdaResult lambdaResult = _lambdaDatabase.GetLambdaResultCounter(request.oid);
+        Database::Entity::Lambda::LambdaResult lambdaResult = _lambdaDatabase->getLambdaResultCounter(request.oid);
         log_trace << "Lambda result found, lambdaResult: " << lambdaResult;
 
         return Dto::Lambda::Mapper::map(lambdaResult);
@@ -862,8 +862,8 @@ namespace Awsmock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase.ListLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            const long count = _lambdaDatabase.LambdaResultsCount(request.lambdaArn);
+            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase->listLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const long count = _lambdaDatabase->lambdaResultsCount(request.lambdaArn);
 
             Dto::Lambda::ListLambdaResultCountersResponse response = Dto::Lambda::Mapper::map(lambdaResults);
             response.total = count;
@@ -881,7 +881,7 @@ namespace Awsmock::Service {
         log_debug << "Delete lambda result counters request, region: " << request.region;
 
         try {
-            const long count = _lambdaDatabase.DeleteResultsCounter(request.oid);
+            const long count = _lambdaDatabase->deleteResultsCounter(request.oid);
             log_trace << "Lambda result counter deleted, count: " << count;
             return count;
         } catch (bsoncxx::exception &exc) {
@@ -896,7 +896,7 @@ namespace Awsmock::Service {
         log_debug << "Delete lambda result counters request, region: " << request.region;
 
         try {
-            const long count = _lambdaDatabase.DeleteResultsCounters(request.lambdaArn);
+            const long count = _lambdaDatabase->deleteResultsCounters(request.lambdaArn);
             log_trace << "Lambda result counter deleted, arn: " << request.lambdaArn;
             return count;
         } catch (bsoncxx::exception &exc) {
@@ -909,15 +909,15 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "enable_lambda");
         log_debug << "Enable lambda request, name: " << request.function.functionName;
 
-        if (!_lambdaDatabase.LambdaExists(request.function.functionName)) {
+        if (!_lambdaDatabase->lambdaExists(request.function.functionName)) {
             log_warning << "Lambda does not exist, name: " << request.function.functionName;
             return;
         }
 
         // Get lambda
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.function.functionName);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(request.region, request.function.functionName);
         lambda.enabled = true;
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
         log_debug << "Lambda enabled, name: " << request.function.functionName;
     }
 
@@ -926,9 +926,9 @@ namespace Awsmock::Service {
         log_debug << "Enable all lambdas request, region: " << request.region;
 
         // Get lambda
-        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(request.region); auto &lambda: lambdas) {
+        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->listLambdas(request.region); auto &lambda: lambdas) {
             lambda.enabled = true;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
         }
         log_debug << "All lambdas enabled, region: " << request.region;
     }
@@ -937,15 +937,15 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "disable_lambda");
         log_debug << "Disable lambda request, name: " << request.function.functionName;
 
-        if (!_lambdaDatabase.LambdaExists(request.function.functionName)) {
+        if (!_lambdaDatabase->lambdaExists(request.function.functionName)) {
             log_warning << "Lambda does not exist, name: " << request.function.functionName;
             return;
         }
 
         // Get lambda
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.function.functionName);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(request.region, request.function.functionName);
         lambda.enabled = false;
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
         log_debug << "Lambda disabled, name: " << request.function.functionName;
     }
 
@@ -954,9 +954,9 @@ namespace Awsmock::Service {
         log_debug << "Disable all lambdas request, region: " << request.region;
 
         // Get lambda
-        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(request.region); auto &lambda: lambdas) {
+        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->listLambdas(request.region); auto &lambda: lambdas) {
             lambda.enabled = false;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
         }
         log_debug << "All lambdas disabled, region: " << request.region;
     }
@@ -965,13 +965,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "start_function");
         log_debug << "Start function, functionArn: " + request.functionArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
         }
 
         // Get lambda function
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
         // Check state
         if (lambda.state == Database::Entity::Lambda::Active && lambda.instances.size() > lambda.concurrency) {
@@ -981,7 +981,7 @@ namespace Awsmock::Service {
 
         // Update state
         lambda.state = Database::Entity::Lambda::Pending;
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Create the lambda function asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
@@ -995,7 +995,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "start_all_lambdas");
         log_debug << "Start all lambdas";
 
-        for (const auto &lambda: _lambdaDatabase.ListLambdas()) {
+        for (const auto &lambda: _lambdaDatabase->listLambdas({})) {
             Dto::Lambda::StartLambdaRequest request;
             request.functionArn = lambda.arn;
             request.region = lambda.region;
@@ -1008,13 +1008,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "stop_function");
         log_debug << "Stop function, functionArn: " + request.functionArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
         }
 
         // Get lambda function
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
         // Check state
         if (lambda.state == Database::Entity::Lambda::Inactive) {
@@ -1036,7 +1036,7 @@ namespace Awsmock::Service {
         // Update state
         lambda.state = Database::Entity::Lambda::Inactive;
         lambda.instances.clear();
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Prune containers
         dockerService.PruneContainers();
@@ -1047,7 +1047,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "stop_all_lambdas");
         log_debug << "Stop all lambdas";
 
-        for (const auto &lambda: _lambdaDatabase.ListLambdas()) {
+        for (const auto &lambda: _lambdaDatabase->listLambdas({})) {
             Dto::Lambda::StopLambdaRequest request;
             request.functionArn = lambda.arn;
             request.region = lambda.region;
@@ -1060,13 +1060,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "stop_instance");
         log_debug << "Stop instance, functionArn: " + request.functionArn << ", instanceId: " + request.instanceId;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
         }
 
         // Get lambda function
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
         // Check state
         if (lambda.state == Database::Entity::Lambda::Inactive) {
@@ -1087,7 +1087,7 @@ namespace Awsmock::Service {
 
         // Update state
         lambda.RemoveInstance(request.instanceId);
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Prune containers
         dockerService.PruneContainers();
@@ -1098,20 +1098,20 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_image");
         log_debug << "Delete image, functionArn: " + request.functionArn;
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.functionArn)) {
             log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
             throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
         }
 
         // Get lambda function
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
         // Cleanup docker
         CleanupDocker(lambda);
 
         // Update state
         lambda.state = Database::Entity::Lambda::Inactive;
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Prune containers
         ContainerService::instance().PruneContainers();
@@ -1124,13 +1124,13 @@ namespace Awsmock::Service {
 
         const ContainerService &dockerService = ContainerService::instance();
 
-        if (!_lambdaDatabase.LambdaExists(request.name)) {
+        if (!_lambdaDatabase->lambdaExists(request.name)) {
             log_error << "Lambda function does not exist, function: " + request.name;
             throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Delete the containers, if existing
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.name);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(request.region, request.name);
         for (const auto &instance: lambda.instances) {
             if (dockerService.ContainerExists(instance.containerId)) {
                 if (Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId); !container.id.empty()) {
@@ -1143,7 +1143,7 @@ namespace Awsmock::Service {
 
         // Update instances
         lambda.instances.clear();
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Delete the image, if existing
         if (dockerService.ImageExists(request.name, request.version)) {
@@ -1168,14 +1168,14 @@ namespace Awsmock::Service {
 
         const ContainerService &dockerService = ContainerService::instance();
 
-        if (!_lambdaDatabase.LambdaExists(request.functionName)) {
+        if (!_lambdaDatabase->lambdaExists(request.functionName)) {
             log_error << "Lambda function does not exist, function: " + request.functionName;
             //throw Core::ServiceException("Lambda function does not exist");
             return;
         }
 
         // Delete the containers, if existing
-        const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+        const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(request.region, request.functionName);
         for (const auto &instance: lambda.instances) {
             if (dockerService.ContainerExists(instance.containerId)) {
                 Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
@@ -1196,7 +1196,7 @@ namespace Awsmock::Service {
         dockerService.PruneContainers();
         log_debug << "Docker image deleted, function: " + request.functionName;
 
-        _lambdaDatabase.DeleteLambda(request.functionName);
+        _lambdaDatabase->deleteLambda(request.functionName);
         log_info << "Lambda function deleted, function: " + request.functionName;
     }
 
@@ -1204,14 +1204,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_tags");
         log_trace << "Delete tags: " + request.ToString();
 
-        if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
+        if (!_lambdaDatabase->lambdaExistsByArn(request.arn)) {
             log_error << "Lambda function does not exist, arn: " + request.arn;
             throw Core::ServiceException("Lambda function does not exist");
         }
 
         // Get the existing entity
         Dto::Lambda::ListTagsResponse response;
-        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByArn(request.arn);
+        Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase->getLambdaByArn(request.arn);
         long count = 0;
         for (const auto &tag: request.tags) {
             count += static_cast<long>(std::erase_if(lambdaEntity.tags, [tag](const auto &item) {
@@ -1219,7 +1219,7 @@ namespace Awsmock::Service {
                 return k == tag;
             }));
         }
-        lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
+        lambdaEntity = _lambdaDatabase->updateLambda(lambdaEntity);
         log_debug << "Delete tag request succeeded, arn: " + lambdaEntity.arn << " deleted: " << count;
     }
 
@@ -1349,4 +1349,4 @@ namespace Awsmock::Service {
         ofs.close();
         log_debug << "New Base64 file written: " << content;
     }
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

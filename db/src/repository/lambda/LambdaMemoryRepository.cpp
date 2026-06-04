@@ -2,14 +2,14 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/LambdaMemoryDb.h>
+#include <awsmock/repository/lambda/LambdaMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex LambdaMemoryDb::_lambdaMutex;
-    boost::mutex LambdaMemoryDb::_lambdaResultMutex;
+    boost::mutex LambdaMemoryRepository::_lambdaMutex;
+    boost::mutex LambdaMemoryRepository::_lambdaResultMutex;
 
-    bool LambdaMemoryDb::LambdaExists(const std::string &function) {
+    bool LambdaMemoryRepository::lambdaExists(const std::string &function) const {
 
         return std::ranges::find_if(_lambdas,
                                     [function](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
@@ -17,7 +17,7 @@ namespace Awsmock::Database {
                                     }) != _lambdas.end();
     }
 
-    bool LambdaMemoryDb::LambdaExists(const Entity::Lambda::Lambda &lambda) {
+    bool LambdaMemoryRepository::lambdaExists(const Entity::Lambda::Lambda &lambda) const {
 
         std::string region = lambda.region;
         std::string function = lambda.function;
@@ -27,9 +27,7 @@ namespace Awsmock::Database {
                                     }) != _lambdas.end();
     }
 
-    bool LambdaMemoryDb::LambdaExists(const std::string &region,
-                                      const std::string &function,
-                                      const std::string &runtime) {
+    bool LambdaMemoryRepository::lambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const {
 
         return std::ranges::find_if(_lambdas,
                                     [region, function, runtime](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
@@ -37,14 +35,14 @@ namespace Awsmock::Database {
                                     }) != _lambdas.end();
     }
 
-    bool LambdaMemoryDb::LambdaExistsByArn(const std::string &arn) {
+    bool LambdaMemoryRepository::lambdaExistsByArn(const std::string &arn) const {
 
         return std::ranges::find_if(_lambdas, [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
                    return lambda.second.arn == arn;
                }) != _lambdas.end();
     }
 
-    Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdasWithEventSource(const std::string &eventSourceArn) {
+    Entity::Lambda::LambdaList LambdaMemoryRepository::listLambdasWithEventSource(const std::string &eventSourceArn) const {
 
         auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
         if (!eventSourceArn.empty()) {
@@ -53,7 +51,7 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    Entity::Lambda::LambdaList LambdaMemoryDb::ListLambdas(const std::string &region) {
+    Entity::Lambda::LambdaList LambdaMemoryRepository::listLambdas(const std::string &region) const {
 
         auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -62,7 +60,7 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaMemoryDb::ListLambdaCounters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
+    std::vector<Entity::Lambda::Lambda> LambdaMemoryRepository::listLambdaCounters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -84,16 +82,23 @@ namespace Awsmock::Database {
         return Core::PageVector<Entity::Lambda::Lambda>(q.to_vector(), pageSize, pageIndex);
     }
 
-    Entity::Lambda::Lambda LambdaMemoryDb::CreateLambda(const Entity::Lambda::Lambda &lambda) {
+    Entity::Lambda::Lambda LambdaMemoryRepository::createLambda(Entity::Lambda::Lambda &lambda) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _lambdas[oid] = lambda;
         log_trace << "Lambda created, oid: " << oid;
-        return GetLambdaById(oid);
+        return getLambdaById(oid);
     }
 
-    Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaById(const std::string &oid) {
+    Entity::Lambda::Lambda LambdaMemoryRepository::createOrUpdateLambda(Entity::Lambda::Lambda &lambda) const {
+        if (lambdaExists(lambda)) {
+            return updateLambda(lambda);
+        }
+        return createLambda(lambda);
+    }
+
+    Entity::Lambda::Lambda LambdaMemoryRepository::getLambdaById(const std::string &oid) const {
 
         const auto it =
                 std::ranges::find_if(_lambdas, [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
@@ -109,7 +114,11 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByArn(const std::string &arn) {
+    Entity::Lambda::Lambda LambdaMemoryRepository::getLambdaById(const bsoncxx::oid &oid) const {
+        return getLambdaById(oid.to_string());
+    }
+
+    Entity::Lambda::Lambda LambdaMemoryRepository::getLambdaByArn(const std::string &arn) const {
 
         const auto it =
                 std::ranges::find_if(_lambdas, [arn](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
@@ -125,7 +134,7 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::Lambda::Lambda LambdaMemoryDb::GetLambdaByName(const std::string &region, const std::string &name) {
+    Entity::Lambda::Lambda LambdaMemoryRepository::getLambdaByName(const std::string &region, const std::string &name) const {
 
         const auto it =
                 std::ranges::find_if(_lambdas, [region, name](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
@@ -141,7 +150,7 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    long LambdaMemoryDb::LambdaCount(const std::string &region) const {
+    long LambdaMemoryRepository::lambdaCount(const std::string &region) const {
 
         auto q = Core::from(_lambdas | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -150,7 +159,7 @@ namespace Awsmock::Database {
         return q.count();
     }
 
-    Entity::Lambda::Lambda LambdaMemoryDb::UpdateLambda(const Entity::Lambda::Lambda &lambda) {
+    Entity::Lambda::Lambda LambdaMemoryRepository::updateLambda(Entity::Lambda::Lambda &lambda) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         std::string region = lambda.region;
@@ -168,7 +177,15 @@ namespace Awsmock::Database {
         return _lambdas[it->first];
     }
 
-    void LambdaMemoryDb::SetInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
+    Entity::Lambda::Lambda LambdaMemoryRepository::importLambda(Entity::Lambda::Lambda &lambda) const {
+        return {};
+    }
+
+    std::vector<Entity::Lambda::Lambda> LambdaMemoryRepository::exportLambdas(const std::vector<SortColumn> &sortColumns) const {
+        return {};
+    }
+
+    void LambdaMemoryRepository::setInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         for (auto &val: _lambdas | std::views::values) {
@@ -181,7 +198,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void LambdaMemoryDb::SetLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) {
+    void LambdaMemoryRepository::setLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         for (auto &val: _lambdas | std::views::values) {
@@ -190,38 +207,34 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::Lambda::LambdaResult LambdaMemoryDb::CreateLambdaResult(const Entity::Lambda::LambdaResult &lambdaResult) {
+    Entity::Lambda::LambdaResult LambdaMemoryRepository::createLambdaResult(Entity::Lambda::LambdaResult &lambdaResult) const {
         boost::mutex::scoped_lock lock(_lambdaResultMutex);
 
-        std::string oid = Core::StringUtils::CreateRandomUuid();
-        _lambdaResults.emplace(oid, lambdaResult);
-        log_trace << "Lambda created, oid: " << oid;
-        return GetLambdaResultById(oid);
+        lambdaResult.oid = Core::StringUtils::CreateRandomUuid();
+        _lambdaResults[lambdaResult.oid] = lambdaResult;
+        log_trace << "Lambda created, oid: " << lambdaResult.oid;
+        return _lambdaResults[lambdaResult.oid];
     }
 
-    bool LambdaMemoryDb::LambdaResultExists(const std::string &oid) {
+    bool LambdaMemoryRepository::lambdaResultExists(const std::string &oid) const {
         return std::ranges::find_if(_lambdaResults, [oid](const std::pair<std::string, Entity::Lambda::LambdaResult> &lambdaResult) {
                    return lambdaResult.first == oid;
                }) != _lambdaResults.end();
     }
 
-    Entity::Lambda::LambdaResult LambdaMemoryDb::GetLambdaResultById(const std::string &oid) {
-
-        const auto it =
-                std::ranges::find_if(_lambdaResults, [oid](const std::pair<std::string, Entity::Lambda::LambdaResult> &lambdaResult) {
-                    return lambdaResult.first == oid;
-                });
-
+    Entity::Lambda::LambdaResult LambdaMemoryRepository::getLambdaResultCounter(const std::string &oid) const {
+        const auto it = std::ranges::find_if(_lambdaResults, [oid](const std::pair<std::string, Entity::Lambda::LambdaResult> &lambdaResult) {
+            return lambdaResult.first == oid;
+        });
         if (it == _lambdaResults.end()) {
-            log_error << "Get lambda result by ID failed, arn: " << oid;
-            throw Core::DatabaseException("Get lambda result by ID failed, arn: " + oid);
+            log_error << "Get lambda result by ID failed, oid: " << oid;
+            throw Core::DatabaseException("Get lambda result by ID failed, oid: " + oid);
         }
-
         it->second.oid = oid;
         return it->second;
     }
 
-    long LambdaMemoryDb::DeleteResultsCounter(const std::string &oid) {
+    long LambdaMemoryRepository::deleteResultsCounter(const std::string &oid) const {
         boost::mutex::scoped_lock lock(_lambdaResultMutex);
 
         const auto count = std::erase_if(_lambdas, [oid](const auto &l) {
@@ -231,7 +244,7 @@ namespace Awsmock::Database {
         return count;
     }
 
-    long LambdaMemoryDb::DeleteResultsCounters(const std::string &lambdaArn) {
+    long LambdaMemoryRepository::deleteResultsCounters(const std::string &lambdaArn) const {
         boost::mutex::scoped_lock lock(_lambdaResultMutex);
 
         const auto count = std::erase_if(_lambdas, [lambdaArn](const auto &l) {
@@ -241,7 +254,7 @@ namespace Awsmock::Database {
         return static_cast<long>(count);
     }
 
-    long LambdaMemoryDb::DeleteAllResultsCounters() {
+    long LambdaMemoryRepository::deleteAllResultsCounters() const {
         boost::mutex::scoped_lock lock(_lambdaResultMutex);
         const long deleted = static_cast<long>(_lambdaResults.size());
         log_debug << "All lambda results deleted, count: " << deleted;
@@ -249,7 +262,7 @@ namespace Awsmock::Database {
         return deleted;
     }
 
-    long LambdaMemoryDb::RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) {
+    long LambdaMemoryRepository::removeExpiredLambdaLogs(const system_clock::time_point &cutOff) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         const auto count = std::erase_if(_lambdaResults, [cutOff](const auto &l) {
@@ -259,7 +272,7 @@ namespace Awsmock::Database {
         return static_cast<long>(count);
     }
 
-    void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {
+    void LambdaMemoryRepository::deleteLambda(const std::string &functionName) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         const auto count = std::erase_if(_lambdas, [functionName](const auto &l) {
@@ -268,11 +281,32 @@ namespace Awsmock::Database {
         log_debug << "Lambda deleted, count: " << count;
     }
 
-    long LambdaMemoryDb::DeleteAllLambdas() {
+    long LambdaMemoryRepository::deleteAllLambdas() const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
         const long deleted = static_cast<long>(_lambdas.size());
         log_debug << "All lambdas deleted, count: " << _lambdas.size();
         _lambdas.clear();
         return deleted;
+    }
+
+    std::vector<Entity::Lambda::LambdaResult> LambdaMemoryRepository::listLambdaResultCounters(const std::string &lambdaArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+
+        auto q = Core::from(_lambdaResults | std::views::values | std::ranges::to<std::vector>());
+        if (!lambdaArn.empty()) {
+            q = q.where([lambdaArn](const Entity::Lambda::LambdaResult &item) { return item.lambdaArn == lambdaArn; });
+        }
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::Lambda::LambdaResult &item) { return Core::StringUtils::StartsWith(item.lambdaArn, prefix); });
+        }
+        return Core::PageVector<Entity::Lambda::LambdaResult>(q.to_vector(), pageSize, pageIndex);
+    }
+
+    long LambdaMemoryRepository::lambdaResultsCount(const std::string &lambdaArn) const {
+
+        auto q = Core::from(_lambdaResults | std::views::values | std::ranges::to<std::vector>());
+        if (!lambdaArn.empty()) {
+            q = q.where([lambdaArn](const Entity::Lambda::LambdaResult &item) { return item.lambdaArn == lambdaArn; });
+        }
+        return q.count();
     }
 }// namespace Awsmock::Database

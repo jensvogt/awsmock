@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/entity/module/ModuleState.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
 
 namespace Awsmock::Database {

@@ -32,14 +32,6 @@ namespace Awsmock::Database {
         CognitoMongoRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static CognitoMongoRepository &instance() {
-            static CognitoMongoRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check the existence of the cognito user pool
          *
          * @param region AWS region name

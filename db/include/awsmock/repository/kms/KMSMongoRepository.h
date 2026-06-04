@@ -33,14 +33,6 @@ namespace Awsmock::Database {
         explicit KMSMongoRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static KMSMongoRepository &instance() {
-            static KMSMongoRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check existence of key by keyId
          *
          * @param keyId key ID

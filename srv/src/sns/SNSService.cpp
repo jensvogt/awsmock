@@ -1137,7 +1137,7 @@ namespace Awsmock::Service {
 
     void SNSService::SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const {
 
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(subscription.endpoint);
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(subscription.endpoint);
         log_debug << "Found lambda, lambdaArn: " << lambda.arn;
         SendLambdaInvocationRequest(lambda, message, request.topicArn);
     }

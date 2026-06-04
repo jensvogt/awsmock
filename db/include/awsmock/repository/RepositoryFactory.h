@@ -17,6 +17,9 @@
 #include <awsmock/repository/kms/IKMSRepository.h>
 #include <awsmock/repository/kms/KMSMemoryRepository.h>
 #include <awsmock/repository/kms/KMSMongoRepository.h>
+#include <awsmock/repository/lambda/ILambdaRepository.h>
+#include <awsmock/repository/lambda/LambdaMemoryRepository.h>
+#include <awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/repository/module/IModuleRepository.h>
 #include <awsmock/repository/module/ModuleMemoryRepository.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
@@ -68,6 +71,7 @@ namespace Awsmock::Database {
             _transferRepo = createTransferRepository();
             _ssmRepo = createSSMRepository();
             _dynamodbRepo = createDynamodbRepository();
+            _lambdaRepo = createLambdaRepository();
         }
 
         [[nodiscard]]
@@ -97,6 +101,9 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::shared_ptr<IDynamoDbRepository> dynamodbRepository() const { return _dynamodbRepo; }
 
+        [[nodiscard]]
+        std::shared_ptr<ILambdaRepository> lambdaRepository() const { return _lambdaRepo; }
+
       private:
 
         BackendType _backend = BackendType::MONGODB;
@@ -109,6 +116,7 @@ namespace Awsmock::Database {
         std::shared_ptr<ITransferRepository> _transferRepo;
         std::shared_ptr<ISSMRepository> _ssmRepo;
         std::shared_ptr<IDynamoDbRepository> _dynamodbRepo;
+        std::shared_ptr<ILambdaRepository> _lambdaRepo;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> createModuleRepository() const {
@@ -207,6 +215,17 @@ namespace Awsmock::Database {
                     return std::make_shared<DynamoDbMemoryRepository>();
             }
             return std::make_shared<DynamoDbMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<ILambdaRepository> createLambdaRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<LambdaMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<LambdaMemoryRepository>();
+            }
+            return std::make_shared<LambdaMemoryRepository>();
         }
     };
 

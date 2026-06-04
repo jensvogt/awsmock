@@ -173,7 +173,7 @@ namespace Awsmock::Manager {
         using Database::Entity::Module::ModuleStatus;
 
         const std::shared_ptr<Database::IModuleRepository> moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
-        if (!Database::ModuleMongoRepository::instance().moduleExists(key)) {
+        if (!Database::RepositoryFactory::instance().moduleRepository()->moduleExists(key)) {
             Database::Entity::Module::Module m = {.name = key, .state = ModuleState::STOPPED, .status = ModuleStatus::ACTIVE};
             m = moduleDatabase->createOrUpdateModule(m);
             log_debug << "Created module, name: " << m.name;
@@ -196,8 +196,8 @@ namespace Awsmock::Manager {
         // Autoload the init files before modules start
         Core::Scheduler::instance().AddOneTimeTask("auto-loader", [this] { AutoLoad(); });
 
-        const Database::ModuleMongoRepository &moduleDatabase = Database::ModuleMongoRepository::instance();
-        for (const std::vector<Database::Entity::Module::Module> modules = moduleDatabase.listModules(); const auto &module: modules) {
+        const std::shared_ptr<Database::IModuleRepository> moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
+        for (const std::vector<Database::Entity::Module::Module> modules = moduleDatabase->listModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));
@@ -208,7 +208,7 @@ namespace Awsmock::Manager {
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::LambdaServer>());
             } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler, _ioc));
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -220,7 +220,7 @@ namespace Awsmock::Manager {
             } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SecretsManagerServer>());
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>());
             }

@@ -1,7 +1,5 @@
 #include "awsmock/ftpserver/UserDatabase.h"
 
-#include "awsmock/core/FileUtils.h"
-
 namespace Awsmock::FtpServer {
 
     UserDatabase::UserDatabase() {
@@ -41,7 +39,7 @@ namespace Awsmock::FtpServer {
         }
 
         try {
-            if (Database::Entity::Cognito::User user = Database::CognitoMongoRepository::instance().getUserByUserName(_region, _userPoolId, username); user.password == password) {
+            if (Database::Entity::Cognito::User user = Database::RepositoryFactory::instance().cognitoRepository()->getUserByUserName(_region, _userPoolId, username); user.password == password) {
 
                 std::string homeDir = Core::FileUtils::appendPath(_baseDir, user.userName);
 

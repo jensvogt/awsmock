@@ -34,7 +34,9 @@ namespace Awsmock::Database {
     }
 
     struct LambdaMemoryDbFixture {
-        LambdaMemoryDbFixture() = default;
+        LambdaMemoryDbFixture() {
+            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+        }
         ~LambdaMemoryDbFixture() {
             const long count = RepositoryFactory::instance().lambdaRepository()->deleteAllLambdas();
             log_debug << "Lambda deleted, count: " << count;

@@ -99,8 +99,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {
-        }
+        explicit SNSService() = default;
 
         /**
          * @brief Creates a new topic
@@ -510,7 +509,7 @@ namespace Awsmock::Service {
         /**
          * Lambda database connection
          */
-        Database::LambdaDatabase &_lambdaDatabase;
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * SQS module

@@ -5,7 +5,8 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace Awsmock::Service {
-    LambdaServer::LambdaServer(Core::Scheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaController(scheduler), _scheduler(scheduler) {
+
+    LambdaServer::LambdaServer() : AbstractServer("lambda") {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.get<std::string>("awsmock.region");
@@ -19,25 +20,25 @@ namespace Awsmock::Service {
         log_debug << "Lambda lifetime period: " << _lifetime << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
 
         // Startup task
-        _scheduler.AddTask("lambda-initialization", [this] { Initialize(); });
+        Core::Scheduler::instance().AddTask("lambda-initialization", [this] { Initialize(); });
         log_debug << "Lambda initialization started, name: initialization";
 
         // Start lambda monitoring update counters
-        _scheduler.AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
+        Core::Scheduler::instance().AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
         // Start the delete old lambda task
-        _scheduler.AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _removePeriod, _removePeriod);
+        Core::Scheduler::instance().AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _removePeriod, _removePeriod);
         log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
 
-        // Start the delete old lambda logs
+        // Start delete old lambda logs
         const long interval = _logRetentionPeriod * 24 * 60 * 60;
-        _scheduler.AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, interval, interval);
+        Core::Scheduler::instance().AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, interval, interval);
         log_debug << "Lambda task started, name remove-lambda-logs, period: " << _logRetentionPeriod;
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("lambda-backup", [] { BackupLambda(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("lambda-backup", [] { BackupLambda(); }, _backupCron);
         }
 
         // Connect stop signal
@@ -52,10 +53,10 @@ namespace Awsmock::Service {
         Core::EventBus::instance().sigLambdaStopAll(_region);
 
         _lambdaController.Shutdown();
-        _scheduler.Shutdown("lambda-monitoring");
-        _scheduler.Shutdown("lambda-remove");
-        _scheduler.Shutdown("lambda-remove-logs");
-        _scheduler.Shutdown("lambda-backup");
+        Core::Scheduler::instance().Shutdown("lambda-monitoring");
+        Core::Scheduler::instance().Shutdown("lambda-remove");
+        Core::Scheduler::instance().Shutdown("lambda-remove-logs");
+        Core::Scheduler::instance().Shutdown("lambda-backup");
 
         log_info << "Lambda server stopped";
     }
@@ -87,7 +88,7 @@ namespace Awsmock::Service {
     void LambdaServer::CleanupInstances() const {
         log_debug << "Cleanup lambdas";
 
-        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
+        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->listLambdas(_region); auto &lambda: lambdas) {
             log_debug << "Get containers";
             for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, lambda.dockerTag); const auto &container: containers) {
                 ContainerService::instance().KillContainer(container.id);
@@ -95,7 +96,7 @@ namespace Awsmock::Service {
             }
             lambda.instances.clear();
             lambda.state = Database::Entity::Lambda::Inactive;
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            lambda = _lambdaDatabase->updateLambda(lambda);
         }
         log_debug << "Lambda instances cleaned up";
     }
@@ -118,7 +119,7 @@ namespace Awsmock::Service {
     void LambdaServer::RemoveExpiredLambdas() const {
 
         // Get the list of lambdas
-        const Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
+        const Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase->listLambdas({});
         if (lambdaList.empty()) {
             return;
         }
@@ -151,7 +152,7 @@ namespace Awsmock::Service {
 
         // Cleanup logs
         const system_clock::time_point cutOff = system_clock::now() - std::chrono::days(_logRetentionPeriod);
-        const long count = _lambdaDatabase.RemoveExpiredLambdaLogs(cutOff);
+        const long count = _lambdaDatabase->removeExpiredLambdaLogs(cutOff);
         log_debug << "Lambda logs removed, cutOff: " << Core::DateTimeUtils::ToISO8601(cutOff) << ", count: " << count;
     }
 
@@ -159,7 +160,7 @@ namespace Awsmock::Service {
         log_trace << "Lambda monitoring starting";
 
         // Get the lambda list
-        const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
+        const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase->listLambdas({});
         Core::EventBus::instance().sigMetricGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas.size()));
 
         if (lambdas.empty()) {

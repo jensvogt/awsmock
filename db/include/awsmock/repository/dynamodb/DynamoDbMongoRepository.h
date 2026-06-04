@@ -35,14 +35,6 @@ namespace Awsmock::Database {
         explicit DynamoDbMongoRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static DynamoDbMongoRepository &instance() {
-            static DynamoDbMongoRepository dynamoDbDatabase;
-            return dynamoDbDatabase;
-        }
-
-        /**
          * @brief Check the existence of a DynamoDb table
          *
          * @param region AWS region name

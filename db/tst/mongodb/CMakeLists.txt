@@ -1,6 +1,6 @@
 set(BINARY db_mongo_tst)
 
-set(SOURCES Main.cpp DynamoDbTest.cpp S3DbTest.cpp SNSDbTest.cpp SQSDbTest.cpp SSMDbTest.cpp)
+set(SOURCES Main.cpp DynamoDbTest.cpp S3DbTest.cpp SNSDbTest.cpp SQSDbTest.cpp SSMDbTest.cpp LambdaDbTest.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PUBLIC ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/db/include)

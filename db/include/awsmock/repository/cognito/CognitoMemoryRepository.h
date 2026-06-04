@@ -41,14 +41,6 @@ namespace Awsmock::Database {
         CognitoMemoryRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static CognitoMemoryRepository &instance() {
-            static CognitoMemoryRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Check the existence of the cognito user pool
          *
          * @param region AWS region name

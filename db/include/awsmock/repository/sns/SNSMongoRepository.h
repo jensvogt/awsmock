@@ -44,14 +44,6 @@ namespace Awsmock::Database {
         explicit SNSMongoRepository() = default;
 
         /**
-         * Singleton instance
-         */
-        static SNSMongoRepository &instance() {
-            static SNSMongoRepository snsDatabase;
-            return snsDatabase;
-        }
-
-        /**
          * @brief Check the existence of a topic
          *
          * @param region AWS region

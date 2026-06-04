@@ -8,9 +8,11 @@
 #include <string>
 
 // AwsMock includes
-#include <../../../../db/include/awsmock/repository/cognito/CognitoMongoRepository.h>
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/ftpserver/FtpUser.h>
+#include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/cognito/CognitoMongoRepository.h>
 
 namespace Awsmock::FtpServer {
 

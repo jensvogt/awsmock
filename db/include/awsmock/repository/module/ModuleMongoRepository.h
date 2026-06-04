@@ -33,14 +33,6 @@ namespace Awsmock::Database {
         explicit ModuleMongoRepository() = default;
 
         /**
-         * @brief Singleton instance
-         */
-        static ModuleMongoRepository &instance() {
-            static ModuleMongoRepository instance;
-            return instance;
-        }
-
-        /**
          * @brief Initialize the database
          */
         void initialize() const override;

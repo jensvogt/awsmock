@@ -11,7 +11,7 @@ namespace Awsmock::Service {
         log_debug << "Start rotation secret, arn: " << secret.arn;
 
         // Get lambda function from database
-        const Database::Entity::Lambda::Lambda lambda = Database::LambdaDatabase::instance().GetLambdaByArn(secret.rotationLambdaARN);
+        const Database::Entity::Lambda::Lambda lambda = Database::RepositoryFactory::instance().lambdaRepository()->getLambdaByArn(secret.rotationLambdaARN);
 
         CreateSecret(secret, lambda, clientRequestToken);
         log_debug << "Secret created, arn: " << secret.arn;

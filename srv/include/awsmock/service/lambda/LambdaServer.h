@@ -8,8 +8,8 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaController.h>
@@ -30,7 +30,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaServer(Core::Scheduler &scheduler);
+        explicit LambdaServer();
 
         /**
          * @brief Shutdown server
@@ -49,11 +49,11 @@ namespace Awsmock::Service {
         void CleanupDocker() const;
 
         /**
-         * @brief Delete instances from database, which are not running
+         * @brief Delete instances from the database, which are not running
          *
          * @par
          * This will stop and delete the lambda containers. This is done in case the shutdown was not gracefully and the lambdas are in
-         * an invalid state. Specially the port is not valid anymore. Deleting the lambda function will recreate the lambda later on with
+         * an invalid state. Especially the port is not valid anymore. Deleting the lambda function will recreate the lambda later on with
          * the correct port.
          */
         void CleanupInstances() const;
@@ -96,14 +96,14 @@ namespace Awsmock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Backup the Lambda objects
+         * @brief Back up the Lambda objects
          */
         static void BackupLambda();
 
         /**
          * Lambda database
          */
-        Database::LambdaDatabase &_lambdaDatabase;
+        std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
 
         /**
          * Docker module
@@ -162,11 +162,6 @@ namespace Awsmock::Service {
          * Log retention period in days
          */
         int _logRetentionPeriod{};
-
-        /**
-         * Asynchronous task scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service
