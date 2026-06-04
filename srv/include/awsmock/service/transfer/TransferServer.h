@@ -6,11 +6,11 @@
 #define AWSMOCK_SERVICE_TRANSFER_SERVER_H
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/transfer/TransferMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/ftpserver/FtpServer.h>
-#include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
@@ -31,6 +31,11 @@ namespace Awsmock::Service {
          * @brief Constructor
          */
         explicit TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
+
+        /**
+         * @brief Shutdown server
+         */
+        void Shutdown() override;
 
       private:
 
@@ -92,19 +97,14 @@ namespace Awsmock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Backup the transfer server
+         * @brief Back up the transfer server
          */
         static void BackupTransfer();
 
         /**
-         * @brief Shutdown server
+         * @brief Transfer database
          */
-        void Shutdown() override;
-
-        /**
-         * Transfer database
-         */
-        Database::TransferDatabase &_transferDatabase;
+        std::shared_ptr<Database::ITransferRepository> _transferDatabase = Database::RepositoryFactory::instance().transferRepository();
 
         /**
          * AWS region

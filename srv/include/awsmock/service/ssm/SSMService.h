@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SSM_SERVICE_H
-#define AWSMOCK_SERVICE_SSM_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -31,7 +30,7 @@
 #include <awsmock/dto/ssm/internal/ListParameterCountersResponse.h>
 #include <awsmock/dto/ssm/internal/UpdateParameterCounterRequest.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
-#include <awsmock/repository/SSMDatabase.h>
+#include <awsmock/repository/ssm/ISSMRepository.h>
 #include <awsmock/service/kms/KMSService.h>
 
 #define DEFAULT_SSM_ACCOUNT_ID "000000000000"
@@ -62,7 +61,8 @@ namespace Awsmock::Service {
          * @see Dto::SSM::PutParameterRequest
          * @see Dto::SSM::PutParameterResponse
          */
-        [[nodiscard]] Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
 
         /**
          * @brief Returns a parameter
@@ -72,7 +72,8 @@ namespace Awsmock::Service {
          * @see Dto::SSM::GetParameterRequest
          * @see Dto::SSM::GetParameterResponse
          */
-        [[nodiscard]] Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
 
         /**
          * @brief Returns a parameter counter
@@ -82,17 +83,19 @@ namespace Awsmock::Service {
          * @see Dto::SSM::GetParameterRequest
          * @see Dto::SSM::GetParameterResponse
          */
-        [[nodiscard]] Dto::SSM::GetParameterCounterResponse GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::GetParameterCounterResponse GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const;
 
         /**
          * @brief Describe the parameters
          *
-         * @param request describe parameters request
-         * @return describe parameters response
+         * @param request describe parameter request
+         * @return describe parameter response
          * @see Dto::SSM::DescribeParametersRequest
          * @see Dto::SSM::DescribeParametersResponse
          */
-        [[nodiscard]] Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
 
         /**
          * @brief List all parameter counters
@@ -102,7 +105,8 @@ namespace Awsmock::Service {
          * @see Dto::SSM::ListParameterCountersRequest
          * @see Dto::SSM::ListParameterCountersResponse
          */
-        [[nodiscard]] Dto::SSM::ListParameterCountersResponse ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::ListParameterCountersResponse ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const;
 
         /**
          * @brief Create a new parameter
@@ -112,7 +116,8 @@ namespace Awsmock::Service {
          * @see Dto::SSM::CreateParameterCounterRequest
          * @see Dto::SSM::ListParameterCountersResponse
          */
-        [[nodiscard]] Dto::SSM::ListParameterCountersResponse CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::ListParameterCountersResponse CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const;
 
         /**
          * @brief Update a parameter
@@ -122,7 +127,8 @@ namespace Awsmock::Service {
          * @see Dto::SSM::CreateParameterCounterRequest
          * @see Dto::SSM::ListParameterCountersResponse
          */
-        [[nodiscard]] Dto::SSM::ListParameterCountersResponse UpdateParameter(const Dto::SSM::UpdateParameterCounterRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::ListParameterCountersResponse UpdateParameter(const Dto::SSM::UpdateParameterCounterRequest &request) const;
 
         /**
          * @brief Deletes a parameter
@@ -138,10 +144,14 @@ namespace Awsmock::Service {
          * @param request delete parameter request
          * @see Dto::SSM::DeleteParameterRequest
          */
-        [[nodiscard]] Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
+        [[nodiscard]]
+        Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "SSM"};
 
         /**
@@ -152,7 +162,7 @@ namespace Awsmock::Service {
         /**
          * Database connection
          */
-        Database::SSMDatabase &_ssmDatabase;
+        std::shared_ptr<Database::ISSMRepository> _ssmDatabase = Database::RepositoryFactory::instance().ssmRepository();
 
         /**
          * KMS service
@@ -161,5 +171,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_KMS_SERVICE_H

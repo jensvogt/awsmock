@@ -2,11 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/common/mapper/SortColumnMapper.h"
-#include "awsmock/dto/dynamodb/mapper/Mapper.h"
-#include "awsmock/dto/transfer/model/Tag.h"
-
-
 #include <awsmock/service/transfer/TransferService.h>
 
 namespace Awsmock::Service {
@@ -16,7 +11,7 @@ namespace Awsmock::Service {
         log_debug << "Create transfer manager";
 
         // Check existence
-        if (_transferDatabase.TransferExists(request.region, ProtocolTypeToString(request.protocols[0]))) {
+        if (_transferDatabase->transferExists(request.region, ProtocolTypeToString(request.protocols[0]))) {
             log_error << "Transfer manager exists already";
             throw Core::ServiceException("Transfer manager exists already");
         }
@@ -37,7 +32,7 @@ namespace Awsmock::Service {
         Database::Entity::Transfer::User anonymousUser = {.userName = "anonymous", .password = "secret", .homeDirectory = "/"};
         transferEntity.users.emplace_back(anonymousUser);
 
-        transferEntity = _transferDatabase.CreateTransfer(transferEntity);
+        transferEntity = _transferDatabase->createTransfer(transferEntity);
 
         // Create response
         Dto::Transfer::CreateServerResponse response;
@@ -55,11 +50,11 @@ namespace Awsmock::Service {
 
         Database::Entity::Transfer::Transfer transferEntity;
 
-        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+        if (!_transferDatabase->transferExists(request.region, request.serverId)) {
             log_error << "Transfer manager with ID '" + request.serverId + "  does not exist";
             throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist");
         }
-        transferEntity = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+        transferEntity = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
         // Check user
         if (transferEntity.HasUser(request.userName)) {
@@ -94,7 +89,7 @@ namespace Awsmock::Service {
         transferEntity.users.emplace_back(user);
 
         // Update database
-        transferEntity = _transferDatabase.UpdateTransfer(transferEntity);
+        transferEntity = _transferDatabase->updateTransfer(transferEntity);
         log_debug << "Updated transfer manager, serverId: " << transferEntity.serverId;
 
         // Create user in transfer server
@@ -112,11 +107,11 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_protocol");
         log_debug << "Create protocol request";
 
-        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+        if (!_transferDatabase->transferExists(request.region, request.serverId)) {
             log_error << "Transfer manager with ID '" + request.serverId + "  does not exist";
             throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist");
         }
-        Database::Entity::Transfer::Transfer transferEntity = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+        Database::Entity::Transfer::Transfer transferEntity = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
         // Check protocol
         if (transferEntity.HasProtocol(ProtocolTypeToString(request.protocol))) {
@@ -129,7 +124,7 @@ namespace Awsmock::Service {
         transferEntity.ports.emplace_back(request.port);
 
         // Update database
-        transferEntity = _transferDatabase.UpdateTransfer(transferEntity);
+        transferEntity = _transferDatabase->updateTransfer(transferEntity);
         log_debug << "Updated transfer manager, serverId: " << transferEntity.serverId;
     }
 
@@ -138,7 +133,7 @@ namespace Awsmock::Service {
 
         try {
             std::string nextToken = request.nextToken;
-            const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region, nextToken, request.maxResults);
+            const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase->listServers(request.region, nextToken, request.maxResults);
 
             auto response = Dto::Transfer::ListServerResponse();
             response.nextToken = nextToken;
@@ -165,10 +160,10 @@ namespace Awsmock::Service {
 
         try {
             const std::vector<Database::SortColumn> sortColumns = Dto::Common::SortColumnMapper::map(request.sortColumns);
-            const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region, request.prefix, request.pageSize, request.pageIndex, sortColumns);
+            const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase->listServers(request.region, request.prefix, request.pageSize, request.pageIndex, sortColumns);
 
             auto response = Dto::Transfer::ListServerCountersResponse();
-            response.total = _transferDatabase.CountServers(request.region);
+            response.total = _transferDatabase->countServers(request.region);
             for (const auto &s: servers) {
                 Dto::Transfer::Server server;
                 server.region = request.region;
@@ -195,13 +190,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "get_server_details");
 
         // Check existence
-        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+        if (!_transferDatabase->transferExists(request.region, request.serverId)) {
             log_error << "Transfer server does not exist, region: " << request.region << " serverId: " << request.serverId;
             throw Core::ServiceException("Transfer server does not exist, region: " + request.region + " serverId: " + request.serverId);
         }
 
         try {
-            Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            Database::Entity::Transfer::Transfer server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             auto response = Dto::Transfer::GetServerDetailsResponse();
             response.server.region = server.region;
@@ -227,7 +222,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_users");
 
         try {
-            const std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId);
+            const std::vector<Database::Entity::Transfer::User> users = _transferDatabase->listUsers(request.region, request.serverId, {}, 0, 0, {});
 
             Dto::Transfer::ListUsersResponse response = Dto::Transfer::Mapper::map(request, users);
             response.nextToken = Core::StringUtils::CreateRandomUuid();
@@ -245,10 +240,10 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_user_counters");
 
         try {
-            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Transfer::User> users = _transferDatabase->listUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
 
             auto response = Dto::Transfer::ListUserCountersResponse();
-            response.total = _transferDatabase.CountUsers(request.region, request.serverId);
+            response.total = _transferDatabase->countUsers(request.region, request.serverId);
             for (const auto &user: users) {
                 Dto::Transfer::User userDto;
                 userDto.region = request.region;
@@ -279,7 +274,7 @@ namespace Awsmock::Service {
                 sortColumns.emplace_back(sortColumn);
             }
 
-            Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            Database::Entity::Transfer::Transfer server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             Dto::Transfer::ListTagCountersResponse response;
             response.total = static_cast<long>(server.tags.size());
@@ -305,7 +300,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_protocol_counters");
 
         try {
-            const Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            const Database::Entity::Transfer::Transfer server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             Dto::Transfer::ListProtocolCountersResponse response;
             response.total = static_cast<long>(server.protocols.size());
@@ -329,24 +324,24 @@ namespace Awsmock::Service {
 
         Database::Entity::Transfer::Transfer server;
         try {
-            if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+            if (!_transferDatabase->transferExists(request.region, request.serverId)) {
                 log_error << "Handler with ID '" << request.serverId << "' does not exist";
                 throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist");
             }
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             // Update state, rest will be done by transfer worker
             server.state = Database::Entity::Transfer::ServerState::ONLINE;
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
             log_info << "Transfer server started, serverId: " << server.serverId;
 
         } catch (bsoncxx::exception &ex) {
 
             // Update state
             server.state = Database::Entity::Transfer::ServerState::START_FAILED;
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
 
             log_error << "Start transfer server request failed, serverId: " << server.serverId << " message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -358,23 +353,23 @@ namespace Awsmock::Service {
 
         Database::Entity::Transfer::Transfer server;
         try {
-            if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+            if (!_transferDatabase->transferExists(request.region, request.serverId)) {
                 throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist");
             }
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             // Update state, rest will be done by transfer worker
             server.state = Database::Entity::Transfer::ServerState::OFFLINE;
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
             log_info << "Transfer manager stopped, serverId: " << server.serverId;
 
         } catch (bsoncxx::exception &ex) {
 
             // Update state
             server.state = Database::Entity::Transfer::ServerState::STOP_FAILED;
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
 
             log_error << "Stop manager request failed, serverId: " << server.serverId << " message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -386,27 +381,27 @@ namespace Awsmock::Service {
 
         Database::Entity::Transfer::Transfer server;
         try {
-            if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+            if (!_transferDatabase->transferExists(request.region, request.serverId)) {
                 log_error << "Handler with ID '" + request.serverId + "' does not exist";
                 throw Core::ServiceException("Handler with ID '" + request.serverId + "' does not exist");
             }
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             // Update state, rest will be done by transfer worker
             server.state = Database::Entity::Transfer::ServerState::OFFLINE;
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
             log_info << "Transfer manager stopped, serverId: " << server.serverId;
 
-            _transferDatabase.DeleteTransfer(request.serverId);
+            _transferDatabase->deleteTransfer(request.serverId);
             log_info << "Transfer manager deleted, serverId: " << server.serverId;
 
         } catch (bsoncxx::exception &ex) {
 
             // Update state
             server.state = Database::Entity::Transfer::ServerState::STOP_FAILED;
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
 
             log_error << "Start manager request failed, serverId: " << server.serverId << " message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -416,7 +411,7 @@ namespace Awsmock::Service {
     void TransferService::DeleteUser(const Dto::Transfer::DeleteUserRequest &request) const {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_user");
 
-        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+        if (!_transferDatabase->transferExists(request.region, request.serverId)) {
             log_error << "Transfer server does not exist, serverId: " << request.serverId;
             throw Core::ServiceException("Transfer server does not exist, serverId: " + request.serverId);
         }
@@ -425,7 +420,7 @@ namespace Awsmock::Service {
         try {
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             if (server.HasUser(request.userName)) {
                 std::string userName = request.userName;
@@ -436,7 +431,7 @@ namespace Awsmock::Service {
             }
 
             // Update server
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
             log_info << "User deleted, serverId: " << server.serverId << " userName: " << request.userName;
 
         } catch (bsoncxx::exception &ex) {
@@ -448,7 +443,7 @@ namespace Awsmock::Service {
     void TransferService::DeleteProtocol(const Dto::Transfer::DeleteProtocolRequest &request) const {
         Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_protocol");
 
-        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+        if (!_transferDatabase->transferExists(request.region, request.serverId)) {
             log_error << "Transfer server does not exist, serverId: " << request.serverId;
             throw Core::ServiceException("Transfer server does not exist, serverId: " + request.serverId);
         }
@@ -457,7 +452,7 @@ namespace Awsmock::Service {
         try {
 
             // Get the manager
-            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+            server = _transferDatabase->getTransferByServerId(request.region, request.serverId);
 
             if (server.HasProtocol(ProtocolTypeToString(request.protocol))) {
                 std::string protocolName = ProtocolTypeToString(request.protocol);
@@ -468,7 +463,7 @@ namespace Awsmock::Service {
             }
 
             // Update server
-            server = _transferDatabase.UpdateTransfer(server);
+            server = _transferDatabase->updateTransfer(server);
             log_info << "Protocol deleted, serverId: " << server.serverId << " protocolName: " << ProtocolTypeToString(request.protocol);
 
         } catch (bsoncxx::exception &ex) {

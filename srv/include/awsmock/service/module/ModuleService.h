@@ -8,6 +8,9 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
+#include <../../../../../db/include/awsmock/repository/ssm/SSMMongoRepository.h>
+#include <../../../../../db/include/awsmock/repository/transfer/TransferMongoRepository.h>
 #include <awsmock/core/BackupUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/Services.h>
@@ -26,12 +29,9 @@
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/ApiGatewayDatabase.h>
 #include <awsmock/repository/ApplicationDatabase.h>
-#include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
-#include <awsmock/repository/SSMDatabase.h>
-#include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
 #include <awsmock/repository/sns/SNSMongoRepository.h>
@@ -52,7 +52,8 @@ namespace Awsmock::Service {
      */
     class ModuleService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -166,11 +167,12 @@ namespace Awsmock::Service {
         /**
          * @brief Returns the log level for a module.
          *
-         * @param request get log level request
+         * @param request get a log level request
          */
         Dto::Module::GetLogLevelResponse getLogLevels(const Dto::Module::GetLogLevelRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -189,7 +191,7 @@ namespace Awsmock::Service {
         /**
          * @brief Module database
          */
-        std::shared_ptr<Database::ModuleMongoRepository> _moduleDatabase;
+        std::shared_ptr<Database::IModuleRepository> _moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

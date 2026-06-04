@@ -2,14 +2,14 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/TransferMemoryDb.h>
+#include <awsmock/repository/transfer/TransferMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex TransferMemoryDb::_transferMutex;
-    boost::mutex TransferMemoryDb::_userMutex;
+    boost::mutex TransferMemoryRepository::_transferMutex;
+    boost::mutex TransferMemoryRepository::_userMutex;
 
-    bool TransferMemoryDb::TransferExists(const std::string &region, const std::string &serverId) {
+    bool TransferMemoryRepository::transferExists(const std::string &region, const std::string &serverId) const {
 
         return std::ranges::find_if(_transfers,
                                     [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
@@ -17,12 +17,12 @@ namespace Awsmock::Database {
                                     }) != _transfers.end();
     }
 
-    bool TransferMemoryDb::TransferExists(const Entity::Transfer::Transfer &transfer) {
+    bool TransferMemoryRepository::transferExists(const Entity::Transfer::Transfer &transfer) const {
 
-        return TransferExists(transfer.region, transfer.serverId);
+        return transferExists(transfer.region, transfer.serverId);
     }
 
-    bool TransferMemoryDb::TransferExists(const std::string &serverId) {
+    bool TransferMemoryRepository::transferExists(const std::string &serverId) const {
 
         return std::ranges::find_if(_transfers,
                                     [serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
@@ -30,7 +30,7 @@ namespace Awsmock::Database {
                                     }) != _transfers.end();
     }
 
-    bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) {
+    bool TransferMemoryRepository::transferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) const {
 
         return std::ranges::find_if(_transfers,
                                     [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
@@ -38,7 +38,7 @@ namespace Awsmock::Database {
                                     }) != _transfers.end();
     }
 
-    std::vector<Entity::Transfer::Transfer> TransferMemoryDb::ListServers(const std::string &region) {
+    std::vector<Entity::Transfer::Transfer> TransferMemoryRepository::listServers(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::Transfer::TransferList transferList;
         if (region.empty()) {
@@ -60,26 +60,54 @@ namespace Awsmock::Database {
         return transferList;
     }
 
-    std::vector<Entity::Transfer::User> TransferMemoryDb::ListUsers(const std::string &region, const std::string &serverId) {
+    std::vector<Entity::Transfer::Transfer> TransferMemoryRepository::listServers(const std::string &region, std::string &nextToken, long maxResults) const {
 
-        Entity::Transfer::Transfer server = GetTransferByServerId(region, serverId);
-        if (!server.users.empty()) {
+        Entity::Transfer::TransferList transferList;
+        if (region.empty()) {
+
+            for (const auto &val: _transfers | std::views::values) {
+                transferList.emplace_back(val);
+            }
+
+        } else {
+
+            for (const auto &val: _transfers | std::views::values) {
+                if (val.region == region) {
+                    transferList.emplace_back(val);
+                }
+            }
+        }
+
+        log_trace << "Got transfer list, size: " << transferList.size();
+        return transferList;
+    }
+
+    std::vector<Entity::Transfer::User> TransferMemoryRepository::listUsers(const std::string &region, const std::string &serverId, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+
+        if (Entity::Transfer::Transfer server = getTransferByServerId(region, serverId); !server.users.empty()) {
             log_trace << "Got user list, size: " << server.users.size();
             return server.users;
         }
         return {};
     }
 
-    Entity::Transfer::Transfer TransferMemoryDb::CreateTransfer(const Entity::Transfer::Transfer &transfer) {
+    Entity::Transfer::Transfer TransferMemoryRepository::createTransfer(const Entity::Transfer::Transfer &transfer) const {
         boost::mutex::scoped_lock lock(_transferMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _transfers[oid] = transfer;
         log_trace << "Transfer created, oid: " << oid;
-        return GetTransferById(oid);
+        return _transfers[oid];
     }
 
-    Entity::Transfer::Transfer TransferMemoryDb::UpdateTransfer(const Entity::Transfer::Transfer &transfer) {
+    Entity::Transfer::Transfer TransferMemoryRepository::createOrUpdateTransfer(const Entity::Transfer::Transfer &transfer) const {
+        if (transferExists(transfer)) {
+            return updateTransfer(transfer);
+        }
+        return createTransfer(transfer);
+    }
+
+    Entity::Transfer::Transfer TransferMemoryRepository::updateTransfer(const Entity::Transfer::Transfer &transfer) const {
         boost::mutex::scoped_lock lock(_transferMutex);
 
         std::string region = transfer.region;
@@ -98,7 +126,7 @@ namespace Awsmock::Database {
         return _transfers[it->first];
     }
 
-    Entity::Transfer::Transfer TransferMemoryDb::GetTransferById(const std::string &oid) {
+    Entity::Transfer::Transfer TransferMemoryRepository::getTransferById(const std::string &oid) const {
 
         const auto it = std::ranges::find_if(_transfers,
                                              [oid](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
@@ -114,7 +142,11 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::Transfer::Transfer TransferMemoryDb::GetTransferByServerId(const std::string &region, const std::string &serverId) {
+    Entity::Transfer::Transfer TransferMemoryRepository::getTransferById(const bsoncxx::oid &oid) const {
+        return getTransferById(oid.to_string());
+    }
+
+    Entity::Transfer::Transfer TransferMemoryRepository::getTransferByServerId(const std::string &region, const std::string &serverId) const {
 
         const auto it = std::ranges::find_if(_transfers,
                                              [region, serverId](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
@@ -130,7 +162,7 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::Transfer::Transfer TransferMemoryDb::GetTransferByArn(const std::string &arn) {
+    Entity::Transfer::Transfer TransferMemoryRepository::getTransferByArn(const std::string &arn) const {
 
         const auto it = std::ranges::find_if(_transfers,
                                              [arn](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
@@ -146,7 +178,7 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    long TransferMemoryDb::CountServers(const std::string &region) {
+    long TransferMemoryRepository::countServers(const std::string &region) const {
 
         long count = 0;
 
@@ -165,8 +197,26 @@ namespace Awsmock::Database {
         return count;
     }
 
+    long TransferMemoryRepository::countUsers(const std::string &region, const std::string &serverId) const {
 
-    void TransferMemoryDb::DeleteTransfer(const std::string &serverId) {
+        long count = 0;
+
+        if (region.empty()) {
+
+            count = static_cast<long>(_users.size());
+
+        } else {
+
+            return std::ranges::count_if(_transfers,
+                                         [region](std::pair<std::string, Entity::Transfer::Transfer> const &p) {
+                                             return p.second.region == region;
+                                         });
+        }
+        log_trace << "Count users, result: " << count;
+        return count;
+    }
+
+    void TransferMemoryRepository::deleteTransfer(const std::string &serverId) const {
         boost::mutex::scoped_lock lock(_transferMutex);
 
         const auto count = std::erase_if(_transfers, [serverId](const auto &item) {
@@ -176,7 +226,7 @@ namespace Awsmock::Database {
         log_debug << "Transfer server deleted, count: " << count;
     }
 
-    long TransferMemoryDb::DeleteAllTransfers() {
+    long TransferMemoryRepository::deleteAllTransfers() const {
         boost::mutex::scoped_lock lock(_transferMutex);
 
         const long count = _transfers.size();

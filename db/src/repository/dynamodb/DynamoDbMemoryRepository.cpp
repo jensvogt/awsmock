@@ -2,12 +2,12 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/DynamoDbMemoryDb.h>
+#include <awsmock/repository/dynamodb/DynamoDbMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex DynamoDbMemoryDb::_tableMutex;
-    boost::mutex DynamoDbMemoryDb::_itemMutex;
+    boost::mutex DynamoDbMemoryRepository::_tableMutex;
+    boost::mutex DynamoDbMemoryRepository::_itemMutex;
 
     template<typename Map, typename Key>
     bool KeyCompare(Map const &lhs, Map const &rhs, Key const &keys) {
@@ -17,7 +17,7 @@ namespace Awsmock::Database {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin(), pred);
     }
 
-    bool DynamoDbMemoryDb::TableExists(const std::string &region, const std::string &tableName) {
+    bool DynamoDbMemoryRepository::tableExists(const std::string &region, const std::string &tableName) const {
 
         if (!region.empty()) {
             return std::ranges::find_if(_tables,
@@ -31,7 +31,7 @@ namespace Awsmock::Database {
                                     }) != _tables.end();
     }
 
-    Entity::DynamoDb::TableList DynamoDbMemoryDb::ListTables(const std::string &region) {
+    Entity::DynamoDb::TableList DynamoDbMemoryRepository::listTables(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::DynamoDb::TableList tables;
         if (region.empty()) {
@@ -50,16 +50,16 @@ namespace Awsmock::Database {
         return tables;
     }
 
-    Entity::DynamoDb::Table DynamoDbMemoryDb::CreateTable(const Entity::DynamoDb::Table &table) {
+    Entity::DynamoDb::Table DynamoDbMemoryRepository::createTable(Entity::DynamoDb::Table &table) const {
         boost::mutex::scoped_lock lock(_tableMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _tables[oid] = table;
         log_trace << "Lambda created, oid: " << oid;
-        return GetTableById(oid);
+        return _tables[oid];
     }
 
-    Entity::DynamoDb::Table DynamoDbMemoryDb::GetTableById(const std::string &oid) {
+    Entity::DynamoDb::Table DynamoDbMemoryRepository::getTableById(const std::string &oid) const {
 
         const auto it =
                 std::ranges::find_if(_tables, [oid](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
@@ -75,7 +75,11 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::DynamoDb::Table DynamoDbMemoryDb::GetTableByRegionName(const std::string &region, const std::string &name) {
+    Entity::DynamoDb::Table DynamoDbMemoryRepository::getTableById(const bsoncxx::oid &oid) const {
+        return getTableById(oid.to_string());
+    }
+
+    Entity::DynamoDb::Table DynamoDbMemoryRepository::getTableByRegionName(const std::string &region, const std::string &name) const {
 
         const auto it = std::ranges::find_if(_tables,
                                              [region, name](const std::pair<std::string, Entity::DynamoDb::Table> &table) {
@@ -91,7 +95,7 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::DynamoDb::Table DynamoDbMemoryDb::UpdateTable(const Entity::DynamoDb::Table &table) {
+    Entity::DynamoDb::Table DynamoDbMemoryRepository::updateTable(Entity::DynamoDb::Table &table) const {
         boost::mutex::scoped_lock lock(_tableMutex);
 
         std::string region = table.region;
@@ -104,7 +108,14 @@ namespace Awsmock::Database {
         return _tables[it->first];
     }
 
-    void DynamoDbMemoryDb::UpdateTableCounter(const std::string &tableArn, const long items, const long size) {
+    Entity::DynamoDb::Table DynamoDbMemoryRepository::createOrUpdateTable(Entity::DynamoDb::Table &table) const {
+        if (tableExists(table.region, table.name)) {
+            return updateTable(table);
+        }
+        return createTable(table);
+    }
+
+    void DynamoDbMemoryRepository::updateTableCounter(const std::string &tableArn, const long items, const long size) const {
 
         boost::mutex::scoped_lock lock(_tableMutex);
 
@@ -118,17 +129,17 @@ namespace Awsmock::Database {
         }
     }
 
-    void DynamoDbMemoryDb::DeleteTable(const std::string &tableName) {
+    void DynamoDbMemoryRepository::deleteTable(const std::string &region, const std::string &tableName) const {
         boost::mutex::scoped_lock lock(_tableMutex);
 
-        const auto count = std::erase_if(_tables, [tableName](const auto &item) {
+        const auto count = std::erase_if(_tables, [region, tableName](const auto &item) {
             auto const &[key, value] = item;
-            return value.name == tableName;
+            return value.region == region && value.name == tableName;
         });
         log_debug << "DynamoDB table deleted, count: " << count;
     }
 
-    long DynamoDbMemoryDb::DeleteAllTables() {
+    long DynamoDbMemoryRepository::deleteAllTables() const {
         boost::mutex::scoped_lock lock(_tableMutex);
 
         const long count = static_cast<long>(_tables.size());
@@ -137,21 +148,21 @@ namespace Awsmock::Database {
         return count;
     }
 
-    bool DynamoDbMemoryDb::ItemExists(const Entity::DynamoDb::Item &item) {
+    bool DynamoDbMemoryRepository::itemExists(const Entity::DynamoDb::Item &item) const {
         return std::ranges::find_if(_items,
                                     [item](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
                                         return i.second.region == item.region && i.second.tableName == item.tableName && i.second.partitionKey == item.partitionKey && i.second.sortKey == item.sortKey;
                                     }) != _items.end();
     }
 
-    bool DynamoDbMemoryDb::ItemExists(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) {
+    bool DynamoDbMemoryRepository::itemExists(const std::string &region, const std::string &tableName, std::string &partitionKey, const std::string &sortKey) const {
         return std::ranges::find_if(_items,
                                     [region, tableName, partitionKey, sortKey](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
                                         return i.second.region == region && i.second.tableName == tableName && std::get<0>(i.second.partitionKey) == partitionKey && std::get<0>(i.second.sortKey) == sortKey;
                                     }) != _items.end();
     }
 
-    Entity::DynamoDb::ItemList DynamoDbMemoryDb::ListItems(const std::string &region, const std::string &tableName) const {
+    Entity::DynamoDb::ItemList DynamoDbMemoryRepository::listItems(const std::string &region, const std::string &tableName, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         const auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -164,18 +175,7 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    long DynamoDbMemoryDb::GetTableSize(const std::string &region, const std::string &tableName) const {
-
-        const long size = std::accumulate(_items.begin(), _items.end(), 0L,
-                                          [tableName, region](long sum, const auto &pair) {
-                                              return pair.second.region == region && pair.second.tableName == tableName ? sum + pair.second.size : sum;
-                                          });
-
-        log_trace << "Got DynamoDB size, region: " << region << ", tableName: " << tableName << ", size: " << size;
-        return size;
-    }
-
-    long DynamoDbMemoryDb::CountTables(const std::string &region) const {
+    long DynamoDbMemoryRepository::countTables(const std::string &region, const std::string &prefix) const {
 
         if (!region.empty()) {
 
@@ -190,7 +190,7 @@ namespace Awsmock::Database {
         return static_cast<long>(_tables.size());
     }
 
-    Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemById(const std::string &oid) {
+    Entity::DynamoDb::Item DynamoDbMemoryRepository::getItemById(const std::string &oid) const {
 
         const auto it =
                 std::ranges::find_if(_items, [oid](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
@@ -206,7 +206,11 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::DynamoDb::Item DynamoDbMemoryDb::GetItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) const {
+    Entity::DynamoDb::Item DynamoDbMemoryRepository::getItemById(const bsoncxx::oid &oid) const {
+        return getItemById(oid.to_string());
+    }
+
+    Entity::DynamoDb::Item DynamoDbMemoryRepository::getItemByKeys(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) const {
 
         const auto it =
                 std::ranges::find_if(_items, [region, tableName, partitionKey, sortKey](const std::pair<std::string, Entity::DynamoDb::Item> &item) {
@@ -220,16 +224,16 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::DynamoDb::Item DynamoDbMemoryDb::CreateItem(const Entity::DynamoDb::Item &item) {
+    Entity::DynamoDb::Item DynamoDbMemoryRepository::createItem(Entity::DynamoDb::Item &item) const {
         boost::mutex::scoped_lock lock(_itemMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _items[oid] = item;
         log_trace << "Item created, oid: " << oid;
-        return GetItemById(oid);
+        return _items[oid];
     }
 
-    Entity::DynamoDb::Item DynamoDbMemoryDb::UpdateItem(const Entity::DynamoDb::Item &item) {
+    Entity::DynamoDb::Item DynamoDbMemoryRepository::updateItem(Entity::DynamoDb::Item &item) const {
         boost::mutex::scoped_lock lock(_itemMutex);
         const auto it = std::ranges::find_if(_items,
                                              [item](const std::pair<std::string, Entity::DynamoDb::Item> &i) {
@@ -242,7 +246,14 @@ namespace Awsmock::Database {
         return {};
     }
 
-    long DynamoDbMemoryDb::CountItems(const std::string &region) const {
+    Entity::DynamoDb::Item DynamoDbMemoryRepository::createOrUpdateItem(Entity::DynamoDb::Item &item) const {
+        if (itemExists(item)) {
+            return updateItem(item);
+        }
+        return createItem(item);
+    }
+
+    long DynamoDbMemoryRepository::countItems(const std::string &region, const std::string &tableName, const std::string &prefix) const {
 
         if (!region.empty()) {
             long count = 0;
@@ -256,7 +267,7 @@ namespace Awsmock::Database {
         return static_cast<long>(_items.size());
     }
 
-    std::vector<Entity::DynamoDb::Item> DynamoDbMemoryDb::GetItems(const std::string &region, const std::string &tableName) {
+    std::vector<Entity::DynamoDb::Item> DynamoDbMemoryRepository::getItems(const std::string &region, const std::string &tableName) const {
 
         const auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -267,8 +278,15 @@ namespace Awsmock::Database {
         }
         return q.to_vector();
     }
+    std::vector<Entity::DynamoDb::Item> DynamoDbMemoryRepository::executeQuery(const value &filter, bool scanIndexForward, int limit) const {
+        return {};
+    }
 
-    void DynamoDbMemoryDb::AdjustItemCounters() {
+    std::vector<Entity::DynamoDb::Item> DynamoDbMemoryRepository::executeQuery(const DynamoToMongoTranslator::DynamoRequest &req, bool scanIndexForward, int limit) const {
+        return {};
+    }
+
+    void DynamoDbMemoryRepository::adjustItemCounters() const {
 
         for (auto &table: _tables | std::views::values) {
 
@@ -285,16 +303,16 @@ namespace Awsmock::Database {
         }
     }
 
-    void DynamoDbMemoryDb::DeleteItem(const std::string &region, const std::string &tableName, const Entity::DynamoDb::KeyValue &partitionKey, const Entity::DynamoDb::KeyValue &sortKey) {
+    void DynamoDbMemoryRepository::deleteItem(const std::string &region, const std::string &tableName, const std::string &partitionKey, const std::string &sortKey) const {
         boost::mutex::scoped_lock lock(_itemMutex);
 
         const auto count = std::erase_if(_items, [region, tableName, partitionKey, sortKey](const auto &item) {
-            return item.second.region == region && item.second.tableName == tableName && item.second.partitionKey == partitionKey && item.second.sortKey == sortKey;
+            return item.second.region == region && item.second.tableName == tableName && item.second.partitionKey == Entity::DynamoDb::KeyValue{partitionKey} && item.second.sortKey == Entity::DynamoDb::KeyValue{sortKey};
         });
         log_debug << "DynamoDB items deleted, count: " << count;
     }
 
-    long DynamoDbMemoryDb::DeleteItems(const std::string &region, const std::string &tableName) {
+    long DynamoDbMemoryRepository::deleteItems(const std::string &region, const std::string &tableName) const {
         boost::mutex::scoped_lock lock(_itemMutex);
 
         const auto count = std::erase_if(_items, [region, tableName](const auto &item) {
@@ -304,7 +322,7 @@ namespace Awsmock::Database {
         return static_cast<long>(count);
     }
 
-    long DynamoDbMemoryDb::DeleteAllItems() {
+    long DynamoDbMemoryRepository::deleteAllItems() const {
         boost::mutex::scoped_lock lock(_itemMutex);
 
         const long count = static_cast<long>(_items.size());

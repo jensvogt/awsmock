@@ -2,16 +2,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/common/SSMClientCommand.h"
-
-
 #include <awsmock/service/ssm/SSMService.h>
 
 namespace Awsmock::Service {
 
-    SSMService::SSMService() : _ssmDatabase(Database::SSMDatabase::instance()) {
-
-        // Initialize environment
+    SSMService::SSMService() {
         _accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
     }
 
@@ -19,7 +14,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "put_parameter");
         log_trace << "Put parameter request: " << request.ToString();
 
-        if (_ssmDatabase.ParameterExists(request.name)) {
+        if (_ssmDatabase->parameterExists(request.name)) {
             log_error << "Parameter exists already, name: " << request.name;
             throw Core::ServiceException("Parameter exists already, name: " + request.name);
         }
@@ -51,7 +46,7 @@ namespace Awsmock::Service {
             }
 
             // Store in the database
-            parameterEntity = _ssmDatabase.CreateParameter(parameterEntity);
+            parameterEntity = _ssmDatabase->createParameter(parameterEntity);
             log_trace << "SSM parameter created: " << parameterEntity.ToString();
 
             Dto::SSM::PutParameterResponse response;
@@ -69,7 +64,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "create_parameter");
         log_trace << "Create parameter request: " << request.ToString();
 
-        if (_ssmDatabase.ParameterExists(request.name)) {
+        if (_ssmDatabase->parameterExists(request.name)) {
             log_error << "Parameter exists already, name: " << request.name;
             throw Core::ServiceException("Parameter exists already, name: " + request.name);
         }
@@ -101,7 +96,7 @@ namespace Awsmock::Service {
             }
 
             // Store in the database
-            parameterEntity = _ssmDatabase.CreateParameter(parameterEntity);
+            parameterEntity = _ssmDatabase->createParameter(parameterEntity);
             log_trace << "SSM parameter created: " << parameterEntity.ToString();
 
             Dto::SSM::ListParameterCountersRequest listRequest;
@@ -120,14 +115,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "update_parameter");
         log_trace << "Create parameter request: " << request.ToString();
 
-        if (!_ssmDatabase.ParameterExists(request.name)) {
+        if (!_ssmDatabase->parameterExists(request.name)) {
             log_error << "Parameter does not exist, name: " << request.name;
             throw Core::ServiceException("Parameter does not exist, name: " + request.name);
         }
 
         try {
             // Update database
-            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase->getParameterByName(request.name);
             parameterEntity.description = request.description;
             parameterEntity.type = Dto::SSM::ParameterTypeToString(request.type);
             parameterEntity.tags = request.tags;
@@ -146,7 +141,7 @@ namespace Awsmock::Service {
             }
 
             // Store in the database
-            parameterEntity = _ssmDatabase.UpdateParameter(parameterEntity);
+            parameterEntity = _ssmDatabase->updateParameter(parameterEntity);
             log_trace << "SSM parameter created: " << parameterEntity.ToString();
 
             Dto::SSM::ListParameterCountersRequest listRequest;
@@ -166,14 +161,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "get_parameter");
         log_trace << "Get parameter request, name: " << request.name;
 
-        if (!_ssmDatabase.ParameterExists(request.name)) {
+        if (!_ssmDatabase->parameterExists(request.name)) {
             log_error << "Parameter does not exist, name: " << request.name;
             throw Core::ServiceException("Parameter does not exist, name: " + request.name);
         }
 
         try {
             // Get from the database
-            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase->getParameterByName(request.name);
             log_trace << "SSM parameter found: " << parameterEntity.ToString();
             if (request.withDecryption) {
                 Dto::KMS::DecryptRequest decryptRequest;
@@ -194,14 +189,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "get_parameter");
         log_trace << "Get parameter counter request: " << request.ToString();
 
-        if (!_ssmDatabase.ParameterExists(request.name)) {
+        if (!_ssmDatabase->parameterExists(request.name)) {
             log_error << "Parameter does not exist, name: " << request.name;
             throw Core::ServiceException("Parameter does not exist, name: " + request.name);
         }
 
         try {
             // Get from the database
-            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase->getParameterByName(request.name);
             log_trace << "SSM parameter found: " << parameterEntity.ToString();
 
             // Encrypt if KMS key provided
@@ -226,7 +221,7 @@ namespace Awsmock::Service {
 
         try {
             // Get from the database
-            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region);
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase->listParameters(request.region, {}, 0, 0, {});
             log_trace << "SSM parameters found: " << parameterEntities.size();
 
             return Dto::SSM::Mapper::map(request, parameterEntities);
@@ -245,8 +240,8 @@ namespace Awsmock::Service {
             Dto::SSM::ListParameterCountersResponse response;
 
             // Get from the database
-            response.total = _ssmDatabase.CountParameters(request.region, request.prefix);
-            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            response.total = _ssmDatabase->countParameters(request.region, request.prefix);
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase->listParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             response.parameterCounters = Dto::SSM::Mapper::map(parameterEntities);
             for (auto &p: response.parameterCounters) {
                 if (p.type == Dto::SSM::ParameterType::secureString) {
@@ -271,17 +266,18 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 
-        if (!_ssmDatabase.ParameterExists(request.name)) {
+        if (!_ssmDatabase->parameterExists(request.name)) {
             log_error << "Parameter does not exist, name: " << request.name;
             throw Core::ServiceException("Parameter does not exist, name: " + request.name);
         }
 
         try {
             // Get from the database
-            const Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            const Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase->getParameterByName(request.name);
             log_trace << "SSM parameter found: " << parameterEntity.ToString();
 
-            _ssmDatabase.DeleteParameter(parameterEntity);
+            const long deleted = _ssmDatabase->deleteParameter(parameterEntity);
+            log_debug << "Deleted " << deleted << " parameter(s)";
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM delete parameter failed, message: " << exc.message();
@@ -293,20 +289,21 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, SSM_SERVICE_COUNTER, "action", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 
-        if (!_ssmDatabase.ParameterExists(request.name)) {
+        if (!_ssmDatabase->parameterExists(request.name)) {
             log_error << "Parameter does not exist, name: " << request.name;
             throw Core::ServiceException("Parameter does not exist, name: " + request.name);
         }
 
         try {
             // Get from the database
-            const Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            const Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase->getParameterByName(request.name);
             log_trace << "SSM parameter found: " << parameterEntity.ToString();
 
-            _ssmDatabase.DeleteParameter(parameterEntity);
+            const long deleted = _ssmDatabase->deleteParameter(parameterEntity);
+            log_debug << "Deleted " << deleted << " parameter(s)";
 
             // Get the list from the database
-            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase->listParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             log_trace << "SSM parameters found: " << parameterEntities.size();
 
             Dto::SSM::ListParameterCountersRequest listRequest;

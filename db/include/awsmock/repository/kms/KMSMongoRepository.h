@@ -10,16 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/config/Configuration.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/kms/Key.h>
-#include <awsmock/entity/s3/Object.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
+#include <awsmock/repository/kms/IKMSRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/SortColumn.h>
-
-#include "IKMSRepository.h"
 
 namespace Awsmock::Database {
 
@@ -30,7 +25,8 @@ namespace Awsmock::Database {
      */
     class KMSMongoRepository final : public IKMSRepository {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -153,7 +149,8 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllKeys() const override;
 
-    private:
+      private:
+
         /**
          * @brfief Channeled logger
          */
@@ -170,4 +167,4 @@ namespace Awsmock::Database {
         static constexpr auto _keyCollectionName = "kms_key";
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

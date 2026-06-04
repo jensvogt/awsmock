@@ -8,76 +8,88 @@
 #include <string>
 #include <vector>
 
+// MongoDB includes
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include "ISSMRepository.h"
+
+
+#include <awsmock/core/Linq.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
-#include <awsmock/memorydb/SSMMemoryDb.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
 
     /**
-     * @brief ssm MongoDB database.
+     * @brief ssm in-memory database
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SSMDatabase : public AwsMock::Database::DatabaseBase {
+    class SSMMemoryRepository final : public ISSMRepository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SSMDatabase() : _databaseName(GetDatabaseName()), _parameterCollectionName("ssm_parameter"), _memoryDb(SSMMemoryDb::instance()) {}
+        SSMMemoryRepository() = default;
 
         /**
          * @brief Singleton instance
          */
-        static SSMDatabase &instance() {
-            static SSMDatabase ssmDatabase;
-            return ssmDatabase;
+        static SSMMemoryRepository &instance() {
+            static SSMMemoryRepository instance;
+            return instance;
         }
 
         /**
-         * @brief Check existence of a parameter by name
+         * @brief Check the existence of a parameter by name
          *
          * @param name parameter name
-         * @return true if key already exists
+         * @return true if the key already exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool ParameterExists(const std::string &name) const;
+        [[nodiscard]]
+        bool parameterExists(const std::string &name) const override;
 
         /**
-         * @brief Returns an SSM parameter by primary key
+         * @brief Returns an SMS parameter by primary key
          *
          * @param oid key primary key
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterById(const std::string &oid) const;
+        [[nodiscard]]
+        Entity::SSM::Parameter getParameterById(const std::string &oid) const override;
 
         /**
-         * @brief Returns a parameter by primary key
+         * @brief Returns an SMS parameter by primary key
          *
          * @param oid key primary key
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterById(bsoncxx::oid oid) const;
+        [[nodiscard]]
+        Entity::SSM::Parameter getParameterById(const bsoncxx::oid &oid) const override;
 
         /**
-         * @brief Returns a parameter by name
+         * @brief Returns an SSM parameter by name
          *
          * @param name parameter name
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterByName(const std::string &name) const;
+        [[nodiscard]]
+        Entity::SSM::Parameter getParameterByName(const std::string &name) const override;
 
         /**
          * @brief List all parameters
@@ -86,20 +98,20 @@ namespace Awsmock::Database {
          * @param prefix name prefix
          * @param pageSize page size
          * @param pageIndex page index
-         * @param sortColumns sort columns list
+         * @param sortColumns sort column list
          * @return ParameterList
          */
-        Entity::SSM::ParameterList ListParameters(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        Entity::SSM::ParameterList listParameters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns the total number of parameters
          *
-         * @param region AWS region
-         * @param prefix name prefix
          * @return total number of parameters
          * @throws DatabaseException
          */
-        long CountParameters(const std::string &region = {}, const std::string &prefix = {}) const;
+        [[nodiscard]]
+        long countParameters(const std::string &region, const std::string &prefix) const override;
 
         /**
          * @brief Create a new parameter in the ssm parameter table
@@ -108,7 +120,8 @@ namespace Awsmock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter CreateParameter(Entity::SSM::Parameter &parameter) const;
+        [[nodiscard]]
+        Entity::SSM::Parameter createParameter(Entity::SSM::Parameter &parameter) const override;
 
         /**
          * @brief Updates a parameter
@@ -117,16 +130,18 @@ namespace Awsmock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter UpdateParameter(Entity::SSM::Parameter &parameter) const;
+        [[nodiscard]]
+        Entity::SSM::Parameter updateParameter(Entity::SSM::Parameter &parameter) const override;
 
         /**
-         * @brief Inserts or updates a parameter
+         * @brief Import parameters
          *
          * @param parameter parameter entity
          * @return inserted or updated parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter ImportParameter(Entity::SSM::Parameter &parameter) const;
+        [[nodiscard]]
+        Entity::SSM::Parameter importParameter(Entity::SSM::Parameter &parameter) const override;
 
         /**
          * @brief Deletes a parameter
@@ -135,34 +150,34 @@ namespace Awsmock::Database {
          * @return number of entities deleted
          * @throws DatabaseException
          */
-        long DeleteParameter(const Entity::SSM::Parameter &parameter) const;
+        [[nodiscard]]
+        long deleteParameter(const Entity::SSM::Parameter &parameter) const override;
 
         /**
-         * @brief Delete all parameters
+         * @brief Deletes all parameters
          *
          * @return number of entities deleted
          * @throws DatabaseException
          */
-        long DeleteAllParameters() const;
+        [[nodiscard]]
+        long deleteAllParameters() const override;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "SSM"};
 
         /**
-         * Database name
+         * @brief SSM parameter vector when running without a database
          */
-        std::string _databaseName;
+        mutable std::map<std::string, Entity::SSM::Parameter> _parameters{};
 
         /**
-         * Parameter collection name
+         * @brief Parameter mutex
          */
-        std::string _parameterCollectionName;
-
-        /**
-         * ssm in-memory database
-         */
-        SSMMemoryDb &_memoryDb;
+        static boost::mutex _parameterMutex;
     };
 
 }// namespace Awsmock::Database

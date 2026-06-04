@@ -2,8 +2,7 @@
 // Created by vogje01 on 28/05/2026.
 //
 
-#ifndef AWSMOCK_SERVICE_LAMBDA_CONTROLLER_H
-#define AWSMOCK_SERVICE_LAMBDA_CONTROLLER_H
+#pragma once
 
 // C++ standard includes
 #include <future>
@@ -43,7 +42,7 @@ namespace Awsmock::Service {
      * ContainerService, then emits monitoring metrics.
      *
      * @par
-     * Additionally schedules a periodic health check task that inspects running Docker
+     * Additionally, schedules a periodic health check task that inspects running Docker
      * containers and removes dead instances from the database.
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -161,7 +160,7 @@ namespace Awsmock::Service {
         std::string _region;
 
         /**
-         * @brief Health-check interval in seconds
+         * @brief Health check interval in seconds
          */
         int _healthCheckPeriod{};
 
@@ -176,9 +175,10 @@ namespace Awsmock::Service {
          */
         mutable std::mutex _mutexMapLock;
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_LAMBDA_CONTROLLER_H

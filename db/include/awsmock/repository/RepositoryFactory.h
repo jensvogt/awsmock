@@ -11,6 +11,9 @@
 #include <awsmock/repository/cognito/CognitoMemoryRepository.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
+#include <awsmock/repository/dynamodb/DynamoDbMemoryRepository.h>
+#include <awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
+#include <awsmock/repository/dynamodb/IDynamoDbRepository.h>
 #include <awsmock/repository/kms/IKMSRepository.h>
 #include <awsmock/repository/kms/KMSMemoryRepository.h>
 #include <awsmock/repository/kms/KMSMongoRepository.h>
@@ -26,6 +29,12 @@
 #include <awsmock/repository/sqs/ISQSRepository.h>
 #include <awsmock/repository/sqs/SQSMemoryRepository.h>
 #include <awsmock/repository/sqs/SQSMongoRepository.h>
+#include <awsmock/repository/ssm/ISSMRepository.h>
+#include <awsmock/repository/ssm/SSMMemoryRepository.h>
+#include <awsmock/repository/ssm/SSMMongoRepository.h>
+#include <awsmock/repository/transfer/ITransferRepository.h>
+#include <awsmock/repository/transfer/TransferMemoryRepository.h>
+#include <awsmock/repository/transfer/TransferMongoRepository.h>
 
 namespace Awsmock::Database {
 
@@ -41,7 +50,8 @@ namespace Awsmock::Database {
      */
     class RepositoryFactory {
 
-    public:
+      public:
+
         static RepositoryFactory &instance() {
             static RepositoryFactory instance;
             return instance;
@@ -55,6 +65,9 @@ namespace Awsmock::Database {
             _cognitoRepo = createCognitoRepository();
             _monitoringRepo = createMonitoringRepository();
             _kmsRepo = createKMSRepository();
+            _transferRepo = createTransferRepository();
+            _ssmRepo = createSSMRepository();
+            _dynamodbRepo = createDynamodbRepository();
         }
 
         [[nodiscard]]
@@ -75,7 +88,17 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::shared_ptr<IKMSRepository> kmsRepository() const { return _kmsRepo; }
 
-    private:
+        [[nodiscard]]
+        std::shared_ptr<ITransferRepository> transferRepository() const { return _transferRepo; }
+
+        [[nodiscard]]
+        std::shared_ptr<ISSMRepository> ssmRepository() const { return _ssmRepo; }
+
+        [[nodiscard]]
+        std::shared_ptr<IDynamoDbRepository> dynamodbRepository() const { return _dynamodbRepo; }
+
+      private:
+
         BackendType _backend = BackendType::MONGODB;
         std::shared_ptr<IModuleRepository> _moduleRepo;
         std::shared_ptr<ISNSRepository> _snsRepo;
@@ -83,6 +106,9 @@ namespace Awsmock::Database {
         std::shared_ptr<ICognitoRepository> _cognitoRepo;
         std::shared_ptr<IMonitoringRepository> _monitoringRepo;
         std::shared_ptr<IKMSRepository> _kmsRepo;
+        std::shared_ptr<ITransferRepository> _transferRepo;
+        std::shared_ptr<ISSMRepository> _ssmRepo;
+        std::shared_ptr<IDynamoDbRepository> _dynamodbRepo;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> createModuleRepository() const {
@@ -149,6 +175,39 @@ namespace Awsmock::Database {
             }
             return std::make_shared<KMSMemoryRepository>();
         }
+
+        [[nodiscard]]
+        std::shared_ptr<ISSMRepository> createSSMRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<SSMMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<SSMMemoryRepository>();
+            }
+            return std::make_shared<SSMMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<ITransferRepository> createTransferRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<TransferMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<TransferMemoryRepository>();
+            }
+            return std::make_shared<TransferMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<IDynamoDbRepository> createDynamodbRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<DynamoDbMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<DynamoDbMemoryRepository>();
+            }
+            return std::make_shared<DynamoDbMemoryRepository>();
+        }
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

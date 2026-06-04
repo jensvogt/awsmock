@@ -122,12 +122,12 @@ namespace Awsmock::Service {
 
             } else if (module == "dynamodb") {
 
-                Database::DynamoDbDatabase &_dynamoDbDatabase = Database::DynamoDbDatabase::instance();
+                std::shared_ptr<Database::IDynamoDbRepository> _dynamoDbDatabase = Database::RepositoryFactory::instance().dynamodbRepository();
                 if (request.IsInfrastructure()) {
-                    infrastructure.dynamoDbTables = _dynamoDbDatabase.ListTables();
+                    infrastructure.dynamoDbTables = _dynamoDbDatabase->listTables({}, {}, 0, 0, {});
                 }
                 if (request.IsObjects()) {
-                    infrastructure.dynamoDbItems = _dynamoDbDatabase.ListItems();
+                    infrastructure.dynamoDbItems = _dynamoDbDatabase->listItems({}, {}, 0, 0, {});
                 }
 
             } else if (module == "secretsmanager") {
@@ -140,8 +140,8 @@ namespace Awsmock::Service {
             } else if (module == "transfer") {
 
                 if (request.IsInfrastructure()) {
-                    Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
-                    infrastructure.transferServers = _transferDatabase.ListServers();
+                    const std::shared_ptr<Database::ITransferRepository> _transferDatabase = Database::RepositoryFactory::instance().transferRepository();
+                    infrastructure.transferServers = _transferDatabase->listServers({}, {}, 0, 0, {});
                 }
 
             } else if (module == "kms") {
@@ -154,8 +154,8 @@ namespace Awsmock::Service {
             } else if (module == "ssm") {
 
                 if (request.IsInfrastructure()) {
-                    Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
-                    infrastructure.ssmParameters = _ssmDatabase.ListParameters();
+                    Database::SSMMongoRepository &_ssmDatabase = Database::SSMMongoRepository::instance();
+                    infrastructure.ssmParameters = _ssmDatabase.listParameters({}, {}, 0, 0, {});
                 }
 
             } else if (module == "application") {
@@ -269,10 +269,10 @@ namespace Awsmock::Service {
 
         // Transfer server
         if (!infrastructure.transferServers.empty()) {
-            const Database::TransferDatabase &_transferDatabase = Database::TransferDatabase::instance();
+            const std::shared_ptr<Database::ITransferRepository> _transferDatabase = Database::RepositoryFactory::instance().transferRepository();
             for (auto &transfer: infrastructure.transferServers) {
                 transfer.modified = system_clock::now();
-                transfer = _transferDatabase.CreateOrUpdateTransfer(transfer);
+                transfer = _transferDatabase->createOrUpdateTransfer(transfer);
             }
             log_info << "Transfer servers imported, count: " << infrastructure.transferServers.size();
         }
@@ -299,11 +299,11 @@ namespace Awsmock::Service {
         try {
             // DynamoDB
             if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
-                const Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
+                const Database::DynamoDbMongoRepository &_dynamoDatabase = Database::DynamoDbMongoRepository::instance();
                 if (!infrastructure.dynamoDbTables.empty()) {
                     for (auto &table: infrastructure.dynamoDbTables) {
                         table.modified = system_clock::now();
-                        _dynamoDatabase.CreateOrUpdateTable(table);
+                        _dynamoDatabase.createOrUpdateTable(table);
                     }
                     log_info << "DynamoDB table imported, count: " << infrastructure.cognitoUserPools.size();
                 }
@@ -312,12 +312,12 @@ namespace Awsmock::Service {
                     for (auto &item: infrastructure.dynamoDbItems) {
                         item.modified = system_clock::now();
                         item.size = sizeof(item) + sizeof(long);
-                        _dynamoDatabase.CreateOrUpdateItem(item);
+                        _dynamoDatabase.createOrUpdateItem(item);
                     }
                     log_info << "DynamoDB item imported, count: " << infrastructure.cognitoUserPools.size();
                 }
 
-                _dynamoDatabase.AdjustItemCounters();
+                _dynamoDatabase.adjustItemCounters();
             }
 
             // Applications
@@ -352,9 +352,9 @@ namespace Awsmock::Service {
 
         // SSM
         if (!infrastructure.ssmParameters.empty()) {
-            const Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+            const Database::SSMMongoRepository &_ssmDatabase = Database::SSMMongoRepository::instance();
             for (auto &parameter: infrastructure.ssmParameters) {
-                _ssmDatabase.ImportParameter(parameter);
+                parameter = _ssmDatabase.importParameter(parameter);
             }
             log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
         }
@@ -385,13 +385,13 @@ namespace Awsmock::Service {
             if (m == "s3") {
                 count += Database::S3Database::instance().DeleteAllBuckets();
             } else if (m == "sqs") {
-                count += Database::SQSMongoRepository::instance().deleteAllQueues();
+                count += Database::RepositoryFactory::instance().sqsRepository()->deleteAllQueues();
             } else if (m == "sns") {
-                count += Database::SNSMongoRepository::instance().deleteAllTopics();
+                count += Database::RepositoryFactory::instance().snsRepository()->deleteAllTopics();
             } else if (m == "dynamodb") {
-                count += Database::DynamoDbDatabase::instance().DeleteAllTables();
+                count += Database::DynamoDbMongoRepository::instance().deleteAllTables();
             } else if (m == "transfer") {
-                count += Database::TransferDatabase::instance().DeleteAllTransfers();
+                count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "application") {
                 count += Database::ApplicationDatabase::instance().DeleteAllApplications();
             }
@@ -416,16 +416,16 @@ namespace Awsmock::Service {
                 count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllUserPools();
                 count += Database::RepositoryFactory::instance().cognitoRepository()->deleteAllGroups({});
             } else if (m == "dynamodb") {
-                count += Database::DynamoDbDatabase::instance().DeleteAllItems();
+                count += Database::DynamoDbMongoRepository::instance().deleteAllItems();
             } else if (m == "secretsmanager") {
                 count += Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
             } else if (m == "kms") {
                 count += Database::RepositoryFactory::instance().kmsRepository()->deleteAllKeys();
             } else if (m == "ssm") {
-                count += Database::SSMDatabase::instance().DeleteAllParameters();
+                count += Database::RepositoryFactory::instance().ssmRepository()->deleteAllParameters();
             } else if (m == "transfer") {
                 Database::S3Database::instance().DeleteObjects("eu-central-1", "transfer-server");
-                count += Database::TransferDatabase::instance().DeleteAllTransfers();
+                count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "apigateway") {
                 count += Database::ApiGatewayDatabase::instance().DeleteAllKeys();
             }
@@ -514,4 +514,4 @@ namespace Awsmock::Service {
         }
         return response;
     }
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

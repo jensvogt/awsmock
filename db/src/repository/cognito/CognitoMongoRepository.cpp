@@ -14,9 +14,9 @@ namespace Awsmock::Database {
             mongocxx::options::count options;
             options.limit(1);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            return col.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            return collection.count_documents(make_document(kvp("region", region), kvp("name", name)), options) > 0;
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
@@ -31,9 +31,9 @@ namespace Awsmock::Database {
             mongocxx::options::count options;
             options.limit(1);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            return col.count_documents(make_document(kvp("userPoolId", userPoolId)), options) > 0;
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            return collection.count_documents(make_document(kvp("userPoolId", userPoolId)), options) > 0;
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
@@ -45,9 +45,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            const auto result = col.insert_one(userPool.ToDocument());
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            const auto result = collection.insert_one(userPool.ToDocument());
             log_trace << "User pool created, oid: " << result->inserted_id().get_oid().value.to_string();
             userPool.oid = result->inserted_id().get_oid().value.to_string();
             return userPool;
@@ -62,9 +62,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("_id", oid)));
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            const auto mResult = collection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -84,9 +84,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("userPoolId", userPoolId)));
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            const auto mResult = collection.find_one(make_document(kvp("userPoolId", userPoolId)));
             if (!mResult) {
                 log_error << "Database exception: user pool not found ";
                 throw Core::DatabaseException("Database exception, user pool not found ");
@@ -105,9 +105,9 @@ namespace Awsmock::Database {
     Entity::Cognito::UserPool CognitoMongoRepository::getUserPoolByClientId(const std::string &clientId) const {
 
         try {
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("userPoolClients", make_document(kvp("$elemMatch", make_document(kvp("clientId", clientId)))))));
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            const auto mResult = collection.find_one(make_document(kvp("userPoolClients", make_document(kvp("$elemMatch", make_document(kvp("clientId", clientId)))))));
             if (!mResult) {
                 log_error << "Database exception: user pool not found ";
                 throw Core::DatabaseException("Database exception, user pool not found ");
@@ -127,9 +127,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("region", region), kvp("name", name)));
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            const auto mResult = collection.find_one(make_document(kvp("region", region), kvp("name", name)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -162,9 +162,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            if (const auto mResult = col.find_one_and_update(make_document(kvp("region", userPool.region), kvp("name", userPool.name)), userPool.ToDocument(), opts)) {
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            if (const auto mResult = collection.find_one_and_update(make_document(kvp("region", userPool.region), kvp("name", userPool.name)), userPool.ToDocument(), opts)) {
                 log_trace << "Cognito user pool updated: " << userPool.ToString();
                 userPool.FromDocument(mResult->view());
                 return userPool;
@@ -183,8 +183,8 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
 
             mongocxx::options::find opts;
             if (!sortColumns.empty()) {
@@ -207,7 +207,7 @@ namespace Awsmock::Database {
                 query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
 
-            for (auto userPoolCursor = col.find(query.extract(), opts); const auto &userPool: userPoolCursor) {
+            for (auto userPoolCursor = collection.find(query.extract(), opts); const auto &userPool: userPoolCursor) {
                 Entity::Cognito::UserPool result;
                 result.FromDocument(userPool);
                 userPools.push_back(result);
@@ -233,10 +233,10 @@ namespace Awsmock::Database {
                 opts.sort(sort.extract());
             }
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
             std::vector<Entity::Cognito::UserPool> userPools;
-            for (auto userPoolCursor = col.find({}, opts); auto userPool: userPoolCursor) {
+            for (auto userPoolCursor = collection.find({}, opts); auto userPool: userPoolCursor) {
                 Entity::Cognito::UserPool result;
                 result.FromDocument(userPool);
                 userPools.push_back(result);
@@ -259,9 +259,9 @@ namespace Awsmock::Database {
             if (!region.empty()) {
                 query.append(kvp("region", region));
             }
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            count = col.count_documents(query.view());
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            count = collection.count_documents(query.view());
             log_trace << "User pool count: " << count;
             return count;
 
@@ -275,9 +275,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            const auto result = col.delete_many(make_document(kvp("userPoolId", userPoolId)));
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            const auto result = collection.delete_many(make_document(kvp("userPoolId", userPoolId)));
             log_debug << "User pool deleted, userPoolId: " << userPoolId << " count: " << result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
@@ -290,9 +290,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USERPOOL_COLLECTION];
-            const auto result = col.delete_many({});
+            const auto entry = Database::instance().client();
+            auto collection = (*entry)[_dataName][_userpoolCollection];
+            const auto result = collection.delete_many({});
             log_debug << "All cognito user pools deleted, count: " << result->deleted_count();
             return result->deleted_count();
 
@@ -310,9 +310,9 @@ namespace Awsmock::Database {
             mongocxx::options::count options;
             options.limit(1);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            return col.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)), options) > 0;
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            return collection.count_documents(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)), options) > 0;
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
@@ -324,9 +324,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            const int64_t count = col.count_documents(make_document(kvp("region", region), kvp("userName", userName)));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            const int64_t count = collection.count_documents(make_document(kvp("region", region), kvp("userName", userName)));
             log_trace << "Cognito user exists: " << std::boolalpha << count;
             return count > 0;
 
@@ -340,9 +340,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            const auto result = col.insert_one(user.ToDocument());
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            const auto result = collection.insert_one(user.ToDocument());
             log_trace << "User created, oid: " << result->inserted_id().get_oid().value.to_string();
             user.oid = result->inserted_id().get_oid().value.to_string();
             return user;
@@ -357,9 +357,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("_id", oid)));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            const auto mResult = collection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: user not found ";
                 throw Core::DatabaseException("Database exception, user not found ");
@@ -379,9 +379,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            const auto mResult = collection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("userName", userName)));
             if (!mResult) {
                 log_error << "Database exception: user not found ";
                 throw Core::DatabaseException("Database exception, user not found ");
@@ -418,9 +418,9 @@ namespace Awsmock::Database {
                 query.append(kvp("groups.groupName", groupName));
             }
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            count = col.count_documents(query.view());
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            count = collection.count_documents(query.view());
 
             log_trace << "User count: " << count;
             return count;
@@ -461,9 +461,9 @@ namespace Awsmock::Database {
                 query.append(kvp("userName", make_document(kvp("$regex", "^" + prefix))));
             }
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            for (auto userCursor = col.find(query.extract(), opts); const auto &user: userCursor) {
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            for (auto userCursor = collection.find(query.extract(), opts); const auto &user: userCursor) {
                 Entity::Cognito::User result;
                 result.FromDocument(user);
                 users.push_back(result);
@@ -489,10 +489,10 @@ namespace Awsmock::Database {
                 opts.sort(sort.extract());
             }
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
             std::vector<Entity::Cognito::User> users;
-            for (auto userCursor = col.find(query.extract(), opts); auto user: userCursor) {
+            for (auto userCursor = collection.find(query.extract(), opts); auto user: userCursor) {
                 Entity::Cognito::User result;
                 result.FromDocument(user);
                 users.push_back(result);
@@ -509,9 +509,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            auto userCursor = col.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groups", make_document(kvp("$elemMatch", make_document(kvp("groupName", groupName)))))));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            auto userCursor = collection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groups", make_document(kvp("$elemMatch", make_document(kvp("groupName", groupName)))))));
             std::vector<Entity::Cognito::User> users;
             for (auto user: userCursor) {
                 Entity::Cognito::User result;
@@ -534,9 +534,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            if (const auto mResult = col.find_one_and_update(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)), user.ToDocument(), opts)) {
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            if (const auto mResult = collection.find_one_and_update(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)), user.ToDocument(), opts)) {
                 log_trace << "Cognito user updated: " << user.ToString();
                 user.FromDocument(mResult->view());
                 return user;
@@ -562,9 +562,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            const auto result = col.delete_many(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            const auto result = collection.delete_many(make_document(kvp("region", user.region), kvp("userPoolId", user.userPoolId), kvp("userName", user.userName)));
             log_debug << "User deleted, userName: " << user.userName << " count: " << result->deleted_count();
             return result->deleted_count();
 
@@ -578,9 +578,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][USER_COLLECTION];
-            const auto result = col.delete_many({});
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_userCollection];
+            const auto result = collection.delete_many({});
             log_debug << "All cognito users deleted, count: " << result->deleted_count();
             return result->deleted_count();
 
@@ -598,9 +598,9 @@ namespace Awsmock::Database {
             mongocxx::options::count options;
             options.limit(1);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
-            return col.count_documents(make_document(kvp("region", region), kvp("groupName", groupName)), options) > 0;
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
+            return collection.count_documents(make_document(kvp("region", region), kvp("groupName", groupName)), options) > 0;
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
@@ -612,9 +612,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("_id", oid)));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
+            const auto mResult = collection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -634,9 +634,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
-            const auto mResult = col.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
+            const auto mResult = collection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
             if (!mResult) {
                 log_error << "Database exception: group not found ";
                 throw Core::DatabaseException("Database exception, group not found ");
@@ -656,9 +656,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
-            const auto result = col.insert_one(group.ToDocument());
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
+            const auto result = collection.insert_one(group.ToDocument());
             log_trace << "Cognito group created, oid: " << result->inserted_id().get_oid().value.to_string();
             group.oid = result->inserted_id().get_oid().value.to_string();
             return group;
@@ -681,10 +681,10 @@ namespace Awsmock::Database {
                 query.append(kvp("userPoolId", userPoolId));
             }
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
             std::vector<Entity::Cognito::Group> groups;
-            for (auto groupCursor = col.find(query.view()); auto group: groupCursor) {
+            for (auto groupCursor = collection.find(query.view()); auto group: groupCursor) {
                 Entity::Cognito::Group result;
                 result.FromDocument(group);
                 groups.push_back(result);
@@ -710,10 +710,10 @@ namespace Awsmock::Database {
                 opts.sort(sort.extract());
             }
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
             std::vector<Entity::Cognito::Group> groups;
-            for (auto groupCursor = col.find(query.extract(), opts); auto group: groupCursor) {
+            for (auto groupCursor = collection.find(query.extract(), opts); auto group: groupCursor) {
                 Entity::Cognito::Group result;
                 result.FromDocument(group);
                 groups.push_back(result);
@@ -731,9 +731,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
-            const auto result = col.delete_many(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
+            const auto result = collection.delete_many(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
             log_debug << "Group deleted, groupName: " << groupName << " count: " << result->deleted_count();
             return result->deleted_count();
 
@@ -751,9 +751,9 @@ namespace Awsmock::Database {
             if (!region.empty()) {
                 query.append(kvp("region", region));
             }
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
-            const auto result = col.delete_many(query.extract());
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
+            const auto result = collection.delete_many(query.extract());
             log_debug << "All groups deleted, count: " << result->deleted_count();
 
             return result->deleted_count();
@@ -768,9 +768,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto col = (*client)[DATABASE_NAME][GROUP_COLLECTION];
-            const int64_t count = col.count_documents(make_document(kvp("region", region), kvp("userPoolClients", make_document(kvp("$elemMatch", make_document(kvp("clientId", clientId)))))));
+            const auto entry = ConnectionPool::instance().GetConnection();
+            auto collection = (*entry)[_dataName][_groupCollection];
+            const int64_t count = collection.count_documents(make_document(kvp("region", region), kvp("userPoolClients", make_document(kvp("$elemMatch", make_document(kvp("clientId", clientId)))))));
             log_trace << "Cognito client id exists: " << std::boolalpha << count;
             return count > 0;
 

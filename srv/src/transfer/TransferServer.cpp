@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    TransferServer::TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()), _ioc(ioc), _scheduler(scheduler) {
+    TransferServer::TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("transfer"), _ioc(ioc), _scheduler(scheduler) {
 
         // REST manager configuration
         _region = Core::Configuration::instance().get<std::string>("awsmock.region");
@@ -70,7 +70,7 @@ namespace Awsmock::Service {
         // Update database
         server.lastStarted = system_clock::now();
         server.state = Database::Entity::Transfer::ServerState::ONLINE;
-        server = _transferDatabase.UpdateTransfer(server);
+        server = _transferDatabase->updateTransfer(server);
         log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress << ", protocols: " << server.protocols.size();
     }
 
@@ -119,8 +119,8 @@ namespace Awsmock::Service {
     }
 
     void TransferServer::StartTransferServers() {
-        log_info << "Starting transfer servers, count: " << _transferDatabase.CountServers(_region);
-        for (std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region); auto &transfer: transfers) {
+        log_info << "Starting transfer servers, count: " << _transferDatabase->countServers(_region);
+        for (std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->listServers(_region, {}, 0, 0, {}); auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 StartTransferServer(transfer);
             }
@@ -130,7 +130,7 @@ namespace Awsmock::Service {
     void TransferServer::CheckTransferServers() {
         log_trace << "Checking transfer servers";
 
-        for (std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region); auto &transfer: transfers) {
+        for (std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase->listServers(_region, {}, 0, 0, {}); auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 if (auto it = _transferServerList.find(transfer.serverId); it == _transferServerList.end()) {
                     StartTransferServer(transfer);
@@ -145,8 +145,8 @@ namespace Awsmock::Service {
         }
 
         for (const auto &key: _transferServerList | std::views::keys) {
-            if (!_transferDatabase.TransferExists(key)) {
-                Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(_region, key);
+            if (!_transferDatabase->transferExists(key)) {
+                Database::Entity::Transfer::Transfer server = _transferDatabase->getTransferByServerId(_region, key);
                 StopTransferServer(server);
                 log_info << "Transfer server stopped, serverId: " << key;
             }
@@ -156,7 +156,7 @@ namespace Awsmock::Service {
     void TransferServer::UpdateCounter() const {
         log_trace << "Transfer monitoring starting";
 
-        const long servers = _transferDatabase.CountServers();
+        const long servers = _transferDatabase->countServers({});
         Core::EventBus::instance().sigMetricGauge(TRANSFER_SERVER_COUNT, {}, {}, static_cast<double>(servers));
 
         log_trace << "Transfer monitoring finished";

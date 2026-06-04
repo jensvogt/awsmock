@@ -2,20 +2,20 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/SSMMemoryDb.h>
+#include <awsmock/repository/ssm/SSMMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex SSMMemoryDb::_parameterMutex;
+    boost::mutex SSMMemoryRepository::_parameterMutex;
 
-    bool SSMMemoryDb::ParameterExists(const std::string &name) {
+    bool SSMMemoryRepository::parameterExists(const std::string &name) const {
 
         return std::ranges::find_if(_parameters, [name](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
                    return topic.second.parameterName == name;
                }) != _parameters.end();
     }
 
-    Entity::SSM::Parameter SSMMemoryDb::GetParameterById(const std::string &oid) {
+    Entity::SSM::Parameter SSMMemoryRepository::getParameterById(const std::string &oid) const {
 
         const auto it = std::ranges::find_if(_parameters, [oid](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
             return topic.first == oid;
@@ -30,7 +30,11 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SSM::Parameter SSMMemoryDb::GetParameterByName(const std::string &name) {
+    Entity::SSM::Parameter SSMMemoryRepository::getParameterById(const bsoncxx::oid &oid) const {
+        return getParameterById(oid.to_string());
+    }
+
+    Entity::SSM::Parameter SSMMemoryRepository::getParameterByName(const std::string &name) const {
 
         const auto it = std::ranges::find_if(_parameters, [name](const std::pair<std::string, Entity::SSM::Parameter> &topic) {
             return topic.second.parameterName == name;
@@ -45,30 +49,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SSM::ParameterList SSMMemoryDb::ListParameters(const std::string &region) const {
-
-        Entity::SSM::ParameterList parameterList;
-
-        if (region.empty()) {
-
-            for (const auto &val: _parameters | std::views::values) {
-                parameterList.emplace_back(val);
-            }
-
-        } else {
-
-            for (const auto &val: _parameters | std::views::values) {
-                if (val.region == region) {
-                    parameterList.emplace_back(val);
-                }
-            }
-        }
-
-        log_trace << "Got parameter list, size: " << parameterList.size();
-        return parameterList;
-    }
-
-    Entity::SSM::ParameterList SSMMemoryDb::ListParameterCounters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
+    Entity::SSM::ParameterList SSMMemoryRepository::listParameters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         Entity::SSM::ParameterList result;
 
         // Get values
@@ -102,21 +83,32 @@ namespace Awsmock::Database {
         return result;
     }
 
-    long SSMMemoryDb::CountParameters() const {
+    long SSMMemoryRepository::countParameters(const std::string &region, const std::string &prefix) const {
 
-        return static_cast<long>(_parameters.size());
+        Entity::SSM::ParameterList result;
+        const auto q = Core::from(result);
+        for (auto &val: _parameters | std::views::values) {
+            result.push_back(val);
+        }
+        if (!region.empty()) {
+            q.where([region](const Entity::SSM::Parameter &item) { return item.region == region; });
+        }
+        if (!prefix.empty()) {
+            q.where([prefix](const Entity::SSM::Parameter &item) { return Core::StringUtils::StartsWith(item.parameterName, prefix); });
+        }
+        return q.count();
     }
 
-    Entity::SSM::Parameter SSMMemoryDb::CreateParameter(const Entity::SSM::Parameter &topic) {
+    Entity::SSM::Parameter SSMMemoryRepository::createParameter(Entity::SSM::Parameter &parameter) const {
         boost::mutex::scoped_lock loc(_parameterMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _parameters[oid] = topic;
+        _parameters[oid] = parameter;
         log_trace << "Parameter created, oid: " << oid;
-        return GetParameterById(oid);
+        return _parameters[oid];
     }
 
-    Entity::SSM::Parameter SSMMemoryDb::UpdateParameter(const Entity::SSM::Parameter &parameter) {
+    Entity::SSM::Parameter SSMMemoryRepository::updateParameter(Entity::SSM::Parameter &parameter) const {
         boost::mutex::scoped_lock lock(_parameterMutex);
 
         std::string oid = parameter.oid;
@@ -132,7 +124,14 @@ namespace Awsmock::Database {
         return parameter;
     }
 
-    long SSMMemoryDb::DeleteParameter(const Entity::SSM::Parameter &parameter) {
+    Entity::SSM::Parameter SSMMemoryRepository::importParameter(Entity::SSM::Parameter &parameter) const {
+        if (parameterExists(parameter.parameterName)) {
+            return createParameter(parameter);
+        }
+        return updateParameter(parameter);
+    }
+
+    long SSMMemoryRepository::deleteParameter(const Entity::SSM::Parameter &parameter) const {
         boost::mutex::scoped_lock lock(_parameterMutex);
 
         std::string oid = parameter.oid;
@@ -141,15 +140,15 @@ namespace Awsmock::Database {
             return k == oid;
         });
         log_debug << "Parameter deleted, count: " << count;
-        return count;
+        return static_cast<long>(count);
     }
 
-    long SSMMemoryDb::DeleteAllParameters() {
+    long SSMMemoryRepository::deleteAllParameters() const {
         boost::mutex::scoped_lock lock(_parameterMutex);
-        const long deleted = _parameters.size();
+        const auto deleted = _parameters.size();
         _parameters.clear();
         log_debug << "All SSM parameters deleted, count: " << deleted;
-        return deleted;
+        return static_cast<long>(deleted);
     }
 
 }// namespace Awsmock::Database

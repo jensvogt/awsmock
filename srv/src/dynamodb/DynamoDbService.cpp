@@ -17,9 +17,9 @@ namespace Awsmock::Service {
         createTableResponse.region = request.region;
         createTableResponse.tableName = request.tableName;
 
-        if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_debug << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
-            Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
             createTableResponse.tableArn = table.arn;
             createTableResponse.keySchemas = Dto::DynamoDb::Mapper::map(table.keySchema);
             createTableResponse.attributeDefinitions = Dto::DynamoDb::Mapper::map(table.attributeDefinitions);
@@ -62,7 +62,7 @@ namespace Awsmock::Service {
                 }
             }
 
-            table = _dynamoDbDatabase.CreateTable(table);
+            table = _dynamoDbDatabase->createTable(table);
             createTableResponse.tableArn = table.arn;
             createTableResponse.keySchemas = Dto::DynamoDb::Mapper::map(table.keySchema);
             createTableResponse.attributeDefinitions = Dto::DynamoDb::Mapper::map(table.attributeDefinitions);
@@ -82,7 +82,7 @@ namespace Awsmock::Service {
 
         try {
 
-            return _dynamoDbDatabase.TableExists(region, tableName);
+            return _dynamoDbDatabase->tableExists(region, tableName);
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd list tables failed, error: " << exc.message();
@@ -96,7 +96,7 @@ namespace Awsmock::Service {
 
         try {
 
-            const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region);
+            const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase->listTables(request.region, {}, 0, 0, {});
 
             Dto::DynamoDb::ListTableResponse response;
             for (const auto &table: tables) {
@@ -117,8 +117,8 @@ namespace Awsmock::Service {
         try {
 
             Dto::DynamoDb::ListTableCountersResponse tableResponse;
-            tableResponse.total = _dynamoDbDatabase.CountTables(request.region, request.prefix);
-            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)); const auto &table: tables) {
+            tableResponse.total = _dynamoDbDatabase->countTables(request.region, request.prefix);
+            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase->listTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)); const auto &table: tables) {
                 Dto::DynamoDb::TableCounter tableCounter;
                 tableCounter.region = table.region;
                 tableCounter.tableName = table.name;
@@ -144,7 +144,7 @@ namespace Awsmock::Service {
         try {
 
             Dto::DynamoDb::GetTableDetailCountersResponse tableResponse;
-            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
             tableResponse.tableCounters.region = table.region;
             tableResponse.tableCounters.tableName = table.name;
             tableResponse.tableCounters.items = table.items;
@@ -167,7 +167,7 @@ namespace Awsmock::Service {
         try {
 
             Dto::DynamoDb::ListTableArnsResponse tableResponse;
-            for (const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(region); const auto &table: tables) {
+            for (const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase->listTables(region, {}, 0, 0, {}); const auto &table: tables) {
                 tableResponse.tableArns.emplace_back(table.arn);
             }
             return tableResponse;
@@ -202,8 +202,8 @@ namespace Awsmock::Service {
 
         try {
             Dto::DynamoDb::ListItemCountersResponse itemResponse;
-            itemResponse.total = _dynamoDbDatabase.CountItems(request.region, request.tableName, request.prefix);
-            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)));
+            itemResponse.total = _dynamoDbDatabase->countItems(request.region, request.tableName, request.prefix);
+            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase->listItems(request.region, request.tableName, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns)));
             return itemResponse;
 
         } catch (Core::JsonException &exc) {
@@ -217,7 +217,7 @@ namespace Awsmock::Service {
         log_debug << "Describe DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         try {
-            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
             Dto::DynamoDb::DescribeTableResponse response;
             response.region = request.region;
             response.tableName = request.tableName;
@@ -262,21 +262,21 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "delete_table");
         log_debug << "Delete DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         }
 
         try {
             // Get the table
-            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
 
             // Delete all items
-            const long deleted = _dynamoDbDatabase.DeleteItems(request.region, request.tableName);
+            const long deleted = _dynamoDbDatabase->deleteItems(request.region, request.tableName);
             log_debug << "Items deleted, table: " << request.tableName << ", count: " << deleted;
 
             // Delete table in a database
-            _dynamoDbDatabase.DeleteTable(request.region, request.tableName);
+            _dynamoDbDatabase->deleteTable(request.region, request.tableName);
             log_debug << "DynamoDb table deleted, name: " << request.tableName;
 
             Dto::DynamoDb::DeleteTableResponse deleteTableResponse = {};
@@ -300,11 +300,11 @@ namespace Awsmock::Service {
         try {
 
             // Delete all items
-            const long itemCount = _dynamoDbDatabase.DeleteAllItems();
+            const long itemCount = _dynamoDbDatabase->deleteAllItems();
             log_debug << "Items deleted, count: " << itemCount;
 
             // Delete the table from the database
-            const long count = _dynamoDbDatabase.DeleteAllTables();
+            const long count = _dynamoDbDatabase->deleteAllTables();
             log_debug << "DynamoDb tables deleted, count: " << count;
             return count;
 
@@ -318,7 +318,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "get_item");
         log_debug << "Start get item, region: " << request.region << " name: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
@@ -326,11 +326,11 @@ namespace Awsmock::Service {
         try {
 
             // Get the table and the primary keys
-            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
             std::string partitionKey = request.keys[table.GetPartitionKeyName()].stringValue;
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
 
-            if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName, partitionKey, sortKey)) {
+            if (!_dynamoDbDatabase->itemExists(request.region, request.tableName, partitionKey, sortKey)) {
                 log_debug << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
                 Dto::DynamoDb::GetItemResponse getItemResponse;
                 getItemResponse.region = request.region;
@@ -340,7 +340,7 @@ namespace Awsmock::Service {
             }
 
             // Get item
-            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, partitionKey, sortKey);
+            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, partitionKey, sortKey);
 
             // Prepare response
             Dto::DynamoDb::GetItemResponse getItemResponse;
@@ -360,7 +360,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "get_item");
         log_debug << "Start get item counter, region: " << request.region << " name: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
@@ -368,9 +368,9 @@ namespace Awsmock::Service {
         try {
 
             // Get the table and the primary keys
-            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
 
-            if (!_dynamoDbDatabase.ItemExists(request.region, request.tableName, request.partitionKey, request.sortKey)) {
+            if (!_dynamoDbDatabase->itemExists(request.region, request.tableName, request.partitionKey, request.sortKey)) {
                 log_debug << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
                 Dto::DynamoDb::GetItemCounterResponse getItemResponse;
                 getItemResponse.region = request.region;
@@ -380,7 +380,7 @@ namespace Awsmock::Service {
             }
 
             // Get item
-            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, request.partitionKey, request.sortKey);
+            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, request.partitionKey, request.sortKey);
 
             // Prepare response
             Dto::DynamoDb::GetItemCounterResponse getItemResponse;
@@ -403,7 +403,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "put_item");
         log_debug << "Start put item, region: " << request.region << " name: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         }
@@ -414,17 +414,17 @@ namespace Awsmock::Service {
             item.size = sizeof(item) + sizeof(long);
 
             // Get the table
-            Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
             item.partitionKey = request.attributes[table.GetPartitionKeyName()].stringValue;
             item.sortKey = request.attributes[table.GetSortKeyName()].stringValue;
 
-            item = _dynamoDbDatabase.CreateOrUpdateItem(item);
+            item = _dynamoDbDatabase->createOrUpdateItem(item);
             log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
 
             // Update table
             table.size += item.size;
             table.items++;
-            table = _dynamoDbDatabase.UpdateTable(table);
+            table = _dynamoDbDatabase->updateTable(table);
             log_debug << "Database updated, region: " << table.region << " tableName: " << table.name;
 
             Dto::DynamoDb::PutItemResponse response;
@@ -448,7 +448,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "query");
         log_debug << "Start query, region: " << request.region << " name: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
@@ -464,7 +464,7 @@ namespace Awsmock::Service {
             log_debug << "MongoDB query: " << bsoncxx::to_json(filter);
 
             // Query database
-            std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase.ExecuteQuery(filter, true, request.limit);
+            std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase->executeQuery(filter, true, request.limit);
 
             // Prepare response
             Dto::DynamoDb::QueryResponse queryResponse;
@@ -487,14 +487,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "scan");
         log_debug << "Start scan, region: " << request.region << " name: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
         try {
-            const std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase.ListItems(request.region, request.tableName);
-            const long count = _dynamoDbDatabase.CountItems(request.region, request.tableName);
+            const std::vector<Database::Entity::DynamoDb::Item> items = _dynamoDbDatabase->listItems(request.region, request.tableName, 0, 0, {});
+            const long count = _dynamoDbDatabase->countItems(request.region, request.tableName, {});
 
             Dto::DynamoDb::ScanResponse scanResponse;
             scanResponse.region = request.region;
@@ -518,7 +518,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "delete_item");
         log_debug << "Start creating a new DynamoDb item, region: " << request.region << " table: " << request.tableName;
 
-        if (const Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request); !_dynamoDbDatabase.ItemExists(item)) {
+        if (const Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request); !_dynamoDbDatabase->itemExists(item)) {
             log_warning << "DynamoDb item does not exist, region: " << request.region << " name: " << request.tableName;
             return {};
         }
@@ -526,15 +526,15 @@ namespace Awsmock::Service {
         try {
 
             // Get the table
-            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
             std::string partitionKey = request.keys[table.GetPartitionKeyName()].stringValue;
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
 
             // Get the item
-            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase.GetItemByKeys(request.region, request.tableName, item.partitionKey, item.sortKey);
+            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, item.partitionKey, item.sortKey);
 
             // Delete item
-            _dynamoDbDatabase.DeleteItem(request.region, request.tableName, partitionKey, sortKey);
+            _dynamoDbDatabase->deleteItem(request.region, request.tableName, partitionKey, sortKey);
 
             Dto::DynamoDb::DeleteItemResponse deleteItemResponse;
             deleteItemResponse.requestId = request.requestId;
@@ -554,7 +554,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "delete_all_items");
         log_debug << "Start deleting all items, region: " << request.region << " table: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         }
@@ -583,7 +583,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "export_items");
         log_debug << "Start exporting all items, region: " << request.region << " table: " << request.tableName;
 
-        if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
             log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
             throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         }
@@ -594,7 +594,7 @@ namespace Awsmock::Service {
             Dto::DynamoDb::ExportItemsResponse response;
             response.tableName = request.tableName;
             response.region = request.region;
-            response.infrastructure.dynamoDbItems = _dynamoDbDatabase.GetItems(request.region, request.tableName);
+            response.infrastructure.dynamoDbItems = _dynamoDbDatabase->getItems(request.region, request.tableName);
             return response;
 
         } catch (Core::JsonException &exc) {
@@ -610,7 +610,7 @@ namespace Awsmock::Service {
         try {
 
             // Recalculate item counters
-            _dynamoDbDatabase.AdjustItemCounters();
+            _dynamoDbDatabase->adjustItemCounters();
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd reset item counters failed, message: " << exc.message();

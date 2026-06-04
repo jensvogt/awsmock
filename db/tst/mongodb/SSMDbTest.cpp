@@ -6,8 +6,8 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <../../include/awsmock/repository/ssm/SSMDatabase.h>
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/repository/SSMDatabase.h>
 #include <boost/test/utils/runtime/modifier.hpp>
 
 namespace {

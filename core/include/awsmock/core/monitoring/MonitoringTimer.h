@@ -2,8 +2,7 @@
 // Created by vogje01 on 18/05/2023.
 //
 
-#ifndef AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H
-#define AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -124,5 +123,3 @@ namespace Awsmock::Monitoring {
     };
 
 }// namespace Awsmock::Monitoring
-
-#endif//AWSMOCK_MONITORING_METRIC_SERVICE_TIMER_H
