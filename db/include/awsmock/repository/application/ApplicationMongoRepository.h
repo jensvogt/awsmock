@@ -2,16 +2,14 @@
 // Created by vogje01 on 29/11/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_APPLICATION_DATABASE_H
-#define AWSMOCK_REPOSITORY_APPLICATION_DATABASE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/memorydb/ApplicationMemoryDb.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
+#include <awsmock/repository/application/IApplicationRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace Awsmock::Database {
 
@@ -20,22 +18,14 @@ namespace Awsmock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ApplicationDatabase : public AwsMock::Database::DatabaseBase {
+    class ApplicationMongoRepository final : public IApplicationRepository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit ApplicationDatabase();
-
-        /**
-         * @brief Singleton instance
-         */
-        static ApplicationDatabase &instance() {
-            static ApplicationDatabase applicationDatabase;
-            return applicationDatabase;
-        }
+        explicit ApplicationMongoRepository() = default;
 
         /**
          * @brief Check the existence of the application
@@ -45,7 +35,8 @@ namespace Awsmock::Database {
          * @return true if, application exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool ApplicationExists(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        bool ApplicationExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Create a new application
@@ -53,7 +44,8 @@ namespace Awsmock::Database {
          * @param application application entity to create
          * @return created application entity.
          */
-        Entity::Apps::Application CreateApplication(Entity::Apps::Application &application) const;
+        [[nodiscard]]
+        Entity::Apps::Application CreateApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Update an application
@@ -61,7 +53,8 @@ namespace Awsmock::Database {
          * @param application application entity to update
          * @return updated application entity.
          */
-        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application) const;
+        [[nodiscard]]
+        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Toggle the enabled flag of an application without loading the full entity.
@@ -71,7 +64,7 @@ namespace Awsmock::Database {
          * @param enabled new value
          * @throws DatabaseException
          */
-        void SetEnabled(const std::string &region, const std::string &name, bool enabled) const;
+        void SetEnabled(const std::string &region, const std::string &name, bool enabled) const override;
 
         /**
          * @brief Import an application
@@ -79,7 +72,8 @@ namespace Awsmock::Database {
          * @param application application entity to import
          * @return imported application entity.
          */
-        Entity::Apps::Application ImportApplication(Entity::Apps::Application &application) const;
+        [[nodiscard]]
+        Entity::Apps::Application ImportApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Get an application
@@ -89,7 +83,8 @@ namespace Awsmock::Database {
          * @return application entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Returns a list of applications
@@ -101,7 +96,8 @@ namespace Awsmock::Database {
          * @param sortColumns vector of sort columns and direction
          * @return list of applications
          */
-        [[nodiscard]] std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]]
+        std::vector<Entity::Apps::Application> ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Count all applications by region and prefix
@@ -110,7 +106,8 @@ namespace Awsmock::Database {
          * @param prefix name prefix
          * @return number of applications
          */
-        [[nodiscard]] long CountApplications(const std::string &region = {}, const std::string &prefix = {}) const;
+        [[nodiscard]]
+        long CountApplications(const std::string &region = {}, const std::string &prefix = {}) const override;
 
         /**
          * @brief Deletes an application
@@ -121,38 +118,33 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        long DeleteApplication(const std::string &region, const std::string &name) const;
-
+        long DeleteApplication(const std::string &region, const std::string &name) const override;
 
         /**
-         * @brief Deletes all application
+         * @brief Deletes all applications
          *
          * @return true if, application exists
          * @throws DatabaseException
          */
         [[nodiscard]]
-        long DeleteAllApplications() const;
+        long DeleteAllApplications() const override;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
-         * Database name
+         * @brief Database name
          */
-        std::string _databaseName{};
+        static constexpr auto _databaseName = "awsmock";
 
         /**
-         * Application collection name
+         * @brief User pool collection name
          */
-        std::string _applicationCollectionName{};
-
-        /**
-         * Application in-memory database
-         */
-        ApplicationMemoryDb &_memoryDb;
+        static constexpr auto _applicationCollectionName = "application";
     };
 
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_APPLICATION_DATABASE_H

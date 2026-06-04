@@ -15,7 +15,7 @@ namespace Awsmock::Service {
         log_debug << "Start creating application, region: " << region << ", name: " << name;
 
         // Make a local copy
-        Database::Entity::Apps::Application applicationEntity = Database::ApplicationDatabase::instance().GetApplication(region, name);
+        Database::Entity::Apps::Application applicationEntity = Database::RepositoryFactory::instance().applicationRepository()->GetApplication(region, name);
 
         // Create a new instance
         CreateInstance(instanceId, applicationEntity, applicationCodeFile);
@@ -23,7 +23,7 @@ namespace Awsmock::Service {
         // Update database
         applicationEntity.lastStarted = system_clock::now();
         applicationEntity.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
-        applicationEntity = Database::ApplicationDatabase::instance().UpdateApplication(applicationEntity);
+        applicationEntity = Database::RepositoryFactory::instance().applicationRepository()->UpdateApplication(applicationEntity);
 
         log_info << "Application installed: " << applicationEntity.name << ", status: " << applicationEntity.status;
     }

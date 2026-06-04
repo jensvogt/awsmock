@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -17,6 +16,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/repository/application/IApplicationRepository.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -29,22 +29,14 @@ namespace Awsmock::Database {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ApplicationMemoryDb {
+    class ApplicationMemoryRepository final : public IApplicationRepository {
 
       public:
 
         /**
          * @brief Constructor
          */
-        ApplicationMemoryDb() = default;
-
-        /**
-         * @brief Singleton instance
-         */
-        static ApplicationMemoryDb &instance() {
-            static ApplicationMemoryDb applicationMemoryDb;
-            return applicationMemoryDb;
-        }
+        ApplicationMemoryRepository() = default;
 
         /**
          * @brief Check the existence of an application
@@ -54,16 +46,8 @@ namespace Awsmock::Database {
          * @return true, if the application exists
          * @throws DatabaseException
          */
-        bool ApplicationExists(const std::string &region, const std::string &name);
-
-        /**
-         * @brief Returns an application entity by primary key
-         *
-         * @param oid application primary key
-         * @return application entity
-         * @throws DatabaseException
-         */
-        Entity::Apps::Application GetApplicationByOid(const std::string &oid);
+        [[nodiscard]]
+        bool ApplicationExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Get an application
@@ -73,7 +57,8 @@ namespace Awsmock::Database {
          * @return application entity
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Create a new application
@@ -81,7 +66,8 @@ namespace Awsmock::Database {
          * @param application application entity to create
          * @return created cognito user pool entity.
          */
-        Entity::Apps::Application CreateApplication(const Entity::Apps::Application &application);
+        [[nodiscard]]
+        Entity::Apps::Application CreateApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Update an application
@@ -89,7 +75,8 @@ namespace Awsmock::Database {
          * @param application application entity to update
          * @return updated application entity.
          */
-        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application);
+        [[nodiscard]]
+        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Toggle the enabled flag of an application without loading the full entity.
@@ -99,7 +86,7 @@ namespace Awsmock::Database {
          * @param enabled new value
          * @throws DatabaseException
          */
-        void SetEnabled(const std::string &region, const std::string &name, bool enabled);
+        void SetEnabled(const std::string &region, const std::string &name, bool enabled) const override;
 
         /**
          * @brief Returns a list of cognito user pools.
@@ -111,7 +98,8 @@ namespace Awsmock::Database {
          * @param sortColumns vector of sort columns and direction
          * @return list of cognito user pools
          */
-        std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {});
+        [[nodiscard]]
+        std::vector<Entity::Apps::Application> ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Count all applications by region and prefix
@@ -120,7 +108,17 @@ namespace Awsmock::Database {
          * @param prefix name prefix
          * @return number of applications
          */
-        long CountApplications(const std::string &region, const std::string &prefix) const;
+        [[nodiscard]]
+        long CountApplications(const std::string &region, const std::string &prefix) const override;
+
+        /**
+         * @brief Import an application
+         *
+         * @param application application entity to import
+         * @return imported application entity.
+         */
+        [[nodiscard]]
+        Entity::Apps::Application ImportApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Deletes an application
@@ -130,25 +128,29 @@ namespace Awsmock::Database {
          * @return true if, application exists
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteApplication(const std::string &region, const std::string &name);
-
+        [[nodiscard]]
+        long DeleteApplication(const std::string &region, const std::string &name) const override;
 
         /**
-         * @brief Deletes all application
+         * @brief Deletes all applications
          *
          * @return true if, application exists
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteAllApplications();
+        [[nodiscard]]
+        long DeleteAllApplications() const override;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
          * Application map
          */
-        std::map<std::string, Entity::Apps::Application> _applications{};
+        mutable std::unordered_map<std::string, Entity::Apps::Application> _applications{};
 
         /**
          * Application mutex
@@ -157,5 +159,3 @@ namespace Awsmock::Database {
     };
 
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H

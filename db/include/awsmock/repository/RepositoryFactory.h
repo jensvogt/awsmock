@@ -8,6 +8,9 @@
 #include <memory>
 
 // Awsmock includes
+#include <awsmock/repository/application/ApplicationMemoryRepository.h>
+#include <awsmock/repository/application/ApplicationMongoRepository.h>
+#include <awsmock/repository/application/IApplicationRepository.h>
 #include <awsmock/repository/cognito/CognitoMemoryRepository.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
@@ -72,6 +75,7 @@ namespace Awsmock::Database {
             _ssmRepo = createSSMRepository();
             _dynamodbRepo = createDynamodbRepository();
             _lambdaRepo = createLambdaRepository();
+            _applicationRepo = createApplicationRepository();
         }
 
         [[nodiscard]]
@@ -104,6 +108,9 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::shared_ptr<ILambdaRepository> lambdaRepository() const { return _lambdaRepo; }
 
+        [[nodiscard]]
+        std::shared_ptr<IApplicationRepository> applicationRepository() const { return _applicationRepo; }
+
       private:
 
         BackendType _backend = BackendType::MONGODB;
@@ -117,6 +124,7 @@ namespace Awsmock::Database {
         std::shared_ptr<ISSMRepository> _ssmRepo;
         std::shared_ptr<IDynamoDbRepository> _dynamodbRepo;
         std::shared_ptr<ILambdaRepository> _lambdaRepo;
+        std::shared_ptr<IApplicationRepository> _applicationRepo;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> createModuleRepository() const {
@@ -226,6 +234,17 @@ namespace Awsmock::Database {
                     return std::make_shared<LambdaMemoryRepository>();
             }
             return std::make_shared<LambdaMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<IApplicationRepository> createApplicationRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<ApplicationMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<ApplicationMemoryRepository>();
+            }
+            return std::make_shared<ApplicationMemoryRepository>();
         }
     };
 

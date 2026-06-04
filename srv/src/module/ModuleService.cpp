@@ -161,8 +161,8 @@ namespace Awsmock::Service {
             } else if (module == "application") {
 
                 if (request.IsInfrastructure()) {
-                    Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
-                    infrastructure.applications = _applicationDatabase.ListApplications();
+                    const std::shared_ptr<Database::IApplicationRepository> _applicationDatabase = Database::RepositoryFactory::instance().applicationRepository();
+                    infrastructure.applications = _applicationDatabase->ListApplications({}, {}, 0, 0, {});
                 }
 
             } else if (module == "apigateway") {
@@ -321,9 +321,9 @@ namespace Awsmock::Service {
 
             // Applications
             if (!infrastructure.applications.empty()) {
-                const Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+                const std::shared_ptr<Database::IApplicationRepository> _applicationDatabase = Database::RepositoryFactory::instance().applicationRepository();
                 for (auto &application: infrastructure.applications) {
-                    application = _applicationDatabase.ImportApplication(application);
+                    application = _applicationDatabase->ImportApplication(application);
                 }
                 log_info << "Applications imported, count: " << infrastructure.applications.size();
             }
@@ -392,7 +392,7 @@ namespace Awsmock::Service {
             } else if (m == "transfer") {
                 count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "application") {
-                count += Database::ApplicationDatabase::instance().DeleteAllApplications();
+                count += Database::RepositoryFactory::instance().applicationRepository()->DeleteAllApplications();
             }
         }
     }
