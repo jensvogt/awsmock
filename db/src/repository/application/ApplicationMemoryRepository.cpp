@@ -70,14 +70,14 @@ namespace Awsmock::Database {
         it->second.modified = system_clock::now();
     }
 
-    std::vector<Entity::Apps::Application> ApplicationMemoryRepository::ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::Apps::Application> ApplicationMemoryRepository::ListApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
             q = q.where([region](const Entity::Apps::Application &application) { return application.region == region; });
         }
         if (!prefix.empty()) {
-            q = q.where([prefix](const Entity::Apps::Application &application) { return Core::StringUtils::StartsWith(application.region, prefix); });
+            q = q.where([prefix](const Entity::Apps::Application &application) { return Core::StringUtils::StartsWith(application.name, prefix); });
         }
         if (!sortColumns.empty()) {
             std::ranges::sort(q.to_vector(), [sortColumns](const Entity::Apps::Application &a, const Entity::Apps::Application &b) {

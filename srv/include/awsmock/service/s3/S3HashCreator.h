@@ -6,9 +6,9 @@
 #define AWSMOCK_SERVICE_S3_HASH_CREATOR_H
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/entity/s3/Object.h>
-#include <awsmock/repository/S3Database.h>
 
 #define DEFAULT_DATA_DIR "/home/awsmock/data"
 

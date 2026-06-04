@@ -18,7 +18,6 @@
 #include <awsmock/entity/lambda/EphemeralStorage.h>
 #include <awsmock/entity/lambda/EventSourceMapping.h>
 #include <awsmock/entity/lambda/Instance.h>
-#include <awsmock/repository/S3Database.h>
 
 namespace Awsmock::Database::Entity::Lambda {
 

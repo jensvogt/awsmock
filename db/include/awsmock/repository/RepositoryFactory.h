@@ -29,6 +29,9 @@
 #include <awsmock/repository/monitoring/IMonitoringRepository.h>
 #include <awsmock/repository/monitoring/MonitoringMemoryRepository.h>
 #include <awsmock/repository/monitoring/MonitoringMongoRepository.h>
+#include <awsmock/repository/s3/IS3Repository.h>
+#include <awsmock/repository/s3/S3MemoryRepository.h>
+#include <awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/repository/sns/ISNSRepository.h>
 #include <awsmock/repository/sns/SNSMemoryRepository.h>
 #include <awsmock/repository/sns/SNSMongoRepository.h>
@@ -68,6 +71,7 @@ namespace Awsmock::Database {
             _moduleRepo = createModuleRepository();
             _snsRepo = createSNSRepository();
             _sqsRepo = createSQSRepository();
+            _s3Repo = createS3Repository();
             _cognitoRepo = createCognitoRepository();
             _monitoringRepo = createMonitoringRepository();
             _kmsRepo = createKMSRepository();
@@ -86,6 +90,9 @@ namespace Awsmock::Database {
 
         [[nodiscard]]
         std::shared_ptr<ISQSRepository> sqsRepository() const { return _sqsRepo; }
+
+        [[nodiscard]]
+        std::shared_ptr<IS3Repository> s3Repository() const { return _s3Repo; }
 
         [[nodiscard]]
         std::shared_ptr<ICognitoRepository> cognitoRepository() const { return _cognitoRepo; }
@@ -117,6 +124,7 @@ namespace Awsmock::Database {
         std::shared_ptr<IModuleRepository> _moduleRepo;
         std::shared_ptr<ISNSRepository> _snsRepo;
         std::shared_ptr<ISQSRepository> _sqsRepo;
+        std::shared_ptr<IS3Repository> _s3Repo;
         std::shared_ptr<ICognitoRepository> _cognitoRepo;
         std::shared_ptr<IMonitoringRepository> _monitoringRepo;
         std::shared_ptr<IKMSRepository> _kmsRepo;
@@ -157,6 +165,17 @@ namespace Awsmock::Database {
                     return std::make_shared<SQSMemoryRepository>();
             }
             return std::make_shared<SQSMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<IS3Repository> createS3Repository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<S3MongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<S3MemoryRepository>();
+            }
+            return std::make_shared<S3MemoryRepository>();
         }
 
         [[nodiscard]]

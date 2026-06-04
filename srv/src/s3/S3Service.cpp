@@ -1354,7 +1354,7 @@ namespace Awsmock::Service {
 
     void S3Service::CheckBucketExistence(const std::string &region, const std::string &name) {
         // Check existence
-        if (!Database::S3Database::instance().BucketExists(region, name)) {
+        if (!Database::S3MongoRepository::instance().BucketExists(region, name)) {
             log_warning << "Bucket does not exists, region: " << region << " name: " << name;
             throw Core::NotFoundException("Bucket does not exists, region: " + region + " name: " + name);
         }
@@ -1362,7 +1362,7 @@ namespace Awsmock::Service {
 
     void S3Service::CheckBucketNonExistence(const std::string &region, const std::string &name) {
         // Check existence
-        if (Database::S3Database::instance().BucketExists(region, name)) {
+        if (Database::S3MongoRepository::instance().BucketExists(region, name)) {
             log_warning << "Bucket exists already, region: " << region << " name: " << name;
             throw Core::NotFoundException("Bucket exists already, region: " + region + ", name: " + name);
         }

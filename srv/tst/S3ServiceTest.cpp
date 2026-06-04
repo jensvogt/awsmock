@@ -10,7 +10,7 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
-#include <awsmock/repository/S3Database.h>
+#include <../../db/include/awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace {
@@ -50,9 +50,9 @@ namespace Awsmock::Database {
         S3ServiceFixture() = default;
         ~S3ServiceFixture() {
             try {
-                const long deletedObjects = S3Database::instance().DeleteAllObjects();
+                const long deletedObjects = S3MongoRepository::instance().DeleteAllObjects();
                 log_debug << "S3 objects deleted, count: " << deletedObjects;
-                const long deletedBuckets = S3Database::instance().DeleteAllBuckets();
+                const long deletedBuckets = S3MongoRepository::instance().DeleteAllBuckets();
                 log_debug << "S3 buckets deleted, count: " << deletedBuckets;
             } catch (const std::exception &exc) {
                 log_error << "S3 fixture cleanup failed: " << exc.what();
