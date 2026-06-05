@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_API_GATEWAY_API_KEY_H
-#define AWSMOCK_DB_ENTITY_API_GATEWAY_API_KEY_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -94,5 +93,3 @@ namespace Awsmock::Database::Entity::ApiGateway {
     };
 
 }// namespace Awsmock::Database::Entity::ApiGateway
-
-#endif// AWSMOCK_DB_ENTITY_API_GATEWAY_API_KEY_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_STATUS_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USER_STATUS_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -48,5 +47,3 @@ namespace Awsmock::Database::Entity::Cognito {
     }
 
 }// namespace Awsmock::Database::Entity::Cognito
-
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_STATUS_H

@@ -2,8 +2,10 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H
+#pragma once
+
+// C++ includes
+#include <string>
 
 namespace Awsmock::Database::Entity::Cognito {
 
@@ -21,5 +23,3 @@ namespace Awsmock::Database::Entity::Cognito {
     };
 
 }// namespace Awsmock::Database::Entity::Cognito
-
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H

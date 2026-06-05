@@ -39,7 +39,7 @@ namespace Awsmock::Database {
          * @param id API key ID
          */
         [[nodiscard]]
-        bool ApiKeyExists(const std::string &id) const override;
+        bool apiKeyExists(const std::string &id) const override;
 
         /**
          * @brief Check the existence of an API key
@@ -48,7 +48,7 @@ namespace Awsmock::Database {
          * @param name API key name
          */
         [[nodiscard]]
-        bool ApiKeyExists(const std::string &region, const std::string &name) const override;
+        bool apiKeyExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Create a new API gateway key
@@ -57,7 +57,7 @@ namespace Awsmock::Database {
          * @return created api key
          */
         [[nodiscard]]
-        Entity::ApiGateway::ApiKey CreateKey(Entity::ApiGateway::ApiKey &key) const override;
+        Entity::ApiGateway::ApiKey createKey(Entity::ApiGateway::ApiKey &key) const override;
 
         /**
          * @brief Returns a list of API keys
@@ -69,7 +69,7 @@ namespace Awsmock::Database {
          * @return created api key
          */
         [[nodiscard]]
-        std::vector<Entity::ApiGateway::ApiKey> GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const override;
+        std::vector<Entity::ApiGateway::ApiKey> getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const override;
 
         /**
          * @brief Returns an API key by ID
@@ -78,7 +78,7 @@ namespace Awsmock::Database {
          * @return api key
          */
         [[nodiscard]]
-        Entity::ApiGateway::ApiKey GetApiKeyById(const std::string &id) const override;
+        Entity::ApiGateway::ApiKey getApiKeyById(const std::string &id) const override;
 
         /**
          * @brief Updates an existing API key
@@ -87,7 +87,7 @@ namespace Awsmock::Database {
          * @return updated api key
          */
         [[nodiscard]]
-        Entity::ApiGateway::ApiKey UpdateApiKey(Entity::ApiGateway::ApiKey &key) const override;
+        Entity::ApiGateway::ApiKey updateApiKey(Entity::ApiGateway::ApiKey &key) const override;
 
         /**
          * @brief Import an API key
@@ -97,7 +97,7 @@ namespace Awsmock::Database {
          *
          * @param key API key to import
          */
-        void ImportApiKey(Entity::ApiGateway::ApiKey &key) const override;
+        void importApiKey(Entity::ApiGateway::ApiKey &key) const override;
 
         /**
          * @brief Returns the total number of keys
@@ -105,14 +105,14 @@ namespace Awsmock::Database {
          * @return API key count
          */
         [[nodiscard]]
-        long CountApiKeys() const override;
+        long countApiKeys() const override;
 
         /**
          * @brief Delete an API gateway key by ID
          *
          * @param id API gateway key ID
          */
-        void DeleteKey(const std::string &id) const override;
+        void deleteKey(const std::string &id) const override;
 
         /**
          * @brief Delete all keys
@@ -121,15 +121,15 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        long DeleteAllKeys() const override;
+        long deleteAllKeys() const override;
 
         /**
          * @brief Check the existence of an REST API
          *
-         * @param id REST API ID
+         * @param oid REST API ID
          */
         [[nodiscard]]
-        bool RestApiExists(const std::string &id) const override;
+        bool restApiExists(const std::string &oid) const override;
 
         /**
          * @brief Check the existence of an REST API
@@ -138,7 +138,7 @@ namespace Awsmock::Database {
          * @param name REST API name
          */
         [[nodiscard]]
-        bool RestApiExists(const std::string &region, const std::string &name) const override;
+        bool restApiExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Create a new REST API
@@ -147,7 +147,7 @@ namespace Awsmock::Database {
          * @return created REST API entity
          */
         [[nodiscard]]
-        Entity::ApiGateway::RestApi CreateRestApi(Entity::ApiGateway::RestApi &restApi) const override;
+        Entity::ApiGateway::RestApi createRestApi(Entity::ApiGateway::RestApi &restApi) const override;
 
         /**
          * @brief Returns a list of API key counters
@@ -159,7 +159,7 @@ namespace Awsmock::Database {
          * @return list of API key counters
          */
         [[nodiscard]]
-        std::vector<Entity::ApiGateway::ApiKey> ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
+        std::vector<Entity::ApiGateway::ApiKey> listApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns a list of REST API counters
@@ -171,7 +171,7 @@ namespace Awsmock::Database {
          * @return list of REST API counters
          */
         [[nodiscard]]
-        std::vector<Entity::ApiGateway::RestApi> ListRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
+        std::vector<Entity::ApiGateway::RestApi> listRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
       private:
 

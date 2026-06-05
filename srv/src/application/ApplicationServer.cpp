@@ -43,10 +43,10 @@ namespace Awsmock::Service {
         log_trace << "Application Monitoring starting";
 
         // Total count
-        Core::EventBus::instance().sigMetricGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase->CountApplications({}, {}));
+        Core::EventBus::instance().sigMetricGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase->countApplications({}, {}));
 
         // CPU / memory usage
-        for (auto &application: _applicationDatabase->ListApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
 
             if (!application.containerId.empty() && ContainerService::instance().ContainerExists(application.containerId)) {
                 const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId);
@@ -67,12 +67,12 @@ namespace Awsmock::Service {
     }
 
     void ApplicationServer::StartApplications() const {
-        for (auto &application: _applicationDatabase->ListApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
             if (application.enabled) {
                 StartApplication(application);
             } else {
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application = _applicationDatabase->UpdateApplication(application);
+                application = _applicationDatabase->updateApplication(application);
                 log_debug << "Application stopped, name: " << application.name;
             }
         }
@@ -92,7 +92,7 @@ namespace Awsmock::Service {
 
             // Start dependent application
             for (const auto &dependency: application.dependencies) {
-                StartApplication(_applicationDatabase->GetApplication(application.region, dependency));
+                StartApplication(_applicationDatabase->getApplication(application.region, dependency));
             }
         }
 
@@ -114,7 +114,7 @@ namespace Awsmock::Service {
 
             // Start dependent application
             for (const auto &dependency: application.dependencies) {
-                StopApplication(_applicationDatabase->GetApplication(application.region, dependency));
+                StopApplication(_applicationDatabase->getApplication(application.region, dependency));
             }
         }
 
@@ -147,7 +147,7 @@ namespace Awsmock::Service {
         const auto stopped = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
 
         // Check status
-        for (auto &application: _applicationDatabase->ListApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
 
             // If containerId is empty and the application is enabled, start it
             if (application.containerId.empty() && application.enabled) {
@@ -175,7 +175,7 @@ namespace Awsmock::Service {
                 application.status = stopped;
                 application.containerId = "";
                 application.containerName = "";
-                application = _applicationDatabase->UpdateApplication(application);
+                application = _applicationDatabase->updateApplication(application);
                 log_warning << "Application container not found, cleared, name: " << application.name;
             }
         }
@@ -201,8 +201,8 @@ namespace Awsmock::Service {
                 log_error << "Invalid container name: " << container.image;
                 continue;
             }
-            if (_applicationDatabase->ApplicationExists(region, name)) {
-                Database::Entity::Apps::Application application = _applicationDatabase->GetApplication(region, name);
+            if (_applicationDatabase->applicationExists(region, name)) {
+                Database::Entity::Apps::Application application = _applicationDatabase->getApplication(region, name);
                 application.region = region;
                 application.containerId = container.id;
                 application.containerName = container.GetContainerName();
@@ -210,18 +210,18 @@ namespace Awsmock::Service {
                 application.imageId = container.imageId;
                 application.version = version;
                 application.status = container.state.running ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application = _applicationDatabase->UpdateApplication(application);
+                application = _applicationDatabase->updateApplication(application);
                 log_debug << "Application updated, imageName: " << application.imageName;
             }
         }
 
         // Clear stale containerId for applications whose containers are no longer in Docker
-        for (auto &application: _applicationDatabase->ListApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
             if (!application.containerId.empty() && !activeContainerIds.contains(application.containerId)) {
                 application.containerId = "";
                 application.containerName = "";
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application = _applicationDatabase->UpdateApplication(application);
+                application = _applicationDatabase->updateApplication(application);
                 log_info << "Cleared stale container reference, application: " << application.name;
             }
         }
@@ -234,7 +234,7 @@ namespace Awsmock::Service {
         Core::Scheduler::instance().Shutdown("application-watchdog");
         Core::Scheduler::instance().Shutdown("application-backup");
 
-        for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase->ListApplications({}, {}, 0, 0, {}); auto &application: applications) {
+        for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase->listApplications({}, {}, 0, 0, {}); auto &application: applications) {
             ContainerService::instance().KillContainer(application.containerId);
             log_info << "Application stopped, name: " << application.name;
         }

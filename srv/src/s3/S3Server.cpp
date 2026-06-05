@@ -37,7 +37,7 @@ namespace Awsmock::Service {
         const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
 
         // Get the bucket list
-        const Database::Entity::S3::BucketList buckets = _s3Database->ListBuckets({}, {}, 0, 0, {});
+        const Database::Entity::S3::BucketList buckets = _s3Database->listBuckets({}, {}, 0, 0, {});
         log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
 
         if (buckets.empty()) {
@@ -48,23 +48,23 @@ namespace Awsmock::Service {
         int filesDeleted = 0, objectsDeleted = 0;
         for (auto &bucket: buckets) {
             // Get objects and delete objects, where the file is not existing anymore, The files are identified by internal name.
-            std::vector objects = _s3Database->GetBucketObjectList(region, bucket.name, 1000);
+            std::vector objects = _s3Database->getBucketObjectList(region, bucket.name, 1000);
             while (!objects.empty()) {
                 for (const auto &object: objects) {
                     if (!Core::FileUtils::FileExists(Core::FileUtils::appendPath(s3DataDir, object.internalName))) {
-                        const long deleted = _s3Database->DeleteObject(object);
+                        const long deleted = _s3Database->deleteObject(object);
                         log_debug << "Object deleted, internalName: " << object.internalName << ", count: " << deleted;
                         objectsDeleted++;
                     }
                 }
-                objects = _s3Database->GetBucketObjectList(region, bucket.name, 1000);
+                objects = _s3Database->getBucketObjectList(region, bucket.name, 1000);
             }
         }
 
         // Loop over files and check the database for internal name
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
-                if (!_s3Database->ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
+                if (!_s3Database->objectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::RemoveFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
                     filesDeleted++;
@@ -79,10 +79,10 @@ namespace Awsmock::Service {
         log_trace << "S3 Monitoring starting";
 
         // Reload the counters first
-        _s3Database->AdjustObjectCounters();
+        _s3Database->adjustObjectCounters();
 
         long totalKeys = 0, totalSize = 0;
-        const Database::Entity::S3::BucketList buckets = _s3Database->ListBuckets({}, {}, 0, 0, {});
+        const Database::Entity::S3::BucketList buckets = _s3Database->listBuckets({}, {}, 0, 0, {});
         for (const auto &bucket: buckets) {
 
             Core::EventBus::instance().sigMetricGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, bucket.keys);

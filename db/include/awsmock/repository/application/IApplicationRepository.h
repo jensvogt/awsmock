@@ -11,10 +11,6 @@
 
 // Awsmock includes
 #include <awsmock/entity/apps/Application.h>
-#include <awsmock/entity/cognito/User.h>
-#include <awsmock/entity/cognito/UserPool.h>
-#include <awsmock/entity/sqs/Message.h>
-#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -46,7 +42,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        virtual bool ApplicationExists(const std::string &region, const std::string &name) const = 0;
+        virtual bool applicationExists(const std::string &region, const std::string &name) const = 0;
 
         /**
          * @brief Create a new application
@@ -55,7 +51,7 @@ namespace Awsmock::Database {
          * @return created application entity.
          */
         [[nodiscard]]
-        virtual Entity::Apps::Application CreateApplication(Entity::Apps::Application &application) const = 0;
+        virtual Entity::Apps::Application createApplication(Entity::Apps::Application &application) const = 0;
 
         /**
          * @brief Update an application
@@ -64,7 +60,7 @@ namespace Awsmock::Database {
          * @return updated application entity.
          */
         [[nodiscard]]
-        virtual Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application) const = 0;
+        virtual Entity::Apps::Application updateApplication(Entity::Apps::Application &application) const = 0;
 
         /**
          * @brief Toggle the enabled flag of an application without loading the full entity.
@@ -74,7 +70,7 @@ namespace Awsmock::Database {
          * @param enabled new value
          * @throws DatabaseException
          */
-        virtual void SetEnabled(const std::string &region, const std::string &name, bool enabled) const = 0;
+        virtual void setEnabled(const std::string &region, const std::string &name, bool enabled) const = 0;
 
         /**
          * @brief Import an application
@@ -83,7 +79,7 @@ namespace Awsmock::Database {
          * @return imported application entity.
          */
         [[nodiscard]]
-        virtual Entity::Apps::Application ImportApplication(Entity::Apps::Application &application) const = 0;
+        virtual Entity::Apps::Application importApplication(Entity::Apps::Application &application) const = 0;
 
         /**
          * @brief Get an application
@@ -94,7 +90,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        virtual Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const = 0;
+        virtual Entity::Apps::Application getApplication(const std::string &region, const std::string &name) const = 0;
 
         /**
          * @brief Returns a list of applications
@@ -107,7 +103,7 @@ namespace Awsmock::Database {
          * @return list of applications
          */
         [[nodiscard]]
-        virtual std::vector<Entity::Apps::Application> ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
+        virtual std::vector<Entity::Apps::Application> listApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
 
         /**
          * @brief Count all applications by region and prefix
@@ -117,7 +113,7 @@ namespace Awsmock::Database {
          * @return number of applications
          */
         [[nodiscard]]
-        virtual long CountApplications(const std::string &region, const std::string &prefix) const = 0;
+        virtual long countApplications(const std::string &region, const std::string &prefix) const = 0;
 
         /**
          * @brief Deletes an application
@@ -128,7 +124,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        virtual long DeleteApplication(const std::string &region, const std::string &name) const = 0;
+        virtual long deleteApplication(const std::string &region, const std::string &name) const = 0;
 
         /**
          * @brief Deletes all applications
@@ -137,7 +133,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        virtual long DeleteAllApplications() const = 0;
+        virtual long deleteAllApplications() const = 0;
     };
 
 }// namespace Awsmock::Database

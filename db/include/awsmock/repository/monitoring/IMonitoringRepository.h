@@ -5,29 +5,27 @@
 #pragma once
 
 // C++ includes
-#include <optional>
 #include <string>
 #include <vector>
 
 // Awsmock includes
 #include <awsmock/entity/monitoring/Counter.h>
-#include <awsmock/entity/sns/Message.h>
-#include <awsmock/entity/sns/Topic.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
 
     /**
-     * @brief Interface for SQS repository operations.
+     * @brief Interface for monitoring repository operations.
      *
      * Provides an abstraction for storing, retrieving, and managing
-     * SQS-related data.
+     * monitoring-related data.
      */
     class IMonitoringRepository {
 
-    public:
+      public:
+
         /**
-         * @brief Virtual destructor for the ISQSRepository interface.
+         * @brief Virtual destructor for the IMonitoringRepository interface.
          *
          * Ensures derived classes' destructor is invoked correctly
          * during object destruction to release resources.
@@ -47,18 +45,17 @@ namespace Awsmock::Database {
          * @return list of counter-values
          */
         [[nodiscard]]
-        virtual std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName, const std::string &labelValue,
-                                                                             long limit) const = 0;
+        virtual std::vector<Entity::Monitoring::Counter> getMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName, const std::string &labelValue, long limit) const = 0;
 
         /**
          * @brief Saves the monitoring data to the database
          *
          * @param values key value map of values
          */
-        virtual void UpdateMonitoringCounters(const std::map<std::string, double> &values) const = 0;
+        virtual void updateMonitoringCounters(const std::map<std::string, double> &values) const = 0;
 
         /**
-         * @brief Returns list of label values by label name
+         * @brief Returns a list of label values by label name
          *
          * @param name monitoring feature name
          * @param labelName label name
@@ -68,7 +65,7 @@ namespace Awsmock::Database {
          * @return list of label values
          */
         [[nodiscard]]
-        virtual std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit, system_clock::time_point start, system_clock::time_point end) const = 0;
+        virtual std::vector<std::string> getDistinctLabelValues(const std::string &name, const std::string &labelName, long limit, system_clock::time_point start, system_clock::time_point end) const = 0;
 
         /**
          * @brief Deletes old monitoring data
@@ -77,7 +74,7 @@ namespace Awsmock::Database {
          * @return number of deleted data rows
          */
         [[nodiscard]]
-        virtual long DeleteOldMonitoringData(int retentionPeriod) const = 0;
+        virtual long deleteOldMonitoringData(int retentionPeriod) const = 0;
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

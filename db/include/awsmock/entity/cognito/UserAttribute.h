@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_ATTRIBUTE_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USER_ATTRIBUTE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -32,5 +31,3 @@ namespace Awsmock::Database::Entity::Cognito {
     typedef std::vector<UserAttribute> UserAttributeList;
 
 }// namespace Awsmock::Database::Entity::Cognito
-
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_ATTRIBUTE_H

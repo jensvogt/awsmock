@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_API_GATEWAY_REST_API_H
-#define AWSMOCK_DB_ENTITY_API_GATEWAY_REST_API_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -116,7 +115,8 @@ namespace Awsmock::Database::Entity::ApiGateway {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
+        [[nodiscard]]
+        view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -127,5 +127,3 @@ namespace Awsmock::Database::Entity::ApiGateway {
     };
 
 }// namespace Awsmock::Database::Entity::ApiGateway
-
-#endif// AWSMOCK_DB_ENTITY_API_GATEWAY_REST_API_H

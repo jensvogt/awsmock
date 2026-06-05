@@ -10,7 +10,7 @@ namespace Awsmock::Database {
             {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
             {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
-    bool S3MongoRepository::BucketExists(const std::string &region, const std::string &name) const {
+    bool S3MongoRepository::bucketExists(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "bucket_exists");
 
         try {
@@ -30,7 +30,7 @@ namespace Awsmock::Database {
         }
     }
 
-    bool S3MongoRepository::BucketExists(const std::string &bucketArn) const {
+    bool S3MongoRepository::bucketExists(const std::string &bucketArn) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "bucket_exists");
 
         try {
@@ -50,11 +50,11 @@ namespace Awsmock::Database {
         }
     }
 
-    bool S3MongoRepository::BucketExists(const Entity::S3::Bucket &bucket) const {
-        return BucketExists(bucket.region, bucket.name);
+    bool S3MongoRepository::bucketExists(const Entity::S3::Bucket &bucket) const {
+        return bucketExists(bucket.region, bucket.name);
     }
 
-    Entity::S3::Bucket S3MongoRepository::CreateBucket(Entity::S3::Bucket &bucket) const {
+    Entity::S3::Bucket S3MongoRepository::createBucket(Entity::S3::Bucket &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "create_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -74,7 +74,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long S3MongoRepository::BucketCount(const std::string &region, const std::string &prefix) const {
+    long S3MongoRepository::bucketCount(const std::string &region, const std::string &prefix) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "bucket_count");
 
         try {
@@ -100,7 +100,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Bucket S3MongoRepository::GetBucketById(const bsoncxx::oid &oid) const {
+    Entity::S3::Bucket S3MongoRepository::getBucketById(const bsoncxx::oid &oid) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -111,7 +111,7 @@ namespace Awsmock::Database {
         return Entity::S3::Bucket::FromDocument(mResult->view());
     }
 
-    Entity::S3::Bucket S3MongoRepository::GetBucketByArn(const std::string &bucketArn) const {
+    Entity::S3::Bucket S3MongoRepository::getBucketByArn(const std::string &bucketArn) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -121,11 +121,11 @@ namespace Awsmock::Database {
         return Entity::S3::Bucket::FromDocument(mResult->view());
     }
 
-    Entity::S3::Bucket S3MongoRepository::GetBucketById(const std::string &oid) const {
-        return GetBucketById(bsoncxx::oid(oid));
+    Entity::S3::Bucket S3MongoRepository::getBucketById(const std::string &oid) const {
+        return getBucketById(bsoncxx::oid(oid));
     }
 
-    Entity::S3::Bucket S3MongoRepository::GetBucketByRegionName(const std::string &region, const std::string &name) const {
+    Entity::S3::Bucket S3MongoRepository::getBucketByRegionName(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -136,7 +136,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::BucketList S3MongoRepository::ListBuckets(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
+    Entity::S3::BucketList S3MongoRepository::listBuckets(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -173,7 +173,7 @@ namespace Awsmock::Database {
         return bucketList;
     }
 
-    Entity::S3::BucketList S3MongoRepository::ExportBuckets(const std::vector<SortColumn> &sortColumns) const {
+    Entity::S3::BucketList S3MongoRepository::exportBuckets(const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "export_buckets");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -196,7 +196,7 @@ namespace Awsmock::Database {
         return bucketList;
     }
 
-    bool S3MongoRepository::HasObjects(const Entity::S3::Bucket &bucket) const {
+    bool S3MongoRepository::hasObjects(const Entity::S3::Bucket &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "has_objects");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -209,7 +209,7 @@ namespace Awsmock::Database {
         return _objectCollection.count_documents(make_document(kvp("region", bucket.region), kvp("bucket", bucket.name)), options) > 0;
     }
 
-    std::vector<Entity::S3::Object> S3MongoRepository::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) const {
+    std::vector<Entity::S3::Object> S3MongoRepository::getBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object_list");
 
         std::vector<Entity::S3::Object> objectList;
@@ -229,7 +229,7 @@ namespace Awsmock::Database {
         return objectList;
     }
 
-    long S3MongoRepository::GetBucketObjectCount(const std::string &region, const std::string &bucket) const {
+    long S3MongoRepository::getBucketObjectCount(const std::string &region, const std::string &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object_count");
 
         std::vector<Entity::S3::Object> objectList;
@@ -241,7 +241,7 @@ namespace Awsmock::Database {
         return objectCount;
     }
 
-    long S3MongoRepository::PurgeBucket(Entity::S3::Bucket &bucket) const {
+    long S3MongoRepository::purgeBucket(Entity::S3::Bucket &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "purge_count");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -263,7 +263,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Bucket S3MongoRepository::UpdateBucket(Entity::S3::Bucket &bucket) const {
+    Entity::S3::Bucket S3MongoRepository::updateBucket(Entity::S3::Bucket &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "update_bucket");
 
         mongocxx::options::find_one_and_update opts{};
@@ -289,7 +289,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void S3MongoRepository::UpdateBucketCounter(const std::string &bucketArn, const long keys, const long size) const {
+    void S3MongoRepository::updateBucketCounter(const std::string &bucketArn, const long keys, const long size) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "update_bucket_counter");
 
         mongocxx::options::find_one_and_update opts{};
@@ -320,15 +320,15 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Bucket S3MongoRepository::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const {
+    Entity::S3::Bucket S3MongoRepository::createOrUpdateBucket(Entity::S3::Bucket &bucket) const {
 
-        if (BucketExists(bucket)) {
-            return UpdateBucket(bucket);
+        if (bucketExists(bucket)) {
+            return updateBucket(bucket);
         }
-        return CreateBucket(bucket);
+        return createBucket(bucket);
     }
 
-    std::vector<Entity::S3::Object> S3MongoRepository::ListBucket(const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3MongoRepository::listBucket(const std::string &bucket, const std::string &prefix) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_objects");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -349,7 +349,7 @@ namespace Awsmock::Database {
         return objectList;
     }
 
-    long S3MongoRepository::GetBucketSize(const std::string &region, const std::string &bucket) const {
+    long S3MongoRepository::getBucketSize(const std::string &region, const std::string &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket_size");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -372,7 +372,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void S3MongoRepository::DeleteBucket(const Entity::S3::Bucket &bucket) const {
+    void S3MongoRepository::deleteBucket(const Entity::S3::Bucket &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -390,7 +390,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long S3MongoRepository::DeleteAllBuckets() const {
+    long S3MongoRepository::deleteAllBuckets() const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_all_buckets");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -409,7 +409,7 @@ namespace Awsmock::Database {
         }
     }
 
-    bool S3MongoRepository::ObjectExists(const Entity::S3::Object &object) const {
+    bool S3MongoRepository::objectExists(const Entity::S3::Object &object) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -422,7 +422,7 @@ namespace Awsmock::Database {
         return _objectCollection.count_documents(make_document(kvp("region", object.region), kvp("bucket", object.bucket), kvp("key", object.key)), options) > 0;
     }
 
-    bool S3MongoRepository::ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const {
+    bool S3MongoRepository::objectExists(const std::string &region, const std::string &bucket, const std::string &key) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -435,7 +435,7 @@ namespace Awsmock::Database {
         return _objectCollection.count_documents(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)), options) > 0;
     }
 
-    bool S3MongoRepository::ObjectExists(const std::string &oid) const {
+    bool S3MongoRepository::objectExists(const std::string &oid) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -445,7 +445,7 @@ namespace Awsmock::Database {
         return count > 0;
     }
 
-    bool S3MongoRepository::ObjectExistsInternalName(const std::string &filename) const {
+    bool S3MongoRepository::objectExistsInternalName(const std::string &filename) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -463,7 +463,7 @@ namespace Awsmock::Database {
         return _objectCollection.count_documents(query.view(), options) > 0;
     }
 
-    Entity::S3::Object S3MongoRepository::CreateObject(Entity::S3::Object &object) const {
+    Entity::S3::Object S3MongoRepository::createObject(Entity::S3::Object &object) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "create_object");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -480,7 +480,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Object S3MongoRepository::GetObjectById(bsoncxx::oid oid) const {
+    Entity::S3::Object S3MongoRepository::getObjectById(bsoncxx::oid oid) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object");
 
         try {
@@ -499,18 +499,18 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::S3::Object S3MongoRepository::GetObjectById(const std::string &oid) const {
-        return GetObjectById(bsoncxx::oid(oid));
+    Entity::S3::Object S3MongoRepository::getObjectById(const std::string &oid) const {
+        return getObjectById(bsoncxx::oid(oid));
     }
 
-    Entity::S3::Object S3MongoRepository::CreateOrUpdateObject(Entity::S3::Object &object) const {
-        if (ObjectExists(object)) {
-            return UpdateObject(object);
+    Entity::S3::Object S3MongoRepository::createOrUpdateObject(Entity::S3::Object &object) const {
+        if (objectExists(object)) {
+            return updateObject(object);
         }
-        return CreateObject(object);
+        return createObject(object);
     }
 
-    Entity::S3::Object S3MongoRepository::UpdateObject(Entity::S3::Object &object) const {
+    Entity::S3::Object S3MongoRepository::updateObject(Entity::S3::Object &object) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "update_object");
 
         mongocxx::options::find_one_and_update opts{};
@@ -536,7 +536,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Object S3MongoRepository::GetObject(const std::string &region, const std::string &bucket, const std::string &key) const {
+    Entity::S3::Object S3MongoRepository::getObject(const std::string &region, const std::string &bucket, const std::string &key) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object");
 
         try {
@@ -555,7 +555,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Object S3MongoRepository::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) const {
+    Entity::S3::Object S3MongoRepository::getObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object");
 
         try {
@@ -577,7 +577,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Object S3MongoRepository::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version) const {
+    Entity::S3::Object S3MongoRepository::getObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object_version");
 
         try {
@@ -599,7 +599,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    std::vector<Entity::S3::Object> S3MongoRepository::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3MongoRepository::listObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_object_versions");
 
         std::vector<Entity::S3::Object> objectList;
@@ -625,7 +625,7 @@ namespace Awsmock::Database {
         return objectList;
     }
 
-    long S3MongoRepository::ObjectCount(const std::string &region, const std::string &prefix, const std::string &bucket) const {
+    long S3MongoRepository::objectCount(const std::string &region, const std::string &prefix, const std::string &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "count_objects");
 
         try {
@@ -656,7 +656,7 @@ namespace Awsmock::Database {
         return -1;
     }
 
-    std::vector<Entity::S3::Object> S3MongoRepository::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::S3::Object> S3MongoRepository::listObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_objects");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -697,7 +697,7 @@ namespace Awsmock::Database {
         return objectList;
     }
 
-    long S3MongoRepository::DeleteObject(const Entity::S3::Object &object) const {
+    long S3MongoRepository::deleteObject(const Entity::S3::Object &object) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_objects");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -718,7 +718,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long S3MongoRepository::DeleteObjects(const std::string &region, const std::string &bucketName, const std::vector<std::string> &keys) const {
+    long S3MongoRepository::deleteObjects(const std::string &region, const std::string &bucketName, const std::vector<std::string> &keys) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_objects");
 
         array array{};
@@ -752,7 +752,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long S3MongoRepository::DeleteAllObjects() const {
+    long S3MongoRepository::deleteAllObjects() const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_all_objects");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -772,9 +772,9 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::S3::Bucket S3MongoRepository::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const {
+    Entity::S3::Bucket S3MongoRepository::createBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const {
 
-        Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
+        Entity::S3::Bucket internBucket = getBucketByRegionName(bucket.region, bucket.name);
         //        internBucket.notifications.clear();
         if (Core::StringUtils::Contains(bucketNotification.event, "*")) {
 
@@ -802,12 +802,12 @@ namespace Awsmock::Database {
 
         log_debug << "Bucket notification added, notification: " << bucketNotification.ToString();
 
-        return UpdateBucket(internBucket);
+        return updateBucket(internBucket);
     }
 
-    Entity::S3::Bucket S3MongoRepository::DeleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const {
+    Entity::S3::Bucket S3MongoRepository::deleteBucketNotifications(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const {
 
-        Entity::S3::Bucket internBucket = GetBucketByRegionName(bucket.region, bucket.name);
+        Entity::S3::Bucket internBucket = getBucketByRegionName(bucket.region, bucket.name);
 
         if (Core::StringUtils::Contains(bucketNotification.event, "*")) {
 
@@ -835,10 +835,10 @@ namespace Awsmock::Database {
 
         log_trace << "Bucket notification deleted, notification: " << bucketNotification.ToString();
 
-        return UpdateBucket(internBucket);
+        return updateBucket(internBucket);
     }
 
-    void S3MongoRepository::AdjustObjectCounters() const {
+    void S3MongoRepository::adjustObjectCounters() const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "adjust_object_counter");
 
         const auto client = ConnectionPool::instance().GetConnection();

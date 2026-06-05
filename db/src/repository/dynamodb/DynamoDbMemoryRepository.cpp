@@ -164,12 +164,12 @@ namespace Awsmock::Database {
 
     Entity::DynamoDb::ItemList DynamoDbMemoryRepository::listItems(const std::string &region, const std::string &tableName, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
-        const auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
-            q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
+            q = q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
         }
         if (!tableName.empty()) {
-            q.where([tableName](const Entity::DynamoDb::Item &item) { return item.tableName == tableName; });
+            q = q.where([tableName](const Entity::DynamoDb::Item &item) { return item.tableName == tableName; });
         }
         log_trace << "Got DynamoDB items, region: " << region << ", tableName: " << tableName << ", size: " << q.count();
         return q.to_vector();
@@ -269,12 +269,12 @@ namespace Awsmock::Database {
 
     std::vector<Entity::DynamoDb::Item> DynamoDbMemoryRepository::getItems(const std::string &region, const std::string &tableName) const {
 
-        const auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
-            q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
+            q = q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
         }
         if (!tableName.empty()) {
-            q.where([tableName](const Entity::DynamoDb::Item &item) { return item.tableName == tableName; });
+            q = q.where([tableName](const Entity::DynamoDb::Item &item) { return item.tableName == tableName; });
         }
         return q.to_vector();
     }

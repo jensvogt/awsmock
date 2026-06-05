@@ -1,7 +1,7 @@
 set(BINARY db_memory_tst)
 
 set(SOURCES Main.cpp DynamoDbTest.cpp CognitoDbTest.cpp SQSDbTest.cpp SNSDbTest.cpp S3DbTest.cpp LambdaDbTest.cpp
-        SSMDbTest.cpp SecretsManagerDbTests.cpp ApplicationDbTest.cpp)
+        SSMDbTest.cpp SecretsManagerDbTests.cpp ApplicationDbTest.cpp ApiGatewayDbTest.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PUBLIC ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/db/include)

@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_H
-#define AWSMOCK_DB_ENTITY_COGNITO_USER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -109,5 +108,3 @@ namespace Awsmock::Database::Entity::Cognito {
     typedef std::vector<User> UserList;
 
 }// namespace Awsmock::Database::Entity::Cognito
-
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_H

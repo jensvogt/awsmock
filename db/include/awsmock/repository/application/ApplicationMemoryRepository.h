@@ -47,7 +47,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        bool ApplicationExists(const std::string &region, const std::string &name) const override;
+        bool applicationExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Get an application
@@ -58,7 +58,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const override;
+        Entity::Apps::Application getApplication(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Create a new application
@@ -67,7 +67,7 @@ namespace Awsmock::Database {
          * @return created cognito user pool entity.
          */
         [[nodiscard]]
-        Entity::Apps::Application CreateApplication(Entity::Apps::Application &application) const override;
+        Entity::Apps::Application createApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Update an application
@@ -76,7 +76,7 @@ namespace Awsmock::Database {
          * @return updated application entity.
          */
         [[nodiscard]]
-        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application) const override;
+        Entity::Apps::Application updateApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Toggle the enabled flag of an application without loading the full entity.
@@ -86,7 +86,7 @@ namespace Awsmock::Database {
          * @param enabled new value
          * @throws DatabaseException
          */
-        void SetEnabled(const std::string &region, const std::string &name, bool enabled) const override;
+        void setEnabled(const std::string &region, const std::string &name, bool enabled) const override;
 
         /**
          * @brief Returns a list of cognito user pools.
@@ -99,7 +99,7 @@ namespace Awsmock::Database {
          * @return list of cognito user pools
          */
         [[nodiscard]]
-        std::vector<Entity::Apps::Application> ListApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
+        std::vector<Entity::Apps::Application> listApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Count all applications by region and prefix
@@ -109,7 +109,7 @@ namespace Awsmock::Database {
          * @return number of applications
          */
         [[nodiscard]]
-        long CountApplications(const std::string &region, const std::string &prefix) const override;
+        long countApplications(const std::string &region, const std::string &prefix) const override;
 
         /**
          * @brief Import an application
@@ -118,7 +118,7 @@ namespace Awsmock::Database {
          * @return imported application entity.
          */
         [[nodiscard]]
-        Entity::Apps::Application ImportApplication(Entity::Apps::Application &application) const override;
+        Entity::Apps::Application importApplication(Entity::Apps::Application &application) const override;
 
         /**
          * @brief Deletes an application
@@ -129,7 +129,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        long DeleteApplication(const std::string &region, const std::string &name) const override;
+        long deleteApplication(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Deletes all applications
@@ -138,7 +138,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        long DeleteAllApplications() const override;
+        long deleteAllApplications() const override;
 
       private:
 

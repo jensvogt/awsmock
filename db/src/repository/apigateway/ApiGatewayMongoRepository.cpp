@@ -9,7 +9,7 @@ namespace Awsmock::Database {
     // ========================================================================================================================
     // API key
     // ========================================================================================================================
-    bool ApiGatewayMongoRepository::ApiKeyExists(const std::string &region, const std::string &name) const {
+    bool ApiGatewayMongoRepository::apiKeyExists(const std::string &region, const std::string &name) const {
 
         try {
 
@@ -25,7 +25,7 @@ namespace Awsmock::Database {
         }
     }
 
-    bool ApiGatewayMongoRepository::ApiKeyExists(const std::string &id) const {
+    bool ApiGatewayMongoRepository::apiKeyExists(const std::string &id) const {
 
         try {
 
@@ -41,7 +41,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::ApiGateway::ApiKey ApiGatewayMongoRepository::CreateKey(Entity::ApiGateway::ApiKey &key) const {
+    Entity::ApiGateway::ApiKey ApiGatewayMongoRepository::createKey(Entity::ApiGateway::ApiKey &key) const {
 
         key.created = system_clock::now();
 
@@ -61,7 +61,7 @@ namespace Awsmock::Database {
         }
     }
 
-    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, const long limit) const {
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, const long limit) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
@@ -100,7 +100,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::ApiGateway::ApiKey ApiGatewayMongoRepository::GetApiKeyById(const std::string &id) const {
+    Entity::ApiGateway::ApiKey ApiGatewayMongoRepository::getApiKeyById(const std::string &id) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
@@ -125,7 +125,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::ApiGateway::ApiKey ApiGatewayMongoRepository::UpdateApiKey(Entity::ApiGateway::ApiKey &key) const {
+    Entity::ApiGateway::ApiKey ApiGatewayMongoRepository::updateApiKey(Entity::ApiGateway::ApiKey &key) const {
 
         key.modified = system_clock::now();
 
@@ -155,15 +155,15 @@ namespace Awsmock::Database {
         }
     }
 
-    void ApiGatewayMongoRepository::ImportApiKey(Entity::ApiGateway::ApiKey &key) const {
+    void ApiGatewayMongoRepository::importApiKey(Entity::ApiGateway::ApiKey &key) const {
 
-        if (ApiKeyExists(key.id)) {
-            key = UpdateApiKey(key);
+        if (apiKeyExists(key.id)) {
+            key = updateApiKey(key);
         }
-        key = CreateKey(key);
+        key = createKey(key);
     }
 
-    long ApiGatewayMongoRepository::CountApiKeys() const {
+    long ApiGatewayMongoRepository::countApiKeys() const {
 
         try {
 
@@ -179,7 +179,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void ApiGatewayMongoRepository::DeleteKey(const std::string &id) const {
+    void ApiGatewayMongoRepository::deleteKey(const std::string &id) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
@@ -195,7 +195,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long ApiGatewayMongoRepository::DeleteAllKeys() const {
+    long ApiGatewayMongoRepository::deleteAllKeys() const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
@@ -205,7 +205,7 @@ namespace Awsmock::Database {
             const auto result = apiKeyCollection.delete_many({});
             log_trace << "Key deleted, count: " << result->deleted_count();
             return result->deleted_count();
-            
+
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
@@ -215,7 +215,7 @@ namespace Awsmock::Database {
     // ========================================================================================================================
     // REST API
     // ========================================================================================================================
-    bool ApiGatewayMongoRepository::RestApiExists(const std::string &region, const std::string &name) const {
+    bool ApiGatewayMongoRepository::restApiExists(const std::string &region, const std::string &name) const {
 
         try {
 
@@ -231,13 +231,13 @@ namespace Awsmock::Database {
         }
     }
 
-    bool ApiGatewayMongoRepository::RestApiExists(const std::string &id) const {
+    bool ApiGatewayMongoRepository::restApiExists(const std::string &oid) const {
 
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection restApiCollection = client->database(_databaseName)[_apiKeyCollectionName];
-            const int64_t count = restApiCollection.count_documents(make_document(kvp("id", id)));
+            mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+            const int64_t count = restApiCollection.count_documents(make_document(kvp("_id", bsoncxx::oid(oid))));
             log_trace << "REST API exists: " << std::boolalpha << count;
             return count > 0;
 
@@ -247,7 +247,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::ApiGateway::RestApi ApiGatewayMongoRepository::CreateRestApi(Entity::ApiGateway::RestApi &restApi) const {
+    Entity::ApiGateway::RestApi ApiGatewayMongoRepository::createRestApi(Entity::ApiGateway::RestApi &restApi) const {
 
         restApi.created = system_clock::now();
         const auto client = ConnectionPool::instance().GetConnection();
@@ -269,7 +269,7 @@ namespace Awsmock::Database {
     // ========================================================================================================================
     // AwsMock internal
     // ========================================================================================================================
-    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::ListApiKeyCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::listApiKeyCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
@@ -310,7 +310,7 @@ namespace Awsmock::Database {
         }
     }
 
-    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMongoRepository::ListRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMongoRepository::listRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection restapiCollection = client->database(_databaseName)[_restApiCollectionName];

@@ -6,7 +6,7 @@
 
 namespace Awsmock::Database {
 
-    bool ApplicationMongoRepository::ApplicationExists(const std::string &region, const std::string &name) const {
+    bool ApplicationMongoRepository::applicationExists(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "application_exists");
 
         try {
@@ -26,7 +26,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::Apps::Application ApplicationMongoRepository::CreateApplication(Entity::Apps::Application &application) const {
+    Entity::Apps::Application ApplicationMongoRepository::createApplication(Entity::Apps::Application &application) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "create_application");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -45,18 +45,18 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::Apps::Application ApplicationMongoRepository::ImportApplication(Entity::Apps::Application &application) const {
+    Entity::Apps::Application ApplicationMongoRepository::importApplication(Entity::Apps::Application &application) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "import_application");
 
         application.containerId = "";
         application.containerName = "";
-        if (ApplicationExists(application.region, application.name)) {
-            return UpdateApplication(application);
+        if (applicationExists(application.region, application.name)) {
+            return updateApplication(application);
         }
-        return CreateApplication(application);
+        return createApplication(application);
     }
 
-    Entity::Apps::Application ApplicationMongoRepository::GetApplication(const std::string &region, const std::string &name) const {
+    Entity::Apps::Application ApplicationMongoRepository::getApplication(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "get_application");
 
         try {
@@ -79,7 +79,7 @@ namespace Awsmock::Database {
         }
     }
 
-    std::vector<Entity::Apps::Application> ApplicationMongoRepository::ListApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::Apps::Application> ApplicationMongoRepository::listApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "list_applications");
 
         try {
@@ -122,7 +122,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long ApplicationMongoRepository::CountApplications(const std::string &region, const std::string &prefix) const {
+    long ApplicationMongoRepository::countApplications(const std::string &region, const std::string &prefix) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "count_applications");
 
         try {
@@ -148,7 +148,7 @@ namespace Awsmock::Database {
         }
     }
 
-    Entity::Apps::Application ApplicationMongoRepository::UpdateApplication(Entity::Apps::Application &application) const {
+    Entity::Apps::Application ApplicationMongoRepository::updateApplication(Entity::Apps::Application &application) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "update_applications");
 
         application.modified = system_clock::now();
@@ -176,7 +176,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void ApplicationMongoRepository::SetEnabled(const std::string &region, const std::string &name, const bool enabled) const {
+    void ApplicationMongoRepository::setEnabled(const std::string &region, const std::string &name, const bool enabled) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "set_enabled");
 
         try {
@@ -196,7 +196,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long ApplicationMongoRepository::DeleteApplication(const std::string &region, const std::string &name) const {
+    long ApplicationMongoRepository::deleteApplication(const std::string &region, const std::string &name) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "delete_applications");
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -214,7 +214,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long ApplicationMongoRepository::DeleteAllApplications() const {
+    long ApplicationMongoRepository::deleteAllApplications() const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "delete_applications");
 
         const auto client = ConnectionPool::instance().GetConnection();

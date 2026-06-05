@@ -294,7 +294,7 @@ namespace Awsmock::Service {
         if (zipFile.empty() && !lambda.code.s3Bucket.empty() && !lambda.code.s3Key.empty()) {
 
             // Get internal name of S3 object
-            Database::Entity::S3::Object s3Object = Database::RepositoryFactory::instance().s3Repository()->GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
+            Database::Entity::S3::Object s3Object = Database::RepositoryFactory::instance().s3Repository()->getObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
             std::string s3CodeFile = Core::FileUtils::appendPath(s3DataDir, s3Object.internalName);
 
             // Load file

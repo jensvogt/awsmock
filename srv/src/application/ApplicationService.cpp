@@ -15,7 +15,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "create_application");
         log_debug << "Create application request, region:  " << request.region << " name: " << request.application.name;
 
-        if (_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_error << "Application exists already, region: " << request.region << " name: " << request.application.name;
             throw Core::ServiceException("Application exists already, region: " + request.region + " name: " + request.application.name);
         }
@@ -27,7 +27,7 @@ namespace Awsmock::Service {
             application.created = system_clock::now();
             application.modified = system_clock::now();
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
-            application = _applicationDatabase->CreateApplication(application);
+            application = _applicationDatabase->createApplication(application);
 
             // Save the base64 encoded file
             const std::string fullBase64File = WriteBase64File(request.code, application, request.application.version);
@@ -58,13 +58,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "get_application");
         log_debug << "Get application request, region:  " << request.region << " name: " << request.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.name)) {
             log_error << "Application does not exist, region: " << request.region << " name: " << request.name;
             throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.name);
         }
 
         try {
-            const Database::Entity::Apps::Application application = _applicationDatabase->GetApplication(request.region, request.name);
+            const Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.name);
 
             Dto::Apps::GetApplicationResponse getRequest{};
             getRequest.requestId = request.requestId;
@@ -84,7 +84,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "update_application");
         log_debug << "Get application request, region:  " << request.region << " name: " << request.application.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_error << "Application does not exist, region: " << request.region << " name: " << request.application.name;
             throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.application.name);
         }
@@ -93,7 +93,7 @@ namespace Awsmock::Service {
 
             // Update database
             Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
-            application = _applicationDatabase->UpdateApplication(application);
+            application = _applicationDatabase->updateApplication(application);
 
             // Stop if not enabled anymore
             if (!application.enabled) {
@@ -132,7 +132,7 @@ namespace Awsmock::Service {
         log_debug << "Upload application code request, name: " << request.applicationName;
 
         // Check existence
-        if (!_applicationDatabase->ApplicationExists(request.region, request.applicationName)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.applicationName)) {
             log_warning << "Application does not exist, name: " << request.applicationName;
             throw Core::ServiceException("Application does not exist, name: " + request.applicationName);
         }
@@ -144,7 +144,7 @@ namespace Awsmock::Service {
         }
 
         // Get application
-        Database::Entity::Apps::Application application = _applicationDatabase->GetApplication(request.region, request.applicationName);
+        Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.applicationName);
 
         // Save the base64 encoded file
         const std::string fullBase64File = WriteBase64File(request.applicationCode, application, request.version);
@@ -156,7 +156,7 @@ namespace Awsmock::Service {
         application.archive = request.archive;
         application.created = system_clock::now();
         application.modified = system_clock::now();
-        application = _applicationDatabase->UpdateApplication(application);
+        application = _applicationDatabase->updateApplication(application);
 
         // Delete container and image
         CleanupDocker(application);
@@ -173,17 +173,17 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "rebuild_application");
         log_debug << "Rebuild application code request, name: " << request.application.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             throw Core::ServiceException("Application does not exist, name: " + request.application.name);
         }
 
         // Get application
-        Database::Entity::Apps::Application application = _applicationDatabase->GetApplication(request.region, request.application.name);
+        Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.application.name);
 
         // Set status and version
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
-        application = _applicationDatabase->UpdateApplication(application);
+        application = _applicationDatabase->updateApplication(application);
 
         // Delete container and image
         CleanupDocker(application);
@@ -205,12 +205,12 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_application");
         log_debug << "Enable application request, name: " << request.application.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             return;
         }
 
-        _applicationDatabase->SetEnabled(request.region, request.application.name, true);
+        _applicationDatabase->setEnabled(request.region, request.application.name, true);
         log_debug << "Application enabled, name: " << request.application.name;
     }
 
@@ -218,8 +218,8 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_all_applications");
         log_debug << "Enable all applications request, region: " << request.region;
 
-        for (const auto &application: _applicationDatabase->ListApplications(request.region, {}, 0, 0, {})) {
-            _applicationDatabase->SetEnabled(application.region, application.name, true);
+        for (const auto &application: _applicationDatabase->listApplications(request.region, {}, 0, 0, {})) {
+            _applicationDatabase->setEnabled(application.region, application.name, true);
         }
         log_debug << "All applications enabled, region: " << request.region;
     }
@@ -228,12 +228,12 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "disable_application");
         log_debug << "Diable application request, name: " << request.application.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             return;
         }
 
-        _applicationDatabase->SetEnabled(request.region, request.application.name, false);
+        _applicationDatabase->setEnabled(request.region, request.application.name, false);
         log_debug << "Application disabled, name: " << request.application.name;
     }
 
@@ -241,8 +241,8 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "disable_all_applications");
         log_debug << "Disable all applications request, region: " << request.region;
 
-        for (const auto &application: _applicationDatabase->ListApplications(request.region, {}, 0, 0, {})) {
-            _applicationDatabase->SetEnabled(application.region, application.name, false);
+        for (const auto &application: _applicationDatabase->listApplications(request.region, {}, 0, 0, {})) {
+            _applicationDatabase->setEnabled(application.region, application.name, false);
         }
         log_debug << "All applications disabled, region: " << request.region;
     }
@@ -251,13 +251,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "start_application");
         log_debug << "Start application request, name: " << request.application.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             return;
         }
 
         // Get application
-        Database::Entity::Apps::Application application = _applicationDatabase->GetApplication(request.region, request.application.name);
+        Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.application.name);
 
         // Check enables flag
         if (!application.enabled) {
@@ -270,14 +270,14 @@ namespace Awsmock::Service {
         std::string fullBase64File = Core::FileUtils::appendPath(dataDir, application.name + "-" + application.version + ".b64");
         if (!Core::FileUtils::FileExists(fullBase64File)) {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-            application = _applicationDatabase->UpdateApplication(application);
+            application = _applicationDatabase->updateApplication(application);
             log_error << "Application Base64 image does not exist, name: " << fullBase64File;
             throw Core::CoreException("Application Base64 image does not exist, name: " + fullBase64File);
         }
 
         // Update status
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
-        application = _applicationDatabase->UpdateApplication(application);
+        application = _applicationDatabase->updateApplication(application);
 
         // Get container id, if already running
         if (application.containerName.empty()) {
@@ -285,7 +285,7 @@ namespace Awsmock::Service {
                 application.imageName = container.image;
                 application.containerId = container.id;
                 application.containerName = container.GetContainerName();
-                application = _applicationDatabase->UpdateApplication(application);
+                application = _applicationDatabase->updateApplication(application);
             }
         }
 
@@ -314,7 +314,7 @@ namespace Awsmock::Service {
                 application.containerName = inspectContainerResponse.name.substr(1);
                 application.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
                 application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application = _applicationDatabase->UpdateApplication(application);
+                application = _applicationDatabase->updateApplication(application);
                 log_info << "Application started, name: " << request.application.name << ", publicPort: " << application.publicPort;
             } else {
                 log_error << "Could not get the status of the container, name: " << application.containerName;
@@ -328,7 +328,7 @@ namespace Awsmock::Service {
 
         // Loop over applications
         long count = 0;
-        for (auto &application: _applicationDatabase->ListApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
             if (application.enabled) {
 
                 Dto::Apps::StartApplicationRequest startRequest;
@@ -349,17 +349,17 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "restart_application");
         log_debug << "Restart application request, name: " << request.application.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             return;
         }
 
         // Get application
-        Database::Entity::Apps::Application application = _applicationDatabase->GetApplication(request.region, request.application.name);
+        Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.application.name);
 
         // Update status
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
-        application = _applicationDatabase->UpdateApplication(application);
+        application = _applicationDatabase->updateApplication(application);
 
         // Stop the application
         if (!ContainerService::instance().ContainerExists(application.containerName)) {
@@ -401,7 +401,7 @@ namespace Awsmock::Service {
                 application.containerName = inspectContainerResponse.name.substr(1);
                 application.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
                 application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application = _applicationDatabase->UpdateApplication(application);
+                application = _applicationDatabase->updateApplication(application);
                 log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;
             } else {
                 log_error << "Could not get the status of the container, name: " << application.containerName;
@@ -422,13 +422,13 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "stop_application");
         log_debug << "Stop application request, region:  " << request.region << " name: " << request.application.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.application.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.application.name)) {
             log_error << "Application does not exist, region: " << request.region << " name: " << request.application.name;
             throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.application.name);
         }
 
         try {
-            Database::Entity::Apps::Application application = _applicationDatabase->GetApplication(request.region, request.application.name);
+            Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.application.name);
 
             if (application.containerName.empty() || !ContainerService::instance().ContainerExists(application.containerName)) {
                 log_warning << "Container does not exist, name: " << request.application.name;
@@ -440,7 +440,7 @@ namespace Awsmock::Service {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
             application.containerId = "";
             application.containerName = "";
-            application = _applicationDatabase->UpdateApplication(application);
+            application = _applicationDatabase->updateApplication(application);
             log_debug << "Application stopped, name: " << application.name;
 
         } catch (bsoncxx::exception &exc) {
@@ -455,7 +455,7 @@ namespace Awsmock::Service {
 
         try {
             long count = 0;
-            for (auto &application: _applicationDatabase->ListApplications({}, {}, 0, 0, {})) {
+            for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
                 Dto::Apps::StopApplicationRequest stopRequest;
                 stopRequest.application = Dto::Apps::Mapper::map(application);
                 stopRequest.region = application.region;
@@ -478,8 +478,8 @@ namespace Awsmock::Service {
 
             Dto::Apps::ListApplicationCountersResponse response;
 
-            const std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase->ListApplications(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            response.total = _applicationDatabase->CountApplications(request.region, request.prefix);
+            const std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase->listApplications(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            response.total = _applicationDatabase->countApplications(request.region, request.prefix);
             log_trace << "Got applications, region: " << request.region;
 
             // Prepare response
@@ -501,7 +501,7 @@ namespace Awsmock::Service {
 
         try {
 
-            const std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase->ListApplications({}, {}, 0, 0, {});
+            const std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase->listApplications({}, {}, 0, 0, {});
 
             // Prepare response
             Dto::Apps::ListApplicationNamesResponse response;
@@ -521,14 +521,14 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "delete_application");
         log_debug << "Delete application request, region:  " << request.region << " name: " << request.name;
 
-        if (!_applicationDatabase->ApplicationExists(request.region, request.name)) {
+        if (!_applicationDatabase->applicationExists(request.region, request.name)) {
             log_error << "Application does not exist, region: " << request.region << " name: " << request.name;
             throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.name);
         }
 
         try {
 
-            const long count = _applicationDatabase->DeleteApplication(request.region, request.name);
+            const long count = _applicationDatabase->deleteApplication(request.region, request.name);
             log_debug << "Application deleted, count: " << count;
 
             Dto::Apps::ListApplicationCountersRequest listRequest{};
