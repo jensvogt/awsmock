@@ -223,6 +223,15 @@
         "watchdog-period": 300,
         "log-server": false,
         "log-server-port": 4568
+      },
+      "api-gateway": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300
       }
     },
     "docker": {

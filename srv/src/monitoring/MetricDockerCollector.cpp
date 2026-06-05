@@ -6,7 +6,7 @@
 
 namespace Awsmock::Monitoring {
 
-    void MetricDockerCollector::CollectDockerCounter() {
+    void MetricDockerCollector::CollectDockerCounter() const {
         log_trace << "Docker collector starting";
 
         // Get the container list
@@ -24,7 +24,7 @@ namespace Awsmock::Monitoring {
                 }
 
                 // Get statistics
-                const Dto::Docker::ContainerStat stats = Service::ContainerService::instance().GetContainerStats(container.id);
+                const Dto::Docker::ContainerStat stats = Service::ContainerService::instance().GetContainerStats(container.id, containerName);
 
                 // CPU
                 if (const double timeDiff = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(stats.read - stats.preRead).count()); timeDiff > 0) {

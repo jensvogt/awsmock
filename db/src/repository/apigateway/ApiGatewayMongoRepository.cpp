@@ -266,6 +266,38 @@ namespace Awsmock::Database {
         }
     }
 
+    Entity::ApiGateway::RestApi ApiGatewayMongoRepository::upsertRestApi(Entity::ApiGateway::RestApi &restApi) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+        try {
+
+            const auto filter = make_document(kvp("name", restApi.name));
+            const auto update = make_document(
+                    kvp("$set", restApi.ToDocument()),
+                    kvp("$setOnInsert", make_document(
+                                                kvp("created", bsoncxx::types::b_date{
+                                                                       std::chrono::duration_cast<std::chrono::milliseconds>(
+                                                                               restApi.created.time_since_epoch())}))),
+                    kvp("$currentDate", make_document(kvp("modified", true))));
+
+            mongocxx::options::find_one_and_update opts;
+            opts.upsert(true);
+            opts.return_document(mongocxx::options::return_document::k_after);
+            const auto mResult = restApiCollection.find_one_and_update(filter.view(), update.view(), opts);
+            if (!mResult) {
+                throw Core::DatabaseException("find_one_and_update returned no document");
+            }
+            restApi.FromDocument(mResult->view());
+            return restApi;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
     // ========================================================================================================================
     // AwsMock internal
     // ========================================================================================================================

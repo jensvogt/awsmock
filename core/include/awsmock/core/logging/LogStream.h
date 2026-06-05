@@ -2,8 +2,7 @@
 // Created by vogje01 on 20/06/2023.
 //
 
-#ifndef AWS_MOCK_CORE_LOG_STREAM_H
-#define AWS_MOCK_CORE_LOG_STREAM_H
+#pragma once
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -140,6 +139,13 @@ namespace Awsmock::Core {
          */
         static void RemoveConsoleLogs();
 
+        /**
+         * @brief Logs a raw message without timestamp, severity, or other decorators
+         *
+         * @param message message to write verbatim to stdout
+         */
+        static void LogRaw(const std::string &message);
+
       private:
 
         /**
@@ -225,5 +231,4 @@ namespace Awsmock::Core {
 #define log_debug BOOST_LOG_SEV(_logger, boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #define log_trace BOOST_LOG_SEV(_logger, boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #endif
-
-#endif
+#define log_raw(msg) Awsmock::Core::LogStream::LogRaw(msg)

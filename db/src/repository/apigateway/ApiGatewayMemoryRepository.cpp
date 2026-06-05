@@ -156,6 +156,13 @@ namespace Awsmock::Database {
         return _restApis[oid];
     }
 
+    Entity::ApiGateway::RestApi ApiGatewayMemoryRepository::upsertRestApi(Entity::ApiGateway::RestApi &restApi) const {
+        if (restApiExists(restApi.region, restApi.name)) {
+            return upsertRestApi(restApi);
+        }
+        return createRestApi(restApi);
+    }
+
     // ========================================================================================================================
     // AwsMock internal
     // ========================================================================================================================

@@ -5,15 +5,16 @@
 #pragma once
 
 // C++ includes
+#include <set>
 #include <string>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/apps/model/Status.h>
+#include <awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/service/apps/ApplicationLogServer.h>
 #include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractServer.h>

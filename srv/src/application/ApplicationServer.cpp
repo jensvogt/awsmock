@@ -4,8 +4,6 @@
 
 #include <awsmock/service/apps/ApplicationServer.h>
 
-#include <set>
-
 namespace Awsmock::Service {
 
     ApplicationServer::ApplicationServer() : AbstractServer("application"), _module("application") {
@@ -43,13 +41,13 @@ namespace Awsmock::Service {
         log_trace << "Application Monitoring starting";
 
         // Total count
-        Core::EventBus::instance().sigMetricGauge(APPLICATION_COUNT, {}, {}, _applicationDatabase->countApplications({}, {}));
+        Core::EventBus::instance().sigMetricGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationDatabase->countApplications({}, {})));
 
         // CPU / memory usage
         for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
 
             if (!application.containerId.empty() && ContainerService::instance().ContainerExists(application.containerId)) {
-                const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId);
+                const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId, application.name);
                 const auto cpuDelta = static_cast<double>(containerStat.cpuStats.cpuUsage.total - containerStat.preCpuStats.cpuUsage.total);
                 const auto systemCpuDelta = static_cast<double>(containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);
                 const auto numberCpus = static_cast<double>(containerStat.cpuStats.onlineCpus);

@@ -245,4 +245,10 @@ namespace Awsmock::Core {
     void LogStream::RemoveConsoleLogs() {
         boost::log::core::get()->remove_sink(console_sink);
     }
+    
+    void LogStream::LogRaw(const std::string &message) {
+        std::cout << message << '\n';
+        std::cout.flush();
+    }
+
 }// namespace Awsmock::Core

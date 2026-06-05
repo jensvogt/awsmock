@@ -150,6 +150,15 @@ namespace Awsmock::Database {
         Entity::ApiGateway::RestApi createRestApi(Entity::ApiGateway::RestApi &restApi) const override;
 
         /**
+         * @brief Create a new REST API or updates an existing one.
+         *
+         * @param restApi REST API entity to create or update
+         * @return created or updated REST API entity
+         */
+        [[nodiscard]]
+        Entity::ApiGateway::RestApi upsertRestApi(Entity::ApiGateway::RestApi &restApi) const override;
+
+        /**
          * @brief Returns a list of API key counters
          *
          * @param prefix name prefix
