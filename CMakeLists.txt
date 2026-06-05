@@ -147,17 +147,18 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/repository/dynamodb/DynamoDbMongoRepository.cpp db/src/entity/dynamodb/ProvisionedThroughput.cpp
         db/src/repository/dynamodb/DynamoDbMemoryRepository.cpp db/src/entity/secretsmanager/Secret.cpp
         db/src/entity/secretsmanager/SecretVersion.cpp db/src/entity/secretsmanager/RotationRules.cpp
-        db/src/repository/SecretsManagerDatabase.cpp db/src/memorydb/SecretsManagerMemoryDb.cpp db/src/entity/kms/Key.cpp
-        db/src/repository/kms/KMSMongoRepository.cpp db/src/repository/kms/KMSMemoryRepository.cpp db/src/entity/ssm/Parameter.cpp
-        db/src/repository/ssm/SSMMongoRepository.cpp db/src/repository/ssm/SSMMemoryRepository.cpp db/src/entity/module/Module.cpp
-        db/src/repository/module/ModuleMongoRepository.cpp db/src/repository/module/ModuleMemoryRepository.cpp
+        db/src/repository/secretsmanager/SecretsManagerMongoRepository.cpp db/src/repository/secretsmanager/SecretsManagerMemoryRepository.cpp
+        db/src/entity/kms/Key.cpp db/src/repository/kms/KMSMongoRepository.cpp db/src/repository/kms/KMSMemoryRepository.cpp
+        db/src/entity/ssm/Parameter.cpp db/src/repository/ssm/SSMMongoRepository.cpp db/src/repository/ssm/SSMMemoryRepository.cpp
+        db/src/entity/module/Module.cpp db/src/repository/module/ModuleMongoRepository.cpp db/src/repository/module/ModuleMemoryRepository.cpp
         db/src/entity/apps/Application.cpp db/src/repository/application/ApplicationMongoRepository.cpp
         db/src/repository/application/ApplicationMemoryRepository.cpp db/src/utils/MongoUtils.cpp
         db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/entity/dynamodb/Tag.cpp
-        db/src/repository/ApiGatewayDatabase.cpp db/src/memorydb/ApiGatewayMemoryDb.cpp db/src/entity/apigateway/ApiKey.cpp
-        db/src/entity/apigateway/Rest.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
-        db/src/repository/monitoring/MonitoringMongoRepository.cpp db/src/repository/monitoring/MonitoringMemoryRepository.cpp
-        db/src/repository/Database.cpp db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp)
+        db/src/repository/apigateway/ApiGatewayMongoRepository.cpp db/src/repository/apigateway/ApiGatewayMemoryRepository.cpp
+        db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp db/src/entity/monitoring/Counter.cpp
+        db/src/entity/dynamodb/KeySchema.cpp db/src/repository/monitoring/MonitoringMongoRepository.cpp
+        db/src/repository/monitoring/MonitoringMemoryRepository.cpp db/src/repository/Database.cpp
+        db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include

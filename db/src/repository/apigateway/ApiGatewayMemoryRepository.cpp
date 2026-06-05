@@ -2,22 +2,19 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include "awsmock/entity/apigateway/RestApi.h"
-
-
-#include <awsmock/memorydb/ApiGatewayMemoryDb.h>
+#include <awsmock/repository/apigateway/ApiGatewayMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex ApiGatewayMemoryDb::_apiKeyMutex;
-    boost::mutex ApiGatewayMemoryDb::_restApiMutex;
+    boost::mutex ApiGatewayMemoryRepository::_apiKeyMutex;
+    boost::mutex ApiGatewayMemoryRepository::_restApiMutex;
 
     logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
 
     // ========================================================================================================================
     // API key
     // ========================================================================================================================
-    bool ApiGatewayMemoryDb::ApiKeyExists(const std::string &region, const std::string &name) const {
+    bool ApiGatewayMemoryRepository::ApiKeyExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_apiKeys,
                                     [region, name](const std::pair<std::string, Entity::ApiGateway::ApiKey> &key) {
@@ -25,7 +22,7 @@ namespace Awsmock::Database {
                                     }) != _apiKeys.end();
     }
 
-    bool ApiGatewayMemoryDb::ApiKeyExists(const std::string &id) const {
+    bool ApiGatewayMemoryRepository::ApiKeyExists(const std::string &id) const {
 
         return std::ranges::find_if(_apiKeys,
                                     [id](const std::pair<std::string, Entity::ApiGateway::ApiKey> &key) {
@@ -33,16 +30,16 @@ namespace Awsmock::Database {
                                     }) != _apiKeys.end();
     }
 
-    Entity::ApiGateway::ApiKey ApiGatewayMemoryDb::CreateKey(const Entity::ApiGateway::ApiKey &key) {
+    Entity::ApiGateway::ApiKey ApiGatewayMemoryRepository::CreateKey(Entity::ApiGateway::ApiKey &key) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
-        const std::string oid = Core::StringUtils::CreateRandomUuid();
-        _apiKeys[oid] = key;
-        log_trace << "Application created, oid: " << oid;
-        return _apiKeys[oid];
+        key.oid = Core::StringUtils::CreateRandomUuid();
+        _apiKeys[key.oid] = key;
+        log_trace << "Application created, oid: " << key.oid;
+        return _apiKeys[key.oid];
     }
 
-    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryDb::GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) {
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryRepository::GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
         std::vector<Entity::ApiGateway::ApiKey> result;
@@ -67,7 +64,7 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
-    Entity::ApiGateway::ApiKey ApiGatewayMemoryDb::GetApiKeyById(const std::string &id) {
+    Entity::ApiGateway::ApiKey ApiGatewayMemoryRepository::GetApiKeyById(const std::string &id) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
         const auto it = std::ranges::find_if(_apiKeys, [id](const std::pair<std::string, Entity::ApiGateway::ApiKey> &key) {
@@ -82,7 +79,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::ApiGateway::ApiKey ApiGatewayMemoryDb::UpdateApiKey(const Entity::ApiGateway::ApiKey &key) {
+    Entity::ApiGateway::ApiKey ApiGatewayMemoryRepository::UpdateApiKey(Entity::ApiGateway::ApiKey &key) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
         std::string keyId = key.id;
@@ -98,7 +95,7 @@ namespace Awsmock::Database {
         return key;
     }
 
-    void ApiGatewayMemoryDb::ImportApiKey(Entity::ApiGateway::ApiKey &key) {
+    void ApiGatewayMemoryRepository::ImportApiKey(Entity::ApiGateway::ApiKey &key) const {
 
         if (ApiKeyExists(key.id)) {
             key = UpdateApiKey(key);
@@ -106,12 +103,12 @@ namespace Awsmock::Database {
         CreateKey(key);
     }
 
-    long ApiGatewayMemoryDb::CountApiKeys() const {
+    long ApiGatewayMemoryRepository::CountApiKeys() const {
 
         return static_cast<long>(_apiKeys.size());
     }
 
-    void ApiGatewayMemoryDb::DeleteKey(const std::string &id) {
+    void ApiGatewayMemoryRepository::DeleteKey(const std::string &id) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
         const auto count = std::erase_if(_apiKeys, [id](const auto &item) {
@@ -121,10 +118,10 @@ namespace Awsmock::Database {
         log_debug << "API gateway key deleted, count: " << count;
     }
 
-    long ApiGatewayMemoryDb::DeleteAllKeys() {
+    long ApiGatewayMemoryRepository::DeleteAllKeys() const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
-        const long count = _apiKeys.size();
+        const long count = static_cast<long>(_apiKeys.size());
         _apiKeys.clear();
         log_debug << "API gateway keys deleted, count: " << count;
         return count;
@@ -133,7 +130,7 @@ namespace Awsmock::Database {
     // ========================================================================================================================
     // REST API
     // ========================================================================================================================
-    bool ApiGatewayMemoryDb::RestApiExists(const std::string &region, const std::string &name) const {
+    bool ApiGatewayMemoryRepository::RestApiExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_restApis,
                                     [region, name](const std::pair<std::string, Entity::ApiGateway::RestApi> &restApi) {
@@ -141,7 +138,7 @@ namespace Awsmock::Database {
                                     }) != _restApis.end();
     }
 
-    bool ApiGatewayMemoryDb::RestApiExists(const std::string &id) const {
+    bool ApiGatewayMemoryRepository::RestApiExists(const std::string &id) const {
 
         return std::ranges::find_if(_restApis,
                                     [id](const std::pair<std::string, Entity::ApiGateway::RestApi> &restApi) {
@@ -149,7 +146,7 @@ namespace Awsmock::Database {
                                     }) != _restApis.end();
     }
 
-    Entity::ApiGateway::RestApi ApiGatewayMemoryDb::CreateRestApi(const Entity::ApiGateway::RestApi &restApi) {
+    Entity::ApiGateway::RestApi ApiGatewayMemoryRepository::CreateRestApi(Entity::ApiGateway::RestApi &restApi) const {
         boost::mutex::scoped_lock lock(_restApiMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
@@ -161,7 +158,7 @@ namespace Awsmock::Database {
     // ========================================================================================================================
     // AwsMock internal
     // ========================================================================================================================
-    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryDb::ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryRepository::ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
         std::vector<Entity::ApiGateway::ApiKey> values;
@@ -190,7 +187,7 @@ namespace Awsmock::Database {
         return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
     }
 
-    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryDb::ListRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::ListRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         boost::mutex::scoped_lock lock(_restApiMutex);
 
         std::vector<Entity::ApiGateway::RestApi> values;

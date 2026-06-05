@@ -9,17 +9,17 @@ namespace Awsmock::Service {
     SecretsManagerServer::SecretsManagerServer() : AbstractServer("secretsmanager") {
 
         // Manager configuration
-        _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.secretsmanager.monitoring-period");
-        _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.secretsmanager.backup.active");
-        _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.secretsmanager.backup.cron");
+        const int monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.secretsmanager.monitoring-period");
+        const bool backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.secretsmanager.backup.active");
+        const std::string backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.secretsmanager.backup.cron");
         log_debug << "SecretsManager rest module initialized";
 
         // Start secrets manager monitoring update counters
-        Core::Scheduler::instance().AddTask("secretsmanager-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("secretsmanager-monitoring", [this] { this->UpdateCounter(); }, monitoringPeriod);
 
         // Start backup
-        if (_backupActive) {
-            Core::Scheduler::instance().AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, _backupCron);
+        if (backupActive) {
+            Core::Scheduler::instance().AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, backupCron);
         }
 
         // Connect stop signal
@@ -29,7 +29,7 @@ namespace Awsmock::Service {
     }
 
     void SecretsManagerServer::UpdateCounter() const {
-        const long secrets = _secretsManagerDatabase.CountSecrets();
+        const long secrets = _secretsManagerDatabase->CountSecrets();
         Core::EventBus::instance().sigMetricGauge(SECRETSMANAGER_SECRETS_COUNT, {}, {}, secrets);
         log_trace << "Secrets manager update counter finished";
     }

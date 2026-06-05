@@ -2,13 +2,13 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/memorydb/SecretsManagerMemoryDb.h>
+#include <awsmock/repository/secretsmanager/SecretsManagerMemoryRepository.h>
 
 namespace Awsmock::Database {
 
-    boost::mutex SecretsManagerMemoryDb::_secretMutex;
+    boost::mutex SecretsManagerMemoryRepository::_secretMutex;
 
-    bool SecretsManagerMemoryDb::SecretExists(const std::string &region, const std::string &name) {
+    bool SecretsManagerMemoryRepository::SecretExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_secrets,
                                     [region, name](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
@@ -16,7 +16,7 @@ namespace Awsmock::Database {
                                     }) != _secrets.end();
     }
 
-    bool SecretsManagerMemoryDb::SecretExistsByArn(const std::string &arn) const {
+    bool SecretsManagerMemoryRepository::SecretExistsByArn(const std::string &arn) const {
 
         return std::ranges::find_if(_secrets,
                                     [arn](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
@@ -24,11 +24,11 @@ namespace Awsmock::Database {
                                     }) != _secrets.end();
     }
 
-    bool SecretsManagerMemoryDb::SecretExists(const Entity::SecretsManager::Secret &secret) {
+    bool SecretsManagerMemoryRepository::SecretExists(const Entity::SecretsManager::Secret &secret) const {
         return SecretExists(secret.region, secret.name);
     }
 
-    bool SecretsManagerMemoryDb::SecretExists(const std::string &secretId) {
+    bool SecretsManagerMemoryRepository::SecretExists(const std::string &secretId) const {
 
         return std::ranges::find_if(_secrets,
                                     [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
@@ -36,7 +36,11 @@ namespace Awsmock::Database {
                                     }) != _secrets.end();
     }
 
-    Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretById(const std::string &oid) {
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::GetSecretById(bsoncxx::oid oid) const {
+        return GetSecretById(oid.to_string());
+    }
+
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::GetSecretById(const std::string &oid) const {
 
         const auto it = std::ranges::find_if(_secrets,
                                              [oid](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
@@ -50,7 +54,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByRegionName(const std::string &region, const std::string &name) {
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::GetSecretByRegionName(const std::string &region, const std::string &name) const {
 
         Entity::SecretsManager::Secret result;
 
@@ -66,7 +70,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretBySecretId(const std::string &secretId) {
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::GetSecretBySecretId(const std::string &secretId) const {
 
         Entity::SecretsManager::Secret result;
 
@@ -82,7 +86,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByArn(const std::string &arn) {
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::GetSecretByArn(const std::string &arn) const {
 
         Entity::SecretsManager::Secret result;
 
@@ -98,7 +102,7 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SecretsManager::Secret SecretsManagerMemoryDb::CreateSecret(const Entity::SecretsManager::Secret &secret) {
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::CreateSecret(Entity::SecretsManager::Secret &secret) const {
         boost::mutex::scoped_lock lock(_secretMutex);
 
         const std::string oid = Core::StringUtils::CreateRandomUuid();
@@ -107,7 +111,7 @@ namespace Awsmock::Database {
         return GetSecretById(oid);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerMemoryDb::UpdateSecret(const Entity::SecretsManager::Secret &secret) {
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::UpdateSecret(Entity::SecretsManager::Secret &secret) const {
 
         boost::mutex::scoped_lock lock(_secretMutex);
 
@@ -123,7 +127,14 @@ namespace Awsmock::Database {
         return {};
     }
 
-    Entity::SecretsManager::SecretList SecretsManagerMemoryDb::ListSecrets() const {
+    Entity::SecretsManager::Secret SecretsManagerMemoryRepository::CreateOrUpdateSecret(Entity::SecretsManager::Secret &secret) const {
+        if (SecretExists(secret)) {
+            return UpdateSecret(secret);
+        }
+        return CreateSecret(secret);
+    }
+
+    Entity::SecretsManager::SecretList SecretsManagerMemoryRepository::ListSecrets() const {
 
         Entity::SecretsManager::SecretList secretList;
 
@@ -135,7 +146,7 @@ namespace Awsmock::Database {
         return secretList;
     }
 
-    long SecretsManagerMemoryDb::CountSecrets(const std::string &region) const {
+    long SecretsManagerMemoryRepository::CountSecrets(const std::string &region) const {
 
         long count = 0;
         if (region.empty()) {
@@ -150,7 +161,7 @@ namespace Awsmock::Database {
         return count;
     }
 
-    void SecretsManagerMemoryDb::DeleteSecret(const Entity::SecretsManager::Secret &secret) {
+    void SecretsManagerMemoryRepository::DeleteSecret(const Entity::SecretsManager::Secret &secret) const {
         boost::mutex::scoped_lock lock(_secretMutex);
 
         std::string region = secret.region;
@@ -162,9 +173,9 @@ namespace Awsmock::Database {
         log_debug << "Secret deleted, count: " << count;
     }
 
-    long SecretsManagerMemoryDb::DeleteAllSecrets() {
+    long SecretsManagerMemoryRepository::DeleteAllSecrets() const {
         boost::mutex::scoped_lock lock(_secretMutex);
-        const long deleted = _secrets.size();
+        const long deleted = static_cast<long>(_secrets.size());
         _secrets.clear();
         log_debug << "Secrets deleted, count: " << deleted;
         return deleted;
