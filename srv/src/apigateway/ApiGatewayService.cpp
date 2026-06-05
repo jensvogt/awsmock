@@ -13,7 +13,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_api_key");
         log_debug << "Create API key request, region:  " << request.region << " customerId: " << request.customerId;
 
-        if (_apiGatewayDatabase.ApiKeyExists(request.region, request.name)) {
+        if (_apiGatewayDatabase->ApiKeyExists(request.region, request.name)) {
             log_error << "API key exists already, region: " << request.region << " name: " << request.customerId;
             throw Core::ServiceException("API key exists already, region: " + request.region + " name: " + request.customerId);
         }
@@ -37,7 +37,7 @@ namespace Awsmock::Service {
             }
 
             // Save to the database
-            key = _apiGatewayDatabase.CreateKey(key);
+            key = _apiGatewayDatabase->CreateKey(key);
 
             log_trace << "Api key created, name: " + key.ToJson();
             return Dto::ApiGateway::Mapper::map(request, key);
@@ -55,7 +55,7 @@ namespace Awsmock::Service {
         try {
 
             // Get the list of API keys
-            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase.GetApiKeys(request.nameQuery, request.customerId, request.position, request.limit);
+            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase->GetApiKeys(request.nameQuery, request.customerId, request.position, request.limit);
 
             log_trace << "Get API keys, count: " << keys.size();
             Dto::ApiGateway::GetApiKeysResponse response{};
@@ -77,7 +77,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_api_key");
         log_debug << "Delete API key request, region:  " << request.region << " apiKey: " << request.apiKey;
 
-        if (!_apiGatewayDatabase.ApiKeyExists(request.apiKey)) {
+        if (!_apiGatewayDatabase->ApiKeyExists(request.apiKey)) {
             log_error << "API key does not exist, region: " << request.region << " apiKey: " << request.apiKey;
             throw Core::ServiceException("API key does not exist, region: " + request.region + " apiKey: " + request.apiKey);
         }
@@ -85,7 +85,7 @@ namespace Awsmock::Service {
         try {
 
             // Delete it from the database
-            _apiGatewayDatabase.DeleteKey(request.apiKey);
+            _apiGatewayDatabase->DeleteKey(request.apiKey);
 
             log_trace << "Api key deleted, id: " + request.apiKey;
 
@@ -99,7 +99,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_rest_api");
         log_debug << "Create REST API request, region:  " << request.region << ", name: " << request.name;
 
-        if (_apiGatewayDatabase.ApiKeyExists(request.region, request.name)) {
+        if (_apiGatewayDatabase->ApiKeyExists(request.region, request.name)) {
             log_error << "API key exists already, region: " << request.region << " name: " << request.name;
             throw Core::ServiceException("API key exists already, region: " + request.region + " name: " + request.name);
         }
@@ -115,7 +115,7 @@ namespace Awsmock::Service {
             }
 
             // Save to the database
-            restApi = _apiGatewayDatabase.CreateRestApi(restApi);
+            restApi = _apiGatewayDatabase->CreateRestApi(restApi);
 
             log_trace << "REST API created, name: " + restApi.name;
             return Dto::ApiGateway::Mapper::map(request, restApi);
@@ -133,8 +133,8 @@ namespace Awsmock::Service {
         try {
 
             // Get the list of API keys
-            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase.ListApiKeyCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            const long total = _apiGatewayDatabase.CountApiKeys();
+            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase->ListApiKeyCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const long total = _apiGatewayDatabase->CountApiKeys();
 
             log_trace << "Get API keys, count: " << keys.size();
             Dto::ApiGateway::ListApiKeyCountersResponse response{};
@@ -152,7 +152,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_key");
         log_debug << "Get API key counter request, region:  " << request.region;
 
-        if (!_apiGatewayDatabase.ApiKeyExists(request.id)) {
+        if (!_apiGatewayDatabase->ApiKeyExists(request.id)) {
             log_error << "API key does not exist, region: " << request.region << ", id: " << request.id;
             throw Core::ServiceException("API key does not exist, region: " + request.region + ", apiKey: " + request.id);
         }
@@ -160,7 +160,7 @@ namespace Awsmock::Service {
         try {
 
             // Get the API key
-            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase.GetApiKeyById(request.id);
+            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->GetApiKeyById(request.id);
 
             Dto::ApiGateway::GetApiKeyCounterResponse response{};
             response.apiKey = Dto::ApiGateway::Mapper::map(key);
@@ -176,7 +176,7 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "update_api_key");
         log_debug << "Update API key counter request, region:  " << request.apiKey.id;
 
-        if (!_apiGatewayDatabase.ApiKeyExists(request.apiKey.id)) {
+        if (!_apiGatewayDatabase->ApiKeyExists(request.apiKey.id)) {
             log_error << "API key does not exist, region: " << request.region << " id: " << request.apiKey.id;
             throw Core::ServiceException("API key does not exist, region: " + request.region + " id: " + request.apiKey.id);
         }
@@ -185,7 +185,7 @@ namespace Awsmock::Service {
 
             // Update the API key
             Database::Entity::ApiGateway::ApiKey key = Dto::ApiGateway::Mapper::map(request.apiKey);
-            key = _apiGatewayDatabase.UpdateApiKey(key);
+            key = _apiGatewayDatabase->UpdateApiKey(key);
             log_debug << "Api key updated, id: " + key.id;
 
         } catch (bsoncxx::exception &exc) {
@@ -201,8 +201,8 @@ namespace Awsmock::Service {
         try {
 
             // Get the list of REST APIs
-            const std::vector<Database::Entity::ApiGateway::RestApi> restApis = _apiGatewayDatabase.ListRestApiCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            const long total = _apiGatewayDatabase.CountApiKeys();
+            const std::vector<Database::Entity::ApiGateway::RestApi> restApis = _apiGatewayDatabase->ListRestApiCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const long total = _apiGatewayDatabase->CountApiKeys();
 
             log_trace << "Get REST APIs, count: " << restApis.size();
             Dto::ApiGateway::ListRestApiCountersResponse response{};

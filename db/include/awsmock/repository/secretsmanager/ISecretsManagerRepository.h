@@ -1,49 +1,37 @@
-﻿//
-// Created by vogje01 on 29/05/2023.
+//
+// Created by vogje01 on 5/24/26.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H
-#define AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H
+#pragma once
 
-// C++ standard includes
+// C++ includes
+#include <optional>
 #include <string>
 #include <vector>
 
-// AwsMock includes
-#include "DatabaseBase.h"
-
-
-#include <awsmock/core/DirUtils.h>
-#include <awsmock/core/FileUtils.h>
-#include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/logging/LogStream.h>
+// Awsmock includes
 #include <awsmock/entity/secretsmanager/Secret.h>
-#include <awsmock/memorydb/SecretsManagerMemoryDb.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
 
     /**
-     * @brief Secrets manager MongoDB database.
+     * @brief Interface for secrets manager repository operations.
      *
-     * @author jens.vogt\@opitz-consulting.com
+     * Provides an abstraction for storing, retrieving, and managing
+     * secret-manager-related data.
      */
-    class SecretsManagerDatabase : public AwsMock::Database::DatabaseBase {
+    class ISecretsManagerRepository {
 
       public:
 
         /**
-         * @brief Constructor
+         * @brief Virtual destructor for the IS3Repository interface.
+         *
+         * Ensures derived classes' destructor is invoked correctly
+         * during object destruction to release resources.
          */
-        explicit SecretsManagerDatabase();
-
-        /**
-         * @brief Singleton instance
-         */
-        static SecretsManagerDatabase &instance() {
-            static SecretsManagerDatabase secretsManagerDatabase;
-            return secretsManagerDatabase;
-        }
+        virtual ~ISecretsManagerRepository() = default;
 
         /**
          * @brief Secret exists
@@ -53,7 +41,8 @@ namespace Awsmock::Database {
          * @return true if secret exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool SecretExists(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        virtual bool SecretExists(const std::string &region, const std::string &name) const = 0;
 
         /**
          * @brief Secret exists
@@ -62,7 +51,8 @@ namespace Awsmock::Database {
          * @return true if secret exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool SecretExists(const Entity::SecretsManager::Secret &secret) const;
+        [[nodiscard]]
+        virtual bool SecretExists(const Entity::SecretsManager::Secret &secret) const = 0;
 
         /**
          * @brief Secret exists by ID
@@ -71,7 +61,8 @@ namespace Awsmock::Database {
          * @return true if secret exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool SecretExists(const std::string &secretId) const;
+        [[nodiscard]]
+        virtual bool SecretExists(const std::string &secretId) const = 0;
 
         /**
          * @brief Secret exists by ARN
@@ -80,7 +71,8 @@ namespace Awsmock::Database {
          * @return true if secret exists
          * @throws DatabaseException
          */
-        [[nodiscard]] bool SecretExistsByArn(const std::string &arn) const;
+        [[nodiscard]]
+        virtual bool SecretExistsByArn(const std::string &arn) const = 0;
 
         /**
          * @brief Returns the secret by oid
@@ -89,7 +81,8 @@ namespace Awsmock::Database {
          * @return secret, if existing
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::SecretsManager::Secret GetSecretById(bsoncxx::oid oid) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret GetSecretById(bsoncxx::oid oid) const = 0;
 
         /**
          * @brief Returns the secret by userPoolId
@@ -98,7 +91,8 @@ namespace Awsmock::Database {
          * @return secret, if existing
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::SecretsManager::Secret GetSecretById(const std::string &oid) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret GetSecretById(const std::string &oid) const = 0;
 
         /**
          * @brief Returns the secret by AWS ARN
@@ -107,7 +101,8 @@ namespace Awsmock::Database {
          * @return secret, if existing
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::SecretsManager::Secret GetSecretByArn(const std::string &arn) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret GetSecretByArn(const std::string &arn) const = 0;
 
         /**
          * @brief Returns the secret by region and name.
@@ -116,7 +111,8 @@ namespace Awsmock::Database {
          * @param name secret name
          * @return secret entity
          */
-        [[nodiscard]] Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name) const = 0;
 
         /**
          * @brief Returns the secret by secret ID.
@@ -124,16 +120,18 @@ namespace Awsmock::Database {
          * @param secretId secret ID
          * @return secret entity
          */
-        [[nodiscard]] Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId) const = 0;
 
         /**
          * @brief Creates a new secret in the secrets collection
          *
          * @param secret secret entity
-         * @return created secret entity
+         * @return created a secret entity
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret CreateSecret(Entity::SecretsManager::Secret &secret) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret CreateSecret(Entity::SecretsManager::Secret &secret) const = 0;
 
         /**
          * @brief Updates an existing secret
@@ -142,7 +140,8 @@ namespace Awsmock::Database {
          * @return updated secret entity
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret UpdateSecret(Entity::SecretsManager::Secret &secret) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret UpdateSecret(Entity::SecretsManager::Secret &secret) const = 0;
 
         /**
          * @brief Creates or updates a secret in the secret collection
@@ -151,7 +150,8 @@ namespace Awsmock::Database {
          * @return created secret entity
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret CreateOrUpdateSecret(Entity::SecretsManager::Secret &secret) const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::Secret CreateOrUpdateSecret(Entity::SecretsManager::Secret &secret) const = 0;
 
         /**
          * @brief Returns a list of secrets
@@ -159,7 +159,8 @@ namespace Awsmock::Database {
          * @return list of available secrets
          * @throws DatabaseException
          */
-        Entity::SecretsManager::SecretList ListSecrets() const;
+        [[nodiscard]]
+        virtual Entity::SecretsManager::SecretList ListSecrets() const = 0;
 
         /**
          * @brief Returns the total number of secrets
@@ -168,7 +169,8 @@ namespace Awsmock::Database {
          * @return total number of secrets
          * @throws DatabaseException
          */
-        long CountSecrets(const std::string &region = {}) const;
+        [[nodiscard]]
+        virtual long CountSecrets(const std::string &region = {}) const = 0;
 
         /**
          * @brief Delete a secret.
@@ -176,7 +178,7 @@ namespace Awsmock::Database {
          * @param secret secret entity
          * @throws DatabaseException
          */
-        void DeleteSecret(const Entity::SecretsManager::Secret &secret) const;
+        virtual void DeleteSecret(const Entity::SecretsManager::Secret &secret) const = 0;
 
         /**
          * @brief Delete all secret.
@@ -184,28 +186,8 @@ namespace Awsmock::Database {
          * @return number of entities deleted
          * @throws DatabaseException
          */
-        long DeleteAllSecrets() const;
-
-      private:
-
-        mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
-
-        /**
-         * Database name
-         */
-        std::string _databaseName;
-
-        /**
-         * Database collection name
-         */
-        std::string _collectionName;
-
-        /**
-         * Lambda in-memory database
-         */
-        SecretsManagerMemoryDb &_memoryDb;
+        [[nodiscard]]
+        virtual long DeleteAllSecrets() const = 0;
     };
 
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_SECRETSMANAGER_DATABASE_H

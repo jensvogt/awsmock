@@ -50,9 +50,9 @@ namespace Awsmock::Database {
         S3ServiceFixture() = default;
         ~S3ServiceFixture() {
             try {
-                const long deletedObjects = S3MongoRepository::instance().DeleteAllObjects();
+                const long deletedObjects = RepositoryFactory::instance().s3Repository()->DeleteAllObjects();
                 log_debug << "S3 objects deleted, count: " << deletedObjects;
-                const long deletedBuckets = S3MongoRepository::instance().DeleteAllBuckets();
+                const long deletedBuckets = RepositoryFactory::instance().s3Repository()->DeleteAllBuckets();
                 log_debug << "S3 buckets deleted, count: " << deletedBuckets;
             } catch (const std::exception &exc) {
                 log_error << "S3 fixture cleanup failed: " << exc.what();

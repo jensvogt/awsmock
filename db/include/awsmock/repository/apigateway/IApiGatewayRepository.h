@@ -1,0 +1,178 @@
+//
+// Created by vogje01 on 5/24/26.
+//
+
+#pragma once
+
+// C++ includes
+#include <optional>
+#include <string>
+#include <vector>
+
+// Awsmock includes
+#include <awsmock/entity/apigateway/ApiKey.h>
+#include <awsmock/entity/apigateway/RestApi.h>
+#include <awsmock/utils/SortColumn.h>
+
+namespace Awsmock::Database {
+
+    /**
+     * @brief Interface for application repository operations.
+     *
+     * Provides an abstraction for storing, retrieving, and managing
+     * Cognito-related data.
+     */
+    class IApiGatewayRepository {
+
+      public:
+
+        /**
+         * @brief Virtual destructor for the IApplicationRepository interface.
+         *
+         * Ensures derived classes' destructor is invoked correctly
+         * during object destruction to release resources.
+         */
+        virtual ~IApiGatewayRepository() = default;
+
+        /**
+         * @brief Check the existence of an API key
+         *
+         * @param id API key ID
+         */
+        [[nodiscard]]
+        virtual bool ApiKeyExists(const std::string &id) const = 0;
+
+        /**
+         * @brief Check the existence of an API key
+         *
+         * @param region AWS region
+         * @param name API key name
+         */
+        [[nodiscard]]
+        virtual bool ApiKeyExists(const std::string &region, const std::string &name) const = 0;
+
+        /**
+         * @brief Create a new API gateway key
+         *
+         * @param key API gateway key to create
+         * @return created api key
+         */
+        [[nodiscard]]
+        virtual Entity::ApiGateway::ApiKey CreateKey(Entity::ApiGateway::ApiKey &key) const = 0;
+
+        /**
+         * @brief Returns a list of API keys
+         *
+         * @param nameQuery name query
+         * @param customerId customer ID
+         * @param position current position
+         * @param limit maximal number of keys
+         * @return created api key
+         */
+        [[nodiscard]]
+        virtual std::vector<Entity::ApiGateway::ApiKey> GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const = 0;
+
+        /**
+         * @brief Returns an API key by ID
+         *
+         * @param id name query
+         * @return api key
+         */
+        [[nodiscard]]
+        virtual Entity::ApiGateway::ApiKey GetApiKeyById(const std::string &id) const = 0;
+
+        /**
+         * @brief Updates an existing API key
+         *
+         * @param key API key to update
+         * @return updated api key
+         */
+        [[nodiscard]]
+        virtual Entity::ApiGateway::ApiKey UpdateApiKey(Entity::ApiGateway::ApiKey &key) const = 0;
+
+        /**
+         * @brief Import an API key
+         *
+         * @par
+         * If the provided API key exists already, it will be updated, otherwise inserted. The modified/created timestamp will be updated accordingly.
+         *
+         * @param key API key to import
+         */
+        virtual void ImportApiKey(Entity::ApiGateway::ApiKey &key) const = 0;
+
+        /**
+         * @brief Returns the total number of keys
+         *
+         * @return API key count
+         */
+        [[nodiscard]]
+        virtual long CountApiKeys() const = 0;
+
+        /**
+         * @brief Delete an API gateway key by ID
+         *
+         * @param id API gateway key ID
+         */
+        virtual void DeleteKey(const std::string &id) const = 0;
+
+        /**
+         * @brief Delete all keys
+         *
+         * @return number of entities deleted
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        virtual long DeleteAllKeys() const = 0;
+
+        /**
+         * @brief Check the existence of an REST API
+         *
+         * @param id REST API ID
+         */
+        [[nodiscard]]
+        virtual bool RestApiExists(const std::string &id) const = 0;
+
+        /**
+         * @brief Check the existence of an REST API
+         *
+         * @param region AWS region
+         * @param name REST API name
+         */
+        [[nodiscard]]
+        virtual bool RestApiExists(const std::string &region, const std::string &name) const = 0;
+
+        /**
+         * @brief Create a new REST API
+         *
+         * @param restApi REST API entity to create
+         * @return created REST API entity
+         */
+        [[nodiscard]]
+        virtual Entity::ApiGateway::RestApi CreateRestApi(Entity::ApiGateway::RestApi &restApi) const = 0;
+
+        /**
+         * @brief Returns a list of API key counters
+         *
+         * @param prefix name prefix
+         * @param pageSize page size customer ID
+         * @param pageIndex page index
+         * @param sortColumns sorting columns
+         * @return list of API key counters
+         */
+        [[nodiscard]]
+        virtual std::vector<Entity::ApiGateway::ApiKey> ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
+
+        /**
+         * @brief Returns a list of REST API counters
+         *
+         * @param prefix name prefix
+         * @param pageSize page size customer ID
+         * @param pageIndex page index
+         * @param sortColumns sorting columns
+         * @return list of REST API counters
+         */
+        [[nodiscard]]
+        virtual std::vector<Entity::ApiGateway::RestApi> ListRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
+    };
+
+}// namespace Awsmock::Database

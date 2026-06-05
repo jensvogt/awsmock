@@ -8,9 +8,11 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
+#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/ssm/SSMMongoRepository.h>
 #include <../../../../../db/include/awsmock/repository/transfer/TransferMongoRepository.h>
 #include <awsmock/core/BackupUtils.h>
@@ -29,9 +31,7 @@
 #include <awsmock/dto/module/model/Infrastructure.h>
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
-#include <awsmock/repository/ApiGatewayDatabase.h>
 #include <awsmock/repository/RepositoryFactory.h>
-#include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
 #include <awsmock/repository/sns/SNSMongoRepository.h>

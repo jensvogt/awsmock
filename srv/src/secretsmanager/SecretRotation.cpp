@@ -23,7 +23,7 @@ namespace Awsmock::Service {
         log_debug << "Secret testet, arn: " << secret.arn;
 
         secret.nextRotatedDate = GetNextRotationDate(secret);
-        secret = Database::SecretsManagerDatabase::instance().UpdateSecret(secret);
+        secret = Database::RepositoryFactory::instance().secretsmanagerRepository()->UpdateSecret(secret);
         log_debug << "Secret updated, arn: " << secret.arn;
     }
 

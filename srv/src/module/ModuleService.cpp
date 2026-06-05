@@ -134,8 +134,8 @@ namespace Awsmock::Service {
             } else if (module == "secretsmanager") {
 
                 if (request.IsInfrastructure()) {
-                    Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-                    infrastructure.secrets = _secretsManagerDatabase.ListSecrets();
+                    const std::shared_ptr<Database::ISecretsManagerRepository> _secretsManagerDatabase = Database::RepositoryFactory::instance().secretsmanagerRepository();
+                    infrastructure.secrets = _secretsManagerDatabase->ListSecrets();
                 }
 
             } else if (module == "transfer") {
@@ -169,8 +169,8 @@ namespace Awsmock::Service {
             } else if (module == "apigateway") {
 
                 if (request.IsInfrastructure()) {
-                    Database::ApiGatewayDatabase &_apiGatewayDatabase = Database::ApiGatewayDatabase::instance();
-                    infrastructure.apiKeys = _apiGatewayDatabase.GetApiKeys();
+                    const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
+                    infrastructure.apiKeys = _apiGatewayDatabase->GetApiKeys({}, {}, {}, 0);
                 }
             }
         }
@@ -334,9 +334,9 @@ namespace Awsmock::Service {
 
         // SecretsManager
         if (!infrastructure.secrets.empty()) {
-            const Database::SecretsManagerDatabase &_secretsDatabase = Database::SecretsManagerDatabase::instance();
+            const std::shared_ptr<Database::ISecretsManagerRepository> _secretsDatabase = Database::RepositoryFactory::instance().secretsmanagerRepository();
             for (auto &secret: infrastructure.secrets) {
-                secret = _secretsDatabase.CreateOrUpdateSecret(secret);
+                secret = _secretsDatabase->CreateOrUpdateSecret(secret);
             }
             log_info << "Secrets imported, count: " << infrastructure.secrets.size();
         }
@@ -361,9 +361,9 @@ namespace Awsmock::Service {
 
         // API gateway keys
         if (!infrastructure.apiKeys.empty()) {
-            const Database::ApiGatewayDatabase &_apiGatewayDatabase = Database::ApiGatewayDatabase::instance();
+            const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
             for (auto &apiKey: infrastructure.apiKeys) {
-                _apiGatewayDatabase.ImportApiKey(apiKey);
+                _apiGatewayDatabase->ImportApiKey(apiKey);
             }
             log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
         }
@@ -418,7 +418,7 @@ namespace Awsmock::Service {
             } else if (m == "dynamodb") {
                 count += Database::RepositoryFactory::instance().dynamodbRepository()->deleteAllItems();
             } else if (m == "secretsmanager") {
-                count += Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
+                count += Database::RepositoryFactory::instance().secretsmanagerRepository()->DeleteAllSecrets();
             } else if (m == "kms") {
                 count += Database::RepositoryFactory::instance().kmsRepository()->deleteAllKeys();
             } else if (m == "ssm") {
@@ -427,7 +427,7 @@ namespace Awsmock::Service {
                 count += Database::RepositoryFactory::instance().s3Repository()->DeleteObjects("eu-central-1", "transfer-server", {});
                 count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "apigateway") {
-                count += Database::ApiGatewayDatabase::instance().DeleteAllKeys();
+                count += Database::RepositoryFactory::instance().apigatewayRepository()->DeleteAllKeys();
             }
         }
     }

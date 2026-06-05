@@ -11,8 +11,8 @@
 #include "awsmock/core/AwsUtils.h"
 
 
+#include <../../include/awsmock/repository/secretsmanager/SecretsManagerDatabase.h>
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/repository/SecretsManagerDatabase.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};

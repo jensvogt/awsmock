@@ -9,9 +9,9 @@
 
 // AwsMock includes
 #include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
+#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
-#include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace Awsmock::Service {

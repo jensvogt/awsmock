@@ -8,11 +8,11 @@
 #include <string>
 
 // AwsMock includes
+#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -41,6 +41,9 @@ namespace Awsmock::Service {
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
@@ -56,30 +59,7 @@ namespace Awsmock::Service {
         /**
          * @brief Database connection
          */
-        Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
-
-        /**
-         * @brief Secrets manager backup flag.
-         *
-         * @par
-         * If true, backup tables and items based on cron expression
-         */
-        bool _backupActive;
-
-        /**
-         * @brief Secrets manager backup cron schedule.
-         *
-         * @par
-         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
-         *
-         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
-         */
-        std::string _backupCron;
-
-        /**
-         * Monitoring period
-         */
-        int _monitoringPeriod;
+        std::shared_ptr<Database::ISecretsManagerRepository> _secretsManagerDatabase = Database::RepositoryFactory::instance().secretsmanagerRepository();
     };
 
 }// namespace Awsmock::Service

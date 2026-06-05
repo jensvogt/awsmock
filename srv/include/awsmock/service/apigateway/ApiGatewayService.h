@@ -10,8 +10,10 @@
 
 // AwsMock includes
 #include "awsmock/dto/apigateway/CreateRestApiResponse.h"
+#include "awsmock/repository/RepositoryFactory.h"
 
 
+#include <../../../../../db/include/awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
@@ -32,7 +34,6 @@
 #include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
-#include <awsmock/repository/ApiGatewayDatabase.h>
 
 namespace Awsmock::Service {
 
@@ -55,7 +56,7 @@ namespace Awsmock::Service {
          *
          * @param ioc boost IO context
          */
-        explicit ApiGatewayService(boost::asio::io_context &ioc) : _apiGatewayDatabase(Database::ApiGatewayDatabase::instance()), _ioc(ioc) {}
+        explicit ApiGatewayService(boost::asio::io_context &ioc) : _ioc(ioc) {}
 
         /**
          * @brief Creates a new API key
@@ -123,16 +124,20 @@ namespace Awsmock::Service {
          * @param request internal REST API counters request
          * @return list of REST API counters
          */
-        [[nodiscard]] Dto::ApiGateway::ListRestApiCountersResponse ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
+        [[nodiscard]]
+        Dto::ApiGateway::ListRestApiCountersResponse ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
 
         /**
          * Database connection
          */
-        Database::ApiGatewayDatabase &_apiGatewayDatabase;
+        std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
 
         /**
          * Boost asio IO context

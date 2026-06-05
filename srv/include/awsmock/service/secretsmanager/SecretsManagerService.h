@@ -12,6 +12,7 @@
 #include "awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h"
 
 
+#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
@@ -47,7 +48,6 @@
 #include <awsmock/dto/secretsmanager/mapper/Mapper.h>
 #include <awsmock/dto/secretsmanager/model/VersionStage.h>
 #include <awsmock/entity/lambda/Lambda.h>
-#include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/secretsmanager/SecretRotation.h>
@@ -264,7 +264,7 @@ namespace Awsmock::Service {
         /**
          * Secrets manager database connection
          */
-        Database::SecretsManagerDatabase &_secretsManagerDatabase;
+        std::shared_ptr<Database::ISecretsManagerRepository> _secretsManagerDatabase = Database::RepositoryFactory::instance().secretsmanagerRepository();
 
         /**
          * Lambda database connection

@@ -8,6 +8,9 @@
 #include <memory>
 
 // Awsmock includes
+#include <awsmock/repository/apigateway/ApiGatewayMemoryRepository.h>
+#include <awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
+#include <awsmock/repository/apigateway/IApiGatewayRepository.h>
 #include <awsmock/repository/application/ApplicationMemoryRepository.h>
 #include <awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/repository/application/IApplicationRepository.h>
@@ -32,6 +35,9 @@
 #include <awsmock/repository/s3/IS3Repository.h>
 #include <awsmock/repository/s3/S3MemoryRepository.h>
 #include <awsmock/repository/s3/S3MongoRepository.h>
+#include <awsmock/repository/secretsmanager/ISecretsManagerRepository.h>
+#include <awsmock/repository/secretsmanager/SecretsManagerMemoryRepository.h>
+#include <awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/repository/sns/ISNSRepository.h>
 #include <awsmock/repository/sns/SNSMemoryRepository.h>
 #include <awsmock/repository/sns/SNSMongoRepository.h>
@@ -80,6 +86,8 @@ namespace Awsmock::Database {
             _dynamodbRepo = createDynamodbRepository();
             _lambdaRepo = createLambdaRepository();
             _applicationRepo = createApplicationRepository();
+            _secretsmanagerRepo = createSecretsManagerRepository();
+            _apigatewayRepo = createApiGatewayRepository();
         }
 
         [[nodiscard]]
@@ -118,6 +126,12 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::shared_ptr<IApplicationRepository> applicationRepository() const { return _applicationRepo; }
 
+        [[nodiscard]]
+        std::shared_ptr<ISecretsManagerRepository> secretsmanagerRepository() const { return _secretsmanagerRepo; }
+
+        [[nodiscard]]
+        std::shared_ptr<IApiGatewayRepository> apigatewayRepository() const { return _apigatewayRepo; }
+
       private:
 
         BackendType _backend = BackendType::MONGODB;
@@ -133,6 +147,8 @@ namespace Awsmock::Database {
         std::shared_ptr<IDynamoDbRepository> _dynamodbRepo;
         std::shared_ptr<ILambdaRepository> _lambdaRepo;
         std::shared_ptr<IApplicationRepository> _applicationRepo;
+        std::shared_ptr<ISecretsManagerRepository> _secretsmanagerRepo;
+        std::shared_ptr<IApiGatewayRepository> _apigatewayRepo;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> createModuleRepository() const {
@@ -264,6 +280,28 @@ namespace Awsmock::Database {
                     return std::make_shared<ApplicationMemoryRepository>();
             }
             return std::make_shared<ApplicationMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<ISecretsManagerRepository> createSecretsManagerRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<SecretsManagerMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<SecretsManagerMemoryRepository>();
+            }
+            return std::make_shared<SecretsManagerMemoryRepository>();
+        }
+
+        [[nodiscard]]
+        std::shared_ptr<IApiGatewayRepository> createApiGatewayRepository() const {
+            switch (_backend) {
+                case BackendType::MONGODB:
+                    return std::make_shared<ApiGatewayMongoRepository>();
+                case BackendType::MEMORY:
+                    return std::make_shared<ApiGatewayMemoryRepository>();
+            }
+            return std::make_shared<ApiGatewayMemoryRepository>();
         }
     };
 
