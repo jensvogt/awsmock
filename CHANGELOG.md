@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.18.56](https://github.com/jensvogt/awsmock/compare/1.18.55...v1.18.56) (2026-06-05)
+
+
+### Bug Fixes
+
+* core, database and service tests ([cad1874](https://github.com/jensvogt/awsmock/commit/cad18744ac5ffb8fd2d4f677d66b1b2518b55ef0))
+* core, database and service tests ([e651f11](https://github.com/jensvogt/awsmock/commit/e651f11c2308ccd26e45a766c9231a1a1100d776))
+* core, database and service tests ([ab87751](https://github.com/jensvogt/awsmock/commit/ab877513bca0d4a875d445a134564282707afad3))
+* core, database and service tests ([bb9017e](https://github.com/jensvogt/awsmock/commit/bb9017e96a35371604ca2efff9555fcafbc53708))
+* core, database and service tests ([6b3ea8a](https://github.com/jensvogt/awsmock/commit/6b3ea8a54ed8ead435fc9fef592b2131e6dae614))
+* core, database and service tests ([2d7778c](https://github.com/jensvogt/awsmock/commit/2d7778c12c5b2cd4acfa82a75a94f42a43342899))
+* core, database and service tests ([9246548](https://github.com/jensvogt/awsmock/commit/924654894bfe16b80dab342cd89834b225596134))
+* core, database and service tests ([1356bae](https://github.com/jensvogt/awsmock/commit/1356baedaa219f191e2fdaf47a10779cd1d38874))
+* core, database and service tests ([eccc0ce](https://github.com/jensvogt/awsmock/commit/eccc0ce20c1b76286ab235302282130c68cb460d))
+* log channels ([68394e6](https://github.com/jensvogt/awsmock/commit/68394e6afc230062d3f4147cbaf84538a43e5e45))
+* new database layer for SNS and modules ([95a7366](https://github.com/jensvogt/awsmock/commit/95a7366e16c7c9563b942343c70196f39bb98a81))
+* new database layer for SNS and modules ([33085e6](https://github.com/jensvogt/awsmock/commit/33085e6157b059f1be5d6efd8e8c5c4bcf5110a0))
+* new database layer for SNS and modules ([5ea9b54](https://github.com/jensvogt/awsmock/commit/5ea9b54f701adb6e7ba45ec208b3e5c65f72722e))
+* new database layer for SQS and cognito ([e2f461e](https://github.com/jensvogt/awsmock/commit/e2f461ef4c71ae3b90d53c8107af98226dbfa0f7))
+* new database layer for SQS and cognito ([6ddaef8](https://github.com/jensvogt/awsmock/commit/6ddaef8de9058708d109e330c5e03f51819d9ee9))
+* windows port new kms database layer ([ffdcfd2](https://github.com/jensvogt/awsmock/commit/ffdcfd290ab259fcfccef91310863e45a6ba2f20))
+* windows port of new database layer ([1a0e6b4](https://github.com/jensvogt/awsmock/commit/1a0e6b42e91a5c09bdc2c3089fb16ab519c5c5e1))
+* windows port of new database layer ([2177b0b](https://github.com/jensvogt/awsmock/commit/2177b0bee9502127997ef58e11ed48f4b70356a5))
+* windows port of new database layer ([d202b52](https://github.com/jensvogt/awsmock/commit/d202b52181fa94f0591ede5c8a4e1cecfa767376))
+* windows port of new database layer ([f13719b](https://github.com/jensvogt/awsmock/commit/f13719b12309bea8e404003dc8e497f931f5e5c7))
+
 ## [1.18.55](https://github.com/jensvogt/awsmock/compare/1.18.54...v1.18.55) (2026-06-01)
 
 
