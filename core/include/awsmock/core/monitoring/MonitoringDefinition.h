@@ -124,6 +124,8 @@
 // Api gateway
 #define API_GATEWAY_SERVICE_TIMER "api_gateway_service_timer"
 #define API_GATEWAY_SERVICE_COUNTER "api_gateway_service_counter"
+#define API_GATEWAY_PROXY_COUNTER "api_gateway_proxy_counter"
+#define API_GATEWAY_PROXY_TIMER "api_gateway_proxy_timer"
 
 // Docker
 #define DOCKER_CONTAINER_COUNT "docker_container_counter"

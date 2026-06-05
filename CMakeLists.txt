@@ -181,11 +181,11 @@ endif ()
 add_library(awsmockagw STATIC agw/src/ProxyListener.cpp agw/src/ProxySession.cpp)
 target_include_directories(awsmockagw PUBLIC ${CMAKE_SOURCE_DIR}/agw/include ${CMAKE_SOURCE_DIR}/core/include
         ${CMAKE_SOURCE_DIR}/dto/include)
-target_link_libraries(awsmockagw PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
+target_link_libraries(awsmockagw PRIVATE awsmockcore awsmockdto OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
         Boost::json Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono
         LibArchive::LibArchive unofficial::libmagic::libmagic PCRE2::POSIX PCRE2::8BIT)
-target_link_libraries(awsmockagw PUBLIC $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmockagw PUBLIC $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
+target_link_libraries(awsmockagw PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
+target_link_libraries(awsmockagw PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library

@@ -30,6 +30,7 @@ namespace Awsmock::Service {
 
     void ApiGatewayServer::UpdateCounter() const {
         log_trace << "ApiGateway monitoring starting";
+        
         //
         // const long users = _apiGatewayDatabase->countUsers({}, {}, {});
         // const long userPools = _apiGatewayDatabase->countUserPools({});
