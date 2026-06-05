@@ -2,6 +2,15 @@
 // Created by vogje01 on 04/01/2023.
 //
 
+// C++ includes
+#include <filesystem>
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 #include <awsmock/service/apigateway/ApiGatewayServer.h>
 
 namespace Awsmock::Service {
@@ -51,15 +60,44 @@ namespace Awsmock::Service {
         log_trace << "ApiGateway monitoring finished";
     }
 
+    static std::string ResolveAgwExecutable() {
+        auto name = Core::Configuration::instance().getOr<std::string>("awsmock.modules.api-gateway.proxy.executable", "awsmock-agw");
+        if (name.find('/') != std::string::npos)
+            return name;// already an absolute path
+
+        // Look next to the running manager binary before falling back to PATH
+#if defined(__linux__)
+        char buf[PATH_MAX];
+        if (const ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1); len > 0) {
+            buf[len] = '\0';
+            auto candidate = std::filesystem::path(buf).parent_path() / name;
+            if (std::filesystem::exists(candidate))
+                return candidate.string();
+        }
+#elif defined(__APPLE__)
+        char buf[PATH_MAX];
+        uint32_t size = sizeof(buf);
+        if (_NSGetExecutablePath(buf, &size) == 0) {
+            auto candidate = std::filesystem::path(buf).parent_path() / name;
+            if (std::filesystem::exists(candidate))
+                return candidate.string();
+        }
+#endif
+        return name;// fall back to PATH lookup via execvp
+    }
+
     void ApiGatewayServer::StartRestApis() {
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
         const auto restApis = _apiGatewayDatabase->listRestApis(region);
         if (restApis.empty()) return;
 
-        const auto executable = Core::Configuration::instance().getOr<std::string>("awsmock.modules.api-gateway.proxy.executable", "awsmock-agw");
+        const std::string executable = ResolveAgwExecutable();
         const int threads = Core::Configuration::instance().getOr<int>("awsmock.modules.api-gateway.proxy.threads", 4);
         const int targetPort = Core::Configuration::instance().getOr<int>("awsmock.modules.api-gateway.proxy.target-port", 4566);
         const auto targetHost = Core::Configuration::instance().getOr<std::string>("awsmock.modules.api-gateway.proxy.target-host", "localhost");
+        const auto logLevel = Core::LogStream::GetSeverity();
+
+        log_debug << "awsmock-agw executable resolved to: " << executable;
 
         for (const auto &restApi: restApis) {
             const int listenPort = Core::SystemUtils::GetNextFreePort();
@@ -82,13 +120,17 @@ namespace Awsmock::Service {
                     socketPath,
                     "--threads",
                     std::to_string(threads),
+                    "--log-level",
+                    logLevel,
             };
+
+            log_info << "Starting restApi proxy: " << executable << " --name " << restApi.name << " --port " << listenPort << " --target-host " << targetHost << ":" << targetPort;
 
             _controller.registerModule(cfg);
             if (_controller.start(restApi.name)) {
-                log_info << "Started restApi proxy, name: " << restApi.name << ", port: " << listenPort;
+                log_info << "Started restApi proxy, name: " << restApi.name << ", listenPort: " << listenPort;
             } else {
-                log_error << "Failed to start restApi proxy, name: " << restApi.name;
+                log_error << "Failed to start restApi proxy, name: " << restApi.name << " — is '" << executable << "' installed and executable?";
             }
         }
     }

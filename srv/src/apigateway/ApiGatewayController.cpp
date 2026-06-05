@@ -1,8 +1,14 @@
 
+#ifndef _WIN32
+// POSIX includes
+#include <spawn.h>
+#include <unistd.h>// environ
+#endif
+
 // Awsmock includes
-#include <awsmock/service/apigateway/ApiGatewayController.h>
 #include <awsmock/entity/module/ModuleState.h>
 #include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/service/apigateway/ApiGatewayController.h>
 #include <awsmock/service/apigateway/ApiGatewayControllerPlatform.h>
 
 namespace Awsmock::Service {
@@ -11,33 +17,38 @@ namespace Awsmock::Service {
 
     static Database::Entity::Module::ModuleState toModuleState(const Database::Entity::ProcessState state) {
         switch (state) {
-            case Database::Entity::ProcessState::RUNNING: return Database::Entity::Module::ModuleState::RUNNING;
+            case Database::Entity::ProcessState::RUNNING:
+                return Database::Entity::Module::ModuleState::RUNNING;
             case Database::Entity::ProcessState::STARTING:
-            case Database::Entity::ProcessState::RESTARTING: return Database::Entity::Module::ModuleState::STARTING;
-            default: return Database::Entity::Module::ModuleState::STOPPED;
+            case Database::Entity::ProcessState::RESTARTING:
+                return Database::Entity::Module::ModuleState::STARTING;
+            default:
+                return Database::Entity::Module::ModuleState::STOPPED;
         }
     }
 
     // Reads lines from fd until EOF and re-emits each line through Boost.Log.
     // Runs on a detached background thread; closes fd when done.
-    static void drainPipe(const int fd, const bool /*isError*/) {
+    static void drainPipe(const int fd) {
         std::string line;
         char ch;
-        auto emit = [&](const std::string &raw) {
-            log_raw(raw);
-        };
 #ifdef _WIN32
         while (_read(fd, &ch, 1) == 1) {
 #else
-            while (read(fd, &ch, 1) == 1) {
+        while (read(fd, &ch, 1) == 1) {
 #endif
             if (ch == '\n') {
-                emit(line);
+                if (!line.empty()) {
+                    log_raw(line);
+                }
                 line.clear();
-            } else
+            } else {
                 line += ch;
+            }
         }
-        if (!line.empty()) emit(line);
+        if (!line.empty()) {
+            log_raw(line);
+        }
 #ifdef _WIN32
         _close(fd);
 #else
@@ -125,8 +136,8 @@ namespace Awsmock::Service {
 
         const int outFd = _open_osfhandle(reinterpret_cast<intptr_t>(hOutRead), 0);
         const int errFd = _open_osfhandle(reinterpret_cast<intptr_t>(hErrRead), 0);
-        std::thread(drainPipe, outFd, false).detach();
-        std::thread(drainPipe, errFd, true).detach();
+        std::thread(drainPipe, outFd).detach();
+        std::thread(drainPipe, errFd).detach();
 
         if (waitForSocket(svc->config.socketPath, 5000)) {
             svc->state = Database::Entity::ProcessState::RUNNING;
@@ -150,38 +161,51 @@ namespace Awsmock::Service {
 #else
     bool spawnProcess(const std::shared_ptr<Dto::ModuleProcess> &svc) {
         int outPipe[2], errPipe[2];
-        pipe(outPipe);
-        pipe(errPipe);
-
-        const pid_t pid = fork();
-
-        if (pid < 0) {
+        if (pipe(outPipe) < 0 || pipe(errPipe) < 0) {
             svc->state = Database::Entity::ProcessState::CRASHED;
             return false;
         }
 
-        if (pid == 0) {
-            dup2(outPipe[1], STDOUT_FILENO);
-            dup2(errPipe[1], STDERR_FILENO);
+        // Use posix_spawn() instead of fork()+exec() to avoid deadlocks in
+        // multi-threaded processes: fork() leaves child with all parent mutexes
+        // (Boost.Log, malloc, mongocxx, …) in whatever state they were, so
+        // execvp()'s internal malloc call can deadlock before the binary runs.
+        posix_spawn_file_actions_t fa;
+        posix_spawn_file_actions_init(&fa);
+        posix_spawn_file_actions_adddup2(&fa, outPipe[1], STDOUT_FILENO);
+        posix_spawn_file_actions_adddup2(&fa, errPipe[1], STDERR_FILENO);
+        posix_spawn_file_actions_addclose(&fa, outPipe[0]);
+        posix_spawn_file_actions_addclose(&fa, outPipe[1]);
+        posix_spawn_file_actions_addclose(&fa, errPipe[0]);
+        posix_spawn_file_actions_addclose(&fa, errPipe[1]);
 
-            close(outPipe[0]);
-            close(outPipe[1]);
-            close(errPipe[0]);
-            close(errPipe[1]);
+        posix_spawnattr_t sa;
+        posix_spawnattr_init(&sa);
+#ifdef POSIX_SPAWN_SETSID
+        posix_spawnattr_setflags(&sa, POSIX_SPAWN_SETSID);
+#endif
 
-            setsid();
+        std::vector<char *> argv;
+        argv.push_back(const_cast<char *>(svc->config.executable.c_str()));
+        for (auto &a: svc->config.args) argv.push_back(const_cast<char *>(a.c_str()));
+        argv.push_back(nullptr);
 
-            std::vector<const char *> argv;
-            argv.push_back(svc->config.executable.c_str());
-            for (auto &a: svc->config.args) argv.push_back(a.c_str());
-            argv.push_back(nullptr);
-
-            execvp(svc->config.executable.c_str(), const_cast<char **>(argv.data()));
-            _exit(127);
-        }
+        pid_t pid = -1;
+        // NOLINTNEXTLINE(concurrency-mt-unsafe) — environ read is safe here
+        const int rc = posix_spawn(&pid, svc->config.executable.c_str(), &fa, &sa, argv.data(), environ);
+        posix_spawn_file_actions_destroy(&fa);
+        posix_spawnattr_destroy(&sa);
 
         close(outPipe[1]);
         close(errPipe[1]);
+
+        if (rc != 0) {
+            log_error << "posix_spawn failed for '" << svc->config.executable << "': " << strerror(rc);
+            close(outPipe[0]);
+            close(errPipe[0]);
+            svc->state = Database::Entity::ProcessState::CRASHED;
+            return false;
+        }
 
         svc->pid = pid;
         svc->state = Database::Entity::ProcessState::STARTING;
@@ -189,19 +213,32 @@ namespace Awsmock::Service {
         svc->stdoutFd = outPipe[0];
         svc->stderrFd = errPipe[0];
 
-        std::thread(drainPipe, outPipe[0], false).detach();
-        std::thread(drainPipe, errPipe[0], true).detach();
+        std::thread(drainPipe, outPipe[0]).detach();
+        std::thread(drainPipe, errPipe[0]).detach();
 
-        if (waitForSocket(svc->config.socketPath, 5000)) {
+        if (waitForSocket(svc->config.socketPath, 10000)) {
             svc->state = Database::Entity::ProcessState::RUNNING;
             log_info << "Service ready, name: " << svc->config.name << ", pid: " << svc->pid;
             Database::RepositoryFactory::instance().moduleRepository()->setState(svc->config.name, toModuleState(svc->state));
             return true;
         }
 
-        log_error << "Service " << svc->config.name << " did not become ready, killing pid " << svc->pid;
-        kill(svc->pid, SIGKILL);
-        waitpid(svc->pid, nullptr, 0);
+        // Give drainPipe threads a moment to flush the child's output before we log the error.
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        // Determine whether the child already exited (crash) or is still alive (hung).
+        int childStatus = 0;
+        if (const pid_t exited = waitpid(svc->pid, &childStatus, WNOHANG); exited == svc->pid) {
+            if (WIFEXITED(childStatus))
+                log_error << "Service '" << svc->config.name << "' exited with code " << WEXITSTATUS(childStatus) << " before signalling readiness" << " (code 127 = executable not found or missing shared library)";
+            else if (WIFSIGNALED(childStatus))
+                log_error << "Service '" << svc->config.name << "' killed by signal " << WTERMSIG(childStatus) << " before signalling readiness";
+        } else {
+            log_error << "Service '" << svc->config.name << "' is still running but did not signal readiness within 10s — killing";
+            kill(svc->pid, SIGKILL);
+            waitpid(svc->pid, nullptr, 0);
+        }
+
         svc->pid = -1;
         svc->state = Database::Entity::ProcessState::PENDING_RESTART;
         svc->lastCrashTime = std::chrono::steady_clock::now();
@@ -265,8 +302,8 @@ namespace Awsmock::Service {
         }
         if (waitForExit(svc->pid, 2000)) {
 #else
-            kill(svc->pid, SIGKILL);
-            if (waitForExit(svc->pid, 2000)) {
+        kill(svc->pid, SIGKILL);
+        if (waitForExit(svc->pid, 2000)) {
 #endif
             log_info << "Service '" << name << "' killed";
 #ifdef _WIN32
@@ -313,9 +350,9 @@ namespace Awsmock::Service {
         return svc->config.socketPath;
     }
 
-    std::vector<std::pair<std::string, Database::Entity::ProcessState> > ApiGatewayController::listModules() {
+    std::vector<std::pair<std::string, Database::Entity::ProcessState>> ApiGatewayController::listModules() {
         std::lock_guard lock(_mutex);
-        std::vector<std::pair<std::string, Database::Entity::ProcessState> > result;
+        std::vector<std::pair<std::string, Database::Entity::ProcessState>> result;
         result.reserve(_services.size());
         for (const auto &[name, svc]: _services) result.emplace_back(name, svc->state);
         return result;
@@ -459,4 +496,4 @@ namespace Awsmock::Service {
         svc->state = Database::Entity::ProcessState::CRASHED;
     }
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service
