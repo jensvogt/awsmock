@@ -8,10 +8,10 @@
 #include <string>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
+#include <awsmock/repository/lambda/LambdaMongoRepository.h>
+#include <awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace Awsmock::Service {
@@ -25,11 +25,11 @@ namespace Awsmock::Service {
     };
 
     static std::map<TaskType, std::string> TaskTypeNames{
-            {createSecret, "createSecret"},
-            {setSecret, "setSecret"},
-            {testSecret, "testSecret"},
-            {finishSecret, "finishSecret"},
-            {unknown, "unknown"},
+        {createSecret, "createSecret"},
+        {setSecret, "setSecret"},
+        {testSecret, "testSecret"},
+        {finishSecret, "finishSecret"},
+        {unknown, "unknown"},
     };
 
     [[maybe_unused]] static std::string TaskTypeToString(const TaskType taskType) {
@@ -52,8 +52,7 @@ namespace Awsmock::Service {
      */
     class SecretRotation {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -67,8 +66,7 @@ namespace Awsmock::Service {
          */
         void operator()(Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
         /**
@@ -124,4 +122,4 @@ namespace Awsmock::Service {
         system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

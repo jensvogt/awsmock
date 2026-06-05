@@ -14,7 +14,6 @@
 #endif
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/core/BsonConverter.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MagicDetector.h>
@@ -80,6 +79,7 @@
 #include <awsmock/entity/s3/LambdaNotification.h>
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
+#include <awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
@@ -95,8 +95,7 @@ namespace Awsmock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -158,6 +157,7 @@ namespace Awsmock::Service {
          * @return number of objects deleted
          */
         long PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const;
+
         long PurgeAllBuckets() const;
 
         /**
@@ -362,7 +362,7 @@ namespace Awsmock::Service {
          *
          * @param request delete object request
          */
-        void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
+        void DeleteObject(const Dto::S3::DeleteObjectRequest &request) const;
 
         /**
          * @brief Delete objects
@@ -370,7 +370,7 @@ namespace Awsmock::Service {
          * @param request delete objects request
          * @return DeleteObjectsResponse
          */
-        [[nodiscard]] Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
+        [[nodiscard]] Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) const;
 
         /**
          * @brief Adds a bucket notification configuration
@@ -412,8 +412,7 @@ namespace Awsmock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
@@ -593,4 +592,4 @@ namespace Awsmock::Service {
         LambdaService _lambdaService;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

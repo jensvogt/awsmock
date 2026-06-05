@@ -13,7 +13,6 @@
 #include "awsmock/repository/RepositoryFactory.h"
 
 
-#include <../../../../../db/include/awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
@@ -34,6 +33,7 @@
 #include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
+#include <awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
 
 namespace Awsmock::Service {
 
@@ -49,14 +49,14 @@ namespace Awsmock::Service {
      */
     class ApiGatewayService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          *
          * @param ioc boost IO context
          */
-        explicit ApiGatewayService(boost::asio::io_context &ioc) : _ioc(ioc) {}
+        explicit ApiGatewayService(boost::asio::io_context &ioc) : _ioc(ioc) {
+        }
 
         /**
          * @brief Creates a new API key
@@ -127,8 +127,7 @@ namespace Awsmock::Service {
         [[nodiscard]]
         Dto::ApiGateway::ListRestApiCountersResponse ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -145,4 +144,4 @@ namespace Awsmock::Service {
         boost::asio::io_context &_ioc;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

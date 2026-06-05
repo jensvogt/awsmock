@@ -6,10 +6,12 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <sys/types.h>
 #include <thread>
 #include <utility>
 #include <vector>
+#ifndef _WIN32
+#include <sys/types.h>
+#endif
 
 // Awsmock includes
 #include <awsmock/core/logging/LogStream.h>

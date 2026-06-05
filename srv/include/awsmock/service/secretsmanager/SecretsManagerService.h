@@ -8,11 +8,6 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/secretsmanager/internal/UpdateSecretDetailsRequest.h"
-#include "awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h"
-
-
-#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
@@ -27,10 +22,10 @@
 #include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueResponse.h>
 #include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
-#include <awsmock/dto/secretsmanager/ListSecretVersionIdsRequest.h>
-#include <awsmock/dto/secretsmanager/ListSecretVersionIdsResponse.h>
 #include <awsmock/dto/secretsmanager/ListSecretsRequest.h>
 #include <awsmock/dto/secretsmanager/ListSecretsResponse.h>
+#include <awsmock/dto/secretsmanager/ListSecretVersionIdsRequest.h>
+#include <awsmock/dto/secretsmanager/ListSecretVersionIdsResponse.h>
 #include <awsmock/dto/secretsmanager/PutSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/PutSecretValueResponse.h>
 #include <awsmock/dto/secretsmanager/RotateSecretRequest.h>
@@ -44,10 +39,13 @@
 #include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersRequest.h>
 #include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersResponse.h>
 #include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsRequest.h>
+#include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsRequest.h>
+#include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h>
 #include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h>
 #include <awsmock/dto/secretsmanager/mapper/Mapper.h>
 #include <awsmock/dto/secretsmanager/model/VersionStage.h>
 #include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/secretsmanager/SecretRotation.h>
@@ -61,8 +59,7 @@ namespace Awsmock::Service {
      */
     class SecretsManagerService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -172,8 +169,7 @@ namespace Awsmock::Service {
          */
         [[nodiscard]] Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -287,4 +283,4 @@ namespace Awsmock::Service {
         boost::mutex _mutex;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

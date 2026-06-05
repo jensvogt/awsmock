@@ -2,14 +2,12 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_APPLICATION_CREATOR_H
-#define AWSMOCK_SERVICE_APPLICATION_CREATOR_H
+#pragma once
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/ZipUtils.h>
@@ -17,6 +15,7 @@
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/service/container/ContainerService.h>
 
 namespace Awsmock::Service {
@@ -52,8 +51,7 @@ namespace Awsmock::Service {
      */
     class ApplicationCreator {
 
-      public:
-
+    public:
         /**
          * @brief Constructor.
          */
@@ -69,8 +67,7 @@ namespace Awsmock::Service {
          */
         void operator()(const std::string &applicationCodeFile, const std::string &region, const std::string &name, const std::string &instanceId) const;
 
-      private:
-
+    private:
         /**
          * @brief Create an application instance
          *
@@ -142,6 +139,4 @@ namespace Awsmock::Service {
         static std::string GetDockerTag(const Database::Entity::Apps::Application &application);
     };
 
-}// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_APPLICATION_CREATOR_H
+} // namespace Awsmock::Service
