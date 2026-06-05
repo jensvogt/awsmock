@@ -231,7 +231,10 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "monitoring-period": 300
+        "monitoring-period": 300,
+        "proxy": {
+          "threads": 4
+        }
       }
     },
     "docker": {
@@ -257,19 +260,6 @@
         "key": "C:\\Program Files\\awsmock\\etc\\key.pem",
         "verify-peer": true
       }
-    },
-    "podman": {
-      "active": false,
-      "network-mode": "local",
-      "network-name": "local",
-      "default": {
-        "memory-size": 512,
-        "temp-size": 10240
-      },
-      "container": {
-        "port": 8080
-      },
-      "socket": "http://localhost:2375"
     },
     "monitoring": {
       "active": true,
