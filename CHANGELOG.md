@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.18.57](https://github.com/jensvogt/awsmock/compare/v1.18.56...v1.18.57) (2026-06-05)
+
+
+### Bug Fixes
+
+* core, database and service tests ([6c9f30d](https://github.com/jensvogt/awsmock/commit/6c9f30dc2e83b96db3afb16325dc7a1d94f76535))
+* core, database and service tests ([caf93fb](https://github.com/jensvogt/awsmock/commit/caf93fb26a97215360c0dd9270d0e184c8e02a26))
+* core, database and service tests ([fae9a09](https://github.com/jensvogt/awsmock/commit/fae9a091ace62f04e874471ec9041a899d6bce02))
+* core, database and service tests ([f913fc1](https://github.com/jensvogt/awsmock/commit/f913fc147af3ddb116646513b149651fbf9e3603))
+* core, database and service tests ([ac9d601](https://github.com/jensvogt/awsmock/commit/ac9d60112125bc31e0f16f4360d3934f18887509))
+* core, database and service tests ([5873840](https://github.com/jensvogt/awsmock/commit/5873840922d4e66b38527f0cc204601fcc64a5a1))
+* windows port new kms database layer ([171972f](https://github.com/jensvogt/awsmock/commit/171972fceced8f690450beb6f09c27b97889925e))
+* windows port new kms database layer ([807ce14](https://github.com/jensvogt/awsmock/commit/807ce14db6d3d7902c5382fb2148a183eac80eb8))
+
 ## [1.18.56](https://github.com/jensvogt/awsmock/compare/1.18.55...v1.18.56) (2026-06-05)
 
 
