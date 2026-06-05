@@ -8,13 +8,6 @@
 #include <string>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/ssm/SSMMongoRepository.h>
-#include <../../../../../db/include/awsmock/repository/transfer/TransferMongoRepository.h>
 #include <awsmock/core/BackupUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/Services.h>
@@ -32,10 +25,17 @@
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
+#include <awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/repository/cognito/CognitoMongoRepository.h>
+#include <awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
+#include <awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
+#include <awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/repository/sns/SNSMongoRepository.h>
 #include <awsmock/repository/sqs/SQSMongoRepository.h>
+#include <awsmock/repository/ssm/SSMMongoRepository.h>
+#include <awsmock/repository/transfer/TransferMongoRepository.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/module/ModuleMap.h>
 
@@ -52,8 +52,7 @@ namespace Awsmock::Service {
      */
     class ModuleService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -171,8 +170,7 @@ namespace Awsmock::Service {
          */
         Dto::Module::GetLogLevelResponse getLogLevels(const Dto::Module::GetLogLevelRequest &request) const;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -194,4 +192,4 @@ namespace Awsmock::Service {
         std::shared_ptr<Database::IModuleRepository> _moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

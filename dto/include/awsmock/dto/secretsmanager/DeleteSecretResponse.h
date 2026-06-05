@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
-#define AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -13,6 +12,8 @@
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace Awsmock::Dto::SecretsManager {
+
+    using std::chrono::system_clock;
 
     /**
      * @brief Return structure for the delete secret request.
@@ -45,8 +46,7 @@ namespace Awsmock::Dto::SecretsManager {
          */
         system_clock::time_point deletionDate;
 
-      private:
-
+    private:
         friend DeleteSecretResponse tag_invoke(boost::json::value_to_tag<DeleteSecretResponse>, boost::json::value const &v) {
             DeleteSecretResponse r;
             r.name = Core::Json::GetStringValue(v, "Name");
@@ -57,16 +57,14 @@ namespace Awsmock::Dto::SecretsManager {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteSecretResponse const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
-                    {"Name", obj.name},
-                    {"ARN", obj.arn},
-                    {"DeletionDate", Core::DateTimeUtils::UnixTimestamp(obj.deletionDate)},
+                {"Region", obj.region},
+                {"User", obj.user},
+                {"RequestId", obj.requestId},
+                {"Name", obj.name},
+                {"ARN", obj.arn},
+                {"DeletionDate", Core::DateTimeUtils::UnixTimestamp(obj.deletionDate)},
             };
         }
     };
 
-}// namespace Awsmock::Dto::SecretsManager
-
-#endif// AWSMOCK_DTO_SECRETMANAGER_DELETE_SECRET_RESPONSE_H
+} // namespace Awsmock::Dto::SecretsManager

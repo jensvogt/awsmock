@@ -271,7 +271,7 @@ namespace Awsmock::Service {
         Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket);
         bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Core::StringUtils::ToLower(request.status));
 
-        _s3Database->updateBucket(bucket);
+        bucket = _s3Database->updateBucket(bucket);
         log_debug << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status;
     }
 
@@ -286,7 +286,7 @@ namespace Awsmock::Service {
         Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket);
         //bucket.lifecycleConfigurations = Dto::S3::LifecycleMapper::toEntityList(request.rules);
 
-        _s3Database->updateBucket(bucket);
+        bucket = _s3Database->updateBucket(bucket);
         log_debug << "Put bucket lifecycle configuration, bucket: " << request.bucket;
     }
 
@@ -327,7 +327,7 @@ namespace Awsmock::Service {
         Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket);
         bucket.lifecycleConfigurations.clear();
 
-        _s3Database->updateBucket(bucket);
+        bucket = _s3Database->updateBucket(bucket);
         log_debug << "Delete bucket lifecycle configuration, bucket: " << request.bucket;
     }
 
@@ -992,7 +992,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
+    void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_object");
         log_trace << "Delete object request: " << request.ToString();
 
@@ -1005,8 +1005,8 @@ namespace Awsmock::Service {
                 const Database::Entity::S3::Object object = _s3Database->getObject(request.region, request.bucket, request.key);
 
                 // Delete from database
-                _s3Database->deleteObject(object);
-                log_debug << "Database object deleted, bucket: " + request.bucket + ", key: " << request.key;
+                long deleted = _s3Database->deleteObject(object);
+                log_debug << "Database object deleted, bucket: " + request.bucket + ", key: " << request.key << ", deleted: " << deleted;
 
                 // Delete the file system object
                 DeleteObject(object.bucket, object.key, object.internalName);
@@ -1022,7 +1022,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) {
+    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_objects");
         log_trace << "Delete objects request: " << request.ToString();
 
@@ -1048,8 +1048,8 @@ namespace Awsmock::Service {
             }
 
             // Delete from database
-            _s3Database->deleteObjects(request.region, request.bucket, request.keys);
-            log_debug << "Database object deleted, count: " << request.keys.size();
+            long deleted = _s3Database->deleteObjects(request.region, request.bucket, request.keys);
+            log_debug << "Database object deleted, count: " << request.keys.size() << ", deleted: " << deleted;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 delete objects failed, message: " << ex.what();
@@ -1705,4 +1705,4 @@ namespace Awsmock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

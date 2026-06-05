@@ -12,7 +12,6 @@
 #include <boost/asio/strand.hpp>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/core/exception/CoreException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
@@ -42,6 +41,7 @@
 #include <awsmock/dto/apps/mapper/Mapper.h>
 #include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
+#include <awsmock/repository/application/ApplicationMongoRepository.h>
 #include <awsmock/service/apps/ApplicationCreator.h>
 
 namespace Awsmock::Service {
@@ -58,8 +58,7 @@ namespace Awsmock::Service {
      */
     class ApplicationService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -228,8 +227,7 @@ namespace Awsmock::Service {
         [[nodiscard]]
         Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**
@@ -264,4 +262,4 @@ namespace Awsmock::Service {
         ApplicationCreator applicationCreator;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

@@ -8,8 +8,8 @@
 #include <string>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/core/scheduler/Scheduler.h>
+#include <awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaController.h>
@@ -25,8 +25,7 @@ namespace Awsmock::Service {
      */
     class LambdaServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -37,10 +36,15 @@ namespace Awsmock::Service {
          */
         void Shutdown() override;
 
+        /**
+         * @brief Initialization
+         */
         void Initialize();
 
-      private:
-
+    private:
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
@@ -164,4 +168,4 @@ namespace Awsmock::Service {
         int _logRetentionPeriod{};
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

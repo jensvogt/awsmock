@@ -9,7 +9,6 @@
 #include <thread>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/MagicDetector.h>
@@ -92,6 +91,7 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventRecord.h>
 #include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/repository/lambda/LambdaMongoRepository.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace Awsmock::Service {
@@ -103,8 +103,7 @@ namespace Awsmock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -493,8 +492,7 @@ namespace Awsmock::Service {
          */
         [[nodiscard]] Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
 
         /**
@@ -549,4 +547,4 @@ namespace Awsmock::Service {
          */
         LambdaService _lambdaService;
     };
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

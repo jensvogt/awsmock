@@ -209,12 +209,12 @@ namespace Awsmock::Database {
         /**
          * Database name
          */
-        static constexpr std::string _databaseName = "awsmock";
+        static constexpr auto _databaseName = "awsmock";
 
         /**
          * Server collection name
          */
-        static constexpr std::string _serverCollectionName = "transfer";
+        static constexpr auto _serverCollectionName = "transfer";
     };
 
 }// namespace Awsmock::Database

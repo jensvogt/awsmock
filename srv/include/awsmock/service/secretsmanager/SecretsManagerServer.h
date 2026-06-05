@@ -8,11 +8,11 @@
 #include <string>
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
+#include <awsmock/repository/secretsmanager/SecretsManagerMongoRepository.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -27,8 +27,7 @@ namespace Awsmock::Service {
      */
     class SecretsManagerServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -39,8 +38,7 @@ namespace Awsmock::Service {
          */
         void Shutdown() override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -62,4 +60,4 @@ namespace Awsmock::Service {
         std::shared_ptr<Database::ISecretsManagerRepository> _secretsManagerDatabase = Database::RepositoryFactory::instance().secretsmanagerRepository();
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

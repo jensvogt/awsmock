@@ -2,15 +2,14 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFER_SERVER_H
-#define AWSMOCK_SERVICE_TRANSFER_SERVER_H
+#pragma once
 
 // AwsMock includes
-#include <../../../../../db/include/awsmock/repository/transfer/TransferMongoRepository.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/ftpserver/FtpServer.h>
+#include <awsmock/repository/transfer/TransferMongoRepository.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
@@ -25,8 +24,7 @@ namespace Awsmock::Service {
      */
     class TransferServer final : public AbstractServer {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -37,8 +35,7 @@ namespace Awsmock::Service {
          */
         void Shutdown() override;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
@@ -167,7 +164,7 @@ namespace Awsmock::Service {
         /**
          * List of transfer servers
          */
-        std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
+        std::map<std::string, std::shared_ptr<FtpServer::FtpServer> > _transferServerList;
 
         /**
          * Actual FTP manager
@@ -190,6 +187,4 @@ namespace Awsmock::Service {
         Core::Scheduler &_scheduler;
     };
 
-}// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_TRANSFER_SERVER_H
+} // namespace Awsmock::Service
