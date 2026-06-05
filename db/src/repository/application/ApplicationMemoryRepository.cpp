@@ -8,7 +8,7 @@ namespace Awsmock::Database {
 
     boost::mutex ApplicationMemoryRepository::_applicationMutex;
 
-    bool ApplicationMemoryRepository::ApplicationExists(const std::string &region, const std::string &name) const {
+    bool ApplicationMemoryRepository::applicationExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_applications,
                                     [region, name](const std::pair<std::string, Entity::Apps::Application> &application) {
@@ -16,7 +16,7 @@ namespace Awsmock::Database {
                                     }) != _applications.end();
     }
 
-    Entity::Apps::Application ApplicationMemoryRepository::GetApplication(const std::string &region, const std::string &name) const {
+    Entity::Apps::Application ApplicationMemoryRepository::getApplication(const std::string &region, const std::string &name) const {
 
         const auto it = std::ranges::find_if(_applications,
                                              [region, name](const std::pair<std::string, Entity::Apps::Application> &application) {
@@ -30,7 +30,7 @@ namespace Awsmock::Database {
         return it->second;
     }
 
-    Entity::Apps::Application ApplicationMemoryRepository::CreateApplication(Entity::Apps::Application &application) const {
+    Entity::Apps::Application ApplicationMemoryRepository::createApplication(Entity::Apps::Application &application) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         application.oid = Core::StringUtils::CreateRandomUuid();
@@ -39,7 +39,7 @@ namespace Awsmock::Database {
         return _applications[application.oid];
     }
 
-    Entity::Apps::Application ApplicationMemoryRepository::UpdateApplication(Entity::Apps::Application &application) const {
+    Entity::Apps::Application ApplicationMemoryRepository::updateApplication(Entity::Apps::Application &application) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const auto it = std::ranges::find_if(_applications,
@@ -55,7 +55,7 @@ namespace Awsmock::Database {
         return _applications[it->first];
     }
 
-    void ApplicationMemoryRepository::SetEnabled(const std::string &region, const std::string &name, const bool enabled) const {
+    void ApplicationMemoryRepository::setEnabled(const std::string &region, const std::string &name, const bool enabled) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const auto it = std::ranges::find_if(_applications, [&region, &name](const std::pair<std::string, Entity::Apps::Application> &a) {
@@ -63,14 +63,14 @@ namespace Awsmock::Database {
         });
 
         if (it == _applications.end()) {
-            log_error << "SetEnabled failed, region: " << region << " name: " << name;
-            throw Core::DatabaseException("SetEnabled failed, region: " + region + " name: " + name);
+            log_error << "setEnabled failed, region: " << region << " name: " << name;
+            throw Core::DatabaseException("setEnabled failed, region: " + region + " name: " + name);
         }
         it->second.enabled = enabled;
         it->second.modified = system_clock::now();
     }
 
-    std::vector<Entity::Apps::Application> ApplicationMemoryRepository::ListApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::Apps::Application> ApplicationMemoryRepository::listApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -94,7 +94,7 @@ namespace Awsmock::Database {
         return Core::PageVector<Entity::Apps::Application>(q.to_vector(), pageSize, pageIndex);
     }
 
-    long ApplicationMemoryRepository::CountApplications(const std::string &region, const std::string &prefix) const {
+    long ApplicationMemoryRepository::countApplications(const std::string &region, const std::string &prefix) const {
 
         auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
         if (!region.empty()) {
@@ -106,14 +106,14 @@ namespace Awsmock::Database {
         return static_cast<long>(q.count());
     }
 
-    Entity::Apps::Application ApplicationMemoryRepository::ImportApplication(Entity::Apps::Application &application) const {
-        if (ApplicationExists(application.region, application.name)) {
-            return UpdateApplication(application);
+    Entity::Apps::Application ApplicationMemoryRepository::importApplication(Entity::Apps::Application &application) const {
+        if (applicationExists(application.region, application.name)) {
+            return updateApplication(application);
         }
-        return CreateApplication(application);
+        return createApplication(application);
     }
 
-    long ApplicationMemoryRepository::DeleteApplication(const std::string &region, const std::string &name) const {
+    long ApplicationMemoryRepository::deleteApplication(const std::string &region, const std::string &name) const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const auto count = std::erase_if(_applications, [region, name](const std::pair<std::string, Entity::Apps::Application> &a) {
@@ -123,7 +123,7 @@ namespace Awsmock::Database {
         return static_cast<long>(count);
     }
 
-    long ApplicationMemoryRepository::DeleteAllApplications() const {
+    long ApplicationMemoryRepository::deleteAllApplications() const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
         const long count = _applications.size();

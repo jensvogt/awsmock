@@ -9,11 +9,11 @@ namespace Awsmock::Database {
 
     MonitoringMongoRepository::MonitoringMongoRepository() {
         _collectorConnection = Core::EventBus::instance().sigCollector.connect([this](const std::map<std::string, double> &values) {
-            this->UpdateMonitoringCounters(values);
+            this->updateMonitoringCounters(values);
         });
     }
 
-    std::vector<std::string> MonitoringMongoRepository::GetDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit, const system_clock::time_point start, const system_clock::time_point end) const {
+    std::vector<std::string> MonitoringMongoRepository::getDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit, const system_clock::time_point start, const system_clock::time_point end) const {
         log_trace << "Get distinct label values, labelName: " << labelName;
 
         const auto client = ConnectionPool::instance().GetConnection();
@@ -52,7 +52,7 @@ namespace Awsmock::Database {
         }
     }
 
-    std::vector<Entity::Monitoring::Counter> MonitoringMongoRepository::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const long step, const std::string &labelName,
+    std::vector<Entity::Monitoring::Counter> MonitoringMongoRepository::getMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const long step, const std::string &labelName,
                                                                                             const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
 
@@ -88,7 +88,7 @@ namespace Awsmock::Database {
         }
     }
 
-    void MonitoringMongoRepository::UpdateMonitoringCounters(const std::map<std::string, double> &values) const {
+    void MonitoringMongoRepository::updateMonitoringCounters(const std::map<std::string, double> &values) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
@@ -122,7 +122,7 @@ namespace Awsmock::Database {
         }
     }
 
-    long MonitoringMongoRepository::DeleteOldMonitoringData(const int retentionPeriod) const {
+    long MonitoringMongoRepository::deleteOldMonitoringData(const int retentionPeriod) const {
         log_trace << "Deleting old monitoring data, retention:: " << retentionPeriod;
 
         const auto client = ConnectionPool::instance().GetConnection();

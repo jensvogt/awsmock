@@ -67,10 +67,10 @@ namespace Awsmock::Database {
         }
 
         if (!region.empty()) {
-            q.where([region](const Entity::SSM::Parameter &item) { return item.region == region; });
+            q = q.where([region](const Entity::SSM::Parameter &item) { return item.region == region; });
         }
         if (!prefix.empty()) {
-            q.where([prefix](const Entity::SSM::Parameter &item) { return Core::StringUtils::StartsWith(item.parameterName, prefix); });
+            q = q.where([prefix](const Entity::SSM::Parameter &item) { return Core::StringUtils::StartsWith(item.parameterName, prefix); });
         }
         result = q.to_vector();
 
@@ -89,12 +89,12 @@ namespace Awsmock::Database {
         for (auto &val: _parameters | std::views::values) {
             result.push_back(val);
         }
-        const auto q = Core::from(result);
+        auto q = Core::from(result);
         if (!region.empty()) {
-            q.where([region](const Entity::SSM::Parameter &item) { return item.region == region; });
+            q = q.where([region](const Entity::SSM::Parameter &item) { return item.region == region; });
         }
         if (!prefix.empty()) {
-            q.where([prefix](const Entity::SSM::Parameter &item) { return Core::StringUtils::StartsWith(item.parameterName, prefix); });
+            q = q.where([prefix](const Entity::SSM::Parameter &item) { return Core::StringUtils::StartsWith(item.parameterName, prefix); });
         }
         return static_cast<long>(q.count());
     }

@@ -55,7 +55,7 @@ namespace Awsmock::Service {
         log_trace << "Monitoring worker starting";
 
         const int retentionPeriod = Core::Configuration::instance().get<int>("awsmock.monitoring.retention");
-        const long deletedCount = _monitoringDatabase->DeleteOldMonitoringData(retentionPeriod);
+        const long deletedCount = _monitoringDatabase->deleteOldMonitoringData(retentionPeriod);
 
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;
     }

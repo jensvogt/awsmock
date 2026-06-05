@@ -38,7 +38,7 @@ namespace Awsmock::Database {
             RepositoryFactory::instance().initialize(BackendType::MONGODB);
         }
         ~ApplicationMongoDbFixture() {
-            const long count = RepositoryFactory::instance().applicationRepository()->DeleteAllApplications();
+            const long count = RepositoryFactory::instance().applicationRepository()->deleteAllApplications();
             log_debug << "Applications deleted, count: " << count;
         }
     };
@@ -52,7 +52,7 @@ namespace Awsmock::Database {
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
 
         // act
-        const Entity::Apps::Application result = applicationRepository->CreateApplication(application);
+        const Entity::Apps::Application result = applicationRepository->createApplication(application);
 
         // assert
         BOOST_CHECK_EQUAL(result.name, TEST_APPLICATION_NAME);
@@ -70,11 +70,11 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
-        application = applicationRepository->CreateApplication(application);
+        application = applicationRepository->createApplication(application);
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
-        const long result = applicationRepository->CountApplications(TEST_REGION, {});
+        const long result = applicationRepository->countApplications(TEST_REGION, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, result);
@@ -85,11 +85,11 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
-        application = applicationRepository->CreateApplication(application);
+        application = applicationRepository->createApplication(application);
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
-        const bool result = applicationRepository->ApplicationExists(TEST_REGION, TEST_APPLICATION_NAME);
+        const bool result = applicationRepository->applicationExists(TEST_REGION, TEST_APPLICATION_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
@@ -100,11 +100,11 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
-        application = applicationRepository->CreateApplication(application);
+        application = applicationRepository->createApplication(application);
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
-        const Entity::Apps::Application result = applicationRepository->GetApplication(TEST_REGION, TEST_APPLICATION_NAME);
+        const Entity::Apps::Application result = applicationRepository->getApplication(TEST_REGION, TEST_APPLICATION_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(result.name, TEST_APPLICATION_NAME);
@@ -117,12 +117,12 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
-        application = applicationRepository->CreateApplication(application);
+        application = applicationRepository->createApplication(application);
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
         application.description = "updated description";
-        const Entity::Apps::Application result = applicationRepository->UpdateApplication(application);
+        const Entity::Apps::Application result = applicationRepository->updateApplication(application);
 
         // assert
         BOOST_CHECK_EQUAL(result.description, "updated description");
@@ -134,12 +134,12 @@ namespace Awsmock::Database {
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
         application.enabled = true;
-        application = applicationRepository->CreateApplication(application);
+        application = applicationRepository->createApplication(application);
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
-        applicationRepository->SetEnabled(TEST_REGION, TEST_APPLICATION_NAME, false);
-        const Entity::Apps::Application result = applicationRepository->GetApplication(TEST_REGION, TEST_APPLICATION_NAME);
+        applicationRepository->setEnabled(TEST_REGION, TEST_APPLICATION_NAME, false);
+        const Entity::Apps::Application result = applicationRepository->getApplication(TEST_REGION, TEST_APPLICATION_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(result.enabled, false);
@@ -150,11 +150,11 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
-        application = applicationRepository->CreateApplication(application);
+        application = applicationRepository->createApplication(application);
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
-        const std::vector<Entity::Apps::Application> result = applicationRepository->ListApplications(TEST_REGION, {}, 10, 0, {});
+        const std::vector<Entity::Apps::Application> result = applicationRepository->listApplications(TEST_REGION, {}, 10, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, result.size());
@@ -169,11 +169,11 @@ namespace Awsmock::Database {
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application app1 = CreateDefaultApplication(TEST_REGION, "test-app-1");
         Entity::Apps::Application app2 = CreateDefaultApplication(TEST_REGION, "other-app");
-        app1 = applicationRepository->CreateApplication(app1);
-        app2 = applicationRepository->CreateApplication(app2);
+        app1 = applicationRepository->createApplication(app1);
+        app2 = applicationRepository->createApplication(app2);
 
         // act
-        const std::vector<Entity::Apps::Application> result = applicationRepository->ListApplications(TEST_REGION, "test", 10, 0, {});
+        const std::vector<Entity::Apps::Application> result = applicationRepository->listApplications(TEST_REGION, "test", 10, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, result.size());
@@ -185,12 +185,12 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IApplicationRepository> applicationRepository = RepositoryFactory::instance().applicationRepository();
         Entity::Apps::Application application = CreateDefaultApplication(TEST_REGION, TEST_APPLICATION_NAME);
-        application = applicationRepository->CreateApplication(application);
+        application = applicationRepository->createApplication(application);
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
-        applicationRepository->DeleteApplication(TEST_REGION, TEST_APPLICATION_NAME);
-        const bool result = applicationRepository->ApplicationExists(TEST_REGION, TEST_APPLICATION_NAME);
+        applicationRepository->deleteApplication(TEST_REGION, TEST_APPLICATION_NAME);
+        const bool result = applicationRepository->applicationExists(TEST_REGION, TEST_APPLICATION_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);

@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_APPS_APPLICATION_H
-#define AWSMOCK_DB_ENTITY_APPS_APPLICATION_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -159,5 +158,3 @@ namespace Awsmock::Database::Entity::Apps {
     };
 
 }// namespace Awsmock::Database::Entity::Apps
-
-#endif// AWSMOCK_DB_ENTITY_APPS_APPLICATION_H

@@ -78,11 +78,11 @@ namespace Awsmock::Service {
 
                 const std::shared_ptr<Database::IS3Repository> _s3Database = Database::RepositoryFactory::instance().s3Repository();
                 if (request.IsInfrastructure()) {
-                    infrastructure.s3Buckets = _s3Database->ExportBuckets({sortColumn});
+                    infrastructure.s3Buckets = _s3Database->exportBuckets({sortColumn});
                 }
                 if (request.IsObjects()) {
-                    infrastructure.s3Objects = _s3Database->ListObjects({}, {}, {}, 0, 0, {});
-                    infrastructure.s3Objects = _s3Database->ListObjects({}, {}, {}, 0, 0, {});
+                    infrastructure.s3Objects = _s3Database->listObjects({}, {}, {}, 0, 0, {});
+                    infrastructure.s3Objects = _s3Database->listObjects({}, {}, {}, 0, 0, {});
                 }
 
             } else if (module == "sqs") {
@@ -163,14 +163,14 @@ namespace Awsmock::Service {
 
                 if (request.IsInfrastructure()) {
                     const std::shared_ptr<Database::IApplicationRepository> _applicationDatabase = Database::RepositoryFactory::instance().applicationRepository();
-                    infrastructure.applications = _applicationDatabase->ListApplications({}, {}, 0, 0, {});
+                    infrastructure.applications = _applicationDatabase->listApplications({}, {}, 0, 0, {});
                 }
 
             } else if (module == "apigateway") {
 
                 if (request.IsInfrastructure()) {
                     const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
-                    infrastructure.apiKeys = _apiGatewayDatabase->GetApiKeys({}, {}, {}, 0);
+                    infrastructure.apiKeys = _apiGatewayDatabase->getApiKeys({}, {}, {}, 0);
                 }
             }
         }
@@ -200,7 +200,7 @@ namespace Awsmock::Service {
             if (!infrastructure.s3Buckets.empty()) {
                 for (auto &bucket: infrastructure.s3Buckets) {
                     bucket.modified = system_clock::now();
-                    bucket = _s3Database->CreateOrUpdateBucket(bucket);
+                    bucket = _s3Database->createOrUpdateBucket(bucket);
                 }
                 log_info << "S3 buckets imported, count: " << infrastructure.s3Buckets.size();
             }
@@ -209,7 +209,7 @@ namespace Awsmock::Service {
 
                     // Create objects
                     object.modified = system_clock::now();
-                    object = _s3Database->CreateOrUpdateObject(object);
+                    object = _s3Database->createOrUpdateObject(object);
 
                     // Load local files
                     if (!object.localName.empty()) {
@@ -324,7 +324,7 @@ namespace Awsmock::Service {
             if (!infrastructure.applications.empty()) {
                 const std::shared_ptr<Database::IApplicationRepository> _applicationDatabase = Database::RepositoryFactory::instance().applicationRepository();
                 for (auto &application: infrastructure.applications) {
-                    application = _applicationDatabase->ImportApplication(application);
+                    application = _applicationDatabase->importApplication(application);
                 }
                 log_info << "Applications imported, count: " << infrastructure.applications.size();
             }
@@ -363,7 +363,7 @@ namespace Awsmock::Service {
         if (!infrastructure.apiKeys.empty()) {
             const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
             for (auto &apiKey: infrastructure.apiKeys) {
-                _apiGatewayDatabase->ImportApiKey(apiKey);
+                _apiGatewayDatabase->importApiKey(apiKey);
             }
             log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
         }
@@ -383,7 +383,7 @@ namespace Awsmock::Service {
         for (const auto &m: request.modules) {
 
             if (m == "s3") {
-                count += Database::RepositoryFactory::instance().s3Repository()->DeleteAllBuckets();
+                count += Database::RepositoryFactory::instance().s3Repository()->deleteAllBuckets();
             } else if (m == "sqs") {
                 count += Database::RepositoryFactory::instance().sqsRepository()->deleteAllQueues();
             } else if (m == "sns") {
@@ -393,7 +393,7 @@ namespace Awsmock::Service {
             } else if (m == "transfer") {
                 count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "application") {
-                count += Database::RepositoryFactory::instance().applicationRepository()->DeleteAllApplications();
+                count += Database::RepositoryFactory::instance().applicationRepository()->deleteAllApplications();
             }
         }
     }
@@ -404,7 +404,7 @@ namespace Awsmock::Service {
         long count = 0;
         for (const auto &m: request.modules) {
             if (m == "s3") {
-                count += Database::RepositoryFactory::instance().s3Repository()->DeleteAllObjects();
+                count += Database::RepositoryFactory::instance().s3Repository()->deleteAllObjects();
             } else if (m == "sqs") {
                 count += Database::RepositoryFactory::instance().sqsRepository()->deleteAllMessages();
             } else if (m == "sns") {
@@ -424,10 +424,10 @@ namespace Awsmock::Service {
             } else if (m == "ssm") {
                 count += Database::RepositoryFactory::instance().ssmRepository()->deleteAllParameters();
             } else if (m == "transfer") {
-                count += Database::RepositoryFactory::instance().s3Repository()->DeleteObjects("eu-central-1", "transfer-server", {});
+                count += Database::RepositoryFactory::instance().s3Repository()->deleteObjects("eu-central-1", "transfer-server", {});
                 count += Database::RepositoryFactory::instance().transferRepository()->deleteAllTransfers();
             } else if (m == "apigateway") {
-                count += Database::RepositoryFactory::instance().apigatewayRepository()->DeleteAllKeys();
+                count += Database::RepositoryFactory::instance().apigatewayRepository()->deleteAllKeys();
             }
         }
     }

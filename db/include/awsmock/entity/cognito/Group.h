@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COGNITO_GROUP_H
-#define AWSMOCK_DB_ENTITY_COGNITO_GROUP_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -85,5 +84,3 @@ namespace Awsmock::Database::Entity::Cognito {
     typedef std::vector<Group> GroupList;
 
 }// namespace Awsmock::Database::Entity::Cognito
-
-#endif// AWSMOCK_DB_ENTITY_COGNITO_GROUP_H

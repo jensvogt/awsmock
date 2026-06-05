@@ -50,9 +50,9 @@ namespace Awsmock::Database {
         }
 
         ~S3DbFixture() {
-            const long objectCount = RepositoryFactory::instance().s3Repository()->DeleteAllObjects();
+            const long objectCount = RepositoryFactory::instance().s3Repository()->deleteAllObjects();
             log_debug << "Objects deleted " << objectCount;
-            const long bucketCount = RepositoryFactory::instance().s3Repository()->DeleteAllBuckets();
+            const long bucketCount = RepositoryFactory::instance().s3Repository()->deleteAllBuckets();
             log_debug << "Bucket deleted " << bucketCount;
         }
     };
@@ -66,7 +66,7 @@ namespace Awsmock::Database {
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
 
         // act
-        const Entity::S3::Bucket result = s3Database->CreateBucket(bucket);
+        const Entity::S3::Bucket result = s3Database->createBucket(bucket);
 
         // assert
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
@@ -79,10 +79,10 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
 
         // act
-        const long result = s3Database->BucketCount({}, {});
+        const long result = s3Database->bucketCount({}, {});
 
         // assert
         BOOST_CHECK_EQUAL(1, result);
@@ -94,10 +94,10 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
 
         // act
-        const bool result = s3Database->BucketExists(bucket);
+        const bool result = s3Database->bucketExists(bucket);
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
@@ -108,10 +108,10 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
 
         // act
-        const Entity::S3::Bucket result = s3Database->GetBucketByRegionName(bucket.region, bucket.name);
+        const Entity::S3::Bucket result = s3Database->getBucketByRegionName(bucket.region, bucket.name);
 
         // assert
         BOOST_CHECK_EQUAL(result.name, bucket.name);
@@ -123,10 +123,10 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
 
         // act
-        const Entity::S3::Bucket result = s3Database->GetBucketById(bucket.oid);
+        const Entity::S3::Bucket result = s3Database->getBucketById(bucket.oid);
 
         // assert
         BOOST_CHECK_EQUAL(result.oid, bucket.oid);
@@ -137,10 +137,10 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
 
         // act
-        const Entity::S3::BucketList result = s3Database->ListBuckets({}, {}, 0, 0, {});
+        const Entity::S3::BucketList result = s3Database->listBuckets({}, {}, 0, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(result.size(), 1);
@@ -151,15 +151,15 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        object1 = s3Database->CreateObject(object1);
+        object1 = s3Database->createObject(object1);
         Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
-        object2 = s3Database->CreateObject(object2);
+        object2 = s3Database->createObject(object2);
 
         // act
-        const std::vector<Entity::S3::Object> result1 = s3Database->ListBucket(bucket.name, {});
-        const std::vector<Entity::S3::Object> result2 = s3Database->ListBucket(bucket.name, "test1");
+        const std::vector<Entity::S3::Object> result1 = s3Database->listBucket(bucket.name, {});
+        const std::vector<Entity::S3::Object> result2 = s3Database->listBucket(bucket.name, "test1");
 
         // assert
         BOOST_CHECK_EQUAL(result1.size(), 2);
@@ -174,15 +174,15 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        object1 = s3Database->CreateObject(object1);
+        object1 = s3Database->createObject(object1);
         Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
-        object2 = s3Database->CreateObject(object2);
+        object2 = s3Database->createObject(object2);
 
         // act
-        const long totalSize = s3Database->GetBucketSize(TEST_REGION, TEST_BUCKET_NAME);
+        const long totalSize = s3Database->getBucketSize(TEST_REGION, TEST_BUCKET_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(totalSize, 10);
@@ -193,15 +193,15 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->CreateObject(object1);
+        s3Database->createObject(object1);
         Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
-        s3Database->CreateObject(object2);
+        s3Database->createObject(object2);
 
         // act
-        const bool result = s3Database->HasObjects(bucket);
+        const bool result = s3Database->hasObjects(bucket);
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
@@ -212,12 +212,12 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // act
-        BOOST_CHECK_NO_THROW({ s3Database->DeleteBucket(bucket); });
-        const bool result = s3Database->BucketExists(bucket.region, bucket.name);
+        BOOST_CHECK_NO_THROW({ s3Database->deleteBucket(bucket); });
+        const bool result = s3Database->bucketExists(bucket.region, bucket.name);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
@@ -228,12 +228,12 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // act
-        BOOST_CHECK_NO_THROW({ s3Database->DeleteAllBuckets(); });
-        const bool result = s3Database->BucketExists(bucket.region, bucket.name);
+        BOOST_CHECK_NO_THROW({ s3Database->deleteAllBuckets(); });
+        const bool result = s3Database->bucketExists(bucket.region, bucket.name);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
@@ -244,13 +244,13 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->CreateObject(object1);
+        s3Database->createObject(object1);
 
         // act
-        const bool result = s3Database->ObjectExists(object1);
+        const bool result = s3Database->objectExists(object1);
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
@@ -261,13 +261,13 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->CreateObject(object1);
+        s3Database->createObject(object1);
 
         // act
-        const Entity::S3::Object result = s3Database->GetObject(TEST_REGION, object1.bucket, object1.key);
+        const Entity::S3::Object result = s3Database->getObject(TEST_REGION, object1.bucket, object1.key);
 
         // assert
         BOOST_CHECK_EQUAL(result.key, object1.key);
@@ -278,10 +278,10 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->CreateObject(object1);
+        s3Database->createObject(object1);
         Entity::S3::Object updateObject;
         updateObject.region = TEST_REGION;
         updateObject.bucket = bucket.name;
@@ -290,7 +290,7 @@ namespace Awsmock::Database {
         updateObject.size = object1.size + 10;
 
         // act
-        const Entity::S3::Object result = s3Database->UpdateObject(updateObject);
+        const Entity::S3::Object result = s3Database->updateObject(updateObject);
 
         // assert
         BOOST_CHECK_EQUAL(15, result.size);
@@ -301,13 +301,13 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        object1 = s3Database->CreateObject(object1);
+        object1 = s3Database->createObject(object1);
 
         // act
-        const Entity::S3::Object result = s3Database->GetObjectById(object1.oid);
+        const Entity::S3::Object result = s3Database->getObjectById(object1.oid);
 
         // assert
         BOOST_CHECK_EQUAL(result.oid, object1.oid);
@@ -318,14 +318,14 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        object1 = s3Database->CreateObject(object1);
+        object1 = s3Database->createObject(object1);
 
         // act
-        BOOST_CHECK_NO_THROW({ s3Database->DeleteObject(object1); });
-        const bool result = s3Database->ObjectExists(object1.region, object1.bucket, object1.key);
+        BOOST_CHECK_NO_THROW({ s3Database->deleteObject(object1); });
+        const bool result = s3Database->objectExists(object1.region, object1.bucket, object1.key);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
@@ -336,17 +336,17 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // Create objects
         for (int i = 0; i < 10; i++) {
             Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key-" + std::to_string(i));
-            object1 = s3Database->CreateObject(object1);
+            object1 = s3Database->createObject(object1);
         }
 
         // act
-        const long result = s3Database->ObjectCount(bucket.region, {}, bucket.name);
+        const long result = s3Database->objectCount(bucket.region, {}, bucket.name);
 
         // assert
         BOOST_CHECK_EQUAL(10, result);
@@ -357,17 +357,17 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // Create objects
         for (int i = 0; i < 10; i++) {
             Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key-" + std::to_string(i));
-            object1 = s3Database->CreateObject(object1);
+            object1 = s3Database->createObject(object1);
         }
 
         // act
-        const std::vector<Entity::S3::Object> result = s3Database->ListObjects({}, {}, {}, 0, 0, {});
+        const std::vector<Entity::S3::Object> result = s3Database->listObjects({}, {}, {}, 0, 0, {});
 
         // assert
         BOOST_CHECK_EQUAL(10, result.size());
@@ -378,7 +378,7 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // Create objects
@@ -387,12 +387,12 @@ namespace Awsmock::Database {
             std::string key = std::string("test1/key-") + std::to_string(i);
             keys.push_back(key);
             Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, key);
-            object = s3Database->CreateObject(object);
+            object = s3Database->createObject(object);
         }
 
         // act
-        BOOST_CHECK_NO_THROW({ long deleted = s3Database->DeleteObjects(TEST_REGION, bucket.name, keys); });
-        const bool result = s3Database->ObjectCount(bucket.region, bucket.name, {});
+        BOOST_CHECK_NO_THROW({ long deleted = s3Database->deleteObjects(TEST_REGION, bucket.name, keys); });
+        const bool result = s3Database->objectCount(bucket.region, bucket.name, {});
 
         // assert
         BOOST_CHECK_EQUAL(0, result);
@@ -403,17 +403,17 @@ namespace Awsmock::Database {
         // arrange
         const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
         Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-        bucket = s3Database->CreateBucket(bucket);
+        bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        object = s3Database->CreateObject(object);
+        object = s3Database->createObject(object);
 
         // act
         BOOST_CHECK_NO_THROW({
-            const long deleted = s3Database->DeleteAllObjects();
+            const long deleted = s3Database->deleteAllObjects();
             log_debug << "Deleted: " << deleted;
         });
-        const bool result = s3Database->ObjectExists(object.region, object.bucket, object.key);
+        const bool result = s3Database->objectExists(object.region, object.bucket, object.key);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
@@ -425,14 +425,14 @@ namespace Awsmock::Database {
     //     // arrange
     //     const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
     //     Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-    //     bucket = s3Database->CreateBucket(bucket);
+    //     bucket = s3Database->createBucket(bucket);
     //     BOOST_CHECK_EQUAL(false, bucket.arn.empty());
     //     Entity::S3::BucketNotification notification;
     //     notification.event = "s3:ObjectCreated:*";
     //     notification.lambdaArn = "aws:arn:000000000:lambda:test";
     //
     //     // act
-    //     const Entity::S3::Bucket result = s3Database->CreateBucketNotification(bucket, notification);
+    //     const Entity::S3::Bucket result = s3Database->createBucketNotification(bucket, notification);
     //
     //     // assert
     //     BOOST_CHECK_EQUAL(4, result.notifications.size());
@@ -443,14 +443,14 @@ namespace Awsmock::Database {
     //     // arrange
     //     const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
     //     Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-    //     bucket = s3Database->CreateBucket(bucket);
+    //     bucket = s3Database->createBucket(bucket);
     //     BOOST_CHECK_EQUAL(false, bucket.arn.empty());
     //     Entity::S3::BucketNotification notification;
     //     notification.event = "s3:ObjectCreated:Put";
     //     notification.lambdaArn = "aws:arn:000000000:lambda:test";
     //
     //     // act
-    //     const Entity::S3::Bucket result = s3Database->CreateBucketNotification(bucket, notification);
+    //     const Entity::S3::Bucket result = s3Database->createBucketNotification(bucket, notification);
     //
     //     // assert
     //     BOOST_CHECK_EQUAL(1, result.notifications.size());
@@ -461,15 +461,15 @@ namespace Awsmock::Database {
     //     // arrange
     //     const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
     //     Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-    //     bucket = s3Database->CreateBucket(bucket);
+    //     bucket = s3Database->createBucket(bucket);
     //     BOOST_CHECK_EQUAL(false, bucket.arn.empty());
     //     Entity::S3::BucketNotification notification;
     //     notification.event = "s3:ObjectCreated:Put";
     //     notification.lambdaArn = "aws:arn:000000000:lambda:test";
-    //     bucket = s3Database->CreateBucketNotification(bucket, notification);
+    //     bucket = s3Database->createBucketNotification(bucket, notification);
     //
     //     // act
-    //     const Entity::S3::Bucket result = s3Database->CreateBucketNotification(bucket, notification);
+    //     const Entity::S3::Bucket result = s3Database->createBucketNotification(bucket, notification);
     //
     //     // assert
     //     BOOST_CHECK_EQUAL(1, result.notifications.size());
@@ -480,15 +480,15 @@ namespace Awsmock::Database {
     //     // arrange
     //     const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
     //     Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-    //     bucket = s3Database->CreateBucket(bucket);
+    //     bucket = s3Database->createBucket(bucket);
     //     BOOST_CHECK_EQUAL(false, bucket.arn.empty());
     //     Entity::S3::BucketNotification notification;
     //     notification.event = "s3:ObjectCreated:*";
     //     notification.lambdaArn = "aws:arn:000000000:lambda:test";
-    //     bucket = s3Database->CreateBucketNotification(bucket, notification);
+    //     bucket = s3Database->createBucketNotification(bucket, notification);
     //
     //     // act
-    //     const Entity::S3::Bucket result = s3Database->DeleteBucketNotifications(bucket, notification);
+    //     const Entity::S3::Bucket result = s3Database->deleteBucketNotifications(bucket, notification);
     //
     //     // assert
     //     BOOST_CHECK_EQUAL(result.notifications.empty(), true);
@@ -499,18 +499,18 @@ namespace Awsmock::Database {
     //     // arrange
     //     const std::shared_ptr<IS3Repository> s3Database = RepositoryFactory::instance().s3Repository();
     //     Entity::S3::Bucket bucket = CreateDefaultBucket(TEST_BUCKET_NAME);
-    //     bucket = s3Database->CreateBucket(bucket);
+    //     bucket = s3Database->createBucket(bucket);
     //     BOOST_CHECK_EQUAL(false, bucket.arn.empty());
     //     Entity::S3::BucketNotification notification;
     //     notification.event = "s3:ObjectCreated:*";
     //     notification.lambdaArn = "aws:arn:000000000:lambda:test";
-    //     bucket = s3Database->CreateBucketNotification(bucket, notification);
+    //     bucket = s3Database->createBucketNotification(bucket, notification);
     //     Entity::S3::BucketNotification deleteNotification;
     //     deleteNotification.event = "s3:ObjectCreated:Put";
     //     deleteNotification.lambdaArn = "aws:arn:000000000:lambda:test";
     //
     //     // act
-    //     const Entity::S3::Bucket result = s3Database->DeleteBucketNotifications(bucket, deleteNotification);
+    //     const Entity::S3::Bucket result = s3Database->deleteBucketNotifications(bucket, deleteNotification);
     //
     //     // assert
     //     BOOST_CHECK_EQUAL(0, result.notifications.size());

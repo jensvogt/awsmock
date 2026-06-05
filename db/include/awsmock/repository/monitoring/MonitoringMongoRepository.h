@@ -41,7 +41,7 @@ namespace Awsmock::Database {
          * @return list of counter-values
          */
         [[nodiscard]]
-        std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {},
+        std::vector<Entity::Monitoring::Counter> getMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, long step, const std::string &labelName = {}, const std::string &labelValue = {},
                                                                      long limit = 10) const override;
 
         /**
@@ -49,7 +49,7 @@ namespace Awsmock::Database {
          *
          * @param values key value map of values
          */
-        void UpdateMonitoringCounters(const std::map<std::string, double> &values) const override;
+        void updateMonitoringCounters(const std::map<std::string, double> &values) const override;
 
         /**
          * @brief Returns list of label values by label name
@@ -62,7 +62,7 @@ namespace Awsmock::Database {
          * @return list of label values
          */
         [[nodiscard]]
-        std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit, system_clock::time_point start, system_clock::time_point end) const override;
+        std::vector<std::string> getDistinctLabelValues(const std::string &name, const std::string &labelName, long limit, system_clock::time_point start, system_clock::time_point end) const override;
 
         /**
          * @brief Deletes old monitoring data
@@ -71,7 +71,7 @@ namespace Awsmock::Database {
          * @return number of deleted data rows
          */
         [[nodiscard]]
-        long DeleteOldMonitoringData(int retentionPeriod) const override;
+        long deleteOldMonitoringData(int retentionPeriod) const override;
 
       private:
 

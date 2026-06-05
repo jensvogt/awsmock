@@ -18,7 +18,7 @@ namespace Awsmock::Service {
             } else if (algorithm == "MD5") {
                 object.sha256sum = Core::Crypto::GetMd5FromFile(filename);
             }
-            object = Database::RepositoryFactory::instance().s3Repository()->UpdateObject(object);
+            object = Database::RepositoryFactory::instance().s3Repository()->updateObject(object);
             log_debug << "Calculated hashes, key: " << object.key << " hash: " << algorithm;
         }
     }
