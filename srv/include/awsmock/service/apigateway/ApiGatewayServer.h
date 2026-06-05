@@ -1,26 +1,17 @@
-﻿//
+//
 // Created by vogje01 on 04/01/2023.
 //
 
 #pragma once
 
-// C++ includes
-#include <list>
-#include <thread>
-#include <vector>
-
-// Boost includes
-#include <boost/asio/io_context.hpp>
-
 // AwsMock includes
-#include <awsmock/agw/ProxyListener.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/dto/apigateway/model/ProxyConfig.h>
 #include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/service/apigateway/ApiGatewayController.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -41,7 +32,7 @@ namespace Awsmock::Service {
         explicit ApiGatewayServer();
 
         /**
-         * @brief Shutdown the cognito server
+         * @brief Shutdown the api-gateway server
          */
         void Shutdown() override;
 
@@ -50,24 +41,20 @@ namespace Awsmock::Service {
         /**
          * @brief Channeled logger
          */
-        mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
+        mutable logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
 
         /**
          * @brief Update counters
          */
         void UpdateCounter() const;
 
-
         /**
-         * @brief Initiates and starts the REST APIs for the application.
-         *
-         * This method is responsible for activating and launching the REST API endpoints
-         * within the application, ensuring they are ready to handle incoming requests.
+         * @brief Starts an awsmock-agw proxy process for each registered REST API.
          */
         void StartRestApis();
 
         /**
-         * @brief Back up the cognito objects
+         * @brief Back up the api-gateway objects
          */
         static void BackupApiGateway();
 
@@ -77,19 +64,9 @@ namespace Awsmock::Service {
         std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
 
         /**
-         * @brief io_context shared by all in-process ProxyListeners
+         * @brief Manages the awsmock-agw child processes (one per REST API)
          */
-        boost::asio::io_context _ioc;
-
-        /**
-         * @brief Stable storage for ProxyConfig objects (ProxyListener holds references)
-         */
-        std::list<Dto::ApiGateway::ProxyConfig> _proxyConfigs;
-
-        /**
-         * @brief Thread pool driving _ioc
-         */
-        std::vector<std::thread> _ioThreads;
+        ApiGatewayController _controller;
     };
 
 }// namespace Awsmock::Service

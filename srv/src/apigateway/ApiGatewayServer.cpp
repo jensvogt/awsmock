@@ -30,7 +30,7 @@ namespace Awsmock::Service {
 
     void ApiGatewayServer::UpdateCounter() const {
         log_trace << "ApiGateway monitoring starting";
-        
+
         //
         // const long users = _apiGatewayDatabase->countUsers({}, {}, {});
         // const long userPools = _apiGatewayDatabase->countUserPools({});
@@ -52,28 +52,45 @@ namespace Awsmock::Service {
     }
 
     void ApiGatewayServer::StartRestApis() {
-
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
         const auto restApis = _apiGatewayDatabase->listRestApis(region);
-        if (restApis.empty()) {
-            return;
-        }
+        if (restApis.empty()) return;
+
+        const auto executable = Core::Configuration::instance().getOr<std::string>("awsmock.modules.api-gateway.proxy.executable", "awsmock-agw");
+        const int threads = Core::Configuration::instance().getOr<int>("awsmock.modules.api-gateway.proxy.threads", 4);
+        const int targetPort = Core::Configuration::instance().getOr<int>("awsmock.modules.api-gateway.proxy.target-port", 4566);
+        const auto targetHost = Core::Configuration::instance().getOr<std::string>("awsmock.modules.api-gateway.proxy.target-host", "localhost");
 
         for (const auto &restApi: restApis) {
-            log_info << "Starting proxy for restApi, name: " << restApi.name;
-            auto &cfg = _proxyConfigs.emplace_back();
-            cfg.name = restApi.name;
-            cfg.listenPort = Core::SystemUtils::GetNextFreePort();
-            cfg.threads = Core::Configuration::instance().getOr<int>("awsmock.modules.api-gateway.proxy.threads", 4);
-            cfg.targetPort = 4566;
-            log_info << "Proxy started, name: " << restApi.name << ", listenPort: " << cfg.listenPort << ", targetPort: " << cfg.targetPort;
-            std::make_shared<Agw::ProxyListener>(_ioc, cfg)->Run();
-        }
+            const int listenPort = Core::SystemUtils::GetNextFreePort();
+            const std::string socketPath = "/tmp/awsmock-agw-" + restApi.name + ".sock";
 
-        const int threads = _proxyConfigs.front().threads;
-        _ioThreads.reserve(static_cast<std::size_t>(threads));
-        for (int i = 0; i < threads; ++i)
-            _ioThreads.emplace_back([this] { _ioc.run(); });
+            Dto::ProcessConfig cfg;
+            cfg.name = restApi.name;
+            cfg.executable = executable;
+            cfg.socketPath = socketPath;
+            cfg.args = {
+                    "--name",
+                    restApi.name,
+                    "--port",
+                    std::to_string(listenPort),
+                    "--target-host",
+                    targetHost,
+                    "--target-port",
+                    std::to_string(targetPort),
+                    "--socket-path",
+                    socketPath,
+                    "--threads",
+                    std::to_string(threads),
+            };
+
+            _controller.registerModule(cfg);
+            if (_controller.start(restApi.name)) {
+                log_info << "Started restApi proxy, name: " << restApi.name << ", port: " << listenPort;
+            } else {
+                log_error << "Failed to start restApi proxy, name: " << restApi.name;
+            }
+        }
     }
 
     void ApiGatewayServer::BackupApiGateway() {
@@ -83,8 +100,7 @@ namespace Awsmock::Service {
     void ApiGatewayServer::Shutdown() {
         Core::Scheduler::instance().Shutdown("api-gateway-monitoring");
         Core::Scheduler::instance().Shutdown("api-gateway-backup");
-        _ioc.stop();
-        for (auto &t: _ioThreads) t.join();
+        _controller.stopAll();
         log_info << "ApiGateway server stopped";
     }
 }// namespace Awsmock::Service
