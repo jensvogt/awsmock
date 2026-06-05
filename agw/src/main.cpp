@@ -1,5 +1,5 @@
 // ===================================================================================
-// awsmockagw — standalone HTTP reverse-agw process for the AwsMock API Gateway.
+// awsmock-agw — standalone HTTP reverse-agw process for the AwsMock API Gateway.
 //
 // Started by ApiGatewayController via fork/exec. The controller waits for the
 // process to create a listening UNIX-domain socket at --socket-path before
@@ -159,7 +159,8 @@ int main(int argc, char *argv[]) {
 
     // Signal readiness to ApiGatewayController.  The controller's waitForSocket()
     // loop polls this path — it succeeds as soon as our UNIX socket is in LISTEN.
-    if (ReadinessSocket readiness{cfg.socketPath}; !readiness.ok()) {
+    ReadinessSocket readiness{cfg.socketPath};
+    if (!readiness.ok()) {
         log_error << "Could not create readiness socket at '" << cfg.socketPath << "'";
         return 1;
     }
