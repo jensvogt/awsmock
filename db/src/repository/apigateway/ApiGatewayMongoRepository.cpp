@@ -298,6 +298,32 @@ namespace Awsmock::Database {
         }
     }
 
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMongoRepository::listRestApis(const std::string &region) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection restapiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+        try {
+
+            document query = {};
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+
+            std::vector<Entity::ApiGateway::RestApi> restApiList;
+            for (auto lambdaCursor = restapiCollection.find(query.extract()); auto lambda: lambdaCursor) {
+                Entity::ApiGateway::RestApi result;
+                result.FromDocument(lambda);
+                restApiList.push_back(result);
+            }
+            return restApiList;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
     // ========================================================================================================================
     // AwsMock internal
     // ========================================================================================================================

@@ -174,6 +174,15 @@ namespace Awsmock::Database {
          */
         [[nodiscard]] std::vector<Entity::ApiGateway::RestApi> listRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
+        /**
+         * @brief Returns a list of REST API counters
+         *
+         * @param region AWS region
+         * @return list of REST API counters
+         */
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::RestApi> listRestApis(const std::string &region) const override;
+        
       private:
 
         /**
