@@ -13,7 +13,7 @@ const isPageContext = !isExtensionContext;
 // default target host
 const AWSMOCK_HOST = "localhost:4566";
 
-// list of XHR proxy attributes - see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+// list of XHR agw attributes - see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 const XHR_PROXY_ATTRS = ["statusText", "responseType", "response", "responseText", "readyState", "responseXML", "responseURL", "status", "statusText", "withCredentials", "timeout"];
 // list of XHR event type names - see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#events
 const XHR_EVENT_NAMES = ["readystatechange", "progress", "error", "abort", "load", "beforesend", "loadstart", "loadend", "timeout"];
@@ -32,7 +32,7 @@ const XHR_EVENT_ATTRS = [
  */
 const patchXMLHttpRequest = () => {
 
-    // add all proxy getters, with fallback to _attribute
+    // add all agw getters, with fallback to _attribute
     XHR_PROXY_ATTRS.forEach(function (item) {
         const oldProp = Object.getOwnPropertyDescriptor(window.XMLHttpRequest.prototype, item);
         Object.defineProperty(window.XMLHttpRequest.prototype, item, {
@@ -43,7 +43,7 @@ const patchXMLHttpRequest = () => {
         });
     });
 
-    // add all pure proxy pass-through methods
+    // add all pure agw pass-through methods
     ["getAllResponseHeaders"].forEach(function (item) {
         const oldProp = Object.getOwnPropertyDescriptor(window.XMLHttpRequest.prototype, item);
         Object.defineProperty(window.XMLHttpRequest.prototype, item, {

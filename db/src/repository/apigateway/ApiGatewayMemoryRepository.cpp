@@ -163,6 +163,23 @@ namespace Awsmock::Database {
         return createRestApi(restApi);
     }
 
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::listRestApis(const std::string &region) const {
+        boost::mutex::scoped_lock lock(_apiKeyMutex);
+
+        std::vector<Entity::ApiGateway::RestApi> values;
+
+        // Get values
+        for (auto &val: _restApis | std::views::values) {
+            values.push_back(val);
+        }
+
+        auto q = Core::from(values);
+        if (!region.empty()) {
+            q = q.where([region](const Entity::ApiGateway::RestApi &item) { return item.region == region; });
+        }
+        return q.to_vector();
+    }
+
     // ========================================================================================================================
     // AwsMock internal
     // ========================================================================================================================

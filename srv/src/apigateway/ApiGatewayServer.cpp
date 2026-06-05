@@ -4,8 +4,6 @@
 
 #include <awsmock/service/apigateway/ApiGatewayServer.h>
 
-#include "awsmock/service/apigateway/ApiGatewayController.h"
-
 namespace Awsmock::Service {
 
     ApiGatewayServer::ApiGatewayServer() : AbstractServer("api-gateway") {
@@ -52,12 +50,29 @@ namespace Awsmock::Service {
         log_trace << "ApiGateway monitoring finished";
     }
 
-    void ApiGatewayServer::StartRestApis() const {
-        ApiGatewayController ctrl;
-        for (const auto &restApi: _apiGatewayDatabase->listRestApiCounters({}, 0, 0, {})) {
-            log_info << "Starting restApi, name: " << restApi.name;
-            ctrl.start(restApi.name);
+    void ApiGatewayServer::StartRestApis() {
+
+        const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
+        const auto restApis = _apiGatewayDatabase->listRestApis(region);
+        if (restApis.empty()) {
+            return;
         }
+
+        for (const auto &restApi: restApis) {
+            log_info << "Starting proxy for restApi, name: " << restApi.name;
+            auto &cfg = _proxyConfigs.emplace_back();
+            cfg.name = restApi.name;
+            cfg.listenPort = Core::SystemUtils::GetNextFreePort();
+            cfg.threads = Core::Configuration::instance().getOr<int>("awsmock.modules.api-gateway.proxy.threads", 4);
+            cfg.targetPort = 4566;
+            log_info << "Proxy started, name: " << restApi.name << ", listenPort: " << cfg.listenPort << ", targetPort: " << cfg.targetPort;
+            std::make_shared<Agw::ProxyListener>(_ioc, cfg)->Run();
+        }
+
+        const int threads = _proxyConfigs.front().threads;
+        _ioThreads.reserve(static_cast<std::size_t>(threads));
+        for (int i = 0; i < threads; ++i)
+            _ioThreads.emplace_back([this] { _ioc.run(); });
     }
 
     void ApiGatewayServer::BackupApiGateway() {
@@ -67,6 +82,8 @@ namespace Awsmock::Service {
     void ApiGatewayServer::Shutdown() {
         Core::Scheduler::instance().Shutdown("api-gateway-monitoring");
         Core::Scheduler::instance().Shutdown("api-gateway-backup");
+        _ioc.stop();
+        for (auto &t: _ioThreads) t.join();
         log_info << "ApiGateway server stopped";
     }
 }// namespace Awsmock::Service
