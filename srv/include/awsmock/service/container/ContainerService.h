@@ -380,11 +380,12 @@ namespace Awsmock::Service {
          * @brief Get statistics about a container
          *
          * @param containerId ID of the container
+         * @param applicationName name of the application
          * @return counter statistics
          * @see AwsMock::Dto::Docker::Model::ContainerStat
          */
         [[nodiscard]]
-        Dto::Docker::ContainerStat GetContainerStats(const std::string &containerId) const;
+        Dto::Docker::ContainerStat GetContainerStats(const std::string &containerId, const std::string &applicationName) const;
 
         /**
          * @brief Start the container

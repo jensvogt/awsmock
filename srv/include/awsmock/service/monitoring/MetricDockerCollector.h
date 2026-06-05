@@ -32,7 +32,7 @@ namespace Awsmock::Monitoring {
         /**
          * @brief Updates the system counter
          */
-        void CollectDockerCounter();
+        void CollectDockerCounter() const;
 
       private:
 

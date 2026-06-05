@@ -60,12 +60,14 @@ namespace Awsmock::Manager {
          */
         explicit Manager(boost::asio::io_context &ioc) : _ioc(ioc) {
                                                          };
-
         /**
-         * @brief Initialization
+         * @brief General initialization
          */
         void Initialize() const;
 
+        /**
+         * @brief Initialize the logging subsystem
+         */
         void InitializeLogging() const;
 
         /**
@@ -73,6 +75,9 @@ namespace Awsmock::Manager {
          */
         void Run(bool isService);
 
+        /**
+         * @brief Stop the manager
+         */
         void Stop() const;
 
         /**

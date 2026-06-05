@@ -2,7 +2,6 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#include <awsmock/dto/module/model/Module.h>
 #include <awsmock/repository/module/ModuleMongoRepository.h>
 
 namespace Awsmock::Database {
@@ -18,7 +17,8 @@ namespace Awsmock::Database {
             {"secretsmanager", {.name = "secretsmanager", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"kms", {.name = "kms", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
             {"ssm", {.name = "ssm", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
-            {"application", {.name = "application", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
+            {"application", {.name = "application", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}},
+            {"api-gateway", {.name = "api-gateway", .state = Entity::Module::ModuleState::STOPPED, .status = Entity::Module::ModuleStatus::INACTIVE}}};
 
     void ModuleMongoRepository::initialize() const {
 

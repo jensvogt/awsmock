@@ -4,6 +4,8 @@
 
 #include <awsmock/server/Manager.h>
 
+#include "awsmock/service/apigateway/ApiGatewayServer.h"
+
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
 #endif
@@ -223,6 +225,8 @@ namespace Awsmock::Manager {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SecretsManagerServer>());
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>());
+            } else if (module.name == "api-gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApiGatewayServer>());
             }
         }
         log_info << "Modules started, count: " << Service::ModuleMap::instance().GetSize();

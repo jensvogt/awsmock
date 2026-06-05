@@ -182,12 +182,11 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/s3/S3Handler.cpp srv/src/s3/S3Service.cpp srv/src/s3/S3HashCreator.cpp srv/src/sqs/SQSServer.cpp
         srv/src/sqs/SQSHandler.cpp srv/src/sqs/SQSService.cpp srv/src/sns/SNSServer.cpp srv/src/sns/SNSHandler.cpp
         srv/src/sns/SNSService.cpp srv/src/lambda/LambdaServer.cpp srv/src/lambda/LambdaHandler.cpp
-        srv/src/lambda/LambdaController.cpp
-        srv/src/lambda/LambdaService.cpp srv/src/lambda/LambdaCreator.cpp srv/src/lambda/LambdaExecutor.cpp
-        srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoService.cpp
-        srv/src/cognito/CognitoServer.cpp srv/src/transfer/TransferServer.cpp srv/src/transfer/TransferHandler.cpp
-        srv/src/transfer/TransferService.cpp srv/src/dynamodb/DynamoDbServer.cpp srv/src/dynamodb/DynamoDbHandler.cpp
-        srv/src/dynamodb/DynamoDbService.cpp srv/src/secretsmanager/SecretsManagerServer.cpp
+        srv/src/lambda/LambdaController.cpp srv/src/lambda/LambdaService.cpp srv/src/lambda/LambdaCreator.cpp
+        srv/src/lambda/LambdaExecutor.cpp srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoHandler.cpp
+        srv/src/cognito/CognitoService.cpp srv/src/cognito/CognitoServer.cpp srv/src/transfer/TransferServer.cpp
+        srv/src/transfer/TransferHandler.cpp srv/src/transfer/TransferService.cpp srv/src/dynamodb/DynamoDbServer.cpp
+        srv/src/dynamodb/DynamoDbHandler.cpp srv/src/dynamodb/DynamoDbService.cpp srv/src/secretsmanager/SecretsManagerServer.cpp
         srv/src/secretsmanager/SecretsManagerHandler.cpp srv/src/secretsmanager/SecretsManagerService.cpp
         srv/src/secretsmanager/SecretRotation.cpp srv/src/kms/KMSServer.cpp srv/src/kms/KMSHandler.cpp
         srv/src/kms/KMSService.cpp srv/src/kms/KMSCreator.cpp srv/src/ssm/SSMServer.cpp srv/src/ssm/SSMHandler.cpp
@@ -201,10 +200,10 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/application/ApplicationService.cpp srv/src/application/ApplicationCreator.cpp
         srv/src/application/ApplicationLogServer.cpp srv/src/application/ApplicationLogSession.cpp
         srv/src/apigateway/ApiGatewayService.cpp srv/src/apigateway/ApiGatewayHandler.cpp
-        srv/src/monitoring/MetricSystemCollector.cpp srv/src/monitoring/MetricDockerCollector.cpp
-        srv/src/monitoring/MonitoringHandler.cpp srv/src/monitoring/MonitoringServer.cpp
-        srv/src/monitoring/MonitoringService.cpp srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp
-        srv/src/frontend/FrontendSession.cpp)
+        srv/src/apigateway/ApiGatewayServer.cpp srv/src/monitoring/MetricSystemCollector.cpp
+        srv/src/monitoring/MetricDockerCollector.cpp srv/src/monitoring/MonitoringHandler.cpp
+        srv/src/monitoring/MonitoringServer.cpp srv/src/monitoring/MonitoringService.cpp srv/src/apigateway/ApiGatewayController.cpp
+        srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp srv/src/frontend/FrontendSession.cpp)
 
 add_library(awsmocksrv STATIC ${SRV_SOURCES})
 target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include

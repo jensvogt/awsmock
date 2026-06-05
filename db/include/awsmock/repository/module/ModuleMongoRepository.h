@@ -9,6 +9,7 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/module/IModuleRepository.h>
