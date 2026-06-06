@@ -32,7 +32,8 @@ namespace Awsmock::Database {
      */
     class ApiGatewayMemoryRepository final : public IApiGatewayRepository {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -204,7 +205,28 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::vector<Entity::ApiGateway::RestApi> listRestApis(const std::string &region) const override;
 
-    private:
+        /**
+         * @brief Returns the total number of REST Apis
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @return REST API count
+         */
+        [[nodiscard]]
+        long countRestApis(const std::string &region, const std::string &prefix) const override;
+
+        /**
+         * @brief Returns a REST API entity
+         *
+         * @param region AWS region
+         * @param name name
+         * @return REST API entity
+         */
+        [[nodiscard]]
+        Entity::ApiGateway::RestApi getRestApi(const std::string &region, const std::string &name) const override;
+
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -231,4 +253,4 @@ namespace Awsmock::Database {
         static boost::mutex _restApiMutex;
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

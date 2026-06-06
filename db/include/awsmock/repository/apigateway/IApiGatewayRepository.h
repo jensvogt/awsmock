@@ -24,7 +24,8 @@ namespace Awsmock::Database {
      */
     class IApiGatewayRepository {
 
-    public:
+      public:
+
         /**
          * @brief Virtual destructor for the IApplicationRepository interface.
          *
@@ -200,6 +201,26 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         virtual std::vector<Entity::ApiGateway::RestApi> listRestApis(const std::string &region) const = 0;
+
+        /**
+         * @brief Returns the total number of REST Apis
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @return REST API count
+         */
+        [[nodiscard]]
+        virtual long countRestApis(const std::string &region, const std::string &prefix) const = 0;
+
+        /**
+         * @brief Returns a REST API entity
+         *
+         * @param region AWS region
+         * @param prefix name
+         * @return REST API entity
+         */
+        [[nodiscard]]
+        virtual Entity::ApiGateway::RestApi getRestApi(const std::string &region, const std::string &prefix) const = 0;
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

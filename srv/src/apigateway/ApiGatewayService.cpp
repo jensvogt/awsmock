@@ -202,12 +202,33 @@ namespace Awsmock::Service {
 
             // Get the list of REST APIs
             const std::vector<Database::Entity::ApiGateway::RestApi> restApis = _apiGatewayDatabase->listRestApiCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
-            const long total = _apiGatewayDatabase->countApiKeys();
-
-            log_trace << "Get REST APIs, count: " << restApis.size();
             Dto::ApiGateway::ListRestApiCountersResponse response{};
-            response.total = total;
+            response.total = _apiGatewayDatabase->countRestApis(request.region, request.prefix);
             response.restApis = Dto::ApiGateway::Mapper::map(restApis);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::GetRestApiCounterResponse ApiGatewayService::GetRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_rest_api");
+        log_debug << "Get REST API counter request, region:  " << request.region << ", name: " << request.name;
+
+        if (!_apiGatewayDatabase->restApiExists(request.region, request.name)) {
+            log_error << "REST API does not exist, region: " << request.region << ", name: " << request.name;
+            throw Core::ServiceException("REST API key does not exist, region: " + request.region + ", name: " + request.name);
+        }
+
+        try {
+
+            // Get the API key
+            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.region, request.name);
+
+            Dto::ApiGateway::GetRestApiCounterResponse response{};
+            response.restApi = Dto::ApiGateway::Mapper::map(restApi);
             return response;
 
         } catch (bsoncxx::exception &exc) {

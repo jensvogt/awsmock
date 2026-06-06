@@ -83,7 +83,7 @@ namespace Awsmock::Dto::ApiGateway {
         Database::Entity::ApiGateway::RestApi restApiEntity;
         restApiEntity.region = request.region;
         restApiEntity.name = request.name;
-        restApiEntity.apiKeySource = ApiKeySourceTypeToString(request.apiKeySource);
+        restApiEntity.apiKeySource = Database::Entity::ApiGateway::ApiKeySourceTypeFromString(ApiKeySourceTypeToString(request.apiKeySource));
         restApiEntity.description = request.description;
         restApiEntity.binaryMediaTypes = request.binaryMediaTypes;
         restApiEntity.cloneFrom = request.cloneFrom;
@@ -101,7 +101,7 @@ namespace Awsmock::Dto::ApiGateway {
         response.user = request.user;
         response.requestId = request.requestId;
         response.name = restApiEntity.name;
-        response.apiKeySource = ApiKeySourceTypeFromString(restApiEntity.apiKeySource);
+        response.apiKeySource = ApiKeySourceTypeFromString(Database::Entity::ApiGateway::ApiKeySourceTypeToString(restApiEntity.apiKeySource));
         response.description = restApiEntity.description;
         response.policy = restApiEntity.policy;
         response.rootResourceId = restApiEntity.rootResourceId;
@@ -115,7 +115,7 @@ namespace Awsmock::Dto::ApiGateway {
     RestApi Mapper::map(const Database::Entity::ApiGateway::RestApi &restApiEntity) {
         RestApi restApi{};
         restApi.name = restApiEntity.name;
-        restApi.apiKeySource = ApiKeySourceTypeFromString(restApiEntity.apiKeySource);
+        restApi.apiKeySource = ApiKeySourceTypeFromString(Database::Entity::ApiGateway::ApiKeySourceTypeToString(restApiEntity.apiKeySource));
         restApi.description = restApiEntity.description;
         restApi.policy = restApiEntity.policy;
         restApi.rootResourceId = restApiEntity.rootResourceId;

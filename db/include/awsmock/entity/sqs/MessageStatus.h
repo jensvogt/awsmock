@@ -34,9 +34,9 @@ namespace Awsmock::Database::Entity::SQS {
     }
 
     [[maybe_unused]] static MessageStatus MessageStatusFromString(const std::string &messageStatus) {
-        for (auto &it: MessageStatusNames) {
-            if (it.second == messageStatus) {
-                return it.first;
+        for (auto &[fst, snd]: MessageStatusNames) {
+            if (snd == messageStatus) {
+                return fst;
             }
         }
         return MessageStatus::UNKNOWN;

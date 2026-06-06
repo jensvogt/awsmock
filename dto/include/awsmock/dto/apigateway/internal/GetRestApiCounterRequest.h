@@ -14,31 +14,31 @@
 namespace Awsmock::Dto::ApiGateway {
 
     /**
-     * @brief Returns a single API key
+     * @brief Returns a single REST API
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetApiKeyCounterRequest final : Common::BaseCounter<GetApiKeyCounterRequest> {
+    struct GetRestApiCounterRequest final : Common::BaseCounter<GetRestApiCounterRequest> {
 
         /**
-         * API Key ID
+         * REST API name
          */
-        std::string id;
+        std::string name;
 
       private:
 
-        friend GetApiKeyCounterRequest tag_invoke(boost::json::value_to_tag<GetApiKeyCounterRequest>, boost::json::value const &v) {
-            GetApiKeyCounterRequest r;
-            r.id = Core::Json::GetStringValue(v, "id");
+        friend GetRestApiCounterRequest tag_invoke(boost::json::value_to_tag<GetRestApiCounterRequest>, boost::json::value const &v) {
+            GetRestApiCounterRequest r;
+            r.name = Core::Json::GetStringValue(v, "name");
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetApiKeyCounterRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetRestApiCounterRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"id", obj.id},
+                    {"name", obj.name},
             };
         }
     };
