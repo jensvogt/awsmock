@@ -72,7 +72,7 @@ namespace Awsmock::Database {
 
     std::vector<Entity::Apps::Application> ApplicationMemoryRepository::listApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
-        auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(Core::NumberUtils::toVector(_applications));
         if (!region.empty()) {
             q = q.where([region](const Entity::Apps::Application &application) { return application.region == region; });
         }
@@ -96,7 +96,7 @@ namespace Awsmock::Database {
 
     long ApplicationMemoryRepository::countApplications(const std::string &region, const std::string &prefix) const {
 
-        auto q = Core::from(_applications | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(Core::NumberUtils::toVector(_applications));
         if (!region.empty()) {
             q = q.where([region](const Entity::Apps::Application &application) { return application.region == region; });
         }
@@ -126,9 +126,9 @@ namespace Awsmock::Database {
     long ApplicationMemoryRepository::deleteAllApplications() const {
         boost::mutex::scoped_lock lock(_applicationMutex);
 
-        const long count = _applications.size();
+        const long count = static_cast<long>(_applications.size());
         _applications.clear();
         log_debug << "All applications deleted";
         return count;
     }
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

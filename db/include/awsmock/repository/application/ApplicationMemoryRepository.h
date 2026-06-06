@@ -12,6 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Linq.h>
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/apps/Application.h>
@@ -31,8 +32,7 @@ namespace Awsmock::Database {
      */
     class ApplicationMemoryRepository final : public IApplicationRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -140,8 +140,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllApplications() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -158,4 +157,4 @@ namespace Awsmock::Database {
         static boost::mutex _applicationMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

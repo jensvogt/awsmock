@@ -13,6 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Linq.h>
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
@@ -28,8 +29,7 @@ namespace Awsmock::Database {
      */
     class DynamoDbMemoryRepository final : public IDynamoDbRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -340,8 +340,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllItems() const override;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 
         /**
@@ -365,4 +364,4 @@ namespace Awsmock::Database {
         static boost::mutex _itemMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

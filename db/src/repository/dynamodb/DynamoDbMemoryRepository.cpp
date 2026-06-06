@@ -164,7 +164,7 @@ namespace Awsmock::Database {
 
     Entity::DynamoDb::ItemList DynamoDbMemoryRepository::listItems(const std::string &region, const std::string &tableName, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
-        auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(Core::NumberUtils::toVector(_items));
         if (!region.empty()) {
             q = q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
         }
@@ -269,7 +269,7 @@ namespace Awsmock::Database {
 
     std::vector<Entity::DynamoDb::Item> DynamoDbMemoryRepository::getItems(const std::string &region, const std::string &tableName) const {
 
-        auto q = Core::from(_items | std::views::values | std::ranges::to<std::vector>());
+        auto q = Core::from(Core::NumberUtils::toVector(_items));
         if (!region.empty()) {
             q = q.where([region](const Entity::DynamoDb::Item &item) { return item.region == region; });
         }
@@ -278,6 +278,7 @@ namespace Awsmock::Database {
         }
         return q.to_vector();
     }
+
     std::vector<Entity::DynamoDb::Item> DynamoDbMemoryRepository::executeQuery(const value &filter, bool scanIndexForward, int limit) const {
         return {};
     }
@@ -330,4 +331,4 @@ namespace Awsmock::Database {
         _items.clear();
         return count;
     }
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

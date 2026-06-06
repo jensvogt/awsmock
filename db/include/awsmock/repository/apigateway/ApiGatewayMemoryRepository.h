@@ -13,6 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/Linq.h>
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/RestApi.h>
 #include <awsmock/repository/Database.h>
@@ -31,8 +32,7 @@ namespace Awsmock::Database {
      */
     class ApiGatewayMemoryRepository final : public IApiGatewayRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -43,7 +43,8 @@ namespace Awsmock::Database {
          *
          * @param id API key ID
          */
-        [[nodiscard]] bool apiKeyExists(const std::string &id) const override;
+        [[nodiscard]]
+        bool apiKeyExists(const std::string &id) const override;
 
         /**
          * @brief Check the existence of an API key
@@ -51,7 +52,8 @@ namespace Awsmock::Database {
          * @param region AWS region
          * @param name API key name
          */
-        [[nodiscard]] bool apiKeyExists(const std::string &region, const std::string &name) const override;
+        [[nodiscard]]
+        bool apiKeyExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Create a new API gateway key
@@ -59,6 +61,7 @@ namespace Awsmock::Database {
          * @param key API gateway key to create
          * @return created api key
          */
+        [[nodiscard]]
         Entity::ApiGateway::ApiKey createKey(Entity::ApiGateway::ApiKey &key) const override;
 
         /**
@@ -70,6 +73,7 @@ namespace Awsmock::Database {
          * @param limit maximal number of keys
          * @return created api key
          */
+        [[nodiscard]]
         std::vector<Entity::ApiGateway::ApiKey> getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const override;
 
         /**
@@ -78,7 +82,8 @@ namespace Awsmock::Database {
          * @param id name query
          * @return api key
          */
-        [[nodiscard]] Entity::ApiGateway::ApiKey getApiKeyById(const std::string &id) const override;
+        [[nodiscard]]
+        Entity::ApiGateway::ApiKey getApiKeyById(const std::string &id) const override;
 
         /**
          * @brief Updates an existing API key
@@ -103,7 +108,8 @@ namespace Awsmock::Database {
          *
          * @return API key count
          */
-        [[nodiscard]] long countApiKeys() const override;
+        [[nodiscard]]
+        long countApiKeys() const override;
 
         /**
          * @brief Delete an API gateway key by ID
@@ -125,7 +131,8 @@ namespace Awsmock::Database {
          *
          * @param id REST API ID
          */
-        [[nodiscard]] bool restApiExists(const std::string &id) const override;
+        [[nodiscard]]
+        bool restApiExists(const std::string &id) const override;
 
         /**
          * @brief Check the existence of an REST API
@@ -133,7 +140,8 @@ namespace Awsmock::Database {
          * @param region AWS region
          * @param name REST API name
          */
-        [[nodiscard]] bool restApiExists(const std::string &region, const std::string &name) const override;
+        [[nodiscard]]
+        bool restApiExists(const std::string &region, const std::string &name) const override;
 
         /**
          * @brief Create a new REST API
@@ -141,7 +149,8 @@ namespace Awsmock::Database {
          * @param restApi REST API entity to create
          * @return created REST API entity
          */
-        [[nodiscard]] Entity::ApiGateway::RestApi createRestApi(Entity::ApiGateway::RestApi &restApi) const override;
+        [[nodiscard]]
+        Entity::ApiGateway::RestApi createRestApi(Entity::ApiGateway::RestApi &restApi) const override;
 
         /**
          * @brief Create a new REST API or updates an existing one.
@@ -161,7 +170,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting columns
          * @return list of API key counters
          */
-        [[nodiscard]] std::vector<Entity::ApiGateway::ApiKey> listApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::ApiKey> listApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns a list of REST API counters
@@ -172,7 +182,8 @@ namespace Awsmock::Database {
          * @param sortColumns sorting columns
          * @return list of REST API counters
          */
-        [[nodiscard]] std::vector<Entity::ApiGateway::RestApi> listRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::RestApi> listRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Returns a list of REST API counters
@@ -182,9 +193,8 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         std::vector<Entity::ApiGateway::RestApi> listRestApis(const std::string &region) const override;
-        
-      private:
 
+    private:
         /**
          * @brief Channeled logger
          */
@@ -211,4 +221,4 @@ namespace Awsmock::Database {
         static boost::mutex _restApiMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database
