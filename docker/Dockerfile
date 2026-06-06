@@ -17,9 +17,6 @@ WORKDIR /usr/local/vcpkg
 RUN git clone https://github.com/microsoft/vcpkg.git .
 RUN ./bootstrap-vcpkg.sh
 
-# libssh workaround
-#ENV X_VCPKG_ASSET_SOURCES="clear;x-script,wget -nv -c --tries=30 -O {dst} {url}"
-
 # Create build environment
 RUN mkdir -p /usr/src
 
@@ -29,7 +26,7 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
     mkdir build && \
     cmake -S . -B build -DBUILD_DOCUMENTATION=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake \
-    -DVCPKG_OVERLAY_TRIPLETS=./dist/vcpkg -DVCPKG_TARGET_TRIPLET=x64-linux-release -DCMAKE_BUILD_TYPE=Release -Wno-dev && \
+    -DVCPKG_TARGET_TRIPLET=x64-linux-release -DCMAKE_BUILD_TYPE=Release -Wno-dev && \
     cmake --build build
 
 FROM node:24-alpine AS buildfrontend
@@ -73,6 +70,7 @@ COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/loca
 COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/awsmock/bin
 COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/awsmock/bin
 COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/awsmock/bin
+COPY --from=build /usr/src/awsmock/build/awsmock-agw /usr/local/awsmock/bin
 COPY --from=build /usr/src/awsmock/dist/etc/magic.mgc /usr/local/awsmock/etc
 COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
 COPY --from=build /usr/src/awsmock/dist/etc/ssh_host_key /usr/local/awsmock/etc/ssh_host_key

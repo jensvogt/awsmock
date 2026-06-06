@@ -365,7 +365,16 @@ namespace Awsmock::Service {
             for (auto &apiKey: infrastructure.apiKeys) {
                 _apiGatewayDatabase->importApiKey(apiKey);
             }
-            log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
+            log_info << "Api gateway api keys imported, count: " << infrastructure.apiKeys.size();
+        }
+
+        // API gateway REST APIs
+        if (!infrastructure.restApis.empty()) {
+            const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
+            for (auto &restApi: infrastructure.restApis) {
+                _apiGatewayDatabase->importRestApis(restApi);
+            }
+            log_info << "Api gateway rest apis imported, count: " << infrastructure.restApis.size();
         }
     }
 
@@ -514,4 +523,4 @@ namespace Awsmock::Service {
         }
         return response;
     }
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

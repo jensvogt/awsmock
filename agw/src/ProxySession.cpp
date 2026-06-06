@@ -2,7 +2,8 @@
 
 namespace Awsmock::Agw {
 
-    ProxySession::ProxySession(net::io_context &ioc, tcp::socket &&socket, const Dto::ApiGateway::ProxyConfig &cfg) : _ioc(ioc), _clientStream(std::move(socket)), _resolver(net::make_strand(ioc)), _cfg(cfg) {}
+    ProxySession::ProxySession(net::io_context &ioc, tcp::socket &&socket, const Dto::ApiGateway::ProxyConfig &cfg) : _ioc(ioc), _clientStream(std::move(socket)), _resolver(net::make_strand(ioc)), _cfg(cfg) {
+    }
 
     void ProxySession::Run() {
         net::dispatch(_clientStream.get_executor(), beast::bind_front_handler(&ProxySession::DoRead, shared_from_this()));
@@ -45,7 +46,7 @@ namespace Awsmock::Agw {
         _backendStream->async_connect(results, beast::bind_front_handler(&ProxySession::OnConnect, shared_from_this()));
     }
 
-    void ProxySession::OnConnect(const beast::error_code &ec, tcp::endpoint) {
+    void ProxySession::OnConnect(const beast::error_code &ec, const tcp::endpoint &endpoint) {
         if (ec) {
             log_error << "Connect to " << _cfg.targetHost << ":" << _cfg.targetPort << ": " << ec.message();
             return SendBadGateway("Connection to backend refused");
@@ -127,7 +128,7 @@ namespace Awsmock::Agw {
     }
 
     void ProxySession::SendBadGateway(const std::string &detail) {
-        auto res = std::make_shared<http::response<http::string_body>>(http::status::bad_gateway, 11);
+        auto res = std::make_shared<http::response<http::string_body> >(http::status::bad_gateway, 11);
         res->set(http::field::content_type, "text/plain");
         res->body() = "502 Bad Gateway: " + detail;
         res->keep_alive(false);
@@ -137,4 +138,4 @@ namespace Awsmock::Agw {
         http::async_write(_clientStream, *res, [self = shared_from_this(), res](beast::error_code, std::size_t) { self->DoClose(); });
     }
 
-}// namespace Awsmock::Agw
+} // namespace Awsmock::Agw

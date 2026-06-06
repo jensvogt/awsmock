@@ -163,6 +163,10 @@ namespace Awsmock::Database {
         key = createKey(key);
     }
 
+    void ApiGatewayMongoRepository::importRestApis(Entity::ApiGateway::RestApi &restApi) const {
+        restApi = upsertRestApi(restApi);
+    }
+
     long ApiGatewayMongoRepository::countApiKeys() const {
 
         try {
@@ -275,12 +279,13 @@ namespace Awsmock::Database {
 
             const auto filter = make_document(kvp("name", restApi.name));
             const auto update = make_document(
-                    kvp("$set", restApi.ToDocument()),
-                    kvp("$setOnInsert", make_document(
-                                                kvp("created", bsoncxx::types::b_date{
-                                                                       std::chrono::duration_cast<std::chrono::milliseconds>(
-                                                                               restApi.created.time_since_epoch())}))),
-                    kvp("$currentDate", make_document(kvp("modified", true))));
+                kvp("$set", restApi.ToDocument()),
+                kvp("$setOnInsert", make_document(
+                        kvp("created", bsoncxx::types::b_date{
+                                std::chrono::duration_cast<std::chrono::milliseconds>(
+                                    restApi.created.time_since_epoch())
+                            }))),
+                kvp("$currentDate", make_document(kvp("modified", true))));
 
             mongocxx::options::find_one_and_update opts;
             opts.upsert(true);
@@ -409,4 +414,4 @@ namespace Awsmock::Database {
         }
     }
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

@@ -26,8 +26,7 @@ namespace Awsmock::Database {
      */
     class ApiGatewayMongoRepository final : public IApiGatewayRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -98,6 +97,16 @@ namespace Awsmock::Database {
          * @param key API key to import
          */
         void importApiKey(Entity::ApiGateway::ApiKey &key) const override;
+
+        /**
+         * @brief Import an REST APIs.
+         *
+         * @par
+         * If the provided REST API exists already, it will be updated, otherwise inserted. The modified/created timestamp will be updated accordingly.
+         *
+         * @param restApi REST API to import
+         */
+        void importRestApis(Entity::ApiGateway::RestApi &restApi) const override;
 
         /**
          * @brief Returns the total number of keys
@@ -191,8 +200,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::vector<Entity::ApiGateway::RestApi> listRestApis(const std::string &region) const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -214,4 +222,4 @@ namespace Awsmock::Database {
         static constexpr auto _restApiCollectionName = "apigateway_rest";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

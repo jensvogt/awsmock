@@ -22,11 +22,14 @@ namespace Awsmock::Service {
             return;
         }
 
-        // Dual-stack: also accept IPv4-mapped connections on the IPv6 socket
-        ec = _acceptor.set_option(ip::v6_only(false), ec);
-        if (ec) {
-            log_error << ec.message();
-            return;
+        // Dual-stack: accept IPv4-mapped connections on IPv6 sockets only.
+        // Not applicable (and would error) on IPv4 sockets.
+        if (endpoint.protocol() == ip::tcp::v6()) {
+            beast::error_code v6ec;
+            _acceptor.set_option(ip::v6_only(false), v6ec);
+            if (v6ec) {
+                log_warning << "Dual-stack (v6_only=false) unavailable: " << v6ec.message();
+            }
         }
 
         ec = _acceptor.bind(endpoint, ec);
@@ -57,7 +60,8 @@ namespace Awsmock::Service {
             // Disable Nagle algorithm for large uploads — avoids head-of-line blocking on Windows
             beast::error_code opt_ec;
             socket.set_option(ip::tcp::no_delay(true), opt_ec);
-            if (opt_ec) log_warning << "TCP_NODELAY failed: " << opt_ec.message();
+            if (opt_ec)
+                log_warning << "TCP_NODELAY failed: " << opt_ec.message();
 
             // Create the http session and run it
             std::make_shared<GatewaySession>(_ioc, std::move(socket))->Run();
@@ -67,4 +71,4 @@ namespace Awsmock::Service {
         DoAccept();
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

@@ -29,8 +29,7 @@ namespace Awsmock::Agw {
      * @param connectionConfig Configuration parameters defining the proxy's connection behavior.
      */
     class ProxySession : public std::enable_shared_from_this<ProxySession> {
-      public:
-
+    public:
         /**
          * Represents a proxy session that manages the lifecycle and operations
          * of a proxy connection in a networked environment.
@@ -50,8 +49,7 @@ namespace Awsmock::Agw {
          */
         void Run();
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -59,11 +57,14 @@ namespace Awsmock::Agw {
 
         // ── client → agw ──────────────────────────────────────────────
         void DoRead();
+
         void OnRead(const beast::error_code &ec, std::size_t);
 
         // ── agw → backend ─────────────────────────────────────────────
         void OnResolve(const beast::error_code &ec, const tcp::resolver::results_type &results);
-        void OnConnect(const beast::error_code &ec, tcp::endpoint);
+
+        void OnConnect(const beast::error_code &ec, const tcp::endpoint &endpoint);
+
         void OnForward(const beast::error_code &ec, std::size_t);
 
         // ── backend → agw ─────────────────────────────────────────────
@@ -71,10 +72,12 @@ namespace Awsmock::Agw {
 
         // ── agw → client ──────────────────────────────────────────────
         void OnClientWrite(bool keepAlive, const beast::error_code &ec, std::size_t);
+
         void DoClose();
 
         // ── helpers ──────────────────────────────────────────────────────
         void PrepareForwardRequest();
+
         void SendBadGateway(const std::string &detail);
 
         net::io_context &_ioc;
@@ -84,8 +87,8 @@ namespace Awsmock::Agw {
         // Created fresh for each proxied request (per-request backend connection).
         boost::optional<beast::tcp_stream> _backendStream;
 
-        boost::optional<http::request_parser<http::dynamic_body>> _reqParser;
-        boost::optional<http::response_parser<http::dynamic_body>> _respParser;
+        boost::optional<http::request_parser<http::dynamic_body> > _reqParser;
+        boost::optional<http::response_parser<http::dynamic_body> > _respParser;
 
         http::request<http::dynamic_body> _req;
         http::response<http::dynamic_body> _resp;
@@ -96,4 +99,4 @@ namespace Awsmock::Agw {
         const Dto::ApiGateway::ProxyConfig &_cfg;
     };
 
-}// namespace Awsmock::Agw
+} // namespace Awsmock::Agw

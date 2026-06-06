@@ -12,8 +12,8 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <afunix.h>
 #include <winsock2.h>
+#include <afunix.h>
 #else
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -66,13 +66,21 @@ namespace {
 
             if (::bind(_fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) < 0) {
                 log_error << "ReadinessSocket: bind() failed: " << strerror(errno);
+#ifdef _WIN32
+                ::closesocket(_fd);
+#else
                 close(_fd);
+#endif
                 _fd = -1;
                 return;
             }
             if (listen(_fd, 8) < 0) {
                 log_error << "ReadinessSocket: listen() failed: " << strerror(errno);
+#ifdef _WIN32
+                ::closesocket(_fd);
+#else
                 close(_fd);
+#endif
                 _fd = -1;
             }
         }
