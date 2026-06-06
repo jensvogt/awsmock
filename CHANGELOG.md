@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.59](https://github.com/jensvogt/awsmock/compare/v1.18.58...v1.18.59) (2026-06-06)
+
+
+### Bug Fixes
+
+* start rest api UI connection and add get ([05884ad](https://github.com/jensvogt/awsmock/commit/05884ad32992709d5f1e9faf05adffd647760bb0))
+* start rest api UI connection and add get ([7b99a69](https://github.com/jensvogt/awsmock/commit/7b99a694d25659774f04ab844e198b3214218912))
+* start rest api UI connection and add get ([10e514b](https://github.com/jensvogt/awsmock/commit/10e514bb25dd831b2812dfd61835ef9fe01b4496))
+
 ## [1.18.58](https://github.com/jensvogt/awsmock/compare/v1.18.57...v1.18.58) (2026-06-06)
 
 
