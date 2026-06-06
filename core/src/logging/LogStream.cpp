@@ -1,7 +1,9 @@
 
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
+
 #include <awsmock/core/logging/LoggingServer.h>
+#include <ranges>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
@@ -87,6 +89,11 @@ namespace Awsmock::Core {
 
     void LogColorFormatter(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
 
+        if (const auto raw = boost::log::extract<bool>("Raw", rec); raw && raw.get()) {
+            strm << rec[boost::log::expressions::smessage];
+            return;
+        }
+
         std::string func = processFuncName(boost::log::extract<std::string>("Function", rec)->c_str());
 
 #ifndef _WIN32
@@ -112,6 +119,11 @@ namespace Awsmock::Core {
 
     void LogFormatter(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
 
+        if (const auto raw = boost::log::extract<bool>("Raw", rec); raw && raw.get()) {
+            strm << rec[boost::log::expressions::smessage];
+            return;
+        }
+
         std::string func = processFuncName(boost::log::extract<std::string>("Function", rec)->c_str());
 
         auto date_time_formatter = boost::log::expressions::stream << boost::log::expressions::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f");
@@ -119,7 +131,7 @@ namespace Awsmock::Core {
 
         strm << " [" << rec[boost::log::trivial::severity] << "]";
         strm << " [" << rec[thread_id].get().native_id() << "]";
-        if (auto chan = boost::log::extract<std::string>("Channel", rec); chan) {
+        if (const auto chan = boost::log::extract<std::string>("Channel", rec); chan) {
             strm << " [" << chan.get() << "]";
         }
         strm << " [" << func << ":" << boost::log::extract<int>("Line", rec) << "] ";
@@ -165,7 +177,7 @@ namespace Awsmock::Core {
         // Per-sink filters must be at least as permissive as the most verbose channel override,
         // otherwise they block records before the channel-aware core filter can evaluate them.
         auto minLevel = globalLevel;
-        for (const auto &[_, lv]: channelLevels) {
+        for (const auto &lv: channelLevels | std::views::values) {
             if (lv < minLevel) minLevel = lv;
         }
         if (console_sink) console_sink->set_filter(boost::log::trivial::severity >= minLevel);
@@ -247,8 +259,9 @@ namespace Awsmock::Core {
     }
     
     void LogStream::LogRaw(const std::string &message) {
-        std::cout << message << '\n';
-        std::cout.flush();
+        BOOST_LOG_SEV(_logger, boost::log::trivial::info)
+                << boost::log::add_value("Raw", true)
+                << message;
     }
 
 }// namespace Awsmock::Core

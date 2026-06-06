@@ -233,7 +233,7 @@
         "monitoring-period": 300,
         "proxy": {
           "threads": 4,
-          "executable": "awsmock-agw",
+          "executable": "/usr/local/wsmock/bin/awsmock-agw",
           "target-port": 4566,
           "target-host": "localhost"
         }
