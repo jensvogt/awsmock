@@ -233,7 +233,10 @@
         },
         "monitoring-period": 300,
         "proxy": {
-          "threads": 4
+          "threads": 4,
+          "executable": "C:\\Program Files\\awsmock\\bin\\awsmock-agw",
+          "target-port": 4566,
+          "target-host": "localhost"
         }
       }
     },

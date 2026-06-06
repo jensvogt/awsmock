@@ -136,7 +136,7 @@ namespace Awsmock::Service {
     }
 
     void ApiGatewayServer::BackupApiGateway() {
-        ModuleService{}.BackupModule("apiGateway", Dto::Module::ExportType::INFRA_STRUCTURE);
+        ModuleService{}.BackupModule("api-gateway", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void ApiGatewayServer::Shutdown() {
