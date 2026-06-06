@@ -350,7 +350,7 @@ namespace Awsmock::Database {
 
             document query = {};
             if (!prefix.empty()) {
-                query.append(kvp("functionName", make_document(kvp("$regex", "^" + prefix))));
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
 
             for (auto lambdaCursor = apiKeyCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
@@ -391,7 +391,7 @@ namespace Awsmock::Database {
 
             document query = {};
             if (!prefix.empty()) {
-                query.append(kvp("functionName", make_document(kvp("$regex", "^" + prefix))));
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
             }
 
             for (auto lambdaCursor = restapiCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
@@ -407,4 +407,57 @@ namespace Awsmock::Database {
         }
     }
 
-} // namespace Awsmock::Database
+    long ApiGatewayMongoRepository::countRestApis(const std::string &region, const std::string &prefix) const {
+
+        try {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection restApiCollection = (*client)[_databaseName][_restApiCollectionName];
+
+            document query = {};
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!prefix.empty()) {
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+            }
+
+            const int64_t count = restApiCollection.count_documents(query.view());
+            log_trace << "REST APIs count: " << count;
+            return count;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    Entity::ApiGateway::RestApi ApiGatewayMongoRepository::getRestApi(const std::string &region, const std::string &name) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+        try {
+
+            document query = {};
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!name.empty()) {
+                query.append(kvp("name", region));
+            }
+
+            if (const auto result = restApiCollection.find_one(query.extract()); result.has_value()) {
+                Entity::ApiGateway::RestApi restApi;
+                restApi.FromDocument(*result);
+                return restApi;
+            }
+            return {};
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+}// namespace Awsmock::Database

@@ -34,6 +34,7 @@ namespace Awsmock::Dto::Common {
         GET_API_KEY_COUNTER,
         UPDATE_API_KEY_COUNTER,
         LIST_REST_API_COUNTERS,
+        GET_REST_API_COUNTER,
         UNKNOWN
     };
 
@@ -47,20 +48,17 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},
             {ApiGatewayCommandType::UPDATE_API_KEY_COUNTER, "update-api-key-counter"},
             {ApiGatewayCommandType::LIST_REST_API_COUNTERS, "list-rest-api-counters"},
+            {ApiGatewayCommandType::GET_REST_API_COUNTER, "get-rest-api-counter"},
             {ApiGatewayCommandType::UNKNOWN, "unknown"},
     };
 
-    [[maybe_unused]] static std::string ApiGatewayCommandTypeToString(const ApiGatewayCommandType commandType) {
+    [[maybe_unused]] static std::string ApiGatewayCommandTypeToString(const ApiGatewayCommandType &commandType) {
         return ApiGatewayCommandTypeNames[commandType];
     }
 
     [[maybe_unused]] static ApiGatewayCommandType ApiGatewayCommandTypeFromString(const std::string &commandType) {
-        for (auto &[fst, snd]: ApiGatewayCommandTypeNames) {
-            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
-                return fst;
-            }
-        }
-        return ApiGatewayCommandType::UNKNOWN;
+        const auto it = std::ranges::find_if(ApiGatewayCommandTypeNames, [&](const auto &p) { return p.second == commandType; });
+        return it != ApiGatewayCommandTypeNames.end() ? it->first : ApiGatewayCommandType::UNKNOWN;
     }
 
     /**

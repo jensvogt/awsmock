@@ -215,4 +215,28 @@ namespace Awsmock::Database {
         auto resultVector = q.to_vector();
         return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
     }
-} // namespace Awsmock::Database
+
+    long ApiGatewayMemoryRepository::countRestApis(const std::string &region, const std::string &prefix) const {
+        auto q = Core::from(Core::NumberUtils::toVector(_restApis));
+
+        if (!region.empty()) {
+            q = q.where([region](const Entity::ApiGateway::RestApi &item) { return item.region == region; });
+        }
+        if (!prefix.empty()) {
+            q = q.where([region](const Entity::ApiGateway::RestApi &item) { return Core::StringUtils::StartsWith(item.name, region); });
+        }
+        return static_cast<long>(q.count());
+    }
+
+    Entity::ApiGateway::RestApi ApiGatewayMemoryRepository::getRestApi(const std::string &region, const std::string &name) const {
+
+        const auto it = std::ranges::find_if(_restApis,
+                                             [region, name](const std::pair<std::string, Entity::ApiGateway::RestApi> &restApi) {
+                                                 return restApi.second.region == region && restApi.second.name == name;
+                                             });
+        if (it != _restApis.end()) {
+            return it->second;
+        }
+        return {};
+    }
+}// namespace Awsmock::Database

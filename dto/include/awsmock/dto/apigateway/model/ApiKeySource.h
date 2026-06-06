@@ -2,8 +2,7 @@
 // Created by vogje01 on 9/5/25.
 //
 
-#ifndef AWSMOCK_DTO_API_GATEWAY_API_KEY_SOURCE_H
-#define AWSMOCK_DTO_API_GATEWAY_API_KEY_SOURCE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -36,14 +35,8 @@ namespace Awsmock::Dto::ApiGateway {
     }
 
     [[maybe_unused]] static ApiKeySourceType ApiKeySourceTypeFromString(const std::string &ApiKeySourceType) {
-        for (auto &[fst, snd]: ApiKeySourceTypeNames) {
-            if (snd == ApiKeySourceType) {
-                return fst;
-            }
-        }
-        return ApiKeySourceType::UNKNOWN;
+        const auto it = std::ranges::find_if(ApiKeySourceTypeNames, [&](const auto &p) { return p.second == ApiKeySourceType; });
+        return it != ApiKeySourceTypeNames.end() ? it->first : ApiKeySourceType::UNKNOWN;
     }
 
 }// namespace Awsmock::Dto::ApiGateway
-
-#endif// AWSMOCK_DTO_API_GATEWAY_API_KEY_SOURCE_H

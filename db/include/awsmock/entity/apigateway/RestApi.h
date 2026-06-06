@@ -6,6 +6,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/apigateway/ApiKeySource.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
 namespace Awsmock::Database::Entity::ApiGateway {
@@ -51,9 +52,9 @@ namespace Awsmock::Database::Entity::ApiGateway {
         std::string endpointUrl;
 
         /**
-         * API key
+         * API key source
          */
-        std::string apiKeySource;
+        ApiKeySourceType apiKeySource;
 
         /**
          * Clone source
@@ -113,7 +114,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         /**
          * @brief Converts the entity to a MongoDB document
          *
-         * @return entity as MongoDB document.
+         * @return entity as a MongoDB document.
          */
         [[nodiscard]]
         view_or_value<view, value> ToDocument() const override;

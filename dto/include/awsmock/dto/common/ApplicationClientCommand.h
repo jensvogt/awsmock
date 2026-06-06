@@ -70,17 +70,14 @@ namespace Awsmock::Dto::Common {
     }
 
     [[maybe_unused]] static ApplicationCommandType ApplicationCommandTypeFromString(const std::string &commandType) {
-        for (auto &[fst, snd]: ApplicationCommandTypeNames) {
-            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
-                return fst;
-            }
-        }
-        return ApplicationCommandType::UNKNOWN;
+        const auto it = std::ranges::find_if(ApplicationCommandTypeNames, [&](const auto &p) { return p.second == commandType; });
+        return it != ApplicationCommandTypeNames.end() ? it->first : ApplicationCommandType::UNKNOWN;
     }
 
     /**
-     * @brief Application client command
+     * @brief Application client command.
      *
+     * @par
      * The Application client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a
      * different way of calling the AWS REST services.
      *

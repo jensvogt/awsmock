@@ -152,7 +152,7 @@ namespace Awsmock::Database {
          * @return BucketList
          */
         [[nodiscard]]
-        Entity::S3::BucketList listBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const override;
+        Entity::S3::BucketList listBuckets(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Export all buckets
@@ -161,7 +161,7 @@ namespace Awsmock::Database {
          * @return BucketList
          */
         [[nodiscard]]
-        Entity::S3::BucketList exportBuckets(const std::vector<SortColumn> &sortColumns = {}) const override;
+        Entity::S3::BucketList exportBuckets(const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Check whether the bucket has still objects
@@ -256,7 +256,7 @@ namespace Awsmock::Database {
         Entity::S3::Object createObject(Entity::S3::Object &object) const override;
 
         /**
-         * @brief Create a new S3 object in the S3 object table, if it does not exist, otherwise update the exiting object.
+         * @brief Create a new S3 object in the S3 object table if it does not exist, otherwise update the exiting object.
          *
          * @param object object entity
          * @return created or updated object entity
@@ -409,7 +409,7 @@ namespace Awsmock::Database {
          * @return ObjectList
          */
         [[nodiscard]]
-        std::vector<Entity::S3::Object> listObjects(const std::string &region, const std::string &prefix, const std::string &bucket, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
+        std::vector<Entity::S3::Object> listObjects(const std::string &region, const std::string &prefix, const std::string &bucket, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
          * @brief Counts the number of keys in a bucket
@@ -417,7 +417,7 @@ namespace Awsmock::Database {
          * @param region AWS region
          * @param prefix key prefix
          * @param bucket bucket name
-         * @return number of objects in bucket
+         * @return number of objects in the bucket
          * @throws DatabaseException
          */
         [[nodiscard]]

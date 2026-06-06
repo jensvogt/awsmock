@@ -14,7 +14,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         keyDocument.append(kvp("name", name));
         keyDocument.append(kvp("description", description));
         keyDocument.append(kvp("endpointUrl", endpointUrl));
-        keyDocument.append(kvp("apiKeySource", apiKeySource));
+        keyDocument.append(kvp("apiKeySource", ApiKeySourceTypeToString(apiKeySource)));
         keyDocument.append(kvp("version", version));
         keyDocument.append(kvp("cloneFrom", cloneFrom));
         keyDocument.append(kvp("policy", policy));
@@ -61,7 +61,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
         endpointUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "endpointUrl");
-        apiKeySource = Core::Bson::BsonUtils::GetStringValue(mResult, "apiKeySource");
+        apiKeySource = ApiKeySourceTypeFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "apiKeySource"));
         version = Core::Bson::BsonUtils::GetStringValue(mResult, "version");
         cloneFrom = Core::Bson::BsonUtils::GetStringValue(mResult, "cloneFrom");
         policy = Core::Bson::BsonUtils::GetStringValue(mResult, "policy");

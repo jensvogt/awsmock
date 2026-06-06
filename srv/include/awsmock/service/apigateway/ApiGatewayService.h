@@ -26,6 +26,8 @@
 #include <awsmock/dto/apigateway/GetApiKeysResponse.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterResponse.h>
+#include <awsmock/dto/apigateway/internal/GetRestApiCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/GetRestApiCounterResponse.h>
 #include <awsmock/dto/apigateway/internal/ListApiKeyCountersRequest.h>
 #include <awsmock/dto/apigateway/internal/ListApiKeyCountersResponse.h>
 #include <awsmock/dto/apigateway/internal/ListRestApiCountersRequest.h>
@@ -49,7 +51,8 @@ namespace Awsmock::Service {
      */
     class ApiGatewayService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          *
@@ -127,7 +130,16 @@ namespace Awsmock::Service {
         [[nodiscard]]
         Dto::ApiGateway::ListRestApiCountersResponse ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
 
-    private:
+        /**
+         * @brief Returns a REST API entity
+         *
+         * @param request get a REST API request
+         * @return REST API response
+         */
+        Dto::ApiGateway::GetRestApiCounterResponse GetRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const;
+
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -144,4 +156,4 @@ namespace Awsmock::Service {
         boost::asio::io_context &_ioc;
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

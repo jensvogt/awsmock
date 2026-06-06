@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_API_GATEWAY_LIST_REST_API_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_API_GATEWAY_LIST_REST_API_COUNTERS_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -68,5 +67,3 @@ namespace Awsmock::Dto::ApiGateway {
     };
 
 }// namespace Awsmock::Dto::ApiGateway
-
-#endif// AWSMOCK_DTO_API_GATEWAY_LIST_REST_API_COUNTERS_REQUEST_H
