@@ -24,8 +24,7 @@ namespace Awsmock::Database {
      */
     class IApiGatewayRepository {
 
-      public:
-
+    public:
         /**
          * @brief Virtual destructor for the IApplicationRepository interface.
          *
@@ -99,6 +98,16 @@ namespace Awsmock::Database {
          * @param key API key to import
          */
         virtual void importApiKey(Entity::ApiGateway::ApiKey &key) const = 0;
+
+        /**
+         * @brief Import an REST APIs.
+         *
+         * @par
+         * If the provided REST API exists already, it will be updated, otherwise inserted. The modified/created timestamp will be updated accordingly.
+         *
+         * @param restApi REST API to import
+         */
+        virtual void importRestApis(Entity::ApiGateway::RestApi &restApi) const = 0;
 
         /**
          * @brief Returns the total number of keys
@@ -182,7 +191,7 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         virtual std::vector<Entity::ApiGateway::RestApi> listRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
-        
+
         /**
          * @brief Returns a list of REST API counters
          *
@@ -193,4 +202,4 @@ namespace Awsmock::Database {
         virtual std::vector<Entity::ApiGateway::RestApi> listRestApis(const std::string &region) const = 0;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

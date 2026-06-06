@@ -93,11 +93,14 @@ namespace Awsmock::Database {
         if (apiKeyExists(key.id)) {
             key = updateApiKey(key);
         }
-        createKey(key);
+        key = createKey(key);
+    }
+
+    void ApiGatewayMemoryRepository::importRestApis(Entity::ApiGateway::RestApi &restApi) const {
+        restApi = upsertRestApi(restApi);
     }
 
     long ApiGatewayMemoryRepository::countApiKeys() const {
-
         return static_cast<long>(_apiKeys.size());
     }
 

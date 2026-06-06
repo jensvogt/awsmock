@@ -104,6 +104,16 @@ namespace Awsmock::Database {
         void importApiKey(Entity::ApiGateway::ApiKey &key) const override;
 
         /**
+         * @brief Import an REST APIs.
+         *
+         * @par
+         * If the provided REST API exists already, it will be updated, otherwise inserted. The modified/created timestamp will be updated accordingly.
+         *
+         * @param restApi REST API to import
+         */
+        void importRestApis(Entity::ApiGateway::RestApi &restApi) const override;
+
+        /**
          * @brief Returns the total number of keys
          *
          * @return API key count

@@ -22,8 +22,14 @@ namespace Awsmock::Service {
         // Set running
         SetRunning();
 
-        // Create and launch a listening port, dual stack IPv4/v6
-        const auto listener = std::make_shared<GatewayListener>(_ios, tcp::endpoint(tcp::v6(), _port));
+        // Create endpoint from the configured address so that an IPv4 address
+        // (e.g. "0.0.0.0") binds an IPv4 socket rather than always forcing
+        // dual-stack IPv6, which fails on Windows with WSAEACCES when the port
+        // is in the OS-reserved range or the IPv4 side is already taken.
+        boost::system::error_code addr_ec;
+        const auto addr = net::ip::make_address(_address, addr_ec);
+        const tcp::endpoint ep = addr_ec ? tcp::endpoint(tcp::v6(), _port) : tcp::endpoint(addr, _port);
+        const auto listener = std::make_shared<GatewayListener>(_ios, ep);
         listener->Run();
 
         // Log endpoint

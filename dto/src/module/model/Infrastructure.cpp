@@ -47,8 +47,9 @@ namespace Awsmock::Dto::Module {
         // Applications
         Core::Bson::ToBsonArray(document, "applications", applications);
 
-        // API gateway keys
+        // API gateway
         Core::Bson::ToBsonArray(document, "api-gateway-keys", apiKeys);
+        Core::Bson::ToBsonArray(document, "api-gateway-rest-apis", restApis);
 
         return document;
     }
@@ -99,8 +100,9 @@ namespace Awsmock::Dto::Module {
         // Application
         Core::Bson::FromBsonArray(document, "applications", &applications);
 
-        // API gateway keys
+        // API gateway
         Core::Bson::FromBsonArray(document, "api-gateway-keys", &apiKeys);
+        Core::Bson::FromBsonArray(document, "api-gateway-rest-apis", &restApis);
     }
 
-}// namespace Awsmock::Dto::Module
+} // namespace Awsmock::Dto::Module
