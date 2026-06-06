@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.18.58](https://github.com/jensvogt/awsmock/compare/v1.18.57...v1.18.58) (2026-06-06)
+
+
+### Bug Fixes
+
+* subprocess logging ([7b8fdcc](https://github.com/jensvogt/awsmock/commit/7b8fdccda6e990e794f064ebbf6912a80dc533cb))
+* windows port new kms database layer ([2e63d3b](https://github.com/jensvogt/awsmock/commit/2e63d3b2d440df2b2cda9d42711700e0e82041b9))
+* windows port new kms database layer ([e453fd2](https://github.com/jensvogt/awsmock/commit/e453fd24ebcc9b5cb0e7bba7a103fced3f19fab9))
+* windows port new kms database layer ([d13f7f4](https://github.com/jensvogt/awsmock/commit/d13f7f4aa6c89ab483a8f10f647589b544255c1f))
+* windows port new kms database layer ([e7c9062](https://github.com/jensvogt/awsmock/commit/e7c90623ed494b915662821761a63f050c1ac678))
+
 ## [1.18.57](https://github.com/jensvogt/awsmock/compare/v1.18.56...v1.18.57) (2026-06-05)
 
 ### Bug Fixes
@@ -936,4 +947,3 @@
   added ([d39aa90](https://github.com/jensvogt/awsmock/commit/d39aa908b2723217aa832d4b5b99b2cae08ce57e))
 * DynamoDB queries
   added ([3368a33](https://github.com/jensvogt/awsmock/commit/3368a33a33a8aea33a6f4b22bcc5fecc111e09f9))
-
