@@ -176,16 +176,11 @@ namespace Awsmock::Database {
     }
 
     long CognitoMemoryRepository::countUserPools(const std::string &region) const {
-        long count = 0;
-        if (region.empty()) {
-            count = static_cast<long>(_userPools.size());
-        } else {
-            for (const auto &val: _userPools | std::views::values) {
-                if (val.region == region) {
-                    count++;
-                }
-            }
-        }
+        const long count = region.empty()
+                               ? static_cast<long>(_userPools.size())
+                               : std::ranges::count_if(_userPools | std::views::values, [&region](const auto &val) {
+                                   return val.region == region;
+                               });
 
         log_trace << "Count user pools, size: " << count;
         return count;
@@ -297,18 +292,16 @@ namespace Awsmock::Database {
 
     long CognitoMemoryRepository::countUsers(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {
 
-        long count = 0;
-
-        count = std::ranges::count_if(_users,
-                                      [region, userPoolId](const std::pair<std::string, Entity::Cognito::User> &obj) {
-                                          if (!region.empty() && obj.second.region == region) {
-                                              return true;
-                                          }
-                                          if (!region.empty() && obj.second.region == region && !userPoolId.empty() && obj.second.userPoolId == userPoolId) {
-                                              return true;
-                                          }
-                                          return true;
-                                      });
+        const long count = static_cast<long>(std::ranges::count_if(_users,
+                                                                   [region, userPoolId](const std::pair<std::string, Entity::Cognito::User> &obj) {
+                                                                       if (!region.empty() && obj.second.region == region) {
+                                                                           return true;
+                                                                       }
+                                                                       if (!region.empty() && obj.second.region == region && !userPoolId.empty() && obj.second.userPoolId == userPoolId) {
+                                                                           return true;
+                                                                       }
+                                                                       return true;
+                                                                   }));
 
         log_trace << "Count user pools, size: " << count;
         return count;
@@ -316,30 +309,13 @@ namespace Awsmock::Database {
 
     std::vector<Entity::Cognito::User> CognitoMemoryRepository::listUsers(const std::string &region, const std::string &userPoolId, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
-        Entity::Cognito::UserList userList;
+        auto filtered = _users | std::views::values | std::views::filter([&](const auto &val) {
+            if (!region.empty() && val.region != region) return false;
+            if (!userPoolId.empty() && val.userPoolId != userPoolId) return false;
+            return true;
+        });
 
-        if (!region.empty() && !userPoolId.empty()) {
-
-            for (const auto &val: _users | std::views::values) {
-                if (val.region == region && val.userPoolId == userPoolId) {
-                    userList.emplace_back(val);
-                }
-            }
-
-        } else if (!region.empty()) {
-
-            for (const auto &val: _users | std::views::values) {
-                if (val.region == region) {
-                    userList.emplace_back(val);
-                }
-            }
-
-        } else {
-
-            for (const auto &val: _users | std::views::values) {
-                userList.emplace_back(val);
-            }
-        }
+        Entity::Cognito::UserList userList(filtered.begin(), filtered.end());
 
         log_trace << "Got user list, size: " << userList.size();
         return userList;
@@ -365,8 +341,8 @@ namespace Awsmock::Database {
 
         for (const auto &val: _users | std::views::values) {
             if (val.region == region && val.userPoolId == userPoolId && std::ranges::find_if(val.groups, [&groupName](const Entity::Cognito::Group &g) {
-                                                                            return g.groupName == groupName;
-                                                                        }) != val.groups.end()) {
+                return g.groupName == groupName;
+            }) != val.groups.end()) {
                 userList.emplace_back(val);
             }
         }
@@ -465,29 +441,13 @@ namespace Awsmock::Database {
 
     std::vector<Entity::Cognito::Group> CognitoMemoryRepository::listGroups(const std::string &region, const std::string &userPoolId) const {
 
-        Entity::Cognito::GroupList groupList;
-        if (!region.empty() && !userPoolId.empty()) {
+        auto filtered = _groups | std::views::values | std::views::filter([&](const auto &val) {
+            if (!region.empty() && val.region != region) return false;
+            if (!userPoolId.empty() && val.userPoolId != userPoolId) return false;
+            return true;
+        });
 
-            for (const auto &val: _groups | std::views::values) {
-                if (val.region == region && val.userPoolId == userPoolId) {
-                    groupList.emplace_back(val);
-                }
-            }
-
-        } else if (!region.empty()) {
-
-            for (const auto &val: _groups | std::views::values) {
-                if (val.region == region) {
-                    groupList.emplace_back(val);
-                }
-            }
-
-        } else {
-
-            for (const auto &val: _groups | std::views::values) {
-                groupList.emplace_back(val);
-            }
-        }
+        Entity::Cognito::GroupList groupList(filtered.begin(), filtered.end());
 
         log_trace << "Got group list, size: " << groupList.size();
         return groupList;
@@ -495,16 +455,12 @@ namespace Awsmock::Database {
 
     std::vector<Entity::Cognito::Group> CognitoMemoryRepository::exportGroups(const std::vector<SortColumn> &sortColumns) const {
 
-        Entity::Cognito::GroupList groupList;
-        for (const auto &val: _groups | std::views::values) {
-            groupList.emplace_back(val);
-        }
-
-        std::ranges::sort(groupList, [](const Entity::Cognito::Group &g1, const Entity::Cognito::Group &g2) {
+        std::vector<Entity::Cognito::Group> groupVec = Core::NumberUtils::toVector(_groups);
+        std::ranges::sort(groupVec, [](const Entity::Cognito::Group &g1, const Entity::Cognito::Group &g2) {
             return g1.groupName < g2.groupName;
         });
-        log_trace << "Got group list, size: " << groupList.size();
-        return groupList;
+        log_trace << "Got group list, size: " << groupVec.size();
+        return groupVec;
     }
 
     long CognitoMemoryRepository::deleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {
@@ -547,4 +503,4 @@ namespace Awsmock::Database {
                                     }) != _userPools.end();
     }
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

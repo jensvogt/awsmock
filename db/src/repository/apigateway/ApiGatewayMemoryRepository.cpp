@@ -42,14 +42,7 @@ namespace Awsmock::Database {
     std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryRepository::getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
-        std::vector<Entity::ApiGateway::ApiKey> result;
-
-        // Get values
-        for (auto &val: _apiKeys | std::views::values) {
-            result.push_back(val);
-        }
-
-        auto q = Core::from(result);
+        auto q = Core::from(Core::NumberUtils::toVector(_apiKeys));
         q = q.order_by([](const Entity::ApiGateway::ApiKey &key1, const Entity::ApiGateway::ApiKey &key2) { return key1.id < key2.id; });
 
         if (!nameQuery.empty()) {
@@ -166,14 +159,7 @@ namespace Awsmock::Database {
     std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::listRestApis(const std::string &region) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
-        std::vector<Entity::ApiGateway::RestApi> values;
-
-        // Get values
-        for (auto &val: _restApis | std::views::values) {
-            values.push_back(val);
-        }
-
-        auto q = Core::from(values);
+        auto q = Core::from(Core::NumberUtils::toVector(_restApis));
         if (!region.empty()) {
             q = q.where([region](const Entity::ApiGateway::RestApi &item) { return item.region == region; });
         }
@@ -186,14 +172,7 @@ namespace Awsmock::Database {
     std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryRepository::listApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
-        std::vector<Entity::ApiGateway::ApiKey> values;
-
-        // Get values
-        for (auto &val: _apiKeys | std::views::values) {
-            values.push_back(val);
-        }
-
-        auto q = Core::from(values);
+        auto q = Core::from(Core::NumberUtils::toVector(_apiKeys));
         if (!sortColumns.empty()) {
             for (const auto &sc: sortColumns) {
                 if (sc.column == "id") {
@@ -215,14 +194,7 @@ namespace Awsmock::Database {
     std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::listRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         boost::mutex::scoped_lock lock(_restApiMutex);
 
-        std::vector<Entity::ApiGateway::RestApi> values;
-
-        // Get values
-        for (auto &val: _restApis | std::views::values) {
-            values.push_back(val);
-        }
-
-        auto q = Core::from(values);
+        auto q = Core::from(Core::NumberUtils::toVector(_restApis));
         if (!sortColumns.empty()) {
             for (const auto &sc: sortColumns) {
                 if (sc.column == "id") {
@@ -240,4 +212,4 @@ namespace Awsmock::Database {
         auto resultVector = q.to_vector();
         return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
     }
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

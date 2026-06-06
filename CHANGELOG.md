@@ -2,63 +2,87 @@
 
 ## [1.18.57](https://github.com/jensvogt/awsmock/compare/v1.18.56...v1.18.57) (2026-06-05)
 
-
 ### Bug Fixes
 
-* core, database and service tests ([6c9f30d](https://github.com/jensvogt/awsmock/commit/6c9f30dc2e83b96db3afb16325dc7a1d94f76535))
-* core, database and service tests ([caf93fb](https://github.com/jensvogt/awsmock/commit/caf93fb26a97215360c0dd9270d0e184c8e02a26))
-* core, database and service tests ([fae9a09](https://github.com/jensvogt/awsmock/commit/fae9a091ace62f04e874471ec9041a899d6bce02))
-* core, database and service tests ([f913fc1](https://github.com/jensvogt/awsmock/commit/f913fc147af3ddb116646513b149651fbf9e3603))
-* core, database and service tests ([ac9d601](https://github.com/jensvogt/awsmock/commit/ac9d60112125bc31e0f16f4360d3934f18887509))
-* core, database and service tests ([5873840](https://github.com/jensvogt/awsmock/commit/5873840922d4e66b38527f0cc204601fcc64a5a1))
-* windows port new kms database layer ([171972f](https://github.com/jensvogt/awsmock/commit/171972fceced8f690450beb6f09c27b97889925e))
-* windows port new kms database layer ([807ce14](https://github.com/jensvogt/awsmock/commit/807ce14db6d3d7902c5382fb2148a183eac80eb8))
+* core, database and service
+  tests ([6c9f30d](https://github.com/jensvogt/awsmock/commit/6c9f30dc2e83b96db3afb16325dc7a1d94f76535))
+* core, database and service
+  tests ([caf93fb](https://github.com/jensvogt/awsmock/commit/caf93fb26a97215360c0dd9270d0e184c8e02a26))
+* core, database and service
+  tests ([fae9a09](https://github.com/jensvogt/awsmock/commit/fae9a091ace62f04e874471ec9041a899d6bce02))
+* core, database and service
+  tests ([f913fc1](https://github.com/jensvogt/awsmock/commit/f913fc147af3ddb116646513b149651fbf9e3603))
+* core, database and service
+  tests ([ac9d601](https://github.com/jensvogt/awsmock/commit/ac9d60112125bc31e0f16f4360d3934f18887509))
+* core, database and service
+  tests ([5873840](https://github.com/jensvogt/awsmock/commit/5873840922d4e66b38527f0cc204601fcc64a5a1))
+* windows port new kms database
+  layer ([171972f](https://github.com/jensvogt/awsmock/commit/171972fceced8f690450beb6f09c27b97889925e))
+* windows port new kms database
+  layer ([807ce14](https://github.com/jensvogt/awsmock/commit/807ce14db6d3d7902c5382fb2148a183eac80eb8))
 
 ## [1.18.56](https://github.com/jensvogt/awsmock/compare/1.18.55...v1.18.56) (2026-06-05)
 
-
 ### Bug Fixes
 
-* core, database and service tests ([cad1874](https://github.com/jensvogt/awsmock/commit/cad18744ac5ffb8fd2d4f677d66b1b2518b55ef0))
-* core, database and service tests ([e651f11](https://github.com/jensvogt/awsmock/commit/e651f11c2308ccd26e45a766c9231a1a1100d776))
-* core, database and service tests ([ab87751](https://github.com/jensvogt/awsmock/commit/ab877513bca0d4a875d445a134564282707afad3))
-* core, database and service tests ([bb9017e](https://github.com/jensvogt/awsmock/commit/bb9017e96a35371604ca2efff9555fcafbc53708))
-* core, database and service tests ([6b3ea8a](https://github.com/jensvogt/awsmock/commit/6b3ea8a54ed8ead435fc9fef592b2131e6dae614))
-* core, database and service tests ([2d7778c](https://github.com/jensvogt/awsmock/commit/2d7778c12c5b2cd4acfa82a75a94f42a43342899))
-* core, database and service tests ([9246548](https://github.com/jensvogt/awsmock/commit/924654894bfe16b80dab342cd89834b225596134))
-* core, database and service tests ([1356bae](https://github.com/jensvogt/awsmock/commit/1356baedaa219f191e2fdaf47a10779cd1d38874))
-* core, database and service tests ([eccc0ce](https://github.com/jensvogt/awsmock/commit/eccc0ce20c1b76286ab235302282130c68cb460d))
+* core, database and service
+  tests ([cad1874](https://github.com/jensvogt/awsmock/commit/cad18744ac5ffb8fd2d4f677d66b1b2518b55ef0))
+* core, database and service
+  tests ([e651f11](https://github.com/jensvogt/awsmock/commit/e651f11c2308ccd26e45a766c9231a1a1100d776))
+* core, database and service
+  tests ([ab87751](https://github.com/jensvogt/awsmock/commit/ab877513bca0d4a875d445a134564282707afad3))
+* core, database and service
+  tests ([bb9017e](https://github.com/jensvogt/awsmock/commit/bb9017e96a35371604ca2efff9555fcafbc53708))
+* core, database and service
+  tests ([6b3ea8a](https://github.com/jensvogt/awsmock/commit/6b3ea8a54ed8ead435fc9fef592b2131e6dae614))
+* core, database and service
+  tests ([2d7778c](https://github.com/jensvogt/awsmock/commit/2d7778c12c5b2cd4acfa82a75a94f42a43342899))
+* core, database and service
+  tests ([9246548](https://github.com/jensvogt/awsmock/commit/924654894bfe16b80dab342cd89834b225596134))
+* core, database and service
+  tests ([1356bae](https://github.com/jensvogt/awsmock/commit/1356baedaa219f191e2fdaf47a10779cd1d38874))
+* core, database and service
+  tests ([eccc0ce](https://github.com/jensvogt/awsmock/commit/eccc0ce20c1b76286ab235302282130c68cb460d))
 * log channels ([68394e6](https://github.com/jensvogt/awsmock/commit/68394e6afc230062d3f4147cbaf84538a43e5e45))
-* new database layer for SNS and modules ([95a7366](https://github.com/jensvogt/awsmock/commit/95a7366e16c7c9563b942343c70196f39bb98a81))
-* new database layer for SNS and modules ([33085e6](https://github.com/jensvogt/awsmock/commit/33085e6157b059f1be5d6efd8e8c5c4bcf5110a0))
-* new database layer for SNS and modules ([5ea9b54](https://github.com/jensvogt/awsmock/commit/5ea9b54f701adb6e7ba45ec208b3e5c65f72722e))
-* new database layer for SQS and cognito ([e2f461e](https://github.com/jensvogt/awsmock/commit/e2f461ef4c71ae3b90d53c8107af98226dbfa0f7))
-* new database layer for SQS and cognito ([6ddaef8](https://github.com/jensvogt/awsmock/commit/6ddaef8de9058708d109e330c5e03f51819d9ee9))
-* windows port new kms database layer ([ffdcfd2](https://github.com/jensvogt/awsmock/commit/ffdcfd290ab259fcfccef91310863e45a6ba2f20))
-* windows port of new database layer ([1a0e6b4](https://github.com/jensvogt/awsmock/commit/1a0e6b42e91a5c09bdc2c3089fb16ab519c5c5e1))
-* windows port of new database layer ([2177b0b](https://github.com/jensvogt/awsmock/commit/2177b0bee9502127997ef58e11ed48f4b70356a5))
-* windows port of new database layer ([d202b52](https://github.com/jensvogt/awsmock/commit/d202b52181fa94f0591ede5c8a4e1cecfa767376))
-* windows port of new database layer ([f13719b](https://github.com/jensvogt/awsmock/commit/f13719b12309bea8e404003dc8e497f931f5e5c7))
+* new database layer for SNS and
+  modules ([95a7366](https://github.com/jensvogt/awsmock/commit/95a7366e16c7c9563b942343c70196f39bb98a81))
+* new database layer for SNS and
+  modules ([33085e6](https://github.com/jensvogt/awsmock/commit/33085e6157b059f1be5d6efd8e8c5c4bcf5110a0))
+* new database layer for SNS and
+  modules ([5ea9b54](https://github.com/jensvogt/awsmock/commit/5ea9b54f701adb6e7ba45ec208b3e5c65f72722e))
+* new database layer for SQS and
+  cognito ([e2f461e](https://github.com/jensvogt/awsmock/commit/e2f461ef4c71ae3b90d53c8107af98226dbfa0f7))
+* new database layer for SQS and
+  cognito ([6ddaef8](https://github.com/jensvogt/awsmock/commit/6ddaef8de9058708d109e330c5e03f51819d9ee9))
+* windows port new kms database
+  layer ([ffdcfd2](https://github.com/jensvogt/awsmock/commit/ffdcfd290ab259fcfccef91310863e45a6ba2f20))
+* windows port of new database
+  layer ([1a0e6b4](https://github.com/jensvogt/awsmock/commit/1a0e6b42e91a5c09bdc2c3089fb16ab519c5c5e1))
+* windows port of new database
+  layer ([2177b0b](https://github.com/jensvogt/awsmock/commit/2177b0bee9502127997ef58e11ed48f4b70356a5))
+* windows port of new database
+  layer ([d202b52](https://github.com/jensvogt/awsmock/commit/d202b52181fa94f0591ede5c8a4e1cecfa767376))
+* windows port of new database
+  layer ([f13719b](https://github.com/jensvogt/awsmock/commit/f13719b12309bea8e404003dc8e497f931f5e5c7))
 
 ## [1.18.55](https://github.com/jensvogt/awsmock/compare/1.18.54...v1.18.55) (2026-06-01)
-
 
 ### Bug Fixes
 
 * log channels ([5f706ee](https://github.com/jensvogt/awsmock/commit/5f706eee0444154168f13518f28191fe8c35d5e3))
-* windows installer download page ([6696aab](https://github.com/jensvogt/awsmock/commit/6696aab82c0675ca5af0db8c76a549498716cc2f))
+* windows installer download
+  page ([6696aab](https://github.com/jensvogt/awsmock/commit/6696aab82c0675ca5af0db8c76a549498716cc2f))
 
 ## [1.18.54](https://github.com/jensvogt/awsmock/compare/v1.18.53...v1.18.54) (2026-05-31)
 
-
 ### Bug Fixes
 
-* application startup and bad_alloc error in periodic tasks ([a4fa7a7](https://github.com/jensvogt/awsmock/commit/a4fa7a7dfb13309f6129a3af1f67dba7455e940f))
+* application startup and bad_alloc error in periodic
+  tasks ([a4fa7a7](https://github.com/jensvogt/awsmock/commit/a4fa7a7dfb13309f6129a3af1f67dba7455e940f))
 * logging channels ([25f9eb9](https://github.com/jensvogt/awsmock/commit/25f9eb9705ede63917324b39ea9ad8fdf385337d))
 * logging channels ([6167c07](https://github.com/jensvogt/awsmock/commit/6167c07cc1d0f563c2a53c56f7f8b06194d8687c))
 
 ## [1.18.53](https://github.com/jensvogt/awsmock/compare/v1.18.52...v1.18.53) (2026-05-31)
-
 
 ### Bug Fixes
 
@@ -72,7 +96,6 @@
 
 ## [1.18.52](https://github.com/jensvogt/awsmock/compare/1.18.51...v1.18.52) (2026-05-30)
 
-
 ### Bug Fixes
 
 * channel logging ([79c6262](https://github.com/jensvogt/awsmock/commit/79c626294b666aa351d3b145a8c91b253e516ab1))
@@ -83,77 +106,84 @@
 
 ## [1.18.51](https://github.com/jensvogt/awsmock/compare/v1.18.50...v1.18.51) (2026-05-28)
 
-
 ### Bug Fixes
 
-* windows application support ([5833771](https://github.com/jensvogt/awsmock/commit/58337713e15d2966cbb007ca1e538aafc496cf73))
+* windows application
+  support ([5833771](https://github.com/jensvogt/awsmock/commit/58337713e15d2966cbb007ca1e538aafc496cf73))
 
 ## [1.18.50](https://github.com/jensvogt/awsmock/compare/v1.18.49...v1.18.50) (2026-05-28)
 
-
 ### Bug Fixes
 
-* windows application support ([015842a](https://github.com/jensvogt/awsmock/commit/015842a637af52cf869104a006ba89248b09da70))
+* windows application
+  support ([015842a](https://github.com/jensvogt/awsmock/commit/015842a637af52cf869104a006ba89248b09da70))
 
 ## [1.18.49](https://github.com/jensvogt/awsmock/compare/v1.18.48...v1.18.49) (2026-05-27)
 
-
 ### Bug Fixes
 
-* windows application support ([b328254](https://github.com/jensvogt/awsmock/commit/b328254ce0242fe2fe38555f01d8957206a9e176))
-* windows application support ([ae06621](https://github.com/jensvogt/awsmock/commit/ae06621c7a2b43f95d0c7b677acdda9736c9a17b))
+* windows application
+  support ([b328254](https://github.com/jensvogt/awsmock/commit/b328254ce0242fe2fe38555f01d8957206a9e176))
+* windows application
+  support ([ae06621](https://github.com/jensvogt/awsmock/commit/ae06621c7a2b43f95d0c7b677acdda9736c9a17b))
 
 ## [1.18.48](https://github.com/jensvogt/awsmock/compare/v1.18.47...v1.18.48) (2026-05-27)
 
-
 ### Bug Fixes
 
-* windows application support ([be00507](https://github.com/jensvogt/awsmock/commit/be00507acc94693246b6b37576280f7a7edf6e6a))
+* windows application
+  support ([be00507](https://github.com/jensvogt/awsmock/commit/be00507acc94693246b6b37576280f7a7edf6e6a))
 
 ## [1.18.47](https://github.com/jensvogt/awsmock/compare/v1.18.46...v1.18.47) (2026-05-27)
 
-
 ### Bug Fixes
 
-* windows application support ([6a42722](https://github.com/jensvogt/awsmock/commit/6a4272250dc3c25aa3928489c907cad3dcacd751))
+* windows application
+  support ([6a42722](https://github.com/jensvogt/awsmock/commit/6a4272250dc3c25aa3928489c907cad3dcacd751))
 
 ## [1.18.46](https://github.com/jensvogt/awsmock/compare/v1.18.45...v1.18.46) (2026-05-27)
 
-
 ### Bug Fixes
 
-* windows application support ([6b020ce](https://github.com/jensvogt/awsmock/commit/6b020ced440c2ed92690e625f52e9ea8a15bb302))
-* windows application support ([5c2c374](https://github.com/jensvogt/awsmock/commit/5c2c374e394ce5afaed315aa417a4244163f6adb))
-* windows application support ([d61447b](https://github.com/jensvogt/awsmock/commit/d61447bd4b39cd6154dadd5d1ef4718fc21fcba4))
+* windows application
+  support ([6b020ce](https://github.com/jensvogt/awsmock/commit/6b020ced440c2ed92690e625f52e9ea8a15bb302))
+* windows application
+  support ([5c2c374](https://github.com/jensvogt/awsmock/commit/5c2c374e394ce5afaed315aa417a4244163f6adb))
+* windows application
+  support ([d61447b](https://github.com/jensvogt/awsmock/commit/d61447bd4b39cd6154dadd5d1ef4718fc21fcba4))
 
 ## [1.18.45](https://github.com/jensvogt/awsmock/compare/v1.18.44...v1.18.45) (2026-05-27)
 
-
 ### Bug Fixes
 
-* add tests to github action ([8f2429f](https://github.com/jensvogt/awsmock/commit/8f2429f421f6a886745eac83f10cbbf6899b4fc0))
+* add tests to github
+  action ([8f2429f](https://github.com/jensvogt/awsmock/commit/8f2429f421f6a886745eac83f10cbbf6899b4fc0))
 
 ## [1.18.44](https://github.com/jensvogt/awsmock/compare/v1.18.43...v1.18.44) (2026-05-26)
 
-
 ### Bug Fixes
 
-* add tests to github action ([08e4325](https://github.com/jensvogt/awsmock/commit/08e432531fa07d4ddc2232fc7fc8859bb071edbc))
-* add tests to github action ([d88eaef](https://github.com/jensvogt/awsmock/commit/d88eaef78bfbbc0f86073b0e07a301e7b16cbac0))
-* add tests to github action ([de8c9d5](https://github.com/jensvogt/awsmock/commit/de8c9d58f7da21daddeb3b5383cbb4be1b4f2d0a))
-* add tests to github action ([beedb62](https://github.com/jensvogt/awsmock/commit/beedb62d75cbc8a93dc0b0be15a502ca52f89f75))
-* add tests to github action ([7219714](https://github.com/jensvogt/awsmock/commit/7219714b2d1966ad60ac16ec60429d84fa19aab0))
-* add TLS to docker connection ([1609742](https://github.com/jensvogt/awsmock/commit/160974223508c81b78c12f7086ea3ada06eaf42d))
+* add tests to github
+  action ([08e4325](https://github.com/jensvogt/awsmock/commit/08e432531fa07d4ddc2232fc7fc8859bb071edbc))
+* add tests to github
+  action ([d88eaef](https://github.com/jensvogt/awsmock/commit/d88eaef78bfbbc0f86073b0e07a301e7b16cbac0))
+* add tests to github
+  action ([de8c9d5](https://github.com/jensvogt/awsmock/commit/de8c9d58f7da21daddeb3b5383cbb4be1b4f2d0a))
+* add tests to github
+  action ([beedb62](https://github.com/jensvogt/awsmock/commit/beedb62d75cbc8a93dc0b0be15a502ca52f89f75))
+* add tests to github
+  action ([7219714](https://github.com/jensvogt/awsmock/commit/7219714b2d1966ad60ac16ec60429d84fa19aab0))
+* add TLS to docker
+  connection ([1609742](https://github.com/jensvogt/awsmock/commit/160974223508c81b78c12f7086ea3ada06eaf42d))
 
 ## [1.18.43](https://github.com/jensvogt/awsmock/compare/1.18.42...v1.18.43) (2026-05-26)
 
-
 ### Bug Fixes
 
-* windows application support ([7266ab7](https://github.com/jensvogt/awsmock/commit/7266ab7e878ade651fd2d558dfeb0eae649e8617))
+* windows application
+  support ([7266ab7](https://github.com/jensvogt/awsmock/commit/7266ab7e878ade651fd2d558dfeb0eae649e8617))
 
 ## [1.18.42](https://github.com/jensvogt/awsmock/compare/v1.18.41...v1.18.42) (2026-05-26)
-
 
 ### Bug Fixes
 
@@ -161,13 +191,11 @@
 
 ## [1.18.41](https://github.com/jensvogt/awsmock/compare/v1.18.40...v1.18.41) (2026-05-26)
 
-
 ### Bug Fixes
 
 * windows port ([ce98715](https://github.com/jensvogt/awsmock/commit/ce987154652b457774f15dd34782004a82f5dd69))
 
 ## [1.18.40](https://github.com/jensvogt/awsmock/compare/v1.18.39...v1.18.40) (2026-05-25)
-
 
 ### Bug Fixes
 
@@ -176,23 +204,24 @@
 
 ## [1.18.39](https://github.com/jensvogt/awsmock/compare/v1.18.38...v1.18.39) (2026-05-25)
 
-
 ### Bug Fixes
 
-* add TLS to docker connection ([db65a21](https://github.com/jensvogt/awsmock/commit/db65a21ad85ed332c7c21070abdc3f2a7c4fc063))
-* add TLS to docker connection ([53d5852](https://github.com/jensvogt/awsmock/commit/53d5852fb7bdd192d1b2d51fbf18e180d68520a6))
+* add TLS to docker
+  connection ([db65a21](https://github.com/jensvogt/awsmock/commit/db65a21ad85ed332c7c21070abdc3f2a7c4fc063))
+* add TLS to docker
+  connection ([53d5852](https://github.com/jensvogt/awsmock/commit/53d5852fb7bdd192d1b2d51fbf18e180d68520a6))
 
 ## [1.18.38](https://github.com/jensvogt/awsmock/compare/v1.18.37...v1.18.38) (2026-05-25)
 
-
 ### Bug Fixes
 
-* add TLS to docker connection ([014cd45](https://github.com/jensvogt/awsmock/commit/014cd454f1ecebdb1a6f0c17c0687a99e59f7cd4))
-* add TLS to docker connection ([ab065cb](https://github.com/jensvogt/awsmock/commit/ab065cbea42df830807521ccc7bc2806353a9ba2))
+* add TLS to docker
+  connection ([014cd45](https://github.com/jensvogt/awsmock/commit/014cd454f1ecebdb1a6f0c17c0687a99e59f7cd4))
+* add TLS to docker
+  connection ([ab065cb](https://github.com/jensvogt/awsmock/commit/ab065cbea42df830807521ccc7bc2806353a9ba2))
 * new vcpkg commit ID ([7fbc17a](https://github.com/jensvogt/awsmock/commit/7fbc17ac9e1b3b0ceb4c465b69f8a92df79f991b))
 
 ## [1.18.37](https://github.com/jensvogt/awsmock/compare/1.18.36...v1.18.37) (2026-05-22)
-
 
 ### Bug Fixes
 
@@ -200,13 +229,11 @@
 
 ## [1.18.36](https://github.com/jensvogt/awsmock/compare/1.18.35...v1.18.36) (2026-05-21)
 
-
 ### Bug Fixes
 
 * windows service crash ([96a8c23](https://github.com/jensvogt/awsmock/commit/96a8c23b8d111cfcc8e2dfb12a8d99834d1b4eb9))
 
 ## [1.18.35](https://github.com/jensvogt/awsmock/compare/1.18.34...v1.18.35) (2026-05-20)
-
 
 ### Bug Fixes
 
@@ -214,13 +241,11 @@
 
 ## [1.18.34](https://github.com/jensvogt/awsmock/compare/v1.18.33...v1.18.34) (2026-05-20)
 
-
 ### Bug Fixes
 
 * windows service crash ([1c5a2ac](https://github.com/jensvogt/awsmock/commit/1c5a2acd69d97aadb217a17e57c566b663ef8b7a))
 
 ## [1.18.33](https://github.com/jensvogt/awsmock/compare/v1.18.32...v1.18.33) (2026-05-20)
-
 
 ### Bug Fixes
 
@@ -228,13 +253,11 @@
 
 ## [1.18.32](https://github.com/jensvogt/awsmock/compare/v1.18.31...v1.18.32) (2026-05-20)
 
-
 ### Bug Fixes
 
 * windows service crash ([5a407cd](https://github.com/jensvogt/awsmock/commit/5a407cda582e97c3ed211e8a34d24603d87ec07b))
 
 ## [1.18.31](https://github.com/jensvogt/awsmock/compare/v1.18.30...v1.18.31) (2026-05-20)
-
 
 ### Bug Fixes
 
@@ -242,13 +265,11 @@
 
 ## [1.18.30](https://github.com/jensvogt/awsmock/compare/v1.18.29...v1.18.30) (2026-05-19)
 
-
 ### Bug Fixes
 
 * windows service crash ([8414fa9](https://github.com/jensvogt/awsmock/commit/8414fa9f1a799a73a8064bdadf690f3c9feca88a))
 
 ## [1.18.29](https://github.com/jensvogt/awsmock/compare/v1.18.28...v1.18.29) (2026-05-19)
-
 
 ### Bug Fixes
 
@@ -256,13 +277,11 @@
 
 ## [1.18.28](https://github.com/jensvogt/awsmock/compare/v1.18.27...v1.18.28) (2026-05-19)
 
-
 ### Bug Fixes
 
 * windows service crash ([373b565](https://github.com/jensvogt/awsmock/commit/373b5655d3652ccd7d6c9d65cfa25cdadb3f8424))
 
 ## [1.18.27](https://github.com/jensvogt/awsmock/compare/v1.18.26...v1.18.27) (2026-05-19)
-
 
 ### Bug Fixes
 
@@ -270,13 +289,11 @@
 
 ## [1.18.26](https://github.com/jensvogt/awsmock/compare/v1.18.25...v1.18.26) (2026-05-19)
 
-
 ### Bug Fixes
 
 * windows service crash ([4326f5f](https://github.com/jensvogt/awsmock/commit/4326f5f8678b94b9035c4783b80f6e5fb94a1283))
 
 ## [1.18.25](https://github.com/jensvogt/awsmock/compare/v1.18.24...v1.18.25) (2026-05-18)
-
 
 ### Bug Fixes
 
@@ -284,13 +301,11 @@
 
 ## [1.18.24](https://github.com/jensvogt/awsmock/compare/v1.18.23...v1.18.24) (2026-05-18)
 
-
 ### Bug Fixes
 
 * windows service crash ([fb2f532](https://github.com/jensvogt/awsmock/commit/fb2f532c8ba674e9a63153a3e982e92d369ef679))
 
 ## [1.18.23](https://github.com/jensvogt/awsmock/compare/v1.18.22...v1.18.23) (2026-05-18)
-
 
 ### Bug Fixes
 
@@ -298,14 +313,12 @@
 
 ## [1.18.22](https://github.com/jensvogt/awsmock/compare/v1.18.21...v1.18.22) (2026-05-18)
 
-
 ### Bug Fixes
 
 * windows service crash ([b2688db](https://github.com/jensvogt/awsmock/commit/b2688db91a66754695b22b69aa50b5717888a67f))
 * windows service crash ([6580fc2](https://github.com/jensvogt/awsmock/commit/6580fc28a1d767421cf186ebd396e3c5d55017f8))
 
 ## [1.18.21](https://github.com/jensvogt/awsmock/compare/v1.18.20...v1.18.21) (2026-05-18)
-
 
 ### Bug Fixes
 
@@ -315,13 +328,11 @@
 
 ## [1.18.20](https://github.com/jensvogt/awsmock/compare/v1.18.19...v1.18.20) (2026-05-18)
 
-
 ### Bug Fixes
 
 * windows service crash ([6970bb5](https://github.com/jensvogt/awsmock/commit/6970bb58e9e3c603dbe659c60582455501fd2273))
 
 ## [1.18.19](https://github.com/jensvogt/awsmock/compare/v1.18.18...v1.18.19) (2026-05-17)
-
 
 ### Bug Fixes
 
@@ -329,22 +340,21 @@
 
 ## [1.18.18](https://github.com/jensvogt/awsmock/compare/v1.18.17...v1.18.18) (2026-05-17)
 
-
 ### Bug Fixes
 
 * windows service crash ([014c6f3](https://github.com/jensvogt/awsmock/commit/014c6f304ceb20febe92ea35baae854a27af9884))
 
 ## [1.18.17](https://github.com/jensvogt/awsmock/compare/v1.18.16...v1.18.17) (2026-05-17)
 
-
 ### Bug Fixes
 
 * lambda failures ([8e71c4a](https://github.com/jensvogt/awsmock/commit/8e71c4a18ef39e9d6aece4748a5022c598e9cfa7))
-* windows exec installation ([f14d5e0](https://github.com/jensvogt/awsmock/commit/f14d5e04b9a354234b72b7df4c1d8ea7ebaa513c))
-* windows exec installation ([74eb232](https://github.com/jensvogt/awsmock/commit/74eb2324d9603f6a2b1867b6a1bf99f994a2e719))
+* windows exec
+  installation ([f14d5e0](https://github.com/jensvogt/awsmock/commit/f14d5e04b9a354234b72b7df4c1d8ea7ebaa513c))
+* windows exec
+  installation ([74eb232](https://github.com/jensvogt/awsmock/commit/74eb2324d9603f6a2b1867b6a1bf99f994a2e719))
 
 ## [1.18.16](https://github.com/jensvogt/awsmock/compare/1.18.15...v1.18.16) (2026-05-16)
-
 
 ### Bug Fixes
 
@@ -353,20 +363,19 @@
 
 ## [1.18.15](https://github.com/jensvogt/awsmock/compare/1.18.14...v1.18.15) (2026-05-15)
 
-
 ### Bug Fixes
 
-* dynamodb attributes null values ([886a2a5](https://github.com/jensvogt/awsmock/commit/886a2a55791ed7c5049f07d100cac195e67cb6ee))
+* dynamodb attributes null
+  values ([886a2a5](https://github.com/jensvogt/awsmock/commit/886a2a55791ed7c5049f07d100cac195e67cb6ee))
 
 ## [1.18.14](https://github.com/jensvogt/awsmock/compare/1.18.13...v1.18.14) (2026-05-12)
 
-
 ### Bug Fixes
 
-* SQS queue tagging ([#2294](https://github.com/jensvogt/awsmock/issues/2294)) ([737b0d8](https://github.com/jensvogt/awsmock/commit/737b0d858dfe06cd8621efff870ae71506b8e41c))
+* SQS queue
+  tagging ([#2294](https://github.com/jensvogt/awsmock/issues/2294)) ([737b0d8](https://github.com/jensvogt/awsmock/commit/737b0d858dfe06cd8621efff870ae71506b8e41c))
 
 ## [1.18.13](https://github.com/jensvogt/awsmock/compare/1.18.12...v1.18.13) (2026-05-12)
-
 
 ### Bug Fixes
 
@@ -375,7 +384,6 @@
 
 ## [1.18.12](https://github.com/jensvogt/awsmock/compare/1.18.11...v1.18.12) (2026-05-04)
 
-
 ### Bug Fixes
 
 * purge SQS queues ([ae4bb44](https://github.com/jensvogt/awsmock/commit/ae4bb444761ba50111e9c7d087f3b9d5c1648a65))
@@ -383,13 +391,12 @@
 
 ## [1.18.11](https://github.com/jensvogt/awsmock/compare/v1.18.10...v1.18.11) (2026-05-04)
 
-
 ### Bug Fixes
 
-* resend single SNS messages ([a0832db](https://github.com/jensvogt/awsmock/commit/a0832db32f018cbff52147d1df37ebce485dad67))
+* resend single SNS
+  messages ([a0832db](https://github.com/jensvogt/awsmock/commit/a0832db32f018cbff52147d1df37ebce485dad67))
 
 ## [1.18.10](https://github.com/jensvogt/awsmock/compare/1.18.9...v1.18.10) (2026-05-04)
-
 
 ### Bug Fixes
 
@@ -397,14 +404,13 @@
 
 ## [1.18.9](https://github.com/jensvogt/awsmock/compare/1.18.8...v1.18.9) (2026-05-03)
 
-
 ### Bug Fixes
 
-* asynchronous handler methods ([9bbd674](https://github.com/jensvogt/awsmock/commit/9bbd674be9128e3687cc6f3b6a7e5d9e5d769d52))
+* asynchronous handler
+  methods ([9bbd674](https://github.com/jensvogt/awsmock/commit/9bbd674be9128e3687cc6f3b6a7e5d9e5d769d52))
 * dynamodb item export ([ed85b11](https://github.com/jensvogt/awsmock/commit/ed85b11d1853614c664050fa958d59799757f532))
 
 ## [1.18.8](https://github.com/jensvogt/awsmock/compare/v1.18.7...v1.18.8) (2026-05-02)
-
 
 ### Bug Fixes
 
@@ -413,20 +419,17 @@
 
 ## [1.18.7](https://github.com/jensvogt/awsmock/compare/v1.18.6...v1.18.7) (2026-05-02)
 
-
 ### Bug Fixes
 
 * dynamodb item export ([8a32ce0](https://github.com/jensvogt/awsmock/commit/8a32ce0f249a619c091b5c54942b0683cf9be0d1))
 
 ## [1.18.6](https://github.com/jensvogt/awsmock/compare/v1.18.5...v1.18.6) (2026-05-02)
 
-
 ### Bug Fixes
 
 * dynamodb item export ([a45a3d4](https://github.com/jensvogt/awsmock/commit/a45a3d42d1710adae798a2909ab671b63c633da1))
 
 ## [1.18.5](https://github.com/jensvogt/awsmock/compare/1.18.4...v1.18.5) (2026-05-02)
-
 
 ### Bug Fixes
 
@@ -435,21 +438,20 @@
 
 ## [1.18.4](https://github.com/jensvogt/awsmock/compare/v1.18.3...v1.18.4) (2026-04-30)
 
-
 ### Bug Fixes
 
 * file utils ([cbc69b6](https://github.com/jensvogt/awsmock/commit/cbc69b6c03c637bfd32c773bb7ddc2047dd13b14))
 
 ## [1.18.3](https://github.com/jensvogt/awsmock/compare/1.18.2...v1.18.3) (2026-04-30)
 
-
 ### Bug Fixes
 
-* stream line awsmock controller ([c0c828a](https://github.com/jensvogt/awsmock/commit/c0c828a37949294f47cfdd11b5ef2ccea47dd5e0))
-* stream line awsmock controller ([3e94529](https://github.com/jensvogt/awsmock/commit/3e94529e159f8dfa03de227e5883cb49a0a197a2))
+* stream line awsmock
+  controller ([c0c828a](https://github.com/jensvogt/awsmock/commit/c0c828a37949294f47cfdd11b5ef2ccea47dd5e0))
+* stream line awsmock
+  controller ([3e94529](https://github.com/jensvogt/awsmock/commit/3e94529e159f8dfa03de227e5883cb49a0a197a2))
 
 ## [1.18.2](https://github.com/jensvogt/awsmock/compare/v1.18.1...v1.18.2) (2026-04-30)
-
 
 ### Bug Fixes
 
@@ -457,19 +459,18 @@
 
 ## [1.18.1](https://github.com/jensvogt/awsmock/compare/v1.18.0...v1.18.1) (2026-04-29)
 
-
 ### Bug Fixes
 
-* SQL cleanup, new libmagic singleton instance ([747496c](https://github.com/jensvogt/awsmock/commit/747496c4a7fc7372b8773e6c0aaa19be50681d63))
-* SQL cleanup, new libmagic singleton instance ([fa313a5](https://github.com/jensvogt/awsmock/commit/fa313a58e945fdec4de1359e8f371b9a0c380276))
+* SQL cleanup, new libmagic singleton
+  instance ([747496c](https://github.com/jensvogt/awsmock/commit/747496c4a7fc7372b8773e6c0aaa19be50681d63))
+* SQL cleanup, new libmagic singleton
+  instance ([fa313a5](https://github.com/jensvogt/awsmock/commit/fa313a58e945fdec4de1359e8f371b9a0c380276))
 
 ## [1.18.0](https://github.com/jensvogt/awsmock/compare/v1.17.0...v1.18.0) (2026-04-29)
-
 
 ### Features
 
 * container expose port ([4391e3e](https://github.com/jensvogt/awsmock/commit/4391e3ef06aeb77fc905baee640f90728d6582f8))
-
 
 ### Bug Fixes
 
@@ -477,12 +478,10 @@
 
 ## [1.17.0](https://github.com/jensvogt/awsmock/compare/v1.16.56...v1.17.0) (2026-04-27)
 
-
 ### Features
 
 * s3 object counters ([fda852c](https://github.com/jensvogt/awsmock/commit/fda852cfb74432cc525973eb4e20c93a9784df19))
 * s3 object counters ([3ac8b37](https://github.com/jensvogt/awsmock/commit/3ac8b37d43d4690c6618d7eb8cb425bd5c6e216e))
-
 
 ### Bug Fixes
 
@@ -490,14 +489,12 @@
 
 ## [1.16.56](https://github.com/jensvogt/awsmock/compare/v1.16.55...v1.16.56) (2026-04-26)
 
-
 ### Bug Fixes
 
 * application startup ([c7c4466](https://github.com/jensvogt/awsmock/commit/c7c4466daa6913449c4dad95e90e735369db9820))
 * application startup ([56df7b5](https://github.com/jensvogt/awsmock/commit/56df7b539b60e5b3df4ba6de003624b29382c41c))
 
 ## [1.16.55](https://github.com/jensvogt/awsmock/compare/v1.16.54...v1.16.55) (2026-04-26)
-
 
 ### Bug Fixes
 
@@ -507,50 +504,50 @@
 
 ## [1.16.54](https://github.com/jensvogt/awsmock/compare/v1.16.53...v1.16.54) (2026-04-26)
 
-
 ### Bug Fixes
 
 * application startup ([80368d6](https://github.com/jensvogt/awsmock/commit/80368d6af771e299cedbcf4cfbd556070098e78d))
 
 ## [1.16.53](https://github.com/jensvogt/awsmock/compare/v1.16.52...v1.16.53) (2026-04-26)
 
-
 ### Bug Fixes
 
-* docker file for applications ([a729e48](https://github.com/jensvogt/awsmock/commit/a729e4845494af87084e5b2878d169877b75199c))
-* docker file for applications ([3542743](https://github.com/jensvogt/awsmock/commit/3542743a3db1c0f4a2065b0d78c0acedcf0f1930))
+* docker file for
+  applications ([a729e48](https://github.com/jensvogt/awsmock/commit/a729e4845494af87084e5b2878d169877b75199c))
+* docker file for
+  applications ([3542743](https://github.com/jensvogt/awsmock/commit/3542743a3db1c0f4a2065b0d78c0acedcf0f1930))
 
 ## [1.16.52](https://github.com/jensvogt/awsmock/compare/v1.16.51...v1.16.52) (2026-04-24)
 
-
 ### Bug Fixes
 
-* message attribute serialization ([2718c78](https://github.com/jensvogt/awsmock/commit/2718c789a96ee0954c0cfeb7a7d0c8d9851e47b8))
+* message attribute
+  serialization ([2718c78](https://github.com/jensvogt/awsmock/commit/2718c789a96ee0954c0cfeb7a7d0c8d9851e47b8))
 
 ## [1.16.51](https://github.com/jensvogt/awsmock/compare/v1.16.50...v1.16.51) (2026-04-24)
 
-
 ### Bug Fixes
 
-* message attribute serialization ([d625002](https://github.com/jensvogt/awsmock/commit/d625002ce09efa857a1a02aa89b69e9abd695153))
-* message attribute serialization ([c80bb0d](https://github.com/jensvogt/awsmock/commit/c80bb0dc5d4ae32bb9f304cac81dc8e1befd95d0))
+* message attribute
+  serialization ([d625002](https://github.com/jensvogt/awsmock/commit/d625002ce09efa857a1a02aa89b69e9abd695153))
+* message attribute
+  serialization ([c80bb0d](https://github.com/jensvogt/awsmock/commit/c80bb0dc5d4ae32bb9f304cac81dc8e1befd95d0))
 
 ## [1.16.50](https://github.com/jensvogt/awsmock/compare/v1.16.49...v1.16.50) (2026-04-23)
 
-
 ### Bug Fixes
 
-* monitoring graphs zoom, limit, scale ([97aef10](https://github.com/jensvogt/awsmock/commit/97aef10a3900a0e6845ce52eade9334f5abcd986))
+* monitoring graphs zoom, limit,
+  scale ([97aef10](https://github.com/jensvogt/awsmock/commit/97aef10a3900a0e6845ce52eade9334f5abcd986))
 
 ## [1.16.49](https://github.com/jensvogt/awsmock/compare/v1.16.48...v1.16.49) (2026-04-23)
 
-
 ### Bug Fixes
 
-* monitoring exclusion list ([f0251c2](https://github.com/jensvogt/awsmock/commit/f0251c2ace6f1d1e0f59edfcdc0252c5bf2fe3e6))
+* monitoring exclusion
+  list ([f0251c2](https://github.com/jensvogt/awsmock/commit/f0251c2ace6f1d1e0f59edfcdc0252c5bf2fe3e6))
 
 ## [1.16.48](https://github.com/jensvogt/awsmock/compare/v1.16.47...v1.16.48) (2026-04-22)
-
 
 ### Bug Fixes
 
@@ -558,78 +555,85 @@
 
 ## [1.16.47](https://github.com/jensvogt/awsmock/compare/v1.16.46...v1.16.47) (2026-04-22)
 
-
 ### Bug Fixes
 
 * fix SNS message size ([cd1fd1b](https://github.com/jensvogt/awsmock/commit/cd1fd1bf9640551e43b30a7a4992c68b4a87e2df))
 
 ## [1.16.46](https://github.com/jensvogt/awsmock/compare/v1.16.45...v1.16.46) (2026-04-22)
 
-
 ### Bug Fixes
 
-* SNS default attribute delete ([4efc058](https://github.com/jensvogt/awsmock/commit/4efc058b0c7b1fdda23478eb3d76fc384aa78b0b))
-* SNS default attribute delete ([59e415a](https://github.com/jensvogt/awsmock/commit/59e415a8a1c5fad1555f8d32b7952de0d437f288))
+* SNS default attribute
+  delete ([4efc058](https://github.com/jensvogt/awsmock/commit/4efc058b0c7b1fdda23478eb3d76fc384aa78b0b))
+* SNS default attribute
+  delete ([59e415a](https://github.com/jensvogt/awsmock/commit/59e415a8a1c5fad1555f8d32b7952de0d437f288))
 
 ## [1.16.45](https://github.com/jensvogt/awsmock/compare/v1.16.44...v1.16.45) (2026-04-21)
 
-
 ### Bug Fixes
 
-* SNS default attribute delete ([9a6eacc](https://github.com/jensvogt/awsmock/commit/9a6eacc580cffe1637e565610b5575bd30369e9d))
+* SNS default attribute
+  delete ([9a6eacc](https://github.com/jensvogt/awsmock/commit/9a6eacc580cffe1637e565610b5575bd30369e9d))
 
 ## [1.16.44](https://github.com/jensvogt/awsmock/compare/v1.16.43...v1.16.44) (2026-04-21)
 
-
 ### Bug Fixes
 
-* SNS-&gt;SQS notifications ([7392d28](https://github.com/jensvogt/awsmock/commit/7392d28a006e85f4d8d0e94cb7534829acc9645c))
+* SNS-&gt;SQS
+  notifications ([7392d28](https://github.com/jensvogt/awsmock/commit/7392d28a006e85f4d8d0e94cb7534829acc9645c))
 
 ## [1.16.43](https://github.com/jensvogt/awsmock/compare/v1.16.42...v1.16.43) (2026-04-20)
 
-
 ### Bug Fixes
 
-* add dual stack add  SNS-&gt;SQS subscriptions ([9771569](https://github.com/jensvogt/awsmock/commit/9771569129b16e61a79424cbd3b76ca05a78c460))
+* add dual stack add SNS-&gt;SQS
+  subscriptions ([9771569](https://github.com/jensvogt/awsmock/commit/9771569129b16e61a79424cbd3b76ca05a78c460))
 
 ## [1.16.42](https://github.com/jensvogt/awsmock/compare/v1.16.41...v1.16.42) (2026-04-20)
 
-
 ### Bug Fixes
 
-* add dual stack IPv4/v6 support ([8b823bc](https://github.com/jensvogt/awsmock/commit/8b823bced66051db9240e082e5f4de254391f393))
-* add dual stack IPv4/v6 support ([ad9e5eb](https://github.com/jensvogt/awsmock/commit/ad9e5ebe636130a6900905fae375055381695a60))
-* add dual stack IPv4/v6 support ([3b169de](https://github.com/jensvogt/awsmock/commit/3b169dedada847469dde274701773ae469d4d4c3))
-* add dual stack IPv4/v6 support ([e31a638](https://github.com/jensvogt/awsmock/commit/e31a638654607fd685addc295a75d8fe7cd3938a))
-* add dual stack IPv4/v6 support ([ea6159d](https://github.com/jensvogt/awsmock/commit/ea6159d5c65943b69feddec82ac687c466ca5fa2))
-* docker container management ([530da02](https://github.com/jensvogt/awsmock/commit/530da02217508cd5f67cbae46d5f1d0cf14d3634))
-* docker container management ([66785cd](https://github.com/jensvogt/awsmock/commit/66785cd42638b1dbe9a720594a3cf9227d829ae3))
+* add dual stack IPv4/v6
+  support ([8b823bc](https://github.com/jensvogt/awsmock/commit/8b823bced66051db9240e082e5f4de254391f393))
+* add dual stack IPv4/v6
+  support ([ad9e5eb](https://github.com/jensvogt/awsmock/commit/ad9e5ebe636130a6900905fae375055381695a60))
+* add dual stack IPv4/v6
+  support ([3b169de](https://github.com/jensvogt/awsmock/commit/3b169dedada847469dde274701773ae469d4d4c3))
+* add dual stack IPv4/v6
+  support ([e31a638](https://github.com/jensvogt/awsmock/commit/e31a638654607fd685addc295a75d8fe7cd3938a))
+* add dual stack IPv4/v6
+  support ([ea6159d](https://github.com/jensvogt/awsmock/commit/ea6159d5c65943b69feddec82ac687c466ca5fa2))
+* docker container
+  management ([530da02](https://github.com/jensvogt/awsmock/commit/530da02217508cd5f67cbae46d5f1d0cf14d3634))
+* docker container
+  management ([66785cd](https://github.com/jensvogt/awsmock/commit/66785cd42638b1dbe9a720594a3cf9227d829ae3))
 
 ## [1.16.41](https://github.com/jensvogt/awsmock/compare/v1.16.40...v1.16.41) (2026-04-14)
 
-
 ### Bug Fixes
 
-* docker container management ([755bc53](https://github.com/jensvogt/awsmock/commit/755bc53617804745895a3e8ab15476dbe46669f0))
-* SQL cleanup, new libmagic singleton instance ([fb371d3](https://github.com/jensvogt/awsmock/commit/fb371d30001dbfd29032bf1011ea64796aa50ccf))
+* docker container
+  management ([755bc53](https://github.com/jensvogt/awsmock/commit/755bc53617804745895a3e8ab15476dbe46669f0))
+* SQL cleanup, new libmagic singleton
+  instance ([fb371d3](https://github.com/jensvogt/awsmock/commit/fb371d30001dbfd29032bf1011ea64796aa50ccf))
 
 ## [1.16.40](https://github.com/jensvogt/awsmock/compare/v1.16.39...v1.16.40) (2026-04-13)
 
-
 ### Bug Fixes
 
-* add java25 support for applications and lambdas ([305e4c5](https://github.com/jensvogt/awsmock/commit/305e4c5cbe6bbd15794f819efff3cd55dd6444aa))
-* add java25 support for applications and lambdas ([d186bb7](https://github.com/jensvogt/awsmock/commit/d186bb7372985bf361aee0a77b4c454965880970))
+* add java25 support for applications and
+  lambdas ([305e4c5](https://github.com/jensvogt/awsmock/commit/305e4c5cbe6bbd15794f819efff3cd55dd6444aa))
+* add java25 support for applications and
+  lambdas ([d186bb7](https://github.com/jensvogt/awsmock/commit/d186bb7372985bf361aee0a77b4c454965880970))
 
 ## [1.16.39](https://github.com/jensvogt/awsmock/compare/v1.16.38...v1.16.39) (2026-04-12)
 
-
 ### Bug Fixes
 
-* SQL cleanup, new libmagic singleton instance ([50a9596](https://github.com/jensvogt/awsmock/commit/50a959694f967cf85db6aab452ffbe6582c93050))
+* SQL cleanup, new libmagic singleton
+  instance ([50a9596](https://github.com/jensvogt/awsmock/commit/50a959694f967cf85db6aab452ffbe6582c93050))
 
 ## [1.16.38](https://github.com/jensvogt/awsmock/compare/v1.16.37...v1.16.38) (2026-04-11)
-
 
 ### Bug Fixes
 
@@ -637,13 +641,11 @@
 
 ## [1.16.37](https://github.com/jensvogt/awsmock/compare/v1.16.36...v1.16.37) (2026-04-11)
 
-
 ### Bug Fixes
 
 * SQS cleanup ([a195114](https://github.com/jensvogt/awsmock/commit/a195114b855fc695821f5cd1671d4325a7cfa783))
 
 ## [1.16.36](https://github.com/jensvogt/awsmock/compare/v1.16.35...v1.16.36) (2026-04-10)
-
 
 ### Bug Fixes
 
@@ -655,73 +657,76 @@
 
 ## [1.16.35](https://github.com/jensvogt/awsmock/compare/v1.16.34...v1.16.35) (2026-04-10)
 
-
 ### Bug Fixes
 
-* fix windows github action ([bd6f5b0](https://github.com/jensvogt/awsmock/commit/bd6f5b0501751046a7e6f15c5d62eaf0ca465f74))
-* fix windows github action ([bf0c32c](https://github.com/jensvogt/awsmock/commit/bf0c32c67d0ac849a7572c3e3eb028ca09c3fccb))
+* fix windows github
+  action ([bd6f5b0](https://github.com/jensvogt/awsmock/commit/bd6f5b0501751046a7e6f15c5d62eaf0ca465f74))
+* fix windows github
+  action ([bf0c32c](https://github.com/jensvogt/awsmock/commit/bf0c32c67d0ac849a7572c3e3eb028ca09c3fccb))
 
 ## [1.16.34](https://github.com/jensvogt/awsmock/compare/v1.16.33...v1.16.34) (2026-04-10)
 
-
 ### Bug Fixes
 
-* fix windows github action ([5123944](https://github.com/jensvogt/awsmock/commit/5123944f104e61f22a8dae99e219ceca8b57e33c))
+* fix windows github
+  action ([5123944](https://github.com/jensvogt/awsmock/commit/5123944f104e61f22a8dae99e219ceca8b57e33c))
 
 ## [1.16.33](https://github.com/jensvogt/awsmock/compare/v1.16.32...v1.16.33) (2026-04-10)
 
-
 ### Bug Fixes
 
-* fix windows github action ([16643ae](https://github.com/jensvogt/awsmock/commit/16643aecdd1d4b0008ef63142b501a43b6cfed7d))
+* fix windows github
+  action ([16643ae](https://github.com/jensvogt/awsmock/commit/16643aecdd1d4b0008ef63142b501a43b6cfed7d))
 
 ## [1.16.32](https://github.com/jensvogt/awsmock/compare/v1.16.31...v1.16.32) (2026-04-09)
 
-
 ### Bug Fixes
 
-* release github actions ([c1d5c1d](https://github.com/jensvogt/awsmock/commit/c1d5c1d551f7701c57c884addda1ae4924b39656))
+* release github
+  actions ([c1d5c1d](https://github.com/jensvogt/awsmock/commit/c1d5c1d551f7701c57c884addda1ae4924b39656))
 
 ## [1.16.31](https://github.com/jensvogt/awsmock/compare/v1.16.30...v1.16.31) (2026-04-09)
 
-
 ### Bug Fixes
 
-* release github actions ([279e900](https://github.com/jensvogt/awsmock/commit/279e900a1ce2b5fdfff33eeec8ea2e2e29277dda))
+* release github
+  actions ([279e900](https://github.com/jensvogt/awsmock/commit/279e900a1ce2b5fdfff33eeec8ea2e2e29277dda))
 
 ## [1.16.30](https://github.com/jensvogt/awsmock/compare/v1.16.29...v1.16.30) (2026-04-09)
 
-
 ### Bug Fixes
 
-* release github actions ([b67302b](https://github.com/jensvogt/awsmock/commit/b67302bd5558e5981e2fc092d7e4241bd5197a77))
+* release github
+  actions ([b67302b](https://github.com/jensvogt/awsmock/commit/b67302bd5558e5981e2fc092d7e4241bd5197a77))
 
 ## [1.16.29](https://github.com/jensvogt/awsmock/compare/v1.16.28...v1.16.29) (2026-04-09)
 
-
 ### Bug Fixes
 
-* release github actions ([1518154](https://github.com/jensvogt/awsmock/commit/15181546c1f548cf1596757c178193a7b10fc8e6))
-* release github actions ([fe3ef29](https://github.com/jensvogt/awsmock/commit/fe3ef294aa97a0335ef563c1c445c19e1bf144c7))
+* release github
+  actions ([1518154](https://github.com/jensvogt/awsmock/commit/15181546c1f548cf1596757c178193a7b10fc8e6))
+* release github
+  actions ([fe3ef29](https://github.com/jensvogt/awsmock/commit/fe3ef294aa97a0335ef563c1c445c19e1bf144c7))
 
 ## [1.16.28](https://github.com/jensvogt/awsmock/compare/v1.16.27...v1.16.28) (2026-04-09)
 
-
 ### Bug Fixes
 
-* release github actions ([5defdc9](https://github.com/jensvogt/awsmock/commit/5defdc902970fdc6cfc6e8f47d313ae92c8dfc4c))
+* release github
+  actions ([5defdc9](https://github.com/jensvogt/awsmock/commit/5defdc902970fdc6cfc6e8f47d313ae92c8dfc4c))
 
 ## [1.16.27](https://github.com/jensvogt/awsmock/compare/v1.16.26...v1.16.27) (2026-04-09)
 
-
 ### Bug Fixes
 
-* docker cpu/memory stats on Windows ([d9e47f3](https://github.com/jensvogt/awsmock/commit/d9e47f39aa420dc2d5cc49a62f09c21b5baa9981))
-* docker cpu/memory stats on Windows ([e908d49](https://github.com/jensvogt/awsmock/commit/e908d49d7a4df05cc59dc53b10b791d7d4306f2a))
-* release github actions ([6a6107a](https://github.com/jensvogt/awsmock/commit/6a6107ab96ea91a6b14fb91c552edb445d612678))
+* docker cpu/memory stats on
+  Windows ([d9e47f3](https://github.com/jensvogt/awsmock/commit/d9e47f39aa420dc2d5cc49a62f09c21b5baa9981))
+* docker cpu/memory stats on
+  Windows ([e908d49](https://github.com/jensvogt/awsmock/commit/e908d49d7a4df05cc59dc53b10b791d7d4306f2a))
+* release github
+  actions ([6a6107a](https://github.com/jensvogt/awsmock/commit/6a6107ab96ea91a6b14fb91c552edb445d612678))
 
 ## [1.16.26](https://github.com/jensvogt/awsmock/compare/v1.16.25...v1.16.26) (2026-04-09)
-
 
 ### Bug Fixes
 
@@ -729,13 +734,11 @@
 
 ## [1.16.25](https://github.com/jensvogt/awsmock/compare/v1.16.24...v1.16.25) (2026-04-09)
 
-
 ### Bug Fixes
 
 * S3/Dynamodb tests ([9d5a857](https://github.com/jensvogt/awsmock/commit/9d5a8573fc455b000c42913993279c4208f432b6))
 
 ## [1.16.24](https://github.com/jensvogt/awsmock/compare/v1.16.23...v1.16.24) (2026-04-08)
-
 
 ### Bug Fixes
 
@@ -744,23 +747,21 @@
 
 ## [1.16.23](https://github.com/jensvogt/awsmock/compare/v1.16.22...v1.16.23) (2026-04-08)
 
-
 ### Bug Fixes
 
 * S3/Dynamodb tests ([c56e43f](https://github.com/jensvogt/awsmock/commit/c56e43f7de79d8743c510f02007e808ae5790610))
 
 ## [1.16.22](https://github.com/jensvogt/awsmock/compare/v1.16.21...v1.16.22) (2026-04-08)
 
-
 ### Bug Fixes
 
 * memory db for SQS/SNS ([120fd8f](https://github.com/jensvogt/awsmock/commit/120fd8f687afdbe39208da55a647e688f8d3158c))
-* rearrange dynamodb items ([0762bd2](https://github.com/jensvogt/awsmock/commit/0762bd2bbf778d1e5e83238684e8ce6a0283c0a2))
+* rearrange dynamodb
+  items ([0762bd2](https://github.com/jensvogt/awsmock/commit/0762bd2bbf778d1e5e83238684e8ce6a0283c0a2))
 * S3/Dynamodb tests ([a280398](https://github.com/jensvogt/awsmock/commit/a2803987de42b465430a7381e730aa7acfa97163))
 * S3/Dynamodb tests ([46c0baa](https://github.com/jensvogt/awsmock/commit/46c0baad0c9fa77da2d440295626629cde59fd1c))
 
 ## [1.16.21](https://github.com/jensvogt/awsmock/compare/v1.16.20...v1.16.21) (2026-04-07)
-
 
 ### Bug Fixes
 
@@ -771,14 +772,12 @@
 
 ## [1.16.20](https://github.com/jensvogt/awsmock/compare/v1.16.19...v1.16.20) (2026-04-06)
 
-
 ### Bug Fixes
 
 * cognito configuration ([1f7f9eb](https://github.com/jensvogt/awsmock/commit/1f7f9eb64a60167bd0db6101a8903b9a56333d6c))
 * SQS message group ID ([0989dfe](https://github.com/jensvogt/awsmock/commit/0989dfe8dcf883cc472bb0d76e0ae04fb0b34bb3))
 
 ## [1.16.19](https://github.com/jensvogt/awsmock/compare/v1.16.18...v1.16.19) (2026-04-05)
-
 
 ### Bug Fixes
 
@@ -789,7 +788,6 @@
 
 ## [1.16.18](https://github.com/jensvogt/awsmock/compare/v1.16.17...v1.16.18) (2026-04-05)
 
-
 ### Bug Fixes
 
 * SQS message group ID ([8c84dfc](https://github.com/jensvogt/awsmock/commit/8c84dfc7897563927609995c8b24ca6423393df8))
@@ -797,54 +795,54 @@
 
 ## [1.16.17](https://github.com/jensvogt/awsmock/compare/v1.16.16...v1.16.17) (2026-04-04)
 
-
 ### Bug Fixes
 
-* rearrange dynamodb items ([c3848b9](https://github.com/jensvogt/awsmock/commit/c3848b9a35dcd6289377f2dd7a97fef35909d87b))
+* rearrange dynamodb
+  items ([c3848b9](https://github.com/jensvogt/awsmock/commit/c3848b9a35dcd6289377f2dd7a97fef35909d87b))
 
 ## [1.16.16](https://github.com/jensvogt/awsmock/compare/v1.16.15...v1.16.16) (2026-04-03)
 
-
 ### Bug Fixes
 
-* fix import/export of infrastructure data ([1bf1f2b](https://github.com/jensvogt/awsmock/commit/1bf1f2b5cca5f7e5d5ea85e2c542937e6e8ca998))
-* fix import/export of infrastructure data ([21cd21f](https://github.com/jensvogt/awsmock/commit/21cd21f2c08ede7992f43122b40d983c3c2ece80))
+* fix import/export of infrastructure
+  data ([1bf1f2b](https://github.com/jensvogt/awsmock/commit/1bf1f2b5cca5f7e5d5ea85e2c542937e6e8ca998))
+* fix import/export of infrastructure
+  data ([21cd21f](https://github.com/jensvogt/awsmock/commit/21cd21f2c08ede7992f43122b40d983c3c2ece80))
 * SQS message group ID ([3a7ab69](https://github.com/jensvogt/awsmock/commit/3a7ab690c50a84f3fb96c1d760224180e65a0b6b))
 * SQS message group ID ([558f77e](https://github.com/jensvogt/awsmock/commit/558f77e1ce3b992c4eabc073358a92d76ae8ea40))
 
 ## [1.16.15](https://github.com/jensvogt/awsmock/compare/1.16.14...v1.16.15) (2026-04-03)
 
-
 ### Bug Fixes
 
-* fix import/export of infrastructure data ([5cf7522](https://github.com/jensvogt/awsmock/commit/5cf7522b88a3ba28bbc4e571dc09780f2f39c6fa))
+* fix import/export of infrastructure
+  data ([5cf7522](https://github.com/jensvogt/awsmock/commit/5cf7522b88a3ba28bbc4e571dc09780f2f39c6fa))
 
 ## [1.16.14](https://github.com/jensvogt/awsmock/compare/v1.16.13...v1.16.14) (2026-04-01)
 
-
 ### Bug Fixes
 
-* fix cognito user client explicit auth flows ([c2ff49a](https://github.com/jensvogt/awsmock/commit/c2ff49a4e687155d7c93d0c073bc59345f153278))
+* fix cognito user client explicit auth
+  flows ([c2ff49a](https://github.com/jensvogt/awsmock/commit/c2ff49a4e687155d7c93d0c073bc59345f153278))
 
 ## [1.16.13](https://github.com/jensvogt/awsmock/compare/v1.16.12...v1.16.13) (2026-04-01)
-
 
 ### Bug Fixes
 
 * cognito auth flow ([ddc7a82](https://github.com/jensvogt/awsmock/commit/ddc7a828be75d0b99a88bb5140d2fd2e645d7bf4))
 * cognito auth flow ([463965f](https://github.com/jensvogt/awsmock/commit/463965fbfed88bde28b1a517f1f1b88e5f98f073))
-* fix cognito user password challenge ([3d3f5ca](https://github.com/jensvogt/awsmock/commit/3d3f5caeb96454c54281e06c154421a5b3db3d19))
-* fix cognito user password challenge ([e16cb8b](https://github.com/jensvogt/awsmock/commit/e16cb8b40496f6b30f657e6a66d540d53a255d0b))
+* fix cognito user password
+  challenge ([3d3f5ca](https://github.com/jensvogt/awsmock/commit/3d3f5caeb96454c54281e06c154421a5b3db3d19))
+* fix cognito user password
+  challenge ([e16cb8b](https://github.com/jensvogt/awsmock/commit/e16cb8b40496f6b30f657e6a66d540d53a255d0b))
 
 ## [1.16.12](https://github.com/jensvogt/awsmock/compare/v1.16.11...v1.16.12) (2026-03-31)
-
 
 ### Bug Fixes
 
 * fix SNS attributes ([c9fedec](https://github.com/jensvogt/awsmock/commit/c9fedec50c16a8696ead605111d6bd4f22775dde))
 
 ## [1.16.11](https://github.com/jensvogt/awsmock/compare/1.16.10...v1.16.11) (2026-03-31)
-
 
 ### Bug Fixes
 
@@ -853,2326 +851,89 @@
 
 ## [1.16.10](https://github.com/jensvogt/awsmock/compare/v1.16.9...v1.16.10) (2026-03-29)
 
-
 ### Bug Fixes
 
-* set log level on websocket sink ([5453440](https://github.com/jensvogt/awsmock/commit/5453440747f8908b1b530e923ef40d3185d14809))
+* set log level on websocket
+  sink ([5453440](https://github.com/jensvogt/awsmock/commit/5453440747f8908b1b530e923ef40d3185d14809))
 
 ## [1.16.9](https://github.com/jensvogt/awsmock/compare/v1.16.8...v1.16.9) (2026-03-29)
 
-
 ### Bug Fixes
 
-* fix SQS redrive policy ([ff24f6a](https://github.com/jensvogt/awsmock/commit/ff24f6a578791705409f6e4f6eac333858109bae))
+* fix SQS redrive
+  policy ([ff24f6a](https://github.com/jensvogt/awsmock/commit/ff24f6a578791705409f6e4f6eac333858109bae))
 
 ## [1.16.8](https://github.com/jensvogt/awsmock/compare/v1.16.7...v1.16.8) (2026-03-29)
 
-
 ### Bug Fixes
 
-* fix SQS redrive policy ([f2a8fcb](https://github.com/jensvogt/awsmock/commit/f2a8fcb4e6018bbd4d08d58f8d3cc6c59f23d75c))
-* fix SQS redrive policy ([eaec254](https://github.com/jensvogt/awsmock/commit/eaec254bd1683e0b8f7a192fea684135fcff0a8a))
-* fix SQS redrive policy ([78d32e8](https://github.com/jensvogt/awsmock/commit/78d32e84ee831a5c981a6d3dfc4fa636d2d9e6c6))
+* fix SQS redrive
+  policy ([f2a8fcb](https://github.com/jensvogt/awsmock/commit/f2a8fcb4e6018bbd4d08d58f8d3cc6c59f23d75c))
+* fix SQS redrive
+  policy ([eaec254](https://github.com/jensvogt/awsmock/commit/eaec254bd1683e0b8f7a192fea684135fcff0a8a))
+* fix SQS redrive
+  policy ([78d32e8](https://github.com/jensvogt/awsmock/commit/78d32e84ee831a5c981a6d3dfc4fa636d2d9e6c6))
 
 ## [1.16.7](https://github.com/jensvogt/awsmock/compare/1.16.6...v1.16.7) (2026-03-29)
-
 
 ### Bug Fixes
 
 * fix docker service ([5ff7fce](https://github.com/jensvogt/awsmock/commit/5ff7fce5931d4b3bdd0c721c90703e6e84943244))
-* fix dynamodb update trigger ([0a6bd50](https://github.com/jensvogt/awsmock/commit/0a6bd503c6c53d557c95cb1964b24b5c5fb12a59))
+* fix dynamodb update
+  trigger ([0a6bd50](https://github.com/jensvogt/awsmock/commit/0a6bd503c6c53d557c95cb1964b24b5c5fb12a59))
 
 ## [1.16.6](https://github.com/jensvogt/awsmock/compare/v1.16.5...v1.16.6) (2026-03-28)
 
-
 ### Bug Fixes
 
-* fix dynamodb partition key/sortKey handling ([d96efe2](https://github.com/jensvogt/awsmock/commit/d96efe20c89d960145670affcd4e204ba0e93d85))
-* fix dynamodb partition key/sortKey handling ([e5d56f1](https://github.com/jensvogt/awsmock/commit/e5d56f119a07ab04a19b8502b62f14d68a36f7ed))
+* fix dynamodb partition key/sortKey
+  handling ([d96efe2](https://github.com/jensvogt/awsmock/commit/d96efe20c89d960145670affcd4e204ba0e93d85))
+* fix dynamodb partition key/sortKey
+  handling ([e5d56f1](https://github.com/jensvogt/awsmock/commit/e5d56f119a07ab04a19b8502b62f14d68a36f7ed))
 
 ## [1.16.5](https://github.com/jensvogt/awsmock/compare/1.16.4...v1.16.5) (2026-03-28)
 
-
 ### Bug Fixes
 
-* fix SNS publish attribute parsing ([d228850](https://github.com/jensvogt/awsmock/commit/d228850fdd6e945c6880f694533e661e989db2e4))
+* fix SNS publish attribute
+  parsing ([d228850](https://github.com/jensvogt/awsmock/commit/d228850fdd6e945c6880f694533e661e989db2e4))
 
 ## [1.16.4](https://github.com/jensvogt/awsmock/compare/v1.16.3...v1.16.4) (2026-03-25)
 
-
 ### Bug Fixes
 
-* fix dynamodb attributes as variants tests ([b6fea4e](https://github.com/jensvogt/awsmock/commit/b6fea4ece2811c1d683544abeaac5440aca2f1a9))
+* fix dynamodb attributes as variants
+  tests ([b6fea4e](https://github.com/jensvogt/awsmock/commit/b6fea4ece2811c1d683544abeaac5440aca2f1a9))
 
 ## [1.16.3](https://github.com/jensvogt/awsmock/compare/v1.16.2...v1.16.3) (2026-03-24)
 
-
 ### Bug Fixes
 
-* fix dynamodb attributes as variants tests ([52944f2](https://github.com/jensvogt/awsmock/commit/52944f26018fd2e130d8c4e315780238a58f62fc))
-* fix dynamodb attributes as variants tests ([90a3aea](https://github.com/jensvogt/awsmock/commit/90a3aea20486c04a2f3975741c8807db775eddba))
+* fix dynamodb attributes as variants
+  tests ([52944f2](https://github.com/jensvogt/awsmock/commit/52944f26018fd2e130d8c4e315780238a58f62fc))
+* fix dynamodb attributes as variants
+  tests ([90a3aea](https://github.com/jensvogt/awsmock/commit/90a3aea20486c04a2f3975741c8807db775eddba))
 
 ## [1.16.2](https://github.com/jensvogt/awsmock/compare/1.16.1...v1.16.2) (2026-03-24)
 
-
 ### Bug Fixes
 
-* fix mongo db dynamodb tests ([62669b2](https://github.com/jensvogt/awsmock/commit/62669b25dbceae66917c68f2345462967ee3cc0b))
+* fix mongo db dynamodb
+  tests ([62669b2](https://github.com/jensvogt/awsmock/commit/62669b25dbceae66917c68f2345462967ee3cc0b))
 
 ## [1.16.1](https://github.com/jensvogt/awsmock/compare/v1.16.0...v1.16.1) (2026-03-23)
 
-
 ### Bug Fixes
 
-* fix mongo db dynamodb tests ([14f8ac4](https://github.com/jensvogt/awsmock/commit/14f8ac476ae04572f99b2820a99ade5aba571cf9))
+* fix mongo db dynamodb
+  tests ([14f8ac4](https://github.com/jensvogt/awsmock/commit/14f8ac476ae04572f99b2820a99ade5aba571cf9))
 
 ## [1.16.0](https://github.com/jensvogt/awsmock/compare/1.15.0...v1.16.0) (2026-03-23)
 
-
 ### Features
 
-* DynamoDB queries added ([d39aa90](https://github.com/jensvogt/awsmock/commit/d39aa908b2723217aa832d4b5b99b2cae08ce57e))
-* DynamoDB queries added ([3368a33](https://github.com/jensvogt/awsmock/commit/3368a33a33a8aea33a6f4b22bcc5fecc111e09f9))
+* DynamoDB queries
+  added ([d39aa90](https://github.com/jensvogt/awsmock/commit/d39aa908b2723217aa832d4b5b99b2cae08ce57e))
+* DynamoDB queries
+  added ([3368a33](https://github.com/jensvogt/awsmock/commit/3368a33a33a8aea33a6f4b22bcc5fecc111e09f9))
 
-## [1.15.0](https://github.com/jensvogt/awsmock/compare/v1.14.52...v1.15.0) (2026-03-18)
-
-
-### Features
-
-* add dynamodb add/delete/list tables ([004438f](https://github.com/jensvogt/awsmock/commit/004438fba824179ace20bec4fe67b4f70f1e8743))
-* add log messages to FE ([691c0b1](https://github.com/jensvogt/awsmock/commit/691c0b1609d9066891c3caa85de80262fa9b907d))
-* add log messages to FE ([15626e5](https://github.com/jensvogt/awsmock/commit/15626e533daa6e11467cff4072913ddca9712c78))
-* add log messages to FE ([61a7833](https://github.com/jensvogt/awsmock/commit/61a783364e0945ecbfd3e77fdba59d8eeabca1ef))
-* add s3 storage class ([54976ca](https://github.com/jensvogt/awsmock/commit/54976caa0a0091c9dd1aca617da552c814749b88))
-* add s3 storage class ([212caa1](https://github.com/jensvogt/awsmock/commit/212caa1efa50c33c0929334e75fcf49f9b35bfe3))
-* add s3 storage class ([577398e](https://github.com/jensvogt/awsmock/commit/577398ee3efaff869ad507f742fc88d7936b87a4))
-
-
-### Bug Fixes
-
-* add cognito database tests ([4536a24](https://github.com/jensvogt/awsmock/commit/4536a24c01b2d584de435ddd61cc82a0803e82cd))
-* add cognito database tests ([ffbc945](https://github.com/jensvogt/awsmock/commit/ffbc945c835e1b4c0c42345564f27be2ca976e83))
-* add cognito database tests ([d54adff](https://github.com/jensvogt/awsmock/commit/d54adff2004cd7ed87bb78ca177c5b02049f1ce7))
-* add docker stats pages ([167a43b](https://github.com/jensvogt/awsmock/commit/167a43b6cc2d13b5b1709e70ff9c6f0af456d7d7))
-* add docker stats pages ([97bdb9c](https://github.com/jensvogt/awsmock/commit/97bdb9c005a12630f89ecc3149f1ba49ac1f30d6))
-* add docker stats pages ([bf83389](https://github.com/jensvogt/awsmock/commit/bf83389355ad666073c9864a36bc7910fcd9876b))
-* add dynamodb items add/delete/list ([c292eb7](https://github.com/jensvogt/awsmock/commit/c292eb72a0fa2215b680720ae0ee5d40b61650dd))
-* add magic.mgc to docker image ([1041dd4](https://github.com/jensvogt/awsmock/commit/1041dd4cd5726f6f01e22ef3acc647483a4c042c))
-* add secrets manager details dialog ([5ca5f3f](https://github.com/jensvogt/awsmock/commit/5ca5f3f785a1cab4fe0d2deb918770646775e6fa))
-* add secrets manager details dialog ([3732261](https://github.com/jensvogt/awsmock/commit/37322610a1650696523949cadd6a8144cc5dc358))
-* add secrets manager details dialog ([59af1c6](https://github.com/jensvogt/awsmock/commit/59af1c615e5f899881ea3d91f1bfc13a68305c04))
-* add SFTP ssh host key ([8b80e78](https://github.com/jensvogt/awsmock/commit/8b80e78902635e4226dfe82eae90396e54f5b014))
-* add SNS add message dialog ([349b201](https://github.com/jensvogt/awsmock/commit/349b201582728a0d02da35b9a8867846d23c54bf))
-* add SNS add message dialog ([5624d6f](https://github.com/jensvogt/awsmock/commit/5624d6ff5d5a34dbbb4e4253363d8e1968c7f7cb))
-* add SNS add message dialog ([5cd1503](https://github.com/jensvogt/awsmock/commit/5cd15037e5c3cce3b23dc5f2f0f00520137e3f35))
-* add SNS add message dialog ([3738dbc](https://github.com/jensvogt/awsmock/commit/3738dbc9d9884305160bfa696af6e4da921cb749))
-* add SNS add message dialog ([3a40b44](https://github.com/jensvogt/awsmock/commit/3a40b44d4b62980f2d43c1ff0a25e0ab7cfc486f))
-* add SNS add message dialog ([9fb1ba1](https://github.com/jensvogt/awsmock/commit/9fb1ba1a7bed69c40c4af07eaed276f018fa6dc5))
-* add SSM tags ([bd76379](https://github.com/jensvogt/awsmock/commit/bd76379e4492225280bb464e3145a8ec72263c29))
-* add windows binaries ([ff32841](https://github.com/jensvogt/awsmock/commit/ff32841e78d7fc8d34eabf74c458c65517a88d28))
-* add windows binaries ([c75971b](https://github.com/jensvogt/awsmock/commit/c75971b1f875ff2173158259a254f115290edd86))
-* add windows binaries ([a29d29f](https://github.com/jensvogt/awsmock/commit/a29d29f8d90656f209efc2fb9682ab1849f3ea70))
-* add windows binaries ([47cb8ce](https://github.com/jensvogt/awsmock/commit/47cb8ce35659aa99e2f82b0b5f41696f5df3c9e7))
-* add windows binaries ([a49d2c6](https://github.com/jensvogt/awsmock/commit/a49d2c6b2ace4b9edb919c06e3c684647ec588b5))
-* add windows binaries ([fd418e1](https://github.com/jensvogt/awsmock/commit/fd418e12e2a18b0be7da019fcf7e4ed17260858e))
-* add windows binaries ([795a329](https://github.com/jensvogt/awsmock/commit/795a3294a221c10bee09b95f19825cba0cfee506))
-* add windows binaries ([e0eb570](https://github.com/jensvogt/awsmock/commit/e0eb570306a1c2bcc785a5d41f76d8e281713cdb))
-* add windows binaries ([0eda34e](https://github.com/jensvogt/awsmock/commit/0eda34e31f42c17cfefd69528e8701ffb2ce2bfc))
-* add windows binaries ([0cd92fa](https://github.com/jensvogt/awsmock/commit/0cd92fa33c8fec550a519c07e34fe0f9516a544f))
-* add windows binaries ([354c184](https://github.com/jensvogt/awsmock/commit/354c18458bf6d81985c644d15418f1e887f7a2e6))
-* bug in dynamodb query processing, and putitem. Added listValues and mapValues. ([52e7871](https://github.com/jensvogt/awsmock/commit/52e7871200871b5a31232892cbebc89139199bf2))
-* bug in S3 delete bucket ([99f9b25](https://github.com/jensvogt/awsmock/commit/99f9b259bcc08f022d85a44cecbe7e9cae82e557))
-* bug in S3 get lifecycle configuration ([f408c6b](https://github.com/jensvogt/awsmock/commit/f408c6b4d6e0e76871e42133f5d546d798ea6221))
-* bug in S3 get lifecycle configuration ([642fb4b](https://github.com/jensvogt/awsmock/commit/642fb4bf3c22b8240cc57b6f0989e9f375e584fe))
-* bug in S3 get lifecycle configuration ([90328ec](https://github.com/jensvogt/awsmock/commit/90328ecb6de30e03120ff3ecf41156dbf9b13d27))
-* bug in S3 lifecylce, default strorage class is 'STANDARD' ([f708eec](https://github.com/jensvogt/awsmock/commit/f708eec0205d6a26a9ddbd013e702bf000144bf4))
-* bug in S3 lifecylce, default strorage class is 'STANDARD' ([f380f70](https://github.com/jensvogt/awsmock/commit/f380f709291967ee5cbfe57c40f21bd21f0f2472))
-* bug in S3 lifecylce, default strorage class is 'STANDARD' ([#1959](https://github.com/jensvogt/awsmock/issues/1959)) ([8fcf2cf](https://github.com/jensvogt/awsmock/commit/8fcf2cf3d0ef89fc7b578f816da9faaac68f597a))
-* change sha1/sha256 algorithms ([5019f4c](https://github.com/jensvogt/awsmock/commit/5019f4c4cdf1b8cd8c460783efa8df2f8d620950))
-* change sha1/sha256 algorithms ([32a8cc4](https://github.com/jensvogt/awsmock/commit/32a8cc49039051a10eb0bc48437e5cb05d4df7fb))
-* change sha1/sha256 algorithms ([b6b0b7e](https://github.com/jensvogt/awsmock/commit/b6b0b7ec3edd0f0240141c42e5bbfa6a704aeddb))
-* change sha1/sha256 algorithms ([b2ce2bc](https://github.com/jensvogt/awsmock/commit/b2ce2bc747fac525645246c86bf7cb789901adae))
-* change sha1/sha256 algorithms ([5aa160f](https://github.com/jensvogt/awsmock/commit/5aa160f7b0e4c1f93cbb4070541df8a02cb6bcd9))
-* controller having wrong ports ([40672ef](https://github.com/jensvogt/awsmock/commit/40672effc2b10164d095a49885b368a395bac3a3))
-* controller having wrong ports ([99ba51c](https://github.com/jensvogt/awsmock/commit/99ba51c0781dfe62d8dbc98cab263ee36bec7b47))
-* delete dynamodb memory database ([937d168](https://github.com/jensvogt/awsmock/commit/937d1685c3c650ff0406bdc7432ae3707dca6d29))
-* duplicate application in database ([a0f2caa](https://github.com/jensvogt/awsmock/commit/a0f2caa894883d99df4fc43a020dac4a98204f79))
-* duplicate application in database ([ae5a379](https://github.com/jensvogt/awsmock/commit/ae5a379a0bbd45e722b13489b30ef3ffee2eadcb))
-* dynamodb getitem response ([06f9bfd](https://github.com/jensvogt/awsmock/commit/06f9bfd80ccc452da9d5ef34341efeb029902752))
-* fix github pages processing ([777c5f1](https://github.com/jensvogt/awsmock/commit/777c5f1f85e4b7cf7df3f778d0b5b58314d69950))
-* fix several issues ([e1bca33](https://github.com/jensvogt/awsmock/commit/e1bca33ed0bca7eded44e9200b10129e1b2f4093))
-* fix some minor issues dynamodb query processing ([5212c19](https://github.com/jensvogt/awsmock/commit/5212c19037f7342ca8c428d4156bfcd27fea40fc))
-* fix windows package errors ([fed386c](https://github.com/jensvogt/awsmock/commit/fed386cd6e34639d78f5e730b99dbf1094ff6ec3))
-* fix windows package errors ([1659c89](https://github.com/jensvogt/awsmock/commit/1659c892b9f1b82c1dc466f6c0955d6f6a34b3b8))
-* fix windows package errors ([446c3d9](https://github.com/jensvogt/awsmock/commit/446c3d91056cb2625a3ab6879965ce05586d3fe2))
-* fix windows package errors ([fdf6975](https://github.com/jensvogt/awsmock/commit/fdf6975214b291eab8db874255124336ecff24dd))
-* fix windows package errors ([0a72c59](https://github.com/jensvogt/awsmock/commit/0a72c5951fa6554303680973ebd94654710c55e4))
-* fix windows package errors ([61bde07](https://github.com/jensvogt/awsmock/commit/61bde07e7ef1a8606059a8986351da884f270d53))
-* fix windows package errors ([e0fd3d1](https://github.com/jensvogt/awsmock/commit/e0fd3d18d41a551cbfc9584f2718b32e5ee97a6b))
-* fix windows package errors ([06eed96](https://github.com/jensvogt/awsmock/commit/06eed966118d81b4b3432b7ea961708ec2d43b6a))
-* fix windows package errors ([d2abfa9](https://github.com/jensvogt/awsmock/commit/d2abfa989c79023b36ddb7d90f948607eda86cbe))
-* fix windows package errors ([14d31fd](https://github.com/jensvogt/awsmock/commit/14d31fdd1b43c00721a49a268af52642a8c336d6))
-* fix windows vcpkg errors ([bc2cd01](https://github.com/jensvogt/awsmock/commit/bc2cd017df434fb08f8291e983dc2f0683fd12b1))
-* fix windows vcpkg errors ([006cc90](https://github.com/jensvogt/awsmock/commit/006cc90c66173d784229408bba8d56c78471c636))
-* fix windows vcpkg errors ([3aabe2d](https://github.com/jensvogt/awsmock/commit/3aabe2d6a64ed6e218bb72708767f45bec1273d3))
-* fix windows vcpkg errors ([5a2ff47](https://github.com/jensvogt/awsmock/commit/5a2ff47fa8525d2f6b457c24db29deb1bdb93b27))
-* fix windows vcpkg errors ([e621ea7](https://github.com/jensvogt/awsmock/commit/e621ea751691a057728c87093c309283cd8b5b27))
-* fix windows vcpkg errors ([3f40f63](https://github.com/jensvogt/awsmock/commit/3f40f63bd987b2cd1bbbce51ef2ff3dcc5b4e273))
-* fix windows vcpkg errors ([7d476f0](https://github.com/jensvogt/awsmock/commit/7d476f001d3eb70ead7a3d34c326c2c20f772a1e))
-* fix windows vcpkg errors ([ff2f897](https://github.com/jensvogt/awsmock/commit/ff2f8973098fbade0916f498ed3cca5fc2a338c6))
-* fix windows vcpkg errors ([9f17fab](https://github.com/jensvogt/awsmock/commit/9f17fab47cac1cc14d1538a7bedde2a2b0ebcbde))
-* fix windows vcpkg errors ([1f2a2dc](https://github.com/jensvogt/awsmock/commit/1f2a2dc401471ebf926df9f1b8995fcaea042b48))
-* fix windows vcpkg errors ([e9a53ab](https://github.com/jensvogt/awsmock/commit/e9a53ab48c9be12e9f170d31d0061e2683d372fe))
-* fix windows vcpkg errors ([172dd87](https://github.com/jensvogt/awsmock/commit/172dd877e340171884e80665ec5f700e635c7f14))
-* fix windows vcpkg errors ([b6994bd](https://github.com/jensvogt/awsmock/commit/b6994bd690d4902a44b7fbe776db2bf4086fe0b4))
-* fix windows vcpkg errors ([09638d6](https://github.com/jensvogt/awsmock/commit/09638d67d8b131f11d1192c1373006ce6af860c8))
-* fix windows vcpkg errors ([121b572](https://github.com/jensvogt/awsmock/commit/121b57247cbb0143ef9a63fccfe412cf1b599be2))
-* fix windows vcpkg errors ([32ba751](https://github.com/jensvogt/awsmock/commit/32ba7510c5197de1d7740b5535aca422242de022))
-* fix windows vcpkg errors ([3da1583](https://github.com/jensvogt/awsmock/commit/3da1583c3d0b80c82e4e598589e0af65333a2b46))
-* fix windows vcpkg errors ([68f3efb](https://github.com/jensvogt/awsmock/commit/68f3efb89814bb17a042f58e0bb8ab5cd919396e))
-* fix windows vcpkg errors ([8294c14](https://github.com/jensvogt/awsmock/commit/8294c14eacf10424b7dd163e01a28727d37d0ea6))
-* fix windows vcpkg errors ([9da2dee](https://github.com/jensvogt/awsmock/commit/9da2deee234ace672e1cbb51e7e45870ea21e239))
-* fix windows vcpkg errors ([4e2c8e2](https://github.com/jensvogt/awsmock/commit/4e2c8e2f95d65e6c2a188ea18c548130b8930755))
-* fix windows vcpkg errors ([82cb196](https://github.com/jensvogt/awsmock/commit/82cb1967bfe9a9d1017e8a0be57864399ad64db3))
-* fix windows vcpkg errors ([3b12193](https://github.com/jensvogt/awsmock/commit/3b1219303aae9b9e0ed827b5ab180bbbb6609670))
-* fix windows vcpkg errors ([8eec1fa](https://github.com/jensvogt/awsmock/commit/8eec1fa6c63ce64ea47da1afbfae811ea1e1e72b))
-* fix windows vcpkg errors ([ee59fe4](https://github.com/jensvogt/awsmock/commit/ee59fe4891c2af25fe670e87400965fcb65e88f1))
-* fix windows vcpkg errors ([80bc0c4](https://github.com/jensvogt/awsmock/commit/80bc0c46eb6ca552afeacf489fb06389e92baa34))
-* fix windows vcpkg errors ([56a8c32](https://github.com/jensvogt/awsmock/commit/56a8c325207db988315b9d401492b7d67a30ecb6))
-* fix windows vcpkg errors ([a9c5823](https://github.com/jensvogt/awsmock/commit/a9c58234d97db205c9a4cd12a8634c2b97e632f9))
-* fix windows vcpkg errors ([716fe71](https://github.com/jensvogt/awsmock/commit/716fe7104fbcd8dca95a7c9ed5a097e066a012e6))
-* fix windows vcpkg errors ([e9e7632](https://github.com/jensvogt/awsmock/commit/e9e7632767f493f80e74fc1384977ef6cbd3f6eb))
-* fix windows vcpkg errors ([b2c2d1b](https://github.com/jensvogt/awsmock/commit/b2c2d1b9ea82d9838f6026c1dfd4846b532f1118))
-* fix windows vcpkg errors ([152846f](https://github.com/jensvogt/awsmock/commit/152846fff30d481b1dc56ab10d38aa49a727ee4e))
-* fix windows vcpkg errors ([94f5fc9](https://github.com/jensvogt/awsmock/commit/94f5fc96082d00b59b88537f0f9ed1de29a40def))
-* fix windows vcpkg errors ([e9ae6e2](https://github.com/jensvogt/awsmock/commit/e9ae6e2d6154fd0eec3044a8f7e4958fa3410ee8))
-* fix windows vcpkg errors ([a7db7bc](https://github.com/jensvogt/awsmock/commit/a7db7bc9bf036b733f516c75035a7ea0fbaae497))
-* fix windows vcpkg errors ([21ce8dc](https://github.com/jensvogt/awsmock/commit/21ce8dc6c5bd066796186a64861468814d5f7886))
-* fix windows vcpkg errors ([cffe647](https://github.com/jensvogt/awsmock/commit/cffe647e4567af6065a9ba92f5aead2c8e7ed68a))
-* fix windows vcpkg errors ([e5b49d5](https://github.com/jensvogt/awsmock/commit/e5b49d50e90a71af14e03d4f1d30601cae7f0758))
-* fix windows vcpkg errors ([9d5d8a6](https://github.com/jensvogt/awsmock/commit/9d5d8a62853b4048b1d8430a0940e8641ab6db14))
-* fix windows vcpkg errors ([365676c](https://github.com/jensvogt/awsmock/commit/365676cd62f874fec7516c2c649cd4c0dcd96a7f))
-* fix windows vcpkg errors ([b001335](https://github.com/jensvogt/awsmock/commit/b0013353ea57b530964584f4af3662abef1eb062))
-* fix windows vcpkg errors ([b81bfb7](https://github.com/jensvogt/awsmock/commit/b81bfb71b8d12026a89954a4b31ee7c291e46af8))
-* fix windows vcpkg errors ([1a3f096](https://github.com/jensvogt/awsmock/commit/1a3f096c02db1ca53ccef8524438a26c7b6faf5b))
-* fix windows vcpkg errors ([12b1989](https://github.com/jensvogt/awsmock/commit/12b198904c65621c81d5328f0ba0a5c01b431ecd))
-* fix windows vcpkg errors ([4a7d074](https://github.com/jensvogt/awsmock/commit/4a7d0740da42ef0b35305f54d1df8e8d51809959))
-* fix windows vcpkg errors ([e94c7b7](https://github.com/jensvogt/awsmock/commit/e94c7b70e468e34a80e126b724d2f9b1d08573e6))
-* fix windows vcpkg errors ([5f2e6fa](https://github.com/jensvogt/awsmock/commit/5f2e6fae6126a7ab9bff9c9b723a2f1d41c8d380))
-* fix windows vcpkg errors ([2c20fda](https://github.com/jensvogt/awsmock/commit/2c20fda39c95ae43d212b110ac8139066067f2e3))
-* fix windows vcpkg errors ([1dc9a40](https://github.com/jensvogt/awsmock/commit/1dc9a402c98d614dd680b6eb931c8b4c23c12af0))
-* fix windows vcpkg errors ([0c55326](https://github.com/jensvogt/awsmock/commit/0c553267154af9842cf631c3e17e3bbab62eda8e))
-* fix windows vcpkg errors ([ff2e233](https://github.com/jensvogt/awsmock/commit/ff2e233019035e17454d26ffaace3ff343d84d1b))
-* fix windows vcpkg errors ([737116c](https://github.com/jensvogt/awsmock/commit/737116c36b837e42f1cddb8f76a9599550411f07))
-* fix windows vcpkg errors ([9e3f46a](https://github.com/jensvogt/awsmock/commit/9e3f46ab7adb9fd5d8fefbc1b42e644a71dba8de))
-* fix windows vcpkg errors ([3fc9c83](https://github.com/jensvogt/awsmock/commit/3fc9c8360653466f37646c7a8815ad796e6ffe07))
-* fix windows vcpkg errors ([ad37fb9](https://github.com/jensvogt/awsmock/commit/ad37fb9d4ebf3659d7807028cc721ba043e3a699))
-* fix windows vcpkg errors ([15d14ce](https://github.com/jensvogt/awsmock/commit/15d14ce9abcade70267cb4b5fd915778e3cface4))
-* fix windows vcpkg errors ([8cb9b49](https://github.com/jensvogt/awsmock/commit/8cb9b497845bc43e7133a081bf7766831f89147b))
-* fix windows vcpkg errors ([f7d8362](https://github.com/jensvogt/awsmock/commit/f7d8362c8e632004f1d07d10760693b6a25fc65b))
-* fix windows vcpkg errors ([66ccd1f](https://github.com/jensvogt/awsmock/commit/66ccd1f0f3a72bc0ad10bc59168818faa3ae5f36))
-* fix windows vcpkg errors ([b10c696](https://github.com/jensvogt/awsmock/commit/b10c696762e49d7d9971b6138b6bd634f260bbf9))
-* fix windows vcpkg errors ([c1d7ec0](https://github.com/jensvogt/awsmock/commit/c1d7ec046bb8245e94c58e5106e638ed334707cd))
-* fix windows vcpkg errors ([82eed24](https://github.com/jensvogt/awsmock/commit/82eed24cf5e3f1b6487f4df14303a9bfc57d1db6))
-* fix windows vcpkg errors ([5926328](https://github.com/jensvogt/awsmock/commit/5926328448e370940e4aa04a85c633c8237f054d))
-* fix windows vcpkg errors ([e5eedcd](https://github.com/jensvogt/awsmock/commit/e5eedcd72aa5ba10f9bd194f93b27a4f829c7def))
-* fix windows vcpkg errors ([1442eab](https://github.com/jensvogt/awsmock/commit/1442eab7779a6e51e4e003236073a8ccb3ec5f1b))
-* gate problem using 100-continue header ([e52d1fd](https://github.com/jensvogt/awsmock/commit/e52d1fde1da1b79dd2e3a4b343cc0d938a57d916))
-* gateway debugging ([559ad13](https://github.com/jensvogt/awsmock/commit/559ad13905747e7b8e5ad2698eeaadedf048f37a))
-* gateway debugging ([25ef395](https://github.com/jensvogt/awsmock/commit/25ef395253b961adb336f032e901dd89e4bbd7c3))
-* gateway issues ([c67358b](https://github.com/jensvogt/awsmock/commit/c67358b598d24eb6d63111dd1d358352c68eef11))
-* gateway issues ([a315aad](https://github.com/jensvogt/awsmock/commit/a315aad69a7a2fb84e4c7a10a7d92929762d2f67))
-* get log level ([eb46f8d](https://github.com/jensvogt/awsmock/commit/eb46f8d35aee4bcbc127fcdb87466b9a09735adf))
-* get log level ([5615924](https://github.com/jensvogt/awsmock/commit/5615924f6bd33aa2f7e1a5b4ee0d2085f3bd24e6))
-* get log level ([37c218c](https://github.com/jensvogt/awsmock/commit/37c218c0bc2bc9e4191866397956f91cb8585079))
-* get SQS attributes, delay status ([b09e53c](https://github.com/jensvogt/awsmock/commit/b09e53ce80eef5268a5209a3c9cc265584aa4d4b))
-* get SQS sttributes ([102ed86](https://github.com/jensvogt/awsmock/commit/102ed86c7a59b9c565cbdc1d8ae398d5b9c4e1a8))
-* infrastructure dialog ([0e4a75d](https://github.com/jensvogt/awsmock/commit/0e4a75d6eb7e6b5c7120580c675427cbb4c74c10))
-* infrastructure dialog ([b243497](https://github.com/jensvogt/awsmock/commit/b243497dcd97f8ab99e3d33db91b1a98252af00c))
-* keep alive settings ([2524bc4](https://github.com/jensvogt/awsmock/commit/2524bc4ee7c8356cd1d2837d05f0db8ba095c302))
-* keep alive settings ([8aac559](https://github.com/jensvogt/awsmock/commit/8aac559a7f48a17df53c04043e9da7420e79e1d5))
-* keep alive settings ([6e17825](https://github.com/jensvogt/awsmock/commit/6e17825f9b846d0b8cc1e25a472ff252ae331920))
-* keep alive settings ([8e8ef51](https://github.com/jensvogt/awsmock/commit/8e8ef51ad0f8e49d3e825e1a2f53f90f580701d6))
-* keep alive settings ([dd4e4cb](https://github.com/jensvogt/awsmock/commit/dd4e4cba253f2433f7aa07bb55bb7cc1d8e98bfb))
-* keep alive settings ([c2bb499](https://github.com/jensvogt/awsmock/commit/c2bb4992f6179b2b1721d581392e962436fb3451))
-* keep alive settings ([7c3154d](https://github.com/jensvogt/awsmock/commit/7c3154ddf9eabe92cbb6d132cb6d18750a315341))
-* keep alive settings ([a738b73](https://github.com/jensvogt/awsmock/commit/a738b73cb8bb20d14290bfa1ad69d6edf31731de))
-* keep alive settings ([dd822b9](https://github.com/jensvogt/awsmock/commit/dd822b97459866d92c79f7fb5f4e60fc20483937))
-* keep alive settings ([3053930](https://github.com/jensvogt/awsmock/commit/3053930c2e62aa4da47a4191394f24bec22f10ef))
-* keep alive settings ([3f9577b](https://github.com/jensvogt/awsmock/commit/3f9577bc6d784575dc2f4611671ef6fb245179b4))
-* keep alive settings ([390c72e](https://github.com/jensvogt/awsmock/commit/390c72ee8823f8e9421d568234549e8e8f1454f1))
-* keep alive settings ([fc8eeab](https://github.com/jensvogt/awsmock/commit/fc8eeab0e07182cc9ed47bd2eeb852f88eb8c3d9))
-* kms import/export ([a41d6da](https://github.com/jensvogt/awsmock/commit/a41d6daca812ee4192741a7ad3a9ecdb41f21d0a))
-* lambda update code call ([f55681f](https://github.com/jensvogt/awsmock/commit/f55681f480e3be68a640e96e7ea6f39d8f08eee0))
-* lambda update code call ([1c04f87](https://github.com/jensvogt/awsmock/commit/1c04f870fccc5eeba30a3f723869f9d9ca0cecf1))
-* link statically ([eea54c2](https://github.com/jensvogt/awsmock/commit/eea54c2cc3b1d3517e06f9a929fd4a5e511c6e2e))
-* link statically ([772fb90](https://github.com/jensvogt/awsmock/commit/772fb90f391c285f35e8cb338749fcf7fadcf34c))
-* link statically ([f70f852](https://github.com/jensvogt/awsmock/commit/f70f852d812b916fec314c735fb95ef3d49f9cef))
-* link statically ([ce700f5](https://github.com/jensvogt/awsmock/commit/ce700f563eda3526d9c3d6988e77e2ed70c2c6fc))
-* link statically ([3b287f2](https://github.com/jensvogt/awsmock/commit/3b287f24dc477f204db6d14601c6545b6224d10f))
-* logging messages in module service ([a8f125c](https://github.com/jensvogt/awsmock/commit/a8f125c851925868d77023d53cf77f27db2e9753))
-* logging messages in module service ([9bea156](https://github.com/jensvogt/awsmock/commit/9bea1566a918035dece9fa2767f40191015f0e32))
-* macOS port ([80c198d](https://github.com/jensvogt/awsmock/commit/80c198dc9b5ed35dd950920063415fc33d0c8992))
-* macOS port ([aa48e30](https://github.com/jensvogt/awsmock/commit/aa48e30fb7ec8d12753d653842813d959c659d93))
-* macOS port and new tests for memory DB ([6b8fad8](https://github.com/jensvogt/awsmock/commit/6b8fad8c3338863b2c731c54831c40cfe4d422f6))
-* mongodb index sqs-message. create SNS topic ([2db9010](https://github.com/jensvogt/awsmock/commit/2db9010ee1b41825ff240a8fb3f917b224791624))
-* queue name as arn/url ([12ce444](https://github.com/jensvogt/awsmock/commit/12ce4449b74bc3f30a2b371201e7b1a1c5bec42d))
-* rebuild lambda ([5a040c0](https://github.com/jensvogt/awsmock/commit/5a040c0a49d5e1165e4bee9de42765235d03cc50))
-* rebuild lambda ([8ccd4ad](https://github.com/jensvogt/awsmock/commit/8ccd4ad06a1f1644e702193e8a356c7129f17f3a))
-* remove dynamodb java app ([f421041](https://github.com/jensvogt/awsmock/commit/f42104146e4c4ce4692bd22d310a483f9dcb809e))
-* remove dynamodb java app ([20fae51](https://github.com/jensvogt/awsmock/commit/20fae51878df6641c28811bf55cb4066aefe32f3))
-* remove dynamodb java app ([2d3865d](https://github.com/jensvogt/awsmock/commit/2d3865d171a2addc20e5220fecbbeb96f313232a))
-* remove dynamodb java app ([7628c12](https://github.com/jensvogt/awsmock/commit/7628c12deb89583cd2b39570ed57dc287a6075f9))
-* remove dynamodb java app ([da453d9](https://github.com/jensvogt/awsmock/commit/da453d98aad14d85ac2997aa23a37936d28d01d1))
-* remove dynamodb java app ([d32cde7](https://github.com/jensvogt/awsmock/commit/d32cde751c7c1bf16223792b713cb6287814635c))
-* remove dynamodb java app ([85e881c](https://github.com/jensvogt/awsmock/commit/85e881cbff9f91801920c93d2e36129dc57124c9))
-* remove dynamodb java app ([a57d6dc](https://github.com/jensvogt/awsmock/commit/a57d6dcbaf4193ce940275b3879975957e0332c8))
-* remove dynamodb java app ([ce0f388](https://github.com/jensvogt/awsmock/commit/ce0f388af2ffbf39f36d52ad828b77ceeca2b8bc))
-* remove dynamodb java app ([#2079](https://github.com/jensvogt/awsmock/issues/2079)) ([bf86cb0](https://github.com/jensvogt/awsmock/commit/bf86cb0082653c1c9507405d5049740f953369de))
-* remove shared memory ([e221ef8](https://github.com/jensvogt/awsmock/commit/e221ef825d644109d120d77ebd98f4c89ea93c2d))
-* remove shared memory ([77c6656](https://github.com/jensvogt/awsmock/commit/77c6656d9dd48343d67d57919091d7eb99d8de5e))
-* secrets manager tags ([f4a9d1a](https://github.com/jensvogt/awsmock/commit/f4a9d1a647ffa7d4fca7a0290633c4b4964ae1c0))
-* secrets manager tags ([5c8a88e](https://github.com/jensvogt/awsmock/commit/5c8a88e69068734c7385fc93bbdf9e0e4dc6bc83))
-* secrets manager tags ([6ed5dc7](https://github.com/jensvogt/awsmock/commit/6ed5dc73e9c9abab9d4571a4ba46ec56fd95f6e4))
-* secrets manager tags ([16fb882](https://github.com/jensvogt/awsmock/commit/16fb8829705aa27730e1aab4453d01a23825b229))
-* secrets manager tags ([0076c6e](https://github.com/jensvogt/awsmock/commit/0076c6e34070403e84d0753bb1c04f429f346f85))
-* SEGFAULT in application module ([9102d1d](https://github.com/jensvogt/awsmock/commit/9102d1d663784b266e0d447711fa0af3c080259c))
-* SEGFAULT in application module ([cc41020](https://github.com/jensvogt/awsmock/commit/cc4102034ae2818db2e8a5bdae680f3b002e1a91))
-* set correct lambda version, when new code is uploaded ([018c69a](https://github.com/jensvogt/awsmock/commit/018c69a98c4cc656169394a067f0f2ac6f25030b))
-* set correct lambda version, when new code is uploaded ([688a18a](https://github.com/jensvogt/awsmock/commit/688a18a342a5e8f6803fdeac7ddb109cdab94881))
-* some KMS issues ([64007eb](https://github.com/jensvogt/awsmock/commit/64007eb641c2fd43dfb17e47204cc6da2fe854e9))
-* SQS counters ([9439974](https://github.com/jensvogt/awsmock/commit/9439974bc529e17600123c9e152ecf403233f090))
-* SQS message counter using memory db ([22a7a99](https://github.com/jensvogt/awsmock/commit/22a7a99d3ae708a2006ae4ce0024307375c30f5d))
-* SQS queue default attributes ([1eb1880](https://github.com/jensvogt/awsmock/commit/1eb1880e6faff6158583dcd526c407b72a6fe594))
-* SQS queue default attributes ([19d6097](https://github.com/jensvogt/awsmock/commit/19d6097cc83040048db23b26568af86980b82061))
-* SQS queue default attributes ([42eecf3](https://github.com/jensvogt/awsmock/commit/42eecf3ab6beeeaff8cc82b0e6a3de32072d4eb6))
-* SQS queue default attributes ([aff3b65](https://github.com/jensvogt/awsmock/commit/aff3b658cb3bedf9580e294e20e62ab00558b550))
-* SQS queue default attributes ([f04deef](https://github.com/jensvogt/awsmock/commit/f04deefb732bf83cb235ec3cce02b95c6a271025))
-* SQS queue default attributes ([fbf9bce](https://github.com/jensvogt/awsmock/commit/fbf9bceec6888615cf512d8cadd87222dddfc551))
-* SQS/SNS load database when redrivePolicy is missing ([b103b05](https://github.com/jensvogt/awsmock/commit/b103b056a898a967510bc6cc0d4d206d31fed688))
-* SQS/SNS load database when redrivePolicy is missing ([0fb484b](https://github.com/jensvogt/awsmock/commit/0fb484b8646e47ffdecac871a4c268a17794b8ac))
-* SQS/SNS load database when redrivePolicy is missing ([60f47d9](https://github.com/jensvogt/awsmock/commit/60f47d97dd90f2511b60e0f12503b2df36892cbd))
-* SQS/SNS load database when redrivePolicy is missing ([7bd913e](https://github.com/jensvogt/awsmock/commit/7bd913eac6209f0329d59c42e9d2eab73b189cac))
-* SQS/SNS memory DB delete methods ([b6f6e88](https://github.com/jensvogt/awsmock/commit/b6f6e88838d9268c145949610e5f16ee450835ca))
-* synchronous hash algorithm ([4e29cb7](https://github.com/jensvogt/awsmock/commit/4e29cb7eaebe5364bfa8fb872dd7122f345f0fa7))
-
-## [1.14.52](https://github.com/jensvogt/awsmock/compare/v1.14.51...v1.14.52) (2026-03-18)
-
-
-### Bug Fixes
-
-* macOS port ([80c198d](https://github.com/jensvogt/awsmock/commit/80c198dc9b5ed35dd950920063415fc33d0c8992))
-
-## [1.14.51](https://github.com/jensvogt/awsmock/compare/v1.14.50...v1.14.51) (2026-03-18)
-
-
-### Bug Fixes
-
-* macOS port ([aa48e30](https://github.com/jensvogt/awsmock/commit/aa48e30fb7ec8d12753d653842813d959c659d93))
-
-## [1.14.50](https://github.com/jensvogt/awsmock/compare/v1.14.49...v1.14.50) (2026-03-17)
-
-
-### Bug Fixes
-
-* SQS/SNS load database when redrivePolicy is missing ([b103b05](https://github.com/jensvogt/awsmock/commit/b103b056a898a967510bc6cc0d4d206d31fed688))
-* SQS/SNS load database when redrivePolicy is missing ([0fb484b](https://github.com/jensvogt/awsmock/commit/0fb484b8646e47ffdecac871a4c268a17794b8ac))
-
-## [1.14.49](https://github.com/jensvogt/awsmock/compare/1.14.48...v1.14.49) (2026-03-17)
-
-
-### Bug Fixes
-
-* add SFTP ssh host key ([8b80e78](https://github.com/jensvogt/awsmock/commit/8b80e78902635e4226dfe82eae90396e54f5b014))
-* remove shared memory ([e221ef8](https://github.com/jensvogt/awsmock/commit/e221ef825d644109d120d77ebd98f4c89ea93c2d))
-* remove shared memory ([77c6656](https://github.com/jensvogt/awsmock/commit/77c6656d9dd48343d67d57919091d7eb99d8de5e))
-
-## [1.14.48](https://github.com/jensvogt/awsmock/compare/v1.14.47...v1.14.48) (2026-03-16)
-
-
-### Bug Fixes
-
-* SQS/SNS load database when redrivePolicy is missing ([60f47d9](https://github.com/jensvogt/awsmock/commit/60f47d97dd90f2511b60e0f12503b2df36892cbd))
-
-## [1.14.47](https://github.com/jensvogt/awsmock/compare/1.14.46...v1.14.47) (2026-03-16)
-
-
-### Bug Fixes
-
-* SQS/SNS load database when redrivePolicy is missing ([7bd913e](https://github.com/jensvogt/awsmock/commit/7bd913eac6209f0329d59c42e9d2eab73b189cac))
-
-## [1.14.46](https://github.com/jensvogt/awsmock/compare/1.14.45...v1.14.46) (2026-03-15)
-
-
-### Bug Fixes
-
-* SQS/SNS memory DB delete methods ([b6f6e88](https://github.com/jensvogt/awsmock/commit/b6f6e88838d9268c145949610e5f16ee450835ca))
-
-## [1.14.45](https://github.com/jensvogt/awsmock/compare/v1.14.44...v1.14.45) (2026-03-14)
-
-
-### Bug Fixes
-
-* SQS message counter using memory db ([22a7a99](https://github.com/jensvogt/awsmock/commit/22a7a99d3ae708a2006ae4ce0024307375c30f5d))
-
-## [1.14.44](https://github.com/jensvogt/awsmock/compare/1.14.43...v1.14.44) (2026-03-14)
-
-
-### Bug Fixes
-
-* get SQS attributes, delay status ([b09e53c](https://github.com/jensvogt/awsmock/commit/b09e53ce80eef5268a5209a3c9cc265584aa4d4b))
-
-## [1.14.43](https://github.com/jensvogt/awsmock/compare/1.14.42...v1.14.43) (2026-03-14)
-
-
-### Bug Fixes
-
-* get SQS sttributes ([102ed86](https://github.com/jensvogt/awsmock/commit/102ed86c7a59b9c565cbdc1d8ae398d5b9c4e1a8))
-
-## [1.14.42](https://github.com/jensvogt/awsmock/compare/1.14.41...v1.14.42) (2026-03-13)
-
-
-### Bug Fixes
-
-* mongodb index sqs-message. create SNS topic ([2db9010](https://github.com/jensvogt/awsmock/commit/2db9010ee1b41825ff240a8fb3f917b224791624))
-
-## [1.14.41](https://github.com/jensvogt/awsmock/compare/v1.14.40...v1.14.41) (2026-03-12)
-
-
-### Bug Fixes
-
-* duplicate application in database ([a0f2caa](https://github.com/jensvogt/awsmock/commit/a0f2caa894883d99df4fc43a020dac4a98204f79))
-
-## [1.14.40](https://github.com/jensvogt/awsmock/compare/1.14.39...v1.14.40) (2026-03-12)
-
-
-### Bug Fixes
-
-* delete dynamodb memory database ([937d168](https://github.com/jensvogt/awsmock/commit/937d1685c3c650ff0406bdc7432ae3707dca6d29))
-* duplicate application in database ([ae5a379](https://github.com/jensvogt/awsmock/commit/ae5a379a0bbd45e722b13489b30ef3ffee2eadcb))
-
-## [1.14.39](https://github.com/jensvogt/awsmock/compare/1.14.38...v1.14.39) (2026-03-10)
-
-
-### Bug Fixes
-
-* queue name as arn/url ([12ce444](https://github.com/jensvogt/awsmock/commit/12ce4449b74bc3f30a2b371201e7b1a1c5bec42d))
-
-## [1.14.38](https://github.com/jensvogt/awsmock/compare/1.14.37...v1.14.38) (2026-03-09)
-
-
-### Bug Fixes
-
-* add cognito database tests ([4536a24](https://github.com/jensvogt/awsmock/commit/4536a24c01b2d584de435ddd61cc82a0803e82cd))
-* add cognito database tests ([ffbc945](https://github.com/jensvogt/awsmock/commit/ffbc945c835e1b4c0c42345564f27be2ca976e83))
-* add cognito database tests ([d54adff](https://github.com/jensvogt/awsmock/commit/d54adff2004cd7ed87bb78ca177c5b02049f1ce7))
-* macOS port and new tests for memory DB ([6b8fad8](https://github.com/jensvogt/awsmock/commit/6b8fad8c3338863b2c731c54831c40cfe4d422f6))
-
-## [1.14.37](https://github.com/jensvogt/awsmock/compare/v1.14.36...v1.14.37) (2026-03-09)
-
-
-### Bug Fixes
-
-* remove dynamodb java app ([20fae51](https://github.com/jensvogt/awsmock/commit/20fae51878df6641c28811bf55cb4066aefe32f3))
-* remove dynamodb java app ([2d3865d](https://github.com/jensvogt/awsmock/commit/2d3865d171a2addc20e5220fecbbeb96f313232a))
-
-## [1.14.36](https://github.com/jensvogt/awsmock/compare/v1.14.35...v1.14.36) (2026-03-08)
-
-
-### Bug Fixes
-
-* remove dynamodb java app ([7628c12](https://github.com/jensvogt/awsmock/commit/7628c12deb89583cd2b39570ed57dc287a6075f9))
-
-## [1.14.35](https://github.com/jensvogt/awsmock/compare/v1.14.34...v1.14.35) (2026-03-08)
-
-
-### Bug Fixes
-
-* remove dynamodb java app ([da453d9](https://github.com/jensvogt/awsmock/commit/da453d98aad14d85ac2997aa23a37936d28d01d1))
-
-## [1.14.34](https://github.com/jensvogt/awsmock/compare/1.14.33...v1.14.34) (2026-03-07)
-
-
-### Bug Fixes
-
-* remove dynamodb java app ([d32cde7](https://github.com/jensvogt/awsmock/commit/d32cde751c7c1bf16223792b713cb6287814635c))
-* remove dynamodb java app ([85e881c](https://github.com/jensvogt/awsmock/commit/85e881cbff9f91801920c93d2e36129dc57124c9))
-* remove dynamodb java app ([a57d6dc](https://github.com/jensvogt/awsmock/commit/a57d6dcbaf4193ce940275b3879975957e0332c8))
-* remove dynamodb java app ([ce0f388](https://github.com/jensvogt/awsmock/commit/ce0f388af2ffbf39f36d52ad828b77ceeca2b8bc))
-
-## [1.14.33](https://github.com/jensvogt/awsmock/compare/v1.14.32...v1.14.33) (2026-03-06)
-
-
-### Bug Fixes
-
-* lambda update code call ([f55681f](https://github.com/jensvogt/awsmock/commit/f55681f480e3be68a640e96e7ea6f39d8f08eee0))
-* lambda update code call ([1c04f87](https://github.com/jensvogt/awsmock/commit/1c04f870fccc5eeba30a3f723869f9d9ca0cecf1))
-
-## [1.14.32](https://github.com/jensvogt/awsmock/compare/v1.14.31...v1.14.32) (2026-03-06)
-
-
-### Bug Fixes
-
-* SEGFAULT in application module ([9102d1d](https://github.com/jensvogt/awsmock/commit/9102d1d663784b266e0d447711fa0af3c080259c))
-* SEGFAULT in application module ([cc41020](https://github.com/jensvogt/awsmock/commit/cc4102034ae2818db2e8a5bdae680f3b002e1a91))
-
-## [1.14.31](https://github.com/jensvogt/awsmock/compare/v1.14.30...v1.14.31) (2026-03-05)
-
-
-### Bug Fixes
-
-* secrets manager tags ([f4a9d1a](https://github.com/jensvogt/awsmock/commit/f4a9d1a647ffa7d4fca7a0290633c4b4964ae1c0))
-
-## [1.14.30](https://github.com/jensvogt/awsmock/compare/v1.14.29...v1.14.30) (2026-03-05)
-
-
-### Bug Fixes
-
-* secrets manager tags ([5c8a88e](https://github.com/jensvogt/awsmock/commit/5c8a88e69068734c7385fc93bbdf9e0e4dc6bc83))
-
-## [1.14.29](https://github.com/jensvogt/awsmock/compare/1.14.28...v1.14.29) (2026-03-05)
-
-
-### Bug Fixes
-
-* secrets manager tags ([6ed5dc7](https://github.com/jensvogt/awsmock/commit/6ed5dc73e9c9abab9d4571a4ba46ec56fd95f6e4))
-
-## [1.14.28](https://github.com/jensvogt/awsmock/compare/v1.14.27...v1.14.28) (2026-02-27)
-
-
-### Bug Fixes
-
-* secrets manager tags ([16fb882](https://github.com/jensvogt/awsmock/commit/16fb8829705aa27730e1aab4453d01a23825b229))
-* secrets manager tags ([0076c6e](https://github.com/jensvogt/awsmock/commit/0076c6e34070403e84d0753bb1c04f429f346f85))
-
-## [1.14.27](https://github.com/jensvogt/awsmock/compare/v1.14.26...v1.14.27) (2026-02-27)
-
-
-### Bug Fixes
-
-* change sha1/sha256 algorithms ([5019f4c](https://github.com/jensvogt/awsmock/commit/5019f4c4cdf1b8cd8c460783efa8df2f8d620950))
-
-## [1.14.26](https://github.com/jensvogt/awsmock/compare/1.14.25...v1.14.26) (2026-02-27)
-
-
-### Bug Fixes
-
-* change sha1/sha256 algorithms ([32a8cc4](https://github.com/jensvogt/awsmock/commit/32a8cc49039051a10eb0bc48437e5cb05d4df7fb))
-
-## [1.14.25](https://github.com/jensvogt/awsmock/compare/v1.14.24...v1.14.25) (2026-02-27)
-
-
-### Bug Fixes
-
-* change sha1/sha256 algorithms ([5aa160f](https://github.com/jensvogt/awsmock/commit/5aa160f7b0e4c1f93cbb4070541df8a02cb6bcd9))
-
-## [1.14.24](https://github.com/jensvogt/awsmock/compare/v1.14.23...v1.14.24) (2026-02-27)
-
-
-### Bug Fixes
-
-* synchronous hash algorithm ([4e29cb7](https://github.com/jensvogt/awsmock/commit/4e29cb7eaebe5364bfa8fb872dd7122f345f0fa7))
-
-## [1.14.23](https://github.com/jensvogt/awsmock/compare/1.14.22...v1.14.23) (2026-02-27)
-
-
-### Bug Fixes
-
-* add magic.mgc to docker image ([1041dd4](https://github.com/jensvogt/awsmock/commit/1041dd4cd5726f6f01e22ef3acc647483a4c042c))
-
-## [1.14.22](https://github.com/jensvogt/awsmock/compare/v1.14.21...v1.14.22) (2026-02-26)
-
-
-### Bug Fixes
-
-* keep alive settings ([2524bc4](https://github.com/jensvogt/awsmock/commit/2524bc4ee7c8356cd1d2837d05f0db8ba095c302))
-
-## [1.14.21](https://github.com/jensvogt/awsmock/compare/1.14.20...v1.14.21) (2026-02-26)
-
-
-### Bug Fixes
-
-* keep alive settings ([8aac559](https://github.com/jensvogt/awsmock/commit/8aac559a7f48a17df53c04043e9da7420e79e1d5))
-
-## [1.14.20](https://github.com/jensvogt/awsmock/compare/1.14.19...v1.14.20) (2026-02-26)
-
-
-### Bug Fixes
-
-* keep alive settings ([6e17825](https://github.com/jensvogt/awsmock/commit/6e17825f9b846d0b8cc1e25a472ff252ae331920))
-
-## [1.14.19](https://github.com/jensvogt/awsmock/compare/v1.14.18...v1.14.19) (2026-02-24)
-
-
-### Bug Fixes
-
-* keep alive settings ([8e8ef51](https://github.com/jensvogt/awsmock/commit/8e8ef51ad0f8e49d3e825e1a2f53f90f580701d6))
-
-## [1.14.18](https://github.com/jensvogt/awsmock/compare/1.14.17...v1.14.18) (2026-02-23)
-
-
-### Bug Fixes
-
-* SQS queue default attributes ([42eecf3](https://github.com/jensvogt/awsmock/commit/42eecf3ab6beeeaff8cc82b0e6a3de32072d4eb6))
-* SQS queue default attributes ([aff3b65](https://github.com/jensvogt/awsmock/commit/aff3b658cb3bedf9580e294e20e62ab00558b550))
-
-## [1.14.17](https://github.com/jensvogt/awsmock/compare/1.14.16...v1.14.17) (2026-02-22)
-
-
-### Bug Fixes
-
-* keep alive settings ([c2bb499](https://github.com/jensvogt/awsmock/commit/c2bb4992f6179b2b1721d581392e962436fb3451))
-* keep alive settings ([7c3154d](https://github.com/jensvogt/awsmock/commit/7c3154ddf9eabe92cbb6d132cb6d18750a315341))
-* SQS queue default attributes ([f04deef](https://github.com/jensvogt/awsmock/commit/f04deefb732bf83cb235ec3cce02b95c6a271025))
-
-## [1.14.16](https://github.com/jensvogt/awsmock/compare/1.14.15...v1.14.16) (2026-02-19)
-
-
-### Bug Fixes
-
-* SQS queue default attributes ([fbf9bce](https://github.com/jensvogt/awsmock/commit/fbf9bceec6888615cf512d8cadd87222dddfc551))
-
-## [1.14.15](https://github.com/jensvogt/awsmock/compare/v1.14.14...v1.14.15) (2026-02-19)
-
-
-### Bug Fixes
-
-* gateway issues ([c67358b](https://github.com/jensvogt/awsmock/commit/c67358b598d24eb6d63111dd1d358352c68eef11))
-* gateway issues ([a315aad](https://github.com/jensvogt/awsmock/commit/a315aad69a7a2fb84e4c7a10a7d92929762d2f67))
-
-## [1.14.14](https://github.com/jensvogt/awsmock/compare/1.14.13...v1.14.14) (2026-02-18)
-
-
-### Bug Fixes
-
-* get log level ([eb46f8d](https://github.com/jensvogt/awsmock/commit/eb46f8d35aee4bcbc127fcdb87466b9a09735adf))
-
-## [1.14.13](https://github.com/jensvogt/awsmock/compare/1.14.12...v1.14.13) (2026-02-18)
-
-
-### Bug Fixes
-
-* get log level ([5615924](https://github.com/jensvogt/awsmock/commit/5615924f6bd33aa2f7e1a5b4ee0d2085f3bd24e6))
-* get log level ([37c218c](https://github.com/jensvogt/awsmock/commit/37c218c0bc2bc9e4191866397956f91cb8585079))
-
-## [1.14.12](https://github.com/jensvogt/awsmock/compare/v1.14.11...v1.14.12) (2026-02-17)
-
-
-### Bug Fixes
-
-* keep alive settings ([a738b73](https://github.com/jensvogt/awsmock/commit/a738b73cb8bb20d14290bfa1ad69d6edf31731de))
-* keep alive settings ([dd822b9](https://github.com/jensvogt/awsmock/commit/dd822b97459866d92c79f7fb5f4e60fc20483937))
-* rebuild lambda ([5a040c0](https://github.com/jensvogt/awsmock/commit/5a040c0a49d5e1165e4bee9de42765235d03cc50))
-* rebuild lambda ([8ccd4ad](https://github.com/jensvogt/awsmock/commit/8ccd4ad06a1f1644e702193e8a356c7129f17f3a))
-
-## [1.14.11](https://github.com/jensvogt/awsmock/compare/1.14.10...v1.14.11) (2026-02-17)
-
-
-### Bug Fixes
-
-* gateway debugging ([559ad13](https://github.com/jensvogt/awsmock/commit/559ad13905747e7b8e5ad2698eeaadedf048f37a))
-* gateway debugging ([25ef395](https://github.com/jensvogt/awsmock/commit/25ef395253b961adb336f032e901dd89e4bbd7c3))
-
-## [1.14.10](https://github.com/jensvogt/awsmock/compare/v1.14.9...v1.14.10) (2026-02-16)
-
-
-### Bug Fixes
-
-* keep alive settings ([3053930](https://github.com/jensvogt/awsmock/commit/3053930c2e62aa4da47a4191394f24bec22f10ef))
-
-## [1.14.9](https://github.com/jensvogt/awsmock/compare/v1.14.8...v1.14.9) (2026-02-16)
-
-
-### Bug Fixes
-
-* keep alive settings ([3f9577b](https://github.com/jensvogt/awsmock/commit/3f9577bc6d784575dc2f4611671ef6fb245179b4))
-
-## [1.14.8](https://github.com/jensvogt/awsmock/compare/v1.14.7...v1.14.8) (2026-02-16)
-
-
-### Bug Fixes
-
-* add SNS add message dialog ([349b201](https://github.com/jensvogt/awsmock/commit/349b201582728a0d02da35b9a8867846d23c54bf))
-
-## [1.14.7](https://github.com/jensvogt/awsmock/compare/1.14.6...v1.14.7) (2026-02-16)
-
-
-### Bug Fixes
-
-* add SNS add message dialog ([5624d6f](https://github.com/jensvogt/awsmock/commit/5624d6ff5d5a34dbbb4e4253363d8e1968c7f7cb))
-* add SNS add message dialog ([5cd1503](https://github.com/jensvogt/awsmock/commit/5cd15037e5c3cce3b23dc5f2f0f00520137e3f35))
-
-## [1.14.6](https://github.com/jensvogt/awsmock/compare/v1.14.5...v1.14.6) (2026-02-16)
-
-
-### Bug Fixes
-
-* keep alive settings ([fc8eeab](https://github.com/jensvogt/awsmock/commit/fc8eeab0e07182cc9ed47bd2eeb852f88eb8c3d9))
-
-## [1.14.5](https://github.com/jensvogt/awsmock/compare/1.14.4...v1.14.5) (2026-02-15)
-
-
-### Bug Fixes
-
-* SQS counters ([9439974](https://github.com/jensvogt/awsmock/commit/9439974bc529e17600123c9e152ecf403233f090))
-
-## [1.14.4](https://github.com/jensvogt/awsmock/compare/1.14.3...v1.14.4) (2026-02-15)
-
-
-### Bug Fixes
-
-* fix several issues ([e1bca33](https://github.com/jensvogt/awsmock/commit/e1bca33ed0bca7eded44e9200b10129e1b2f4093))
-
-## [1.14.3](https://github.com/jensvogt/awsmock/compare/1.14.2...v1.14.3) (2026-02-13)
-
-
-### Bug Fixes
-
-* gate problem using 100-continue header ([e52d1fd](https://github.com/jensvogt/awsmock/commit/e52d1fde1da1b79dd2e3a4b343cc0d938a57d916))
-
-## [1.14.2](https://github.com/jensvogt/awsmock/compare/1.14.1...v1.14.2) (2026-02-12)
-
-
-### Bug Fixes
-
-* dynamodb getitem response ([06f9bfd](https://github.com/jensvogt/awsmock/commit/06f9bfd80ccc452da9d5ef34341efeb029902752))
-
-## [1.14.1](https://github.com/jensvogt/awsmock/compare/1.14.0...v1.14.1) (2026-02-07)
-
-
-### Bug Fixes
-
-* some KMS issues ([64007eb](https://github.com/jensvogt/awsmock/commit/64007eb641c2fd43dfb17e47204cc6da2fe854e9))
-
-## [1.14.0](https://github.com/jensvogt/awsmock/compare/v1.13.0...v1.14.0) (2026-02-06)
-
-
-### Features
-
-* add log messages to FE ([691c0b1](https://github.com/jensvogt/awsmock/commit/691c0b1609d9066891c3caa85de80262fa9b907d))
-* add log messages to FE ([15626e5](https://github.com/jensvogt/awsmock/commit/15626e533daa6e11467cff4072913ddca9712c78))
-
-## [1.13.0](https://github.com/jensvogt/awsmock/compare/1.12.15...v1.13.0) (2026-02-06)
-
-
-### Features
-
-* add log messages to FE ([61a7833](https://github.com/jensvogt/awsmock/commit/61a783364e0945ecbfd3e77fdba59d8eeabca1ef))
-
-## [1.12.15](https://github.com/jensvogt/awsmock/compare/1.12.14...v1.12.15) (2026-02-05)
-
-
-### Bug Fixes
-
-* logging messages in module service ([a8f125c](https://github.com/jensvogt/awsmock/commit/a8f125c851925868d77023d53cf77f27db2e9753))
-
-## [1.12.14](https://github.com/jensvogt/awsmock/compare/1.12.13...v1.12.14) (2026-02-04)
-
-
-### Bug Fixes
-
-* logging messages in module service ([9bea156](https://github.com/jensvogt/awsmock/commit/9bea1566a918035dece9fa2767f40191015f0e32))
-
-## [1.12.13](https://github.com/jensvogt/awsmock/compare/1.12.12...v1.12.13) (2026-02-03)
-
-
-### Bug Fixes
-
-* infrastructure dialog ([0e4a75d](https://github.com/jensvogt/awsmock/commit/0e4a75d6eb7e6b5c7120580c675427cbb4c74c10))
-
-## [1.12.12](https://github.com/jensvogt/awsmock/compare/1.12.11...v1.12.12) (2026-02-03)
-
-
-### Bug Fixes
-
-* infrastructure dialog ([b243497](https://github.com/jensvogt/awsmock/commit/b243497dcd97f8ab99e3d33db91b1a98252af00c))
-
-## [1.12.11](https://github.com/jensvogt/awsmock/compare/v1.12.10...v1.12.11) (2026-02-03)
-
-
-### Bug Fixes
-
-* add SSM tags ([bd76379](https://github.com/jensvogt/awsmock/commit/bd76379e4492225280bb464e3145a8ec72263c29))
-
-## [1.12.10](https://github.com/jensvogt/awsmock/compare/1.12.9...v1.12.10) (2026-02-03)
-
-
-### Bug Fixes
-
-* kms import/export ([a41d6da](https://github.com/jensvogt/awsmock/commit/a41d6daca812ee4192741a7ad3a9ecdb41f21d0a))
-
-## [1.12.9](https://github.com/jensvogt/awsmock/compare/1.12.8...v1.12.9) (2026-02-01)
-
-
-### Bug Fixes
-
-* controller having wrong ports ([40672ef](https://github.com/jensvogt/awsmock/commit/40672effc2b10164d095a49885b368a395bac3a3))
-
-## [1.12.8](https://github.com/jensvogt/awsmock/compare/v1.12.7...v1.12.8) (2026-02-01)
-
-
-### Bug Fixes
-
-* controller having wrong ports ([99ba51c](https://github.com/jensvogt/awsmock/commit/99ba51c0781dfe62d8dbc98cab263ee36bec7b47))
-
-## [1.12.7](https://github.com/jensvogt/awsmock/compare/v1.12.6...v1.12.7) (2026-02-01)
-
-
-### Bug Fixes
-
-* set correct lambda version, when new code is uploaded ([018c69a](https://github.com/jensvogt/awsmock/commit/018c69a98c4cc656169394a067f0f2ac6f25030b))
-
-## [1.12.6](https://github.com/jensvogt/awsmock/compare/1.12.5...v1.12.6) (2026-02-01)
-
-
-### Bug Fixes
-
-* set correct lambda version, when new code is uploaded ([688a18a](https://github.com/jensvogt/awsmock/commit/688a18a342a5e8f6803fdeac7ddb109cdab94881))
-
-## [1.12.5](https://github.com/jensvogt/awsmock/compare/v1.12.4...v1.12.5) (2026-02-01)
-
-
-### Bug Fixes
-
-* bug in S3 lifecylce, default strorage class is 'STANDARD' ([#1959](https://github.com/jensvogt/awsmock/issues/1959)) ([8fcf2cf](https://github.com/jensvogt/awsmock/commit/8fcf2cf3d0ef89fc7b578f816da9faaac68f597a))
-
-## [1.12.4](https://github.com/jensvogt/awsmock/compare/v1.12.3...v1.12.4) (2026-01-12)
-
-
-### Bug Fixes
-
-* bug in S3 lifecylce, default strorage class is 'STANDARD' ([f380f70](https://github.com/jensvogt/awsmock/commit/f380f709291967ee5cbfe57c40f21bd21f0f2472))
-
-## [1.12.3](https://github.com/jensvogt/awsmock/compare/1.12.2...v1.12.3) (2026-01-12)
-
-
-### Bug Fixes
-
-* bug in S3 get lifecycle configuration ([f408c6b](https://github.com/jensvogt/awsmock/commit/f408c6b4d6e0e76871e42133f5d546d798ea6221))
-
-## [1.12.2](https://github.com/jensvogt/awsmock/compare/v1.12.1...v1.12.2) (2026-01-10)
-
-
-### Bug Fixes
-
-* bug in S3 get lifecycle configuration ([642fb4b](https://github.com/jensvogt/awsmock/commit/642fb4bf3c22b8240cc57b6f0989e9f375e584fe))
-* bug in S3 get lifecycle configuration ([90328ec](https://github.com/jensvogt/awsmock/commit/90328ecb6de30e03120ff3ecf41156dbf9b13d27))
-
-## [1.12.1](https://github.com/jensvogt/awsmock/compare/1.12.0...v1.12.1) (2026-01-10)
-
-
-### Bug Fixes
-
-* bug in S3 delete bucket ([99f9b25](https://github.com/jensvogt/awsmock/commit/99f9b259bcc08f022d85a44cecbe7e9cae82e557))
-
-## [1.12.0](https://github.com/jensvogt/awsmock/compare/1.11.0...v1.12.0) (2026-01-06)
-
-
-### Features
-
-* add s3 storage class ([54976ca](https://github.com/jensvogt/awsmock/commit/54976caa0a0091c9dd1aca617da552c814749b88))
-
-## [1.11.0](https://github.com/jensvogt/awsmock/compare/1.10.1...v1.11.0) (2026-01-06)
-
-
-### Features
-
-* add s3 storage class ([212caa1](https://github.com/jensvogt/awsmock/commit/212caa1efa50c33c0929334e75fcf49f9b35bfe3))
-* add s3 storage class ([577398e](https://github.com/jensvogt/awsmock/commit/577398ee3efaff869ad507f742fc88d7936b87a4))
-
-## [1.10.1](https://github.com/jensvogt/awsmock/compare/1.10.0...v1.10.1) (2025-12-22)
-
-
-### Bug Fixes
-
-* add dynamodb items add/delete/list ([c292eb7](https://github.com/jensvogt/awsmock/commit/c292eb72a0fa2215b680720ae0ee5d40b61650dd))
-
-## [1.10.0](https://github.com/jensvogt/awsmock/compare/1.9.120...v1.10.0) (2025-12-21)
-
-
-### Features
-
-* add dynamodb add/delete/list tables ([004438f](https://github.com/jensvogt/awsmock/commit/004438fba824179ace20bec4fe67b4f70f1e8743))
-
-## [1.9.120](https://github.com/jensvogt/awsmock/compare/1.9.119...v1.9.120) (2025-12-19)
-
-
-### Bug Fixes
-
-* add SNS add message dialog ([3738dbc](https://github.com/jensvogt/awsmock/commit/3738dbc9d9884305160bfa696af6e4da921cb749))
-* add SNS add message dialog ([3a40b44](https://github.com/jensvogt/awsmock/commit/3a40b44d4b62980f2d43c1ff0a25e0ab7cfc486f))
-
-## [1.9.119](https://github.com/jensvogt/awsmock/compare/1.9.118...v1.9.119) (2025-12-19)
-
-
-### Bug Fixes
-
-* fix github pages processing ([777c5f1](https://github.com/jensvogt/awsmock/commit/777c5f1f85e4b7cf7df3f778d0b5b58314d69950))
-
-## [1.9.118](https://github.com/jensvogt/awsmock/compare/1.9.117...v1.9.118) (2025-12-18)
-
-
-### Bug Fixes
-
-* fix some minor issues dynamodb query processing ([5212c19](https://github.com/jensvogt/awsmock/commit/5212c19037f7342ca8c428d4156bfcd27fea40fc))
-
-## [1.9.117](https://github.com/jensvogt/awsmock/compare/1.9.116...v1.9.117) (2025-12-17)
-
-
-### Bug Fixes
-
-* bug in dynamodb query processing, and putitem. Added listValues and mapValues. ([52e7871](https://github.com/jensvogt/awsmock/commit/52e7871200871b5a31232892cbebc89139199bf2))
-
-## [1.9.116](https://github.com/jensvogt/awsmock/compare/1.9.115...v1.9.116) (2025-12-16)
-
-
-### Bug Fixes
-
-* add secrets manager details dialog ([5ca5f3f](https://github.com/jensvogt/awsmock/commit/5ca5f3f785a1cab4fe0d2deb918770646775e6fa))
-
-## [1.9.115](https://github.com/jensvogt/awsmock/compare/1.9.114...v1.9.115) (2025-12-16)
-
-
-### Bug Fixes
-
-* add secrets manager details dialog ([3732261](https://github.com/jensvogt/awsmock/commit/37322610a1650696523949cadd6a8144cc5dc358))
-* add secrets manager details dialog ([59af1c6](https://github.com/jensvogt/awsmock/commit/59af1c615e5f899881ea3d91f1bfc13a68305c04))
-
-## [1.9.114](https://github.com/jensvogt/awsmock/compare/1.9.113...v1.9.114) (2025-12-15)
-
-
-### Bug Fixes
-
-* add SNS add message dialog ([9fb1ba1](https://github.com/jensvogt/awsmock/commit/9fb1ba1a7bed69c40c4af07eaed276f018fa6dc5))
-
-## [1.9.113](https://github.com/jensvogt/awsmock/compare/1.9.112...v1.9.113) (2025-12-14)
-
-
-### Bug Fixes
-
-* add docker stats pages ([167a43b](https://github.com/jensvogt/awsmock/commit/167a43b6cc2d13b5b1709e70ff9c6f0af456d7d7))
-* fix windows package errors ([fed386c](https://github.com/jensvogt/awsmock/commit/fed386cd6e34639d78f5e730b99dbf1094ff6ec3))
-* fix windows package errors ([1659c89](https://github.com/jensvogt/awsmock/commit/1659c892b9f1b82c1dc466f6c0955d6f6a34b3b8))
-* fix windows package errors ([446c3d9](https://github.com/jensvogt/awsmock/commit/446c3d91056cb2625a3ab6879965ce05586d3fe2))
-
-## [1.9.112](https://github.com/jensvogt/awsmock/compare/1.9.111...v1.9.112) (2025-12-13)
-
-
-### Bug Fixes
-
-* add docker stats pages ([97bdb9c](https://github.com/jensvogt/awsmock/commit/97bdb9c005a12630f89ecc3149f1ba49ac1f30d6))
-* add docker stats pages ([bf83389](https://github.com/jensvogt/awsmock/commit/bf83389355ad666073c9864a36bc7910fcd9876b))
-* fix windows package errors ([fdf6975](https://github.com/jensvogt/awsmock/commit/fdf6975214b291eab8db874255124336ecff24dd))
-* fix windows package errors ([0a72c59](https://github.com/jensvogt/awsmock/commit/0a72c5951fa6554303680973ebd94654710c55e4))
-* fix windows package errors ([61bde07](https://github.com/jensvogt/awsmock/commit/61bde07e7ef1a8606059a8986351da884f270d53))
-
-## [1.9.111](https://github.com/jensvogt/awsmock/compare/v1.9.110...v1.9.111) (2025-12-11)
-
-
-### Bug Fixes
-
-* fix windows package errors ([e0fd3d1](https://github.com/jensvogt/awsmock/commit/e0fd3d18d41a551cbfc9584f2718b32e5ee97a6b))
-* fix windows package errors ([06eed96](https://github.com/jensvogt/awsmock/commit/06eed966118d81b4b3432b7ea961708ec2d43b6a))
-* fix windows package errors ([d2abfa9](https://github.com/jensvogt/awsmock/commit/d2abfa989c79023b36ddb7d90f948607eda86cbe))
-* fix windows package errors ([14d31fd](https://github.com/jensvogt/awsmock/commit/14d31fdd1b43c00721a49a268af52642a8c336d6))
-* fix windows vcpkg errors ([bc2cd01](https://github.com/jensvogt/awsmock/commit/bc2cd017df434fb08f8291e983dc2f0683fd12b1))
-
-## [1.9.110](https://github.com/jensvogt/awsmock/compare/v1.9.109...v1.9.110) (2025-12-11)
-
-
-### Bug Fixes
-
-* link statically ([eea54c2](https://github.com/jensvogt/awsmock/commit/eea54c2cc3b1d3517e06f9a929fd4a5e511c6e2e))
-* link statically ([772fb90](https://github.com/jensvogt/awsmock/commit/772fb90f391c285f35e8cb338749fcf7fadcf34c))
-
-## [1.9.109](https://github.com/jensvogt/awsmock/compare/v1.9.108...v1.9.109) (2025-12-10)
-
-
-### Bug Fixes
-
-* fix windows vcpkg errors ([3aabe2d](https://github.com/jensvogt/awsmock/commit/3aabe2d6a64ed6e218bb72708767f45bec1273d3))
-
-## [1.9.108](https://github.com/jensvogt/awsmock/compare/v1.9.107...v1.9.108) (2025-12-10)
-
-
-### Bug Fixes
-
-* fix windows vcpkg errors ([5a2ff47](https://github.com/jensvogt/awsmock/commit/5a2ff47fa8525d2f6b457c24db29deb1bdb93b27))
-* fix windows vcpkg errors ([e621ea7](https://github.com/jensvogt/awsmock/commit/e621ea751691a057728c87093c309283cd8b5b27))
-* fix windows vcpkg errors ([3f40f63](https://github.com/jensvogt/awsmock/commit/3f40f63bd987b2cd1bbbce51ef2ff3dcc5b4e273))
-* fix windows vcpkg errors ([7d476f0](https://github.com/jensvogt/awsmock/commit/7d476f001d3eb70ead7a3d34c326c2c20f772a1e))
-* fix windows vcpkg errors ([ff2f897](https://github.com/jensvogt/awsmock/commit/ff2f8973098fbade0916f498ed3cca5fc2a338c6))
-* fix windows vcpkg errors ([9f17fab](https://github.com/jensvogt/awsmock/commit/9f17fab47cac1cc14d1538a7bedde2a2b0ebcbde))
-* fix windows vcpkg errors ([1f2a2dc](https://github.com/jensvogt/awsmock/commit/1f2a2dc401471ebf926df9f1b8995fcaea042b48))
-
-## [1.9.107](https://github.com/jensvogt/awsmock/compare/v1.9.106...v1.9.107) (2025-12-10)
-
-
-### Bug Fixes
-
-* fix windows vcpkg errors ([e9a53ab](https://github.com/jensvogt/awsmock/commit/e9a53ab48c9be12e9f170d31d0061e2683d372fe))
-* fix windows vcpkg errors ([172dd87](https://github.com/jensvogt/awsmock/commit/172dd877e340171884e80665ec5f700e635c7f14))
-* fix windows vcpkg errors ([b6994bd](https://github.com/jensvogt/awsmock/commit/b6994bd690d4902a44b7fbe776db2bf4086fe0b4))
-* fix windows vcpkg errors ([09638d6](https://github.com/jensvogt/awsmock/commit/09638d67d8b131f11d1192c1373006ce6af860c8))
-* fix windows vcpkg errors ([121b572](https://github.com/jensvogt/awsmock/commit/121b57247cbb0143ef9a63fccfe412cf1b599be2))
-* fix windows vcpkg errors ([32ba751](https://github.com/jensvogt/awsmock/commit/32ba7510c5197de1d7740b5535aca422242de022))
-* fix windows vcpkg errors ([3da1583](https://github.com/jensvogt/awsmock/commit/3da1583c3d0b80c82e4e598589e0af65333a2b46))
-* fix windows vcpkg errors ([68f3efb](https://github.com/jensvogt/awsmock/commit/68f3efb89814bb17a042f58e0bb8ab5cd919396e))
-* fix windows vcpkg errors ([8294c14](https://github.com/jensvogt/awsmock/commit/8294c14eacf10424b7dd163e01a28727d37d0ea6))
-* fix windows vcpkg errors ([9da2dee](https://github.com/jensvogt/awsmock/commit/9da2deee234ace672e1cbb51e7e45870ea21e239))
-* fix windows vcpkg errors ([4e2c8e2](https://github.com/jensvogt/awsmock/commit/4e2c8e2f95d65e6c2a188ea18c548130b8930755))
-* fix windows vcpkg errors ([82cb196](https://github.com/jensvogt/awsmock/commit/82cb1967bfe9a9d1017e8a0be57864399ad64db3))
-* fix windows vcpkg errors ([3b12193](https://github.com/jensvogt/awsmock/commit/3b1219303aae9b9e0ed827b5ab180bbbb6609670))
-* fix windows vcpkg errors ([8eec1fa](https://github.com/jensvogt/awsmock/commit/8eec1fa6c63ce64ea47da1afbfae811ea1e1e72b))
-* fix windows vcpkg errors ([ee59fe4](https://github.com/jensvogt/awsmock/commit/ee59fe4891c2af25fe670e87400965fcb65e88f1))
-* fix windows vcpkg errors ([80bc0c4](https://github.com/jensvogt/awsmock/commit/80bc0c46eb6ca552afeacf489fb06389e92baa34))
-* fix windows vcpkg errors ([56a8c32](https://github.com/jensvogt/awsmock/commit/56a8c325207db988315b9d401492b7d67a30ecb6))
-* fix windows vcpkg errors ([a9c5823](https://github.com/jensvogt/awsmock/commit/a9c58234d97db205c9a4cd12a8634c2b97e632f9))
-
-## [1.9.106](https://github.com/jensvogt/awsmock/compare/v1.9.105...v1.9.106) (2025-12-10)
-
-
-### Bug Fixes
-
-* fix windows vcpkg errors ([716fe71](https://github.com/jensvogt/awsmock/commit/716fe7104fbcd8dca95a7c9ed5a097e066a012e6))
-
-## [1.9.105](https://github.com/jensvogt/awsmock/compare/v1.9.104...v1.9.105) (2025-12-09)
-
-
-### Bug Fixes
-
-* fix windows vcpkg errors ([e9e7632](https://github.com/jensvogt/awsmock/commit/e9e7632767f493f80e74fc1384977ef6cbd3f6eb))
-* fix windows vcpkg errors ([b2c2d1b](https://github.com/jensvogt/awsmock/commit/b2c2d1b9ea82d9838f6026c1dfd4846b532f1118))
-
-## [1.9.104](https://github.com/jensvogt/awsmock/compare/v1.9.103...v1.9.104) (2025-12-09)
-
-
-### Bug Fixes
-
-* add windows binaries ([ff32841](https://github.com/jensvogt/awsmock/commit/ff32841e78d7fc8d34eabf74c458c65517a88d28))
-* fix windows vcpkg errors ([152846f](https://github.com/jensvogt/awsmock/commit/152846fff30d481b1dc56ab10d38aa49a727ee4e))
-* fix windows vcpkg errors ([94f5fc9](https://github.com/jensvogt/awsmock/commit/94f5fc96082d00b59b88537f0f9ed1de29a40def))
-* fix windows vcpkg errors ([e9ae6e2](https://github.com/jensvogt/awsmock/commit/e9ae6e2d6154fd0eec3044a8f7e4958fa3410ee8))
-* fix windows vcpkg errors ([a7db7bc](https://github.com/jensvogt/awsmock/commit/a7db7bc9bf036b733f516c75035a7ea0fbaae497))
-* fix windows vcpkg errors ([21ce8dc](https://github.com/jensvogt/awsmock/commit/21ce8dc6c5bd066796186a64861468814d5f7886))
-* fix windows vcpkg errors ([cffe647](https://github.com/jensvogt/awsmock/commit/cffe647e4567af6065a9ba92f5aead2c8e7ed68a))
-* fix windows vcpkg errors ([e5b49d5](https://github.com/jensvogt/awsmock/commit/e5b49d50e90a71af14e03d4f1d30601cae7f0758))
-* fix windows vcpkg errors ([9d5d8a6](https://github.com/jensvogt/awsmock/commit/9d5d8a62853b4048b1d8430a0940e8641ab6db14))
-* fix windows vcpkg errors ([365676c](https://github.com/jensvogt/awsmock/commit/365676cd62f874fec7516c2c649cd4c0dcd96a7f))
-* fix windows vcpkg errors ([b001335](https://github.com/jensvogt/awsmock/commit/b0013353ea57b530964584f4af3662abef1eb062))
-* fix windows vcpkg errors ([b81bfb7](https://github.com/jensvogt/awsmock/commit/b81bfb71b8d12026a89954a4b31ee7c291e46af8))
-* fix windows vcpkg errors ([1a3f096](https://github.com/jensvogt/awsmock/commit/1a3f096c02db1ca53ccef8524438a26c7b6faf5b))
-* fix windows vcpkg errors ([12b1989](https://github.com/jensvogt/awsmock/commit/12b198904c65621c81d5328f0ba0a5c01b431ecd))
-* fix windows vcpkg errors ([4a7d074](https://github.com/jensvogt/awsmock/commit/4a7d0740da42ef0b35305f54d1df8e8d51809959))
-* fix windows vcpkg errors ([e94c7b7](https://github.com/jensvogt/awsmock/commit/e94c7b70e468e34a80e126b724d2f9b1d08573e6))
-* fix windows vcpkg errors ([5f2e6fa](https://github.com/jensvogt/awsmock/commit/5f2e6fae6126a7ab9bff9c9b723a2f1d41c8d380))
-* fix windows vcpkg errors ([2c20fda](https://github.com/jensvogt/awsmock/commit/2c20fda39c95ae43d212b110ac8139066067f2e3))
-* fix windows vcpkg errors ([1dc9a40](https://github.com/jensvogt/awsmock/commit/1dc9a402c98d614dd680b6eb931c8b4c23c12af0))
-* fix windows vcpkg errors ([0c55326](https://github.com/jensvogt/awsmock/commit/0c553267154af9842cf631c3e17e3bbab62eda8e))
-* fix windows vcpkg errors ([ff2e233](https://github.com/jensvogt/awsmock/commit/ff2e233019035e17454d26ffaace3ff343d84d1b))
-* fix windows vcpkg errors ([737116c](https://github.com/jensvogt/awsmock/commit/737116c36b837e42f1cddb8f76a9599550411f07))
-* fix windows vcpkg errors ([9e3f46a](https://github.com/jensvogt/awsmock/commit/9e3f46ab7adb9fd5d8fefbc1b42e644a71dba8de))
-* fix windows vcpkg errors ([3fc9c83](https://github.com/jensvogt/awsmock/commit/3fc9c8360653466f37646c7a8815ad796e6ffe07))
-* fix windows vcpkg errors ([ad37fb9](https://github.com/jensvogt/awsmock/commit/ad37fb9d4ebf3659d7807028cc721ba043e3a699))
-* fix windows vcpkg errors ([15d14ce](https://github.com/jensvogt/awsmock/commit/15d14ce9abcade70267cb4b5fd915778e3cface4))
-* fix windows vcpkg errors ([8cb9b49](https://github.com/jensvogt/awsmock/commit/8cb9b497845bc43e7133a081bf7766831f89147b))
-* fix windows vcpkg errors ([f7d8362](https://github.com/jensvogt/awsmock/commit/f7d8362c8e632004f1d07d10760693b6a25fc65b))
-* fix windows vcpkg errors ([66ccd1f](https://github.com/jensvogt/awsmock/commit/66ccd1f0f3a72bc0ad10bc59168818faa3ae5f36))
-* fix windows vcpkg errors ([b10c696](https://github.com/jensvogt/awsmock/commit/b10c696762e49d7d9971b6138b6bd634f260bbf9))
-* fix windows vcpkg errors ([c1d7ec0](https://github.com/jensvogt/awsmock/commit/c1d7ec046bb8245e94c58e5106e638ed334707cd))
-* fix windows vcpkg errors ([82eed24](https://github.com/jensvogt/awsmock/commit/82eed24cf5e3f1b6487f4df14303a9bfc57d1db6))
-* fix windows vcpkg errors ([5926328](https://github.com/jensvogt/awsmock/commit/5926328448e370940e4aa04a85c633c8237f054d))
-* fix windows vcpkg errors ([e5eedcd](https://github.com/jensvogt/awsmock/commit/e5eedcd72aa5ba10f9bd194f93b27a4f829c7def))
-* fix windows vcpkg errors ([1442eab](https://github.com/jensvogt/awsmock/commit/1442eab7779a6e51e4e003236073a8ccb3ec5f1b))
-
-## [1.9.103](https://github.com/jensvogt/awsmock/compare/v1.9.102...v1.9.103) (2025-12-09)
-
-
-### Bug Fixes
-
-* add windows binaries ([c75971b](https://github.com/jensvogt/awsmock/commit/c75971b1f875ff2173158259a254f115290edd86))
-
-## [1.9.102](https://github.com/jensvogt/awsmock/compare/v1.9.101...v1.9.102) (2025-12-09)
-
-
-### Bug Fixes
-
-* add windows binaries ([a29d29f](https://github.com/jensvogt/awsmock/commit/a29d29f8d90656f209efc2fb9682ab1849f3ea70))
-* add windows binaries ([47cb8ce](https://github.com/jensvogt/awsmock/commit/47cb8ce35659aa99e2f82b0b5f41696f5df3c9e7))
-* add windows binaries ([a49d2c6](https://github.com/jensvogt/awsmock/commit/a49d2c6b2ace4b9edb919c06e3c684647ec588b5))
-
-## [1.9.101](https://github.com/jensvogt/awsmock/compare/v1.9.100...v1.9.101) (2025-12-09)
-
-
-### Bug Fixes
-
-* add windows binaries ([fd418e1](https://github.com/jensvogt/awsmock/commit/fd418e12e2a18b0be7da019fcf7e4ed17260858e))
-* add windows binaries ([795a329](https://github.com/jensvogt/awsmock/commit/795a3294a221c10bee09b95f19825cba0cfee506))
-
-## [1.9.100](https://github.com/jensvogt/awsmock/compare/v1.9.99...v1.9.100) (2025-12-08)
-
-
-### Bug Fixes
-
-* link statically ([f70f852](https://github.com/jensvogt/awsmock/commit/f70f852d812b916fec314c735fb95ef3d49f9cef))
-* link statically ([ce700f5](https://github.com/jensvogt/awsmock/commit/ce700f563eda3526d9c3d6988e77e2ed70c2c6fc))
-* link statically ([3b287f2](https://github.com/jensvogt/awsmock/commit/3b287f24dc477f204db6d14601c6545b6224d10f))
-
-## [1.9.99](https://github.com/jensvogt/awsmock/compare/v1.9.98...v1.9.99) (2025-12-08)
-
-
-### Bug Fixes
-
-* add windows binaries ([e0eb570](https://github.com/jensvogt/awsmock/commit/e0eb570306a1c2bcc785a5d41f76d8e281713cdb))
-
-## [1.9.98](https://github.com/jensvogt/awsmock/compare/v1.9.97...v1.9.98) (2025-12-08)
-
-
-### Bug Fixes
-
-* add windows binaries ([0eda34e](https://github.com/jensvogt/awsmock/commit/0eda34e31f42c17cfefd69528e8701ffb2ce2bfc))
-
-## [1.9.97](https://github.com/jensvogt/awsmock/compare/v1.9.96...v1.9.97) (2025-12-08)
-
-
-### Bug Fixes
-
-* add windows binaries ([0cd92fa](https://github.com/jensvogt/awsmock/commit/0cd92fa33c8fec550a519c07e34fe0f9516a544f))
-* add windows binaries ([354c184](https://github.com/jensvogt/awsmock/commit/354c18458bf6d81985c644d15418f1e887f7a2e6))
-
-## [1.9.96](https://github.com/jensvogt/awsmock/compare/v1.9.95...v1.9.96) (2025-12-08)
-
-
-### Bug Fixes
-
-* link statically ([13504bc](https://github.com/jensvogt/awsmock/commit/13504bc93b8cfad58d3175e010c2b8a73d4c96c3))
-* link statically ([79c876e](https://github.com/jensvogt/awsmock/commit/79c876e703c80c4cc0d347935aabb584ccc88983))
-
-## [1.9.95](https://github.com/jensvogt/awsmock/compare/v1.9.94...v1.9.95) (2025-12-08)
-
-
-### Bug Fixes
-
-* add windows binaries ([87e07e3](https://github.com/jensvogt/awsmock/commit/87e07e3cf96defd3f40cbd0aa98911831ae1177c))
-
-## [1.9.94](https://github.com/jensvogt/awsmock/compare/v1.9.93...v1.9.94) (2025-12-08)
-
-
-### Bug Fixes
-
-* add windows binaries ([87144ae](https://github.com/jensvogt/awsmock/commit/87144ae9aa1687ee007f4e43b1b6bbd93519bb65))
-* add windows binaries ([320d6de](https://github.com/jensvogt/awsmock/commit/320d6dea3d69a66b77695cb84e554400dfa099a9))
-
-## [1.9.93](https://github.com/jensvogt/awsmock/compare/v1.9.92...v1.9.93) (2025-12-07)
-
-
-### Bug Fixes
-
-* link statically ([b648f8b](https://github.com/jensvogt/awsmock/commit/b648f8ba46346f287a7c221796a8c366c8b30e7a))
-* link statically ([71edfe3](https://github.com/jensvogt/awsmock/commit/71edfe305675785bef42e5ad2678f99f21303ff4))
-* link statically ([43225e5](https://github.com/jensvogt/awsmock/commit/43225e5750fab23495064c00bc5c62687f77dc55))
-* link statically ([c2b28bb](https://github.com/jensvogt/awsmock/commit/c2b28bbc7583daedef7639c8ad3725de203518d1))
-* link statically ([e733865](https://github.com/jensvogt/awsmock/commit/e7338650f1b87269a8131e15a2bdcbd929e5cc3a))
-* link statically ([3002eac](https://github.com/jensvogt/awsmock/commit/3002eacf34492b51db7292250dc50b64bbd095d1))
-* link statically ([19f4351](https://github.com/jensvogt/awsmock/commit/19f43516086950bedb92fdc8c300f9a4f215077e))
-
-## [1.9.92](https://github.com/jensvogt/awsmock/compare/v1.9.91...v1.9.92) (2025-12-07)
-
-
-### Bug Fixes
-
-* link statically ([ee93e34](https://github.com/jensvogt/awsmock/commit/ee93e348fa5466e1a420c698d50999f4fe833eff))
-* link statically ([eec6186](https://github.com/jensvogt/awsmock/commit/eec6186458a0c6f4d600c0fb389947768d444427))
-* link statically ([cb2511d](https://github.com/jensvogt/awsmock/commit/cb2511d87491d8dcdb7192c1986da1fac6b528c3))
-
-## [1.9.91](https://github.com/jensvogt/awsmock/compare/v1.9.90...v1.9.91) (2025-12-07)
-
-
-### Bug Fixes
-
-* link statically ([1cca3f6](https://github.com/jensvogt/awsmock/commit/1cca3f6a7faae3e3b33515f6435a9469dd18c11b))
-* link statically ([2f84016](https://github.com/jensvogt/awsmock/commit/2f840160bfe8db0763c98df08b6505280df2cc56))
-
-## [1.9.90](https://github.com/jensvogt/awsmock/compare/v1.9.89...v1.9.90) (2025-12-07)
-
-
-### Bug Fixes
-
-* link statically ([6cad047](https://github.com/jensvogt/awsmock/commit/6cad047b4a62d40f895d4d4d1ac9c4a620f9405c))
-* link statically ([b183b21](https://github.com/jensvogt/awsmock/commit/b183b210245abf3b4f5d4ed3219ecb25e7f29186))
-* link statically ([0e49a9e](https://github.com/jensvogt/awsmock/commit/0e49a9edfa4323d56497d5f774a2698c31000a54))
-* link statically ([aebd1c4](https://github.com/jensvogt/awsmock/commit/aebd1c4a260e7ff3a935fe4c5f505ea82e3e8bec))
-* link statically ([c4d4f74](https://github.com/jensvogt/awsmock/commit/c4d4f7487216412ee2d27058dde2ab9b30e9de74))
-
-## [1.9.89](https://github.com/jensvogt/awsmock/compare/v1.9.88...v1.9.89) (2025-12-07)
-
-
-### Bug Fixes
-
-* link statically ([c557be8](https://github.com/jensvogt/awsmock/commit/c557be82317d4ccffa2d52f1eecd32c3d67a38ee))
-* link statically ([c88cf39](https://github.com/jensvogt/awsmock/commit/c88cf3997b584dde875ca89a60e438357d7e0c76))
-* link statically ([57c9b7a](https://github.com/jensvogt/awsmock/commit/57c9b7a78d704419a18424ab946f00acb50a672a))
-
-## [1.9.88](https://github.com/jensvogt/awsmock/compare/v1.9.87...v1.9.88) (2025-12-07)
-
-
-### Bug Fixes
-
-* link statically ([7a3c9c6](https://github.com/jensvogt/awsmock/commit/7a3c9c6a4deb137749336296f31e9f63a2d311cb))
-
-## [1.9.87](https://github.com/jensvogt/awsmock/compare/v1.9.86...v1.9.87) (2025-12-07)
-
-
-### Bug Fixes
-
-* link statically ([9813f90](https://github.com/jensvogt/awsmock/commit/9813f90eac28c9b0aa74c8582afdf11ab8ba2b4d))
-
-## [1.9.86](https://github.com/jensvogt/awsmock/compare/v1.9.85...v1.9.86) (2025-12-06)
-
-
-### Bug Fixes
-
-* link statically ([5083e7c](https://github.com/jensvogt/awsmock/commit/5083e7c9ec1c56369d0ed7343ff2132fdf34769d))
-
-## [1.9.85](https://github.com/jensvogt/awsmock/compare/v1.9.84...v1.9.85) (2025-12-06)
-
-
-### Bug Fixes
-
-* link statically ([3253a98](https://github.com/jensvogt/awsmock/commit/3253a982f8a858fb4ce17c2663a14f999712104c))
-
-## [1.9.84](https://github.com/jensvogt/awsmock/compare/v1.9.83...v1.9.84) (2025-12-06)
-
-
-### Bug Fixes
-
-* link statically ([a7af5ea](https://github.com/jensvogt/awsmock/commit/a7af5ea1167517bb518949aea0ae6003346c3bfd))
-* link statically ([52c15f9](https://github.com/jensvogt/awsmock/commit/52c15f9fb8d3ed858acbe8310feaf4f0aeade706))
-
-## [1.9.83](https://github.com/jensvogt/awsmock/compare/v1.9.82...v1.9.83) (2025-12-06)
-
-
-### Bug Fixes
-
-* link statically ([a0260b0](https://github.com/jensvogt/awsmock/commit/a0260b05f96ad1803f6dba1909fce7076967d952))
-* link statically ([4164d3d](https://github.com/jensvogt/awsmock/commit/4164d3d20c2d1aee0d284535ec1d1cfe0fff1979))
-
-## [1.9.82](https://github.com/jensvogt/awsmock/compare/v1.9.81...v1.9.82) (2025-12-06)
-
-
-### Bug Fixes
-
-* link statically ([5154e8a](https://github.com/jensvogt/awsmock/commit/5154e8aea415ffcdd864afe9d98ff411a452eae3))
-* link statically ([9575aba](https://github.com/jensvogt/awsmock/commit/9575aba951354031b00e4b5cc8cce24768b714a1))
-* link statically ([da12908](https://github.com/jensvogt/awsmock/commit/da12908436a4dde611257fe2d442dee1faa8bf43))
-
-## [1.9.81](https://github.com/jensvogt/awsmock/compare/v1.9.80...v1.9.81) (2025-12-06)
-
-
-### Bug Fixes
-
-* add installer packages ([92d3ae6](https://github.com/jensvogt/awsmock/commit/92d3ae619dc23d3a70e3c4e362e4f07c89c8b8ad))
-* add installer packages ([fb4c304](https://github.com/jensvogt/awsmock/commit/fb4c30433e55167922f25b27e71f8c1a7f81bbba))
-* add installer packages ([effd0f7](https://github.com/jensvogt/awsmock/commit/effd0f72ce27e749a6c31bfd855bdefe09d28b59))
-* add installer packages ([e4f06c5](https://github.com/jensvogt/awsmock/commit/e4f06c5d1da11ac232918cb4ae98c52a46bdb7cd))
-* add installer packages ([44200fe](https://github.com/jensvogt/awsmock/commit/44200fe84202f0fcde75a6eebdea254109d8b906))
-* add installer packages ([d6d0895](https://github.com/jensvogt/awsmock/commit/d6d0895d2653fc7b003c0764da3dd1f7df3bc517))
-* add installer packages ([3a5bf1e](https://github.com/jensvogt/awsmock/commit/3a5bf1e29570681041aa7d435c633e4bf0439e84))
-* add installer packages ([0cd949f](https://github.com/jensvogt/awsmock/commit/0cd949fa35b6ac55d3d29b76ca38bc886daeb897))
-* add installer packages ([0a4a0be](https://github.com/jensvogt/awsmock/commit/0a4a0bed25432214c73ce9d54cbd0fec6dd84488))
-* add installer packages ([d880a3b](https://github.com/jensvogt/awsmock/commit/d880a3b888d47227364cc902fe2d219e5bae2d31))
-* add installer packages ([fbfd7ce](https://github.com/jensvogt/awsmock/commit/fbfd7ce7a58f889be32237911858c8821a5ca2db))
-* add installer packages ([84f6f30](https://github.com/jensvogt/awsmock/commit/84f6f30c25344e24fdaa48aeed46e0383ccaf010))
-* add installer packages ([0b21198](https://github.com/jensvogt/awsmock/commit/0b211986b0fdf0db8a2c1eef59eeec31e2d22d5d))
-* add installer packages ([774e8ac](https://github.com/jensvogt/awsmock/commit/774e8ac7b9fd17a087bb8dc5d20d178f72392927))
-* add installer packages ([496b648](https://github.com/jensvogt/awsmock/commit/496b64802581233db0709a4f5c3573670679585c))
-* add installer packages ([7a27660](https://github.com/jensvogt/awsmock/commit/7a27660fbd48c8b64ea92b159ba764f31a8d7f34))
-* add installer packages ([aee9eab](https://github.com/jensvogt/awsmock/commit/aee9eab65809ca75879512aaeb91b8612d644ce3))
-* add installer packages ([5c255d1](https://github.com/jensvogt/awsmock/commit/5c255d1c7d32de920b9d2384bd6423eb1f2fa8a3))
-* add installer packages ([4f671ff](https://github.com/jensvogt/awsmock/commit/4f671ffebe8b6e5bc765e3868998416b649578f4))
-* add installer packages ([c76603d](https://github.com/jensvogt/awsmock/commit/c76603d2b9480e0e2fe11fdc09b37975d6da16c1))
-* add installer packages ([2f9f021](https://github.com/jensvogt/awsmock/commit/2f9f02115b40154f50e29ede149045f45eaed23e))
-* add installer packages ([d2430e9](https://github.com/jensvogt/awsmock/commit/d2430e9c3c6e32338fd47ac9c3bbda54081f7636))
-* add installer packages ([2a546b7](https://github.com/jensvogt/awsmock/commit/2a546b731dfc165e8d1e1580796023d7d7a35a87))
-* add installer packages ([ab16fac](https://github.com/jensvogt/awsmock/commit/ab16fac93ec10bea2662d7817e71753243cbaf64))
-* add installer packages ([117eb2f](https://github.com/jensvogt/awsmock/commit/117eb2f6b8b326a5cb4cc74641d13560d7897f98))
-* add installer packages ([b42bda2](https://github.com/jensvogt/awsmock/commit/b42bda229832b8265041aba4b2d85573881ac2d2))
-* add installer packages ([3c4b82b](https://github.com/jensvogt/awsmock/commit/3c4b82b6e545e7ef84057f5262156e48fb2b4f5b))
-* add installer packages ([90aa4c8](https://github.com/jensvogt/awsmock/commit/90aa4c895653d9e5e911d9fe0a7ed1340ae42741))
-* add installer packages ([fd7dbe0](https://github.com/jensvogt/awsmock/commit/fd7dbe0d30ffd448dae4120617f88222a9ca8d68))
-* add installer packages ([f49be5e](https://github.com/jensvogt/awsmock/commit/f49be5e0703d873f8f222bbeabd72b262a95918b))
-* add installer packages ([71a5f48](https://github.com/jensvogt/awsmock/commit/71a5f48e4952d36c66f1247e335316495f46f6ed))
-* add installer packages ([5172161](https://github.com/jensvogt/awsmock/commit/5172161ff8a4b40020032fd792d8f33879a38205))
-* add installer packages ([b5c71ae](https://github.com/jensvogt/awsmock/commit/b5c71aebe44c9177f8f517d98deb7324398b9f6d))
-* add installer packages ([40c06df](https://github.com/jensvogt/awsmock/commit/40c06df86f013c7097f465e5f8959dd88ad98daf))
-* add installer packages ([43d1846](https://github.com/jensvogt/awsmock/commit/43d184613f1145e6316614de9b945a83f3e28823))
-* add installer packages ([42afe45](https://github.com/jensvogt/awsmock/commit/42afe459130973f186a2aa39ebf7b99d56873718))
-* add installer packages ([2b9924c](https://github.com/jensvogt/awsmock/commit/2b9924ca48ab3961e31901823ff44a5bf380db59))
-* add installer packages ([7307641](https://github.com/jensvogt/awsmock/commit/7307641f70e11a5e7db3e5965178339d4f10cf0b))
-* add installer packages ([0ee1443](https://github.com/jensvogt/awsmock/commit/0ee1443e546f417e24e72e429bdcf99ff3309a29))
-* add installer packages ([8f871ae](https://github.com/jensvogt/awsmock/commit/8f871aeb4a41b8d696a6a81e90c46390b9b09761))
-* add installer packages ([2d0bf45](https://github.com/jensvogt/awsmock/commit/2d0bf45ee06f1fe16f21a1e72cc90655e1e48d90))
-* add installer packages ([353916e](https://github.com/jensvogt/awsmock/commit/353916e383cf962138266b936c90daf531174bd0))
-* add installer packages ([046b07f](https://github.com/jensvogt/awsmock/commit/046b07f39b198aaac24b9c150a277186cadd17c8))
-* add installer packages ([9730e61](https://github.com/jensvogt/awsmock/commit/9730e61eb0d1e586c88e123fd3f7165b07c341c7))
-* add installer packages ([baabfee](https://github.com/jensvogt/awsmock/commit/baabfee40389c123c421da9a1a3e3c3e0e132e92))
-* add installer packages ([7dfafc2](https://github.com/jensvogt/awsmock/commit/7dfafc274dcc0b52de28c9b0750b8f680fd11379))
-* add installer packages ([43a903e](https://github.com/jensvogt/awsmock/commit/43a903e8ba8ee6596154ad7a9bd1c7f3c60c3932))
-* add installer packages ([7761a08](https://github.com/jensvogt/awsmock/commit/7761a0846143b5752508b2f58a1842608937f765))
-* add installer packages ([19e4290](https://github.com/jensvogt/awsmock/commit/19e429052c9381914e96e4c60d73f3a43417e761))
-* add installer packages ([dd5d134](https://github.com/jensvogt/awsmock/commit/dd5d134e79446b2a9f4f1738618ceee2ec331ac8))
-* add windows binaries ([a959776](https://github.com/jensvogt/awsmock/commit/a959776bc04430b86ce2079f2630b9421fc46912))
-* add windows binaries ([48c3a81](https://github.com/jensvogt/awsmock/commit/48c3a81bc578d87a0922c5ce5c3d45dce5e131fa))
-* add windows binaries ([d246245](https://github.com/jensvogt/awsmock/commit/d24624580816be3954c25c73dc8e2dfe3f57c679))
-* add windows binaries ([fad53c3](https://github.com/jensvogt/awsmock/commit/fad53c30a3fe9d06557b17bd1fd536a6bdec862d))
-
-## [1.9.80](https://github.com/jensvogt/awsmock/compare/v1.9.79...v1.9.80) (2025-12-04)
-
-
-### Bug Fixes
-
-* add installer packages ([ea8526b](https://github.com/jensvogt/awsmock/commit/ea8526b4953eafcc4771492e34f6a664a53ab68b))
-
-## [1.9.79](https://github.com/jensvogt/awsmock/compare/v1.9.78...v1.9.79) (2025-12-04)
-
-
-### Bug Fixes
-
-* add installer packages ([78fa045](https://github.com/jensvogt/awsmock/commit/78fa045c66f92fe19ee869f651596c56a8973443))
-
-## [1.9.78](https://github.com/jensvogt/awsmock/compare/v1.9.77...v1.9.78) (2025-12-04)
-
-
-### Bug Fixes
-
-* add installer packages ([1c96ae2](https://github.com/jensvogt/awsmock/commit/1c96ae2d26882a75454125fef705276f041aba05))
-* add installer packages ([55480ad](https://github.com/jensvogt/awsmock/commit/55480adef89c37eec05b269a7a64518c27bda533))
-
-## [1.9.77](https://github.com/jensvogt/awsmock/compare/v1.9.76...v1.9.77) (2025-12-03)
-
-
-### Bug Fixes
-
-* add installer packages ([55b9570](https://github.com/jensvogt/awsmock/commit/55b957017a7e4830b81097ae9619b97efdce88e8))
-
-## [1.9.76](https://github.com/jensvogt/awsmock/compare/v1.9.75...v1.9.76) (2025-12-03)
-
-
-### Bug Fixes
-
-* add installer packages ([b165e78](https://github.com/jensvogt/awsmock/commit/b165e78bb7dca4ee8d4da1754195d5c1f516dbfc))
-
-## [1.9.75](https://github.com/jensvogt/awsmock/compare/v1.9.74...v1.9.75) (2025-12-03)
-
-
-### Bug Fixes
-
-* add installer packages ([fa282e3](https://github.com/jensvogt/awsmock/commit/fa282e3d7b516485e0a1f0ab028f9e27347331c9))
-
-## [1.9.74](https://github.com/jensvogt/awsmock/compare/v1.9.73...v1.9.74) (2025-12-03)
-
-
-### Bug Fixes
-
-* add installer packages ([05ae5b0](https://github.com/jensvogt/awsmock/commit/05ae5b0a80ab29ee1ec9361fb03ff3fc7c2163d6))
-
-## [1.9.73](https://github.com/jensvogt/awsmock/compare/v1.9.72...v1.9.73) (2025-12-03)
-
-
-### Bug Fixes
-
-* add installer packages ([5baa436](https://github.com/jensvogt/awsmock/commit/5baa436df6422dca6bca148fd69a8d3fadd88fc6))
-
-## [1.9.72](https://github.com/jensvogt/awsmock/compare/v1.9.71...v1.9.72) (2025-12-03)
-
-
-### Bug Fixes
-
-* add installer packages ([46a86e8](https://github.com/jensvogt/awsmock/commit/46a86e8d1475810b29faad551667c0c90c6497f2))
-
-## [1.9.71](https://github.com/jensvogt/awsmock/compare/v1.9.70...v1.9.71) (2025-12-03)
-
-
-### Bug Fixes
-
-* add installer packages ([a7c2fc8](https://github.com/jensvogt/awsmock/commit/a7c2fc8b9c17c25b8a6a83c87576b6dfc7afd4aa))
-* add installer packages ([231c187](https://github.com/jensvogt/awsmock/commit/231c187b976978adf25bbce774e6b7b052cbc5bd))
-* link statically ([62759e4](https://github.com/jensvogt/awsmock/commit/62759e418abda0bb52c08b15cdd5dc820e8eab33))
-* link statically ([0222d94](https://github.com/jensvogt/awsmock/commit/0222d948e2f3f2234c6d1f0082f823ede5797469))
-* link statically ([61a37fa](https://github.com/jensvogt/awsmock/commit/61a37fa46b819dbd7fcf4dbd14081217dc9052eb))
-
-## [1.9.70](https://github.com/jensvogt/awsmock/compare/v1.9.69...v1.9.70) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([89cd54b](https://github.com/jensvogt/awsmock/commit/89cd54be15e1f6a42fdad9f16f35fd68ae02e179))
-
-## [1.9.69](https://github.com/jensvogt/awsmock/compare/v1.9.68...v1.9.69) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([4cd169a](https://github.com/jensvogt/awsmock/commit/4cd169aeb5544615de75a1b723c255f13cc89944))
-
-## [1.9.68](https://github.com/jensvogt/awsmock/compare/v1.9.67...v1.9.68) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([f48d531](https://github.com/jensvogt/awsmock/commit/f48d531d0df0b3399bcf7bd9750b753951216a14))
-
-## [1.9.67](https://github.com/jensvogt/awsmock/compare/v1.9.66...v1.9.67) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([d07da6e](https://github.com/jensvogt/awsmock/commit/d07da6e324ce15157803375d8e83f190177b497a))
-
-## [1.9.66](https://github.com/jensvogt/awsmock/compare/v1.9.65...v1.9.66) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([1c34030](https://github.com/jensvogt/awsmock/commit/1c340305d4cf7ef02bb1db753f3e75ddf714cd29))
-
-## [1.9.65](https://github.com/jensvogt/awsmock/compare/v1.9.64...v1.9.65) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([b3189d7](https://github.com/jensvogt/awsmock/commit/b3189d7d3df9c5917cecbdd0f2cc0f2b0db77faa))
-
-## [1.9.64](https://github.com/jensvogt/awsmock/compare/v1.9.63...v1.9.64) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([f13634a](https://github.com/jensvogt/awsmock/commit/f13634a2d53de98ec6e52fb28755d7b7d6fd5898))
-
-## [1.9.63](https://github.com/jensvogt/awsmock/compare/v1.9.62...v1.9.63) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([9d101bc](https://github.com/jensvogt/awsmock/commit/9d101bc38ded3b1011b4ad730dd5685492e6aa7d))
-
-## [1.9.62](https://github.com/jensvogt/awsmock/compare/v1.9.61...v1.9.62) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([83695c1](https://github.com/jensvogt/awsmock/commit/83695c136984a97a5a955e723dc79ed9ae3d8be4))
-
-## [1.9.61](https://github.com/jensvogt/awsmock/compare/v1.9.60...v1.9.61) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([c7df5d3](https://github.com/jensvogt/awsmock/commit/c7df5d3856d9d28450bf909906da17a012245d67))
-
-## [1.9.60](https://github.com/jensvogt/awsmock/compare/v1.9.59...v1.9.60) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([316cfa8](https://github.com/jensvogt/awsmock/commit/316cfa8886f52cbafeef908c3be1d69da70238f3))
-
-## [1.9.59](https://github.com/jensvogt/awsmock/compare/v1.9.58...v1.9.59) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([d403c62](https://github.com/jensvogt/awsmock/commit/d403c62b454d60d731575f570a5438319e75cd7a))
-* link statically ([ee3f08b](https://github.com/jensvogt/awsmock/commit/ee3f08b473c2a709dec255be75ca429bbe9b3fc0))
-
-## [1.9.58](https://github.com/jensvogt/awsmock/compare/v1.9.57...v1.9.58) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([dbd0b6e](https://github.com/jensvogt/awsmock/commit/dbd0b6ec11a9762aa20e50c58af650cb2c050087))
-
-## [1.9.57](https://github.com/jensvogt/awsmock/compare/v1.9.56...v1.9.57) (2025-12-03)
-
-
-### Bug Fixes
-
-* link statically ([f1941bf](https://github.com/jensvogt/awsmock/commit/f1941bf91ada87c511da54a18bb6ec0ce5652987))
-* link statically ([0abf4cf](https://github.com/jensvogt/awsmock/commit/0abf4cf9bec5946089432f18711d654655b8edb4))
-* link statically ([40e82aa](https://github.com/jensvogt/awsmock/commit/40e82aaf5d07c0f57d07fa0d0ac6914cf431b990))
-* link statically ([b4505d5](https://github.com/jensvogt/awsmock/commit/b4505d5a10da3ec67ba4ff3d979a19b9f9d41a4c))
-* link statically ([7550310](https://github.com/jensvogt/awsmock/commit/7550310b1618b14e40156e4e7ef07abe49a095e3))
-* link statically ([e0d3652](https://github.com/jensvogt/awsmock/commit/e0d3652c78b69e68ee5ccf2e6ee321161a49624b))
-* link statically ([c53df93](https://github.com/jensvogt/awsmock/commit/c53df93bae1a99381f608f4f29b2e2088e9c289d))
-* link statically ([6d7057f](https://github.com/jensvogt/awsmock/commit/6d7057f43dae44b440c9a6f9324c78f052a44cdb))
-* link statically ([154d729](https://github.com/jensvogt/awsmock/commit/154d7294543e8d9eece020ad9541a211d6e1d614))
-
-## [1.9.56](https://github.com/jensvogt/awsmock/compare/v1.9.55...v1.9.56) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([698feba](https://github.com/jensvogt/awsmock/commit/698feba6686de512c00889bac7a09c1a988a1bfe))
-
-## [1.9.55](https://github.com/jensvogt/awsmock/compare/v1.9.54...v1.9.55) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([e6567cf](https://github.com/jensvogt/awsmock/commit/e6567cfe466a6f0d364cf83d38c557c424ee9f37))
-
-## [1.9.54](https://github.com/jensvogt/awsmock/compare/v1.9.53...v1.9.54) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([c874c8b](https://github.com/jensvogt/awsmock/commit/c874c8b9534cb50549d6773a8a7265b786ca83fc))
-
-## [1.9.53](https://github.com/jensvogt/awsmock/compare/1.9.52...v1.9.53) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([da9612b](https://github.com/jensvogt/awsmock/commit/da9612bf77b902916b342574b82971ad58afe9ba))
-* link statically ([e6e7d96](https://github.com/jensvogt/awsmock/commit/e6e7d96eda44cc1b7af73def31eadddf753ae167))
-* link statically ([2bb239c](https://github.com/jensvogt/awsmock/commit/2bb239c391bf76e5d0dd3c5a30a879906430ff6d))
-
-## [1.9.52](https://github.com/jensvogt/awsmock/compare/1.9.51...v1.9.52) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([267eb10](https://github.com/jensvogt/awsmock/commit/267eb1001c9cddf99d65e3810b8c9c7410ce5e25))
-
-## [1.9.51](https://github.com/jensvogt/awsmock/compare/1.9.50...v1.9.51) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([f30fb1c](https://github.com/jensvogt/awsmock/commit/f30fb1c786ba3954d35111b66e843c3e0da22d72))
-* link statically ([11bd210](https://github.com/jensvogt/awsmock/commit/11bd210ae60250f2fc8a50ab1ca7ca62c5d09023))
-
-## [1.9.50](https://github.com/jensvogt/awsmock/compare/v1.9.49...v1.9.50) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([6aef56e](https://github.com/jensvogt/awsmock/commit/6aef56eee22d8b64f07aae8fb5e588e8ceafc360))
-
-## [1.9.49](https://github.com/jensvogt/awsmock/compare/v1.9.48...v1.9.49) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([2a6a91e](https://github.com/jensvogt/awsmock/commit/2a6a91e38093ae5813794391cd53c070d3a3d04e))
-* link statically ([387c8d2](https://github.com/jensvogt/awsmock/commit/387c8d260bae85c8368ca4b66c606dcab531bea0))
-
-## [1.9.48](https://github.com/jensvogt/awsmock/compare/v1.9.47...v1.9.48) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([81dda33](https://github.com/jensvogt/awsmock/commit/81dda335e0392c6da363c67e5d457e9eff386413))
-* link statically ([18746b7](https://github.com/jensvogt/awsmock/commit/18746b719c6182e6af53c1855f50a6f76cc31994))
-* link statically ([a64f9b7](https://github.com/jensvogt/awsmock/commit/a64f9b78dd167a62efd34211b692ff082c8e56c7))
-
-## [1.9.47](https://github.com/jensvogt/awsmock/compare/v1.9.46...v1.9.47) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([594e515](https://github.com/jensvogt/awsmock/commit/594e515d71d2dc9f504e097e2f214de2a5aba7e5))
-
-## [1.9.46](https://github.com/jensvogt/awsmock/compare/v1.9.45...v1.9.46) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([6f059cf](https://github.com/jensvogt/awsmock/commit/6f059cf150abfde67b2ac0b4a1b369aa82560ad4))
-* link statically ([6deadbe](https://github.com/jensvogt/awsmock/commit/6deadbea5d6a2b9b5722c255000dd284bafff260))
-* link statically ([d023171](https://github.com/jensvogt/awsmock/commit/d0231718cb9c00fedb251c5b8d14f5110da54727))
-
-## [1.9.45](https://github.com/jensvogt/awsmock/compare/v1.9.44...v1.9.45) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([af6e007](https://github.com/jensvogt/awsmock/commit/af6e0078ccc778c89f2f8756781cba32df24c618))
-
-## [1.9.44](https://github.com/jensvogt/awsmock/compare/v1.9.43...v1.9.44) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([a37e90a](https://github.com/jensvogt/awsmock/commit/a37e90a3cfb71a110ea442b08d6c3f0cb5e1ca48))
-* link statically ([ea40fc4](https://github.com/jensvogt/awsmock/commit/ea40fc49d84bfd7b586820ab72cf39c1b752b0e4))
-
-## [1.9.43](https://github.com/jensvogt/awsmock/compare/v1.9.42...v1.9.43) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([a1551ad](https://github.com/jensvogt/awsmock/commit/a1551ad5907601c2bdcc3b1e3e19f666850133a2))
-
-## [1.9.42](https://github.com/jensvogt/awsmock/compare/v1.9.41...v1.9.42) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([fa773cc](https://github.com/jensvogt/awsmock/commit/fa773cc9194690170e1c0b5bfdd1500def256fe7))
-
-## [1.9.41](https://github.com/jensvogt/awsmock/compare/v1.9.40...v1.9.41) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([c897f2a](https://github.com/jensvogt/awsmock/commit/c897f2ac09ea3c989135c3d593d21005e708f8e9))
-
-## [1.9.40](https://github.com/jensvogt/awsmock/compare/v1.9.39...v1.9.40) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([f315d55](https://github.com/jensvogt/awsmock/commit/f315d55efbf3ffab795e058c9155d88e6833cba8))
-* link statically ([d685f35](https://github.com/jensvogt/awsmock/commit/d685f35969144dd2f6dbb66bceb1800c34c9812e))
-
-## [1.9.39](https://github.com/jensvogt/awsmock/compare/v1.9.38...v1.9.39) (2025-12-02)
-
-
-### Bug Fixes
-
-* link statically ([e53fbff](https://github.com/jensvogt/awsmock/commit/e53fbffb7d6244f0960ac690a6580cc3e32f8b6b))
-
-## [1.9.38](https://github.com/jensvogt/awsmock/compare/1.9.37...v1.9.38) (2025-12-02)
-
-
-### Bug Fixes
-
-* add docker container stats ([3d0a71b](https://github.com/jensvogt/awsmock/commit/3d0a71b34ffc739e14edc20097f9b11019ce85f5))
-* build static manager ([ce92bc2](https://github.com/jensvogt/awsmock/commit/ce92bc24ba44987f933650dae4d7499b8eb9ccec))
-* build static manager ([86bc80d](https://github.com/jensvogt/awsmock/commit/86bc80d48a91e46561de66be3e31d0f00df327e6))
-
-## [1.9.37](https://github.com/jensvogt/awsmock/compare/1.9.36...v1.9.37) (2025-12-01)
-
-
-### Bug Fixes
-
-* add docker container stats ([d49df25](https://github.com/jensvogt/awsmock/commit/d49df2541fa1c4bdc907f38b28da27081172f382))
-* add docker container stats ([ea767cf](https://github.com/jensvogt/awsmock/commit/ea767cf6f03180065d08ad671b80dd48e603dc6a))
-
-## [1.9.36](https://github.com/jensvogt/awsmock/compare/v1.9.35...v1.9.36) (2025-12-01)
-
-
-### Bug Fixes
-
-* add installer packages ([5f171c4](https://github.com/jensvogt/awsmock/commit/5f171c4723caeaf5d518b12637a7bd562da49d8a))
-* add installer packages ([30b846f](https://github.com/jensvogt/awsmock/commit/30b846f95cd5a0c6ae214d5a4b857742be17a03b))
-
-## [1.9.35](https://github.com/jensvogt/awsmock/compare/v1.9.34...v1.9.35) (2025-12-01)
-
-
-### Bug Fixes
-
-* add docker container stats ([f8200a4](https://github.com/jensvogt/awsmock/commit/f8200a4847490833591243453d3cb723283f7d4b))
-
-## [1.9.34](https://github.com/jensvogt/awsmock/compare/v1.9.33...v1.9.34) (2025-12-01)
-
-
-### Bug Fixes
-
-* add docker container stats ([97e09b3](https://github.com/jensvogt/awsmock/commit/97e09b37968b7fcbc7f122a119f18a407f3ffddf))
-* add docker container stats ([1ed50ca](https://github.com/jensvogt/awsmock/commit/1ed50cad2494c12d59a0dcfa1d72fa315080d14b))
-
-## [1.9.33](https://github.com/jensvogt/awsmock/compare/v1.9.32...v1.9.33) (2025-12-01)
-
-
-### Bug Fixes
-
-* add docker container stats ([b72ee36](https://github.com/jensvogt/awsmock/commit/b72ee3699f283a18d95e4bba6e3a5267396767ea))
-
-## [1.9.32](https://github.com/jensvogt/awsmock/compare/v1.9.31...v1.9.32) (2025-11-30)
-
-
-### Bug Fixes
-
-* add docker container stats ([a5dda8a](https://github.com/jensvogt/awsmock/commit/a5dda8a44838a4721509aa8d09d9543f56ec1682))
-* add docker container stats ([6b6bdd2](https://github.com/jensvogt/awsmock/commit/6b6bdd285b1e9295220ad3ac265ffab1c0cb8379))
-
-## [1.9.31](https://github.com/jensvogt/awsmock/compare/v1.9.30...v1.9.31) (2025-11-30)
-
-
-### Bug Fixes
-
-* add docker container stats ([4539c4f](https://github.com/jensvogt/awsmock/commit/4539c4f0367edf7e4c700dca957548f54c121d68))
-
-## [1.9.30](https://github.com/jensvogt/awsmock/compare/v1.9.29...v1.9.30) (2025-11-30)
-
-
-### Bug Fixes
-
-* add docker container stats ([655caa1](https://github.com/jensvogt/awsmock/commit/655caa1aa1522f2101875d3338e34f17ddcd1f08))
-
-## [1.9.29](https://github.com/jensvogt/awsmock/compare/v1.9.28...v1.9.29) (2025-11-30)
-
-
-### Bug Fixes
-
-* add docker container stats ([895ce13](https://github.com/jensvogt/awsmock/commit/895ce13c28d3787a7d3f9d543d53f839169caa68))
-
-## [1.9.28](https://github.com/jensvogt/awsmock/compare/v1.9.27...v1.9.28) (2025-11-30)
-
-
-### Bug Fixes
-
-* add docker container stats ([fde104c](https://github.com/jensvogt/awsmock/commit/fde104c9cdc35d54a609d57c29ae9953c4d3e7eb))
-* add docker container stats ([4feada4](https://github.com/jensvogt/awsmock/commit/4feada4ee211e5025d6bb5f51c19fd7206112272))
-* add docker container stats ([14e2b8d](https://github.com/jensvogt/awsmock/commit/14e2b8d6f724c0d2a881e51d52ecb620504c21de))
-* add docker container stats ([cf51f72](https://github.com/jensvogt/awsmock/commit/cf51f7246bf665e540d45c7f96723e393de7571f))
-
-## [1.9.27](https://github.com/jensvogt/awsmock/compare/v1.9.26...v1.9.27) (2025-11-30)
-
-
-### Bug Fixes
-
-* add docker container stats ([e6384e6](https://github.com/jensvogt/awsmock/commit/e6384e60462bdf8561755b84f47d65b7c4f3becd))
-
-## [1.9.26](https://github.com/jensvogt/awsmock/compare/v1.9.25...v1.9.26) (2025-11-30)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([ee5be8c](https://github.com/jensvogt/awsmock/commit/ee5be8cc51f1a7deab2b3d28ed21a716c345256e))
-
-## [1.9.25](https://github.com/jensvogt/awsmock/compare/v1.9.24...v1.9.25) (2025-11-30)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([6117882](https://github.com/jensvogt/awsmock/commit/6117882ecb52440ed3a611d1eb05ed3b2f123994))
-
-## [1.9.24](https://github.com/jensvogt/awsmock/compare/v1.9.23...v1.9.24) (2025-11-30)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([a82404e](https://github.com/jensvogt/awsmock/commit/a82404e430c03341dd887f53ae319fc8e01908dd))
-
-## [1.9.23](https://github.com/jensvogt/awsmock/compare/v1.9.22...v1.9.23) (2025-11-30)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([79e9e9a](https://github.com/jensvogt/awsmock/commit/79e9e9a1197f20557c5a235975f5a91367caa4e8))
-
-## [1.9.22](https://github.com/jensvogt/awsmock/compare/v1.9.21...v1.9.22) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([6e6e342](https://github.com/jensvogt/awsmock/commit/6e6e342d0c8a399d0addc49bdc76be5f56371175))
-
-## [1.9.21](https://github.com/jensvogt/awsmock/compare/v1.9.20...v1.9.21) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([223a19b](https://github.com/jensvogt/awsmock/commit/223a19b1ab9e3c0141b25e9b391ebc06602c31a2))
-
-## [1.9.20](https://github.com/jensvogt/awsmock/compare/v1.9.19...v1.9.20) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([9bb1040](https://github.com/jensvogt/awsmock/commit/9bb1040f176e8ddc541dbd91b4ada1ad9e4e84f5))
-* add linux installation scripts ([680517f](https://github.com/jensvogt/awsmock/commit/680517f1f7687677f1fa119fd6af7300de55e307))
-
-## [1.9.19](https://github.com/jensvogt/awsmock/compare/v1.9.18...v1.9.19) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([c12cbe1](https://github.com/jensvogt/awsmock/commit/c12cbe117f68289a9de1eb5090a763371cb9bbea))
-
-## [1.9.18](https://github.com/jensvogt/awsmock/compare/v1.9.17...v1.9.18) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([b34e785](https://github.com/jensvogt/awsmock/commit/b34e7859139f638b4321b065c6ba24fd569a1d64))
-
-## [1.9.17](https://github.com/jensvogt/awsmock/compare/v1.9.16...v1.9.17) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([0781728](https://github.com/jensvogt/awsmock/commit/07817288af40349fdaa8d02d970460af193937b9))
-
-## [1.9.16](https://github.com/jensvogt/awsmock/compare/v1.9.15...v1.9.16) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([edc95de](https://github.com/jensvogt/awsmock/commit/edc95de53e340692e01db4ae95cd4e568b4fafc0))
-
-## [1.9.15](https://github.com/jensvogt/awsmock/compare/v1.9.14...v1.9.15) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([2275f3f](https://github.com/jensvogt/awsmock/commit/2275f3fd81216ea4c9afab65b5e7496e5a146bb0))
-
-## [1.9.14](https://github.com/jensvogt/awsmock/compare/v1.9.13...v1.9.14) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([4169b76](https://github.com/jensvogt/awsmock/commit/4169b76ce0057b81cb3153be8c8eeed6129a3a8c))
-
-## [1.9.13](https://github.com/jensvogt/awsmock/compare/v1.9.12...v1.9.13) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([3e65d91](https://github.com/jensvogt/awsmock/commit/3e65d913e41382b3dc94f86bbb1f2645e084e066))
-* add linux installation scripts ([3d0f8d8](https://github.com/jensvogt/awsmock/commit/3d0f8d8519531ff89af51d12f9e36b01536257d8))
-
-## [1.9.12](https://github.com/jensvogt/awsmock/compare/v1.9.11...v1.9.12) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([49ddea7](https://github.com/jensvogt/awsmock/commit/49ddea7d36b86cdaddc4622cabb386449ae820c2))
-
-## [1.9.11](https://github.com/jensvogt/awsmock/compare/v1.9.10...v1.9.11) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([9694fd4](https://github.com/jensvogt/awsmock/commit/9694fd46064e27889fab79d575a4c85f9f38f279))
-
-## [1.9.10](https://github.com/jensvogt/awsmock/compare/v1.9.9...v1.9.10) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([afa2b49](https://github.com/jensvogt/awsmock/commit/afa2b498ed33b590cec79b34dcb6426294d0425b))
-
-## [1.9.9](https://github.com/jensvogt/awsmock/compare/v1.9.8...v1.9.9) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([4668709](https://github.com/jensvogt/awsmock/commit/46687094019e484bb6385e40f00c8453dfea8a9b))
-
-## [1.9.8](https://github.com/jensvogt/awsmock/compare/v1.9.7...v1.9.8) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([77fd4f9](https://github.com/jensvogt/awsmock/commit/77fd4f9103e1b78387906aa347ebf18cca15b3cd))
-
-## [1.9.7](https://github.com/jensvogt/awsmock/compare/v1.9.6...v1.9.7) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([fe25cef](https://github.com/jensvogt/awsmock/commit/fe25cef13a59d8eca2e7f0f479daa7bb96d95e35))
-
-## [1.9.6](https://github.com/jensvogt/awsmock/compare/v1.9.5...v1.9.6) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([4af13f2](https://github.com/jensvogt/awsmock/commit/4af13f2eaf34033c0808275b7819983bd336c98b))
-
-## [1.9.5](https://github.com/jensvogt/awsmock/compare/v1.9.4...v1.9.5) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([44053ce](https://github.com/jensvogt/awsmock/commit/44053ce8a912b27f4f1841faf3e4457fe122ce7a))
-
-## [1.9.4](https://github.com/jensvogt/awsmock/compare/v1.9.3...v1.9.4) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([0c8043b](https://github.com/jensvogt/awsmock/commit/0c8043bd65a9f4c47f1ff368b085ac924c1fc622))
-
-## [1.9.3](https://github.com/jensvogt/awsmock/compare/v1.9.2...v1.9.3) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([c9bc342](https://github.com/jensvogt/awsmock/commit/c9bc3427b7145da897ed3331fe65bc612ba60e75))
-* add linux installation scripts ([6f0e6df](https://github.com/jensvogt/awsmock/commit/6f0e6df0b1bb21a2527ae63df5d3a90f16c261d1))
-* add linux installation scripts ([3b4549f](https://github.com/jensvogt/awsmock/commit/3b4549fbdb9ab88be7819026e479cb438de3a5c1))
-* add linux installation scripts ([dee52b2](https://github.com/jensvogt/awsmock/commit/dee52b26557dda68f413dc0054d4cdcb5fc696e2))
-* remove some install steps. ([3c9dba9](https://github.com/jensvogt/awsmock/commit/3c9dba952cd7518798d4e52c7ca80d881f8f18aa))
-
-## [1.9.2](https://github.com/jensvogt/awsmock/compare/v1.9.1...v1.9.2) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([99e55ac](https://github.com/jensvogt/awsmock/commit/99e55acf20e3cce2aff3c4cf2f8412fc84381fcc))
-
-## [1.9.1](https://github.com/jensvogt/awsmock/compare/v1.9.0...v1.9.1) (2025-11-29)
-
-
-### Bug Fixes
-
-* add linux installation scripts ([79c491c](https://github.com/jensvogt/awsmock/commit/79c491c79bfd6f279c53adaf3d1be2dbc42a73d0))
-
-## [1.9.0](https://github.com/jensvogt/awsmock/compare/v1.8.10...v1.9.0) (2025-11-29)
-
-
-### Features
-
-* **1234-new-ui:** use the new UIDs ([fb52673](https://github.com/jensvogt/awsmock/commit/fb526732a9821626b128083307e714127290da07))
-* **1234-new-ui:** use the new UIDs ([f805de9](https://github.com/jensvogt/awsmock/commit/f805de9e217406ed388093bbff71abb0da108d6a))
-
-## [1.8.10](https://github.com/jensvogt/awsmock/compare/v1.8.9...v1.8.10) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([a510ad8](https://github.com/jensvogt/awsmock/commit/a510ad861d3936ec393d0caabc89495aa6459d47))
-
-## [1.8.9](https://github.com/jensvogt/awsmock/compare/v1.8.8...v1.8.9) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([b9a1726](https://github.com/jensvogt/awsmock/commit/b9a1726a7db1ad5e89a2feaac5e7e70f9e003d3b))
-* add installer packages ([eb63201](https://github.com/jensvogt/awsmock/commit/eb63201884b863760a5d93d8b98df3cc7621388d))
-
-## [1.8.8](https://github.com/jensvogt/awsmock/compare/v1.8.7...v1.8.8) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([6959ffd](https://github.com/jensvogt/awsmock/commit/6959ffda31de87270f779a6e6602b6afdd9cb70e))
-* use older boost version ([5bfc3d5](https://github.com/jensvogt/awsmock/commit/5bfc3d5a8e22436d8a4a4eea7b43a25b6d911fd4))
-
-## [1.8.7](https://github.com/jensvogt/awsmock/compare/v1.8.6...v1.8.7) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([ae63dee](https://github.com/jensvogt/awsmock/commit/ae63deea50907170b91a96660be4be661d68d95a))
-
-## [1.8.6](https://github.com/jensvogt/awsmock/compare/v1.8.5...v1.8.6) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([5e08383](https://github.com/jensvogt/awsmock/commit/5e08383a3e5a7dfd38fa873ea63e20546652565c))
-
-## [1.8.5](https://github.com/jensvogt/awsmock/compare/v1.8.4...v1.8.5) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([d68f3ae](https://github.com/jensvogt/awsmock/commit/d68f3aed04eb5aaa938a856791702c3784e721f4))
-
-## [1.8.4](https://github.com/jensvogt/awsmock/compare/v1.8.3...v1.8.4) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([9aa3229](https://github.com/jensvogt/awsmock/commit/9aa32298fc926a1fb71c030a126dbca34ca6a88b))
-
-## [1.8.3](https://github.com/jensvogt/awsmock/compare/v1.8.2...v1.8.3) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([2685ce3](https://github.com/jensvogt/awsmock/commit/2685ce360bcf7bd562871afd1b612aaab2d93ab6))
-
-## [1.8.2](https://github.com/jensvogt/awsmock/compare/v1.8.1...v1.8.2) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([8a08bcf](https://github.com/jensvogt/awsmock/commit/8a08bcf42bafeec0ee41f115dc811c09bf52e68c))
-* add installer packages ([b5e7963](https://github.com/jensvogt/awsmock/commit/b5e79633153d774df1853c35e9660487fbbf4eb3))
-
-## [1.8.1](https://github.com/jensvogt/awsmock/compare/v1.8.0...v1.8.1) (2025-11-29)
-
-
-### Bug Fixes
-
-* add installer packages ([e8ae2e5](https://github.com/jensvogt/awsmock/commit/e8ae2e5adfeaa56324981e252baa69b06e9ab7ca))
-* add installer packages ([43e5430](https://github.com/jensvogt/awsmock/commit/43e5430f2aeb38284829e27f57369850d7596d33))
-
-## [1.8.0](https://github.com/jensvogt/awsmock/compare/v1.7.0...v1.8.0) (2025-11-29)
-
-
-### Features
-
-* **1234-new-ui:** use the new UIDs ([dd9d2f1](https://github.com/jensvogt/awsmock/commit/dd9d2f11822628e38e52b805ae00a836cdb178e6))
-* **1234-new-ui:** use the new UIDs ([8d0ca71](https://github.com/jensvogt/awsmock/commit/8d0ca715a5d9a2c6f0004ceac2f279d2862f67af))
-* **1234-new-ui:** use the new UIDs ([a02c0c1](https://github.com/jensvogt/awsmock/commit/a02c0c1269e949b2681950ffa17b6f232d3781f5))
-* **1234-new-ui:** use the new UIDs ([73edf2d](https://github.com/jensvogt/awsmock/commit/73edf2df6ddcf2929209fcbe3e38efa113385083))
-* **1234-new-ui:** use the new UIDs ([9c26d37](https://github.com/jensvogt/awsmock/commit/9c26d37123ea0c876ae6f2e587354c3dd2185c75))
-
-
-### Bug Fixes
-
-* **1234-windows-11-port:** add new ftp client ([3b87628](https://github.com/jensvogt/awsmock/commit/3b87628baf6ee0461a581c8bce43b9f51b5d10f4))
-* **1234-Windows-port-new:** fix cognito FE pages ([c492eb1](https://github.com/jensvogt/awsmock/commit/c492eb1126dbc6fcf181d86e8442f3568ee1df84))
-* add installer packages ([9dd1076](https://github.com/jensvogt/awsmock/commit/9dd10769071f2c9489b2d485fa46cabdf70839d0))
-* add installer packages ([0d5e6cc](https://github.com/jensvogt/awsmock/commit/0d5e6cc907a2bad3c21cc01f609c74d0e4e6054f))
-* add installer packages ([16dfff6](https://github.com/jensvogt/awsmock/commit/16dfff6b041eb1aa4ad5f67ff4a6e596b5f483f0))
-* add installer packages ([aaeccf1](https://github.com/jensvogt/awsmock/commit/aaeccf16b72937dd2ff3f675313b19c644b53e61))
-* **installer packages:** add new ftp client ([57c566e](https://github.com/jensvogt/awsmock/commit/57c566e45341130a99727bb672176e922440678d))
-
-## [1.7.0](https://github.com/jensvogt/awsmock/compare/v1.6.4...v1.7.0) (2025-10-28)
-
-
-### Features
-
-* **123-windows-port:** windows port ([a48d876](https://github.com/jensvogt/awsmock/commit/a48d87647b3928def7a356c2027a7508c53b4020))
-
-
-### Bug Fixes
-
-* **1234-Windows-port-new:** add application log server port ([f94b7ed](https://github.com/jensvogt/awsmock/commit/f94b7edffce3342efcf540fd26c0b30f0853852f))
-* **1234-Windows-port-new:** add sorting to auto load files in directory ([1307916](https://github.com/jensvogt/awsmock/commit/1307916e686a8f959ba6595c51314e78ffbde6a7))
-* **1234-Windows-port-new:** add sorting to auto load files in directory ([2fdb874](https://github.com/jensvogt/awsmock/commit/2fdb8741d5b0835a7226253dbfb51659e7689a45))
-* **1234-Windows-port-new:** fix application startup ([2d7425f](https://github.com/jensvogt/awsmock/commit/2d7425f8050c91f08ae84e28a9b59a1dfdefbae7))
-* **1234-Windows-port-new:** fix FTP passive port ([f8311c2](https://github.com/jensvogt/awsmock/commit/f8311c285851fcfbd2a94434ddd72c368f356277))
-* **1234-Windows-port-new:** fix s3 handler stol issue ([0633280](https://github.com/jensvogt/awsmock/commit/0633280298b0710d5de13cbae1a12a112d334526))
-* **1375-lambda-invocation:** add enabled flag to lambdas ([25480bb](https://github.com/jensvogt/awsmock/commit/25480bb53cbee84cc7aefa038904a6a99e91372c))
-* **1375-lambda-invocation:** add start/stop/restart/enable/disable applications from awsmokctl ([f68f16f](https://github.com/jensvogt/awsmock/commit/f68f16fc4f60c2844686a748895dfaf0f64f8621))
-* **1375-lambda-invocation:** add start/stop/restart/enable/disable applications from awsmokctl ([f3f6353](https://github.com/jensvogt/awsmock/commit/f3f63536ebcb591247ad2cf6ab6dee9a204ef6e0))
-* **1375-lambda-invocation:** add start/stop/restart/enable/disable lambda to awsmockctl ([b2d09dd](https://github.com/jensvogt/awsmock/commit/b2d09ddb849d47e56db98082e1aa7d4a96bff75d))
-* **1375-lambda-invocation:** add start/stop/restart/enable/disable lambda to awsmockctl ([eb30e26](https://github.com/jensvogt/awsmock/commit/eb30e269d0c98f718429179551fbebf07d997587))
-* **1375-lambda-invocation:** cleanup code ([768faf6](https://github.com/jensvogt/awsmock/commit/768faf6f39fb2ab7a719beccab468d5c69c01b79))
-* **1375-lambda-invocation:** cleanup code ([80fe7e7](https://github.com/jensvogt/awsmock/commit/80fe7e7c698e42496af535ba5b84191a8bdaa322))
-* **1375-lambda-invocation:** cleanup code ([7a853ec](https://github.com/jensvogt/awsmock/commit/7a853ece974f6618d0ee1197c73538a19b0814c3))
-* **1375-lambda-invocation:** cleanup code ([4486f8a](https://github.com/jensvogt/awsmock/commit/4486f8a44b8cb9bdb33440f0df19191278ba1cc8))
-* **1375-lambda-invocation:** fix angular version ([8884bbd](https://github.com/jensvogt/awsmock/commit/8884bbd59a93748deefbc25df63c5ef4f3171639))
-* **1375-lambda-invocation:** fix lambda enabled setting ([d816f7d](https://github.com/jensvogt/awsmock/commit/d816f7dc37e84754d31ddc4b5ba1d96839e9ce25))
-* **1375-lambda-invocation:** fix lambda startup status ([b40aa8a](https://github.com/jensvogt/awsmock/commit/b40aa8aab515eecf583180c80e3ad392dc84bb20))
-* **1375-lambda-invocation:** fix memory leak ([072acc7](https://github.com/jensvogt/awsmock/commit/072acc720714a9928ab18252c2f084180990eb25))
-* **1375-lambda-invocation:** fix memory leak ([0f53122](https://github.com/jensvogt/awsmock/commit/0f531221a87aae1bc29341dd9bf469f9d4624e47))
-* **1375-lambda-invocation:** fix memory leak ([7172f2d](https://github.com/jensvogt/awsmock/commit/7172f2dc41d618245dfe2102ad8146d4b2904b5f))
-* **1375-lambda-invocation:** fix tests ([3d114d1](https://github.com/jensvogt/awsmock/commit/3d114d1881e22fdefff4f6216ea1e1d4b0712dd5))
-* **1375-lambda-invocation:** general cleanup ([0c36c1b](https://github.com/jensvogt/awsmock/commit/0c36c1bb90d437853c2500f6f89dc8564a27acfd))
-* **1375-lambda-invocation:** general cleanup ([b6466fb](https://github.com/jensvogt/awsmock/commit/b6466fb2abc70a11c30555bd7d34e176950ce68d))
-* **1375-lambda-invocation:** use boost ioc for detached threads ([a625f85](https://github.com/jensvogt/awsmock/commit/a625f85dba4492ad872cefcf62d3c8a8efacdba3))
-* **1375-lambda-invocation:** use boost ioc for detached threads ([084ed92](https://github.com/jensvogt/awsmock/commit/084ed92b0630d4d33078b5481bfd3279592c892b))
-* **1375-lambda-invocation:** use boost ioc for detached threads ([ab3471b](https://github.com/jensvogt/awsmock/commit/ab3471bf0ddf4bd9ce7ed5cac88836e91249529c))
-* **1375-new-stream-response:** fix duplicate lambda event sources ([10c613a](https://github.com/jensvogt/awsmock/commit/10c613a33b1177184a391c0b0a1c4468e5643ecb))
-* **1375-new-stream-response:** fix duplicate lambda event sources ([4caf485](https://github.com/jensvogt/awsmock/commit/4caf48542f9ecc81f3997233769efbab67f95a15))
-* **1392-monitoring-when-service-is-down:** add first api gateway REST APIs ([6edc225](https://github.com/jensvogt/awsmock/commit/6edc225a61e448432a6adf984bf966f894c95f45))
-* **1392-monitoring-when-service-is-down:** add first api gateway REST APIs ([04da21f](https://github.com/jensvogt/awsmock/commit/04da21fe017f6fb1f8cf3caea22e73a9cb51ad15))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([c47351d](https://github.com/jensvogt/awsmock/commit/c47351d6a980b0aca38d9950ce9046fff0bd66b5))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([ea3351d](https://github.com/jensvogt/awsmock/commit/ea3351db258cbdf4ee93d3a461618bf915d7535c))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([2ad5eec](https://github.com/jensvogt/awsmock/commit/2ad5eecc149c6c3b6418ffc207a7ccb152aae5c8))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([ce77b96](https://github.com/jensvogt/awsmock/commit/ce77b9638866788c8622acf9882a35cd92d0db22))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([a975025](https://github.com/jensvogt/awsmock/commit/a9750259d37c738c89d4e51114fb05e5a5c34940))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([4e4047d](https://github.com/jensvogt/awsmock/commit/4e4047db2d0f7f32cbbf6b9ceadd8efbafbfc838))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([6d8c2c8](https://github.com/jensvogt/awsmock/commit/6d8c2c8179526df6d0a03a65d59b3bf0760ad88f))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([4c903d4](https://github.com/jensvogt/awsmock/commit/4c903d45b955be4e8e1a650666f99ba1b66f36aa))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([2fa77ad](https://github.com/jensvogt/awsmock/commit/2fa77ad02076ef38efba8c48f57f2de32ac9149e))
-* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([b1a5c08](https://github.com/jensvogt/awsmock/commit/b1a5c08b23ce56180fe4369cb12fd0549b3dd3dd))
-* **1392-monitoring-when-service-is-down:** fix controller ([138883b](https://github.com/jensvogt/awsmock/commit/138883be4904cfe5b1254ccecb7df0ab57039062))
-* **1392-monitoring-when-service-is-down:** fix counter-adjustments for S2, SQS, SNS ([b79cf0c](https://github.com/jensvogt/awsmock/commit/b79cf0c3f39e69dced432a34f6d3026ef43beebb))
-* **1392-monitoring-when-service-is-down:** fix counter-adjustments for S2, SQS, SNS ([d98aa2f](https://github.com/jensvogt/awsmock/commit/d98aa2ff6f162a4ddb11b8dcfdab85a1e8033479))
-* **1392-monitoring-when-service-is-down:** fix counter-adjustments for S2, SQS, SNS ([3986b3f](https://github.com/jensvogt/awsmock/commit/3986b3fb67f163b2bfafc84df84ce215ac13e71f))
-* **1392-monitoring-when-service-is-down:** fix monitoring when container is not existing ([8d45bb7](https://github.com/jensvogt/awsmock/commit/8d45bb705d7c40199f9a00af9ed863ee5fdaa8fb))
-* **1448-s3-monitoring-does-not-work:** fix image size, add file upload during init ([4ab9307](https://github.com/jensvogt/awsmock/commit/4ab9307d8d9fe1c152b7cbd22c8d8afc4112525f))
-* **1448-s3-monitoring-does-not-work:** fix python application deployment ([8b8cabe](https://github.com/jensvogt/awsmock/commit/8b8cabe767c8d4f4c56385cf0d0a1c0285adba22))
-* **1448-s3-monitoring-does-not-work:** fix python application deployment ([92831b8](https://github.com/jensvogt/awsmock/commit/92831b8a4460e3efc98bb2f0748761eb0c65a070))
-* **1448-s3-monitoring-does-not-work:** fix python application deployment ([6963ee5](https://github.com/jensvogt/awsmock/commit/6963ee5de146d4a686daf635f9663bd5ee756dc0))
-* **1448-s3-monitoring-does-not-work:** fix python application deployment ([279dcb7](https://github.com/jensvogt/awsmock/commit/279dcb77bd6d3d00590c7e36b2205f23754a3b36))
-* **1448-s3-monitoring-does-not-work:** fix s3,sqs,sns monitoring counters ([1f25b71](https://github.com/jensvogt/awsmock/commit/1f25b716800c4a3f2265b2e4d4842ce7cd55df79))
-* **1448-s3-monitoring-does-not-work:** fixed public port for applications ([26af027](https://github.com/jensvogt/awsmock/commit/26af027a8acb289bfa739498e7ab1c232def9ef4))
-* **1448-s3-monitoring-does-not-work:** stream line adocker containers ([2653c75](https://github.com/jensvogt/awsmock/commit/2653c75b7956893dd9dbb15c8ba659204e5ff0f1))
-* **980-macos-port:** monitoring over shm ([355f76f](https://github.com/jensvogt/awsmock/commit/355f76f7d373fd31a586a3b7ea231f55214712a2))
-* **main:** add api gateway keys, insert/update/delete ([05c42fe](https://github.com/jensvogt/awsmock/commit/05c42febb3fcc6eb25d631863eca23f80a3e5928))
-* **main:** add api gateway keys, insert/update/delete ([45d3e99](https://github.com/jensvogt/awsmock/commit/45d3e99f3d31171cf89e5921d3cb2c70f0a8ffa5))
-* **main:** add api gateway keys, insert/update/delete ([50e2088](https://github.com/jensvogt/awsmock/commit/50e208882a5c19d8a264d4ededb5c91a6faabbe4))
-* **main:** add rest api, insert ([02e1972](https://github.com/jensvogt/awsmock/commit/02e1972753bc166a30a4818ec044407a752118f2))
-* **main:** add rest api, insert ([10762a2](https://github.com/jensvogt/awsmock/commit/10762a25d977f8cbbbee60d3a7d4ced5a40673f8))
-* **main:** add rest api, insert ([9124273](https://github.com/jensvogt/awsmock/commit/9124273440c25c4b5dbc5082f784aa2da9606ce2))
-* **main:** merge with main ([508183a](https://github.com/jensvogt/awsmock/commit/508183ac6e2d86d59ebb94c6ed2e76cd03efa851))
-* **mein:** add api gateway keys, insert/update/delete ([abaa0a2](https://github.com/jensvogt/awsmock/commit/abaa0a2c82e6883ff4035ff320681814a42a9ec8))
-
-## [1.6.4](https://github.com/jensvogt/awsmock/compare/v1.6.3...v1.6.4) (2025-08-06)
-
-
-### Bug Fixes
-
-* **1366-application-stop:** add dynamodb streams ([d662d8c](https://github.com/jensvogt/awsmock/commit/d662d8c5ee43fbaefb3c3280bf8dda0a9470bc43))
-* **1366-application-stop:** add dynamodb streams ([b6aa475](https://github.com/jensvogt/awsmock/commit/b6aa475e5b197cb44a2b5fb4cd5a4745a324df32))
-* **1375-new-stream-response:** add asynchronous lambda requests ([34babd8](https://github.com/jensvogt/awsmock/commit/34babd8c7da281e63db9a9dfaa0d42b1e1e2889b))
-
-## [1.6.3](https://github.com/jensvogt/awsmock/compare/v1.6.2...v1.6.3) (2025-08-02)
-
-
-### Bug Fixes
-
-* **1366-application-stop:** add dynamodb streams ([2358b31](https://github.com/jensvogt/awsmock/commit/2358b31c70a52a6e32f76435aca03cfc6a8ddb3a))
-* **1366-application-stop:** add dynamodb streams ([35feee5](https://github.com/jensvogt/awsmock/commit/35feee5ce2e426fd71afa12c752c5b8ab4880d5a))
-* **1366-application-stop:** add dynamodb streams ([28b8e9f](https://github.com/jensvogt/awsmock/commit/28b8e9f0fbb6d9364c9ca5fc4cc69d703ef62282))
-* **1366-application-stop:** fix lambda variables ([9d43f24](https://github.com/jensvogt/awsmock/commit/9d43f2499e90c9a637318a2d64b820c241800ea0))
-
-## [1.6.2](https://github.com/jensvogt/awsmock/compare/v1.6.1...v1.6.2) (2025-07-31)
-
-
-### Bug Fixes
-
-* **1366-application-stop:** fix lambda output ([358eb15](https://github.com/jensvogt/awsmock/commit/358eb15ead6859bf2ba7c66a32bc21a317df5dfc))
-
-## [1.6.1](https://github.com/jensvogt/awsmock/compare/v1.6.0...v1.6.1) (2025-07-30)
-
-
-### Bug Fixes
-
-* **1366-application-stop:** add application monitoring ([bde9b33](https://github.com/jensvogt/awsmock/commit/bde9b336e3cff5899f28a4380069a62449f2003e))
-* **1366-application-stop:** add application monitoring ([700fba7](https://github.com/jensvogt/awsmock/commit/700fba70a5d1b2b56a75974a1cda28a739156e63))
-* **1366-application-stop:** fix application stop ([4745ec1](https://github.com/jensvogt/awsmock/commit/4745ec11e3f7176f7d9ec8b3a6efc5eb50c53afc))
-
-## [1.6.0](https://github.com/jensvogt/awsmock/compare/v1.5.5...v1.6.0) (2025-07-21)
-
-
-### Features
-
-* **development:** add application builder ([d7e365b](https://github.com/jensvogt/awsmock/commit/d7e365b920a41dc8932b73c0a35f52828527253d))
-* **development:** add application builder ([789e96b](https://github.com/jensvogt/awsmock/commit/789e96bdd78e98e02009f83661ce7791fb05d8bf))
-* **development:** add application module ([b0fbcd9](https://github.com/jensvogt/awsmock/commit/b0fbcd96452f90bc0e841f2e307d23c6b619888b))
-* **development:** add application module import/export ([62e66bf](https://github.com/jensvogt/awsmock/commit/62e66bf60cefdfed7caa4120292507b200d10c9b))
-* **development:** add application start/stop ([205a089](https://github.com/jensvogt/awsmock/commit/205a089a443d69ef247490833c079978bc001fcd))
-* **development:** add application start/stop ([c8d1799](https://github.com/jensvogt/awsmock/commit/c8d1799d81fbdff0464c4c69fd1814e357a22bcf))
-* **development:** add application start/stop ([f63f128](https://github.com/jensvogt/awsmock/commit/f63f12892503bd79670e72c125345df3c395be00))
-
-
-### Bug Fixes
-
-* **development:** add SSM parameter update ([42a6893](https://github.com/jensvogt/awsmock/commit/42a689317b01c709a0125ecdbb886c668651b741))
-* **development:** fix application logs ([5446d5e](https://github.com/jensvogt/awsmock/commit/5446d5e280ee7ab54645b08165557095224b77f5))
-* **development:** fix application startup ([38c3329](https://github.com/jensvogt/awsmock/commit/38c33296691df3a25b84d470b62cb2340578a3b6))
-
-## [1.5.5](https://github.com/jensvogt/awsmock/compare/v1.5.4...v1.5.5) (2025-07-05)
-
-
-### Bug Fixes
-
-* **development:** add SSM parameter store add parameter dialog ([03b1110](https://github.com/jensvogt/awsmock/commit/03b111060cf8c468f620b7b0f36d5082508a9791))
-* **development:** fix dynamodb table paging ([71ed1a3](https://github.com/jensvogt/awsmock/commit/71ed1a36836282ecee4f57fba05063ebd3138f15))
-
-## [1.5.4](https://github.com/jensvogt/awsmock/compare/v1.5.3...v1.5.4) (2025-06-30)
-
-
-### Bug Fixes
-
-* **1289-backup count:** fix import/export issues ([1920c94](https://github.com/jensvogt/awsmock/commit/1920c9461fc34185ffd7b2f92b82ce9d7cbd5a26))
-* **1289-backup count:** fix SQS batch delete bug ([8aa6682](https://github.com/jensvogt/awsmock/commit/8aa66824c4cde479df355d9f0e763c12c3f85937))
-* **development:** add SSM parameters ([fc28618](https://github.com/jensvogt/awsmock/commit/fc28618fcbb803d3bac67b65505e0b5247ef1590))
-* **development:** add SSM parameters details ([af88bdd](https://github.com/jensvogt/awsmock/commit/af88bdd21bb70130f04c5181f223dc59083bcbac))
-
-## [1.5.3](https://github.com/jensvogt/awsmock/compare/v1.5.2...v1.5.3) (2025-06-28)
-
-### Bug Fixes
-
-* **1289-backup count:** add key management key
-  details ([691ce78](https://github.com/jensvogt/awsmock/commit/691ce781e67a53f86b16697395dfeca19cfcfa35))
-* **1289-backup count:** add key management
-  list ([c914425](https://github.com/jensvogt/awsmock/commit/c9144252d162f2c1bb1002ee98da7b077809b06a))
-* **1289-backup count:** add SQS queue default message
-  attributes ([bc45367](https://github.com/jensvogt/awsmock/commit/bc4536760602561e9b96639ad988a460996b4b32))
-* **1289-backup count:** fix backup
-  cleanup ([a6fe366](https://github.com/jensvogt/awsmock/commit/a6fe366862e18543b077ef96ed16f30f0629f45e))
-* **1289-backup count:** fix bug in SQS message attribute
-  list ([504814f](https://github.com/jensvogt/awsmock/commit/504814f72c24b56ef0688d581b3a1f2ac3d50c2e))
-* **1289-backup count:** fix bug lambda
-  upload ([226a9e8](https://github.com/jensvogt/awsmock/commit/226a9e80edd92855257be7638faf3fc6af307876))
-* **1289-backup count:** fix
-  tests ([c43cd3c](https://github.com/jensvogt/awsmock/commit/c43cd3ca76f4f2d0f9e364be7a10bdb8e2727ca4))
-
-## [1.5.2](https://github.com/jensvogt/awsmock/compare/v1.5.1...v1.5.2) (2025-06-20)
-
-### Bug Fixes
-
-* **1288-add-lambda-event-source:** add lambda event
-  sources ([3199f42](https://github.com/jensvogt/awsmock/commit/3199f42409eae93920cae904239292b4935378be))
-* **1288-add-lambda-event-source:** add lambda event
-  sources ([85210fc](https://github.com/jensvogt/awsmock/commit/85210fcc1e3da1d79786d2286eb3217c4005b550))
-* **1288-add-lambda-event-source:** add lambda event
-  sources ([ad93c1e](https://github.com/jensvogt/awsmock/commit/ad93c1e878ee4ffb567a933f14ed84785b29b79a))
-* **1288-kms-ui-pages:** add top-x counters for ui
-  charts ([40c13ec](https://github.com/jensvogt/awsmock/commit/40c13eca2073db7eeb29fee504bdbbc95d6e0889))
-* **1288-kms-ui-pages:** fix bug in SQS message
-  redrive ([2bb44e0](https://github.com/jensvogt/awsmock/commit/2bb44e02aff7d81d9d7624d171bc8b4677283441))
-
-## [1.5.1](https://github.com/jensvogt/awsmock/compare/v1.5.0...v1.5.1) (2025-06-14)
-
-### Bug Fixes
-
-* **1275-add-secretmanager-rotation:** backup for all
-  modules ([8568ae3](https://github.com/jensvogt/awsmock/commit/8568ae3c8d23c303aab8190e6e8774b4e0bf1fdb))
-* **1275-add-secretmanager-rotation:** fix bug in
-  backup ([2659282](https://github.com/jensvogt/awsmock/commit/2659282f99dbceeb53e459a5a354a202d4525c51))
-* **1275-add-secretmanager-rotation:** fix bug in logging, add backup via
-  cron ([8e4775f](https://github.com/jensvogt/awsmock/commit/8e4775fffef3ccfabd04c6cb6de31d7abfbfd230))
-* **1275-add-secretmanager-rotation:** remove python 3.8 lambda support, add python 3.12,
-  3.13 ([fa8a083](https://github.com/jensvogt/awsmock/commit/fa8a08329afb3ed12d5437d1867d9e85ef0c1260))
-
-## [1.5.0](https://github.com/jensvogt/awsmock/compare/v1.4.0...v1.5.0) (2025-06-09)
-
-### Features
-
-* **1275-add-secretmanager-rotation:** add nodejs22 lambda
-  support ([f2f1e5b](https://github.com/jensvogt/awsmock/commit/f2f1e5b107a8bea681db335c425ada89c4c21ba6))
-
-## [1.4.0](https://github.com/jensvogt/awsmock/compare/v1.3.1...v1.4.0) (2025-06-04)
-
-### Features
-
-* **1251-show-lambda-logs:** fix lambda details
-  page ([da01080](https://github.com/jensvogt/awsmock/commit/da01080e8a296836f97a92a9aaedf0c92c5b71c4))
-
-## [1.3.1](https://github.com/jensvogt/awsmock/compare/v1.3.0...v1.3.1) (2025-05-25)
-
-### Bug Fixes
-
-* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON
-  schema ([17c8d20](https://github.com/jensvogt/awsmock/commit/17c8d206cce3186d96bc95214f9de5333f6d45e2))
-* **1219-dynamodb-resolve-host-exception:** streamline dynamodb
-  DTOs ([d764196](https://github.com/jensvogt/awsmock/commit/d76419657b50403d90af91b6238f2e394265d2ea))
-* **1219-dynamodb-resolve-host-exception:** streamline dynamodb
-  DTOs ([8725fad](https://github.com/jensvogt/awsmock/commit/8725fad0507d37cf0bcf920f29fb98421fc90bf0))
-* **1219-dynamodb-resolve-host-exception:** streamline dynamodb
-  DTOs ([55b934c](https://github.com/jensvogt/awsmock/commit/55b934c7705a091f796858d0056afafa3c7db557))
-
-## [1.3.0](https://github.com/jensvogt/awsmock/compare/v1.2.5...v1.3.0) (2025-05-18)
-
-### Features
-
-* **PIM-1234:** windows
-  port ([bc6a494](https://github.com/jensvogt/awsmock/commit/bc6a494a1ba8caa57f73142093a25ccca3fc1b95))
-
-### Bug Fixes
-
-* **1181-dynamodb-tablesitems-missing-in-ui:** fix logging
-  backend ([3189583](https://github.com/jensvogt/awsmock/commit/318958371385f5ea7ca97a0319e7959328f15ee0))
-* **1181-dynamodb-tablesitems-missing-in-ui:** fix metric
-  service ([e6871fe](https://github.com/jensvogt/awsmock/commit/e6871fe16082893d07fe8dd53474130203195718))
-* **1219-dynamodb-resolve-host-exception:** fix resolve exception, fix monitoring http counter, fix
-  imports. ([3e9ea85](https://github.com/jensvogt/awsmock/commit/3e9ea85217d8fc03ec21543477bc03ef8a583ff8))
-* **1219-dynamodb-resolve-host-exception:** fix resolve exception, fix monitoring http counter, fix
-  imports. ([f90a22d](https://github.com/jensvogt/awsmock/commit/f90a22dc6167bedb82e1241305cb6a9271f41f60))
-* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON
-  schema ([808975d](https://github.com/jensvogt/awsmock/commit/808975d0bcffd04111f0a0d19c2254648fc925d6))
-* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON
-  schema ([3fcbf64](https://github.com/jensvogt/awsmock/commit/3fcbf642c65138205ecbe7f96f3fdd5b38375f63))
-* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON
-  schema ([68a376f](https://github.com/jensvogt/awsmock/commit/68a376f4e9d134c55fa99958ff579434f015ce0c))
-
-## [1.2.5](https://github.com/jensvogt/awsmock/compare/v1.2.4...v1.2.5) (2025-05-11)
-
-### Bug Fixes
-
-* **1181-dynamodb-tablesitems-missing-in-ui:** add transfer server tags, fix S3 metadata in
-  frontend ([1a41367](https://github.com/jensvogt/awsmock/commit/1a413673c669eeab8769cef281578f26c0ed1a71))
-
-## [1.2.4](https://github.com/jensvogt/awsmock/compare/v1.2.3...v1.2.4) (2025-05-10)
-
-### Bug Fixes
-
-* **1181-dynamodb-tablesitems-missing-in-ui:** segfault in SQS
-  database ([78bbc62](https://github.com/jensvogt/awsmock/commit/78bbc62251ecbf2674dc7ba47306234753f31435))
-
-## [1.2.3](https://github.com/jensvogt/awsmock/compare/v1.2.2...v1.2.3) (2025-05-04)
-
-### Bug Fixes
-
-* **1164-main-development:** add HTTP to SNS
-  subscriptions ([bf84159](https://github.com/jensvogt/awsmock/commit/bf841599858eec85fcc044ac177cbde8600c1af4))
-* **1164-main-development:** add HTTP to SNS
-  subscriptions ([6f07d7e](https://github.com/jensvogt/awsmock/commit/6f07d7e8d788326ee73e6c9def4d52c55c3071e1))
-* **1164-main-development:** add HTTP to SNS
-  subscriptions ([3a31699](https://github.com/jensvogt/awsmock/commit/3a316995c3b79cb16cd6be4b55b74a7dfa87162a))
-* **1164-main-development:** add local
-  network ([2a58aff](https://github.com/jensvogt/awsmock/commit/2a58affc825eb668e6656866429e3938592e01c9))
-* **1164-main-development:** fix dynamodb
-  setup ([2104b67](https://github.com/jensvogt/awsmock/commit/2104b67a1024798428e6b0779234cb2f729e96ec))
-* **1164-main-development:** fix dynamodb
-  setup ([cd165e9](https://github.com/jensvogt/awsmock/commit/cd165e9cd4310c0b97d881f3359915adc26ec0f5))
-* **1164-main-development:** fix dynamodb
-  tables ([d3e3e38](https://github.com/jensvogt/awsmock/commit/d3e3e38d0cbc3823c53658d3c3565993df5510a7))
-
-## [1.2.2](https://github.com/jensvogt/awsmock/compare/v1.2.1...v1.2.2) (2025-05-03)
-
-### Bug Fixes
-
-* **1164-main-development:** fix
-  tests ([7a6cd15](https://github.com/jensvogt/awsmock/commit/7a6cd15c4e5e8e7b65b59a8d4c2b2bebc79a8b13))
-* **1164-main-development:** fix
-  tests ([2f8ecad](https://github.com/jensvogt/awsmock/commit/2f8ecadba9dceb5784c32ac223131fa41e7f1fae))
-* **1164-main-development:** SQS sendmessage with new JSON
-  format ([ffcaf30](https://github.com/jensvogt/awsmock/commit/ffcaf30cf4af0292e603e3d1564494e2f6f81570))
-* **1164-main-development:** using shared memory for monitoring in order to improve
-  performance ([47ccb2a](https://github.com/jensvogt/awsmock/commit/47ccb2a0e60a2fc61b68b6552d3a9f9b9bbe5355))
-* **1164-sftp-on-windows:** windows absolute
-  path ([b30a1b5](https://github.com/jensvogt/awsmock/commit/b30a1b5373a3f0bb648bc2b2ceba1c699ba24d65))
-
-## [1.2.1](https://github.com/jensvogt/awsmock/compare/v1.2.0...v1.2.1) (2025-05-01)
-
-### Bug Fixes
-
-* **1164-sftp-on-windows:** add dir
-  permissions ([3f3703d](https://github.com/jensvogt/awsmock/commit/3f3703d7efbc9f6187a6ac79e00c752eeaadd9fd))
-
-## [1.2.0](https://github.com/jensvogt/awsmock/compare/v1.1.0...v1.2.0) (2025-03-05)
-
-### Features
-
-* **123-windows-port:** add some auto
-  pointer ([84b1dfa](https://github.com/jensvogt/awsmock/commit/84b1dfaa638b5aedb0c2b2070ac19f5115835eef))
-* **801-macos-port:** first
-  try ([d23225a](https://github.com/jensvogt/awsmock/commit/d23225a83ed023f9447a504d03d2476c77a96be7))
-* **801-macos-port:** first
-  try ([3a42343](https://github.com/jensvogt/awsmock/commit/3a423438ffaafcc69e2a77d9eacab88c839d6dd3))
-* **801-macos-port:** first
-  try ([ae15f05](https://github.com/jensvogt/awsmock/commit/ae15f05bf84c6c21c8d6998f6f748e12c16e15cc))
-* **891-macos-port:** add some includes for
-  macos ([252cf50](https://github.com/jensvogt/awsmock/commit/252cf50731ea3302ab42516e953679548ce6a359))
-
-### Bug Fixes
-
-* **801-macos-port:** fix ListAllBuckets
-  call ([e2268b1](https://github.com/jensvogt/awsmock/commit/e2268b11c87ff4133745ae45f9c7df39f2f010a4))
-* **801-macos-port:** fix performance
-  counters ([a8c412b](https://github.com/jensvogt/awsmock/commit/a8c412bb2ebde4789f980cd2d5ee8a4365a7c0dd))
-
-## [1.1.0](https://github.com/jensvogt/awsmock/compare/v1.0.1...v1.1.0) (2025-02-01)
-
-### Features
-
-* **903-auto-load-should-load-all-jaon-files:** add all files
-  load ([d96cbe2](https://github.com/jensvogt/awsmock/commit/d96cbe2b8bb70f1dd208d78337ce850455defda1))
-* **903-auto-load-should-load-all-jaon-files:** add all files
-  load ([d77a3b0](https://github.com/jensvogt/awsmock/commit/d77a3b0701be39c0aff0fe3776ed3885afa42cb4))
-* **903-auto-load-should-load-all-jaon-files:** add all files
-  load ([424c333](https://github.com/jensvogt/awsmock/commit/424c333989beee279e1b735cf3f02769dd36aa25))
-* **903-auto-load-should-load-all-jaon-files:** add all files
-  load ([6cd3c3f](https://github.com/jensvogt/awsmock/commit/6cd3c3f77c9f1f715088671fd5836a83fe8eaa76))
-* **903-auto-load-should-load-all-json-files:** add all files
-  load ([eeb8d7b](https://github.com/jensvogt/awsmock/commit/eeb8d7b7155010f690b1de297e204b6ef88c22c2))
-
-### Bug Fixes
-
-* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS
-  attribute ([582d29f](https://github.com/jensvogt/awsmock/commit/582d29f3714f0685986c9936457847faa6507919))
-* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS
-  attribute ([9fdc3bc](https://github.com/jensvogt/awsmock/commit/9fdc3bc531485832ad7c919fb87cccc72f2c88d4))
-* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS
-  attribute ([669c0ec](https://github.com/jensvogt/awsmock/commit/669c0ec7c5388616337e23b4b719cd01a7f62a6b))
-* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS
-  attribute ([bfbf142](https://github.com/jensvogt/awsmock/commit/bfbf142bd821aa2e8759a0cf1cec3e76f8bc5d9b))
