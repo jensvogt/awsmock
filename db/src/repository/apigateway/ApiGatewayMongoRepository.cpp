@@ -278,14 +278,7 @@ namespace Awsmock::Database {
         try {
 
             const auto filter = make_document(kvp("name", restApi.name));
-            const auto update = make_document(
-                kvp("$set", restApi.ToDocument()),
-                kvp("$setOnInsert", make_document(
-                        kvp("created", bsoncxx::types::b_date{
-                                std::chrono::duration_cast<std::chrono::milliseconds>(
-                                    restApi.created.time_since_epoch())
-                            }))),
-                kvp("$currentDate", make_document(kvp("modified", true))));
+            const auto update = make_document(kvp("$set", restApi.ToDocument()));
 
             mongocxx::options::find_one_and_update opts;
             opts.upsert(true);
