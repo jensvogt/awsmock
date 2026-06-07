@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_DOCKER_PORT_BINDING_H
 
 // C++ includes
+#include <algorithm>
 #include <string>
 
 // AwsMock includes

@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_COMMON_APPLICATION_CLIENT_COMMAND_H
 
 // C++ includes
+#include <algorithm>
 #include <string>
 
 // AwsMock includes

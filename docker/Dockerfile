@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM alpine:latest AS build
 
 RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
@@ -10,7 +11,8 @@ ENV VCPKG_ROOT=/usr/local/vcpkg
 ENV VCPKG_MAX_CONCURRENCY=4
 ENV CMAKE_BUILD_PARALLEL_LEVEL=4
 ENV ACLOCAL_PATH=/usr/share/aclocal
-RUN mkdir -p /usr/share/aclocal
+ENV VCPKG_DEFAULT_BINARY_CACHE=/vcpkg-cache
+RUN mkdir -p /usr/share/aclocal && mkdir -p /vcpkg-cache
 
 WORKDIR /usr/local/vcpkg
 
@@ -22,7 +24,8 @@ RUN mkdir -p /usr/src
 
 # Install aws-mock
 WORKDIR /usr/src
-RUN git clone https://github.com/jensvogt/awsmock.git && \
+RUN git clone https://github.com/jensvogt/awsmock.git
+RUN --mount=type=cache,target=/vcpkg-cache \
     cd /usr/src/awsmock && \
     mkdir build && \
     cmake -S . -B build -DBUILD_DOCUMENTATION=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake \

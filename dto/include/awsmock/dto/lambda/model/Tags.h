@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_LAMBDA_TAGS_H
 
 // C++ standard includes
+#include <algorithm>
 #include <map>
 #include <string>
 
