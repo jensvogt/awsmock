@@ -196,15 +196,17 @@ namespace Awsmock::Database {
         bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->createObject(object1);
+        object1 = s3Database->createObject(object1);
         Entity::S3::Object object2 = CreateDefaultObject(TEST_BUCKET_NAME, "test2/key2");
-        s3Database->createObject(object2);
+        object2 = s3Database->createObject(object2);
 
         // act
         const bool result = s3Database->hasObjects(bucket);
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
+        BOOST_CHECK_EQUAL(false, object1.bucket.empty());
+        BOOST_CHECK_EQUAL(false, object2.bucket.empty());
     }
 
     BOOST_AUTO_TEST_CASE(BucketDelete) {
@@ -232,7 +234,10 @@ namespace Awsmock::Database {
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
 
         // act
-        BOOST_CHECK_NO_THROW({ s3Database->deleteAllBuckets(); });
+        BOOST_CHECK_NO_THROW({
+            const long deleted = s3Database->deleteAllBuckets();
+            BOOST_CHECK_EQUAL(1, deleted);
+        });
         const bool result = s3Database->bucketExists(bucket.region, bucket.name);
 
         // assert
@@ -247,13 +252,14 @@ namespace Awsmock::Database {
         bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->createObject(object1);
+        object1 = s3Database->createObject(object1);
 
         // act
         const bool result = s3Database->objectExists(object1);
 
         // assert
         BOOST_CHECK_EQUAL(result, true);
+        BOOST_CHECK_EQUAL(false, object1.bucket.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectCreate) {
@@ -264,13 +270,14 @@ namespace Awsmock::Database {
         bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->createObject(object1);
+        object1 = s3Database->createObject(object1);
 
         // act
         const Entity::S3::Object result = s3Database->getObject(TEST_REGION, object1.bucket, object1.key);
 
         // assert
         BOOST_CHECK_EQUAL(result.key, object1.key);
+        BOOST_CHECK_EQUAL(false, object1.bucket.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectUpdate) {
@@ -281,7 +288,7 @@ namespace Awsmock::Database {
         bucket = s3Database->createBucket(bucket);
         BOOST_CHECK_EQUAL(false, bucket.arn.empty());
         Entity::S3::Object object1 = CreateDefaultObject(TEST_BUCKET_NAME, "test1/key1");
-        s3Database->createObject(object1);
+        object1 = s3Database->createObject(object1);
         Entity::S3::Object updateObject;
         updateObject.region = TEST_REGION;
         updateObject.bucket = bucket.name;
@@ -294,6 +301,7 @@ namespace Awsmock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(15, result.size);
+        BOOST_CHECK_EQUAL(false, object1.bucket.empty());
     }
 
     BOOST_AUTO_TEST_CASE(ObjectById) {
@@ -324,7 +332,10 @@ namespace Awsmock::Database {
         object1 = s3Database->createObject(object1);
 
         // act
-        BOOST_CHECK_NO_THROW({ s3Database->deleteObject(object1); });
+        BOOST_CHECK_NO_THROW({
+            long deleted = s3Database->deleteObject(object1);
+            BOOST_CHECK_EQUAL(1, deleted);
+        });
         const bool result = s3Database->objectExists(object1.region, object1.bucket, object1.key);
 
         // assert
@@ -391,7 +402,10 @@ namespace Awsmock::Database {
         }
 
         // act
-        BOOST_CHECK_NO_THROW({ long deleted = s3Database->deleteObjects(TEST_REGION, bucket.name, keys); });
+        BOOST_CHECK_NO_THROW({
+            const long deleted = s3Database->deleteObjects(TEST_REGION, bucket.name, keys);
+            BOOST_CHECK_EQUAL(1, deleted);
+        });
         const bool result = s3Database->objectCount(bucket.region, bucket.name, {});
 
         // assert
