@@ -15,11 +15,15 @@
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/apigateway/CreateApiKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
+#include <awsmock/dto/apigateway/CreateResourceRequest.h>
+#include <awsmock/dto/apigateway/CreateResourceResponse.h>
 #include <awsmock/dto/apigateway/CreateRestApiRequest.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysResponse.h>
+#include <awsmock/dto/apigateway/GetRestApisRequest.h>
+#include <awsmock/dto/apigateway/GetRestApisResponse.h>
 #include <awsmock/dto/apigateway/internal/DeleteRestApiCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterResponse.h>
@@ -32,7 +36,9 @@
 #include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/UpdateRestApiCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
+#include <awsmock/dto/common/ApiGatewayClientCommand.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
+#include <awsmock/entity/apigateway/Resource.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
 
@@ -67,7 +73,7 @@ namespace Awsmock::Service {
          * @return API gateway create key response
          */
         [[nodiscard]]
-        Dto::ApiGateway::CreateApiKeyResponse CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
+        Dto::ApiGateway::CreateApiKeyResponse createApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
 
         /**
          * @brief Creates a new API key
@@ -76,14 +82,14 @@ namespace Awsmock::Service {
          * @return get API key response
          */
         [[nodiscard]]
-        Dto::ApiGateway::GetApiKeysResponse GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
+        Dto::ApiGateway::GetApiKeysResponse getApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
 
         /**
          * @brief Deletes an API gateway key
          *
          * @param request delete API key request
          */
-        void DeleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
+        void deleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
 
         /**
          * @brief Creates a new REST API
@@ -92,7 +98,15 @@ namespace Awsmock::Service {
          * @return create REST API response
          */
         [[nodiscard]]
-        Dto::ApiGateway::CreateRestApiResponse CreateRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const;
+        Dto::ApiGateway::CreateRestApiResponse createRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const;
+
+        /**
+         * @brief Returns a List of REST APIs
+         *
+         * @param request get REST APIs request
+         * @return list of REST APIs
+         */
+        Dto::ApiGateway::GetRestApisResponse getRestApis(const Dto::ApiGateway::GetRestApisRequest &request) const;
 
         /**
          * @brief List the API key counters
@@ -101,7 +115,7 @@ namespace Awsmock::Service {
          * @return list of API key counters
          */
         [[nodiscard]]
-        Dto::ApiGateway::ListApiKeyCountersResponse ListApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const;
+        Dto::ApiGateway::ListApiKeyCountersResponse listApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const;
 
         /**
          * @brief Get an API key detail
@@ -110,7 +124,7 @@ namespace Awsmock::Service {
          * @return list of API key counters
          */
         [[nodiscard]]
-        Dto::ApiGateway::GetApiKeyCounterResponse GetApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const;
+        Dto::ApiGateway::GetApiKeyCounterResponse getApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const;
 
         /**
          * @brief Updates an API key
@@ -118,7 +132,7 @@ namespace Awsmock::Service {
          * @param request internal API key counters update request
          * @return list of API key counters
          */
-        void UpdateApiKeyCounter(const Dto::ApiGateway::UpdateApiKeyCounterRequest &request) const;
+        void updateApiKeyCounter(const Dto::ApiGateway::UpdateApiKeyCounterRequest &request) const;
 
         /**
          * @brief List REST APIs
@@ -127,7 +141,7 @@ namespace Awsmock::Service {
          * @return list of REST API counters
          */
         [[nodiscard]]
-        Dto::ApiGateway::ListRestApiCountersResponse ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
+        Dto::ApiGateway::ListRestApiCountersResponse listRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
 
         /**
          * @brief Returns a REST API entity
@@ -135,21 +149,29 @@ namespace Awsmock::Service {
          * @param request get a REST API request
          * @return REST API response
          */
-        Dto::ApiGateway::GetRestApiCounterResponse GetRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const;
+        Dto::ApiGateway::GetRestApiCounterResponse getRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const;
 
         /**
          * @brief Updates a REST API entity
          *
          * @param request get a REST API update request
          */
-        void UpdateRestApiCounter(const Dto::ApiGateway::UpdateRestApiCounterRequest &request) const;
+        void updateRestApiCounter(const Dto::ApiGateway::UpdateRestApiCounterRequest &request) const;
 
         /**
          * @brief Deletes a REST API
          *
          * @param request delete request
          */
-        void DeleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const;
+        void deleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const;
+
+        /**
+         * @brief Creates a new resource
+         *
+         * @param request create a resource request
+         * @return create resource response
+         */
+        Dto::ApiGateway::CreateResourceResponse createResource(const Dto::ApiGateway::CreateResourceRequest &request) const;
 
       private:
 

@@ -4,8 +4,8 @@
 
 #pragma once
 
-// AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+// C++ includes
+#include <map>
 
 namespace Awsmock::Dto::ApiGateway {
 

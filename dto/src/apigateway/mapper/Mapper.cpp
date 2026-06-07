@@ -7,6 +7,7 @@
 
 
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
+#include <awsmock/entity/apigateway/Resource.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
@@ -77,6 +78,29 @@ namespace Awsmock::Dto::ApiGateway {
     }
 
     // ========================================================================================================================
+    // Resource
+    // ========================================================================================================================
+    Database::Entity::ApiGateway::Resource Mapper::map(const CreateResourceRequest &request) {
+        Database::Entity::ApiGateway::Resource resourceEntity;
+        resourceEntity.pathPart = request.pathPart;
+        return resourceEntity;
+    }
+
+    CreateResourceResponse Mapper::map(const CreateResourceRequest &request, const Database::Entity::ApiGateway::Resource &resourceEntity) {
+        CreateResourceResponse response{};
+        response.region = request.region;
+        response.user = request.user;
+        response.requestId = request.requestId;
+        response.id = resourceEntity.id;
+        response.parentId = resourceEntity.parentId;
+        response.path = resourceEntity.path;
+        response.pathPart = resourceEntity.pathPart;
+        response.created = resourceEntity.created;
+        response.modified = resourceEntity.modified;
+        return response;
+    }
+
+    // ========================================================================================================================
     // REST API
     // ========================================================================================================================
     Database::Entity::ApiGateway::RestApi Mapper::map(const CreateRestApiRequest &request) {
@@ -114,6 +138,7 @@ namespace Awsmock::Dto::ApiGateway {
 
     RestApi Mapper::map(const Database::Entity::ApiGateway::RestApi &restApiEntity) {
         RestApi restApi{};
+        restApi.id = restApiEntity.id;
         restApi.name = restApiEntity.name;
         restApi.apiKeySource = ApiKeySourceTypeFromString(Database::Entity::ApiGateway::ApiKeySourceTypeToString(restApiEntity.apiKeySource));
         restApi.description = restApiEntity.description;
@@ -121,6 +146,8 @@ namespace Awsmock::Dto::ApiGateway {
         restApi.rootResourceId = restApiEntity.rootResourceId;
         restApi.binaryMediaTypes = restApiEntity.binaryMediaTypes;
         restApi.tags = restApiEntity.tags;
+        restApi.enabled = restApiEntity.enabled;
+        // restApi.customerId = restApiEntity.customerId;
         restApi.warnings = restApiEntity.warnings;
         restApi.created = restApiEntity.created;
         return restApi;

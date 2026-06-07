@@ -9,7 +9,7 @@
 
 namespace Awsmock::Service {
 
-    Dto::ApiGateway::CreateApiKeyResponse ApiGatewayService::CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const {
+    Dto::ApiGateway::CreateApiKeyResponse ApiGatewayService::createApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_api_key");
         log_debug << "Create API key request, region:  " << request.region << " customerId: " << request.customerId;
 
@@ -48,7 +48,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::ApiGateway::GetApiKeysResponse ApiGatewayService::GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const {
+    Dto::ApiGateway::GetApiKeysResponse ApiGatewayService::getApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_keys");
         log_debug << "Get API keys request, region:  " << request.region;
 
@@ -73,7 +73,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void ApiGatewayService::DeleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const {
+    void ApiGatewayService::deleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_api_key");
         log_debug << "Delete API key request, region:  " << request.region << " apiKey: " << request.apiKey;
 
@@ -95,7 +95,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::ApiGateway::CreateRestApiResponse ApiGatewayService::CreateRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const {
+    Dto::ApiGateway::CreateRestApiResponse ApiGatewayService::createRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_rest_api");
         log_debug << "Create REST API request, region:  " << request.region << ", name: " << request.name;
 
@@ -126,7 +126,30 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::ApiGateway::ListApiKeyCountersResponse ApiGatewayService::ListApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const {
+    Dto::ApiGateway::GetRestApisResponse ApiGatewayService::getRestApis(const Dto::ApiGateway::GetRestApisRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_rest_apis");
+        log_debug << "Get REST APIs request, region:  " << request.region;
+
+        try {
+
+            // Get the list of API keys
+            const std::vector<Database::Entity::ApiGateway::RestApi> restApis = _apiGatewayDatabase->listRestApis(request.region);
+
+            log_trace << "Get REST APIs, count: " << restApis.size();
+            Dto::ApiGateway::GetRestApisResponse response{};
+            response.region = request.region;
+            response.user = request.user;
+            response.requestId = request.requestId;
+            response.restApis = Dto::ApiGateway::Mapper::map(restApis);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::ListApiKeyCountersResponse ApiGatewayService::listApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_keys");
         log_debug << "List API key counters request, region:  " << request.region;
 
@@ -148,7 +171,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::ApiGateway::GetApiKeyCounterResponse ApiGatewayService::GetApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const {
+    Dto::ApiGateway::GetApiKeyCounterResponse ApiGatewayService::getApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_key");
         log_debug << "Get API key counter request, region:  " << request.region;
 
@@ -172,7 +195,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void ApiGatewayService::UpdateApiKeyCounter(const Dto::ApiGateway::UpdateApiKeyCounterRequest &request) const {
+    void ApiGatewayService::updateApiKeyCounter(const Dto::ApiGateway::UpdateApiKeyCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "update_api_key");
         log_debug << "Update API key counter request, region:  " << request.apiKey.id;
 
@@ -194,7 +217,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::ApiGateway::ListRestApiCountersResponse ApiGatewayService::ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const {
+    Dto::ApiGateway::ListRestApiCountersResponse ApiGatewayService::listRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "list_rest_apis");
         log_debug << "List REST API counters request, region:  " << request.region;
 
@@ -213,7 +236,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::ApiGateway::GetRestApiCounterResponse ApiGatewayService::GetRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const {
+    Dto::ApiGateway::GetRestApiCounterResponse ApiGatewayService::getRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_rest_api");
         log_debug << "Get REST API counter request, region:  " << request.region << ", name: " << request.name;
 
@@ -237,7 +260,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void ApiGatewayService::UpdateRestApiCounter(const Dto::ApiGateway::UpdateRestApiCounterRequest &request) const {
+    void ApiGatewayService::updateRestApiCounter(const Dto::ApiGateway::UpdateRestApiCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "update_rest_api");
         log_debug << "Update REST API counter request, region:  " << request.region << ", name: " << request.restApi.name;
 
@@ -261,7 +284,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void ApiGatewayService::DeleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const {
+    void ApiGatewayService::deleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_rest_api");
         log_debug << "Update REST API counter request, region:  " << request.region << ", name: " << request.name;
 
@@ -275,6 +298,37 @@ namespace Awsmock::Service {
             // Delete the API key
             const long count = _apiGatewayDatabase->deleteRestApi(request.region, request.name);
             log_debug << "REST API deleted, count: " << count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::CreateResourceResponse ApiGatewayService::createResource(const Dto::ApiGateway::CreateResourceRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_resource");
+        log_debug << "Create resource request, region:  " << request.region << ", pathPart: " << request.pathPart;
+
+        if (_apiGatewayDatabase->apiKeyExists(request.region, request.pathPart)) {
+            log_error << "REST API exists already, region: " << request.region << " pathPart: " << request.pathPart;
+            throw Core::ServiceException("REST API exists already, region: " + request.region + " pathPart: " + request.pathPart);
+        }
+
+        try {
+
+            // Get rest api entity from request
+            Database::Entity::ApiGateway::Resource resource = Dto::ApiGateway::Mapper::map(request);
+
+            // ID
+            if (resource.id.empty()) {
+                resource.id = Core::AwsUtils::CreateResourceId();
+            }
+
+            // Save to the database
+            //resource = _apiGatewayDatabase->createRestApi(resource);
+
+            log_trace << "REST resource created, pathPart: " + resource.pathPart;
+            return Dto::ApiGateway::Mapper::map(request, resource);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

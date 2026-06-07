@@ -78,7 +78,8 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/include/awsmock/core/BsonConverter.h
         core/include/awsmock/core/BsonCursorRange.h dto/include/awsmock/dto/common/mapper/Mapper.h
-        core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp)
+        core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp
+        db/include/awsmock/entity/apigateway/Resource.h)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
@@ -125,11 +126,10 @@ target_link_libraries(awsmockdto PRIVATE unofficial::libmagic::libmagic PCRE2::8
 # Build AWSMock Database library
 # -------------------------------------------------------------------------
 
-set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.cpp
-        db/src/repository/sqs/SQSMongoRepository.cpp db/src/repository/sqs/SQSMemoryRepository.cpp
-        db/src/entity/sqs/Queue.cpp db/src/entity/sqs/QueueAttribute.cpp db/src/entity/sqs/RedrivePolicy.cpp
-        db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp db/src/entity/sns/Topic.cpp
-        db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
+set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.cpp db/src/repository/sqs/SQSMongoRepository.cpp
+        db/src/repository/sqs/SQSMemoryRepository.cpp db/src/entity/sqs/Queue.cpp db/src/entity/sqs/QueueAttribute.cpp
+        db/src/entity/sqs/RedrivePolicy.cpp db/src/entity/sns/MessageAttribute.cpp db/src/entity/sns/Message.cpp
+        db/src/entity/sns/Topic.cpp db/src/entity/sns/TopicAttribute.cpp db/src/entity/sns/Subscription.cpp
         db/src/repository/sns/SNSMongoRepository.cpp db/src/repository/sns/SNSMemoryRepository.cpp
         db/src/entity/s3/Bucket.cpp db/src/entity/s3/BucketNotification.cpp db/src/entity/s3/Object.cpp
         db/src/repository/s3/S3MongoRepository.cpp db/src/repository/s3/S3MemoryRepository.cpp
@@ -155,10 +155,10 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/repository/application/ApplicationMemoryRepository.cpp db/src/utils/MongoUtils.cpp
         db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/entity/dynamodb/Tag.cpp
         db/src/repository/apigateway/ApiGatewayMongoRepository.cpp db/src/repository/apigateway/ApiGatewayMemoryRepository.cpp
-        db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/Rest.cpp db/src/entity/monitoring/Counter.cpp
-        db/src/entity/dynamodb/KeySchema.cpp db/src/repository/monitoring/MonitoringMongoRepository.cpp
-        db/src/repository/monitoring/MonitoringMemoryRepository.cpp db/src/repository/Database.cpp
-        db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp)
+        db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/RestApi.cpp db/src/entity/apigateway/Resource.cpp
+        db/src/entity/apigateway/ResourceMethod.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
+        db/src/repository/monitoring/MonitoringMongoRepository.cpp db/src/repository/monitoring/MonitoringMemoryRepository.cpp
+        db/src/repository/Database.cpp db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include

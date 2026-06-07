@@ -2,8 +2,7 @@
 // Created by vogje01 on 9/5/25.
 //
 
-#ifndef AWSMOCK_DTO_API_GATEWAY_MODEL_KEY_H
-#define AWSMOCK_DTO_API_GATEWAY_MODEL_KEY_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -98,5 +97,3 @@ namespace Awsmock::Dto::ApiGateway {
     };
 
 }// namespace Awsmock::Dto::ApiGateway
-
-#endif// AWSMOCK_DTO_API_GATEWAY_MODEL_KEY_H

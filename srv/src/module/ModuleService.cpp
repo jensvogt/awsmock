@@ -226,7 +226,7 @@ namespace Awsmock::Service {
             const std::shared_ptr<Database::ISQSRepository> _sqsDatabase = Database::RepositoryFactory::instance().sqsRepository();
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
-                    _sqsDatabase->importQueue(queue);
+                    queue = _sqsDatabase->importQueue(queue);
                     log_debug << "SQS queues imported, name: " << queue.name;
                 }
                 log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();

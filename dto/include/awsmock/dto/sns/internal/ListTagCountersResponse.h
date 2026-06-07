@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_RESPONSE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -43,5 +42,3 @@ namespace Awsmock::Dto::SNS {
     };
 
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_LIST_TAG_COUNTERS_RESPONSE_H

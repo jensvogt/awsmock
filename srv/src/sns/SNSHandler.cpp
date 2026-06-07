@@ -1,10 +1,6 @@
 
 #include <awsmock/service/sns/SNSHandler.h>
 
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "SNS"};
-}
-
 namespace Awsmock::Service {
 
     http::response<http::dynamic_body> SNSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {

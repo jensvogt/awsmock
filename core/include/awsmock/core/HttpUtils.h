@@ -160,7 +160,7 @@ namespace Awsmock::Core {
          * @param def default value
          * @return integer parameter
          */
-        static long GetLongParameter(const std::string &uri, const std::string &name, long min, long max, long def);
+        static long GetLongParameter(const std::string &uri, const std::string &name, long min = -1, long max = 1, long def = -1);
 
         /**
          * @brief Returns a string parameter

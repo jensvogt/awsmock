@@ -178,6 +178,13 @@ namespace Awsmock::Core {
         static std::string CreateRestApiId();
 
         /**
+         * @brief Creates an API Gateway resource ID
+         *
+         * @return API Gateway resource ID
+         */
+        static std::string CreateResourceId();
+
+        /**
          * @brief Creates an API gateway API key
          *
          * @return API key
