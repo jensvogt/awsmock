@@ -153,7 +153,7 @@ namespace Awsmock::Database {
         Entity::SQS::QueueList exportQueues(const std::vector<SortColumn> &sortColumns) const override;
 
         /**
-         * @brief Import s a single queue
+         * @brief Imports a single queue
          *
          * @par
          * During import of a queue, the queue URL is adjusted, as it contains the hostname of the machine where the
@@ -162,7 +162,8 @@ namespace Awsmock::Database {
          * @param queue queue entity
          * @throws DatabaseException
          */
-        void importQueue(Entity::SQS::Queue &queue) const override;
+        [[nodiscard]]
+        Entity::SQS::Queue importQueue(Entity::SQS::Queue &queue) const override;
 
         /**
          * @brief Returns a queue by ARN

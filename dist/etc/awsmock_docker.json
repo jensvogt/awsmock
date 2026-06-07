@@ -1,0 +1,375 @@
+{
+  "awsmock": {
+    "region": "eu-central-1",
+    "user": "none",
+    "access": {
+      "key-id": "none",
+      "account-id": "000000000000",
+      "client-id": "00000000",
+      "secret-access-key": "none"
+    },
+    "data-dir": "/usr/local/awsmock/data",
+    "temp-dir": "/usr/local/awsmock/data/tmp",
+    "backup-dir": "/usr/local/awsmock/data/backup",
+    "json": {
+      "pretty": false
+    },
+    "aws": {
+      "signature": {
+        "verify": false
+      }
+    },
+    "dockerized": true,
+    "magic-file": "/usr/local/awsmock/etc/magic.mgc",
+    "autoload": {
+      "active": true,
+      "file": "/usr/local/awsmock/init/01_init.json",
+      "dir": "/usr/local/awsmock/init"
+    },
+    "gateway": {
+      "active": true,
+      "http": {
+        "host": "localhost",
+        "address": "::",
+        "port": 4566,
+        "max-queue": 8,
+        "max-thread": 64,
+        "max-body": 536870912,
+        "timeout": 300
+      }
+    },
+    "modules": {
+      "s3": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "data-dir": "/usr/local/awsmock/data/s3",
+        "counter-period": 60,
+        "sync-period": 3600,
+        "archive-timeout": 300
+      },
+      "sqs": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300,
+        "reset-period": 30,
+        "counter-period": 30,
+        "receive-poll": 1000
+      },
+      "sns": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "timeout": 14,
+        "monitoring-period": 300,
+        "delete-period": 300,
+        "counter-period": 10
+      },
+      "lambda": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "lifetime": 3600,
+        "data-dir": "/usr/local/awsmock/data/lambda",
+        "remove-period": 300,
+        "counter-period": 300,
+        "log-retention-period": 1,
+        "private-port": 8080,
+        "max-invocation-count": 3,
+        "invocation-timeout": 5,
+        "runtime": {
+          "java11": "public.ecr.aws/lambda/java:11",
+          "java17": "public.ecr.aws/lambda/java:17",
+          "java21": "public.ecr.aws/lambda/java:21",
+          "java25": "public.ecr.aws/lambda/java:25",
+          "java26": "public.ecr.aws/lambda/java:26",
+          "python3-9": "public.ecr.aws/lambda/python:3.9",
+          "python3-10": "public.ecr.aws/lambda/python:3.10",
+          "python3-11": "public.ecr.aws/lambda/python:3.11",
+          "python3-12": "public.ecr.aws/lambda/python:3.12",
+          "python3-13": "public.ecr.aws/lambda/python:3.13",
+          "nodejs18-x": "public.ecr.aws/lambda/nodejs:18",
+          "nodejs20-x": "public.ecr.aws/lambda/nodejs:20",
+          "nodejs22-x": "public.ecr.aws/lambda/nodejs:22",
+          "provided-al2": "public.ecr.aws/lambda/provided:al2",
+          "provided-al2023": "public.ecr.aws/lambda/provided:al2023",
+          "provided-latest": "public.ecr.aws/lambda/provided:latest",
+          "go": "public.ecr.aws/lambda/provided:al2023"
+        }
+      },
+      "transfer": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "bucket": "transfer-server",
+        "data-dir": "/usr/local/awsmock/data/transfer",
+        "user-pool-id": "eu-central-1_oGsr6fJ8F",
+        "monitoring-period": 300,
+        "directories": [
+          "incoming/mix",
+          "incoming/split",
+          "feedback"
+        ],
+        "ftp": {
+          "pasv-min": 6000,
+          "pasv-max": 6100,
+          "port": 2121,
+          "address": "0.0.0.0"
+        },
+        "sftp": {
+          "host-key": "/usr/local/awsmock/etc/ssh_host_key",
+          "pasv-min": 6000,
+          "pasv-max": 6100,
+          "port": 2222,
+          "address": "0.0.0.0"
+        }
+      },
+      "cognito": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300
+      },
+      "dynamodb": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "data-dir": "/usr/local/awsmock/data/dynamodb",
+        "monitoring-period": 300,
+        "worker-period": 300
+      },
+      "secretsmanager": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300,
+        "worker-period": 300
+      },
+      "kms": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300,
+        "remove-period": 300
+      },
+      "ssm": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300,
+        "worker-period": 300,
+        "remove-period": 300
+      },
+      "application": {
+        "active": true,
+        "data-dir": "/usr/local/awsmock/data/application",
+        "runtime": {
+          "java11": "alpine/java:11-jdk",
+          "java17": "alpine/java:17-jdk",
+          "java21": "alpine/java:21-jdk",
+          "java25": "alpine/java:25-jdk",
+          "java26": "alpine/java:26-jdk",
+          "python3-9": "public.ecr.aws/lambda/python:3.9",
+          "python3-10": "public.ecr.aws/lambda/python:3.10",
+          "python3-11": "public.ecr.aws/lambda/python:3.11",
+          "python3-12": "public.ecr.aws/lambda/python:3.12",
+          "python3-13": "public.ecr.aws/lambda/python:3.13",
+          "nodejs18-x": "public.ecr.aws/lambda/nodejs:18",
+          "nodejs20-x": "public.ecr.aws/lambda/nodejs:20",
+          "nodejs22-x": "public.ecr.aws/lambda/nodejs:22",
+          "provided-al2": "public.ecr.aws/lambda/provided:al2",
+          "provided-al2023": "public.ecr.aws/lambda/provided:al2023",
+          "provided-latest": "public.ecr.aws/lambda/provided:latest",
+          "go": "public.ecr.aws/lambda/provided:al2023"
+        },
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300,
+        "watchdog-period": 300,
+        "log-server": false,
+        "log-server-port": 4568
+      },
+      "api-gateway": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300,
+        "proxy": {
+          "threads": 4,
+          "executable": "/usr/local/wsmock/bin/awsmock-agw",
+          "target-port": 4566,
+          "target-host": "localhost"
+        }
+      }
+    },
+    "docker": {
+      "active": true,
+      "network-mode": "local",
+      "network-name": "local",
+      "default": {
+        "memory-size": 512,
+        "temp-size": 10240
+      },
+      "container": {
+        "port": 8080,
+        "maxWaitTime": 5,
+        "checkTime": 500
+      },
+      "socket": "/var/run/docker.sock",
+      "tls": {
+        "enabled": false,
+        "host": "localhost",
+        "port": 2376,
+        "ca-cert": "/usr/local/awsmock/etc/ca.pem",
+        "cert": "/usr/local/awsmock/etc/cert.pem",
+        "key": "/usr/local/awsmock/etc/key.pem",
+        "verify-peer": true
+      }
+    },
+    "monitoring": {
+      "active": true,
+      "prometheus": false,
+      "internal": true,
+      "port": 9091,
+      "retention": 3,
+      "smooth": false,
+      "system-period": 60,
+      "average-period": 300,
+      "exclusions": [
+        "sqs_service_timer::action::receive_messages",
+        "gateway_http_timer::method::POST"
+      ]
+    },
+    "mongodb": {
+      "active": false,
+      "name": "awsmock",
+      "host": "localhost",
+      "port": 27017,
+      "user": "root",
+      "password": "password",
+      "pool-size": 256
+    },
+    "frontend": {
+      "active": true,
+      "address": "::",
+      "port": 4567,
+      "workers": 20,
+      "timeout": 900,
+      "doc-root": "/usr/local/awsmock/frontend"
+    },
+    "logging": {
+      "file-active": false,
+      "console-active": true,
+      "websocket-active": true,
+      "websocket-port": 4569,
+      "level": "info",
+      "dir": "/usr/local/awsmock/log",
+      "prefix": "awsmock",
+      "file-size": 10485760,
+      "file-count": 5,
+      "channels": [
+        {
+          "name": "Core",
+          "level": "info"
+        },
+        {
+          "name": "S3",
+          "level": "info"
+        },
+        {
+          "name": "SQS",
+          "level": "info"
+        },
+        {
+          "name": "SNS",
+          "level": "info"
+        },
+        {
+          "name": "KMS",
+          "level": "info"
+        },
+        {
+          "name": "SSM",
+          "level": "info"
+        },
+        {
+          "name": "SecretsManager",
+          "level": "info"
+        },
+        {
+          "name": "Application",
+          "level": "info"
+        },
+        {
+          "name": "Lambda",
+          "level": "info"
+        },
+        {
+          "name": "Cognito",
+          "level": "info"
+        },
+        {
+          "name": "DynamoDB",
+          "level": "info"
+        },
+        {
+          "name": "ApiGateway",
+          "level": "info"
+        },
+        {
+          "name": "Container",
+          "level": "info"
+        },
+        {
+          "name": "Transfer",
+          "level": "info"
+        },
+        {
+          "name": "Gateway",
+          "level": "info"
+        },
+        {
+          "name": "Monitoring",
+          "level": "info"
+        }
+      ]
+    }
+  }
+}

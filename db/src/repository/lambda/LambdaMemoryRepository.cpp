@@ -178,11 +178,17 @@ namespace Awsmock::Database {
     }
 
     Entity::Lambda::Lambda LambdaMemoryRepository::importLambda(Entity::Lambda::Lambda &lambda) const {
-        return {};
+        if (lambdaExists(lambda)) {
+            const Entity::Lambda::Lambda existing = getLambdaByArn(lambda.arn);
+            lambda.modified = system_clock::now();
+            lambda.instances = existing.instances;
+            return updateLambda(lambda);
+        }
+        return createLambda(lambda);
     }
 
     std::vector<Entity::Lambda::Lambda> LambdaMemoryRepository::exportLambdas(const std::vector<SortColumn> &sortColumns) const {
-        return {};
+        return _lambdas | std::views::values | std::ranges::to<std::vector>();
     }
 
     void LambdaMemoryRepository::setInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
