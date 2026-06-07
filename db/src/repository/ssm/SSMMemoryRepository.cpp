@@ -126,9 +126,9 @@ namespace Awsmock::Database {
 
     Entity::SSM::Parameter SSMMemoryRepository::importParameter(Entity::SSM::Parameter &parameter) const {
         if (parameterExists(parameter.parameterName)) {
-            return createParameter(parameter);
+            return updateParameter(parameter);
         }
-        return updateParameter(parameter);
+        return createParameter(parameter);
     }
 
     long SSMMemoryRepository::deleteParameter(const Entity::SSM::Parameter &parameter) const {

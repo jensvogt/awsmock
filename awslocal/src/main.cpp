@@ -34,12 +34,12 @@
 #include <awsmock/core/logging/LogStream.h>
 
 #ifdef _WIN32
-#include <minwindef.h>
-#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.json"
+#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files\\awsmock\\etc\\awsmock.json")
+#elif __APPLE__
+#define DEFAULT_CONFIG_FILE std::string("/usr/local/awsmock/etc/awsmock.json")
 #else
-#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
+#define DEFAULT_CONFIG_FILE std::string("/usr/local/awsmock/etc/awsmock.json")
 #endif
-#define DEFAULT_LOG_LEVEL "info"
 
 /**
  * Show help
@@ -95,13 +95,13 @@ int main(const int argc, char *argv[]) {
         return EXIT_SUCCESS;
     }
 
-    // Read the configuration.
-    Awsmock::Core::Configuration &configuration = Awsmock::Core::Configuration::instance();
+    // Read the configuration file.
+    auto configFilePath = DEFAULT_CONFIG_FILE;
     if (vm.contains("config")) {
-        configuration.setFilePath(vm["config"].as<std::string>());
-    } else {
-        configuration.setFilePath(DEFAULT_CONFIG_FILE);
+        configFilePath = vm["config"].as<std::string>();
     }
+    Awsmock::Core::Configuration::instance().load(configFilePath);
+
 
     // Set the log level
     if (vm.contains("loglevel")) {
@@ -109,7 +109,7 @@ int main(const int argc, char *argv[]) {
         Awsmock::Core::Configuration::instance().set<std::string>("awsmock.logging.level", value);
         Awsmock::Core::LogStream::SetSeverity(value);
     } else {
-        const auto level = Awsmock::Core::Configuration::instance().get<std::string>("awsmock.logging.level");
+        const auto level = Awsmock::Core::Configuration::instance().getOr<std::string>("awsmock.logging.level", "info");
         Awsmock::Core::LogStream::SetSeverity(level);
     }
 

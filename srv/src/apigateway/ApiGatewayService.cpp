@@ -44,7 +44,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -69,7 +69,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -91,7 +91,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -100,8 +100,8 @@ namespace Awsmock::Service {
         log_debug << "Create REST API request, region:  " << request.region << ", name: " << request.name;
 
         if (_apiGatewayDatabase->apiKeyExists(request.region, request.name)) {
-            log_error << "API key exists already, region: " << request.region << " name: " << request.name;
-            throw Core::ServiceException("API key exists already, region: " + request.region + " name: " + request.name);
+            log_error << "REST API exists already, region: " << request.region << " name: " << request.name;
+            throw Core::ServiceException("REST API exists already, region: " + request.region + " name: " + request.name);
         }
 
         try {
@@ -122,7 +122,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -144,7 +144,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -168,7 +168,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -190,7 +190,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -209,7 +209,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -233,7 +233,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -257,7 +257,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 
@@ -278,7 +278,7 @@ namespace Awsmock::Service {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::JsonException(exc.what());
+            throw Core::ServiceException(exc.what());
         }
     }
 

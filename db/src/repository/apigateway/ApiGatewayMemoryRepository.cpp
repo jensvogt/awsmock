@@ -4,6 +4,8 @@
 
 #include <awsmock/repository/apigateway/ApiGatewayMemoryRepository.h>
 
+#include "awsmock/core/PagingUtils.h"
+
 namespace Awsmock::Database {
 
     boost::mutex ApiGatewayMemoryRepository::_apiKeyMutex;
@@ -133,7 +135,7 @@ namespace Awsmock::Database {
     bool ApiGatewayMemoryRepository::restApiExists(const std::string &region, const std::string &name) const {
 
         return std::ranges::find_if(_restApis,
-                                    [region, name](const std::pair<std::string, Entity::ApiGateway::RestApi> &restApi) {
+                                    [&region, &name](const std::pair<const std::string, Entity::ApiGateway::RestApi> &restApi) {
                                         return restApi.second.region == region && restApi.second.name == name;
                                     }) != _restApis.end();
     }
@@ -141,7 +143,7 @@ namespace Awsmock::Database {
     bool ApiGatewayMemoryRepository::restApiExists(const std::string &id) const {
 
         return std::ranges::find_if(_restApis,
-                                    [id](const std::pair<std::string, Entity::ApiGateway::RestApi> &restApi) {
+                                    [&id](const std::pair<const std::string, Entity::ApiGateway::RestApi> &restApi) {
                                         return restApi.first == id;
                                     }) != _restApis.end();
     }
@@ -157,10 +159,24 @@ namespace Awsmock::Database {
     }
 
     Entity::ApiGateway::RestApi ApiGatewayMemoryRepository::upsertRestApi(Entity::ApiGateway::RestApi &restApi) const {
-        if (restApiExists(restApi.region, restApi.name)) {
-            return upsertRestApi(restApi);
+        boost::mutex::scoped_lock lock(_restApiMutex);
+
+        const auto it = std::ranges::find_if(_restApis,
+                                             [&restApi](const std::pair<const std::string, Entity::ApiGateway::RestApi> &entry) {
+                                                 return entry.second.region == restApi.region && entry.second.name == restApi.name;
+                                             });
+        if (it != _restApis.end()) {
+            restApi.oid = it->first;
+            _restApis[it->first] = restApi;
+            log_trace << "REST API updated, oid: " << it->first;
+            return _restApis[it->first];
         }
-        return createRestApi(restApi);
+
+        const std::string oid = Core::StringUtils::CreateRandomUuid();
+        restApi.oid = oid;
+        _restApis[oid] = restApi;
+        log_trace << "REST API created, oid: " << oid;
+        return _restApis[oid];
     }
 
     std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::listRestApis() const {
@@ -198,8 +214,8 @@ namespace Awsmock::Database {
         if (!prefix.empty()) {
             q = q.where([prefix](const Entity::ApiGateway::ApiKey &item) { return Core::StringUtils::StartsWith(item.name, prefix); });
         }
-        auto resultVector = q.to_vector();
-        return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
+        const auto resultVector = q.to_vector();
+        return Core::PageVector(resultVector, pageSize, pageIndex);
     }
 
     std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::listRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
@@ -220,8 +236,8 @@ namespace Awsmock::Database {
         if (!prefix.empty()) {
             q = q.where([prefix](const Entity::ApiGateway::RestApi &item) { return Core::StringUtils::StartsWith(item.name, prefix); });
         }
-        auto resultVector = q.to_vector();
-        return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
+        const auto resultVector = q.to_vector();
+        return Core::PageVector(resultVector, pageSize, pageIndex);
     }
 
     long ApiGatewayMemoryRepository::countRestApis(const std::string &region, const std::string &prefix) const {

@@ -28,7 +28,6 @@ namespace Awsmock::Core {
         return map;
     }
 
-
     template<class T>
     std::vector<T> PageVector(std::vector<T> vec, const long pageSize, const long pageIndex) {
         if (pageSize <= 0) {

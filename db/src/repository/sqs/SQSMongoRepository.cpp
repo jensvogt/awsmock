@@ -248,7 +248,7 @@ namespace Awsmock::Database {
         return queueList;
     }
 
-    void SQSMongoRepository::importQueue(Entity::SQS::Queue &queue) const {
+    Entity::SQS::Queue SQSMongoRepository::importQueue(Entity::SQS::Queue &queue) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "import_queues");
 
         queue.url = Core::CreateSQSQueueUrl(queue.name);
@@ -256,8 +256,7 @@ namespace Awsmock::Database {
         queue.attributes.approximateNumberOfMessages = 0;
         queue.attributes.approximateNumberOfMessagesDelayed = 0;
         queue.attributes.approximateNumberOfMessagesNotVisible = 0;
-        queue = createOrUpdateQueue(queue);
-        log_trace << "Queue imported, queueName: " << queue.name;
+        return createOrUpdateQueue(queue);
     }
 
     Entity::SQS::QueueList SQSMongoRepository::listQueues(const std::string &region) const {
@@ -329,9 +328,7 @@ namespace Awsmock::Database {
     }
 
     Entity::SQS::Queue SQSMongoRepository::createOrUpdateQueue(Entity::SQS::Queue &queue) const {
-
         if (queueArnExists(queue.arn)) {
-
             return updateQueue(queue);
         }
         return createQueue(queue);

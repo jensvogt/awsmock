@@ -196,8 +196,11 @@ namespace Awsmock::Database {
         return q;
     }
 
-    void SQSMemoryRepository::importQueue(Entity::SQS::Queue &queue) const {
-        updateQueue(queue);
+    Entity::SQS::Queue SQSMemoryRepository::importQueue(Entity::SQS::Queue &queue) const {
+        if (queueExists(queue.region, queue.name)) {
+            return updateQueue(queue);
+        }
+        return createQueue(queue);
     }
 
     long SQSMemoryRepository::purgeQueue(const std::string &queueArn) const {

@@ -198,7 +198,8 @@ namespace Awsmock::Database {
          * @param queue queue entity
          * @throws DatabaseException
          */
-        void importQueue(Entity::SQS::Queue &queue) const override;
+        [[nodiscard]]
+        Entity::SQS::Queue importQueue(Entity::SQS::Queue &queue) const override;
 
         /**
          * @brief List all available queues

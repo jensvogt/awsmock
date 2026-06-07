@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/18/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COMMON_BASE_ENTITY_H
-#define AWSMOCK_DB_ENTITY_COMMON_BASE_ENTITY_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -23,17 +22,17 @@ namespace Awsmock::Database::Entity::Common {
     struct BaseEntity {
 
         /**
-         * ID
-         */
-        std::string oid;
-
-        /**
-         * Destructor
+         * @brief Destructor
          */
         virtual ~BaseEntity() = default;
 
         /**
-         * Region
+         * @brief Object ID
+         */
+        std::string oid{};
+
+        /**
+         * @brief Region
          */
         std::string region{};
 
@@ -42,7 +41,8 @@ namespace Awsmock::Database::Entity::Common {
          *
          * @return MongoDB BSON string
          */
-        [[nodiscard]] virtual view_or_value<view, value> ToDocument() const = 0;
+        [[nodiscard]]
+        virtual view_or_value<view, value> ToDocument() const = 0;
 
         /**
          * @brief Convert to JSON representation
@@ -98,5 +98,3 @@ namespace Awsmock::Database::Entity::Common {
     };
 
 }// namespace Awsmock::Database::Entity::Common
-
-#endif// AWSMOCK_DB_ENTITY_COMMON_BASE_ENTITY_H
