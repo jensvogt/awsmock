@@ -7,6 +7,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/apigateway/ApiKeySource.h>
+#include <awsmock/entity/apigateway/Resource.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
 namespace Awsmock::Database::Entity::ApiGateway {
@@ -75,6 +76,11 @@ namespace Awsmock::Database::Entity::ApiGateway {
          * Root resource ID
          */
         std::string rootResourceId;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, Resource> resources;
 
         /**
          * Tags

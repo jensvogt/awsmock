@@ -499,6 +499,31 @@ namespace Awsmock::Database {
         }
     }
 
+    Entity::ApiGateway::RestApi ApiGatewayMongoRepository::getRestApi(const std::string &restApiId) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+        try {
+
+            document query = {};
+            if (!restApiId.empty()) {
+                query.append(kvp("restApiId", restApiId));
+            }
+
+            if (const auto result = restApiCollection.find_one(query.extract()); result.has_value()) {
+                Entity::ApiGateway::RestApi restApi;
+                restApi.FromDocument(*result);
+                return restApi;
+            }
+            return {};
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
     long ApiGatewayMongoRepository::deleteRestApi(const std::string &region, const std::string &name) const {
 
         const auto client = ConnectionPool::instance().GetConnection();

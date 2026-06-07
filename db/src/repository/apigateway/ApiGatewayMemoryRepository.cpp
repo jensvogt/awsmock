@@ -272,6 +272,18 @@ namespace Awsmock::Database {
         return {};
     }
 
+    Entity::ApiGateway::RestApi ApiGatewayMemoryRepository::getRestApi(const std::string &restApiId) const {
+
+        const auto it = std::ranges::find_if(_restApis,
+                                             [restApiId](const std::pair<std::string, Entity::ApiGateway::RestApi> &restApi) {
+                                                 return restApi.second.id == restApiId;
+                                             });
+        if (it != _restApis.end()) {
+            return it->second;
+        }
+        return {};
+    }
+
     long ApiGatewayMemoryRepository::deleteRestApi(const std::string &region, const std::string &name) const {
         boost::mutex::scoped_lock lock(_restApiMutex);
 

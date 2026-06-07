@@ -346,9 +346,11 @@ namespace Awsmock::Service {
             }
 
             // Save to the database
-            //resource = _apiGatewayDatabase->createRestApi(resource);
-
-            log_trace << "REST resource created, pathPart: " + resource.pathPart;
+            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.restApiId);
+            restApi.resources[resource.id] = resource;
+            restApi = _apiGatewayDatabase->upsertRestApi(restApi);
+            log_trace << "REST resource created, restApi:" << restApi.id << ", pathPart: " + resource.pathPart;
+            
             return Dto::ApiGateway::Mapper::map(request, resource);
 
         } catch (bsoncxx::exception &exc) {

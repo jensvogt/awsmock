@@ -247,6 +247,15 @@ namespace Awsmock::Database {
         virtual Entity::ApiGateway::RestApi getRestApi(const std::string &region, const std::string &prefix) const = 0;
 
         /**
+         * @brief Returns a REST API entity
+         *
+         * @param restApiId rest API ID
+         * @return REST API entity
+         */
+        [[nodiscard]]
+        virtual Entity::ApiGateway::RestApi getRestApi(const std::string &restApiId) const = 0;
+
+        /**
          * @brief Deletes a REST API entity
          *
          * @param region AWS region
