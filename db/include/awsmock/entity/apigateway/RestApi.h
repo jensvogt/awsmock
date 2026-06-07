@@ -102,6 +102,11 @@ namespace Awsmock::Database::Entity::ApiGateway {
         long minimumCompressionSize;
 
         /**
+         * @brief Enabled flag
+         */
+        bool enabled = false;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();

@@ -60,8 +60,12 @@ namespace Awsmock::Database {
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
     }
+    
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::listApiKeys() const {
+        return listApiKeys({}, {}, {}, 0);
+    }
 
-    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, const long limit) const {
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::listApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, const long limit) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
@@ -277,7 +281,7 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto filter = make_document(kvp("name", restApi.name));
+            const auto filter = make_document(kvp("region", restApi.region), kvp("name", restApi.name));
             const auto update = make_document(kvp("$set", restApi.ToDocument()));
 
             mongocxx::options::find_one_and_update opts;
@@ -294,6 +298,10 @@ namespace Awsmock::Database {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
+    }
+
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMongoRepository::listRestApis() const {
+        return listRestApis({});
     }
 
     std::vector<Entity::ApiGateway::RestApi> ApiGatewayMongoRepository::listRestApis(const std::string &region) const {
@@ -444,7 +452,7 @@ namespace Awsmock::Database {
                 query.append(kvp("region", region));
             }
             if (!name.empty()) {
-                query.append(kvp("name", region));
+                query.append(kvp("name", name));
             }
 
             if (const auto result = restApiCollection.find_one(query.extract()); result.has_value()) {
@@ -453,6 +461,23 @@ namespace Awsmock::Database {
                 return restApi;
             }
             return {};
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    long ApiGatewayMongoRepository::deleteRestApi(const std::string &region, const std::string &name) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+        try {
+
+            const auto result = restApiCollection.delete_one(make_document(kvp("region", region), kvp("name", name)));
+            log_trace << "Rest API deleted, count: " << result->deleted_count();
+            return result->deleted_count();
 
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();

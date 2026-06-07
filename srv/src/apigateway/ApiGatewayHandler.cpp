@@ -120,6 +120,22 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApiGatewayCommandType::UPDATE_REST_API_COUNTER: {
+
+                    Dto::ApiGateway::UpdateRestApiCounterRequest serviceRequest = Dto::ApiGateway::UpdateRestApiCounterRequest::FromJson(clientCommand);
+                    _apiGatewayService.UpdateRestApiCounter(serviceRequest);
+                    log_info << "Update REST API counter, name: " << serviceRequest.restApi.name;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::DELETE_REST_API_COUNTER: {
+
+                    Dto::ApiGateway::DeleteRestApiCounterRequest serviceRequest = Dto::ApiGateway::DeleteRestApiCounterRequest::FromJson(clientCommand);
+                    _apiGatewayService.DeleteRestApiCounter(serviceRequest);
+                    log_info << "Delete REST API counter, name: " << serviceRequest.name;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 default:
                     log_error << "Unknown action";
                     return SendResponse(request, http::status::bad_request, "Unknown action");

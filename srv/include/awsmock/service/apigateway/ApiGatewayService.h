@@ -9,10 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/apigateway/CreateRestApiResponse.h"
-#include "awsmock/repository/RepositoryFactory.h"
-
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
@@ -24,6 +20,7 @@
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysResponse.h>
+#include <awsmock/dto/apigateway/internal/DeleteRestApiCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterResponse.h>
 #include <awsmock/dto/apigateway/internal/GetRestApiCounterRequest.h>
@@ -33,8 +30,10 @@
 #include <awsmock/dto/apigateway/internal/ListRestApiCountersRequest.h>
 #include <awsmock/dto/apigateway/internal/ListRestApiCountersResponse.h>
 #include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/UpdateRestApiCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/apigateway/ApiGatewayMongoRepository.h>
 
 namespace Awsmock::Service {
@@ -137,6 +136,20 @@ namespace Awsmock::Service {
          * @return REST API response
          */
         Dto::ApiGateway::GetRestApiCounterResponse GetRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const;
+
+        /**
+         * @brief Updates a REST API entity
+         *
+         * @param request get a REST API update request
+         */
+        void UpdateRestApiCounter(const Dto::ApiGateway::UpdateRestApiCounterRequest &request) const;
+
+        /**
+         * @brief Deletes a REST API
+         *
+         * @param request delete request
+         */
+        void DeleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const;
 
       private:
 

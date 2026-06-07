@@ -133,7 +133,7 @@ namespace Awsmock::Database {
         key2 = repo->createKey(key2);
 
         // act
-        const std::vector<Entity::ApiGateway::ApiKey> result = repo->getApiKeys("", "", "", 100);
+        const std::vector<Entity::ApiGateway::ApiKey> result = repo->listApiKeys("", "", "", 100);
 
         // assert
         BOOST_CHECK_EQUAL(2, result.size());
@@ -149,7 +149,7 @@ namespace Awsmock::Database {
         key2 = repo->createKey(key2);
 
         // act
-        const std::vector<Entity::ApiGateway::ApiKey> result = repo->getApiKeys("key-one", "", "", 100);
+        const std::vector<Entity::ApiGateway::ApiKey> result = repo->listApiKeys("key-one", "", "", 100);
 
         // assert
         BOOST_CHECK_EQUAL(1, result.size());

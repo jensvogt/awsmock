@@ -35,6 +35,8 @@ namespace Awsmock::Dto::Common {
         UPDATE_API_KEY_COUNTER,
         LIST_REST_API_COUNTERS,
         GET_REST_API_COUNTER,
+        UPDATE_REST_API_COUNTER,
+        DELETE_REST_API_COUNTER,
         UNKNOWN
     };
 
@@ -49,6 +51,8 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::UPDATE_API_KEY_COUNTER, "update-api-key-counter"},
             {ApiGatewayCommandType::LIST_REST_API_COUNTERS, "list-rest-api-counters"},
             {ApiGatewayCommandType::GET_REST_API_COUNTER, "get-rest-api-counter"},
+            {ApiGatewayCommandType::UPDATE_REST_API_COUNTER, "update-rest-api-counter"},
+            {ApiGatewayCommandType::DELETE_REST_API_COUNTER, "delete-rest-api-counter"},
             {ApiGatewayCommandType::UNKNOWN, "unknown"},
     };
 

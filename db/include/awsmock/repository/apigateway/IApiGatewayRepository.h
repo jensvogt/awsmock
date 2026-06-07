@@ -67,10 +67,18 @@ namespace Awsmock::Database {
          * @param customerId customer ID
          * @param position current position
          * @param limit maximal number of keys
-         * @return created api key
+         * @return list of api keys
          */
         [[nodiscard]]
-        virtual std::vector<Entity::ApiGateway::ApiKey> getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const = 0;
+        virtual std::vector<Entity::ApiGateway::ApiKey> listApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const = 0;
+
+        /**
+         * @brief Returns a list of all API keys
+         *
+         * @return list of api keys
+         */
+        [[nodiscard]]
+        virtual std::vector<Entity::ApiGateway::ApiKey> listApiKeys() const = 0;
 
         /**
          * @brief Returns an API key by ID
@@ -203,6 +211,14 @@ namespace Awsmock::Database {
         virtual std::vector<Entity::ApiGateway::RestApi> listRestApis(const std::string &region) const = 0;
 
         /**
+         * @brief Returns a list of all REST API counters
+         *
+         * @return list of REST API counters
+         */
+        [[nodiscard]]
+        virtual std::vector<Entity::ApiGateway::RestApi> listRestApis() const = 0;
+
+        /**
          * @brief Returns the total number of REST Apis
          *
          * @param region AWS region
@@ -221,6 +237,16 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         virtual Entity::ApiGateway::RestApi getRestApi(const std::string &region, const std::string &prefix) const = 0;
+
+        /**
+         * @brief Deletes a REST API entity
+         *
+         * @param region AWS region
+         * @param name APi name
+         * @return number of REST APIs deleted
+         */
+        [[nodiscard]]
+        virtual long deleteRestApi(const std::string &region, const std::string &name) const = 0;
     };
 
 }// namespace Awsmock::Database
