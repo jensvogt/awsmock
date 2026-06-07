@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.61](https://github.com/jensvogt/awsmock/compare/1.18.60...v1.18.61) (2026-06-07)
+
+
+### Bug Fixes
+
+* delet-rest-api problems ([ebec208](https://github.com/jensvogt/awsmock/commit/ebec2086a09445bf2cae6a31e7cce664b8806033))
+* delet-rest-api problems ([4119bfc](https://github.com/jensvogt/awsmock/commit/4119bfc65d1d59c7bec29d5234e4ad08c4d12a4c))
+
 ## [1.18.60](https://github.com/jensvogt/awsmock/compare/1.18.59...v1.18.60) (2026-06-07)
 
 
