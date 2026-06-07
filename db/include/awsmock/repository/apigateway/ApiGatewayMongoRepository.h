@@ -159,6 +159,14 @@ namespace Awsmock::Database {
         bool restApiExists(const std::string &region, const std::string &name) const override;
 
         /**
+         * @brief Check the existence of an REST API
+         *
+         * @param restApiId REST API ID
+         */
+        [[nodiscard]]
+        bool restApiExistsByRestApiId(const std::string &restApiId) const override;
+
+        /**
          * @brief Create a new REST API
          *
          * @param restApi REST API entity to create
@@ -247,6 +255,15 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteRestApi(const std::string &region, const std::string &name) const override;
 
+        /**
+         * @brief Deletes a REST API entity
+         *
+         * @param restApiId REST API ID AWS region
+         * @return number of REST APIs deleted
+         */
+        [[nodiscard]]
+        long deleteRestApi(const std::string &restApiId) const override;
+        
       private:
 
         /**

@@ -98,6 +98,7 @@ namespace Awsmock::Dto::ApiGateway {
         friend CreateRestApiResponse tag_invoke(boost::json::value_to_tag<CreateRestApiResponse>, boost::json::value const &v) {
             CreateRestApiResponse r;
             r.name = Core::Json::GetStringValue(v, "name");
+            r.id = Core::Json::GetStringValue(v, "id");
             r.apiKeySource = ApiKeySourceTypeFromString(Core::Json::GetStringValue(v, "apiKeySource"));
             r.rootResourceId = Core::Json::GetStringValue(v, "rootResourceId");
             r.description = Core::Json::GetStringValue(v, "description");
@@ -124,6 +125,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"name", obj.name},
+                    {"id", obj.id},
                     {"apiKeySource", ApiKeySourceTypeToString(obj.apiKeySource)},
                     {"description", obj.description},
                     {"disableExecuteApiEndpoint", obj.disableExecuteApiEndpoint},

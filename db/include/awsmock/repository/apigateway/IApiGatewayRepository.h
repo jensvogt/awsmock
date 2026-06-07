@@ -153,6 +153,14 @@ namespace Awsmock::Database {
         /**
          * @brief Check the existence of an REST API
          *
+         * @param restApiId REST API ID
+         */
+        [[nodiscard]]
+        virtual bool restApiExistsByRestApiId(const std::string &restApiId) const = 0;
+
+        /**
+         * @brief Check the existence of an REST API
+         *
          * @param region AWS region
          * @param name REST API name
          */
@@ -247,6 +255,15 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         virtual long deleteRestApi(const std::string &region, const std::string &name) const = 0;
+
+        /**
+         * @brief Deletes a REST API entity
+         *
+         * @param restApiId REST API ID AWS region
+         * @return number of REST APIs deleted
+         */
+        [[nodiscard]]
+        virtual long deleteRestApi(const std::string &restApiId) const = 0;
     };
 
 }// namespace Awsmock::Database
