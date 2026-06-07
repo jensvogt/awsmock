@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.62](https://github.com/jensvogt/awsmock/compare/v1.18.61...v1.18.62) (2026-06-07)
+
+
+### Bug Fixes
+
+* macOS issues with find_if and Docker buildx setup ([6ccae7e](https://github.com/jensvogt/awsmock/commit/6ccae7e086f86e61d108a2e20fb70b2396880e89))
+
 ## [1.18.61](https://github.com/jensvogt/awsmock/compare/1.18.60...v1.18.61) (2026-06-07)
 
 
