@@ -2,8 +2,7 @@
 // Created by vogje01 on 2/5/26.
 //
 
-#ifndef AWSMOCK_SERVICE_LOGGING_SERVER_H
-#define AWSMOCK_SERVICE_LOGGING_SERVER_H
+#pragma once
 
 // C++ includes
 #include <mutex>
@@ -40,5 +39,3 @@ namespace Awsmock::Service::Logging {
     };
 
 }// namespace Awsmock::Service::Logging
-
-#endif// AWSMOCK_SERVICE_LOGGING_SERVER_H

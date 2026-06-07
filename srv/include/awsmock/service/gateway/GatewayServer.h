@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_SERVER_GATEWAY_SERVER_H
-#define AWSMOCK_SERVER_GATEWAY_SERVER_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -84,5 +83,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVER_GATEWAY_SERVER_H

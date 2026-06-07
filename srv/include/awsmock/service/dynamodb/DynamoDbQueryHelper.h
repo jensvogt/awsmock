@@ -2,8 +2,7 @@
 // Created by vogje01 on 3/22/26.
 //
 
-#ifndef AWSMOCK_SERVICE_DYNAMODB_QUERY_HELPER_H
-#define AWSMOCK_SERVICE_DYNAMODB_QUERY_HELPER_H
+#pragma once
 
 // C++ standard includes
 #include <stdexcept>
@@ -480,5 +479,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_DYNAMODB_QUERY_HELPER_H

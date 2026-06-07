@@ -2,8 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_S3_HANDLER_H
-#define AWSMOCK_SERVICE_S3_HANDLER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -140,5 +139,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_S3_HANDLER_H
