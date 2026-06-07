@@ -25,6 +25,11 @@ namespace Awsmock::Dto::ApiGateway {
         std::string restApiId;
 
         /**
+         * Parent ID
+         */
+        std::string parentId;
+
+        /**
          * Path part
          */
         std::string pathPart;
@@ -35,6 +40,7 @@ namespace Awsmock::Dto::ApiGateway {
             CreateResourceRequest r;
             r.restApiId = Core::Json::GetStringValue(v, "restApiId");
             r.pathPart = Core::Json::GetStringValue(v, "pathPart");
+            r.parentId = Core::Json::GetStringValue(v, "parentId");
             return r;
         }
 
@@ -44,6 +50,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"restApiId", obj.restApiId},
+                    {"parentId", obj.parentId},
                     {"pathPart", obj.pathPart},
             };
         }

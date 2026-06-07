@@ -404,7 +404,7 @@ namespace Awsmock::Database {
         // act
         BOOST_CHECK_NO_THROW({
             const long deleted = s3Database->deleteObjects(TEST_REGION, bucket.name, keys);
-            BOOST_CHECK_EQUAL(1, deleted);
+            BOOST_CHECK_EQUAL(10, deleted);
         });
         const bool result = s3Database->objectCount(bucket.region, bucket.name, {});
 

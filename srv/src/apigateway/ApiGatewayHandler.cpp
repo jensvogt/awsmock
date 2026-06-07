@@ -146,6 +146,16 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::ApiGatewayCommandType::CREATE_RESOURCE: {
+
+                    Dto::ApiGateway::CreateResourceRequest serviceRequest = Dto::ApiGateway::CreateResourceRequest::FromJson(clientCommand);
+                    serviceRequest.restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    serviceRequest.parentId = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                    const Dto::ApiGateway::CreateResourceResponse serviceResponse = _apiGatewayService.createResource(serviceRequest);
+                    log_info << "REST resource created, pathPart: " << serviceRequest.pathPart;
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
                 default:
                     log_error << "Unknown action";
                     return SendResponse(request, http::status::bad_request, "Unknown action");
