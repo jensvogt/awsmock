@@ -630,6 +630,11 @@ namespace Awsmock::Service {
         bool _tlsVerifyPeer = true;
 
         /**
+         * If the docker socket is available _initialized=true.
+         */
+        bool _initialized = false;
+
+        /**
          * @brief Domain socket pointer
          */
         static thread_local std::shared_ptr<Core::DomainSocket> _domainSocket;

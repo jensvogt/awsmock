@@ -26,6 +26,15 @@ namespace Awsmock::Service {
             _containerSocketPath = Core::Configuration::instance().get<std::string>("awsmock.docker.socket");
 #else
             _containerSocketPath = Core::Configuration::instance().get<std::string>("awsmock.docker.socket");
+            if (!std::filesystem::exists(_containerSocketPath)) {
+                log_warning << "Docker socket not found, path: " << _containerSocketPath << " - container operations will fail";
+                _initialized = false;
+            } else if (std::filesystem::status(_containerSocketPath).type() != std::filesystem::file_type::socket) {
+                log_warning << "Docker socket path exists but is not a socket, path: " << _containerSocketPath << " - container operations will fail";
+                _initialized = false;
+            } else {
+                _initialized = true;
+            }
 #endif
         }
     }
@@ -46,6 +55,10 @@ namespace Awsmock::Service {
     }
 
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            return false;
+        }
         const Core::DomainSocketResult result = GetSocket()->SendJson(http::verb::get, "/images/" + name + ":" + tag + "/json", {}, {});
         if (result.statusCode == http::status::ok) {
             log_debug << "Docker image found, name: " << name << ":" << tag;
@@ -56,6 +69,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            return;
+        }
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/images/create?name=" + name + "&tag=" + tag + "&fromImage=" + fromImage); statusCode == http::status::ok) {
             while (GetImageByName(name, tag, true).size == 0) {
                 std::this_thread::sleep_for(500ms);
@@ -67,6 +84,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::Image ContainerService::GetImageByName(const std::string &name, const std::string &tag, const bool locked) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            return {};
+        }
         const std::string imageName = name + ":" + tag;
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/images/" + imageName + "/json");
         if (statusCode != http::status::ok) {
@@ -80,9 +101,14 @@ namespace Awsmock::Service {
     }
 
     std::string ContainerService::BuildLambdaImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            return {};
+        }
         log_debug << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime;
         std::string dockerFile = WriteLambdaDockerFile(codeDir, handler, runtime, environment);
         const std::string imageFile = BuildImageFile(codeDir, name);
+
         auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
         log_trace << "Build image, status: " << statusCode << ", body: " << body;
         if (statusCode != http::status::ok) {
@@ -94,9 +120,14 @@ namespace Awsmock::Service {
     }
 
     std::string ContainerService::BuildApplicationImage(const std::string &codeDir, Database::Entity::Apps::Application &applicationEntity) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << applicationEntity.name << ":" << applicationEntity.version;
+            return {};
+        }
         log_debug << "Build image request, name: " << applicationEntity << ", tags: " << applicationEntity.version;
         const std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
         const std::string imageFile = BuildImageFile(codeDir, applicationEntity.name);
+
         if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, image: " << applicationEntity.name << ":" << applicationEntity.version << ", statusCode: " << statusCode << ", body: " << body;
             return {};
@@ -106,6 +137,10 @@ namespace Awsmock::Service {
     }
 
     std::vector<Dto::Docker::Image> ContainerService::ListImagesByName(const std::string &name, const std::string &tag) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/images/json?all=true");
         if (statusCode != http::status::ok) {
             log_error << "List images failed, statusCode: " << statusCode;
@@ -128,6 +163,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::DeleteImage(const std::string &id) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, id: " << id;
+            return;
+        }
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::delete_, "/images/" + id + "?force=true"); statusCode != http::status::ok) {
             log_error << "Delete image failed, statusCode: " << statusCode << ", id: " << id;
             throw Core::ServiceException("Delete image failed, id: " + id, statusCode);
@@ -136,6 +175,10 @@ namespace Awsmock::Service {
     }
 
     bool ContainerService::ContainerExists(const std::string &containerName) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << containerName;
+            return false;
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerName + "/json");
         if (statusCode == http::status::ok) {
             log_debug << "Docker container found, name: " << containerName;
@@ -146,6 +189,10 @@ namespace Awsmock::Service {
     }
 
     bool ContainerService::ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << imageName << ":" << tag;
+            return false;
+        }
         if (const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); containers.empty()) {
             log_info << "Docker container not found, name: " << (tag.empty() ? imageName : imageName + ":" + tag);
             return false;
@@ -154,6 +201,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::Container ContainerService::GetFirstContainerByImageName(const std::string &name, const std::string &tag) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            return {};
+        }
         const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(name, tag);
         if (containers.empty()) {
             log_info << "Docker container not found, name: " << name << ":" << tag;
@@ -167,6 +218,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::Container ContainerService::GetContainerById(const std::string &containerId) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, id: " << containerId;
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json");
         if (statusCode != http::status::ok) {
             log_info << "Get docker container by ID failed, statusCode: " << statusCode;
@@ -177,6 +232,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::Container ContainerService::GetContainerByName(const std::string &name) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name;
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + name + "/json");
         if (statusCode != http::status::ok) {
             log_info << "Get container by name failed, name: " << name << ", statusCode: " << statusCode;
@@ -187,6 +246,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::InspectContainerResponse ContainerService::InspectContainer(const std::string &containerId) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, id: " << containerId;
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         if (statusCode != http::status::ok) {
             log_info << "Inspect container failed, containerId: " << Core::StringUtils::Continuation(containerId, 16) << ", statusCode: " << statusCode;
@@ -201,6 +264,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::ListContainerResponse ContainerService::ListContainers() const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
             log_info << "List docker containers failed, statusCode: " << statusCode;
@@ -212,6 +279,10 @@ namespace Awsmock::Service {
     }
 
     std::vector<Dto::Docker::Container> ContainerService::ListContainerByImageName(const std::string &name, const std::string &tag) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
             log_info << "List docker container by image name failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
@@ -235,6 +306,11 @@ namespace Awsmock::Service {
 
     Dto::Docker::CreateContainerResponse ContainerService::SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, const int hostPort,
                                                                                const std::vector<std::string> &environment) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << imageName << ":" << tag;
+            return {};
+        }
+
         Dto::Docker::CreateContainerRequest request;
         request.hostName = hostName;
         request.domainName = "awsmock";
@@ -288,6 +364,11 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::ListStatsResponse ContainerService::ListContainerStats() const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return {};
+        }
+
         Dto::Docker::ListStatsResponse response;
         const Dto::Docker::ListContainerResponse listResponse = ListContainers();
         for (const auto &container: listResponse.containerList) {
@@ -311,7 +392,10 @@ namespace Awsmock::Service {
             log_error << "Empty container Id";
             return;
         }
-
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return;
+        }
         ws.control_callback([&ws](const boost::beast::websocket::frame_type kind, const boost::beast::string_view message) {
             if (kind == boost::beast::websocket::frame_type::close) {
                 ws.close(boost::beast::websocket::close_code::abnormal);
@@ -355,6 +439,10 @@ namespace Awsmock::Service {
     }
 
     bool ContainerService::NetworkExists(const std::string &name) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available, name: " << name;
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/networks/" + name);
         if (statusCode == http::status::ok) {
             log_debug << "Docker network found, name: " << name;
@@ -365,6 +453,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::CreateNetworkResponse ContainerService::CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/networks/create", request.ToJson());
         if (statusCode != http::status::ok) {
             log_error << "Docker network create failed, name: " << request.name << ", statusCode: " << statusCode;
@@ -375,6 +467,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::StartContainer(const std::string &containerId, const std::string &containerName) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return;
+        }
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
             log_warning << "Start container failed, name: " << containerName << ", id: " << containerId.substr(0, 12) << ", statusCode: " << statusCode;
             return;
@@ -383,6 +479,10 @@ namespace Awsmock::Service {
     }
 
     bool ContainerService::IsContainerRunning(const std::string &containerId) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/json");
         if (statusCode != http::status::ok) {
             log_debug << "Is docker container running failed, id: " << containerId;
@@ -407,6 +507,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::RestartDockerContainer(const std::string &containerId) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return;
+        }
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/restart"); statusCode != http::status::no_content) {
             log_warning << "Restart container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
@@ -415,6 +519,10 @@ namespace Awsmock::Service {
     }
 
     std::string ContainerService::GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return {};
+        }
         const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(start));
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true");
         if (statusCode != http::status::ok) {
@@ -426,6 +534,10 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::ContainerStat ContainerService::GetContainerStats(const std::string &containerId, const std::string &applicationName) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return {};
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
         if (statusCode != http::status::ok) {
             log_error << "Get container stats failed, name: " << applicationName << ", containerId: " << containerId << ", statusCode: " << statusCode;
@@ -440,6 +552,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::StopContainer(const std::string &containerId) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return;
+        }
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/stop"); statusCode != http::status::no_content && statusCode != http::status::not_modified) {
             log_warning << "Stop container failed, statusCode: " << statusCode;
             return;
@@ -452,6 +568,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::KillContainer(const std::string &containerId, const std::string &signal) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return;
+        }
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content) {
             log_warning << "Kill container failed, containerId: " << containerId << ", statusCode: " << statusCode;
             return;
@@ -464,6 +584,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::DeleteContainer(const std::string &containerId) const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return;
+        }
         if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::delete_, "/containers/" + containerId + "?force=true"); statusCode != http::status::no_content) {
             log_warning << "Delete container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
@@ -479,6 +603,10 @@ namespace Awsmock::Service {
     }
 
     void ContainerService::PruneContainers() const {
+        if (!_initialized) {
+            log_warning << "Docker not initialized, container commands not available";
+            return;
+        }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/prune");
         if (statusCode != http::status::ok) {
             log_warning << "Prune containers failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
