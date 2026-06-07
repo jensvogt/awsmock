@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.60](https://github.com/jensvogt/awsmock/compare/1.18.59...v1.18.60) (2026-06-07)
+
+
+### Bug Fixes
+
+* fix some in-memory DB issues ([72223e5](https://github.com/jensvogt/awsmock/commit/72223e588d9e5e9167085196a73259cb87c221db))
+* fix some in-memory DB issues ([d30e546](https://github.com/jensvogt/awsmock/commit/d30e5461be0805f872924452775ea390bdcfdfcf))
+* working on API gateway counter ([bb86a61](https://github.com/jensvogt/awsmock/commit/bb86a61311944d37181df109dd1e51ab24b76422))
+
 ## [1.18.59](https://github.com/jensvogt/awsmock/compare/v1.18.58...v1.18.59) (2026-06-06)
 
 
