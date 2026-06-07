@@ -32,7 +32,7 @@ awsmock is different: written in C++, it starts instantly, uses minimal memory, 
 ## Quick Start (30 seconds)
 
 ```bash
-docker run -p 4566-4568:4566-4568 jensvogt/awsmock:latest
+docker run -p 4566-4568:4566-4568 -v /var/run/docker.dock:/var/run/docker.sock jensvogt/awsmock:latest
 ```
 
 Point your AWS SDK or CLI at `http://localhost:4566`. That's it — no config, no credentials required.

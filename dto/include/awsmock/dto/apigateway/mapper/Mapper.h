@@ -2,18 +2,18 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_API_GATEWAY_MAPPER_H
-#define AWSMOCK_DTO_API_GATEWAY_MAPPER_H
+#pragma once
 
 // AwsMock includes
-#include "awsmock/dto/apigateway/CreateRestApiResponse.h"
-
-
 #include <awsmock/dto/apigateway/CreateApiKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
+#include <awsmock/dto/apigateway/CreateResourceRequest.h>
+#include <awsmock/dto/apigateway/CreateResourceResponse.h>
+#include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/model/Key.h>
 #include <awsmock/dto/apigateway/model/RestApi.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
+#include <awsmock/entity/apigateway/Resource.h>
 #include <awsmock/entity/apigateway/RestApi.h>
 
 namespace Awsmock::Dto::ApiGateway {
@@ -74,6 +74,25 @@ namespace Awsmock::Dto::ApiGateway {
         static Database::Entity::ApiGateway::ApiKey map(const Key &keyDto);
 
         /**
+         * @brief Maps a create resource request to a resource entity
+         *
+         * @param request create resource request
+         * @return resource entity
+         * @see AwsMock::Dto::ApiGateway::CreateResourceRequest
+         */
+        static Database::Entity::ApiGateway::Resource map(const CreateResourceRequest &request);
+
+        /**
+         * @brief Maps a create resource request and resource entity to a create resource response
+         *
+         * @param request create resource request
+         * @param resourceEntity resource entity
+         * @return create resource response
+         * @see AwsMock::Dto::ApiGateway::CreateResourceResponse
+         */
+        static CreateResourceResponse map(const CreateResourceRequest &request, const Database::Entity::ApiGateway::Resource &resourceEntity);
+
+        /**
          * @brief Maps a REST API request to a REST API entity
          *
          * @param request REST API create request
@@ -112,5 +131,3 @@ namespace Awsmock::Dto::ApiGateway {
     };
 
 }// namespace Awsmock::Dto::ApiGateway
-
-#endif// AWSMOCK_DTO_API_GATEWAY_MAPPER_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -71,5 +70,3 @@ namespace Awsmock::Dto::SNS {
     };
 
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_LIST_SUBSCRIPTIONS_COUNTERS_REQUEST_H

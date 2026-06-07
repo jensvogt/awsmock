@@ -66,6 +66,10 @@ namespace Awsmock::Core {
         return StringUtils::GenerateRandomAlphanumericString(12);
     }
 
+    std::string AwsUtils::CreateResourceId() {
+        return StringUtils::GenerateRandomAlphanumericString(12);
+    }
+
     std::string AwsUtils::CreateApiGatewayApiKey() {
         return StringUtils::GenerateRandomString(42);
     }

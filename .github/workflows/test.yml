@@ -1,0 +1,96 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CXX: g++-14
+  CC: gcc-14
+  VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+  VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkg-bincache"
+  VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg-bincache,readwrite"
+  BUILD_DIR: "${{ github.workspace }}/build-test"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh -u root -p password --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev
+
+      - name: Create vcpkg binary cache dir
+        run: mkdir -p ${{ github.workspace }}/vcpkg-bincache
+
+      - name: Cache vcpkg binary packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-bincache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: false
+
+      - name: Set g++-14 as default
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
+          sudo update-alternatives --set g++ /usr/bin/g++-14
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
+
+      - name: Make hostname resolve to localhost (MongoDB service)
+        run: echo "127.0.0.1 $(hostname)" | sudo tee -a /etc/hosts
+
+      - name: Install magic database
+        run: |
+          sudo mkdir -p /usr/local/awsmock/etc
+          sudo cp ${{ github.workspace }}/dist/etc/magic.mgc /usr/local/awsmock/etc/magic.mgc
+
+      - name: Configure
+        run: |
+          mkdir ${{ env.BUILD_DIR }}
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
+
+      - name: Build test binaries
+        run: cmake --build ${{ env.BUILD_DIR }} --target core_tst db_memory_tst db_mongo_tst service_tst --parallel 2
+
+      - name: Run core tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R core_tst --output-on-failure --timeout 120
+
+      - name: Run memory DB tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_memory_tst --output-on-failure --timeout 120
+
+      - name: Run MongoDB tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R db_mongo_tst --output-on-failure --timeout 120
+
+      - name: Run Service tests
+        run: ctest --test-dir ${{ env.BUILD_DIR }} -R service_tst --output-on-failure --timeout 300

@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
-#define AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -53,5 +52,3 @@ namespace Awsmock::Dto::SNS {
     typedef std::map<std::string, std::string> TagList;
 
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_TAG_RESOURCE_REQUEST_H

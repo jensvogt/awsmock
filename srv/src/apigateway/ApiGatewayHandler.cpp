@@ -23,8 +23,18 @@ namespace Awsmock::Service {
                     serviceRequest.includeValues = Core::HttpUtils::GetBoolParameter(request.target(), "includeValues");
                     serviceRequest.limit = Core::HttpUtils::GetLongParameter(request.target(), "limit", 0, 100, 100);
                     serviceRequest.position = Core::HttpUtils::GetStringParameterFromBody(request.target(), "position");
-                    const Dto::ApiGateway::GetApiKeysResponse serviceResponse = _apiGatewayService.GetApiKeys(serviceRequest);
+                    const Dto::ApiGateway::GetApiKeysResponse serviceResponse = _apiGatewayService.getApiKeys(serviceRequest);
                     log_info << "API key list created";
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::GET_REST_APIS: {
+
+                    Dto::ApiGateway::GetRestApisRequest serviceRequest;
+                    serviceRequest.limit = Core::HttpUtils::GetLongParameter(request.target(), "limit");
+                    serviceRequest.position = Core::HttpUtils::GetLongParameter(request.target(), "position");
+                    const Dto::ApiGateway::GetRestApisResponse serviceResponse = _apiGatewayService.getRestApis(serviceRequest);
+                    log_info << "REST APIs list created";
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
@@ -59,7 +69,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::CREATE_API_KEY: {
 
                     Dto::ApiGateway::CreateApiKeyRequest serviceRequest = Dto::ApiGateway::CreateApiKeyRequest::FromJson(clientCommand);
-                    const Dto::ApiGateway::CreateApiKeyResponse serviceResponse = _apiGatewayService.CreateApiKey(serviceRequest);
+                    const Dto::ApiGateway::CreateApiKeyResponse serviceResponse = _apiGatewayService.createApiKey(serviceRequest);
                     log_info << "API key created, name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
@@ -67,7 +77,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::DELETE_API_KEY: {
 
                     Dto::ApiGateway::CreateApiKeyRequest serviceRequest = Dto::ApiGateway::CreateApiKeyRequest::FromJson(clientCommand);
-                    const Dto::ApiGateway::CreateApiKeyResponse serviceResponse = _apiGatewayService.CreateApiKey(serviceRequest);
+                    const Dto::ApiGateway::CreateApiKeyResponse serviceResponse = _apiGatewayService.createApiKey(serviceRequest);
                     log_info << "API key created, name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
@@ -75,7 +85,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::LIST_API_KEY_COUNTERS: {
 
                     Dto::ApiGateway::ListApiKeyCountersRequest serviceRequest = Dto::ApiGateway::ListApiKeyCountersRequest::FromJson(clientCommand);
-                    const Dto::ApiGateway::ListApiKeyCountersResponse serviceResponse = _apiGatewayService.ListApiKeyCounters(serviceRequest);
+                    const Dto::ApiGateway::ListApiKeyCountersResponse serviceResponse = _apiGatewayService.listApiKeyCounters(serviceRequest);
                     log_info << "API key counter list created, count: " << serviceResponse.total;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
@@ -83,7 +93,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::GET_API_KEY_COUNTER: {
 
                     Dto::ApiGateway::GetApiKeyCounterRequest serviceRequest = Dto::ApiGateway::GetApiKeyCounterRequest::FromJson(clientCommand);
-                    const Dto::ApiGateway::GetApiKeyCounterResponse serviceResponse = _apiGatewayService.GetApiKeyCounter(serviceRequest);
+                    const Dto::ApiGateway::GetApiKeyCounterResponse serviceResponse = _apiGatewayService.getApiKeyCounter(serviceRequest);
                     log_info << "Get API key counter, id: " << serviceRequest.id;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
@@ -91,7 +101,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::UPDATE_API_KEY_COUNTER: {
 
                     Dto::ApiGateway::UpdateApiKeyCounterRequest serviceRequest = Dto::ApiGateway::UpdateApiKeyCounterRequest::FromJson(clientCommand);
-                    _apiGatewayService.UpdateApiKeyCounter(serviceRequest);
+                    _apiGatewayService.updateApiKeyCounter(serviceRequest);
                     log_info << "Update API key counter, id: " << serviceRequest.apiKey.id;
                     return SendResponse(request, http::status::ok);
                 }
@@ -99,7 +109,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::CREATE_REST_API: {
 
                     Dto::ApiGateway::CreateRestApiRequest serviceRequest = Dto::ApiGateway::CreateRestApiRequest::FromJson(clientCommand);
-                    const Dto::ApiGateway::CreateRestApiResponse serviceResponse = _apiGatewayService.CreateRestApi(serviceRequest);
+                    const Dto::ApiGateway::CreateRestApiResponse serviceResponse = _apiGatewayService.createRestApi(serviceRequest);
                     log_info << "REST API created, name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
@@ -107,7 +117,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::LIST_REST_API_COUNTERS: {
 
                     Dto::ApiGateway::ListRestApiCountersRequest serviceRequest = Dto::ApiGateway::ListRestApiCountersRequest::FromJson(clientCommand);
-                    Dto::ApiGateway::ListRestApiCountersResponse serviceResponse = _apiGatewayService.ListRestApiCounters(serviceRequest);
+                    Dto::ApiGateway::ListRestApiCountersResponse serviceResponse = _apiGatewayService.listRestApiCounters(serviceRequest);
                     log_info << "List REST API counter, count: " << serviceResponse.total;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
@@ -115,7 +125,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::GET_REST_API_COUNTER: {
 
                     Dto::ApiGateway::GetRestApiCounterRequest serviceRequest = Dto::ApiGateway::GetRestApiCounterRequest::FromJson(clientCommand);
-                    Dto::ApiGateway::GetRestApiCounterResponse serviceResponse = _apiGatewayService.GetRestApiCounter(serviceRequest);
+                    Dto::ApiGateway::GetRestApiCounterResponse serviceResponse = _apiGatewayService.getRestApiCounter(serviceRequest);
                     log_info << "Get REST API counter, name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
@@ -123,7 +133,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::UPDATE_REST_API_COUNTER: {
 
                     Dto::ApiGateway::UpdateRestApiCounterRequest serviceRequest = Dto::ApiGateway::UpdateRestApiCounterRequest::FromJson(clientCommand);
-                    _apiGatewayService.UpdateRestApiCounter(serviceRequest);
+                    _apiGatewayService.updateRestApiCounter(serviceRequest);
                     log_info << "Update REST API counter, name: " << serviceRequest.restApi.name;
                     return SendResponse(request, http::status::ok);
                 }
@@ -131,7 +141,7 @@ namespace Awsmock::Service {
                 case Dto::Common::ApiGatewayCommandType::DELETE_REST_API_COUNTER: {
 
                     Dto::ApiGateway::DeleteRestApiCounterRequest serviceRequest = Dto::ApiGateway::DeleteRestApiCounterRequest::FromJson(clientCommand);
-                    _apiGatewayService.DeleteRestApiCounter(serviceRequest);
+                    _apiGatewayService.deleteRestApiCounter(serviceRequest);
                     log_info << "Delete REST API counter, name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok);
                 }
@@ -168,7 +178,7 @@ namespace Awsmock::Service {
 
                     Dto::ApiGateway::DeleteApiKeyRequest serviceRequest;
                     serviceRequest.apiKey = Core::HttpUtils::GetPathParameter(request.target(), 1);
-                    _apiGatewayService.DeleteApiKey(serviceRequest);
+                    _apiGatewayService.deleteApiKey(serviceRequest);
                     log_info << "API key deleted, id: " << serviceRequest.apiKey;
                     return SendResponse(request, http::status::accepted);
                 }

@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_API_GATEWAY_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_API_GATEWAY_CLIENT_COMMAND_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -28,7 +27,11 @@ namespace Awsmock::Dto::Common {
         CREATE_API_KEY,
         GET_API_KEYS,
         DELETE_API_KEY,
+        GET_REST_APIS,
         CREATE_REST_API,
+        CREATE_RESOURCE,
+        UPDATE_RESOURCE,
+        DELETE_RESOURCE,
         // AwsMock internal
         LIST_API_KEY_COUNTERS,
         GET_API_KEY_COUNTER,
@@ -45,6 +48,10 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::GET_API_KEYS, "get-api-keys"},
             {ApiGatewayCommandType::DELETE_API_KEY, "delete-api-key"},
             {ApiGatewayCommandType::CREATE_REST_API, "create-rest-api"},
+            {ApiGatewayCommandType::CREATE_RESOURCE, "create-resource"},
+            {ApiGatewayCommandType::GET_REST_APIS, "get-rest-apis"},
+            {ApiGatewayCommandType::UPDATE_RESOURCE, "update-resource"},
+            {ApiGatewayCommandType::DELETE_RESOURCE, "delete-resource"},
             // AwsMock internal commands
             {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
             {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},
@@ -113,5 +120,3 @@ namespace Awsmock::Dto::Common {
     };
 
 }// namespace Awsmock::Dto::Common
-
-#endif// AWSMOCK_DTO_COMMON_API_GATEWAY_CLIENT_COMMAND_H
