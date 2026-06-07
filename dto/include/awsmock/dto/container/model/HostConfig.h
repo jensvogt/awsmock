@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_DOCKER_HOST_CONFIG_H
 
 // C++ includes
+#include <algorithm>
 #include <chrono>
 #include <string>
 
