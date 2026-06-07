@@ -286,7 +286,7 @@ namespace Awsmock::Service {
 
     void ApiGatewayService::deleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_rest_api");
-        log_debug << "Update REST API counter request, region:  " << request.region << ", name: " << request.name;
+        log_debug << "Delete REST API counter request, region:  " << request.region << ", name: " << request.name;
 
         if (!_apiGatewayDatabase->restApiExists(request.region, request.name)) {
             log_error << "REST API does not exist, region: " << request.region << ", name: " << request.name;
@@ -297,6 +297,27 @@ namespace Awsmock::Service {
 
             // Delete the API key
             const long count = _apiGatewayDatabase->deleteRestApi(request.region, request.name);
+            log_debug << "REST API deleted, count: " << count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::deleteRestApi(const Dto::ApiGateway::DeleteRestApiRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_rest_api");
+        log_debug << "Delete REST API request, region:  " << request.region << ", restApiId: " << request.restApiId;
+
+        if (!_apiGatewayDatabase->restApiExistsByRestApiId(request.restApiId)) {
+            log_error << "REST API does not exist, region: " << request.region << ", restApiId: " << request.restApiId;
+            throw Core::ServiceException("REST API key does not exist, region: " + request.region + ", restApiId: " + request.restApiId);
+        }
+
+        try {
+
+            // Delete the API key
+            const long count = _apiGatewayDatabase->deleteRestApi(request.restApiId);
             log_debug << "REST API deleted, count: " << count;
 
         } catch (bsoncxx::exception &exc) {

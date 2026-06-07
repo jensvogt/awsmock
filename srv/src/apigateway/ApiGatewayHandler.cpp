@@ -183,6 +183,15 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::accepted);
                 }
 
+                case Dto::Common::ApiGatewayCommandType::DELETE_REST_API: {
+
+                    Dto::ApiGateway::DeleteRestApiRequest serviceRequest;
+                    serviceRequest.restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    _apiGatewayService.deleteRestApi(serviceRequest);
+                    log_info << "REST API deleted, restApiId: " << serviceRequest.restApiId;
+                    return SendResponse(request, http::status::accepted);
+                }
+
                 default:
                     log_error << "Unknown action";
                     return SendResponse(request, http::status::bad_request, "Unknown action");

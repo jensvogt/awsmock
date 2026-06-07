@@ -125,6 +125,7 @@ namespace Awsmock::Dto::ApiGateway {
         response.user = request.user;
         response.requestId = request.requestId;
         response.name = restApiEntity.name;
+        response.id = restApiEntity.id;
         response.apiKeySource = ApiKeySourceTypeFromString(Database::Entity::ApiGateway::ApiKeySourceTypeToString(restApiEntity.apiKeySource));
         response.description = restApiEntity.description;
         response.policy = restApiEntity.policy;

@@ -84,7 +84,7 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         std::vector<Entity::ApiGateway::ApiKey> listApiKeys() const override;
-        
+
         /**
          * @brief Returns an API key by ID
          *
@@ -161,6 +161,14 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         bool restApiExists(const std::string &region, const std::string &name) const override;
+
+        /**
+         * @brief Check the existence of an REST API
+         *
+         * @param restApiId REST API ID
+         */
+        [[nodiscard]]
+        bool restApiExistsByRestApiId(const std::string &restApiId) const override;
 
         /**
          * @brief Create a new REST API
@@ -242,6 +250,15 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         long deleteRestApi(const std::string &region, const std::string &name) const override;
+
+        /**
+         * @brief Deletes a REST API entity
+         *
+         * @param restApiId REST API ID AWS region
+         * @return number of REST APIs deleted
+         */
+        [[nodiscard]]
+        long deleteRestApi(const std::string &restApiId) const override;
 
         /**
          * @brief Returns a list of all REST API counters

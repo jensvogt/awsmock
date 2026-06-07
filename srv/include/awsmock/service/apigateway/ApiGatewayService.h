@@ -20,6 +20,7 @@
 #include <awsmock/dto/apigateway/CreateRestApiRequest.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
+#include <awsmock/dto/apigateway/DeleteRestApiRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysResponse.h>
 #include <awsmock/dto/apigateway/GetRestApisRequest.h>
@@ -164,6 +165,13 @@ namespace Awsmock::Service {
          * @param request delete request
          */
         void deleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const;
+
+        /**
+         * @brief Deletes a REST API
+         *
+         * @param request delete request
+         */
+        void deleteRestApi(const Dto::ApiGateway::DeleteRestApiRequest &request) const;
 
         /**
          * @brief Creates a new resource

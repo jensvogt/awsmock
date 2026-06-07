@@ -148,6 +148,14 @@ namespace Awsmock::Database {
                                     }) != _restApis.end();
     }
 
+    bool ApiGatewayMemoryRepository::restApiExistsByRestApiId(const std::string &restApiId) const {
+
+        return std::ranges::find_if(_restApis,
+                                    [&restApiId](const std::pair<const std::string, Entity::ApiGateway::RestApi> &restApi) {
+                                        return restApi.second.id == restApiId;
+                                    }) != _restApis.end();
+    }
+
     Entity::ApiGateway::RestApi ApiGatewayMemoryRepository::createRestApi(Entity::ApiGateway::RestApi &restApi) const {
         boost::mutex::scoped_lock lock(_restApiMutex);
 
@@ -265,11 +273,22 @@ namespace Awsmock::Database {
     }
 
     long ApiGatewayMemoryRepository::deleteRestApi(const std::string &region, const std::string &name) const {
-        boost::mutex::scoped_lock lock(_apiKeyMutex);
+        boost::mutex::scoped_lock lock(_restApiMutex);
 
-        const auto count = std::erase_if(_apiKeys, [region, name](const auto &item) {
+        const auto count = std::erase_if(_restApis, [region, name](const auto &item) {
             auto const &[key, value] = item;
             return value.region == region && value.name == name;
+        });
+        log_debug << "REST API deleted, count: " << count;
+        return count;
+    }
+
+    long ApiGatewayMemoryRepository::deleteRestApi(const std::string &restApiId) const {
+        boost::mutex::scoped_lock lock(_restApiMutex);
+
+        const auto count = std::erase_if(_restApis, [restApiId](const auto &item) {
+            auto const &[key, value] = item;
+            return value.id == restApiId;
         });
         log_debug << "REST API deleted, count: " << count;
         return count;

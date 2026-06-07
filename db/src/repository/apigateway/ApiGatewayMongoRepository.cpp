@@ -60,7 +60,7 @@ namespace Awsmock::Database {
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
     }
-    
+
     std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMongoRepository::listApiKeys() const {
         return listApiKeys({}, {}, {}, 0);
     }
@@ -229,6 +229,11 @@ namespace Awsmock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
             const int64_t count = restApiCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
             log_trace << "REST API exists: " << std::boolalpha << count;
             return count > 0;
@@ -245,7 +250,33 @@ namespace Awsmock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
             const int64_t count = restApiCollection.count_documents(make_document(kvp("_id", bsoncxx::oid(oid))));
+            log_trace << "REST API exists: " << std::boolalpha << count;
+            return count > 0;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    bool ApiGatewayMongoRepository::restApiExistsByRestApiId(const std::string &restApiId) const {
+
+        try {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+            // Set limit to 1 (Very important for performance!)
+            mongocxx::options::count options;
+            options.limit(1);
+
+            const int64_t count = restApiCollection.count_documents(make_document(kvp("id", restApiId)), options);
             log_trace << "REST API exists: " << std::boolalpha << count;
             return count > 0;
 
@@ -476,6 +507,23 @@ namespace Awsmock::Database {
         try {
 
             const auto result = restApiCollection.delete_one(make_document(kvp("region", region), kvp("name", name)));
+            log_trace << "Rest API deleted, count: " << result->deleted_count();
+            return result->deleted_count();
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    long ApiGatewayMongoRepository::deleteRestApi(const std::string &restApiId) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+
+        try {
+
+            const auto result = restApiCollection.delete_one(make_document(kvp("id", restApiId)));
             log_trace << "Rest API deleted, count: " << result->deleted_count();
             return result->deleted_count();
 
