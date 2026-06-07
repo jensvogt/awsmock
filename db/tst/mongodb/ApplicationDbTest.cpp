@@ -189,11 +189,12 @@ namespace Awsmock::Database {
         BOOST_CHECK_EQUAL(application.name, TEST_APPLICATION_NAME);
 
         // act
-        applicationRepository->deleteApplication(TEST_REGION, TEST_APPLICATION_NAME);
+        const long deleted = applicationRepository->deleteApplication(TEST_REGION, TEST_APPLICATION_NAME);
         const bool result = applicationRepository->applicationExists(TEST_REGION, TEST_APPLICATION_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
+        BOOST_CHECK_EQUAL(1, deleted);
     }
 
     BOOST_AUTO_TEST_SUITE_END()

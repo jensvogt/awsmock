@@ -507,6 +507,8 @@ jobs:
             GH_TOKEN=${{ env.GH_TOKEN }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+        env:
+          DOCKER_BUILD_SUMMARY: false
 
   publish:
     name: Publish Release & Attach Installers
