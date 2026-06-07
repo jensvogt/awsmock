@@ -39,7 +39,11 @@ namespace Awsmock::Database {
         return _apiKeys[key.oid];
     }
 
-    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryRepository::getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const {
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryRepository::listApiKeys() const {
+        return listApiKeys({}, {}, {}, 0);
+    }
+
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayMemoryRepository::listApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
         auto q = Core::from(Core::NumberUtils::toVector(_apiKeys));
@@ -159,6 +163,10 @@ namespace Awsmock::Database {
         return createRestApi(restApi);
     }
 
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::listRestApis() const {
+        return listRestApis({});
+    }
+
     std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryRepository::listRestApis(const std::string &region) const {
         boost::mutex::scoped_lock lock(_apiKeyMutex);
 
@@ -239,4 +247,16 @@ namespace Awsmock::Database {
         }
         return {};
     }
+
+    long ApiGatewayMemoryRepository::deleteRestApi(const std::string &region, const std::string &name) const {
+        boost::mutex::scoped_lock lock(_apiKeyMutex);
+
+        const auto count = std::erase_if(_apiKeys, [region, name](const auto &item) {
+            auto const &[key, value] = item;
+            return value.region == region && value.name == name;
+        });
+        log_debug << "REST API deleted, count: " << count;
+        return count;
+    }
+
 }// namespace Awsmock::Database

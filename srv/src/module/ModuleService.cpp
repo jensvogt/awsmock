@@ -166,11 +166,12 @@ namespace Awsmock::Service {
                     infrastructure.applications = _applicationDatabase->listApplications({}, {}, 0, 0, {});
                 }
 
-            } else if (module == "apigateway") {
+            } else if (module == "api-gateway") {
 
                 if (request.IsInfrastructure()) {
                     const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
-                    infrastructure.apiKeys = _apiGatewayDatabase->getApiKeys({}, {}, {}, 0);
+                    infrastructure.apiKeys = _apiGatewayDatabase->listApiKeys();
+                    infrastructure.restApis = _apiGatewayDatabase->listRestApis();
                 }
             }
         }
@@ -523,4 +524,4 @@ namespace Awsmock::Service {
         }
         return response;
     }
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

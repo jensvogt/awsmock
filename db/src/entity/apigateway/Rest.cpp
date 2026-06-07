@@ -21,6 +21,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         keyDocument.append(kvp("rootResourceId", rootResourceId));
         keyDocument.append(kvp("disableExecuteApiEndpoint", disableExecuteApiEndpoint));
         keyDocument.append(kvp("minimumCompressionSize", bsoncxx::types::b_int64(minimumCompressionSize)));
+        keyDocument.append(kvp("enabled", enabled));
         keyDocument.append(kvp("created", bsoncxx::types::b_date(created)));
         keyDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -68,6 +69,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         rootResourceId = Core::Bson::BsonUtils::GetStringValue(mResult, "rootResourceId");
         disableExecuteApiEndpoint = Core::Bson::BsonUtils::GetBoolValue(mResult, "disableExecuteApiEndpoint");
         minimumCompressionSize = Core::Bson::BsonUtils::GetLongValue(mResult, "minimumCompressionSize");
+        enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

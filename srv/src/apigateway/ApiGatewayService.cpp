@@ -55,7 +55,7 @@ namespace Awsmock::Service {
         try {
 
             // Get the list of API keys
-            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase->getApiKeys(request.nameQuery, request.customerId, request.position, request.limit);
+            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase->listApiKeys(request.nameQuery, request.customerId, request.position, request.limit);
 
             log_trace << "Get API keys, count: " << keys.size();
             Dto::ApiGateway::GetApiKeysResponse response{};
@@ -230,6 +230,51 @@ namespace Awsmock::Service {
             Dto::ApiGateway::GetRestApiCounterResponse response{};
             response.restApi = Dto::ApiGateway::Mapper::map(restApi);
             return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::UpdateRestApiCounter(const Dto::ApiGateway::UpdateRestApiCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "update_rest_api");
+        log_debug << "Update REST API counter request, region:  " << request.region << ", name: " << request.restApi.name;
+
+        if (!_apiGatewayDatabase->restApiExists(request.region, request.restApi.name)) {
+            log_error << "REST API does not exist, region: " << request.region << ", name: " << request.restApi.name;
+            throw Core::ServiceException("REST API key does not exist, region: " + request.region + ", name: " + request.restApi.name);
+        }
+
+        try {
+
+            // Get the API key
+            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.region, request.restApi.name);
+
+            restApi.enabled = request.restApi.enabled;
+            restApi = _apiGatewayDatabase->upsertRestApi(restApi);
+            log_debug << "REST API updated, name: " + restApi.name;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::DeleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_rest_api");
+        log_debug << "Update REST API counter request, region:  " << request.region << ", name: " << request.name;
+
+        if (!_apiGatewayDatabase->restApiExists(request.region, request.name)) {
+            log_error << "REST API does not exist, region: " << request.region << ", name: " << request.name;
+            throw Core::ServiceException("REST API key does not exist, region: " + request.region + ", name: " + request.name);
+        }
+
+        try {
+
+            // Delete the API key
+            const long count = _apiGatewayDatabase->deleteRestApi(request.region, request.name);
+            log_debug << "REST API deleted, count: " << count;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

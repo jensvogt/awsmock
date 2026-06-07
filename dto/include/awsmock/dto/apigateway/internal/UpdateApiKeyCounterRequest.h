@@ -15,7 +15,7 @@
 namespace Awsmock::Dto::ApiGateway {
 
     /**
-     * @brief List user counters request
+     * @brief Update API key request
      *
      * @author jens.vogt\@opitz-consulting.com
      */

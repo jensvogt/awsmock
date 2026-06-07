@@ -75,8 +75,16 @@ namespace Awsmock::Database {
          * @return created api key
          */
         [[nodiscard]]
-        std::vector<Entity::ApiGateway::ApiKey> getApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const override;
+        std::vector<Entity::ApiGateway::ApiKey> listApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const override;
 
+        /**
+         * @brief Returns a list of all API keys
+         *
+         * @return list of api keys
+         */
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::ApiKey> listApiKeys() const override;
+        
         /**
          * @brief Returns an API key by ID
          *
@@ -224,6 +232,24 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         Entity::ApiGateway::RestApi getRestApi(const std::string &region, const std::string &name) const override;
+
+        /**
+         * @brief Deletes a REST API entity
+         *
+         * @param region AWS region
+         * @param name APi name
+         * @return REST API entity
+         */
+        [[nodiscard]]
+        long deleteRestApi(const std::string &region, const std::string &name) const override;
+
+        /**
+         * @brief Returns a list of all REST API counters
+         *
+         * @return list of REST API counters
+         */
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::RestApi> listRestApis() const override;
 
       private:
 
