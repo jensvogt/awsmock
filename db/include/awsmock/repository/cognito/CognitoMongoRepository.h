@@ -8,10 +8,12 @@
 #include <string>
 #include <vector>
 
+// Mongodb includes
+#include <mongocxx/options/count.hpp>
+
 // AwsMock includes
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
 #include <awsmock/utils/SortColumn.h>
 
@@ -24,8 +26,7 @@ namespace Awsmock::Database {
      */
     class CognitoMongoRepository : public ICognitoRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -410,8 +411,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         bool clientIdExists(const std::string &region, const std::string &clientId) const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -438,4 +438,4 @@ namespace Awsmock::Database {
         static constexpr auto _groupCollection = "cognito_group";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

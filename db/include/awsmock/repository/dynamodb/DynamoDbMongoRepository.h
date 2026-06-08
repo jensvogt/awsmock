@@ -10,10 +10,9 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/dynamodb/DynamoDbToMongoTranslator.h>
 #include <awsmock/repository/dynamodb/IDynamoDbRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/SortColumn.h>
 
 #define QUERY_SIZE_LIMIT (1024 * 1024)
@@ -27,8 +26,7 @@ namespace Awsmock::Database {
      */
     class DynamoDbMongoRepository final : public IDynamoDbRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -337,8 +335,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::vector<Entity::DynamoDb::Item> getItems(const std::string &region, const std::string &tableName) const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -381,4 +378,4 @@ namespace Awsmock::Database {
         std::string _accountId;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

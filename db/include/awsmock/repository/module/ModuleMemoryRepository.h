@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ standard includes
+#include <ranges>
 #include <string>
 
 // Boost includes
@@ -15,7 +16,6 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/module/Module.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/module/IModuleRepository.h>
 
 namespace Awsmock::Database {

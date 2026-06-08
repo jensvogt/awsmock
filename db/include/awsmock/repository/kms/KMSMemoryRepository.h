@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ includes
+#include <ranges>
 #include <string>
 
 // Boost includes
@@ -14,7 +15,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/kms/Key.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/kms/IKMSRepository.h>
 
 namespace Awsmock::Database {
@@ -26,8 +26,7 @@ namespace Awsmock::Database {
      */
     class KMSMemoryRepository final : public IKMSRepository {
 
-      public:
-
+    public:
         /**
          * Constructor
          */
@@ -142,8 +141,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllKeys() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -160,4 +158,4 @@ namespace Awsmock::Database {
         static boost::mutex _keyMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

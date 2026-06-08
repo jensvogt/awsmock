@@ -12,9 +12,8 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/RestApi.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/apigateway/IApiGatewayRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -26,8 +25,7 @@ namespace Awsmock::Database {
      */
     class ApiGatewayMongoRepository final : public IApiGatewayRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -253,7 +251,7 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         Entity::ApiGateway::RestApi getRestApi(const std::string &restApiId) const override;
-        
+
         /**
          * @brief Deletes a REST API entity
          *
@@ -273,8 +271,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteRestApi(const std::string &restApiId) const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -296,4 +293,4 @@ namespace Awsmock::Database {
         static constexpr auto _restApiCollectionName = "apigateway_rest";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

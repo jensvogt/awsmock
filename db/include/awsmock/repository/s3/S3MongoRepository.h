@@ -24,9 +24,8 @@
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/s3/IS3Repository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/SortColumn.h>
 
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_counter"
@@ -43,8 +42,7 @@ namespace Awsmock::Database {
      */
     class S3MongoRepository final : public IS3Repository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -495,8 +493,7 @@ namespace Awsmock::Database {
          */
         void adjustObjectCounters() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -505,7 +502,7 @@ namespace Awsmock::Database {
         /**
          * Allowed event types
          */
-        static std::map<std::string, std::vector<std::string>> allowedEventTypes;
+        static std::map<std::string, std::vector<std::string> > allowedEventTypes;
 
         /**
          * Database name
@@ -523,4 +520,4 @@ namespace Awsmock::Database {
         static constexpr auto _objectCollectionName = "s3_object";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

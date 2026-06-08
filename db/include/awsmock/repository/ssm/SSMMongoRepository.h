@@ -11,11 +11,11 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/ssm/ISSMRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -27,8 +27,7 @@ namespace Awsmock::Database {
      */
     class SSMMongoRepository final : public ISSMRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -147,8 +146,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllParameters() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -165,4 +163,4 @@ namespace Awsmock::Database {
         static constexpr auto _parameterCollectionName = "ssm_parameter";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

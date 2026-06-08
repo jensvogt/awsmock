@@ -8,9 +8,10 @@
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/monitoring/Counter.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/monitoring/IMonitoringRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace Awsmock::Database {
 
@@ -21,8 +22,7 @@ namespace Awsmock::Database {
      */
     class MonitoringMongoRepository final : public IMonitoringRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -73,8 +73,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteOldMonitoringData(int retentionPeriod) const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -116,4 +115,4 @@ namespace Awsmock::Database {
             labelValue = std::move(keys[2]);
         }
     }
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

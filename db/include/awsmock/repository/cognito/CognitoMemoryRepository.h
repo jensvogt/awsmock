@@ -17,7 +17,6 @@
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/cognito/ICognitoRepository.h>
 #include <awsmock/utils/SortColumn.h>
 
@@ -33,8 +32,7 @@ namespace Awsmock::Database {
      */
     class CognitoMemoryRepository final : public ICognitoRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -381,8 +379,7 @@ namespace Awsmock::Database {
          */
         bool clientIdExists(const std::string &region, const std::string &clientId) const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -419,4 +416,4 @@ namespace Awsmock::Database {
         static boost::mutex _groupMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

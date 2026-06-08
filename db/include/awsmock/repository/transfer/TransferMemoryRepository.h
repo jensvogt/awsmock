@@ -2,26 +2,23 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#ifndef AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H
-#define AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H
+#pragma once
 
 // C++ includes
+#include <ranges>
 #include <string>
 
 // Boost includes
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include "ITransferRepository.h"
-
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/transfer/User.h>
-#include <awsmock/repository/Database.h>
+#include <awsmock/repository/transfer/ITransferRepository.h>
 
 namespace Awsmock::Database {
 
@@ -32,8 +29,7 @@ namespace Awsmock::Database {
      */
     class TransferMemoryRepository final : public ITransferRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -223,8 +219,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllTransfers() const override;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
@@ -248,6 +243,4 @@ namespace Awsmock::Database {
         static boost::mutex _userMutex;
     };
 
-}// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_TRANSFER_MEMORYDB_H
+} // namespace Awsmock::Database

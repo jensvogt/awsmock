@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ standard includes
+#include <ranges>
 #include <string>
 #include <vector>
 
@@ -17,14 +18,11 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include "ISSMRepository.h"
-
-
+#include <awsmock/repository/ssm/ISSMRepository.h>
 #include <awsmock/core/Linq.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -36,8 +34,7 @@ namespace Awsmock::Database {
      */
     class SSMMemoryRepository final : public ISSMRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -154,8 +151,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllParameters() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -172,4 +168,4 @@ namespace Awsmock::Database {
         static boost::mutex _parameterMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

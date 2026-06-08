@@ -61,19 +61,19 @@ namespace Awsmock::Manager {
     void Manager::InitializeDatabase() const {
 
         // Get database variables
+        const std::string databaseName = Core::Configuration::instance().getOr<std::string>("awsmock.mongodb.active", "awsmock");
         if (Core::Configuration::instance().getOr<bool>("awsmock.mongodb.active", false)) {
 
-            Database::Database::instance().initialize();
-            Database::RepositoryFactory::instance().initialize(Database::BackendType::MONGODB);
+            Database::RepositoryFactory::instance().initialize(Database::BackendType::MONGODB, databaseName);
 
             // Create database indexes in a background thread
             Core::Scheduler::instance().AddOneTimeTask("create-indexes", [] {
-                //Database::RepositoryFactory::instance::instance().createIndexes();
+                Database::RepositoryFactory::instance().createIndexes();
             });
             log_info << "Mongo database initialized";
 
         } else {
-            Database::RepositoryFactory::instance().initialize(Database::BackendType::MEMORY);
+            Database::RepositoryFactory::instance().initialize(Database::BackendType::MEMORY, databaseName);
             log_info << "In-memory database initialized";
         }
     }
@@ -305,4 +305,4 @@ namespace Awsmock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-}// namespace Awsmock::Manager
+} // namespace Awsmock::Manager

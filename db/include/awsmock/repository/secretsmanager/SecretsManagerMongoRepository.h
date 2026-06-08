@@ -14,8 +14,8 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/secretsmanager/ISecretsManagerRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace Awsmock::Database {
 
@@ -26,8 +26,7 @@ namespace Awsmock::Database {
      */
     class SecretsManagerMongoRepository final : public ISecretsManagerRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -189,8 +188,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long DeleteAllSecrets() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -207,4 +205,4 @@ namespace Awsmock::Database {
         static constexpr auto _parameterCollectionName = "secretsmanager_parameter";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

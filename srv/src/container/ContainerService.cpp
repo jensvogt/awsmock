@@ -21,9 +21,11 @@ namespace Awsmock::Service {
             _tlsKeyFile = Core::Configuration::instance().get<std::string>("awsmock.docker.tls.key");
             _tlsVerifyPeer = Core::Configuration::instance().get<bool>("awsmock.docker.tls.verify-peer");
             log_info << "Docker TLS enabled, host: " << _tlsHost << ", port: " << _tlsPort;
+            _initialized = true;
         } else {
 #ifdef WIN32
             _containerSocketPath = Core::Configuration::instance().get<std::string>("awsmock.docker.socket");
+            _initialized = true;
 #else
             _containerSocketPath = Core::Configuration::instance().get<std::string>("awsmock.docker.socket");
             if (!std::filesystem::exists(_containerSocketPath)) {
@@ -107,7 +109,7 @@ namespace Awsmock::Service {
         }
         log_debug << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime;
         std::string dockerFile = WriteLambdaDockerFile(codeDir, handler, runtime, environment);
-        const std::string imageFile = BuildImageFile(codeDir, name);
+        std::string imageFile = BuildImageFile(codeDir, name);
 
         auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
         log_trace << "Build image, status: " << statusCode << ", body: " << body;
@@ -125,7 +127,7 @@ namespace Awsmock::Service {
             return {};
         }
         log_debug << "Build image request, name: " << applicationEntity << ", tags: " << applicationEntity.version;
-        const std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
+        std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
         const std::string imageFile = BuildImageFile(codeDir, applicationEntity.name);
 
         if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {}); statusCode != http::status::ok) {
@@ -733,10 +735,10 @@ namespace Awsmock::Service {
 
         std::ofstream cfgOfs(Core::FileUtils::appendPath(codeDir, "config"));
         cfgOfs << "[default]\n"
-               << "region=" << region << "\n"
-               << "output=json\n";
+                << "region=" << region << "\n"
+                << "output=json\n";
 
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

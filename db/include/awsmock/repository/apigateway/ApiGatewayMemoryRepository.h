@@ -16,7 +16,6 @@
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/RestApi.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/apigateway/IApiGatewayRepository.h>
 #include <awsmock/utils/SortColumn.h>
 
@@ -32,8 +31,7 @@ namespace Awsmock::Database {
      */
     class ApiGatewayMemoryRepository final : public IApiGatewayRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -277,8 +275,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::vector<Entity::ApiGateway::RestApi> listRestApis() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -305,4 +302,4 @@ namespace Awsmock::Database {
         static boost::mutex _restApiMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database
