@@ -35,7 +35,7 @@ namespace Awsmock::Database {
 
     struct ApplicationMemoryDbFixture {
         ApplicationMemoryDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+            RepositoryFactory::instance().initialize(BackendType::MEMORY, "test");
         }
         ~ApplicationMemoryDbFixture() {
             const long count = RepositoryFactory::instance().applicationRepository()->deleteAllApplications();

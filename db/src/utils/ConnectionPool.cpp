@@ -18,8 +18,10 @@ namespace Awsmock::Database {
         // MongoDB URL
         mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
 
-        // Create a connection pool
-        _instance = std::make_shared<mongocxx::instance>();
+        // Create a connection pool (mongocxx::instance must be created exactly once per process)
+        if (!_instance) {
+            _instance = std::make_shared<mongocxx::instance>();
+        }
         _pool = std::make_shared<mongocxx::pool>(_uri);
         log_info << "MongoDB database initialized";
     }

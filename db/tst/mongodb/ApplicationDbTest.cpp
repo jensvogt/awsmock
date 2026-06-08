@@ -35,7 +35,7 @@ namespace Awsmock::Database {
 
     struct ApplicationMongoDbFixture {
         ApplicationMongoDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
         ~ApplicationMongoDbFixture() {
             const long count = RepositoryFactory::instance().applicationRepository()->deleteAllApplications();

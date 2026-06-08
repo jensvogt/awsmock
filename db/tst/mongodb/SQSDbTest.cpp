@@ -41,7 +41,7 @@ namespace Awsmock::Database {
 
     struct SqsDbFixture {
         SqsDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
         ~SqsDbFixture() {
             const long messageCount = RepositoryFactory::instance().sqsRepository()->deleteAllMessages();

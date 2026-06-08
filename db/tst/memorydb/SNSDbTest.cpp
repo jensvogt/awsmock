@@ -40,7 +40,7 @@ namespace Awsmock::Database {
 
     struct SnsMemoryDbFixture {
         SnsMemoryDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+            RepositoryFactory::instance().initialize(BackendType::MEMORY, "test");
         }
         ~SnsMemoryDbFixture() {
             const long messageCount = RepositoryFactory::instance().snsRepository()->deleteAllMessages();

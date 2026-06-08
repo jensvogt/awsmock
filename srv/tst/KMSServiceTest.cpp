@@ -40,7 +40,7 @@ namespace Awsmock::Database {
 
     struct KMSServiceFixture {
         KMSServiceFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
         ~KMSServiceFixture() {
             try {

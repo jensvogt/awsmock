@@ -49,7 +49,7 @@ namespace Awsmock::Database {
 
     struct CognitoServiceFixture {
         CognitoServiceFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
         ~CognitoServiceFixture() {
             try {

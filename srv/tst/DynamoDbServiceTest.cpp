@@ -87,7 +87,7 @@ namespace Awsmock::Database {
 
     struct DynamoDbServiceFixture {
         DynamoDbServiceFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
         ~DynamoDbServiceFixture() {
             try {
