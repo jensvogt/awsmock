@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/10/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H
-#define AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -53,5 +52,3 @@ namespace Awsmock::Database::Entity::SQS {
     };
 
 }// namespace Awsmock::Database::Entity::SQS
-
-#endif// AWSMOCK_DB_ENTITY_SQS_REDRIVE_POLICY_H

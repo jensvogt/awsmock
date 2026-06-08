@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_LAMBDA_H
-#define AWSMOCK_DB_ENTITY_LAMBDA_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -495,5 +494,3 @@ namespace Awsmock::Database::Entity::Lambda {
     }
 
 }// namespace Awsmock::Database::Entity::Lambda
-
-#endif//AWSMOCK_DB_ENTITY_LAMBDA_H

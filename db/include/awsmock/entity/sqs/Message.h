@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGE_H
-#define AWSMOCK_DB_ENTITY_SQS_MESSAGE_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -190,5 +189,3 @@ namespace Awsmock::Database::Entity::SQS {
     typedef std::vector<Message> MessageList;
 
 }// namespace Awsmock::Database::Entity::SQS
-
-#endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_H

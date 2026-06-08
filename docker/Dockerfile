@@ -24,6 +24,7 @@ RUN mkdir -p /usr/src
 
 # Install aws-mock
 WORKDIR /usr/src
+ARG BUILD_VERSION
 RUN git clone https://github.com/jensvogt/awsmock.git
 RUN --mount=type=cache,target=/vcpkg-cache \
     cd /usr/src/awsmock && \
@@ -38,6 +39,7 @@ RUN apk update && apk upgrade && apk add --no-cache git
 
 # Build aws-mock-ui
 WORKDIR /usr/src
+ARG BUILD_VERSION
 RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     cd /usr/src/awsmock-ui && \
     npm install -g @angular/cli && \

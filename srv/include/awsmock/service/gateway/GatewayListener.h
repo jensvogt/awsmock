@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#ifndef AWSMOCK_SERVICE_GATEWAY_LISTENER_H
-#define AWSMOCK_SERVICE_GATEWAY_LISTENER_H
+#pragma once
 
 // C++ includes
 #include <memory>
@@ -77,5 +76,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_GATEWAY_LISTENER_H

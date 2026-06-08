@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SSM_PARAMETER_TOPIC_H
-#define AWSMOCK_DB_ENTITY_SSM_PARAMETER_TOPIC_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -137,5 +136,3 @@ namespace Awsmock::Database::Entity::SSM {
     typedef std::vector<Parameter> ParameterList;
 
 }// namespace Awsmock::Database::Entity::SSM
-
-#endif// AWSMOCK_DB_ENTITY_SSM_PARAMETER_TOPIC_H

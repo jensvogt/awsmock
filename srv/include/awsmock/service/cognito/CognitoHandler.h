@@ -2,8 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITO_HANDLER_H
-#define AWSMOCK_SERVICE_COGNITO_HANDLER_H
+#pragma once
 
 // Boost includes
 #include <boost/beast.hpp>
@@ -71,5 +70,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_COGNITO_HANDLER_H

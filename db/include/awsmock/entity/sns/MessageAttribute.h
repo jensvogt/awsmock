@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H
-#define AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -112,5 +111,3 @@ namespace Awsmock::Database::Entity::SNS {
     };
 
 }// namespace Awsmock::Database::Entity::SNS
-
-#endif// AWSMOCK_DB_ENTITY_SNS_MESSAGE_ATTRIBUTE_H

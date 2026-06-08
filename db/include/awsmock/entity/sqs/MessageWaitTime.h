@@ -2,8 +2,11 @@
 // Created by vogje01 on 6/5/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGE_WAIT_TIME_H
-#define AWSMOCK_DB_ENTITY_SQS_MESSAGE_WAIT_TIME_H
+#pragma once
+
+// C++ includes
+#include <map>
+#include <string>
 
 namespace Awsmock::Database::Entity::SQS {
 
@@ -21,5 +24,3 @@ namespace Awsmock::Database::Entity::SQS {
     };
 
 }// namespace Awsmock::Database::Entity::SQS
-
-#endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_WAIT_TIME_H

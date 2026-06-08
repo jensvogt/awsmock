@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_KMS_KEY_H
-#define AWSMOCK_DB_ENTITY_KMS_KEY_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -183,5 +182,3 @@ namespace Awsmock::Database::Entity::KMS {
     typedef std::vector<Key> KeyList;
 
 }// namespace Awsmock::Database::Entity::KMS
-
-#endif// AWSMOCK_DB_ENTITY_KMS_KEY_H

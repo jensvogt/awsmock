@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SECRETSMANAGER_SECRET_VERSION_H
-#define AWSMOCK_DB_ENTITY_SECRETSMANAGER_SECRET_VERSION_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -72,5 +71,3 @@ namespace Awsmock::Database::Entity::SecretsManager {
     };
 
 }// namespace Awsmock::Database::Entity::SecretsManager
-
-#endif// AWSMOCK_DB_ENTITY_SECRETSMANAGER_SECRET_VERSION_H

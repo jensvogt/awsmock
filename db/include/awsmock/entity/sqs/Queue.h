@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_QUEUE_H
-#define AWSMOCK_DB_ENTITY_SQS_QUEUE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -125,5 +124,3 @@ namespace Awsmock::Database::Entity::SQS {
     typedef std::vector<Queue> QueueList;
 
 }// namespace Awsmock::Database::Entity::SQS
-
-#endif// AWSMOCK_DB_ENTITY_SQS_QUEUE_H

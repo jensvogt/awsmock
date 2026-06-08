@@ -2,8 +2,7 @@
 // Created by vogje01 on 06/10/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_SSM_SERVER_H
-#define AWSMOCK_SERVICE_SSM_SERVER_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -95,5 +94,3 @@ namespace Awsmock::Service {
     };
 
 }// namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_KMS_SERVER_H

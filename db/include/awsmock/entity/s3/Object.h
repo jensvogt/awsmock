@@ -2,14 +2,7 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_S3_OBJECT_H
-#define AWSMOCK_DB_ENTITY_S3_OBJECT_H
-//
-// #ifdef _WIN32
-// #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
-// #include <boost/asio.hpp>
-// #include <windows.h>
-// #endif
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -138,5 +131,3 @@ namespace Awsmock::Database::Entity::S3 {
     };
 
 }// namespace Awsmock::Database::Entity::S3
-
-#endif//AWSMOCK_DB_ENTITY_S3_OBJECT_H
