@@ -46,7 +46,7 @@ namespace Awsmock::Database {
 
     struct S3DbFixture {
         S3DbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
 
         ~S3DbFixture() {

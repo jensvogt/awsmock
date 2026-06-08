@@ -57,7 +57,7 @@ namespace Awsmock::Database {
 
     struct S3DynamoDbFixture {
         S3DynamoDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
         ~S3DynamoDbFixture() {
             const long objectCount = RepositoryFactory::instance().dynamodbRepository()->deleteAllItems();

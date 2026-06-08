@@ -35,7 +35,7 @@ namespace Awsmock::Database {
 
     struct SsmMemoryDbFixture {
         SsmMemoryDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+            RepositoryFactory::instance().initialize(BackendType::MEMORY, "test");
         }
         ~SsmMemoryDbFixture() {
             const long messageCount = RepositoryFactory::instance().ssmRepository()->deleteAllParameters();

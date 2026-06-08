@@ -51,7 +51,7 @@ namespace Awsmock::Database {
 
     struct CognitoMemoryDbFixture {
         CognitoMemoryDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+            RepositoryFactory::instance().initialize(BackendType::MEMORY, "test");
         }
         ~CognitoMemoryDbFixture() {
             long deleted = RepositoryFactory::instance().cognitoRepository()->deleteAllUsers();

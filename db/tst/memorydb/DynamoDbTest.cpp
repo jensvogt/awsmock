@@ -58,7 +58,7 @@ namespace Awsmock::Database {
 
     struct DynamoDbFixture {
         DynamoDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MEMORY);
+            RepositoryFactory::instance().initialize(BackendType::MEMORY, "test");
         }
         ~DynamoDbFixture() {
             const long deletedItems = RepositoryFactory::instance().dynamodbRepository()->deleteAllItems();

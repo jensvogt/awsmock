@@ -47,7 +47,7 @@ namespace Awsmock::Database {
 
     struct ApiGatewayMongoDbFixture {
         ApiGatewayMongoDbFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB);
+            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
         }
         ~ApiGatewayMongoDbFixture() {
             const long count = RepositoryFactory::instance().apigatewayRepository()->deleteAllKeys();
