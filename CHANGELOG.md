@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.64](https://github.com/jensvogt/awsmock/compare/1.18.63...v1.18.64) (2026-06-08)
+
+
+### Bug Fixes
+
+* cleanup code, remove unused include guards ([a4a3390](https://github.com/jensvogt/awsmock/commit/a4a33908d2be9de67ba6438a64797c76a822e24b))
+
 ## [1.18.63](https://github.com/jensvogt/awsmock/compare/1.18.62...v1.18.63) (2026-06-07)
 
 
