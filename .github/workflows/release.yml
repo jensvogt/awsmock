@@ -505,6 +505,7 @@ jobs:
             ${{ secrets.DOCKER_USER }}/awsmock:latest
           build-args: |
             GH_TOKEN=${{ env.GH_TOKEN }}
+            BUILD_VERSION=${{ env.SEMVER }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
         env:

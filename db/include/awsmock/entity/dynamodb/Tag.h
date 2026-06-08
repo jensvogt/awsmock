@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_TAG_H
-#define AWSMOCK_DB_ENTITY_DYNAMODB_TAG_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -59,5 +58,3 @@ namespace Awsmock::Database::Entity::DynamoDb {
     };
 
 }// namespace Awsmock::Database::Entity::DynamoDb
-
-#endif// AWSMOCK_DB_ENTITY_DYNAMODB_TAG_H

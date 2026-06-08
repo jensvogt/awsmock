@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_USER_H
-#define AWSMOCK_DB_ENTITY_USER_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -56,7 +55,7 @@ namespace Awsmock::Database::Entity::Transfer {
         /**
          * @brief Converts the entity to a MongoDB document
          *
-         * @return entity as MongoDB document.
+         * @return entity as a MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
@@ -85,5 +84,3 @@ namespace Awsmock::Database::Entity::Transfer {
     };
 
 }// namespace Awsmock::Database::Entity::Transfer
-
-#endif// AWSMOCK_DB_ENTITY_USER_H

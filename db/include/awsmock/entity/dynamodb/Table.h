@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
-#define AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/entity/common/BaseEntity.h>
@@ -140,5 +139,3 @@ namespace Awsmock::Database::Entity::DynamoDb {
     typedef std::vector<Table> TableList;
 
 }// namespace Awsmock::Database::Entity::DynamoDb
-
-#endif// AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H

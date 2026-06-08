@@ -2,9 +2,7 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_S3_BUCKET_H
-#define AWSMOCK_DB_ENTITY_S3_BUCKET_H
-#include "LifecycleConfiguration.h"
+#pragma once
 
 #ifdef _WIN32
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
@@ -24,6 +22,7 @@
 #include <awsmock/entity/s3/BucketEncryption.h>
 #include <awsmock/entity/s3/BucketNotification.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
+#include <awsmock/entity/s3/LifecycleConfiguration.h>
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
 #include <awsmock/utils/MongoUtils.h>
@@ -285,5 +284,3 @@ namespace Awsmock::Database::Entity::S3 {
     typedef std::vector<Bucket> BucketList;
 
 }// namespace Awsmock::Database::Entity::S3
-
-#endif// AWSMOCK_DB_ENTITY_S3_BUCKET_H

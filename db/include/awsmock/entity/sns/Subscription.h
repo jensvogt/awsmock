@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H
-#define AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -72,4 +71,3 @@ namespace Awsmock::Database::Entity::SNS {
     typedef std::vector<Subscription> SubscriptionList;
 
 }// namespace Awsmock::Database::Entity::SNS
-#endif// AWSMOCK_DB_ENTITY_SNS_SUBSCRIPTION_H

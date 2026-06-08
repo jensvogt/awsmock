@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SNS_TOPIC_H
-#define AWSMOCK_DB_ENTITY_SNS_TOPIC_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -164,5 +163,3 @@ namespace Awsmock::Database::Entity::SNS {
     typedef std::vector<Topic> TopicList;
 
 }// namespace Awsmock::Database::Entity::SNS
-
-#endif// AWSMOCK_DB_ENTITY_SNS_TOPIC_H

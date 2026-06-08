@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_ENTITY_DYNAMODB_STREAM_VIEW_TYPE_H
-#define AWSMOCK_ENTITY_DYNAMODB_STREAM_VIEW_TYPE_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -51,5 +50,3 @@ namespace Awsmock::Database::Entity::DynamoDb {
     }
 
 }// namespace Awsmock::Database::Entity::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_STREAM_VIEW_TYPE_H

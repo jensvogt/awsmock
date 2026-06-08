@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/8/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SECRETSMANAGER_ROTATION_RULES_H
-#define AWSMOCK_DB_ENTITY_SECRETSMANAGER_ROTATION_RULES_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -72,5 +71,3 @@ namespace Awsmock::Database::Entity::SecretsManager {
     };
 
 }// namespace Awsmock::Database::Entity::SecretsManager
-
-#endif// AWSMOCK_ENTITY_SECRETSMANAGER_ROTATION_RULES_H

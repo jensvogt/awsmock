@@ -2,8 +2,7 @@
 // Created by vogje01 on 1/9/26.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_S3_LIFECYCLE_TRANSITION_H
-#define AWSMOCK_DB_ENTITY_S3_LIFECYCLE_TRANSITION_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -63,5 +62,3 @@ namespace Awsmock::Database::Entity::S3 {
     };
 
 }// namespace Awsmock::Database::Entity::S3
-
-#endif// AWSMOCK_DB_ENTITY_S3_LIFECYCLE_TRANSITION_H
