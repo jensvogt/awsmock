@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ standard includes
+#include <ranges>
 #include <string>
 #include <vector>
 
@@ -14,7 +15,6 @@
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/secretsmanager/ISecretsManagerRepository.h>
 
 namespace Awsmock::Database {
@@ -26,8 +26,7 @@ namespace Awsmock::Database {
      */
     class SecretsManagerMemoryRepository final : public ISecretsManagerRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -189,8 +188,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long DeleteAllSecrets() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -207,4 +205,4 @@ namespace Awsmock::Database {
         static boost::mutex _secretMutex;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

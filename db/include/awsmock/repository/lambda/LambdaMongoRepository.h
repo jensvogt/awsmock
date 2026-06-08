@@ -14,8 +14,8 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/lambda/ILambdaRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace Awsmock::Database {
 
@@ -28,8 +28,7 @@ namespace Awsmock::Database {
      */
     class LambdaMongoRepository final : public ILambdaRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -323,8 +322,7 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllLambdas() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -346,4 +344,4 @@ namespace Awsmock::Database {
         static constexpr auto _lambdaResultCollectionName = "lambda_result";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

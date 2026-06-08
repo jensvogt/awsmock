@@ -17,7 +17,6 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/dynamodb/IDynamoDbRepository.h>
 
 namespace Awsmock::Database {

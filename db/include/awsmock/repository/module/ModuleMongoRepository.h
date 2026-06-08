@@ -10,9 +10,9 @@
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/module/Module.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/module/IModuleRepository.h>
 #include <awsmock/repository/module/ModuleMemoryRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 
 namespace Awsmock::Database {
 
@@ -25,8 +25,7 @@ namespace Awsmock::Database {
      */
     class ModuleMongoRepository final : public IModuleRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -231,8 +230,7 @@ namespace Awsmock::Database {
          */
         static std::map<std::string, Entity::Module::Module> getExisting();
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -254,4 +252,4 @@ namespace Awsmock::Database {
         static std::map<std::string, Entity::Module::Module> _existingModules;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

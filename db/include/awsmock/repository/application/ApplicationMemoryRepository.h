@@ -14,9 +14,9 @@
 #include <awsmock/core/Linq.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/PagingUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/apps/Application.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/application/IApplicationRepository.h>
 #include <awsmock/utils/SortColumn.h>
 

@@ -130,21 +130,24 @@ namespace Awsmock::Database::Entity::SNS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]]
+        view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+        [[maybe_unused]]
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]]
+        std::string ToString() const;
 
         /**
          * @brief Stream provider.

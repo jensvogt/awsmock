@@ -2,8 +2,7 @@
 // Created by vogje01 on 29/05/2023.
 //
 
-#ifndef AWSMOCK_REPOSITORY_SNS_DATABASE_H
-#define AWSMOCK_REPOSITORY_SNS_DATABASE_H
+#pragma once
 
 // C++ standard includes
 #include <set>
@@ -19,9 +18,8 @@
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/MessageStatus.h>
 #include <awsmock/entity/sns/Topic.h>
-#include <awsmock/repository/Database.h>
-#include <awsmock/repository/DatabaseBase.h>
 #include <awsmock/repository/sns/ISNSRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/SortColumn.h>
 #include <awsmock/utils/SqsUtils.h>
 
@@ -36,8 +34,7 @@ namespace Awsmock::Database {
      */
     class SNSMongoRepository final : public ISNSRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -415,8 +412,7 @@ namespace Awsmock::Database {
          */
         void adjustMessageCounters() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled logger
          */
@@ -438,6 +434,4 @@ namespace Awsmock::Database {
         static constexpr auto _messageCollectionName = "sns_message";
     };
 
-}// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_SNS_DATABASE_H
+} // namespace Awsmock::Database

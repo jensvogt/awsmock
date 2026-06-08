@@ -58,6 +58,37 @@ namespace Awsmock::Database {
         MEMORY
     };
 
+    struct IndexColumnDefinition {
+
+        /**
+         * Column name
+         */
+        std::string columns;
+
+        /**
+         * Index direction
+         */
+        int direction;
+    };
+
+    struct IndexDefinition {
+
+        /**
+         * Collection name
+         */
+        std::string collectionName;
+
+        /**
+         * Columns definitions
+         */
+        std::vector<IndexColumnDefinition> indexColumns;
+
+        /**
+         * Unique index
+         */
+        bool unique = false;
+    };
+
     /**
      * @brief Repository factory
      *
@@ -65,30 +96,15 @@ namespace Awsmock::Database {
      */
     class RepositoryFactory {
 
-      public:
-
+    public:
         static RepositoryFactory &instance() {
             static RepositoryFactory instance;
             return instance;
         }
 
-        void initialize(const BackendType type) {
-            _backend = type;
-            _moduleRepo = createModuleRepository();
-            _snsRepo = createSNSRepository();
-            _sqsRepo = createSQSRepository();
-            _s3Repo = createS3Repository();
-            _cognitoRepo = createCognitoRepository();
-            _monitoringRepo = createMonitoringRepository();
-            _kmsRepo = createKMSRepository();
-            _transferRepo = createTransferRepository();
-            _ssmRepo = createSSMRepository();
-            _dynamodbRepo = createDynamodbRepository();
-            _lambdaRepo = createLambdaRepository();
-            _applicationRepo = createApplicationRepository();
-            _secretsmanagerRepo = createSecretsManagerRepository();
-            _apigatewayRepo = createApiGatewayRepository();
-        }
+        void initialize(const BackendType &type, const std::string &databaseName);
+
+        void createIndexes() const;
 
         [[nodiscard]]
         std::shared_ptr<IModuleRepository> moduleRepository() const { return _moduleRepo; }
@@ -132,9 +148,25 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::shared_ptr<IApiGatewayRepository> apigatewayRepository() const { return _apigatewayRepo; }
 
-      private:
+    private:
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Database"};
 
+        /**
+         * @brief Database type
+         */
         BackendType _backend = BackendType::MONGODB;
+
+        /**
+         * @brief Database type
+         */
+        std::string _databaseName;
+
+        /**
+         * @brief Repos
+         */
         std::shared_ptr<IModuleRepository> _moduleRepo;
         std::shared_ptr<ISNSRepository> _snsRepo;
         std::shared_ptr<ISQSRepository> _sqsRepo;
@@ -151,158 +183,59 @@ namespace Awsmock::Database {
         std::shared_ptr<IApiGatewayRepository> _apigatewayRepo;
 
         [[nodiscard]]
-        std::shared_ptr<IModuleRepository> createModuleRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<ModuleMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<ModuleMemoryRepository>();
-            }
-            return std::make_shared<ModuleMemoryRepository>();
-        }
+        std::shared_ptr<IModuleRepository> createModuleRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<ISNSRepository> createSNSRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<SNSMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<SNSMemoryRepository>();
-            }
-            return std::make_shared<SNSMemoryRepository>();
-        }
+        std::shared_ptr<ISNSRepository> createSNSRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<ISQSRepository> createSQSRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<SQSMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<SQSMemoryRepository>();
-            }
-            return std::make_shared<SQSMemoryRepository>();
-        }
+        std::shared_ptr<ISQSRepository> createSQSRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<IS3Repository> createS3Repository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<S3MongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<S3MemoryRepository>();
-            }
-            return std::make_shared<S3MemoryRepository>();
-        }
+        std::shared_ptr<IS3Repository> createS3Repository() const;
 
         [[nodiscard]]
-        std::shared_ptr<ICognitoRepository> createCognitoRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<CognitoMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<CognitoMemoryRepository>();
-            }
-            return std::make_shared<CognitoMemoryRepository>();
-        }
+        std::shared_ptr<ICognitoRepository> createCognitoRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<IMonitoringRepository> createMonitoringRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<MonitoringMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<MonitoringMemoryRepository>();
-            }
-            return std::make_shared<MonitoringMemoryRepository>();
-        }
+        std::shared_ptr<IMonitoringRepository> createMonitoringRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<IKMSRepository> createKMSRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<KMSMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<KMSMemoryRepository>();
-            }
-            return std::make_shared<KMSMemoryRepository>();
-        }
+        std::shared_ptr<IKMSRepository> createKMSRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<ISSMRepository> createSSMRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<SSMMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<SSMMemoryRepository>();
-            }
-            return std::make_shared<SSMMemoryRepository>();
-        }
+        std::shared_ptr<ISSMRepository> createSSMRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<ITransferRepository> createTransferRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<TransferMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<TransferMemoryRepository>();
-            }
-            return std::make_shared<TransferMemoryRepository>();
-        }
+        std::shared_ptr<ITransferRepository> createTransferRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<IDynamoDbRepository> createDynamodbRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<DynamoDbMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<DynamoDbMemoryRepository>();
-            }
-            return std::make_shared<DynamoDbMemoryRepository>();
-        }
+        std::shared_ptr<IDynamoDbRepository> createDynamodbRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<ILambdaRepository> createLambdaRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<LambdaMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<LambdaMemoryRepository>();
-            }
-            return std::make_shared<LambdaMemoryRepository>();
-        }
+        std::shared_ptr<ILambdaRepository> createLambdaRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<IApplicationRepository> createApplicationRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<ApplicationMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<ApplicationMemoryRepository>();
-            }
-            return std::make_shared<ApplicationMemoryRepository>();
-        }
+        std::shared_ptr<IApplicationRepository> createApplicationRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<ISecretsManagerRepository> createSecretsManagerRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<SecretsManagerMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<SecretsManagerMemoryRepository>();
-            }
-            return std::make_shared<SecretsManagerMemoryRepository>();
-        }
+        std::shared_ptr<ISecretsManagerRepository> createSecretsManagerRepository() const;
 
         [[nodiscard]]
-        std::shared_ptr<IApiGatewayRepository> createApiGatewayRepository() const {
-            switch (_backend) {
-                case BackendType::MONGODB:
-                    return std::make_shared<ApiGatewayMongoRepository>();
-                case BackendType::MEMORY:
-                    return std::make_shared<ApiGatewayMemoryRepository>();
-            }
-            return std::make_shared<ApiGatewayMemoryRepository>();
-        }
+        std::shared_ptr<IApiGatewayRepository> createApiGatewayRepository() const;
+
+        /**
+         * @brief Create a single index.
+         *
+         * @param database database name
+         * @param indexName name of  the index
+         */
+        void createIndex(const mongocxx::database &database, const std::string &indexName) const;
+
+        /**
+         * @brief Index definitions
+         */
+        const static std::map<std::string, IndexDefinition> indexDefinitions;
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

@@ -27,8 +27,8 @@
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
-#include <awsmock/repository/Database.h>
 #include <awsmock/repository/sqs/SQSMemoryRepository.h>
+#include <awsmock/utils/ConnectionPool.h>
 #include <awsmock/utils/MongoUtils.h>
 #include <awsmock/utils/SortColumn.h>
 #include <awsmock/utils/SqsUtils.h>
@@ -44,8 +44,7 @@ namespace Awsmock::Database {
      */
     class SQSMongoRepository : public ISQSRepository {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -513,8 +512,7 @@ namespace Awsmock::Database {
          */
         void adjustMessageCounters() const override;
 
-      private:
-
+    private:
         /**
          * @brief Channeled log stream
          */
@@ -536,4 +534,4 @@ namespace Awsmock::Database {
         static constexpr auto _messageCollectionName = "sqs_message";
     };
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database
