@@ -155,11 +155,8 @@ namespace Awsmock::Database::Entity::SNS {
          */
         friend std::ostream &operator<<(std::ostream &os, const TopicAttribute &r);
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
     };
 
-}// namespace Awsmock::Database::Entity::SNS
-
-#endif// AWSMOCK_DB_ENTITY_SNS_TOPIC_ATTRIBUTE_H
+} // namespace Awsmock::Database::Entity::SNS
