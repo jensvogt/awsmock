@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.65](https://github.com/jensvogt/awsmock/compare/1.18.64...v1.18.65) (2026-06-08)
+
+
+### Bug Fixes
+
+* cleanup code, remove unused include guards ([43e64a2](https://github.com/jensvogt/awsmock/commit/43e64a2949ff13451cd7b02e437a67cc46d6c8cd))
+* cleanup code, remove unused include guards ([a573e19](https://github.com/jensvogt/awsmock/commit/a573e19a0b8b03a9867408a4b55a83e5c3e29b7a))
+* windows port new kms database layer ([26ea98c](https://github.com/jensvogt/awsmock/commit/26ea98ce6baf7c733dfbbca4bc8119572dcbf99c))
+
 ## [1.18.64](https://github.com/jensvogt/awsmock/compare/1.18.63...v1.18.64) (2026-06-08)
 
 
