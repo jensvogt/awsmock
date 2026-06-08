@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_LAMBDA_CODE_H
-#define AWSMOCK_DB_ENTITY_LAMBDA_CODE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -93,5 +92,3 @@ namespace Awsmock::Database::Entity::Lambda {
     };
 
 }// namespace Awsmock::Database::Entity::Lambda
-
-#endif// AWSMOCK_DB_ENTITY_LAMBDA_CODE_H

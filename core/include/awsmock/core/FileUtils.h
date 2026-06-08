@@ -2,8 +2,7 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWS_MOCK_CORE_FILE_UTILS_H
-#define AWS_MOCK_CORE_FILE_UTILS_H
+#pragma once
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -425,5 +424,3 @@ namespace Awsmock::Core {
     };
 
 }// namespace Awsmock::Core
-
-#endif// AWS_MOCK_CORE_FILE_UTILS_H

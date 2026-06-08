@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/8/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SECRETSMANAGER_VERSION_IDS_TO_STAGES_H
-#define AWSMOCK_DB_ENTITY_SECRETSMANAGER_VERSION_IDS_TO_STAGES_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -92,5 +91,3 @@ namespace Awsmock::Database::Entity::SecretsManager {
     };
 
 }// namespace Awsmock::Database::Entity::SecretsManager
-
-#endif// AWSMOCK_DB_ENTITY_SECRETSMANAGER_VERSION_IDS_TO_STAGES_H

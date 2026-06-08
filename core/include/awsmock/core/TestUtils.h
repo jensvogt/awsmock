@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/09/2023.
 //
 
-#ifndef AWSMOCK_CORE_TEST_UTILS_H
-#define AWSMOCK_CORE_TEST_UTILS_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -56,5 +55,3 @@ namespace Awsmock::Core {
         static std::string SendCliCommand(const std::string &command, const std::vector<std::string> &args);
     };
 }// namespace Awsmock::Core
-
-#endif// AWSMOCK_CORE_TEST_UTILS_H

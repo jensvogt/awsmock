@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_COGNITO_SERVICE_H
-#define AWSMOCK_SERVICE_COGNITO_SERVICE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -93,7 +92,8 @@ namespace Awsmock::Service {
      */
     class CognitoService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -378,7 +378,8 @@ namespace Awsmock::Service {
          */
         void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Cognito"};
 
         /**
@@ -408,6 +409,4 @@ namespace Awsmock::Service {
         std::string _accountId;
     };
 
-} // namespace Awsmock::Service
-
-#endif// AWSMOCK_SERVICE_COGNITO_SERVICE_H
+}// namespace Awsmock::Service

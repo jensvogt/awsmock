@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_TRANSFER_H
-#define AWSMOCK_DB_ENTITY_TRANSFER_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -225,5 +224,3 @@ namespace Awsmock::Database::Entity::Transfer {
     typedef std::vector<Transfer> TransferList;
 
 }// namespace Awsmock::Database::Entity::Transfer
-
-#endif// AWSMOCK_DB_ENTITY_TRANSFER_H

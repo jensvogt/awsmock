@@ -9,9 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/repository/RepositoryFactory.h"
-
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
@@ -59,6 +56,7 @@
 #include <awsmock/dto/dynamodb/internal/ListTableCountersRequest.h>
 #include <awsmock/dto/dynamodb/internal/ListTableCountersResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
 #include <awsmock/repository/dynamodb/DynamoDbToMongoTranslator.h>
 #include <awsmock/service/container/ContainerService.h>

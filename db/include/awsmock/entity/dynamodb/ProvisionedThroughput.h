@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_ENTITY_DYNAMODB_PROVISIONED_THROUGHPUT_H
-#define AWSMOCK_ENTITY_DYNAMODB_PROVISIONED_THROUGHPUT_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -59,5 +58,3 @@ namespace Awsmock::Database::Entity::DynamoDb {
     };
 
 }// namespace Awsmock::Database::Entity::DynamoDb
-
-#endif// AWSMOCK_ENTITY_DYNAMODB_PROVISIONED_THROUGHPUT_H

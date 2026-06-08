@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/21/23.
 //
 
-#ifndef AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_DEFINITION_H
-#define AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_DEFINITION_H
+#pragma once
 
 // AwsMock include
 #include <awsmock/core/BsonUtils.h>
@@ -43,5 +42,3 @@ namespace Awsmock::Database::Entity::DynamoDb {
         void FromDocument(view_or_value<view, value> mResult);
     };
 }// namespace Awsmock::Database::Entity::DynamoDb
-
-#endif// AWSMOCK_ENTITY_DYNAMODB_ATTRIBUTE_DEFINITION_H

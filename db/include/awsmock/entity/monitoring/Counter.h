@@ -2,8 +2,7 @@
 // Created by vogje01 on 10/2/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_COUNTER_H
-#define AWSMOCK_DB_ENTITY_COUNTER_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -62,5 +61,3 @@ namespace Awsmock::Database::Entity::Monitoring {
     };
 
 };// namespace Awsmock::Database::Entity::Monitoring
-
-#endif//AWSMOCK_DB_ENTITY_COUNTER_H

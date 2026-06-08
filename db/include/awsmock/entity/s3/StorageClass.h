@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_S3_STORAGE_CLASS_H
-#define AWSMOCK_DB_ENTITY_S3_STORAGE_CLASS_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -56,5 +55,3 @@ namespace Awsmock::Database::Entity::S3 {
         return StorageClass::STANDARD;
     }
 }// namespace Awsmock::Database::Entity::S3
-
-#endif// AWSMOCK_DB_ENTITY_S3_STORAGE_CLASS_H

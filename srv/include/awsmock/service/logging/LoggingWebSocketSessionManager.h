@@ -2,8 +2,7 @@
 // Created by vogje01 on 2/5/26.
 //
 
-#ifndef AWSMOCK_LOGGING_WEB_SOCKET_SESSION_MANAGER_H
-#define AWSMOCK_LOGGING_WEB_SOCKET_SESSION_MANAGER_H
+#pragma once
 
 // C++ include
 #include <mutex>
@@ -26,5 +25,3 @@ namespace Awsmock::Service::Logging {
 
 
 }// namespace Awsmock::Service::Logging
-
-#endif//AWSMOCK_LOGGING_WEB_SOCKET_SESSION_MANAGER_H

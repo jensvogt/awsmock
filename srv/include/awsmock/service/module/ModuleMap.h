@@ -2,8 +2,7 @@
 // Created by vogje01 on 10/6/24.
 //
 
-#ifndef AWSMOCK_SERVICE_MODULE_MAP_H
-#define AWSMOCK_SERVICE_MODULE_MAP_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -78,4 +77,3 @@ namespace Awsmock::Service {
         std::map<std::string, std::shared_ptr<AbstractServer>> _moduleMap;
     };
 }// namespace Awsmock::Service
-#endif//AWSMOCK_SERVICE_MODULE_MAP_H

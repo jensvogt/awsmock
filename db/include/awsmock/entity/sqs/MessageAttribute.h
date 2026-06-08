@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SQS_MESSAGE_ATTRIBUTE_H
-#define AWSMOCK_DB_ENTITY_SQS_MESSAGE_ATTRIBUTE_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -99,5 +98,3 @@ namespace Awsmock::Database::Entity::SQS {
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
 }// namespace Awsmock::Database::Entity::SQS
-
-#endif// AWSMOCK_DB_ENTITY_SQS_MESSAGE_ATTRIBUTE_H

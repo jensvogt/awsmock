@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/28/24.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_S3_LIFE_CYCLE_CONFIGURATION_H
-#define AWSMOCK_DB_ENTITY_S3_LIFE_CYCLE_CONFIGURATION_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -81,5 +80,3 @@ namespace Awsmock::Database::Entity::S3 {
     };
 
 }// namespace Awsmock::Database::Entity::S3
-
-#endif// AWSMOCK_DB_ENTITY_S3_LIFE_CYCLE_CONFIGURATION_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/21/23.
 //
 
-#ifndef AWSMOCK_ENTITY_DYNAMODB_STREAM_SPECIFICATION_H
-#define AWSMOCK_ENTITY_DYNAMODB_STREAM_SPECIFICATION_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -74,5 +73,3 @@ namespace Awsmock::Database::Entity::DynamoDb {
     };
 
 }// namespace Awsmock::Database::Entity::DynamoDb
-
-#endif// AWSMOCK_ENTITY_DYNAMODB_STREAM_SPECIFICATION_H

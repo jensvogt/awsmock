@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#ifndef AWSMOCK_ENTITY_LAMBDA_ENVIRONMENT_H
-#define AWSMOCK_ENTITY_LAMBDA_ENVIRONMENT_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -50,5 +49,3 @@ namespace Awsmock::Database::Entity::Lambda {
     };
 
 }// namespace Awsmock::Database::Entity::Lambda
-
-#endif// AWSMOCK_ENTITY_LAMBDA_ENVIRONMENT_H
