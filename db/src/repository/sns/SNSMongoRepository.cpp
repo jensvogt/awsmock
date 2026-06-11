@@ -822,18 +822,18 @@ namespace Awsmock::Database {
                                                           kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
             }
 
-            // Zero out queues with no messages
-            for (auto queueCursor = topicCollection.find({}); const auto &q: queueCursor) {
-                if (const auto topicArn = Core::Bson::BsonUtils::GetStringValue(q, "topicArn"); !topicWithMessages.contains(topicArn)) {
-                    bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("topicArn", topicArn)),
-                            make_document(kvp("$set", make_document(
-                                                              kvp("size", bsoncxx::types::b_int64()),
-                                                              kvp("messages", bsoncxx::types::b_int64()),
-                                                              kvp("messagesSend", bsoncxx::types::b_int64()),
-                                                              kvp("messagesResend", bsoncxx::types::b_int64()))))));
-                }
+            // Zero out topics with no messages — single server-side update_many replaces N client-side update_ones
+            bsoncxx::builder::basic::array arnsArray;
+            for (const auto &arn: topicWithMessages) {
+                arnsArray.append(arn);
             }
+            bulk.append(mongocxx::model::update_many(
+                    make_document(kvp("topicArn", make_document(kvp("$nin", arnsArray.view())))),
+                    make_document(kvp("$set", make_document(
+                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                  kvp("messages", bsoncxx::types::b_int64()),
+                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
+                                                  kvp("messagesResend", bsoncxx::types::b_int64()))))));
 
             if (!bulk.empty()) {
                 auto result = bulk.execute();

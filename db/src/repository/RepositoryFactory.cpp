@@ -5,44 +5,44 @@
 namespace Awsmock::Database {
 
     const std::map<std::string, IndexDefinition> RepositoryFactory::indexDefinitions = {
-        // SQS messages
-        {"sqs_message_idx1", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"reset", 1}}, false}},
-        {"sqs_message_idx2", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"retries", 1}}, false}},
-        {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}, false}},
-        {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}, {"size", 1}}, false}},
-        {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}, false}},
-        // SQS queues
-        {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}, true}},
-        // SNS messages
-        {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}, false}},
-        // SNS topics
-        {"sns_topic_idx1", {"sns_topic", {{"region", 1}, {"topicName", 1}}, false}},
-        {"sns_topic_idx2", {"sns_topic", {{"topicArn", 1}}, true}},
-        // S3 buckets
-        {"s3_bucket_idx1", {"s3_bucket", {{"region", 1}, {"name", 1}}, false}},
-        {"s3_bucket_idx2", {"s3_bucket", {{"arn", 1}}, true}},
-        // S3 objects
-        {"s3_object_idx1", {"s3_object", {{"region", 1}, {"bucket", 1}, {"key", 1}}, false}},
-        {"s3_object_idx2", {"s3_object", {{"internalName", 1}}, false}},
-        // Modules
-        {"module_idx1", {"module", {{"name", 1}, {"state", 1}}, false}},
-        {"module_idx2", {"module", {{"name", 1}}, true}},
-        // KMS
-        {"kms_idx1", {"kms", {{"region", 1}, {"keyId", 1}}, false}},
-        // Applications
-        {"application_idx1", {"application", {{"region", 1}, {"name", 1}}, false}},
-        {"application_idx2", {"application", {{"region", 1}, {"name", 1}, {"status", 1}}, false}},
-        // Monitoring
-        {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}, false}},
-        {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}, false}},
-        {"monitoring_idx3", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}}, false}},
-        // DynamoDb tables
-        {"dynamodb_table_idx1", {"dynamodb_table", {{"region", 1}, {"name", 1}}, true}},
-        {"dynamodb_table_idx2", {"dynamodb_table", {{"region", 1}, {"name", 1}, {"itemCount", -1}}, false}},
-        // DynamoDb items
-        {"dynamodb_item_idx1", {"dynamodb_item", {{"tableName", 1}}, false}},
-        {"dynamodb_item_idx2", {"dynamodb_item", {{"tableName", 1}, {"partitionKey", 1}}, false}},
-        {"dynamodb_item_idx3", {"dynamodb_item", {{"tableName", 1}, {"partitionKey", 1}, {"sortKey", 1}}, false}},
+            // SQS messages
+            {"sqs_message_idx1", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"reset", 1}}, false}},
+            {"sqs_message_idx2", {"sqs_message", {{"queueUrl", 1}, {"status", 1}, {"retries", 1}}, false}},
+            {"sqs_message_idx3", {"sqs_message", {{"receiptHandle", 1}}, false}},
+            {"sqs_message_idx4", {"sqs_message", {{"queueArn", 1}, {"status", 1}, {"size", 1}}, false}},
+            {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}, false}},
+            // SQS queues
+            {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}, true}},
+            // SNS messages
+            {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}, false}},
+            // SNS topics
+            {"sns_topic_idx1", {"sns_topic", {{"region", 1}, {"topicName", 1}}, false}},
+            {"sns_topic_idx2", {"sns_topic", {{"topicArn", 1}}, true}},
+            // S3 buckets
+            {"s3_bucket_idx1", {"s3_bucket", {{"region", 1}, {"name", 1}}, false}},
+            {"s3_bucket_idx2", {"s3_bucket", {{"arn", 1}}, true}},
+            // S3 objects
+            {"s3_object_idx1", {"s3_object", {{"region", 1}, {"bucket", 1}, {"key", 1}}, false}},
+            {"s3_object_idx2", {"s3_object", {{"internalName", 1}}, false}},
+            // Modules
+            {"module_idx1", {"module", {{"name", 1}, {"state", 1}}, false}},
+            {"module_idx2", {"module", {{"name", 1}}, true}},
+            // KMS
+            {"kms_idx1", {"kms", {{"region", 1}, {"keyId", 1}}, false}},
+            // Applications
+            {"application_idx1", {"application", {{"region", 1}, {"name", 1}}, false}},
+            {"application_idx2", {"application", {{"region", 1}, {"name", 1}, {"status", 1}}, false}},
+            // Monitoring
+            {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}, false}},
+            {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}, false}},
+            {"monitoring_idx3", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}}, false}},
+            // DynamoDb tables
+            {"dynamodb_table_idx1", {"dynamodb_table", {{"region", 1}, {"name", 1}}, true}},
+            {"dynamodb_table_idx2", {"dynamodb_table", {{"region", 1}, {"name", 1}, {"itemCount", -1}}, false}},
+            // DynamoDb items
+            {"dynamodb_item_idx1", {"dynamodb_item", {{"tableName", 1}}, false}},
+            {"dynamodb_item_idx2", {"dynamodb_item", {{"tableName", 1}, {"partitionKey", 1}}, false}},
+            {"dynamodb_item_idx3", {"dynamodb_item", {{"tableName", 1}, {"partitionKey", 1}, {"sortKey", 1}}, false}},
     };
 
     void RepositoryFactory::initialize(const BackendType &type, const std::string &databaseName) {
@@ -52,7 +52,7 @@ namespace Awsmock::Database {
         _databaseName = databaseName;
 
         // Initialize pool
-        Database::ConnectionPool::instance().Configure();
+        ConnectionPool::instance().Configure();
 
         // Repositeries
         _moduleRepo = createModuleRepository();
@@ -85,7 +85,7 @@ namespace Awsmock::Database {
             log_info << "Finished creating indexes, count: " << indexDefinitions.size();
         }
     }
-    
+
     void RepositoryFactory::createIndex(const mongocxx::database &database, const std::string &indexName) const {
         log_trace << "Start creating index, name: " << indexName;
         auto [collectionName, indexColumns, unique] = indexDefinitions.at(indexName);
@@ -244,4 +244,4 @@ namespace Awsmock::Database {
         return std::make_shared<ApiGatewayMemoryRepository>();
     }
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

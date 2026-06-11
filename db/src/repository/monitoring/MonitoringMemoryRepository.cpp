@@ -24,6 +24,7 @@ namespace Awsmock::Database {
     }
 
     void MonitoringMemoryRepository::updateMonitoringCounters(const std::map<std::string, double> &values) const {
+        log_trace << "Update monitoring counter not available if you running the memory DB";
     }
 
     long MonitoringMemoryRepository::deleteOldMonitoringData(const int retentionPeriod) const {
@@ -31,4 +32,4 @@ namespace Awsmock::Database {
         return 0;
     }
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

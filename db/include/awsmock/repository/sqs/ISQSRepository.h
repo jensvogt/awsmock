@@ -164,6 +164,25 @@ namespace Awsmock::Database {
         virtual Entity::SQS::QueueList listQueues(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const = 0;
 
         /**
+         * @brief List all available queues or a region
+         *
+         * @param region AWS region
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        virtual Entity::SQS::QueueList listQueues(const std::string &region) const = 0;
+
+        /**
+         * @brief List all available queues
+         *
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        virtual Entity::SQS::QueueList listQueues() const = 0;
+
+        /**
          * @brief List available queues using paging
          *
          * @param sortColumns vector of sort columns
@@ -185,16 +204,6 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         virtual Entity::SQS::Queue importQueue(Entity::SQS::Queue &queue) const = 0;
-
-        /**
-         * @brief List all available queues
-         *
-         * @param region AWS region
-         * @return List of SQS queues
-         * @throws DatabaseException
-         */
-        [[nodiscard]]
-        virtual Entity::SQS::QueueList listQueues(const std::string &region) const = 0;
 
         /**
          * @brief Purge a given queueUrl.

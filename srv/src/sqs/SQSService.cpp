@@ -1111,7 +1111,7 @@ namespace Awsmock::Service {
                         break;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(pollPeriod));
-                    elapsed = static_cast<long>(std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count());
+                    elapsed = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count();
                 }
             }
 

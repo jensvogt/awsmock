@@ -26,7 +26,8 @@ namespace Awsmock::Database {
      */
     class DynamoDbMongoRepository final : public IDynamoDbRepository {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -287,7 +288,7 @@ namespace Awsmock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]]
-        std::vector<Entity::DynamoDb::Item> executeQuery(const value &filter, bool scanIndexForward, int limit = 0) const override;
+        std::vector<Entity::DynamoDb::Item> executeQuery(const value &filter, bool scanIndexForward, int limit) const override;
 
         /**
          * @brief Adjust the item counters and updates the table entities.
@@ -335,7 +336,8 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::vector<Entity::DynamoDb::Item> getItems(const std::string &region, const std::string &tableName) const override;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -347,7 +349,7 @@ namespace Awsmock::Database {
          * @param variant variant
          * @return key value
          */
-        Entity::DynamoDb::KeyValue dynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const;
+        static Entity::DynamoDb::KeyValue dynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant);
 
         /**
          * @brief Dumps an item variant to stdout
@@ -355,7 +357,7 @@ namespace Awsmock::Database {
          * @param table name of the table
          * @param item item to dump
          */
-        void dumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) const;
+        static void dumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item);
 
         /**
          * @brief Database name
@@ -378,4 +380,4 @@ namespace Awsmock::Database {
         std::string _accountId;
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

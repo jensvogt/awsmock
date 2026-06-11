@@ -274,6 +274,11 @@ namespace Awsmock::Service {
          * @brief HTTP handler
          */
         std::shared_ptr<AbstractHandler> _handler;
+
+        /**
+         * @brief Module name for the cached handler
+         */
+        std::string _currentModule;
     };
 
 }// namespace Awsmock::Service

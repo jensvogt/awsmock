@@ -174,6 +174,10 @@ namespace Awsmock::Database {
         return q.to_vector();
     }
 
+    Entity::SQS::QueueList SQSMemoryRepository::listQueues() const {
+        return listQueues({});
+    }
+
     Entity::SQS::QueueList SQSMemoryRepository::exportQueues(const std::vector<SortColumn> &sortColumns) const {
 
         auto q = _queues | std::views::values | std::ranges::to<std::vector>();

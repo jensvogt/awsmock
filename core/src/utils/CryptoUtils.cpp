@@ -56,6 +56,7 @@ namespace Awsmock::Core {
             result << std::setw(2) << static_cast<int>(char_ptr[i]);
         }
         file.close();
+        
         return result.str();
     }
 
@@ -347,16 +348,16 @@ namespace Awsmock::Core {
         int outFileLen = 0;
 
         // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
-        auto in_buf = new char[AWSMOCK_BUFFER_SIZE];
-        auto out_buf = new char[AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE];
+        std::vector<char> in_buf(AWSMOCK_BUFFER_SIZE);
+        std::vector<char> out_buf(AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE);
 
         // Allows reusing of 'ctx' for multiple encryption cycles
         EVP_EncryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
 
         while (!input_file.eof()) {
-            input_file.read(in_buf, AWSMOCK_BUFFER_SIZE);
-            if (std::streamsize dataSize = input_file.gcount(); 1 == EVP_EncryptUpdate(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen, reinterpret_cast<const unsigned char *>(in_buf), (int) dataSize)) {
-                output_file.write(out_buf, outFileLen);
+            input_file.read(in_buf.data(), AWSMOCK_BUFFER_SIZE);
+            if (std::streamsize dataSize = input_file.gcount(); 1 == EVP_EncryptUpdate(ctx, reinterpret_cast<unsigned char *>(out_buf.data()), &outFileLen, reinterpret_cast<const unsigned char *>(in_buf.data()), (int) dataSize)) {
+                output_file.write(out_buf.data(), outFileLen);
                 log_trace << "AES256 encryption of file, written: " << outFileLen;
             } else {
                 int count = 0;
@@ -364,12 +365,10 @@ namespace Awsmock::Core {
                 break;
             }
         }
-        EVP_EncryptFinal_ex(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen);
+        EVP_EncryptFinal_ex(ctx, reinterpret_cast<unsigned char *>(out_buf.data()), &outFileLen);
         EVP_CIPHER_CTX_free(ctx);
         input_file.close();
         output_file.close();
-        free(in_buf);
-        free(out_buf);
 
         FileUtils::MoveTo(outFilename, filename);
     }
@@ -391,16 +390,16 @@ namespace Awsmock::Core {
         int outFileLen = 0;
 
         // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 byte
-        auto in_buf = new char[AWSMOCK_BUFFER_SIZE];
-        auto out_buf = new char[AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE];
+        std::vector<char> in_buf(AWSMOCK_BUFFER_SIZE);
+        std::vector<char> out_buf(AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE);
 
         // Allows reusing of 'ctx' for multiple encryption cycles
         EVP_DecryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
 
         while (!input_file.eof()) {
-            input_file.read(in_buf, AWSMOCK_BUFFER_SIZE);
-            if (std::streamsize dataSize = input_file.gcount(); 1 == EVP_DecryptUpdate(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen, reinterpret_cast<const unsigned char *>(in_buf), static_cast<int>(dataSize))) {
-                output_file.write(out_buf, outFileLen);
+            input_file.read(in_buf.data(), AWSMOCK_BUFFER_SIZE);
+            if (std::streamsize dataSize = input_file.gcount(); 1 == EVP_DecryptUpdate(ctx, reinterpret_cast<unsigned char *>(out_buf.data()), &outFileLen, reinterpret_cast<const unsigned char *>(in_buf.data()), static_cast<int>(dataSize))) {
+                output_file.write(out_buf.data(), outFileLen);
                 log_trace << "AES256 decryption of file, written: " << outFileLen;
             } else {
                 int count = 0;
@@ -408,12 +407,10 @@ namespace Awsmock::Core {
                 break;
             }
         }
-        EVP_DecryptFinal_ex(ctx, reinterpret_cast<unsigned char *>(out_buf), &outFileLen);
+        EVP_DecryptFinal_ex(ctx, reinterpret_cast<unsigned char *>(out_buf.data()), &outFileLen);
         EVP_CIPHER_CTX_free(ctx);
         input_file.close();
         output_file.close();
-        free(in_buf);
-        free(out_buf);
     }
 
     int Crypto::Aes256EncryptionInit(const unsigned char *key_data, const int key_data_len, const unsigned char *salt, EVP_CIPHER_CTX *ctx) {
@@ -637,6 +634,7 @@ namespace Awsmock::Core {
             sstream << buf;
         } while (size > 0);
         free(buf);
+        BIO_free(bp);
 
         return sstream.str();
     }
@@ -655,6 +653,7 @@ namespace Awsmock::Core {
             sstream << buf;
         } while (size > 0);
         free(buf);
+        BIO_free(bp);
 
         return sstream.str();
     }
@@ -702,7 +701,9 @@ namespace Awsmock::Core {
             log_error << "Could not encrypt string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         }
         EVP_PKEY_CTX_free(ctx);
-        return {reinterpret_cast<const char *>(encrypt), outLen};
+        std::string result(reinterpret_cast<const char *>(encrypt), outLen);
+        OPENSSL_free(encrypt);
+        return result;
     }
 
     std::string Crypto::RsaDecrypt(EVP_PKEY *keyPair, const std::string &in) {
@@ -725,7 +726,9 @@ namespace Awsmock::Core {
             log_error << "Could not decrypt string, error: " << ERR_error_string(ERR_get_error(), nullptr);
         }
         EVP_PKEY_CTX_free(ctx);
-        return {reinterpret_cast<char *>(decrypt), outLen};
+        std::string result(reinterpret_cast<char *>(decrypt), outLen);
+        OPENSSL_free(decrypt);
+        return result;
     }
 
 }// namespace Awsmock::Core

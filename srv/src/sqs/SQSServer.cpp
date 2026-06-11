@@ -56,7 +56,7 @@ namespace Awsmock::Service {
 
                 // Check the retention period
                 if (queue.attributes.messageRetentionPeriod > 0) {
-                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase->messageRetention(queue.url, queue.attributes.messageRetentionPeriod);
+                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase->messageRetention(queue.arn, queue.attributes.messageRetentionPeriod);
                 }
 
                 // Check visibility timeout
