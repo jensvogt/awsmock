@@ -123,6 +123,19 @@ namespace Awsmock::Database::Entity::ApiGateway {
         system_clock::time_point modified = system_clock::now();
 
         /**
+         * @brief Check whether the path part exists already
+         *
+         * @param pathPart path part of the resource
+         * @return true if path part already exists
+         */
+        bool resourceExists(const std::string &pathPart) {
+            return std::ranges::find_if(resources,
+                                        [pathPart](const std::pair<std::string, Resource> &resource) {
+                                            return resource.second.pathPart == pathPart;
+                                        }) != resources.end();
+        }
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as a MongoDB document.
@@ -138,4 +151,4 @@ namespace Awsmock::Database::Entity::ApiGateway {
         void FromDocument(const std::optional<view> &mResult);
     };
 
-}// namespace Awsmock::Database::Entity::ApiGateway
+} // namespace Awsmock::Database::Entity::ApiGateway

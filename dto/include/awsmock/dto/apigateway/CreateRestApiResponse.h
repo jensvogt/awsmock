@@ -93,8 +93,13 @@ namespace Awsmock::Dto::ApiGateway {
          */
         system_clock::time_point created;
 
-      private:
-
+    private:
+        /**
+         * @brief JSON deserializer
+         *
+         * @param v value
+         * @return object from JSON
+         */
         friend CreateRestApiResponse tag_invoke(boost::json::value_to_tag<CreateRestApiResponse>, boost::json::value const &v) {
             CreateRestApiResponse r;
             r.name = Core::Json::GetStringValue(v, "name");
@@ -108,35 +113,42 @@ namespace Awsmock::Dto::ApiGateway {
             r.policy = Core::Json::GetStringValue(v, "policy");
             r.created = Core::Json::GetDatetimeValue(v, "createdDate");
             if (Core::Json::AttributeExists(v, "binaryMediaTypes")) {
-                r.binaryMediaTypes = boost::json::value_to<std::vector<std::string>>(v.at("binaryMediaTypes"));
+                r.binaryMediaTypes = boost::json::value_to<std::vector<std::string> >(v.at("binaryMediaTypes"));
             }
             if (Core::Json::AttributeExists(v, "tags")) {
-                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+                r.tags = boost::json::value_to<std::map<std::string, std::string> >(v.at("tags"));
             }
             if (Core::Json::AttributeExists(v, "warnings")) {
-                r.warnings = boost::json::value_to<std::vector<std::string>>(v.at("warnings"));
+                r.warnings = boost::json::value_to<std::vector<std::string> >(v.at("warnings"));
             }
             return r;
         }
 
+        /**
+         * @brief JSON serializer
+         *
+         * @param jv JSON value
+         * @param obj object
+         */
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateRestApiResponse const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"name", obj.name},
-                    {"id", obj.id},
-                    {"apiKeySource", ApiKeySourceTypeToString(obj.apiKeySource)},
-                    {"description", obj.description},
-                    {"disableExecuteApiEndpoint", obj.disableExecuteApiEndpoint},
-                    {"version", obj.version},
-                    {"minimumCompressionSize", obj.minimumCompressionSize},
-                    {"policy", obj.policy},
-                    {"binaryMediaTypes", boost::json::value_from(obj.binaryMediaTypes)},
-                    {"tags", boost::json::value_from(obj.tags)},
-                    {"warnings", boost::json::value_from(obj.warnings)},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
+                {"name", obj.name},
+                {"id", obj.id},
+                {"apiKeySource", ApiKeySourceTypeToString(obj.apiKeySource)},
+                {"rootResourceId", obj.rootResourceId},
+                {"description", obj.description},
+                {"disableExecuteApiEndpoint", obj.disableExecuteApiEndpoint},
+                {"version", obj.version},
+                {"minimumCompressionSize", obj.minimumCompressionSize},
+                {"policy", obj.policy},
+                {"binaryMediaTypes", boost::json::value_from(obj.binaryMediaTypes)},
+                {"tags", boost::json::value_from(obj.tags)},
+                {"warnings", boost::json::value_from(obj.warnings)},
             };
         }
     };
 
-}// namespace Awsmock::Dto::ApiGateway
+} // namespace Awsmock::Dto::ApiGateway

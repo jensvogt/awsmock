@@ -312,7 +312,7 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto filter = make_document(kvp("region", restApi.region), kvp("name", restApi.name));
+            const auto filter = make_document(kvp("region", restApi.region), kvp("id", restApi.id));
             const auto update = make_document(kvp("$set", restApi.ToDocument()));
 
             mongocxx::options::find_one_and_update opts;
@@ -508,7 +508,7 @@ namespace Awsmock::Database {
 
             document query = {};
             if (!restApiId.empty()) {
-                query.append(kvp("restApiId", restApiId));
+                query.append(kvp("id", restApiId));
             }
 
             if (const auto result = restApiCollection.find_one(query.extract()); result.has_value()) {

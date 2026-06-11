@@ -51,6 +51,15 @@ namespace Awsmock::Database::Entity::ApiGateway {
             }
             keyDocument.append(kvp("warnings", warningsArray));
         }
+
+        // Resources
+        if (!resources.empty()) {
+            document resourceDocument;
+            for (const auto &[fst, snd]: resources) {
+                resourceDocument.append(kvp(fst, snd.ToDocument()));
+            }
+            keyDocument.append(kvp("resources", resourceDocument));
+        }
         return keyDocument.extract();
     }
 
@@ -93,11 +102,22 @@ namespace Awsmock::Database::Entity::ApiGateway {
 
         // Warnings
         if (mResult.value().find("warnings") != mResult.value().end()) {
-            binaryMediaTypes.clear();
-            for (const view binaryMediaTypeArray = mResult.value()["warnings"].get_array().value; const auto &b: binaryMediaTypeArray) {
+            warnings.clear();
+            for (const view warningsArray = mResult.value()["warnings"].get_array().value; const auto &b: warningsArray) {
                 warnings.emplace_back(b.get_string().value);
+            }
+        }
+
+        // Resources
+        if (mResult.value().find("resources") != mResult.value().end()) {
+            resources.clear();
+            for (const view resourcesDoc = mResult.value()["resources"].get_document().value; const auto &r: resourcesDoc) {
+                const std::string key = bsoncxx::string::to_string(r.key());
+                Resource resource;
+                resource.FromDocument(r.get_document().value);
+                resources[key] = resource;
             }
         }
     }
 
-}// namespace Awsmock::Database::Entity::ApiGateway
+} // namespace Awsmock::Database::Entity::ApiGateway
