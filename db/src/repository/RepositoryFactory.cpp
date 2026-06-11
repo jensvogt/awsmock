@@ -72,20 +72,18 @@ namespace Awsmock::Database {
     }
 
     void RepositoryFactory::createIndexes() const {
-        if (_backend == BackendType::MONGODB) {
 
-            const auto entry = ConnectionPool::instance().GetConnection();
-            const mongocxx::database database = (*entry)[_databaseName];
+        const auto entry = ConnectionPool::instance().GetConnection();
+        const mongocxx::database database = (*entry)[_databaseName];
 
-            log_info << "Start creating indexes";
+        log_info << "Start creating indexes";
 
-            for (const auto &indexName: std::views::keys(indexDefinitions)) {
-                createIndex(database, indexName);
-            }
-            log_info << "Finished creating indexes, count: " << indexDefinitions.size();
+        for (const auto &indexName: std::views::keys(indexDefinitions)) {
+            createIndex(database, indexName);
         }
+        log_info << "Finished creating indexes, count: " << indexDefinitions.size();
     }
-    
+
     void RepositoryFactory::createIndex(const mongocxx::database &database, const std::string &indexName) const {
         log_trace << "Start creating index, name: " << indexName;
         auto [collectionName, indexColumns, unique] = indexDefinitions.at(indexName);

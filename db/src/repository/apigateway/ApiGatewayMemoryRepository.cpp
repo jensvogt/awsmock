@@ -171,7 +171,7 @@ namespace Awsmock::Database {
 
         const auto it = std::ranges::find_if(_restApis,
                                              [&restApi](const std::pair<const std::string, Entity::ApiGateway::RestApi> &entry) {
-                                                 return entry.second.region == restApi.region && entry.second.name == restApi.name;
+                                                 return entry.second.region == restApi.region && entry.second.id == restApi.id;
                                              });
         if (it != _restApis.end()) {
             restApi.oid = it->first;
