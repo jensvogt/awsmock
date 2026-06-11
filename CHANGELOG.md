@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.66](https://github.com/jensvogt/awsmock/compare/1.18.65...v1.18.66) (2026-06-11)
+
+
+### Bug Fixes
+
+* add resource to rest api ([770a557](https://github.com/jensvogt/awsmock/commit/770a557556968650d9b0def0b61c7960da74dfce))
+* add resource to rest api ([f8e860f](https://github.com/jensvogt/awsmock/commit/f8e860f702871ba47015c2506463c57298be6bf7))
+
 ## [1.18.65](https://github.com/jensvogt/awsmock/compare/1.18.64...v1.18.65) (2026-06-08)
 
 
