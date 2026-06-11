@@ -62,8 +62,11 @@ namespace Awsmock::Service {
             response.region = request.region;
             response.user = request.user;
             response.requestId = request.requestId;
-            response.position = keys.empty() ? "" : keys.size() > 1 ? keys.end()->id
-                                                                    : keys.begin()->id;
+            response.position = keys.empty()
+                                    ? ""
+                                    : keys.size() > 1
+                                          ? keys.end()->id
+                                          : keys.begin()->id;
             response.items = Dto::ApiGateway::Mapper::map(keys);
             return response;
 
@@ -112,6 +115,11 @@ namespace Awsmock::Service {
             // ID
             if (restApi.id.empty()) {
                 restApi.id = Core::AwsUtils::CreateRestApiId();
+            }
+
+            // Root resourceId
+            if (restApi.rootResourceId.empty()) {
+                restApi.rootResourceId = Core::AwsUtils::CreateRestApiId();
             }
 
             // Save to the database
@@ -328,29 +336,46 @@ namespace Awsmock::Service {
 
     Dto::ApiGateway::CreateResourceResponse ApiGatewayService::createResource(const Dto::ApiGateway::CreateResourceRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_resource");
-        log_debug << "Create resource request, region:  " << request.region << ", pathPart: " << request.pathPart;
+        log_debug << "Create resource request, region:  " << request.region << ", restApiId:" << request.restApiId << ", parentId: " << request.parentId << ", pathPart: " << request.pathPart;
 
-        if (_apiGatewayDatabase->apiKeyExists(request.region, request.pathPart)) {
-            log_error << "REST API exists already, region: " << request.region << " pathPart: " << request.pathPart;
-            throw Core::ServiceException("REST API exists already, region: " + request.region + " pathPart: " + request.pathPart);
+        if (!_apiGatewayDatabase->restApiExistsByRestApiId(request.restApiId)) {
+            log_error << "REST API does not exist, region: " << request.region << " restApiId: " << request.restApiId;
+            throw Core::ServiceException("REST API does not exist already, region: " + request.region + " restApiId: " + request.restApiId);
         }
 
         try {
 
+            // Get the rest api
+            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.restApiId);
+
             // Get rest api entity from request
             Database::Entity::ApiGateway::Resource resource = Dto::ApiGateway::Mapper::map(request);
+
+            // Check whether it already exists
+            if (restApi.resourceExists(resource.pathPart)) {
+                log_error << "REST API resource exist already, region: " << request.region << " restApiId: " << request.restApiId << ", pathPart: " << request.pathPart;
+                throw Core::ServiceException("REST API does not exist already, region: " + request.region + ", restApiId: " + request.restApiId + ", pathPart: " + request.pathPart);
+            }
 
             // ID
             if (resource.id.empty()) {
                 resource.id = Core::AwsUtils::CreateResourceId();
             }
 
+            // Parent ID and path
+            resource.parentId = request.parentId;
+            if (!request.parentId.empty() && restApi.resources.contains(request.parentId)) {
+                const auto &parentPath = restApi.resources.at(request.parentId).path;
+                resource.path = (parentPath == "/" ? "" : parentPath) + "/" + resource.pathPart;
+            } else {
+                resource.path = "/" + resource.pathPart;
+            }
+
             // Save to the database
-            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.restApiId);
             restApi.resources[resource.id] = resource;
             restApi = _apiGatewayDatabase->upsertRestApi(restApi);
             log_trace << "REST resource created, restApi:" << restApi.id << ", pathPart: " + resource.pathPart;
-            
+
             return Dto::ApiGateway::Mapper::map(request, resource);
 
         } catch (bsoncxx::exception &exc) {
@@ -359,4 +384,4 @@ namespace Awsmock::Service {
         }
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
