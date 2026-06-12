@@ -43,6 +43,11 @@ namespace Awsmock::Dto::ApiGateway {
         std::string pathPart;
 
         /**
+         * Full invoke URL for this resource
+         */
+        std::string url;
+
+        /**
          * Created timestamp
          */
         system_clock::time_point created;
@@ -60,6 +65,7 @@ namespace Awsmock::Dto::ApiGateway {
             r.parentId = Core::Json::GetStringValue(v, "parentId");
             r.path = Core::Json::GetStringValue(v, "path");
             r.pathPart = Core::Json::GetStringValue(v, "pathPart");
+            r.url = Core::Json::GetStringValue(v, "url");
             r.created = Core::Json::GetDatetimeValue(v, "createdDate");
             r.modified = Core::Json::GetDatetimeValue(v, "lastUpdatedDate");
             return r;
@@ -74,6 +80,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"parentId", obj.parentId},
                     {"path", obj.path},
                     {"pathPart", obj.pathPart},
+                    {"url", obj.url},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

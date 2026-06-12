@@ -192,6 +192,15 @@ namespace Awsmock::Core {
         static std::string CreateApiGatewayApiKey();
 
         /**
+         * @brief Creates an API Gateway REST API endpoint URL
+         *
+         * @param restApiId REST API ID
+         * @param region AWS region
+         * @return REST API endpoint URL
+         */
+        static std::string CreateApiGatewayRestApiUrl(const std::string &restApiId, const std::string &region);
+
+        /**
          * @brief Converts a queue ARN to a queue URL
          *
          * @param input ARN of the queue

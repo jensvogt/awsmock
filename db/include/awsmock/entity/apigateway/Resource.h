@@ -44,6 +44,11 @@ namespace Awsmock::Database::Entity::ApiGateway {
         std::string pathPart;
 
         /**
+         * @brief Full invoke URL for this resource
+         */
+        std::string url;
+
+        /**
          * @brief Resource methods
          */
         std::map<std::string, ResourceMethod> resourceMethods;

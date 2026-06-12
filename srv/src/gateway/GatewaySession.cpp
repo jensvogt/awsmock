@@ -178,7 +178,7 @@ namespace Awsmock::Service {
         // Allocate and store the work
         _response_queue.push(std::move(response));
 
-        // If there was no previous work, start the write loop
+        // If there was no previous work, start the writing loop
         if (_response_queue.size() == 1) DoWrite();
     }
 

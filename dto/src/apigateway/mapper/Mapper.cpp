@@ -95,9 +95,71 @@ namespace Awsmock::Dto::ApiGateway {
         response.parentId = resourceEntity.parentId;
         response.path = resourceEntity.path;
         response.pathPart = resourceEntity.pathPart;
+        response.url = resourceEntity.url;
         response.created = resourceEntity.created;
         response.modified = resourceEntity.modified;
         return response;
+    }
+
+    Resource Mapper::map(const Database::Entity::ApiGateway::Resource &resourceEntity) {
+        Resource resource{};
+        resource.id = resourceEntity.id;
+        resource.parentId = resourceEntity.parentId;
+        resource.path = resourceEntity.path;
+        resource.pathPart = resourceEntity.pathPart;
+        resource.url = resourceEntity.url;
+        resource.created = resourceEntity.created;
+        resource.modified = resourceEntity.modified;
+        for (const auto &[key, methodEntity]: resourceEntity.resourceMethods) {
+            ResourceMethod method{};
+            method.httpMethod = methodEntity.httpMethod;
+            method.apiKeyRequired = methodEntity.apiKeyRequired;
+            resource.resourceMethods[key] = method;
+        }
+        return resource;
+    }
+
+    Database::Entity::ApiGateway::Resource Mapper::map(const Resource &resourceDto) {
+        Database::Entity::ApiGateway::Resource resourceEntity{};
+        resourceEntity.id = resourceDto.id;
+        resourceEntity.parentId = resourceDto.parentId;
+        resourceEntity.path = resourceDto.path;
+        resourceEntity.pathPart = resourceDto.pathPart;
+        resourceEntity.url = resourceDto.url;
+        resourceEntity.created = resourceDto.created;
+        resourceEntity.modified = resourceDto.modified;
+        for (const auto &[key, methodDto]: resourceDto.resourceMethods) {
+            Database::Entity::ApiGateway::ResourceMethod method{};
+            method.httpMethod = methodDto.httpMethod;
+            method.apiKeyRequired = methodDto.apiKeyRequired;
+            resourceEntity.resourceMethods[key] = method;
+        }
+        return resourceEntity;
+    }
+
+    std::map<std::string, Resource> Mapper::map(const std::map<std::string, Database::Entity::ApiGateway::Resource> &resources) {
+        std::map<std::string, Resource> result;
+        for (const auto &[key, resourceEntity]: resources) {
+            result[key] = map(resourceEntity);
+        }
+        return result;
+    }
+
+    std::map<std::string, Database::Entity::ApiGateway::Resource> Mapper::map(const std::map<std::string, Resource> &resources) {
+        std::map<std::string, Database::Entity::ApiGateway::Resource> result;
+        for (const auto &[key, resourceDto]: resources) {
+            result[key] = map(resourceDto);
+        }
+        return result;
+    }
+
+    std::vector<Resource> Mapper::map(const std::vector<Database::Entity::ApiGateway::Resource> &resourceEntities) {
+        std::vector<Resource> result;
+        result.reserve(resourceEntities.size());
+        for (const auto &resourceEntity: resourceEntities) {
+            result.emplace_back(map(resourceEntity));
+        }
+        return result;
     }
 
     // ========================================================================================================================
@@ -151,6 +213,7 @@ namespace Awsmock::Dto::ApiGateway {
         // restApi.customerId = restApiEntity.customerId;
         restApi.warnings = restApiEntity.warnings;
         restApi.created = restApiEntity.created;
+        restApi.resources = map(restApiEntity.resources);
         return restApi;
     }
 
