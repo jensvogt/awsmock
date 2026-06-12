@@ -95,6 +95,10 @@ namespace Awsmock::Service {
          * The exclusion list is a vector of string in format name::labelName::labelValue.
          */
         std::vector<std::string> _exclusions;
+
+        boost::signals2::scoped_connection _shutdownConnection;
+        boost::signals2::scoped_connection _metricGaugeConnection;
+        boost::signals2::scoped_connection _metricRateConnection;
     };
 
 }// namespace Awsmock::Service

@@ -63,10 +63,10 @@ namespace Awsmock::Service {
             response.user = request.user;
             response.requestId = request.requestId;
             response.position = keys.empty()
-                                    ? ""
-                                    : keys.size() > 1
-                                          ? keys.end()->id
-                                          : keys.begin()->id;
+                                        ? ""
+                                : keys.size() > 1
+                                        ? keys.end()->id
+                                        : keys.begin()->id;
             response.items = Dto::ApiGateway::Mapper::map(keys);
             return response;
 
@@ -115,6 +115,11 @@ namespace Awsmock::Service {
             // ID
             if (restApi.id.empty()) {
                 restApi.id = Core::AwsUtils::CreateRestApiId();
+            }
+
+            // Endpoint URL
+            if (restApi.endpointUrl.empty()) {
+                restApi.endpointUrl = Core::AwsUtils::CreateApiGatewayRestApiUrl(restApi.id, restApi.region);
             }
 
             // Root resourceId
@@ -283,6 +288,8 @@ namespace Awsmock::Service {
             Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.region, request.restApi.name);
 
             restApi.enabled = request.restApi.enabled;
+            restApi.description = request.restApi.description;
+            restApi.resources = Dto::ApiGateway::Mapper::map(request.restApi.resources);
             restApi = _apiGatewayDatabase->upsertRestApi(restApi);
             log_debug << "REST API updated, name: " + restApi.name;
 
@@ -371,6 +378,12 @@ namespace Awsmock::Service {
                 resource.path = "/" + resource.pathPart;
             }
 
+            // URL
+            if (restApi.endpointUrl.empty()) {
+                restApi.endpointUrl = Core::AwsUtils::CreateApiGatewayRestApiUrl(restApi.id, restApi.region);
+            }
+            resource.url = restApi.endpointUrl + resource.path;
+
             // Save to the database
             restApi.resources[resource.id] = resource;
             restApi = _apiGatewayDatabase->upsertRestApi(restApi);
@@ -384,4 +397,4 @@ namespace Awsmock::Service {
         }
     }
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

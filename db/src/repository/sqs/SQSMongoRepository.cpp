@@ -219,6 +219,14 @@ namespace Awsmock::Database {
         return queueList;
     }
 
+    Entity::SQS::QueueList SQSMongoRepository::listQueues(const std::string &region) const {
+        return listQueues({}, 0, 0, {}, region);
+    }
+
+    Entity::SQS::QueueList SQSMongoRepository::listQueues() const {
+        return listQueues({});
+    }
+
     Entity::SQS::QueueList SQSMongoRepository::exportQueues(const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "export_queues");
 
@@ -257,27 +265,6 @@ namespace Awsmock::Database {
         queue.attributes.approximateNumberOfMessagesDelayed = 0;
         queue.attributes.approximateNumberOfMessagesNotVisible = 0;
         return createOrUpdateQueue(queue);
-    }
-
-    Entity::SQS::QueueList SQSMongoRepository::listQueues(const std::string &region) const {
-        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_queues");
-
-        const auto client = ConnectionPool::instance().GetConnection();
-        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
-
-        document query = {};
-        if (!region.empty()) {
-            query.append(kvp("region", region));
-        }
-
-        Entity::SQS::QueueList queueList;
-        for (auto queueCursor = queueCollection.find(query.view()); auto queue: queueCursor) {
-            Entity::SQS::Queue result;
-            result.FromDocument(queue);
-            queueList.push_back(result);
-        }
-        log_trace << "Got queue list, size: " << queueList.size();
-        return queueList;
     }
 
     long SQSMongoRepository::purgeQueue(const std::string &queueArn) const {
@@ -987,18 +974,18 @@ namespace Awsmock::Database {
                                                           kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
             }
 
-            // Zero out queues with no messages
-            for (auto queueCursor = queueCollection.find({}); const auto &q: queueCursor) {
-                if (const auto queueArn = Core::Bson::BsonUtils::GetStringValue(q, "arn"); !queuesWithMessages.contains(queueArn)) {
-                    bulk.append(mongocxx::model::update_one(
-                            make_document(kvp("arn", queueArn)),
-                            make_document(kvp("$set", make_document(
-                                                              kvp("size", bsoncxx::types::b_int64()),
-                                                              kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
-                                                              kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
-                                                              kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64()))))));
-                }
+            // Zero out queues with no messages — single server-side update_many replaces N client-side update_ones
+            array arnsArray;
+            for (const auto &arn: queuesWithMessages) {
+                arnsArray.append(arn);
             }
+            bulk.append(mongocxx::model::update_many(
+                    make_document(kvp("arn", make_document(kvp("$nin", arnsArray.view())))),
+                    make_document(kvp("$set", make_document(
+                                                      kvp("size", bsoncxx::types::b_int64()),
+                                                      kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
+                                                      kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
+                                                      kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64()))))));
 
             if (!bulk.empty()) {
                 auto result = bulk.execute();

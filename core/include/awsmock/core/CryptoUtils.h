@@ -17,6 +17,7 @@
 #include <array>
 #include <string>
 #include <string_view>
+#include <vector>
 
 // Openssl includes
 #include <openssl/aes.h>
@@ -67,10 +68,10 @@
 
 namespace Awsmock::Core {
 
-    static const std::string _base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    static constexpr std::string_view _base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     /**
-     * @brief Cryptographic utilities like MD5 hash, SHA1, SHA256 etc.
+     * @brief Cryptographic utilities like MD5 hash, SHA1, SHA256, etc.
      *
      * @par
      * This class contains AWS cryptographic method as well as OpenSSL methods. AWS cryptographic methods are denoted with a preceding 'AWS'.

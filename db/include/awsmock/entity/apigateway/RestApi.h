@@ -30,82 +30,82 @@ namespace Awsmock::Database::Entity::ApiGateway {
         /**
          * Aws region
          */
-        std::string region;
+        std::string region{};
 
         /**
          * ID
          */
-        std::string id;
+        std::string id{};
 
         /**
          * Application name
          */
-        std::string name;
+        std::string name{};
 
         /**
          * Description
          */
-        std::string description;
+        std::string description{};
 
         /**
          * Endpoint URL
          */
-        std::string endpointUrl;
+        std::string endpointUrl{};
 
         /**
          * API key source
          */
-        ApiKeySourceType apiKeySource;
+        ApiKeySourceType apiKeySource{};
 
         /**
          * Clone source
          */
-        std::string cloneFrom;
+        std::string cloneFrom{};
 
         /**
          * Version
          */
-        std::string version;
+        std::string version{};
 
         /**
          * JSON policy
          */
-        std::string policy;
+        std::string policy{};
 
         /**
          * Root resource ID
          */
-        std::string rootResourceId;
+        std::string rootResourceId{};
 
         /**
          * Tags
          */
-        std::map<std::string, Resource> resources;
+        std::map<std::string, Resource> resources{};
 
         /**
          * Tags
          */
-        std::map<std::string, std::string> tags;
+        std::map<std::string, std::string> tags{};
 
         /**
          * Binary media types array
          */
-        std::vector<std::string> binaryMediaTypes;
+        std::vector<std::string> binaryMediaTypes{};
 
         /**
          * Warnings
          */
-        std::vector<std::string> warnings;
+        std::vector<std::string> warnings{};
 
         /**
          * Disable API endpoint
          */
-        bool disableExecuteApiEndpoint;
+        bool disableExecuteApiEndpoint{};
 
         /**
          * Minimal compression size
          */
-        long minimumCompressionSize;
+        long minimumCompressionSize{};
 
         /**
          * @brief Enabled flag
@@ -151,4 +151,4 @@ namespace Awsmock::Database::Entity::ApiGateway {
         void FromDocument(const std::optional<view> &mResult);
     };
 
-} // namespace Awsmock::Database::Entity::ApiGateway
+}// namespace Awsmock::Database::Entity::ApiGateway

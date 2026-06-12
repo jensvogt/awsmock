@@ -23,6 +23,9 @@
 // C++ standard includes
 #include <cstdlib>
 #include <iostream>
+#ifdef __linux__
+#include <malloc.h>
+#endif
 
 // Boost includes
 #include <boost/program_options/parsers.hpp>
@@ -58,6 +61,13 @@ namespace {
  * @return system exit code.
  */
 int main(const int argc, char *argv[]) {
+
+#ifdef __linux__
+    // Limit glibc malloc arenas to reduce RSS growth on Linux.
+    // By default glibc creates up to 8*nCPUs arenas and never returns
+    // freed memory to the OS; two arenas are enough for this workload.
+    mallopt(M_ARENA_MAX, 2);
+#endif
 
     // Initialize logging
     Awsmock::Core::LogStream::Initialize();

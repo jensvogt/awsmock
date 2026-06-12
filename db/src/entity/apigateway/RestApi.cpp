@@ -26,7 +26,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         keyDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
 
         // Tags
-        if (!tags.empty()) {
+        {
             document tagsDoc;
             for (const auto &[fst, snd]: tags) {
                 tagsDoc.append(kvp(fst, snd));
@@ -35,7 +35,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         }
 
         // Binary media types
-        if (!binaryMediaTypes.empty()) {
+        {
             array binaryMediaTypesArray;
             for (const auto &binaryMediaType: binaryMediaTypes) {
                 binaryMediaTypesArray.append(binaryMediaType);
@@ -44,7 +44,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         }
 
         // Warnings
-        if (!warnings.empty()) {
+        {
             array warningsArray;
             for (const auto &warning: warnings) {
                 warningsArray.append(warning);
@@ -53,7 +53,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         }
 
         // Resources
-        if (!resources.empty()) {
+        {
             document resourceDocument;
             for (const auto &[fst, snd]: resources) {
                 resourceDocument.append(kvp(fst, snd.ToDocument()));

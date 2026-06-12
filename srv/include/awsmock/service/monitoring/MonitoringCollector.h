@@ -39,13 +39,16 @@ namespace Awsmock::Monitoring {
                 for (auto &[id, entry]: _collectorMap) {
                     if (const auto cnt = boost::accumulators::count(entry.accumulator); cnt > 0) {
                         if (entry.isRate) {
-                            values[id] = static_cast<double>(cnt) / _period;
+                            values[id] = static_cast<double>(cnt) / static_cast<double>(_period);
                         } else {
                             values[id] = boost::accumulators::mean(entry.accumulator);
                         }
                         entry.accumulator = {};
                     }
                 }
+                std::erase_if(_collectorMap, [](const auto &kv) {
+                    return boost::accumulators::count(kv.second.accumulator) == 0;
+                });
             }
 
             if (!values.empty()) {

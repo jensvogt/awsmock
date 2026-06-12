@@ -21,8 +21,7 @@ namespace Awsmock::Service::Frontend {
 
       public:
 
-        listener(net::io_context &ioc, const tcp::endpoint &endpoint)
-            : _ioc(ioc), _acceptor(boost::asio::make_strand(ioc)) {
+        listener(net::io_context &ioc, const tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(boost::asio::make_strand(ioc)) {
             beast::error_code ec;
 
             ec = _acceptor.open(endpoint.protocol(), ec);
@@ -123,6 +122,8 @@ namespace Awsmock::Service::Frontend {
                 });
             }
 
+            log_info << "Frontend server started, endpoint: " << address << ":" << port << " workers: " << num_workers;
+            ioc.run();
 #ifdef _WIN32
             if (isService) {
                 while (true) {
@@ -139,14 +140,6 @@ namespace Awsmock::Service::Frontend {
             } else {
                 ioc.run();
             }
-
-#else
-
-            // Wait for all threads
-            for (auto &t: pool) t.join();
-
-            log_info << "Frontend server started, endpoint: " << address << ":" << port << " workers: " << num_workers;
-            ioc.run();
 #endif
         } catch (const std::exception &e) {
             log_error << "Error: " << e.what() << std::endl;

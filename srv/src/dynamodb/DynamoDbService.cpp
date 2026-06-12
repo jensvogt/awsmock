@@ -318,20 +318,24 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "get_item");
         log_debug << "Start get item, region: " << request.region << " name: " << request.tableName;
 
-        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
-            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
-        }
-
         try {
 
-            // Get the table and the primary keys
+            // Get the table and the primary keys (throws DatabaseException if table not found)
             const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
             std::string partitionKey = request.keys[table.GetPartitionKeyName()].stringValue;
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
 
-            if (!_dynamoDbDatabase->itemExists(request.region, request.tableName, partitionKey, sortKey)) {
-                log_debug << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+            // Get item — return empty response if not found
+            try {
+                const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, partitionKey, sortKey);
+                Dto::DynamoDb::GetItemResponse getItemResponse;
+                getItemResponse.region = request.region;
+                getItemResponse.user = request.user;
+                getItemResponse.requestId = request.requestId;
+                getItemResponse.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
+                return getItemResponse;
+            } catch (Core::DatabaseException &) {
+                log_debug << "DynamoDb item not found, region: " << request.region << " table: " << request.tableName;
                 Dto::DynamoDb::GetItemResponse getItemResponse;
                 getItemResponse.region = request.region;
                 getItemResponse.user = request.user;
@@ -339,20 +343,12 @@ namespace Awsmock::Service {
                 return getItemResponse;
             }
 
-            // Get item
-            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, partitionKey, sortKey);
-
-            // Prepare response
-            Dto::DynamoDb::GetItemResponse getItemResponse;
-            getItemResponse.region = request.region;
-            getItemResponse.user = request.user;
-            getItemResponse.requestId = request.requestId;
-            getItemResponse.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
-            return getItemResponse;
-
+        } catch (Core::DatabaseException &exc) {
+            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+            throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd get item failed, error: " << exc.message();
-            throw Core::ServiceException("DynamoDbd get item failed, , error: " + exc.message());
+            throw Core::ServiceException("DynamoDbd get item failed, error: " + exc.message());
         }
     }
 

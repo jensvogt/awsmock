@@ -93,6 +93,47 @@ namespace Awsmock::Dto::ApiGateway {
         static CreateResourceResponse map(const CreateResourceRequest &request, const Database::Entity::ApiGateway::Resource &resourceEntity);
 
         /**
+         * @brief Maps a resource entity to a resource DTO
+         *
+         * @param resourceEntity resource entity
+         * @return resource DTO
+         * @see AwsMock::Dto::ApiGateway::Resource
+         */
+        static Resource map(const Database::Entity::ApiGateway::Resource &resourceEntity);
+
+        /**
+         * @brief Maps a resource DTO to a resource entity
+         *
+         * @param resourceDto resource DTO
+         * @return resource entity
+         */
+        static Database::Entity::ApiGateway::Resource map(const Resource &resourceDto);
+
+        /**
+         * @brief Maps a map of resource entities to a map of resource DTOs
+         *
+         * @param resources map of resource entities keyed by resource ID
+         * @return map of resource DTOs
+         */
+        static std::map<std::string, Resource> map(const std::map<std::string, Database::Entity::ApiGateway::Resource> &resources);
+
+        /**
+         * @brief Maps a map of resource DTOs to a map of resource entities
+         *
+         * @param resources map of resource DTOs keyed by resource ID
+         * @return map of resource entities
+         */
+        static std::map<std::string, Database::Entity::ApiGateway::Resource> map(const std::map<std::string, Resource> &resources);
+
+        /**
+         * @brief Maps a list of resource entities to a list of resource DTOs
+         *
+         * @param resourceEntities list of resource entities
+         * @return list of resource DTOs
+         */
+        static std::vector<Resource> map(const std::vector<Database::Entity::ApiGateway::Resource> &resourceEntities);
+
+        /**
          * @brief Maps a REST API request to a REST API entity
          *
          * @param request REST API create request

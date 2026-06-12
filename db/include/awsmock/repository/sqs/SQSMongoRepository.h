@@ -44,7 +44,8 @@ namespace Awsmock::Database {
      */
     class SQSMongoRepository : public ISQSRepository {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -178,7 +179,27 @@ namespace Awsmock::Database {
         Entity::SQS::QueueList listQueues(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const override;
 
         /**
-         * @brief List available queues, using paging
+         * @brief List all available queues in a aregion
+         *
+         * @param region AWS region
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::SQS::QueueList listQueues(const std::string &region) const override;
+
+
+        /**
+         * @brief List all available queues
+         *
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        Entity::SQS::QueueList listQueues() const override;
+
+        /**
+         * @brief Export the queues
          *
          * @param sortColumns vector of sort columns
          * @return List of SQS queues
@@ -199,16 +220,6 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         Entity::SQS::Queue importQueue(Entity::SQS::Queue &queue) const override;
-
-        /**
-         * @brief List all available queues
-         *
-         * @param region AWS region
-         * @return List of SQS queues
-         * @throws DatabaseException
-         */
-        [[nodiscard]]
-        Entity::SQS::QueueList listQueues(const std::string &region) const override;
 
         /**
          * @brief Purge a given queueUrl.
@@ -512,7 +523,8 @@ namespace Awsmock::Database {
          */
         void adjustMessageCounters() const override;
 
-    private:
+      private:
+
         /**
          * @brief Channeled log stream
          */
@@ -534,4 +546,4 @@ namespace Awsmock::Database {
         static constexpr auto _messageCollectionName = "sqs_message";
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

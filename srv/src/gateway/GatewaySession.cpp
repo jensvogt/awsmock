@@ -113,7 +113,10 @@ namespace Awsmock::Service {
 
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            _handler = GatewayRouter{}.GetHandler(target, _ioc);
+            if (!_handler || _currentModule != target) {
+                _handler = GatewayRouter{}.GetHandler(target, _ioc);
+                _currentModule = target;
+            }
             if (!_handler) {
                 log_error << "Handler not found, target: " << target;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -130,7 +133,10 @@ namespace Awsmock::Service {
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
             _region = authKey.region;
-            _handler = GatewayRouter{}.GetHandler(authKey.module, _ioc);
+            if (!_handler || _currentModule != authKey.module) {
+                _handler = GatewayRouter{}.GetHandler(authKey.module, _ioc);
+                _currentModule = authKey.module;
+            }
             if (!_handler) {
                 log_error << "Handler not found, target: " << authKey.module;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -172,7 +178,7 @@ namespace Awsmock::Service {
         // Allocate and store the work
         _response_queue.push(std::move(response));
 
-        // If there was no previous work, start the write loop
+        // If there was no previous work, start the writing loop
         if (_response_queue.size() == 1) DoWrite();
     }
 

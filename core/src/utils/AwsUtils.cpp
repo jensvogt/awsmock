@@ -74,6 +74,12 @@ namespace Awsmock::Core {
         return StringUtils::GenerateRandomString(42);
     }
 
+    std::string AwsUtils::CreateApiGatewayRestApiUrl(const std::string &restApiId, const std::string &region) {
+        const auto hostname = SystemUtils::GetHostName();
+        const auto port = Configuration::instance().get<std::string>("awsmock.gateway.http.port");
+        return "http://" + hostname + ":" + port + "/restapis/" + restApiId;
+    }
+
     std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &input) {
         if (input.empty()) {
             log_error << "Empty input, input: '" << input << "'";

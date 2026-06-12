@@ -31,17 +31,17 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect([this]() {
+        _shutdownConnection = Core::EventBus::instance().sigShutdown.connect([this]() {
             this->Shutdown();
         });
 
         // Connect monitoring signal
-        Core::EventBus::instance().sigMetricGauge.connect([this](const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {
+        _metricGaugeConnection = Core::EventBus::instance().sigMetricGauge.connect([this](const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {
             if (CheckExclusions(name, labelName, labelValue)) {
                 this->_monitoringCollector.SetGauge(name, labelName, labelValue, value);
             }
         });
-        Core::EventBus::instance().sigMetricRate.connect([this](const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        _metricRateConnection = Core::EventBus::instance().sigMetricRate.connect([this](const std::string &name, const std::string &labelName, const std::string &labelValue) {
             if (CheckExclusions(name, labelName, labelValue)) {
                 this->_monitoringCollector.Increment(name, labelName, labelValue);
             }

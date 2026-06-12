@@ -77,7 +77,7 @@ namespace Awsmock::Database {
             throw Core::DatabaseException("Database exception " + std::string(exc.what()));
         }
     }
-    
+
     bool DynamoDbMongoRepository::tableExists(const std::string &region, const std::string &tableName) const {
         Monitoring::MonitoringTimer measure(DYNAMODB_DATABASE_TIMER, DYNAMODB_DATABASE_COUNTER, "action", "table_exists");
 
@@ -226,8 +226,6 @@ namespace Awsmock::Database {
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_tableCollectionName];
 
         try {
-
-
             document filterQuery;
             filterQuery.append(kvp("arn", tableArn));
 
@@ -818,15 +816,13 @@ namespace Awsmock::Database {
                 log_debug << "Bulk write result, modified: " << result->modified_count();
             }
 
-            return;
-
         } catch (const mongocxx::exception &exc) {
             log_error << "Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
     }
 
-    Entity::DynamoDb::KeyValue DynamoDbMongoRepository::dynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) const {
+    Entity::DynamoDb::KeyValue DynamoDbMongoRepository::dynamoVariantToKeyValue(const Entity::DynamoDb::DynamoValue::DynamoVariant &variant) {
         return std::visit([]<typename T0>(const T0 &val) -> Entity::DynamoDb::KeyValue {
             using T = std::decay_t<T0>;
 
@@ -843,7 +839,7 @@ namespace Awsmock::Database {
                           variant);
     }
 
-    void DynamoDbMongoRepository::dumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) const {
+    void DynamoDbMongoRepository::dumpVariant(const Entity::DynamoDb::Table &table, Entity::DynamoDb::Item &item) {
         std::string tmp0 = table.GetPartitionKeyName();
         std::string tmp1 = table.GetSortKeyName();
         auto debugVariant = [](const Entity::DynamoDb::DynamoValue::DynamoVariant &variant, const std::string &name) {

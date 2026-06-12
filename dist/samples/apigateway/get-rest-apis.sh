@@ -4,4 +4,4 @@
 awslocal apigateway create-rest-api --name test-rest-api
 
 # Get a list of
-awslocal apigateway create-rest-api --name test-rest-api
+awslocal apigateway get-rest-apis
