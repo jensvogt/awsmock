@@ -4,14 +4,22 @@
 
 #pragma once
 
+// C++ includes
+#include <map>
+#include <memory>
+#include <string>
+
+// Boost includes
+#include <boost/asio/io_context.hpp>
+
 // AwsMock includes
+#include <awsmock/agw/ProxyListener.h>
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/RepositoryFactory.h>
-#include <awsmock/service/apigateway/ApiGatewayController.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 
@@ -28,8 +36,10 @@ namespace Awsmock::Service {
 
         /**
          * @brief Constructor
+         *
+         * @param ioc shared Boost.Asio io_context used for all proxy listeners
          */
-        explicit ApiGatewayServer();
+        explicit ApiGatewayServer(boost::asio::io_context &ioc);
 
         /**
          * @brief Shutdown the api-gateway server
@@ -49,7 +59,7 @@ namespace Awsmock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Starts an awsmock-agw proxy process for each registered REST API.
+         * @brief Starts an in-process proxy listener for each registered REST API.
          */
         void StartRestApis();
 
@@ -59,14 +69,19 @@ namespace Awsmock::Service {
         static void BackupApiGateway();
 
         /**
+         * @brief Shared io_context from the manager, used by all proxy listeners
+         */
+        boost::asio::io_context &_ioc;
+
+        /**
          * @brief Database connection
          */
         std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
 
         /**
-         * @brief Manages the awsmock-agw child processes (one per REST API)
+         * @brief In-process proxy listeners, one per REST API
          */
-        ApiGatewayController _controller;
+        std::map<std::string, std::shared_ptr<Agw::ProxyListener>> _listeners;
     };
 
 }// namespace Awsmock::Service

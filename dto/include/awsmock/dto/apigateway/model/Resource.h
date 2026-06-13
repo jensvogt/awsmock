@@ -74,7 +74,7 @@ namespace Awsmock::Dto::ApiGateway {
             r.parentId = Core::Json::GetStringValue(v, "parentId");
             r.path = Core::Json::GetStringValue(v, "path");
             r.pathPart = Core::Json::GetStringValue(v, "pathPart");
-            r.url = Core::Json::GetBoolValue(v, "url");
+            r.url = Core::Json::GetStringValue(v, "url");
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "resourceMethods")) {

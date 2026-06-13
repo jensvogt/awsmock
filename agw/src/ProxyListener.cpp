@@ -28,6 +28,13 @@ namespace Awsmock::Agw {
         log_info << "Proxy listener bound to " << cfg.listenAddress << ":" << cfg.listenPort;
     }
 
+    void ProxyListener::Stop() {
+        beast::error_code ec;
+        _acceptor.close(ec);
+        if (ec && ec != net::error::bad_descriptor)
+            log_warning << "ProxyListener '" << _cfg.name << "' stop: " << ec.message();
+    }
+
     void ProxyListener::Run() {
         net::dispatch(_acceptor.get_executor(),
                       beast::bind_front_handler(&ProxyListener::DoAccept, shared_from_this()));

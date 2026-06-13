@@ -237,7 +237,7 @@ namespace Awsmock::Manager {
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApplicationServer>());
             } else if (module.name == "api-gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApiGatewayServer>());
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::ApiGatewayServer>(_ioc));
             }
         }
         log_info << "Modules started, count: " << Service::ModuleMap::instance().GetSize();
