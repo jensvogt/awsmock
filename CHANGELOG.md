@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.67](https://github.com/jensvogt/awsmock/compare/1.18.66...v1.18.67) (2026-06-13)
+
+
+### Bug Fixes
+
+* api gateway resources ([ec721d4](https://github.com/jensvogt/awsmock/commit/ec721d46a8edcf7a7ce42ab0027164693d6ba7d2))
+* api gateway resources ([dd73dd8](https://github.com/jensvogt/awsmock/commit/dd73dd869d7bd546244b928f453fafffd1abd644))
+* cleanup code, remove unused include guards ([95e16a3](https://github.com/jensvogt/awsmock/commit/95e16a346d99514ec4ff6c14de4fcc741cea6e83))
+
 ## [1.18.66](https://github.com/jensvogt/awsmock/compare/1.18.65...v1.18.66) (2026-06-11)
 
 
