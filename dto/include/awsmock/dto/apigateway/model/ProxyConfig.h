@@ -6,11 +6,7 @@
 namespace Awsmock::Dto::ApiGateway {
 
     /**
-     * @brief Runtime configuration for the awsmock-agw standalone HTTP-proxy process.
-     *
-     * The ApiGatewayController serialises these fields into ProcessConfig::args when
-     * launching the proxy, and awsmock-agw parses them back from the command line.
-     * Keeping the struct here makes the launcher/proxy contract explicit and type-safe.
+     * @brief Runtime configuration for an in-process HTTP reverse proxy listener.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -40,14 +36,6 @@ namespace Awsmock::Dto::ApiGateway {
          * @brief TCP port of the backend service.
          */
         unsigned short targetPort = 80;
-
-        /**
-         * @brief Path of the UNIX-domain socket created by the proxy to signal readiness.
-         *
-         * Must match ProcessConfig::socketPath so ApiGatewayController::waitForSocket()
-         * can detect that the proxy is ready to accept connections.
-         */
-        std::string socketPath;
 
         /**
          * @brief Number of io_context worker threads (default: 4).

@@ -147,7 +147,6 @@ namespace Awsmock::Core {
             boost::log::add_common_attributes();
             console_sink = boost::log::add_console_log(std::cout);
             console_sink->set_formatter(&LogColorFormatter);
-            console_sink->locked_backend()->auto_flush(true);
         }
         // Apply the initial level so both the core filter and all sink filters are consistent.
         SetSeverity(_currentLevel);

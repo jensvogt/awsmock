@@ -40,6 +40,11 @@ namespace Awsmock::Agw {
          */
         void Run();
 
+        /**
+         * @brief Closes the acceptor and stops accepting new connections.
+         */
+        void Stop();
+
       private:
 
         /**
@@ -73,7 +78,7 @@ namespace Awsmock::Agw {
         /**
          * @brief Gateway configuration
          */
-        const Dto::ApiGateway::ProxyConfig &_cfg;
+        Dto::ApiGateway::ProxyConfig _cfg;
     };
 
 }// namespace Awsmock::Agw

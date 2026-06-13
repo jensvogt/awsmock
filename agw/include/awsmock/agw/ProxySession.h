@@ -96,7 +96,7 @@ namespace Awsmock::Agw {
         beast::flat_buffer _clientBuffer;
         beast::flat_buffer _backendBuffer;
 
-        const Dto::ApiGateway::ProxyConfig &_cfg;
+        Dto::ApiGateway::ProxyConfig _cfg;
     };
 
 } // namespace Awsmock::Agw

@@ -43,6 +43,16 @@ if (WIN32)
 endif ()
 
 # -------------------------------------------------------------------------
+# Linux debug build: reduce DWARF size to speed up debugger startup.
+# -gsplit-dwarf moves debug info into .dwo sidecar files loaded lazily.
+# -fno-var-tracking-assignments removes per-assignment location lists,
+# which are the main source of DWARF bloat from Boost/mongocxx templates.
+# -------------------------------------------------------------------------
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-gsplit-dwarf -fno-var-tracking-assignments)
+endif ()
+
+# -------------------------------------------------------------------------
 # Dependencies
 # -------------------------------------------------------------------------
 find_package(LibArchive REQUIRED)
@@ -207,12 +217,13 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/apigateway/ApiGatewayService.cpp srv/src/apigateway/ApiGatewayHandler.cpp
         srv/src/apigateway/ApiGatewayServer.cpp srv/src/monitoring/MetricSystemCollector.cpp
         srv/src/monitoring/MetricDockerCollector.cpp srv/src/monitoring/MonitoringHandler.cpp
-        srv/src/monitoring/MonitoringServer.cpp srv/src/monitoring/MonitoringService.cpp srv/src/apigateway/ApiGatewayController.cpp
-        srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp srv/src/frontend/FrontendSession.cpp)
+        srv/src/monitoring/MonitoringServer.cpp srv/src/monitoring/MonitoringService.cpp
+        srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp srv/src/frontend/FrontendSession.cpp
+        agw/src/ProxyListener.cpp agw/src/ProxySession.cpp)
 
 add_library(awsmocksrv STATIC ${SRV_SOURCES})
 target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
-        ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
+        ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include ${CMAKE_SOURCE_DIR}/agw/include)
 target_link_libraries(awsmocksrv PRIVATE awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono
         LibArchive::LibArchive ssh)
@@ -275,23 +286,6 @@ target_link_libraries(awslocal PUBLIC awsmockcore awsmockdto OpenSSL::SSL OpenSS
 
 if (WIN32)
     target_link_libraries(awslocal PUBLIC shlwapi.lib)
-endif ()
-
-# -------------------------------------------------------------------------
-# AWSMock API Gateway agw (awsmock-agw)
-# -------------------------------------------------------------------------
-
-add_executable(awsmock-agw agw/src/main.cpp agw/src/ProxyListener.cpp agw/src/ProxySession.cpp)
-target_include_directories(awsmock-agw PRIVATE ${CMAKE_SOURCE_DIR}/agw/include ${CMAKE_SOURCE_DIR}/core/include
-        ${CMAKE_SOURCE_DIR}/dto/include)
-target_link_libraries(awsmock-agw PRIVATE awsmockcore awsmockdto OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
-        Boost::json Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::program_options
-        Boost::chrono LibArchive::LibArchive unofficial::libmagic::libmagic PCRE2::POSIX PCRE2::8BIT)
-target_link_libraries(awsmock-agw PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmock-agw PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-
-if (WIN32)
-    target_link_libraries(awsmock-agw PUBLIC Boost::system crypt32.lib Iphlpapi.lib shlwapi.lib)
 endif ()
 
 # -------------------------------------------------------------------------

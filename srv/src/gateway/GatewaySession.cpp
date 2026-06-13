@@ -188,13 +188,13 @@ namespace Awsmock::Service {
             bool keep_alive = _response_queue.front().keep_alive();
             beast::async_write(_stream,
                                std::move(_response_queue.front()),
-                               boost::beast::bind_front_handler(&GatewaySession::OnWrite,
-                                                                shared_from_this(),
-                                                                keep_alive));
+                               beast::bind_front_handler(&GatewaySession::OnWrite,
+                                                         shared_from_this(),
+                                                         keep_alive));
         }
     }
 
-    void GatewaySession::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) {
+    void GatewaySession::OnWrite(const bool keep_alive, const beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
@@ -202,7 +202,7 @@ namespace Awsmock::Service {
             return DoClose();
         }
 
-        // Resume the read if it has been paused
+        // Resume the reading if it has been paused
         if (_response_queue.size() == _queueLimit)
             DoRead();
 
@@ -213,8 +213,11 @@ namespace Awsmock::Service {
 
     void GatewaySession::DoClose() {
         // Send a TCP shutdown
-        boost::beast::error_code ec;
+        beast::error_code ec;
         ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        if (ec) {
+            log_debug << "Shutdown failed: " << ec.message();
+        }
         // At this point the connection is closed gracefully
     }
 

@@ -289,7 +289,9 @@ namespace Awsmock::Service {
 
             restApi.enabled = request.restApi.enabled;
             restApi.description = request.restApi.description;
+            restApi.apiKeySource = Database::Entity::ApiGateway::ApiKeySourceTypeFromString(ApiKeySourceTypeToString(request.restApi.apiKeySource));
             restApi.resources = Dto::ApiGateway::Mapper::map(request.restApi.resources);
+            restApi.modified = Core::DateTimeUtils::LocalDateTimeNow();
             restApi = _apiGatewayDatabase->upsertRestApi(restApi);
             log_debug << "REST API updated, name: " + restApi.name;
 
@@ -397,4 +399,30 @@ namespace Awsmock::Service {
         }
     }
 
+    void ApiGatewayService::deleteResource(const Dto::ApiGateway::DeleteResourceRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_resource");
+        log_debug << "Delete resource request, region:  " << request.region << ", restApiId:" << request.restApiId << ", resourceId: " << request.resourceId;
+
+        if (!_apiGatewayDatabase->restApiExistsByRestApiId(request.restApiId)) {
+            log_error << "REST API does not exist, region: " << request.region << " restApiId: " << request.restApiId;
+            throw Core::ServiceException("REST API does not exist already, region: " + request.region + " restApiId: " + request.restApiId);
+        }
+
+        try {
+
+            // Get the rest api
+            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.restApiId);
+
+            // Get rest api entity from request
+            restApi.resources.erase(request.resourceId);
+
+            // Save to the database
+            restApi = _apiGatewayDatabase->upsertRestApi(restApi);
+            log_trace << "REST resource deleted, restApi:" << restApi.id << ", restApiId: " + restApi.id;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
 }// namespace Awsmock::Service

@@ -4,6 +4,8 @@
 
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
+#include "awsmock/dto/apigateway/DeleteResourceRequest.h"
+
 namespace Awsmock::Service {
 
     http::response<http::dynamic_body> ApiGatewayHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
@@ -198,6 +200,16 @@ namespace Awsmock::Service {
                     Dto::ApiGateway::DeleteRestApiRequest serviceRequest;
                     serviceRequest.restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
                     _apiGatewayService.deleteRestApi(serviceRequest);
+                    log_info << "REST API deleted, restApiId: " << serviceRequest.restApiId;
+                    return SendResponse(request, http::status::accepted);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::DELETE_RESOURCE: {
+
+                    Dto::ApiGateway::DeleteResourceRequest serviceRequest;
+                    serviceRequest.restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    serviceRequest.resourceId = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                    _apiGatewayService.deleteResource(serviceRequest);
                     log_info << "REST API deleted, restApiId: " << serviceRequest.restApiId;
                     return SendResponse(request, http::status::accepted);
                 }

@@ -213,6 +213,7 @@ namespace Awsmock::Dto::ApiGateway {
         // restApi.customerId = restApiEntity.customerId;
         restApi.warnings = restApiEntity.warnings;
         restApi.created = restApiEntity.created;
+        restApi.modified = restApiEntity.modified;
         restApi.resources = map(restApiEntity.resources);
         return restApi;
     }
