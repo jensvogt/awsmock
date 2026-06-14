@@ -5,6 +5,7 @@
 #pragma once
 
 // AwsMock includes
+#include <awsmock/dto/apigateway/model/Authorizer.h>
 #include <awsmock/dto/apigateway/model/Resource.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
@@ -73,6 +74,11 @@ namespace Awsmock::Dto::ApiGateway {
         std::string value;
 
         /**
+         * Authorizers
+         */
+        std::map<std::string, Authorizer> authorizers;
+
+        /**
          * Resources
          */
         std::map<std::string, Resource> resources;
@@ -117,6 +123,9 @@ namespace Awsmock::Dto::ApiGateway {
             if (Core::Json::AttributeExists(v, "warnings")) {
                 r.warnings = boost::json::value_to<std::vector<std::string>>(v.at("warnings"));
             }
+            if (Core::Json::AttributeExists(v, "authorizers")) {
+                r.authorizers = boost::json::value_to<std::map<std::string, Authorizer>>(v.at("authorizers"));
+            }
             if (Core::Json::AttributeExists(v, "resources")) {
                 r.resources = boost::json::value_to<std::map<std::string, Resource>>(v.at("resources"));
             }
@@ -138,6 +147,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"binaryMediaTypes", boost::json::value_from(obj.binaryMediaTypes)},
                     {"tags", boost::json::value_from(obj.tags)},
                     {"warnings", boost::json::value_from(obj.warnings)},
+                    {"authorizers", boost::json::value_from(obj.authorizers)},
                     {"resources", boost::json::value_from(obj.resources)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},

@@ -252,8 +252,17 @@ namespace Awsmock::Service {
             }
 
             return authKeys;
+        } else {
+            // Fallback: detect module from URL path for requests without Authorization header
+            const std::string target = std::string(request.target());
+            authKeys.region = Core::Configuration::instance().get<std::string>("awsmock.region");
+            if (target.starts_with("/restapis") || target.starts_with("/apikeys")) {
+                authKeys.module = "apigateway";
+            } else if (target.starts_with("/2015-03-31/functions") || target.starts_with("/2021-10-31/event-source-mappings")) {
+                authKeys.module = "lambda";
+            }
         }
-        return {};
+        return authKeys;
     }
 
     void GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {

@@ -33,7 +33,7 @@ namespace Awsmock::Service {
         /**
          * @brief Shutdown server
          */
-        void Shutdown() override;
+        void shutdown() override;
 
     private:
         mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};

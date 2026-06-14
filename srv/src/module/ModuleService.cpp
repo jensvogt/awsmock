@@ -52,7 +52,7 @@ namespace Awsmock::Service {
             if (Database::Entity::Module::Module module = _moduleDatabase->getModuleByName(m.name); module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Send shutdown call
-                ModuleMap::instance().GetModuleMap()[m.name]->Shutdown();
+                ModuleMap::instance().GetModuleMap()[m.name]->shutdown();
 
                 // Set state
                 _moduleDatabase->setState(m.name, Database::Entity::Module::ModuleState::STOPPED);

@@ -19,16 +19,16 @@ namespace Awsmock::Database::Entity::ApiGateway {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    enum ApiKeySourceType {
+    enum class ApiKeySourceType {
         HEADER,
         AUTHORIZER,
         UNKNOWN
     };
 
     static std::map<ApiKeySourceType, std::string> ApiKeySourceTypeNames{
-            {HEADER, "HEADER"},
-            {AUTHORIZER, "AUTHORIZER"},
-            {UNKNOWN, "UNKNOWN"},
+            {ApiKeySourceType::HEADER, "HEADER"},
+            {ApiKeySourceType::AUTHORIZER, "AUTHORIZER"},
+            {ApiKeySourceType::UNKNOWN, "UNKNOWN"},
     };
 
     [[maybe_unused]]
@@ -39,7 +39,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
     [[maybe_unused]]
     static ApiKeySourceType ApiKeySourceTypeFromString(const std::string &s) {
         const auto it = std::ranges::find_if(ApiKeySourceTypeNames, [&](const auto &p) { return p.second == s; });
-        return it != ApiKeySourceTypeNames.end() ? it->first : UNKNOWN;
+        return it != ApiKeySourceTypeNames.end() ? it->first : ApiKeySourceType::UNKNOWN;
     }
 
 }// namespace Awsmock::Database::Entity::ApiGateway

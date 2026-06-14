@@ -30,7 +30,7 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&KMSServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&KMSServer::shutdown, this));
 
         log_debug << "KMS server initialized, removePeriod: " << _removePeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
@@ -61,7 +61,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("kms", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void KMSServer::Shutdown() {
+    void KMSServer::shutdown() {
         log_debug << "KMS server shutdown";
         _scheduler.Shutdown("kms-monitoring");
         _scheduler.Shutdown("kms-delete-keys");

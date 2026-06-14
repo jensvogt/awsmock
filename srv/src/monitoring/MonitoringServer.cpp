@@ -32,7 +32,7 @@ namespace Awsmock::Service {
 
         // Connect stop signal
         _shutdownConnection = Core::EventBus::instance().sigShutdown.connect([this]() {
-            this->Shutdown();
+            this->shutdown();
         });
 
         // Connect monitoring signal
@@ -60,7 +60,7 @@ namespace Awsmock::Service {
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;
     }
 
-    void MonitoringServer::Shutdown() {
+    void MonitoringServer::shutdown() {
         log_debug << "Monitoring server shutdown";
         _scheduler.Shutdown("monitoring-system-collector");
         _scheduler.Shutdown("monitoring-docker-collector");

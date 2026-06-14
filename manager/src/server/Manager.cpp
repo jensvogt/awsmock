@@ -151,7 +151,7 @@ namespace Awsmock::Manager {
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
                 moduleDatabase->setState(module.name, Database::Entity::Module::ModuleState::STOPPED);
                 if (moduleMap.HasModule(module.name)) {
-                    moduleMap.GetModule(module.name)->Shutdown();
+                    moduleMap.GetModule(module.name)->shutdown();
                     log_info << "Module " << i << ": " << module.name << " stopped";
                 }
             }

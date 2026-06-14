@@ -7,8 +7,10 @@
 // AwsMock includes
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/service/apigateway/ApiGatewayService.h>
 #include <awsmock/service/common/AbstractHandler.h>
+#include <awsmock/service/lambda/LambdaService.h>
 
 namespace Awsmock::Service {
 
@@ -49,6 +51,16 @@ namespace Awsmock::Service {
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
+         * @brief HTTP PUT request.
+         *
+         * @param request HTTP request
+         * @param region AWS region name
+         * @param user AWS user
+         * @return HTTP response
+         */
+        http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+
+        /**
          * @brief HTTP DELETE request.
          *
          * @param request HTTP request
@@ -61,12 +73,26 @@ namespace Awsmock::Service {
 
       private:
 
+        /**
+         * @brief Handles an actual API Gateway resource invocation (non-management request).
+         *
+         * Looks up the REST API and resource by path, validates any required API key,
+         * invokes the configured Lambda authorizer (if any), then dispatches to the
+         * configured integration (Lambda, HTTP, or MOCK).
+         */
+        http::response<http::dynamic_body> HandleResourceInvocation(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) const;
+
         mutable logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
 
         /**
          * API gateway service
          */
         ApiGatewayService _apiGatewayService;
+
+        /**
+         * Lambda service (used to invoke authorizer functions)
+         */
+        LambdaService _lambdaService;
     };
 
 }// namespace Awsmock::Service

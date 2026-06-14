@@ -27,7 +27,7 @@ namespace Awsmock::Service {
         _ioc.run();
     }
 
-    void ApplicationLogServer::Shutdown() {
+    void ApplicationLogServer::shutdown() {
     }
 
 }// namespace Awsmock::Service

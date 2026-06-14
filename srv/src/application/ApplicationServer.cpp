@@ -32,7 +32,7 @@ namespace Awsmock::Service {
         }
 
         // Connect shutdown signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&ApplicationServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&ApplicationServer::shutdown, this));
 
         log_debug << "Application server started";
     }
@@ -225,7 +225,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void ApplicationServer::Shutdown() {
+    void ApplicationServer::shutdown() {
         log_info << "Application server shutdown";
         Core::Scheduler::instance().Shutdown("application-monitoring");
         Core::Scheduler::instance().Shutdown("application-restart");

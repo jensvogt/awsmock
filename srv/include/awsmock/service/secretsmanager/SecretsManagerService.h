@@ -278,7 +278,7 @@ namespace Awsmock::Service {
         KMSService _kmsService;
 
         /**
-         * Shutdown mutex
+         * shutdown mutex
          */
         boost::mutex _mutex;
     };

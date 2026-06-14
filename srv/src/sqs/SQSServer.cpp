@@ -32,7 +32,7 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SQSServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SQSServer::shutdown, this));
 
         log_debug << "SQS server initialized";
     }
@@ -136,7 +136,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("sqs", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void SQSServer::Shutdown() {
+    void SQSServer::shutdown() {
         log_info << "SQS manager server shutting down";
         _scheduler.Shutdown("sns-monitoring");
         _scheduler.Shutdown("sns-delete-messages");

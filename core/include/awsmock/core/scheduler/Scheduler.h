@@ -80,7 +80,7 @@ namespace Awsmock::Core {
          * Like AddOneTimeTask but returns a shared_future<void> that becomes
          * ready when the task finishes (or carries the exception if it throws).
          * The scheduler entry is removed automatically; callers do not need to
-         * call Shutdown() for the task name.
+         * call shutdown() for the task name.
          *
          * @param name task name
          * @param task handler function

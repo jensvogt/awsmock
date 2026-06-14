@@ -12,8 +12,7 @@
 // Boost includes
 #include <boost/asio/io_context.hpp>
 
-// AwsMock includes
-#include <awsmock/agw/ProxyListener.h>
+// Awsmock includes
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -44,7 +43,7 @@ namespace Awsmock::Service {
         /**
          * @brief Shutdown the api-gateway server
          */
-        void Shutdown() override;
+        void shutdown() override;
 
       private:
 
@@ -56,17 +55,12 @@ namespace Awsmock::Service {
         /**
          * @brief Update counters
          */
-        void UpdateCounter() const;
-
-        /**
-         * @brief Starts an in-process proxy listener for each registered REST API.
-         */
-        void StartRestApis();
+        void updateCounter() const;
 
         /**
          * @brief Back up the api-gateway objects
          */
-        static void BackupApiGateway();
+        static void backupApiGateway();
 
         /**
          * @brief Shared io_context from the manager, used by all proxy listeners
@@ -81,7 +75,7 @@ namespace Awsmock::Service {
         /**
          * @brief In-process proxy listeners, one per REST API
          */
-        std::map<std::string, std::shared_ptr<Agw::ProxyListener>> _listeners;
+        //std::map<std::string, std::shared_ptr<Agw::ProxyListener>> _listeners;
     };
 
 }// namespace Awsmock::Service

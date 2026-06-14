@@ -26,7 +26,7 @@ namespace Awsmock::Service {
         }
 
         // Connect shutdown signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&S3Server::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&S3Server::shutdown, this));
 
         log_debug << "S3 server initialized";
     }
@@ -102,7 +102,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("s3", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void S3Server::Shutdown() {
+    void S3Server::shutdown() {
         log_info << "S3 server shutting down";
         Core::Scheduler::instance().Shutdown("s3-monitoring");
         Core::Scheduler::instance().Shutdown("s3-sync-objects");

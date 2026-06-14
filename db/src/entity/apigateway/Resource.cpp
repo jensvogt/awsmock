@@ -17,6 +17,15 @@ namespace Awsmock::Database::Entity::ApiGateway {
         keyDocument.append(kvp("url", url));
         keyDocument.append(kvp("created", bsoncxx::types::b_date(created)));
         keyDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
+
+        // Resource methods
+        {
+            document methodsDoc;
+            for (const auto &[k, v]: resourceMethods) {
+                methodsDoc.append(kvp(k, v.ToDocument()));
+            }
+            keyDocument.append(kvp("resourceMethods", methodsDoc));
+        }
         return keyDocument.extract();
     }
 
@@ -31,6 +40,18 @@ namespace Awsmock::Database::Entity::ApiGateway {
         url = Core::Bson::BsonUtils::GetStringValue(mResult, "url");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
+
+        // Resource methods
+        if (mResult.value().find("resourceMethods") != mResult.value().end()) {
+            resourceMethods.clear();
+            for (const view methodsDoc = mResult.value()["resourceMethods"].get_document().value; const auto &m: methodsDoc) {
+                const std::string key = bsoncxx::string::to_string(m.key());
+                ResourceMethod method;
+                const std::optional<view> methodView = m.get_document().value;
+                method.FromDocument(methodView);
+                resourceMethods[key] = method;
+            }
+        }
     }
 
 }// namespace Awsmock::Database::Entity::ApiGateway

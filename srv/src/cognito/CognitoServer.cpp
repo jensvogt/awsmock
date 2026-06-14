@@ -22,7 +22,7 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&CognitoServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&CognitoServer::shutdown, this));
 
         log_info << "Cognito server started";
     }
@@ -53,7 +53,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("cognito", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void CognitoServer::Shutdown() {
+    void CognitoServer::shutdown() {
         _scheduler.Shutdown("cognito-monitoring");
         _scheduler.Shutdown("cognito-backup");
         log_info << "Cognito server stopped";

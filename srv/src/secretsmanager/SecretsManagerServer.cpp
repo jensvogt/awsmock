@@ -23,7 +23,7 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SecretsManagerServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SecretsManagerServer::shutdown, this));
 
         log_debug << "Secrets manager server initialized";
     }
@@ -38,7 +38,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("secretsmanager", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void SecretsManagerServer::Shutdown() {
+    void SecretsManagerServer::shutdown() {
         log_info << "Secrets manager server shutting down";
         Core::Scheduler::instance().Shutdown("secretsmanager-monitoring");
         Core::Scheduler::instance().Shutdown("secretsmanager-backup");

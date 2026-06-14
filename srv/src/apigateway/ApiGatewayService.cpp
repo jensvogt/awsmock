@@ -2,9 +2,6 @@
 // Created by vogje01 on 9/2/25.
 //
 
-#include "awsmock/dto/common/mapper/SortColumnMapper.h"
-
-
 #include <awsmock/service/apigateway/ApiGatewayService.h>
 
 namespace Awsmock::Service {
@@ -62,11 +59,8 @@ namespace Awsmock::Service {
             response.region = request.region;
             response.user = request.user;
             response.requestId = request.requestId;
-            response.position = keys.empty()
-                                        ? ""
-                                : keys.size() > 1
-                                        ? keys.end()->id
-                                        : keys.begin()->id;
+            response.position = keys.empty() ? "" : keys.size() > 1 ? keys.end()->id
+                                                                    : keys.begin()->id;
             response.items = Dto::ApiGateway::Mapper::map(keys);
             return response;
 
@@ -425,4 +419,49 @@ namespace Awsmock::Service {
             throw Core::ServiceException(exc.what());
         }
     }
+    Database::Entity::ApiGateway::RestApi ApiGatewayService::getRestApiById(const std::string &restApiId) const {
+        return _apiGatewayDatabase->getRestApi(restApiId);
+    }
+
+    void ApiGatewayService::putMethod(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod, const bool apiKeyRequired) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "put_method");
+        log_debug << "Put method, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
+
+        Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(restApiId);
+        if (!restApi.resources.contains(resourceId)) {
+            throw Core::ServiceException("Resource not found, resourceId: " + resourceId);
+        }
+        auto &resource = restApi.resources.at(resourceId);
+        Database::Entity::ApiGateway::ResourceMethod method;
+        method.httpMethod = httpMethod;
+        method.apiKeyRequired = apiKeyRequired;
+        resource.resourceMethods[httpMethod] = method;
+        _apiGatewayDatabase->upsertRestApi(restApi);
+    }
+
+    void ApiGatewayService::putIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod,
+                                           const std::string &integrationType, const std::string &integrationUri, const std::string &integrationHttpMethod) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "put_integration");
+        log_debug << "Put integration, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod << ", type: " << integrationType;
+
+        Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(restApiId);
+        if (!restApi.resources.contains(resourceId)) {
+            throw Core::ServiceException("Resource not found, resourceId: " + resourceId);
+        }
+        auto &resource = restApi.resources.at(resourceId);
+        auto &method = resource.resourceMethods[httpMethod];
+        method.httpMethod = httpMethod;
+        method.integrationType = integrationType;
+        method.integrationUri = integrationUri;
+        method.integrationHttpMethod = integrationHttpMethod;
+        _apiGatewayDatabase->upsertRestApi(restApi);
+    }
+
+    bool ApiGatewayService::validateApiKey(const std::string &keyValue) const {
+        const auto keys = _apiGatewayDatabase->listApiKeys();
+        return std::ranges::any_of(keys, [&keyValue](const auto &k) {
+            return k.keyValue == keyValue && k.enabled;
+        });
+    }
+
 }// namespace Awsmock::Service

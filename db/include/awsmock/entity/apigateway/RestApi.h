@@ -7,6 +7,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/apigateway/ApiKeySource.h>
+#include <awsmock/entity/apigateway/ApiStatus.h>
+#include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/entity/apigateway/Resource.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
@@ -78,6 +80,11 @@ namespace Awsmock::Database::Entity::ApiGateway {
         std::string rootResourceId{};
 
         /**
+         * Authorizers
+         */
+        std::map<std::string, Authorizer> authorizers{};
+
+        /**
          * Tags
          */
         std::map<std::string, Resource> resources{};
@@ -113,6 +120,11 @@ namespace Awsmock::Database::Entity::ApiGateway {
         bool enabled = false;
 
         /**
+         * @brief API staus
+         */
+        ApiStatusType apiStatus = ApiStatusType::UNKNOWN;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -126,7 +138,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
          * @brief Check whether the path part exists already
          *
          * @param pathPart path part of the resource
-         * @return true if path part already exists
+         * @return true if the path part already exists
          */
         bool resourceExists(const std::string &pathPart) {
             return std::ranges::find_if(resources,

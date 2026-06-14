@@ -26,12 +26,30 @@ namespace Awsmock::Dto::ApiGateway {
          */
         std::string httpMethod;
 
+        /**
+         * @brief Integration type: AWS, AWS_PROXY, HTTP, HTTP_PROXY, MOCK
+         */
+        std::string integrationType;
+
+        /**
+         * @brief Integration URI (Lambda ARN path or HTTP URL)
+         */
+        std::string integrationUri;
+
+        /**
+         * @brief HTTP method to use when calling the backend
+         */
+        std::string integrationHttpMethod;
+
       private:
 
         friend ResourceMethod tag_invoke(boost::json::value_to_tag<ResourceMethod>, boost::json::value const &v) {
             ResourceMethod r;
             r.apiKeyRequired = Core::Json::GetBoolValue(v, "apiKeyRequired");
             r.httpMethod = Core::Json::GetStringValue(v, "httpMethod");
+            r.integrationType = Core::Json::GetStringValue(v, "integrationType");
+            r.integrationUri = Core::Json::GetStringValue(v, "integrationUri");
+            r.integrationHttpMethod = Core::Json::GetStringValue(v, "integrationHttpMethod");
             return r;
         }
 
@@ -39,6 +57,9 @@ namespace Awsmock::Dto::ApiGateway {
             jv = {
                     {"apiKeyRequired", obj.apiKeyRequired},
                     {"httpMethod", obj.httpMethod},
+                    {"integrationType", obj.integrationType},
+                    {"integrationUri", obj.integrationUri},
+                    {"integrationHttpMethod", obj.integrationHttpMethod},
             };
         }
     };

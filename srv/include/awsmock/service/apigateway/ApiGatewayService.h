@@ -39,6 +39,7 @@
 #include <awsmock/dto/apigateway/internal/UpdateRestApiCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/dto/common/ApiGatewayClientCommand.h>
+#include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/Resource.h>
 #include <awsmock/repository/RepositoryFactory.h>
@@ -189,6 +190,47 @@ namespace Awsmock::Service {
          * @return create resource response
          */
         void deleteResource(const Dto::ApiGateway::DeleteResourceRequest &request) const;
+
+        /**
+         * @brief Returns a REST API entity by its AWS ID
+         *
+         * @param restApiId AWS REST API ID
+         * @return REST API entity
+         */
+        [[nodiscard]]
+        Database::Entity::ApiGateway::RestApi getRestApiById(const std::string &restApiId) const;
+
+        /**
+         * @brief Adds or replaces a method on a resource
+         *
+         * @param restApiId AWS REST API ID
+         * @param resourceId resource ID
+         * @param httpMethod HTTP verb (GET, POST, ...)
+         * @param apiKeyRequired whether an API key is required
+         */
+        void putMethod(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod, bool apiKeyRequired) const;
+
+        /**
+         * @brief Sets integration metadata on a method
+         *
+         * @param restApiId AWS REST API ID
+         * @param resourceId resource ID
+         * @param httpMethod HTTP verb
+         * @param integrationType AWS, AWS_PROXY, HTTP, HTTP_PROXY, or MOCK
+         * @param integrationUri Lambda ARN URI or HTTP endpoint
+         * @param integrationHttpMethod HTTP method to use when calling the backend
+         */
+        void putIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod,
+                            const std::string &integrationType, const std::string &integrationUri, const std::string &integrationHttpMethod) const;
+
+        /**
+         * @brief Validates an API key by its raw key value
+         *
+         * @param keyValue the raw value from the x-api-key request header
+         * @return true if an enabled key with this value exists
+         */
+        [[nodiscard]]
+        bool validateApiKey(const std::string &keyValue) const;
 
       private:
 

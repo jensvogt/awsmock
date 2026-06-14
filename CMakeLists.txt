@@ -166,10 +166,11 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/entity/dynamodb/Tag.cpp
         db/src/repository/apigateway/ApiGatewayMongoRepository.cpp db/src/repository/apigateway/ApiGatewayMemoryRepository.cpp
         db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/RestApi.cpp db/src/entity/apigateway/Resource.cpp
-        db/src/entity/apigateway/ResourceMethod.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
+        db/src/entity/apigateway/Authorizer.cpp db/src/entity/apigateway/ResourceMethod.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
         db/src/repository/monitoring/MonitoringMongoRepository.cpp db/src/repository/monitoring/MonitoringMemoryRepository.cpp
         db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp
-        db/src/repository/RepositoryFactory.cpp)
+        db/src/repository/RepositoryFactory.cpp
+)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
@@ -184,10 +185,6 @@ if (NOT WIN32)
     add_subdirectory(db/tst/mongodb)
     add_subdirectory(db/tst/memorydb)
 endif ()
-
-# -------------------------------------------------------------------------
-# AWSMock API Gateway agw library (shared between awsmocksrv and awsmock-agw)
-# -------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -218,12 +215,11 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/apigateway/ApiGatewayServer.cpp srv/src/monitoring/MetricSystemCollector.cpp
         srv/src/monitoring/MetricDockerCollector.cpp srv/src/monitoring/MonitoringHandler.cpp
         srv/src/monitoring/MonitoringServer.cpp srv/src/monitoring/MonitoringService.cpp
-        srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp srv/src/frontend/FrontendSession.cpp
-        agw/src/ProxyListener.cpp agw/src/ProxySession.cpp)
+        srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp srv/src/frontend/FrontendSession.cpp)
 
 add_library(awsmocksrv STATIC ${SRV_SOURCES})
 target_include_directories(awsmocksrv PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
-        ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include ${CMAKE_SOURCE_DIR}/agw/include)
+        ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
 target_link_libraries(awsmocksrv PRIVATE awsmockcore awsmockdb awsmockdto OpenSSL::SSL OpenSSL::Crypto
         Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono
         LibArchive::LibArchive ssh)
@@ -241,8 +237,7 @@ endif ()
 
 add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/WindowsService.cpp manager/src/main.cpp)
 target_include_directories(awsmockmgr PRIVATE ${CMAKE_SOURCE_DIR}/manager/include ${CMAKE_SOURCE_DIR}/core/include
-        ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/agw/include
-        ${CMAKE_SOURCE_DIR}/srv/include)
+        ${CMAKE_SOURCE_DIR}/dto/include ${CMAKE_SOURCE_DIR}/db/include ${CMAKE_SOURCE_DIR}/srv/include)
 target_link_libraries(awsmockmgr PRIVATE awsmockcore awsmockdb awsmockdto awsmocksrv OpenSSL::SSL
         OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup Boost::thread Boost::process Boost::date_time
         Boost::url Boost::program_options Boost::chrono LibArchive::LibArchive)
