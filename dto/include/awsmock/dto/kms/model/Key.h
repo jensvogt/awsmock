@@ -227,9 +227,6 @@ namespace Awsmock::Dto::KMS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Key const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Arn", obj.arn},
                     {"KeyId", obj.keyId},
                     {"KeySpec", KeySpecToString(obj.keySpec)},

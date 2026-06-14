@@ -84,7 +84,6 @@ namespace Awsmock::Dto::Cognito {
             try {
 
                 document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "region", region);
                 Core::Bson::BsonUtils::SetStringValue(document, "userName", userName);
                 Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
                 Core::Bson::BsonUtils::SetStringValue(document, "userStatus", Database::Entity::Cognito::UserStatusToString(userStatus));
@@ -108,7 +107,6 @@ namespace Awsmock::Dto::Cognito {
 
             try {
 
-                region = Core::Bson::BsonUtils::GetStringValue(document, "region");
                 userName = Core::Bson::BsonUtils::GetStringValue(document, "userName");
                 userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "userPoolId");
                 enabled = Core::Bson::BsonUtils::GetBoolValue(document, "enabled");
@@ -142,9 +140,6 @@ namespace Awsmock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, User const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Oid", obj.oid},
                     {"UserPoolId", obj.userPoolId},
                     {"Username", obj.userName},

@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/service/apps/ApplicationCreator.h>
+#include <awsmock/service/application/ApplicationCreator.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Application"};

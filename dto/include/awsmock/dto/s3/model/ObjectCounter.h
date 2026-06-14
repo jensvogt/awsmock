@@ -104,7 +104,6 @@ namespace Awsmock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ObjectCounter const &obj) {
             jv = {
-                    {"region", obj.region},
                     {"oid", obj.oid},
                     {"bucketName", obj.bucketName},
                     {"key", obj.key},

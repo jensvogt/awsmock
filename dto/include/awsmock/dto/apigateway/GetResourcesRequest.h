@@ -8,12 +8,13 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
     /**
-     * @brief Get REST APis request
+     * @brief Get REST API resources request
      *
      * @author jens.vogt\@opitz-consulting.com
      */

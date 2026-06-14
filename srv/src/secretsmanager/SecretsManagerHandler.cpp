@@ -105,7 +105,7 @@ namespace Awsmock::Service {
 
                     Dto::SecretsManager::GetSecretDetailsRequest secretsManagerRequest = Dto::SecretsManager::GetSecretDetailsRequest::FromJson(clientCommand);
                     Dto::SecretsManager::GetSecretDetailsResponse secretsManagerResponse = _secretsManagerService.GetSecretDetails(secretsManagerRequest);
-                    log_info << "Get secret details, secretId: " << secretsManagerResponse.secretId;
+                    log_info << "Get secret details, secretId: " << secretsManagerResponse.secretId << ", body: " << secretsManagerResponse.ToJson();
                     return SendResponse(request, http::status::ok, secretsManagerResponse.ToJson());
                 }
 

@@ -28,7 +28,7 @@
 #include <awsmock/core/container/WindowsSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/apps/internal/WebSocketCommand.h>
+#include <awsmock/dto/application/internal/WebSocketCommand.h>
 #include <awsmock/dto/container/CreateContainerRequest.h>
 #include <awsmock/dto/container/CreateContainerResponse.h>
 #include <awsmock/dto/container/CreateNetworkRequest.h>

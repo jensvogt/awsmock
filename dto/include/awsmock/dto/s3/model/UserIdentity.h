@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_USER_IDENTITY_H
-#define AWSMOCK_DTO_S3_USER_IDENTITY_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -34,14 +33,9 @@ namespace Awsmock::Dto::S3 {
         }
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UserIdentity const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"principalId", obj.principalId},
             };
         }
     };
 
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_USER_IDENTITY_H

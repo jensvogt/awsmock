@@ -52,6 +52,7 @@ namespace Awsmock::Service {
             Dto::SSM::PutParameterResponse response;
             response.tier = parameterEntity.tier;
             response.version = parameterEntity.version;
+            response.copyMetadata(request);
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -99,12 +100,13 @@ namespace Awsmock::Service {
             parameterEntity = _ssmDatabase->createParameter(parameterEntity);
             log_trace << "SSM parameter created: " << parameterEntity.ToString();
 
-            Dto::SSM::ListParameterCountersRequest listRequest;
-            listRequest.prefix = request.prefix;
-            listRequest.pageSize = request.pageSize;
-            listRequest.pageIndex = request.pageIndex;
-            listRequest.sortColumns = request.sortColumns;
-            return ListParameterCounters(listRequest);
+            Dto::SSM::ListParameterCountersRequest response;
+            response.prefix = request.prefix;
+            response.pageSize = request.pageSize;
+            response.pageIndex = request.pageIndex;
+            response.sortColumns = request.sortColumns;
+            response.copyMetadata(request);
+            return ListParameterCounters(response);
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM put parameter failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
@@ -144,12 +146,13 @@ namespace Awsmock::Service {
             parameterEntity = _ssmDatabase->updateParameter(parameterEntity);
             log_trace << "SSM parameter created: " << parameterEntity.ToString();
 
-            Dto::SSM::ListParameterCountersRequest listRequest;
-            listRequest.prefix = request.prefix;
-            listRequest.pageSize = request.pageSize;
-            listRequest.pageIndex = request.pageIndex;
-            listRequest.sortColumns = request.sortColumns;
-            return ListParameterCounters(listRequest);
+            Dto::SSM::ListParameterCountersRequest response;
+            response.prefix = request.prefix;
+            response.pageSize = request.pageSize;
+            response.pageIndex = request.pageIndex;
+            response.sortColumns = request.sortColumns;
+            response.copyMetadata(request);
+            return ListParameterCounters(response);
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM put parameter failed, message: " << exc.message();
@@ -177,7 +180,9 @@ namespace Awsmock::Service {
                 const Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
                 parameterEntity.parameterValue = Core::Crypto::Base64Decode(kmsResponse.plaintext);
             }
-            return Dto::SSM::Mapper::map(request, parameterEntity);
+            Dto::SSM::GetParameterResponse response = Dto::SSM::Mapper::map(request, parameterEntity);
+            response.copyMetadata(request);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM get parameter failed, message: " << exc.message();
@@ -207,7 +212,11 @@ namespace Awsmock::Service {
                 const Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
                 parameterEntity.parameterValue = kmsResponse.plaintext;
             }
-            return Dto::SSM::Mapper::map(request, parameterEntity);
+
+            // Prepare response
+            Dto::SSM::GetParameterCounterResponse response = Dto::SSM::Mapper::map(request, parameterEntity);
+            response.copyMetadata(request);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM get parameter failed, message: " << exc.message();
@@ -224,7 +233,10 @@ namespace Awsmock::Service {
             const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase->listParameters(request.region, {}, 0, 0, {});
             log_trace << "SSM parameters found: " << parameterEntities.size();
 
-            return Dto::SSM::Mapper::map(request, parameterEntities);
+            // Prepare response
+            Dto::SSM::DescribeParametersResponse response = Dto::SSM::Mapper::map(request, parameterEntities);
+            response.copyMetadata(request);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM describe parameters failed, message: " << exc.message();
@@ -237,7 +249,10 @@ namespace Awsmock::Service {
         log_trace << "List parameter counters region: " << request.region << ", prefix: " << request.prefix;
 
         try {
+
+            // Prepare response
             Dto::SSM::ListParameterCountersResponse response;
+            response.copyMetadata(request);
 
             // Get from the database
             response.total = _ssmDatabase->countParameters(request.region, request.prefix);
@@ -306,12 +321,14 @@ namespace Awsmock::Service {
             const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase->listParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             log_trace << "SSM parameters found: " << parameterEntities.size();
 
-            Dto::SSM::ListParameterCountersRequest listRequest;
-            listRequest.prefix = request.prefix;
-            listRequest.pageSize = request.pageSize;
-            listRequest.pageIndex = request.pageIndex;
-            listRequest.sortColumns = request.sortColumns;
-            return ListParameterCounters(listRequest);
+            // Prepare response
+            Dto::SSM::ListParameterCountersRequest response;
+            response.prefix = request.prefix;
+            response.pageSize = request.pageSize;
+            response.pageIndex = request.pageIndex;
+            response.sortColumns = request.sortColumns;
+            response.copyMetadata(request);
+            return ListParameterCounters(response);
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM delete parameter failed, message: " << exc.message();

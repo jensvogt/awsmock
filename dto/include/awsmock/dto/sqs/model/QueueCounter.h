@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_QUEUE_COUNTER_H
-#define AWSMOCK_DTO_SQS_QUEUE_COUNTER_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -13,13 +12,13 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseObject.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace Awsmock::Dto::SQS {
 
     using std::chrono::system_clock;
 
-    struct QueueCounter final : Common::BaseObject<QueueCounter> {
+    struct QueueCounter final : Common::BaseCounter<QueueCounter> {
 
         /**
          * Queue URL
@@ -95,9 +94,6 @@ namespace Awsmock::Dto::SQS {
 
         friend QueueCounter tag_invoke(boost::json::value_to_tag<QueueCounter>, boost::json::value const &v) {
             QueueCounter r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
             r.queueUrl = v.at("queueUrl").as_string();
             r.queueArn = v.at("queueArn").as_string();
             r.queueName = v.at("queueName").as_string();
@@ -117,9 +113,6 @@ namespace Awsmock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueueCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"queueUrl", obj.queueUrl},
                     {"queueArn", obj.queueArn},
                     {"queueName", obj.queueName},
@@ -141,5 +134,3 @@ namespace Awsmock::Dto::SQS {
     typedef std::vector<QueueCounter> QueueCounterList;
 
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_QUEUEATTRIBUTE_H

@@ -67,7 +67,6 @@ namespace Awsmock::Dto::SecretsManager {
             try {
 
                 document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
                 Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
                 Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyId", kmsKeyId);
                 Core::Bson::BsonUtils::SetLongValue(document, "LastAccessedDate", lastAccessedDate);
@@ -90,7 +89,6 @@ namespace Awsmock::Dto::SecretsManager {
 
             try {
 
-                region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
                 arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
                 kmsKeyId = Core::Bson::BsonUtils::GetStringValue(document, "KmsKeyId");
                 lastAccessedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastAccessedDate");
@@ -119,9 +117,6 @@ namespace Awsmock::Dto::SecretsManager {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ReplicationStatus const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"KmsKeyId", obj.kmsKeyId},
                     {"LastAccessedDate", obj.lastAccessedDate},
                     {"Status", obj.status},

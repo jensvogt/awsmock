@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/apps/model/Application.h>
+#include <awsmock/dto/application/model/Application.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/dto/lambda/model/Function.h>

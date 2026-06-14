@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_MAPPER_H
-#define AWSMOCK_DTO_LAMBDA_MAPPER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
@@ -155,5 +154,3 @@ namespace Awsmock::Dto::Lambda {
     };
 
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_MAPPER_H

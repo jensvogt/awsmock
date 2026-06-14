@@ -25,6 +25,11 @@ namespace Awsmock::Dto::Transfer {
     struct Server final : Common::BaseObject<Server> {
 
         /**
+         * Region
+         */
+        std::string region;
+
+        /**
          * ARN
          */
         std::string arn;
@@ -109,7 +114,6 @@ namespace Awsmock::Dto::Transfer {
             try {
 
                 document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
                 Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
                 Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
                 Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
@@ -174,9 +178,6 @@ namespace Awsmock::Dto::Transfer {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Server const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Arn", obj.arn},
                     {"Domain", obj.domain},
                     {"EndpointType", obj.endpointType},

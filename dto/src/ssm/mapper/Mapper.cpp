@@ -9,7 +9,6 @@ namespace Awsmock::Dto::SSM {
     Parameter Mapper::map(const Database::Entity::SSM::Parameter &parameterEntity) {
 
         Parameter responseDto;
-        responseDto.region = parameterEntity.region;
         responseDto.name = parameterEntity.parameterName;
         responseDto.parameterValue = parameterEntity.parameterValue;
         responseDto.description = parameterEntity.description;
@@ -55,7 +54,6 @@ namespace Awsmock::Dto::SSM {
 
     DescribeParametersResponse Mapper::map(const DescribeParametersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities) {
         DescribeParametersResponse response;
-        response.region = request.region;
         for (const auto &parameterEntity: parameterEntities) {
             Parameter parameter = map(parameterEntity);
             response.parameters.emplace_back(parameter);

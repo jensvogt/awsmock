@@ -9,6 +9,7 @@
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
 #include <awsmock/dto/apigateway/CreateResourceRequest.h>
 #include <awsmock/dto/apigateway/CreateResourceResponse.h>
+#include <awsmock/dto/apigateway/CreateRestApiRequest.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/GetResourcesRequest.h>
 #include <awsmock/dto/apigateway/GetResourcesResponse.h>
@@ -41,7 +42,7 @@ namespace Awsmock::Dto::ApiGateway {
         static Database::Entity::ApiGateway::ApiKey map(const CreateApiKeyRequest &request);
 
         /**
-         * @brief Maps an API gateway key entity to a create key response
+         * @brief Maps an API gateway key entity to a creation key response
          *
          * @param request
          * @param keyEntity API key entity

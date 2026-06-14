@@ -33,7 +33,6 @@ namespace Awsmock::Dto::S3 {
 
         static FilterRule toDto(const Database::Entity::S3::FilterRule &e) {
             FilterRule d;
-            d.region = e.region;
             d.name = NameTypeFromString(e.name);
             d.filterValue = e.value;
             return d;
@@ -41,7 +40,6 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::FilterRule toEntity(const FilterRule &d) {
             Database::Entity::S3::FilterRule e;
-            e.region = d.region;
             e.name = NameTypeToString(d.name);
             e.value = d.filterValue;
             return e;
@@ -54,7 +52,6 @@ namespace Awsmock::Dto::S3 {
 
         static QueueConfiguration toDto(const Database::Entity::S3::QueueNotification &e) {
             QueueConfiguration d;
-            d.region = e.region;
             d.id = e.id;
             d.queueArn = e.queueArn;
             d.filterRules = FilterRuleMapper::toDtoList(e.filterRules);
@@ -66,7 +63,6 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::QueueNotification toEntity(const QueueConfiguration &d) {
             Database::Entity::S3::QueueNotification e;
-            e.region = d.region;
             e.id = d.id;
             e.queueArn = d.queueArn;
             e.filterRules = FilterRuleMapper::toEntityList(d.filterRules);
@@ -83,7 +79,6 @@ namespace Awsmock::Dto::S3 {
 
         static TopicConfiguration toDto(const Database::Entity::S3::TopicNotification &e) {
             TopicConfiguration d;
-            d.region = e.region;
             d.id = e.id;
             d.topicArn = e.topicArn;
             d.filterRules = FilterRuleMapper::toDtoList(e.filterRules);
@@ -95,7 +90,6 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::TopicNotification toEntity(const TopicConfiguration &d) {
             Database::Entity::S3::TopicNotification e;
-            e.region = d.region;
             e.id = d.id;
             e.topicArn = d.topicArn;
             e.filterRules = FilterRuleMapper::toEntityList(d.filterRules);
@@ -112,7 +106,6 @@ namespace Awsmock::Dto::S3 {
 
         static LambdaConfiguration toDto(const Database::Entity::S3::LambdaNotification &e) {
             LambdaConfiguration d;
-            d.region = e.region;
             d.id = e.id;
             d.lambdaArn = e.lambdaArn;
             d.filterRules = FilterRuleMapper::toDtoList(e.filterRules);
@@ -124,7 +117,6 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::LambdaNotification toEntity(const LambdaConfiguration &d) {
             Database::Entity::S3::LambdaNotification e;
-            e.region = d.region;
             e.id = d.id;
             e.lambdaArn = d.lambdaArn;
             e.filterRules = FilterRuleMapper::toEntityList(d.filterRules);
@@ -140,7 +132,6 @@ namespace Awsmock::Dto::S3 {
 
         static LifecycleTransition toDto(const Database::Entity::S3::LifecycleTransition &e) {
             LifecycleTransition d;
-            d.region = e.region;
             d.date = e.date;
             d.days = e.days;
             d.storageClass = StorageClassFromString(StorageClassToString(e.storageClass));
@@ -149,7 +140,6 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::LifecycleTransition toEntity(const LifecycleTransition &d) {
             Database::Entity::S3::LifecycleTransition e;
-            e.region = d.region;
             e.days = d.days;
             e.date = d.date;
             e.storageClass = Database::Entity::S3::StorageClassFromString(StorageClassToString(d.storageClass));
@@ -162,7 +152,6 @@ namespace Awsmock::Dto::S3 {
 
         static LifecycleRule toDto(const Database::Entity::S3::LifecycleConfiguration &e) {
             LifecycleRule d;
-            d.region = e.region;
             d.prefix = e.prefix;
             d.transitions = LifecycleTransitionMapper::toDtoList(e.transitions);
             d.status = LifeCycleStatusFromString(Database::Entity::S3::LifeCycleStatusToString(e.status));
@@ -171,7 +160,6 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::LifecycleConfiguration toEntity(const LifecycleRule &d) {
             Database::Entity::S3::LifecycleConfiguration e;
-            e.region = d.region;
             e.prefix = d.prefix;
             e.status = Database::Entity::S3::LifeCycleStatusFromString(LifeCycleStatusToString(d.status));
             e.transitions = LifecycleTransitionMapper::toEntityList(d.transitions);
@@ -185,7 +173,6 @@ namespace Awsmock::Dto::S3 {
 
         static BucketCounter toDto(const Database::Entity::S3::Bucket &e) {
             BucketCounter d;
-            d.region = e.region;
             d.bucketArn = e.arn;
             d.bucketName = e.name;
             d.keys = e.keys;
@@ -312,7 +299,6 @@ namespace Awsmock::Dto::S3 {
 
         static Bucket toDto(const Database::Entity::S3::Bucket &e) {
             Bucket d;
-            d.region = e.region;
             d.arn = e.arn;
             d.bucketName = e.name;
             d.queueConfigurations = QueueConfigurationMapper::toDtoList(e.queueNotifications);
@@ -326,7 +312,6 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::Bucket toEntity(const Bucket &d) {
             Database::Entity::S3::Bucket e;
-            e.region = d.region;
             e.name = d.bucketName;
             e.arn = d.arn;
             e.owner = d.owner;
@@ -349,10 +334,8 @@ namespace Awsmock::Dto::S3 {
 
         static Object toDto(const Database::Entity::S3::Object &e) {
             Object d;
-            d.region = e.region;
             d.key = e.key;
             d.size = e.size;
-            d.contentType = e.contentType;
             d.etag = e.md5sum;
             d.versionId = e.versionId;
             d.created = e.created;
@@ -362,10 +345,8 @@ namespace Awsmock::Dto::S3 {
 
         static Database::Entity::S3::Object toEntity(const Object &d) {
             Database::Entity::S3::Object e;
-            e.region = d.region;
             e.key = d.key;
             e.size = d.size;
-            e.contentType = d.contentType;
             e.md5sum = d.etag;
             e.versionId = d.versionId;
             e.created = d.created;

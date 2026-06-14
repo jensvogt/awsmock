@@ -73,9 +73,6 @@ namespace Awsmock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EventNotification const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"records", boost::json::value_from(obj.records)},
             };
         }

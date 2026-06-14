@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_SERVER_IDENTITY_PROVIDER_DETAILS_H
-#define AWSMOCK_DTO_TRANSFER_SERVER_IDENTITY_PROVIDER_DETAILS_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -89,9 +88,6 @@ namespace Awsmock::Dto::Transfer {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, IdentityProviderDetails const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"DirectoryId", obj.directoryId},
                     {"Function", obj.function},
                     {"InvocationRole", obj.invocationRole},
@@ -102,5 +98,3 @@ namespace Awsmock::Dto::Transfer {
     };
 
 }// namespace Awsmock::Dto::Transfer
-
-#endif// AWSMOCK_DTO_TRANSFER_SERVER_IDENTITY_PROVIDER_DETAILS_H

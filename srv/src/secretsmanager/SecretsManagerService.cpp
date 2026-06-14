@@ -73,6 +73,7 @@ namespace Awsmock::Service {
             response.name = secret.name;
             response.arn = secret.arn;
             response.versionId = versionId;
+            response.copyMetadata(request);
 
             return response;
 
@@ -106,6 +107,7 @@ namespace Awsmock::Service {
             response.kmsKeyId = secret.kmsKeyId;
             response.rotationEnabled = secret.rotationEnabled;
             response.rotationLambdaARN = secret.rotationLambdaARN;
+            response.copyMetadata(request);
 
             // Version stages
             for (const auto &[fst, snd]: secret.versions) {
@@ -135,6 +137,7 @@ namespace Awsmock::Service {
 
         try {
             Dto::SecretsManager::GetSecretValueResponse response;
+            response.copyMetadata(request);
 
             // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretByArn(arn);
@@ -196,6 +199,7 @@ namespace Awsmock::Service {
 
         try {
             Dto::SecretsManager::PutSecretValueResponse response;
+            response.copyMetadata(request);
 
             // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretByArn(arn);
@@ -278,6 +282,7 @@ namespace Awsmock::Service {
             }
 
             // Convert to DTO
+            response.copyMetadata(request);
             log_debug << "Database list secrets, region: " << request.region;
             return response;
 
@@ -322,6 +327,7 @@ namespace Awsmock::Service {
             response.name = secret.name;
 
             // Convert to DTO
+            response.copyMetadata(request);
             log_debug << "Database list secret versions, region: " << request.region;
             return response;
 
@@ -366,6 +372,7 @@ namespace Awsmock::Service {
             }
 
             // Convert to DTO
+            response.copyMetadata(request);
             log_debug << "Database list secrets, region: " << request.region;
             return response;
 
@@ -397,6 +404,7 @@ namespace Awsmock::Service {
 
             // Convert to DTO
             log_debug << "List secret versions, secretId: " << request.secretId;
+            response.copyMetadata(request);
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -416,12 +424,13 @@ namespace Awsmock::Service {
         }
 
         try {
-            Dto::SecretsManager::GetSecretDetailsResponse response;
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretBySecretId(request.secretId);
 
             // Convert to DTO
             log_debug << "Get secret details, secretId: " << request.secretId;
-            return Dto::SecretsManager::Mapper::map(secret, GetSecretString(secret));
+            Dto::SecretsManager::GetSecretDetailsResponse response = Dto::SecretsManager::Mapper::map(secret, GetSecretString(secret));
+            response.copyMetadata(request);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Get secret details failed, message: " + exc.message();
@@ -468,10 +477,10 @@ namespace Awsmock::Service {
             // Convert to DTO
             log_debug << "Database secret updated, secretId: " << request.secretId;
             Dto::SecretsManager::UpdateSecretResponse response;
-            response.region = secret.region;
             response.name = secret.name;
             response.arn = secret.arn;
             response.versionId = versionId;
+            response.copyMetadata(request);
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -507,7 +516,9 @@ namespace Awsmock::Service {
 
             // Convert to DTO
             log_debug << "Database secret updated, secretId: " << request.secretDetails.secretId;
-            return Dto::SecretsManager::Mapper::mapUpdate(secret, GetSecretString(secret));
+            Dto::SecretsManager::UpdateSecretDetailsResponse response = Dto::SecretsManager::Mapper::mapUpdate(secret, GetSecretString(secret));
+            response.copyMetadata(request);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
@@ -560,6 +571,7 @@ namespace Awsmock::Service {
             response.arn = secret.arn;
             response.name = secret.name;
             response.versionId = secret.GetCurrentVersionId();
+            response.copyMetadata(request);
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -594,6 +606,7 @@ namespace Awsmock::Service {
             response.name = secret.name;
             response.arn = secret.arn;
             response.deletionDate = system_clock::now();
+            response.copyMetadata(request);
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -650,7 +663,7 @@ namespace Awsmock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) {
+    void SecretsManagerService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) const {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");

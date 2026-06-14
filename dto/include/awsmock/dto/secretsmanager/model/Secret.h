@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/11/24.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_SECRET_H
-#define AWSMOCK_DTO_SECRETSMANAGER_SECRET_H
+#pragma once
 
 
 // C++ standard includes
@@ -235,9 +234,6 @@ namespace Awsmock::Dto::SecretsManager {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Secret const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Name", obj.name},
                     {"ARN", obj.arn},
                     {"Description", obj.description},
@@ -258,5 +254,3 @@ namespace Awsmock::Dto::SecretsManager {
     };
 
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif//AWSMOCK_DTO_SECRETSMANAGER_SECRET_H

@@ -71,9 +71,6 @@ namespace Awsmock::Dto::DynamoDb {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TableCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"tableName", obj.tableName},
                     {"tableArn", obj.tableArn},
                     {"status", obj.status},

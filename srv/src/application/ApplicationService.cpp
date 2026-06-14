@@ -3,7 +3,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/service/apps/ApplicationService.h>
+#include <awsmock/service/application/ApplicationService.h>
 
 namespace Awsmock::Service {
 
@@ -45,6 +45,7 @@ namespace Awsmock::Service {
             listRequest.prefix = request.prefix;
             listRequest.pageSize = request.pageSize;
             listRequest.pageIndex = request.pageIndex;
+            listRequest.copyMetadata(request);
             log_trace << "Application created, application: " + application.ToJson();
             return ListApplications(listRequest);
 
@@ -66,13 +67,11 @@ namespace Awsmock::Service {
         try {
             const Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.name);
 
-            Dto::Apps::GetApplicationResponse getRequest{};
-            getRequest.requestId = request.requestId;
-            getRequest.region = request.region;
-            getRequest.user = request.user;
-            getRequest.application = Dto::Apps::Mapper::map(application);
+            Dto::Apps::GetApplicationResponse response{};
+            response.application = Dto::Apps::Mapper::map(application);
+            response.copyMetadata(request);
             log_trace << "Application retrieved, application: " + application.ToJson();
-            return getRequest;
+            return response;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -98,25 +97,19 @@ namespace Awsmock::Service {
             // Stop if not enabled anymore
             if (!application.enabled) {
                 Dto::Apps::StopApplicationRequest stopRequest{};
-                stopRequest.requestId = request.requestId;
-                stopRequest.region = request.region;
-                stopRequest.user = request.user;
                 stopRequest.application = Dto::Apps::Mapper::map(application);
+                stopRequest.copyMetadata(request);
                 StopApplication(stopRequest);
             } else {
                 Dto::Apps::StartApplicationRequest startRequest{};
-                startRequest.requestId = request.requestId;
-                startRequest.region = request.region;
-                startRequest.user = request.user;
+                startRequest.copyMetadata(request);
                 startRequest.application = Dto::Apps::Mapper::map(application);
                 StartApplication(startRequest);
             }
 
             // Create get request
             Dto::Apps::GetApplicationResponse getRequest{};
-            getRequest.requestId = request.requestId;
-            getRequest.region = request.region;
-            getRequest.user = request.user;
+            getRequest.copyMetadata(request);
             getRequest.application = Dto::Apps::Mapper::map(application);
             log_trace << "Application updated, application: " + application.ToJson();
             return getRequest;
@@ -483,9 +476,7 @@ namespace Awsmock::Service {
             log_trace << "Got applications, region: " << request.region;
 
             // Prepare response
-            response.region = request.region;
-            response.user = request.user;
-            response.requestId = request.requestId;
+            response.copyMetadata(request);
             response.applications = Dto::Apps::Mapper::map(applications);
             return response;
 
@@ -509,6 +500,7 @@ namespace Awsmock::Service {
                 response.applicationNames.push_back(application.name);
             }
             response.total = applications.size();
+            response.copyMetadata(request);
             return response;
 
         } catch (bsoncxx::exception &exc) {
@@ -532,12 +524,10 @@ namespace Awsmock::Service {
             log_debug << "Application deleted, count: " << count;
 
             Dto::Apps::ListApplicationCountersRequest listRequest{};
-            listRequest.requestId = request.requestId;
-            listRequest.region = request.region;
-            listRequest.user = request.user;
             listRequest.prefix = request.prefix;
             listRequest.pageSize = request.pageSize;
             listRequest.pageIndex = request.pageIndex;
+            listRequest.copyMetadata(request);
             log_trace << "Application deleted, name: " + request.name;
             return ListApplications(listRequest);
 

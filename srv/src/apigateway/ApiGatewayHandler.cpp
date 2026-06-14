@@ -5,6 +5,7 @@
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 #include "awsmock/dto/apigateway/DeleteResourceRequest.h"
+#include "awsmock/dto/apigateway/GetResourceRequest.h"
 #include <awsmock/core/JsonUtils.h>
 
 namespace Awsmock::Service {
@@ -208,6 +209,15 @@ namespace Awsmock::Service {
                     serviceRequest.position = Core::HttpUtils::GetLongParameter(request.target(), "position");
                     const Dto::ApiGateway::GetRestApisResponse serviceResponse = _apiGatewayService.getRestApis(serviceRequest);
                     log_info << "REST APIs list created";
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::GET_RESOURCE: {
+
+                    Dto::ApiGateway::GetResourcesRequest serviceRequest = Dto::ApiGateway::GetResourcesRequest::FromJson(clientCommand);
+                    serviceRequest.restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const Dto::ApiGateway::GetResourcesResponse serviceResponse = _apiGatewayService.getResources(serviceRequest);
+                    log_info << "Get REST resources, restApiId: " << serviceRequest.restApiId;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 

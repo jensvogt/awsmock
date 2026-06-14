@@ -88,9 +88,6 @@ namespace Awsmock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"requestId", obj.requestId},
-                    {"user", obj.user},
                     {"contentType", obj.contentType},
                     {"topicArn", obj.topicArn},
                     {"messageId", obj.messageId},

@@ -2,8 +2,7 @@
 // Created by vogje01 on 7/6/24.
 //
 
-#ifndef AWSMOCK_DTO_SNS_EVENT_RECORD_H
-#define AWSMOCK_DTO_SNS_EVENT_RECORD_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -62,20 +61,6 @@ namespace Awsmock::Dto::SNS {
          */
         std::string eventSourceArn;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @param document DTO as BSON document
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
       private:
 
         friend Record tag_invoke(boost::json::value_to_tag<Record>, boost::json::value const &v) {
@@ -97,9 +82,6 @@ namespace Awsmock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Record const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"messageId", obj.messageId},
                     {"receiptHandle", obj.receiptHandle},
                     {"body", obj.body},
@@ -112,5 +94,3 @@ namespace Awsmock::Dto::SNS {
         }
     };
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_EVENT_RECORD_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_DETAILS_RESPONSE_H
-#define AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_DETAILS_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -105,9 +104,6 @@ namespace Awsmock::Dto::SecretsManager {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetSecretDetailsResponse const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"secretName", obj.secretName},
                     {"secretUrl", obj.secretUrl},
                     {"secretArn", obj.secretArn},
@@ -125,5 +121,3 @@ namespace Awsmock::Dto::SecretsManager {
     };
 
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif// AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_DETAILS_RESPONSE_H

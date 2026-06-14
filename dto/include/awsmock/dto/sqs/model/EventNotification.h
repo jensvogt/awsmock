@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_EVENT_NOTIFICATION_H
-#define AWSMOCK_DTO_SQS_EVENT_NOTIFICATION_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -65,14 +64,9 @@ namespace Awsmock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EventNotification const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"Records", boost::json::value_from(obj.records)},
             };
         }
     };
 
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_EVENT_NOTIFICATION_H

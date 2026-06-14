@@ -2,12 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#include "awsmock/dto/apigateway/CreateRestApiRequest.h"
-#include "awsmock/entity/apigateway/RestApi.h"
-
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
-#include <awsmock/entity/apigateway/Authorizer.h>
-#include <awsmock/entity/apigateway/Resource.h>
 
 namespace Awsmock::Dto::ApiGateway {
 

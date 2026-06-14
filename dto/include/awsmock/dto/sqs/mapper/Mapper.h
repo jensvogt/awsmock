@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_SQS_MAPPER_H
-#define AWSMOCK_DTO_SQS_MAPPER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/mapper/Mapper.h>
@@ -128,7 +127,6 @@ namespace Awsmock::Dto::SQS {
 
         static Queue toDto(const Database::Entity::SQS::Queue &e) {
             Queue d;
-            d.region = e.region;
             d.name = e.name;
             d.arn = e.arn;
             d.url = e.url;
@@ -143,7 +141,6 @@ namespace Awsmock::Dto::SQS {
 
         static Database::Entity::SQS::Queue toEntity(const Queue &d) {
             Database::Entity::SQS::Queue e;
-            e.region = d.region;
             e.name = d.name;
             e.url = d.url;
             e.arn = d.arn;
@@ -163,7 +160,6 @@ namespace Awsmock::Dto::SQS {
 
         static QueueCounter toDto(const Database::Entity::SQS::Queue &e) {
             QueueCounter d;
-            d.region = e.region;
             d.queueName = e.name;
             d.queueArn = e.arn;
             d.queueUrl = e.url;
@@ -347,5 +343,3 @@ namespace Awsmock::Dto::SQS {
     };
 
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_MAPPER_H

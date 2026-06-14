@@ -37,6 +37,7 @@ namespace Awsmock::Dto::Common {
         PUT_METHOD,
         PUT_INTEGRATION,
         GET_RESOURCES,
+        GET_RESOURCE,
         // AwsMock internal
         LIST_API_KEY_COUNTERS,
         GET_API_KEY_COUNTER,
@@ -61,6 +62,7 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::PUT_METHOD, "put-method"},
             {ApiGatewayCommandType::PUT_INTEGRATION, "put-integration"},
             {ApiGatewayCommandType::GET_RESOURCES, "get-resources"},
+            {ApiGatewayCommandType::GET_RESOURCE, "get-resource"},
             // AwsMock internal commands
             {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
             {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},

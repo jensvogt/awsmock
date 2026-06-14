@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/28/24.
 //
 
-#ifndef AWSMOCK_DTO_S3_LIFECYCLE_RULE_H
-#define AWSMOCK_DTO_S3_LIFECYCLE_RULE_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -13,8 +12,8 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/s3/model/LifecycleStatus.h>
 #include <awsmock/dto/s3/model/LifecycleTransition.h>
 
@@ -109,9 +108,6 @@ namespace Awsmock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LifecycleRule const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"ID", obj.id},
                     {"Prefix", obj.prefix},
                     {"Status", LifeCycleStatusToString(obj.status)},
@@ -121,5 +117,3 @@ namespace Awsmock::Dto::S3 {
     };
 
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_LIFECYCLE_RULE_H

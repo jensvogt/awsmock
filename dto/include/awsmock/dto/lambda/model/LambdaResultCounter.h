@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_RESULT_COUNTER_H
-#define AWSMOCK_DTO_LAMBDA_RESULT_COUNTER_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -118,8 +117,6 @@ namespace Awsmock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LambdaResultCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
                     {"oid", obj.oid},
                     {"lambdaName", obj.lambdaName},
                     {"lambdaArn", obj.lambdaArn},
@@ -138,5 +135,3 @@ namespace Awsmock::Dto::Lambda {
     };
 
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_RESULT_COUNTER_H

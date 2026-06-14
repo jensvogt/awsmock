@@ -14,7 +14,9 @@ namespace Awsmock::Service {
         if (const std::string queueArn = Core::CreateSQSQueueArn(request.region, request.queueName); _sqsDatabase->queueArnExists(queueArn)) {
             log_warning << "Queue exists already, region: " << request.region << ", name: " << request.queueName;
             const Database::Entity::SQS::Queue queue = _sqsDatabase->getQueueByArn(queueArn);
-            return Dto::SQS::CreateQueueResponseMapper::toDto(queue);
+            Dto::SQS::CreateQueueResponse response = Dto::SQS::CreateQueueResponseMapper::toDto(queue);
+            response.copyMetadata(request);
+            return response;
         }
 
         try {
@@ -23,7 +25,9 @@ namespace Awsmock::Service {
             Database::Entity::SQS::Queue queue = Dto::SQS::CreateQueueRequestMapper::toEntity(request);
             queue = _sqsDatabase->createQueue(queue);
             log_trace << "SQS queue created: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
-            return Dto::SQS::CreateQueueResponseMapper::toDto(queue);
+            Dto::SQS::CreateQueueResponse response = Dto::SQS::CreateQueueResponseMapper::toDto(queue);
+            response.copyMetadata(request);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
@@ -52,6 +56,7 @@ namespace Awsmock::Service {
 
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase->listQueues(request.region);
             listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
+            listQueueResponse.copyMetadata(request);
 
             log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
@@ -94,6 +99,7 @@ namespace Awsmock::Service {
             Dto::SQS::ListQueueCountersResponse response;
             response.total = total;
             response.queueCounters = Dto::SQS::QueueCounterMapper::toDtoList(queueList);
+            response.copyMetadata(request);
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -1430,7 +1436,6 @@ namespace Awsmock::Service {
 
         // Create the event record
         Dto::SQS::EventRecord record;
-        record.region = lambda.region;
         record.messageId = message.messageId;
         record.receiptHandle = message.receiptHandle;
         record.body = message.body;

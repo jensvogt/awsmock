@@ -2,7 +2,7 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include <awsmock/service/apps/ApplicationServer.h>
+#include <awsmock/service/application/ApplicationServer.h>
 
 namespace Awsmock::Service {
 

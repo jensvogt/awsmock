@@ -60,7 +60,6 @@ namespace Awsmock::Dto::Cognito {
 
                 document document;
                 Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
-                Core::Bson::BsonUtils::SetStringValue(document, "region", region);
                 Core::Bson::BsonUtils::SetStringValue(document, "name", name);
                 Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
                 Core::Bson::BsonUtils::SetDateValue(document, "created", created);
@@ -89,9 +88,6 @@ namespace Awsmock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UserPool const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Id", obj.userPoolId},
                     {"Name", obj.name},
                     {"Arn", obj.arn},

@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_TAG_H
-#define AWSMOCK_DTO_TRANSFER_TAG_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -38,9 +37,6 @@ namespace Awsmock::Dto::Transfer {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Tag const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Key", obj.key},
                     {"Value", obj.value},
             };
@@ -50,5 +46,3 @@ namespace Awsmock::Dto::Transfer {
     typedef std::vector<Tag> TagList;
 
 }// namespace Awsmock::Dto::Transfer
-
-#endif// AWSMOCK_DTO_TRANSFER_TAG_H

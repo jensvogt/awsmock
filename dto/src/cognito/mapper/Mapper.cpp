@@ -96,8 +96,6 @@ namespace Awsmock::Dto::Cognito {
 
     UserPool Mapper::map(const Database::Entity::Cognito::UserPool &userPoolEntity) {
         UserPool userPoolDto;
-        userPoolDto.user = userPoolEntity.userPoolId;
-        userPoolDto.region = userPoolEntity.region;
         userPoolDto.name = userPoolEntity.name;
         userPoolDto.userPoolId = userPoolEntity.userPoolId;
         userPoolDto.created = userPoolEntity.created;
@@ -118,7 +116,6 @@ namespace Awsmock::Dto::Cognito {
         for (const auto &userPoolEntity: userPoolEntities) {
             UserPoolCounter userPoolCounterDto;
             userPoolCounterDto.id = userPoolEntity.userPoolId,
-            userPoolCounterDto.region = userPoolEntity.region,
             userPoolCounterDto.name = userPoolEntity.name,
             userPoolCounterDto.userPoolId = userPoolEntity.userPoolId,
             userPoolCounterDto.arn = userPoolEntity.arn,
@@ -132,7 +129,6 @@ namespace Awsmock::Dto::Cognito {
 
     User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
         User userDto;
-        userDto.region = userEntity.region;
         userDto.userPoolId = userEntity.userPoolId;
         userDto.userName = userEntity.userName;
         userDto.enabled = userEntity.enabled;
@@ -149,7 +145,6 @@ namespace Awsmock::Dto::Cognito {
         std::vector<UserCounter> userDtos;
         for (const auto &userEntity: userEntities) {
             UserCounter userDto;
-            userDto.region = userEntity.region;
             userDto.userPoolId = userEntity.userPoolId;
             userDto.userName = userEntity.userName;
             userDto.enabled = userEntity.enabled;
@@ -170,7 +165,6 @@ namespace Awsmock::Dto::Cognito {
         std::vector<User> userDtos;
         for (const auto &userEntity: userEntities) {
             User userDto;
-            userDto.region = userEntity.region;
             userDto.userPoolId = userEntity.userPoolId;
             userDto.userName = userEntity.userName;
             userDto.enabled = userEntity.enabled;
@@ -189,7 +183,6 @@ namespace Awsmock::Dto::Cognito {
 
     Group Mapper::map(const Database::Entity::Cognito::Group &groupEntity) {
         Group groupDto;
-        groupDto.region = groupEntity.region;
         groupDto.groupName = groupEntity.groupName;
         groupDto.userPoolId = groupEntity.userPoolId;
         groupDto.precedence = groupEntity.precedence;

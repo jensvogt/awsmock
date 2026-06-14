@@ -51,7 +51,7 @@ namespace Awsmock::Dto::S3 {
             boost::property_tree::ptree bucketsTree;
             for (auto &it: bucketList) {
                 boost::property_tree::ptree bucketTree;
-                bucketTree.add("BucketRegion", it.region);
+                //                bucketTree.add("BucketRegion", it.region);
                 bucketTree.add("Name", it.bucketName);
                 bucketTree.add("CreationDate", Core::DateTimeUtils::ToISO8601(it.created));
                 bucketsTree.push_back(std::make_pair("Bucket", bucketTree));
