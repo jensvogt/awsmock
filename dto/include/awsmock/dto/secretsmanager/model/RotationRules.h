@@ -10,7 +10,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SecretsManager {
 
@@ -28,7 +28,7 @@ namespace Awsmock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RotationRules final : Common::BaseCounter<RotationRules> {
+    struct RotationRules final : Common::BaseObject<RotationRules> {
 
         /**
          * Automatic rotation period

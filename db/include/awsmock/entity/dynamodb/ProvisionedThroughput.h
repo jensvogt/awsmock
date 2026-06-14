@@ -24,12 +24,12 @@ namespace Awsmock::Database::Entity::DynamoDb {
         /**
          * Read capacity units
          */
-        long readCapacityUnits{};
+        std::int64_t readCapacityUnits{};
 
         /**
          * Write capacity units
          */
-        long writeCapacityUnits{};
+        std::int64_t writeCapacityUnits{};
 
         /**
          * Last decrease time
@@ -44,7 +44,7 @@ namespace Awsmock::Database::Entity::DynamoDb {
         /**
          * Number of decreases
          */
-        long numberOfDecreasesToday{};
+        std::int64_t numberOfDecreasesToday{};
 
         /**
          * @brief Convert to a BSON document

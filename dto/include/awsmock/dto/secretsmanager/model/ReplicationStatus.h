@@ -10,7 +10,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SecretsManager {
 
@@ -30,7 +30,7 @@ namespace Awsmock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ReplicationStatus final : Common::BaseCounter<ReplicationStatus> {
+    struct ReplicationStatus final : Common::BaseObject<ReplicationStatus> {
 
         /**
          * ARN

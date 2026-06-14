@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
 
 namespace Awsmock::Dto::SSM {
@@ -22,7 +22,7 @@ namespace Awsmock::Dto::SSM {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ParameterFilter final : Common::BaseCounter<ParameterFilter> {
+    struct ParameterFilter final : Common::BaseObject<ParameterFilter> {
 
         /**
          * The name of the filter.

@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/container/model/PortBinding.h>
 
 namespace Awsmock::Dto::Docker {
@@ -26,7 +26,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Config final : Common::BaseCounter<Config> {
+    struct Config final : Common::BaseObject<Config> {
 
       private:
 
@@ -54,7 +54,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LogConfig final : Common::BaseCounter<LogConfig> {
+    struct LogConfig final : Common::BaseObject<LogConfig> {
 
         /**
          * Logging type

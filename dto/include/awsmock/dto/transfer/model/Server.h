@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/transfer/model/IdentityProviderDetails.h>
 #include <awsmock/dto/transfer/model/IdentityProviderType.h>
 
@@ -22,7 +22,7 @@ namespace Awsmock::Dto::Transfer {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Server final : Common::BaseCounter<Server> {
+    struct Server final : Common::BaseObject<Server> {
 
         /**
          * ARN

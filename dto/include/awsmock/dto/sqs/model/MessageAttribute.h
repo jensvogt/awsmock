@@ -12,12 +12,12 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/sqs/model/MessageAttributeDataType.h>
 
 namespace Awsmock::Dto::SQS {
 
-    struct MessageAttribute final : Common::BaseCounter<MessageAttribute> {
+    struct MessageAttribute final : Common::BaseObject<MessageAttribute> {
 
         /**
          * Message attribute string value

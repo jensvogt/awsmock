@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Lambda {
 
@@ -30,7 +30,7 @@ namespace Awsmock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz--consulting.com
      */
-    struct AccountLimit final : Common::BaseCounter<AccountLimit> {
+    struct AccountLimit final : Common::BaseObject<AccountLimit> {
 
         /**
          * Code size unzipped limit

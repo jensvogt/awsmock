@@ -11,12 +11,12 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/dynamodb/model/Item.h>
 
 namespace Awsmock::Dto::DynamoDb {
 
-    struct ItemCounter final : Common::BaseCounter<ItemCounter> {
+    struct ItemCounter final : Common::BaseObject<ItemCounter> {
 
         /**
          * Table name

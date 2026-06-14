@@ -13,13 +13,13 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SNS {
 
     using std::chrono::system_clock;
 
-    struct Topic final : Common::BaseCounter<Topic> {
+    struct Topic final : Common::BaseObject<Topic> {
 
         /**
          * Topic ARN

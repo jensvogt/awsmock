@@ -10,14 +10,14 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/sns/model/MessageAttribute.h>
 #include <awsmock/dto/sns/model/MessageAttributeCounter.h>
 #include <awsmock/dto/sns/model/MessageStatus.h>
 
 namespace Awsmock::Dto::SNS {
 
-    struct MessageCounter final : Common::BaseCounter<MessageCounter> {
+    struct MessageCounter final : Common::BaseObject<MessageCounter> {
 
         /**
          * Topic ARM

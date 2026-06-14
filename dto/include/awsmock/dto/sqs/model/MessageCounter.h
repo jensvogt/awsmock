@@ -12,7 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace Awsmock::Dto::SQS {
@@ -24,7 +24,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct MessageCounter final : Common::BaseCounter<MessageCounter> {
+    struct MessageCounter final : Common::BaseObject<MessageCounter> {
 
         /**
          * Queue name

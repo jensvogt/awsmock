@@ -15,7 +15,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/entity/lambda/Instance.h>
 
 namespace Awsmock::Dto::Lambda {
@@ -28,7 +28,7 @@ namespace Awsmock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaResultCounter final : Common::BaseCounter<LambdaResultCounter> {
+    struct LambdaResultCounter final : Common::BaseObject<LambdaResultCounter> {
 
         /**
          * Database OID

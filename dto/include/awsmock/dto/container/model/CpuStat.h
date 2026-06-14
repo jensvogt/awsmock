@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/container/model/CpuUsage.h>
 
 namespace Awsmock::Dto::Docker {
@@ -23,7 +23,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CpuStat final : Common::BaseCounter<CpuStat> {
+    struct CpuStat final : Common::BaseObject<CpuStat> {
 
         /**
          * Maximal usage in bytes

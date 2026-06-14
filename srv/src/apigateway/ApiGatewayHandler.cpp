@@ -32,7 +32,7 @@ namespace Awsmock::Service {
 
         // Build the minimal JSON event sent to a Lambda authorizer.
         std::string BuildAuthorizerPayload(const http::request<http::dynamic_body> &request, const std::string &restApiId, const std::string &resourcePath, const Database::Entity::ApiGateway::Authorizer &authorizer) {
-            const std::string httpMethod = boost::lexical_cast<std::string>(request.method());
+            const auto httpMethod = boost::lexical_cast<std::string>(request.method());
 
             // Build the request context
             document requestContext;
@@ -61,7 +61,7 @@ namespace Awsmock::Service {
 
         // Build an API Gateway Lambda proxy event (version 1.0).
         std::string BuildLambdaProxyEvent(const http::request<http::dynamic_body> &request, const std::string &restApiId, const std::string &resourcePath, const std::string &rawUrl) {
-            const std::string httpMethod = boost::lexical_cast<std::string>(request.method());
+            const auto httpMethod = boost::lexical_cast<std::string>(request.method());
 
             // Headers
             document headersDoc;
@@ -208,6 +208,15 @@ namespace Awsmock::Service {
                     serviceRequest.position = Core::HttpUtils::GetLongParameter(request.target(), "position");
                     const Dto::ApiGateway::GetRestApisResponse serviceResponse = _apiGatewayService.getRestApis(serviceRequest);
                     log_info << "REST APIs list created";
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::GET_RESOURCES: {
+
+                    Dto::ApiGateway::GetResourcesRequest serviceRequest = Dto::ApiGateway::GetResourcesRequest::FromJson(clientCommand);
+                    serviceRequest.restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const Dto::ApiGateway::GetResourcesResponse serviceResponse = _apiGatewayService.getResources(serviceRequest);
+                    log_info << "Get REST resources, restApiId: " << serviceRequest.restApiId;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 

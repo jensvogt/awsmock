@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SecretsManager {
 
-    struct Tag final : Common::BaseCounter<Tag> {
+    struct Tag final : Common::BaseObject<Tag> {
 
         /**
          * Key

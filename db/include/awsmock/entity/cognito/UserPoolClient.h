@@ -47,17 +47,17 @@ namespace Awsmock::Database::Entity::Cognito {
         /**
          * Access token validity
          */
-        long accessTokenValidity{};
+        std::int64_t accessTokenValidity{};
 
         /**
          * ID token validity
          */
-        long idTokenValidity{};
+        std::int64_t idTokenValidity{};
 
         /**
          * Refresh token validity
          */
-        long refreshTokenValidity{};
+        std::int64_t refreshTokenValidity{};
 
         /**
          * Auth flows

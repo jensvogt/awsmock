@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SQS {
 
-    struct LambdaTriggerCounter final : Common::BaseCounter<LambdaTriggerCounter> {
+    struct LambdaTriggerCounter final : Common::BaseObject<LambdaTriggerCounter> {
         /**
          * UUID
          */

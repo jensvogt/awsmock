@@ -45,12 +45,12 @@ namespace Awsmock::Database::Entity::Apps {
         /**
          * Private port. This is the internal port used by the application inside the docker image.
          */
-        long privatePort{};
+        std::int64_t privatePort{};
 
         /**
          * Public port. This is the host port used by the application inside the docker image.
          */
-        long publicPort{};
+        std::int64_t publicPort{};
 
         /**
          * Name of the container
@@ -110,7 +110,7 @@ namespace Awsmock::Database::Entity::Apps {
         /**
          * Docker image size
          */
-        long imageSize{};
+        std::int64_t imageSize{};
 
         /**
          * Full image name in format name:tag

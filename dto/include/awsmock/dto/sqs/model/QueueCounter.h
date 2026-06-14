@@ -13,13 +13,13 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SQS {
 
     using std::chrono::system_clock;
 
-    struct QueueCounter final : Common::BaseCounter<QueueCounter> {
+    struct QueueCounter final : Common::BaseObject<QueueCounter> {
 
         /**
          * Queue URL

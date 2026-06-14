@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace Awsmock::Dto::DynamoDb {
@@ -22,7 +22,7 @@ namespace Awsmock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct KeySchema final : Common::BaseCounter<KeySchema> {
+    struct KeySchema final : Common::BaseObject<KeySchema> {
 
         /**
          * Attribute name

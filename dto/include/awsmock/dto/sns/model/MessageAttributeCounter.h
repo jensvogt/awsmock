@@ -11,13 +11,13 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/sns/model/MessageAttribute.h>
 #include <awsmock/dto/sns/model/MessageAttributeDataType.h>
 
 namespace Awsmock::Dto::SNS {
 
-    struct MessageAttributeCounter final : Common::BaseCounter<MessageAttributeCounter> {
+    struct MessageAttributeCounter final : Common::BaseObject<MessageAttributeCounter> {
 
         /**
          * Message attribute name

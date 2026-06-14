@@ -14,7 +14,7 @@
 
 namespace Awsmock::Dto::Lambda {
 
-    struct EphemeralStorage final : Common::BaseCounter<EphemeralStorage> {
+    struct EphemeralStorage final : Common::BaseObject<EphemeralStorage> {
 
         /**
          * Temporary disk space in MB. Default: 512 MB, Range: 512 - 10240 MB

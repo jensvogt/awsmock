@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace Awsmock::Dto::Cognito {
@@ -27,7 +27,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ValidationData final : Common::BaseCounter<ValidationData> {
+    struct ValidationData final : Common::BaseObject<ValidationData> {
 
         /**
          * User attribute name

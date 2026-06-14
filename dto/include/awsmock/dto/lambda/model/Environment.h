@@ -11,12 +11,12 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/lambda/model/Error.h>
 
 namespace Awsmock::Dto::Lambda {
 
-    struct EnvironmentVariables final : Common::BaseCounter<EnvironmentVariables> {
+    struct EnvironmentVariables final : Common::BaseObject<EnvironmentVariables> {
 
         /**
          * @brief Environment variables

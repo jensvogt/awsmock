@@ -92,12 +92,12 @@ namespace Awsmock::Database::Entity::S3 {
         /**
          * Size in bytes
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Number of object keys
          */
-        long keys{};
+        std::int64_t keys{};
 
         /**
          * Bucket notifications

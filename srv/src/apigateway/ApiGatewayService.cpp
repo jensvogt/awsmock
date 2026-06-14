@@ -393,6 +393,28 @@ namespace Awsmock::Service {
         }
     }
 
+    Dto::ApiGateway::GetResourcesResponse ApiGatewayService::getResources(const Dto::ApiGateway::GetResourcesRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_resources");
+        log_debug << "Get resources request, region:  " << request.region << ", restApiId:" << request.restApiId;
+
+        if (!_apiGatewayDatabase->restApiExistsByRestApiId(request.restApiId)) {
+            log_error << "REST API does not exist, region: " << request.region << " restApiId: " << request.restApiId;
+            throw Core::ServiceException("REST API does not exist already, region: " + request.region + " restApiId: " + request.restApiId);
+        }
+
+        try {
+
+            // Get the rest api
+            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.restApiId);
+
+            return Dto::ApiGateway::Mapper::map(request, restApi.resources);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
     void ApiGatewayService::deleteResource(const Dto::ApiGateway::DeleteResourceRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_resource");
         log_debug << "Delete resource request, region:  " << request.region << ", restApiId:" << request.restApiId << ", resourceId: " << request.resourceId;
@@ -431,12 +453,17 @@ namespace Awsmock::Service {
         if (!restApi.resources.contains(resourceId)) {
             throw Core::ServiceException("Resource not found, resourceId: " + resourceId);
         }
+
+        // Get the resource
         auto &resource = restApi.resources.at(resourceId);
+
+        // Create method
         Database::Entity::ApiGateway::ResourceMethod method;
         method.httpMethod = httpMethod;
         method.apiKeyRequired = apiKeyRequired;
         resource.resourceMethods[httpMethod] = method;
-        _apiGatewayDatabase->upsertRestApi(restApi);
+        restApi = _apiGatewayDatabase->upsertRestApi(restApi);
+        log_debug << "Put method created, restApiId: " << restApi.id << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
     }
 
     void ApiGatewayService::putIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod,

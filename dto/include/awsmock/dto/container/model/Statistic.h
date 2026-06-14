@@ -14,7 +14,7 @@
 
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 #define LAMBDA_INTERNAL_PORT 8080
 
@@ -25,7 +25,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Statistic final : Common::BaseCounter<Statistic> {
+    struct Statistic final : Common::BaseObject<Statistic> {
 
         /**
          * Container ID

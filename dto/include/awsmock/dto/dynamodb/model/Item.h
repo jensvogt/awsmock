@@ -13,7 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::DynamoDb {
 
@@ -184,7 +184,7 @@ namespace Awsmock::Dto::DynamoDb {
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Item final : Common::BaseCounter<Item> {
+    struct Item final : Common::BaseObject<Item> {
 
         /**
          * ID

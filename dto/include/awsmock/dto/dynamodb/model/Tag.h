@@ -6,11 +6,11 @@
 #define AWSMOCK_DTO_DYNAMODB_TAG_H
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::DynamoDb {
 
-    struct Tag final : Common::BaseCounter<Tag> {
+    struct Tag final : Common::BaseObject<Tag> {
 
         /**
          * Key

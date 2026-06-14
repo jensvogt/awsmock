@@ -13,7 +13,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
 
 namespace Awsmock::Dto::SSM {
@@ -25,7 +25,7 @@ namespace Awsmock::Dto::SSM {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Parameter final : Common::BaseCounter<Parameter> {
+    struct Parameter final : Common::BaseObject<Parameter> {
 
         /**
          * Parameter name

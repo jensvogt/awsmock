@@ -22,7 +22,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct BatchResultErrorEntry final : Common::BaseCounter<BatchResultErrorEntry> {
+    struct BatchResultErrorEntry final : Common::BaseObject<BatchResultErrorEntry> {
 
         /**
          * @brief Default constructor

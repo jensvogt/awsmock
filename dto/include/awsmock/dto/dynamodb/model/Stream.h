@@ -10,7 +10,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::DynamoDb {
 
@@ -31,7 +31,7 @@ namespace Awsmock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Stream final : Common::BaseCounter<Stream> {
+    struct Stream final : Common::BaseObject<Stream> {
 
         /**
          * The Amazon Resource Name (ARN) for the stream.

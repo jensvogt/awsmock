@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Cognito {
 
@@ -46,7 +46,7 @@ namespace Awsmock::Dto::Cognito {
         return days;
     }
 
-    struct TokenValidityUnits final : Common::BaseCounter<TokenValidityUnits> {
+    struct TokenValidityUnits final : Common::BaseObject<TokenValidityUnits> {
 
         /**
          * Access token

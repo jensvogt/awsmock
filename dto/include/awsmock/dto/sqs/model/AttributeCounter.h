@@ -9,11 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SQS {
 
-    struct AttributeCounter final : Common::BaseCounter<AttributeCounter> {
+    struct AttributeCounter final : Common::BaseObject<AttributeCounter> {
 
         /**
          * Key

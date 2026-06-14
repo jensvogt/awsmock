@@ -58,7 +58,7 @@ namespace Awsmock::Database::Entity::S3 {
         /**
          * Object size
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Object MD5Sum

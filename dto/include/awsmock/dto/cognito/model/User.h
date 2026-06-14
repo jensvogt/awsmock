@@ -22,7 +22,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct User final : Common::BaseCounter<User> {
+    struct User final : Common::BaseObject<User> {
 
         /**
          * MongoDB OID

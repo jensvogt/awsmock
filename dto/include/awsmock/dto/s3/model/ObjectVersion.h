@@ -27,7 +27,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ObjectVersion final : Common::BaseCounter<ObjectVersion> {
+    struct ObjectVersion final : Common::BaseObject<ObjectVersion> {
 
         /**
          * Key

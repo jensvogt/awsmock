@@ -43,7 +43,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct HostConfig final : Common::BaseCounter<HostConfig> {
+    struct HostConfig final : Common::BaseObject<HostConfig> {
 
         /**
          * Network mode

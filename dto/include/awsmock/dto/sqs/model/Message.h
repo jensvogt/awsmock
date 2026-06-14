@@ -25,7 +25,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Message final : Common::BaseCounter<Message> {
+    struct Message final : Common::BaseObject<Message> {
 
         /**
          * Queue name

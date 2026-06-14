@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Lambda {
 
-    struct DeadLetterConfig final : Common::BaseCounter<DeadLetterConfig> {
+    struct DeadLetterConfig final : Common::BaseObject<DeadLetterConfig> {
 
         /**
          * Target ARN

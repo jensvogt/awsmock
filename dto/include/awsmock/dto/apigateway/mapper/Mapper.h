@@ -10,6 +10,8 @@
 #include <awsmock/dto/apigateway/CreateResourceRequest.h>
 #include <awsmock/dto/apigateway/CreateResourceResponse.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
+#include <awsmock/dto/apigateway/GetResourcesRequest.h>
+#include <awsmock/dto/apigateway/GetResourcesResponse.h>
 #include <awsmock/dto/apigateway/model/Authorizer.h>
 #include <awsmock/dto/apigateway/model/Key.h>
 #include <awsmock/dto/apigateway/model/RestApi.h>
@@ -134,6 +136,15 @@ namespace Awsmock::Dto::ApiGateway {
          * @return list of resource DTOs
          */
         static std::vector<Resource> map(const std::vector<Database::Entity::ApiGateway::Resource> &resourceEntities);
+
+        /**
+         * @brief Maps a get-resources request and resource map to a get-resources response
+         *
+         * @param request get resources request
+         * @param resources map of resource entities keyed by resource ID
+         * @return get resources response
+         */
+        static GetResourcesResponse map(const GetResourcesRequest &request, const std::map<std::string, Database::Entity::ApiGateway::Resource> &resources);
 
         /**
          * @brief Maps an authorizer entity to an authorizer DTO

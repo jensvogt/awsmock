@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::S3 {
 
@@ -19,7 +19,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Owner final : Common::BaseCounter<Owner> {
+    struct Owner final : Common::BaseObject<Owner> {
 
         /**
          * ID

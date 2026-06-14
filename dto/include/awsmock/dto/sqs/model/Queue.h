@@ -10,7 +10,7 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 #include <awsmock/dto/sqs/model/QueueAttribute.h>
 
@@ -23,7 +23,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Queue final : Common::BaseCounter<Queue> {
+    struct Queue final : Common::BaseObject<Queue> {
 
         /**
          * Queue name

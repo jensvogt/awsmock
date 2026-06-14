@@ -51,7 +51,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaConfig final : Common::BaseCounter<LambdaConfig> {
+    struct LambdaConfig final : Common::BaseObject<LambdaConfig> {
 
         /**
          * Create authentication challenge

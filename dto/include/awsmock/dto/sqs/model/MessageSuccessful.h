@@ -14,7 +14,7 @@
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SQS {
 
@@ -32,7 +32,7 @@ namespace Awsmock::Dto::SQS {
      * }
      * @endcode
      */
-    struct MessageSuccessful final : Common::BaseCounter<MessageSuccessful> {
+    struct MessageSuccessful final : Common::BaseObject<MessageSuccessful> {
 
         /**
          * Message ID

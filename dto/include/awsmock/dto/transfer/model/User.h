@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Transfer {
 
@@ -38,7 +38,7 @@ namespace Awsmock::Dto::Transfer {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct User final : Common::BaseCounter<User> {
+    struct User final : Common::BaseObject<User> {
 
         /**
          * User name

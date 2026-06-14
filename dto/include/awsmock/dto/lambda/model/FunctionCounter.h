@@ -11,7 +11,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/lambda/model/DeadLetterConfig.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 
@@ -19,7 +19,7 @@ namespace Awsmock::Dto::Lambda {
 
     using std::chrono::system_clock;
 
-    struct FunctionCounter final : Common::BaseCounter<FunctionCounter> {
+    struct FunctionCounter final : Common::BaseObject<FunctionCounter> {
         /**
          * Function ARN
          */

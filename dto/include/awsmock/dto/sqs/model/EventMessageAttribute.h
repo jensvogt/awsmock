@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/sqs/model/MessageAttributeDataType.h>
 
 namespace Awsmock::Dto::SQS {
@@ -25,7 +25,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EventMessageAttribute final : Common::BaseCounter<EventMessageAttribute> {
+    struct EventMessageAttribute final : Common::BaseObject<EventMessageAttribute> {
 
         /**
          * Message attribute string value

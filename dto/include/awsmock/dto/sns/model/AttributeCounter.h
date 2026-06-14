@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SNS {
 
-    struct AttributeCounter final : Common::BaseCounter<AttributeCounter> {
+    struct AttributeCounter final : Common::BaseObject<AttributeCounter> {
 
         /**
          * Key

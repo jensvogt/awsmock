@@ -19,7 +19,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PortBinding final : Common::BaseCounter<PortBinding> {
+    struct PortBinding final : Common::BaseObject<PortBinding> {
 
         /**
          * Port map

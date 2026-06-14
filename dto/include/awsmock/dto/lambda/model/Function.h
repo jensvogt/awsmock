@@ -17,7 +17,7 @@
 
 namespace Awsmock::Dto::Lambda {
 
-    struct Function final : Common::BaseCounter<Function> {
+    struct Function final : Common::BaseObject<Function> {
 
         /**
          * Architectures

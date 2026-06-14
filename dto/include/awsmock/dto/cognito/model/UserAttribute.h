@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace Awsmock::Dto::Cognito {
@@ -19,7 +19,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserAttribute final : Common::BaseCounter<UserAttribute> {
+    struct UserAttribute final : Common::BaseObject<UserAttribute> {
 
         /**
          * User attribute name

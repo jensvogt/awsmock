@@ -11,11 +11,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SQS {
 
-    struct DeleteMessageBatchEntry final : Common::BaseCounter<DeleteMessageBatchEntry> {
+    struct DeleteMessageBatchEntry final : Common::BaseObject<DeleteMessageBatchEntry> {
 
         /**
          * Entry ID

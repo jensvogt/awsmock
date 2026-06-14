@@ -46,7 +46,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct TopicConfiguration : Common::BaseCounter<TopicConfiguration> {
+    struct TopicConfiguration : Common::BaseObject<TopicConfiguration> {
 
         /**
          * ID, optional, if empty, a random ID will be generated

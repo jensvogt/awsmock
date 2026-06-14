@@ -16,11 +16,11 @@
 
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SNS {
 
-    struct Subscription final : Common::BaseCounter<Subscription> {
+    struct Subscription final : Common::BaseObject<Subscription> {
 
         /**
          * Subscription id

@@ -10,12 +10,12 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/sqs/model/RedrivePolicy.h>
 
 namespace Awsmock::Dto::SQS {
 
-    struct QueueAttribute final : Common::BaseCounter<QueueAttribute> {
+    struct QueueAttribute final : Common::BaseObject<QueueAttribute> {
 
         /**
          * Delay seconds
