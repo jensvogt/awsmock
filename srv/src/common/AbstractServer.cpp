@@ -25,7 +25,7 @@ namespace Awsmock::Service {
         return _moduleDatabase->getState(_name) == Database::Entity::Module::ModuleState::RUNNING;
     }
 
-    void AbstractServer::Shutdown() {
+    void AbstractServer::shutdown() {
     }
 
 

@@ -31,7 +31,7 @@ namespace Awsmock::Service {
         StartTransferServers();
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&TransferServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&TransferServer::shutdown, this));
 
         log_info << "Transfer server initialized";
     }
@@ -166,7 +166,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("transfer", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void TransferServer::Shutdown() {
+    void TransferServer::shutdown() {
         log_info << "Transfer server shutting down";
         _scheduler.Shutdown("ssm-monitoring");
         _scheduler.Shutdown("ssm-backup");

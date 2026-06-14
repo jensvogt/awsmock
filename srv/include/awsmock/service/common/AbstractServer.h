@@ -38,7 +38,7 @@ namespace Awsmock::Service {
     /**
      * @brief Shutdown server
      */
-    virtual void Shutdown();
+    virtual void shutdown();
 
   protected:
     /**

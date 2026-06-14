@@ -36,7 +36,7 @@ namespace Awsmock::Service {
         log_info << "Gateway server started, endpoint: " << _address << " port: " << _port;
     }
 
-    void GatewayServer::Shutdown() {
+    void GatewayServer::shutdown() {
         WorkerPool().join();
         _ios.stop();
     }

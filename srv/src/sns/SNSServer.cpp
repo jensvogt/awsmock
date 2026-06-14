@@ -27,7 +27,7 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SNSServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SNSServer::shutdown, this));
 
         log_debug << "SNS server initialized, workerPeriod: " << _deletePeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
@@ -64,7 +64,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("sns", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void SNSServer::Shutdown() {
+    void SNSServer::shutdown() {
         log_info << "SNS manager server shutting down";
         _scheduler.Shutdown("sns-monitoring");
         _scheduler.Shutdown("sns-delete-messages");

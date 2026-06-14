@@ -52,6 +52,15 @@ namespace Awsmock::Database::Entity::ApiGateway {
             keyDocument.append(kvp("warnings", warningsArray));
         }
 
+        // Authorizers
+        {
+            document authorizersDoc;
+            for (const auto &[fst, snd]: authorizers) {
+                authorizersDoc.append(kvp(fst, snd.ToDocument()));
+            }
+            keyDocument.append(kvp("authorizers", authorizersDoc));
+        }
+
         // Resources
         {
             document resourceDocument;
@@ -108,6 +117,17 @@ namespace Awsmock::Database::Entity::ApiGateway {
             }
         }
 
+        // Authorizers
+        if (mResult.value().find("authorizers") != mResult.value().end()) {
+            authorizers.clear();
+            for (const view authorizersDoc = mResult.value()["authorizers"].get_document().value; const auto &a: authorizersDoc) {
+                const std::string key = bsoncxx::string::to_string(a.key());
+                Authorizer authorizer;
+                authorizer.FromDocument(a.get_document().value);
+                authorizers[key] = authorizer;
+            }
+        }
+
         // Resources
         if (mResult.value().find("resources") != mResult.value().end()) {
             resources.clear();
@@ -120,4 +140,4 @@ namespace Awsmock::Database::Entity::ApiGateway {
         }
     }
 
-} // namespace Awsmock::Database::Entity::ApiGateway
+}// namespace Awsmock::Database::Entity::ApiGateway

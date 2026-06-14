@@ -50,7 +50,7 @@ namespace Awsmock::Service {
         log_debug << "Lambda controller initialized";
     }
 
-    void LambdaController::Shutdown() {
+    void LambdaController::shutdown() {
         Core::Scheduler::instance().Shutdown("lambda-controller-health");
         log_info << "Lambda controller stopped";
     }

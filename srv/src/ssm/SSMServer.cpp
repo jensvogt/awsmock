@@ -24,7 +24,7 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SSMServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&SSMServer::shutdown, this));
 
         log_debug << "SSM server started";
     }
@@ -44,7 +44,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("ssm", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void SSMServer::Shutdown() {
+    void SSMServer::shutdown() {
         log_info << "SSM manager server shutting down";
         _scheduler.Shutdown("ssm-monitoring");
         _scheduler.Shutdown("ssm-backup");

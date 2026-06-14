@@ -996,10 +996,14 @@ namespace Awsmock::Service {
         log_debug << "Start all lambdas";
 
         for (const auto &lambda: _lambdaDatabase->listLambdas({})) {
-            Dto::Lambda::StartLambdaRequest request;
-            request.functionArn = lambda.arn;
-            request.region = lambda.region;
-            StartLambda(request);
+            if (lambda.enabled) {
+                Dto::Lambda::StartLambdaRequest request;
+                request.functionArn = lambda.arn;
+                request.region = lambda.region;
+                StartLambda(request);
+            } else {
+                log_debug << "Lambda function disabled, name: " << lambda.function;
+            }
         }
         log_info << "All lambda function started";
     }

@@ -7,6 +7,7 @@
 
 
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
+#include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/entity/apigateway/Resource.h>
 
 namespace Awsmock::Dto::ApiGateway {
@@ -114,6 +115,9 @@ namespace Awsmock::Dto::ApiGateway {
             ResourceMethod method{};
             method.httpMethod = methodEntity.httpMethod;
             method.apiKeyRequired = methodEntity.apiKeyRequired;
+            method.integrationType = methodEntity.integrationType;
+            method.integrationUri = methodEntity.integrationUri;
+            method.integrationHttpMethod = methodEntity.integrationHttpMethod;
             resource.resourceMethods[key] = method;
         }
         return resource;
@@ -132,6 +136,9 @@ namespace Awsmock::Dto::ApiGateway {
             Database::Entity::ApiGateway::ResourceMethod method{};
             method.httpMethod = methodDto.httpMethod;
             method.apiKeyRequired = methodDto.apiKeyRequired;
+            method.integrationType = methodDto.integrationType;
+            method.integrationUri = methodDto.integrationUri;
+            method.integrationHttpMethod = methodDto.integrationHttpMethod;
             resourceEntity.resourceMethods[key] = method;
         }
         return resourceEntity;
@@ -158,6 +165,49 @@ namespace Awsmock::Dto::ApiGateway {
         result.reserve(resourceEntities.size());
         for (const auto &resourceEntity: resourceEntities) {
             result.emplace_back(map(resourceEntity));
+        }
+        return result;
+    }
+
+    // ========================================================================================================================
+    // Authorizer
+    // ========================================================================================================================
+    Authorizer Mapper::map(const Database::Entity::ApiGateway::Authorizer &authorizerEntity) {
+        Authorizer authorizer{};
+        authorizer.id = authorizerEntity.id;
+        authorizer.name = authorizerEntity.name;
+        authorizer.type = authorizerEntity.type;
+        authorizer.authType = authorizerEntity.authType;
+        authorizer.authorizerUri = authorizerEntity.authorizerUri;
+        authorizer.identitySource = authorizerEntity.identitySource;
+        authorizer.authorizerResultTtlInSeconds = authorizerEntity.authorizerResultTtlInSeconds;
+        return authorizer;
+    }
+
+    Database::Entity::ApiGateway::Authorizer Mapper::map(const Authorizer &authorizerDto) {
+        Database::Entity::ApiGateway::Authorizer authorizerEntity{};
+        authorizerEntity.id = authorizerDto.id;
+        authorizerEntity.name = authorizerDto.name;
+        authorizerEntity.type = authorizerDto.type;
+        authorizerEntity.authType = authorizerDto.authType;
+        authorizerEntity.authorizerUri = authorizerDto.authorizerUri;
+        authorizerEntity.identitySource = authorizerDto.identitySource;
+        authorizerEntity.authorizerResultTtlInSeconds = authorizerDto.authorizerResultTtlInSeconds;
+        return authorizerEntity;
+    }
+
+    std::map<std::string, Authorizer> Mapper::map(const std::map<std::string, Database::Entity::ApiGateway::Authorizer> &authorizers) {
+        std::map<std::string, Authorizer> result;
+        for (const auto &[key, authorizerEntity]: authorizers) {
+            result[key] = map(authorizerEntity);
+        }
+        return result;
+    }
+
+    std::map<std::string, Database::Entity::ApiGateway::Authorizer> Mapper::map(const std::map<std::string, Authorizer> &authorizers) {
+        std::map<std::string, Database::Entity::ApiGateway::Authorizer> result;
+        for (const auto &[key, authorizerDto]: authorizers) {
+            result[key] = map(authorizerDto);
         }
         return result;
     }
@@ -214,6 +264,7 @@ namespace Awsmock::Dto::ApiGateway {
         restApi.warnings = restApiEntity.warnings;
         restApi.created = restApiEntity.created;
         restApi.modified = restApiEntity.modified;
+        restApi.authorizers = map(restApiEntity.authorizers);
         restApi.resources = map(restApiEntity.resources);
         return restApi;
     }

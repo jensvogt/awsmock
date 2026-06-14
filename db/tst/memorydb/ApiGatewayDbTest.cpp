@@ -38,7 +38,7 @@ namespace Awsmock::Database {
         restApi.name = name;
         restApi.id = id;
         restApi.description = "test rest api";
-        restApi.apiKeySource = Entity::ApiGateway::HEADER;
+        restApi.apiKeySource = Entity::ApiGateway::ApiKeySourceType::HEADER;
         restApi.version = "1.0";
         restApi.disableExecuteApiEndpoint = false;
         restApi.minimumCompressionSize = 0;

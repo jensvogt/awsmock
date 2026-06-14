@@ -29,7 +29,7 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&DynamoDbServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&DynamoDbServer::shutdown, this));
 
         log_info << "DynamoDB server started";
     }
@@ -81,7 +81,7 @@ namespace Awsmock::Service {
         ModuleService{}.BackupModule("dynamodb", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
-    void DynamoDbServer::Shutdown() {
+    void DynamoDbServer::shutdown() {
         log_debug << "DynamoDb server shutdown, region: " << _region;
         Core::Scheduler::instance().Shutdown("dynamodb-monitoring");
         Core::Scheduler::instance().Shutdown("dynamodb-backup");

@@ -42,17 +42,17 @@ namespace Awsmock::Service {
         }
 
         // Connect stop signal
-        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&LambdaServer::Shutdown, this));
+        Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&LambdaServer::shutdown, this));
 
         log_debug << "Lambda server initialized";
     }
 
-    void LambdaServer::Shutdown() {
+    void LambdaServer::shutdown() {
         log_debug << "Lambda server shutdown, region: " << _region;
 
         Core::EventBus::instance().sigLambdaStopAll(_region);
 
-        _lambdaController.Shutdown();
+        _lambdaController.shutdown();
         Core::Scheduler::instance().Shutdown("lambda-monitoring");
         Core::Scheduler::instance().Shutdown("lambda-remove");
         Core::Scheduler::instance().Shutdown("lambda-remove-logs");

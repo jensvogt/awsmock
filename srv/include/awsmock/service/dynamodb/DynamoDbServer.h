@@ -42,7 +42,7 @@ namespace Awsmock::Service {
         /**
          * @brief Gracefully shutdown the server
          */
-        void Shutdown() override;
+        void shutdown() override;
 
       private:
 

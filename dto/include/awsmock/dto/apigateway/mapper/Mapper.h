@@ -10,9 +10,11 @@
 #include <awsmock/dto/apigateway/CreateResourceRequest.h>
 #include <awsmock/dto/apigateway/CreateResourceResponse.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
+#include <awsmock/dto/apigateway/model/Authorizer.h>
 #include <awsmock/dto/apigateway/model/Key.h>
 #include <awsmock/dto/apigateway/model/RestApi.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
+#include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/entity/apigateway/Resource.h>
 #include <awsmock/entity/apigateway/RestApi.h>
 
@@ -132,6 +134,38 @@ namespace Awsmock::Dto::ApiGateway {
          * @return list of resource DTOs
          */
         static std::vector<Resource> map(const std::vector<Database::Entity::ApiGateway::Resource> &resourceEntities);
+
+        /**
+         * @brief Maps an authorizer entity to an authorizer DTO
+         *
+         * @param authorizerEntity authorizer entity
+         * @return authorizer DTO
+         */
+        static Authorizer map(const Database::Entity::ApiGateway::Authorizer &authorizerEntity);
+
+        /**
+         * @brief Maps an authorizer DTO to an authorizer entity
+         *
+         * @param authorizerDto authorizer DTO
+         * @return authorizer entity
+         */
+        static Database::Entity::ApiGateway::Authorizer map(const Authorizer &authorizerDto);
+
+        /**
+         * @brief Maps a map of authorizer entities to a map of authorizer DTOs
+         *
+         * @param authorizers map of authorizer entities keyed by authorizer ID
+         * @return map of authorizer DTOs
+         */
+        static std::map<std::string, Authorizer> map(const std::map<std::string, Database::Entity::ApiGateway::Authorizer> &authorizers);
+
+        /**
+         * @brief Maps a map of authorizer DTOs to a map of authorizer entities
+         *
+         * @param authorizers map of authorizer DTOs keyed by authorizer ID
+         * @return map of authorizer entities
+         */
+        static std::map<std::string, Database::Entity::ApiGateway::Authorizer> map(const std::map<std::string, Authorizer> &authorizers);
 
         /**
          * @brief Maps a REST API request to a REST API entity

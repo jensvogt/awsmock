@@ -43,7 +43,7 @@ namespace Awsmock::Service {
         /**
          * @brief Shutdown module
          */
-        void Shutdown() override;
+        void shutdown() override;
 
       private:
 

@@ -27,6 +27,21 @@ namespace Awsmock::Database::Entity::ApiGateway {
         std::string httpMethod;
 
         /**
+         * @brief Integration type: AWS, AWS_PROXY, HTTP, HTTP_PROXY, MOCK
+         */
+        std::string integrationType;
+
+        /**
+         * @brief Integration URI (Lambda ARN path or HTTP URL)
+         */
+        std::string integrationUri;
+
+        /**
+         * @brief HTTP method to use when calling the backend
+         */
+        std::string integrationHttpMethod;
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as a MongoDB document.

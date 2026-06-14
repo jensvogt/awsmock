@@ -62,7 +62,7 @@ namespace Awsmock::Service {
         /**
          * @brief Shutdown controller and deregister scheduled tasks
          */
-        void Shutdown() override;
+        void shutdown() override;
 
       private:
 

@@ -45,7 +45,7 @@ namespace Awsmock::Service {
         /**
          * @brief Shutdown the cognito server
          */
-        void Shutdown() override;
+        void shutdown() override;
 
         /**
          * @brief Database connection

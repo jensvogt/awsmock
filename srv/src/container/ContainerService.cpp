@@ -117,6 +117,16 @@ namespace Awsmock::Service {
             log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
             return {};
         }
+        for (const auto &line: Core::StringUtils::SplitOnNewline(body)) {
+            if (line.empty()) continue;
+            boost::system::error_code ec;
+            if (const boost::json::value jv = boost::json::parse(line, ec); !ec && jv.is_object()) {
+                if (const auto *err = jv.as_object().if_contains("error")) {
+                    log_error << "Build image failed, name: " << name << ":" << tag << " error: " << boost::json::serialize(*err);
+                    return {};
+                }
+            }
+        }
         log_info << "Build image request finished, name: " << name << " version: " << tag << " runtime: " << runtime;
         return imageFile;
     }
@@ -130,9 +140,21 @@ namespace Awsmock::Service {
         std::string dockerFile = WriteApplicationDockerFile(codeDir, applicationEntity);
         const std::string imageFile = BuildImageFile(codeDir, applicationEntity.name);
 
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {}); statusCode != http::status::ok) {
+        auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + applicationEntity.name + ":" + applicationEntity.version, imageFile, {});
+        if (statusCode != http::status::ok) {
             log_error << "Build image failed, image: " << applicationEntity.name << ":" << applicationEntity.version << ", statusCode: " << statusCode << ", body: " << body;
             return {};
+        }
+        for (const auto &line: Core::StringUtils::SplitOnNewline(body)) {
+            if (line.empty()) continue;
+            boost::system::error_code ec;
+            const boost::json::value jv = boost::json::parse(line, ec);
+            if (!ec && jv.is_object()) {
+                if (const auto *err = jv.as_object().if_contains("error")) {
+                    log_error << "Build image failed, name: " << applicationEntity.name << ":" << applicationEntity.version << " error: " << boost::json::serialize(*err);
+                    return {};
+                }
+            }
         }
         log_info << "Build image successful, name: " << applicationEntity.name << ":" << applicationEntity.version;
         return dockerFile;
@@ -660,11 +682,15 @@ namespace Awsmock::Service {
             ofs << "CMD [\"" + handler + "\"]\n";
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
             ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/dist\n";
-            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
+            if (Core::DirUtils::DirectoryExists(Core::FileUtils::appendPath(codeDir, "node_modules"))) {
+                ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
+            }
             ofs << "COPY " << GetHandlerFileNodeJs22(handler) << " ${LAMBDA_TASK_ROOT}/dist\n";
             ofs << "CMD [\"" + handler + "\"]\n";
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
-            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
+            if (Core::DirUtils::DirectoryExists(Core::FileUtils::appendPath(codeDir, "node_modules"))) {
+                ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
+            }
             ofs << "COPY index.js ${LAMBDA_TASK_ROOT}\n";
             ofs << "CMD [\"" + handler + "\"]\n";
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
@@ -735,10 +761,10 @@ namespace Awsmock::Service {
 
         std::ofstream cfgOfs(Core::FileUtils::appendPath(codeDir, "config"));
         cfgOfs << "[default]\n"
-                << "region=" << region << "\n"
-                << "output=json\n";
+               << "region=" << region << "\n"
+               << "output=json\n";
 
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service
