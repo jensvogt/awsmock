@@ -60,7 +60,7 @@ namespace Awsmock::Service {
 
       private:
 
-        mutable logger_t _logger{boost::log::keywords::channel = "Module"};
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
         /**
          * Module service

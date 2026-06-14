@@ -123,7 +123,7 @@ namespace Awsmock::Database::Entity::SNS {
         /**
          * @brief Number of available messages
          */
-        long availableMessages{};
+        std::int64_t availableMessages{};
 
         /**
          * @brief Converts the entity to a MongoDB document

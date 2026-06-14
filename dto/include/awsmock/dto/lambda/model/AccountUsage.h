@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Lambda {
 
@@ -27,7 +27,7 @@ namespace Awsmock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz--consulting.com
      */
-    struct AccountUsage final : Common::BaseCounter<AccountUsage> {
+    struct AccountUsage final : Common::BaseObject<AccountUsage> {
 
         /**
          * Function count

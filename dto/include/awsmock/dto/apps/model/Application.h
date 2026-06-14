@@ -14,7 +14,7 @@
 #include <awsmock/dto/apps/model/RunType.h>
 #include <awsmock/dto/apps/model/Runtime.h>
 #include <awsmock/dto/apps/model/Status.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Apps {
 
@@ -25,7 +25,7 @@ namespace Awsmock::Dto::Apps {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Application final : Common::BaseCounter<Application> {
+    struct Application final : Common::BaseObject<Application> {
 
         /**
          * Application name

@@ -10,7 +10,7 @@
 
 // Awsmock includes
 #include <awsmock/dto/apigateway/model/ResourceMethod.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
@@ -24,7 +24,7 @@ namespace Awsmock::Dto::ApiGateway {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Resource final : Common::BaseCounter<Resource> {
+    struct Resource final : Common::BaseObject<Resource> {
 
         /**
          * @brief Resource ID

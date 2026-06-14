@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/ObjectVersion.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
@@ -26,7 +26,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Bucket final : Common::BaseCounter<Bucket> {
+    struct Bucket final : Common::BaseObject<Bucket> {
 
         /**
          * Bucket name

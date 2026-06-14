@@ -12,11 +12,11 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Lambda {
 
-    struct EventSourceMapping final : Common::BaseCounter<EventSourceMapping> {
+    struct EventSourceMapping final : Common::BaseObject<EventSourceMapping> {
 
         /**
          * Type

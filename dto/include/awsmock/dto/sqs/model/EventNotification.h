@@ -46,7 +46,7 @@ namespace Awsmock::Dto::SQS {
      * }
      * @endcode
      */
-    struct EventNotification final : Common::BaseCounter<EventNotification> {
+    struct EventNotification final : Common::BaseObject<EventNotification> {
 
         /**
          * S3 event record

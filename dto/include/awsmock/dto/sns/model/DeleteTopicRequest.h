@@ -10,11 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SNS {
 
-    struct DeleteTopicRequest final : Common::BaseCounter<DeleteTopicRequest> {
+    struct DeleteTopicRequest final : Common::BaseObject<DeleteTopicRequest> {
 
         /**
          * Topic ARN

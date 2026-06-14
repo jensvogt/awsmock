@@ -18,7 +18,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserPoolCounter final : Common::BaseCounter<UserCounter> {
+    struct UserPoolCounter final : Common::BaseObject<UserCounter> {
 
         /**
          * ID

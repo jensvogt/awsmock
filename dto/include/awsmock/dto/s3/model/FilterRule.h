@@ -13,7 +13,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/common/BaseDto.h>
 
 namespace Awsmock::Dto::S3 {
@@ -54,7 +54,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct FilterRule final : Common::BaseCounter<FilterRule> {
+    struct FilterRule final : Common::BaseObject<FilterRule> {
 
         /**
          * Name

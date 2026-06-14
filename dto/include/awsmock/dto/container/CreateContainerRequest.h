@@ -23,7 +23,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ExposedPort final : Common::BaseCounter<ExposedPort> {
+    struct ExposedPort final : Common::BaseObject<ExposedPort> {
 
       private:
 

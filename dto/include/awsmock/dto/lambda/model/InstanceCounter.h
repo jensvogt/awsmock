@@ -9,11 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Lambda {
 
-    struct InstanceCounter final : Common::BaseCounter<InstanceCounter> {
+    struct InstanceCounter final : Common::BaseObject<InstanceCounter> {
 
         /**
          * Instance ID

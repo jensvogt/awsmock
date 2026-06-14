@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Docker {
 
@@ -18,7 +18,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Port final : Common::BaseCounter<Port> {
+    struct Port final : Common::BaseObject<Port> {
 
         /**
          * Host IP address

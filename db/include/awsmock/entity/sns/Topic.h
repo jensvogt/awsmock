@@ -83,22 +83,22 @@ namespace Awsmock::Database::Entity::SNS {
         /**
          * Total size of all messages in bytes
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Total number of all messages
          */
-        long messages{};
+        std::int64_t messages{};
 
         /**
          * Total number of all messages send
          */
-        long messagesSend{};
+        std::int64_t messagesSend{};
 
         /**
          * Total number of all messages resend
          */
-        long messagesResend{};
+        std::int64_t messagesResend{};
 
         /**
          * Creation date

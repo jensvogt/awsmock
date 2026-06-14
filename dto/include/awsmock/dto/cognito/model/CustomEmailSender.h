@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Cognito {
 
@@ -28,7 +28,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CustomEmailSender final : Common::BaseCounter<CustomEmailSender> {
+    struct CustomEmailSender final : Common::BaseObject<CustomEmailSender> {
 
         /**
          * Lambda ARN

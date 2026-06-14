@@ -14,12 +14,12 @@
 
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/transfer/model/SftpAuthenticationMethod.h>
 
 namespace Awsmock::Dto::Transfer {
 
-    struct IdentityProviderDetails final : Common::BaseCounter<IdentityProviderDetails> {
+    struct IdentityProviderDetails final : Common::BaseObject<IdentityProviderDetails> {
 
         /**
          * Directory ID

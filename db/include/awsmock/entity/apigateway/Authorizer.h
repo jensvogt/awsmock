@@ -61,7 +61,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         /**
          * @brief TTL in seconds for cached authorizer results
          */
-        long authorizerResultTtlInSeconds{};
+        std::int64_t authorizerResultTtlInSeconds{};
 
         /**
          * @brief Creation timestamp

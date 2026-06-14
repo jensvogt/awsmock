@@ -12,7 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/s3/model/Owner.h>
 
 namespace Awsmock::Dto::S3 {
@@ -24,7 +24,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Content final : Common::BaseCounter<Content> {
+    struct Content final : Common::BaseObject<Content> {
 
         /**
          * ETag

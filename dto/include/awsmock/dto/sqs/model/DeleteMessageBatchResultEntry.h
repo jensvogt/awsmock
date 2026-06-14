@@ -14,7 +14,7 @@
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SQS {
 
@@ -23,7 +23,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteMessageBatchResultEntry final : Common::BaseCounter<DeleteMessageBatchResultEntry> {
+    struct DeleteMessageBatchResultEntry final : Common::BaseObject<DeleteMessageBatchResultEntry> {
 
 
         /**

@@ -37,7 +37,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ContainerPort final : Common::BaseCounter<ContainerPort> {
+    struct ContainerPort final : Common::BaseObject<ContainerPort> {
 
         /**
          * IP address
@@ -142,7 +142,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Container final : Common::BaseCounter<Container> {
+    struct Container final : Common::BaseObject<Container> {
 
         /**
          * Image ID

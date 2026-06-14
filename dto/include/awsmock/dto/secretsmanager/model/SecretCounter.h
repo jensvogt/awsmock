@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/secretsmanager/model/RotationRules.h>
 
 namespace Awsmock::Dto::SecretsManager {
@@ -54,7 +54,7 @@ namespace Awsmock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SecretCounter final : Common::BaseCounter<SecretCounter> {
+    struct SecretCounter final : Common::BaseObject<SecretCounter> {
 
         /**
          * AWS ARN

@@ -43,7 +43,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct MessageEntry final : Common::BaseCounter<MessageEntry> {
+    struct MessageEntry final : Common::BaseObject<MessageEntry> {
 
         /**
          * Message ID

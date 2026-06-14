@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Cognito {
 
@@ -21,7 +21,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AuthenticationResult final : Common::BaseCounter<AuthenticationResult> {
+    struct AuthenticationResult final : Common::BaseObject<AuthenticationResult> {
 
         /**
          * Access token

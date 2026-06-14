@@ -12,7 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/s3/model/Owner.h>
 #include <awsmock/dto/s3/model/UserIdentity.h>
 
@@ -67,7 +67,7 @@ namespace Awsmock::Dto::S3 {
      *   ]
      * }
      */
-    struct RequestParameter final : Common::BaseCounter<RequestParameter> {
+    struct RequestParameter final : Common::BaseObject<RequestParameter> {
 
         /**
          * Request parameters
@@ -99,7 +99,7 @@ namespace Awsmock::Dto::S3 {
         }
     };
 
-    struct ResponseElements final : Common::BaseCounter<ResponseElements> {
+    struct ResponseElements final : Common::BaseObject<ResponseElements> {
 
         /**
          * Request ID
@@ -128,7 +128,7 @@ namespace Awsmock::Dto::S3 {
         }
     };
 
-    struct Object final : Common::BaseCounter<Object> {
+    struct Object final : Common::BaseObject<Object> {
 
         /**
          * S3 object key
@@ -195,7 +195,7 @@ namespace Awsmock::Dto::S3 {
         }
     };
 
-    struct NotificationBucket final : Common::BaseCounter<NotificationBucket> {
+    struct NotificationBucket final : Common::BaseObject<NotificationBucket> {
 
         /**
          * Bucket name
@@ -231,7 +231,7 @@ namespace Awsmock::Dto::S3 {
         }
     };
 
-    struct S3 final : Common::BaseCounter<S3> {
+    struct S3 final : Common::BaseObject<S3> {
 
         /**
          * Schema version
@@ -274,7 +274,7 @@ namespace Awsmock::Dto::S3 {
         }
     };
 
-    struct Record final : Common::BaseCounter<Record> {
+    struct Record final : Common::BaseObject<Record> {
 
         /**
          * Record version
@@ -353,7 +353,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EventNotification final : Common::BaseCounter<EventNotification> {
+    struct EventNotification final : Common::BaseObject<EventNotification> {
 
         /**
          * S3 event record

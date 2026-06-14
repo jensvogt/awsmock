@@ -79,7 +79,7 @@ namespace Awsmock::Database::Entity::SQS {
         /**
          * Queue size in bytes
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Content type

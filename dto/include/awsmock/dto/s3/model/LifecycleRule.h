@@ -13,7 +13,7 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/s3/model/LifecycleStatus.h>
 #include <awsmock/dto/s3/model/LifecycleTransition.h>
@@ -25,7 +25,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LifecycleRule final : Common::BaseCounter<LifecycleRule> {
+    struct LifecycleRule final : Common::BaseObject<LifecycleRule> {
 
         /**
          * @brief ID

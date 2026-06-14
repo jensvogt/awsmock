@@ -14,7 +14,7 @@
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Docker {
 
@@ -26,7 +26,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct MemoryStats final : Common::BaseCounter<MemoryStats> {
+    struct MemoryStats final : Common::BaseObject<MemoryStats> {
 
         /**
          * Cached memory

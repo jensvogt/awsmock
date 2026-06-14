@@ -5,7 +5,7 @@
 #pragma once
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::ApiGateway {
 

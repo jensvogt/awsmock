@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyState.h>
@@ -34,7 +34,7 @@ namespace Awsmock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct KeyCounter final : Common::BaseCounter<KeyCounter> {
+    struct KeyCounter final : Common::BaseObject<KeyCounter> {
 
         /**
          * Key ID

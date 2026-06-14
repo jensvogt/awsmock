@@ -66,12 +66,12 @@ namespace Awsmock::Database::Entity::DynamoDb {
         /**
          * Item count
          */
-        long items{};
+        std::int64_t items{};
 
         /**
          * Size in bytes
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Provisioned throughput

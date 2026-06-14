@@ -7,11 +7,11 @@
 // AwsMock includes
 #include <awsmock/dto/apigateway/model/Authorizer.h>
 #include <awsmock/dto/apigateway/model/Resource.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
-    struct RestApi final : Common::BaseCounter<RestApi> {
+    struct RestApi final : Common::BaseObject<RestApi> {
 
         /**
          * ID

@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::S3 {
 
@@ -24,7 +24,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct BucketCounter final : Common::BaseCounter<BucketCounter> {
+    struct BucketCounter final : Common::BaseObject<BucketCounter> {
 
         /**
          * Bucket name

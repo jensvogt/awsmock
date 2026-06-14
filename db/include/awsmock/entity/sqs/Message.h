@@ -63,17 +63,17 @@ namespace Awsmock::Database::Entity::SQS {
         /**
          * Send retries
          */
-        long retries{};
+        std::int64_t retries{};
 
         /**
          * Message size
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Visibility timeout
          */
-        long visibilityTimeout = 30;
+        std::int64_t visibilityTimeout = 30;
 
         /**
          * Message ID

@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/container/model/CpuStat.h>
 #include <awsmock/dto/container/model/MemoryStat.h>
 
@@ -26,7 +26,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ContainerStat final : Common::BaseCounter<ContainerStat> {
+    struct ContainerStat final : Common::BaseObject<ContainerStat> {
 
         /**
          * ContainerId

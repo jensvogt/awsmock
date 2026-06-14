@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Docker {
 
@@ -19,7 +19,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Platform final : Common::BaseCounter<Platform> {
+    struct Platform final : Common::BaseObject<Platform> {
 
         /**
          * Platform name

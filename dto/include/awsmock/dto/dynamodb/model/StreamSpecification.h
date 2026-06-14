@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/dynamodb/model/StreamViewType.h>
 
 namespace Awsmock::Dto::DynamoDb {
@@ -20,7 +20,7 @@ namespace Awsmock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct StreamSpecification final : Common::BaseCounter<StreamSpecification> {
+    struct StreamSpecification final : Common::BaseObject<StreamSpecification> {
 
         /**
          * Enabled

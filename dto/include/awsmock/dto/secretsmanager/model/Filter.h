@@ -12,7 +12,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SecretsManager {
 
@@ -31,7 +31,7 @@ namespace Awsmock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Filter final : Common::BaseCounter<Filter> {
+    struct Filter final : Common::BaseObject<Filter> {
 
         /**
          * Filter key

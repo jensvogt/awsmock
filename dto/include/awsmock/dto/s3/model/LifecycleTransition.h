@@ -9,7 +9,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/s3/model/StorageClass.h>
 
 namespace Awsmock::Dto::S3 {
@@ -21,7 +21,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LifecycleTransition final : Common::BaseCounter<LifecycleTransition> {
+    struct LifecycleTransition final : Common::BaseObject<LifecycleTransition> {
 
         /**
          * @brief Fixed timestamp

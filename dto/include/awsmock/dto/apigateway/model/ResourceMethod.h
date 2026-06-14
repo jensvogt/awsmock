@@ -5,7 +5,7 @@
 #pragma once
 
 // Awsmock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
@@ -14,7 +14,7 @@ namespace Awsmock::Dto::ApiGateway {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ResourceMethod final : Common::BaseCounter<ResourceMethod> {
+    struct ResourceMethod final : Common::BaseObject<ResourceMethod> {
 
         /**
          * @brief Is an API key required flag

@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/cognito/model/Group.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 
@@ -25,7 +25,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserCounter final : Common::BaseCounter<UserCounter> {
+    struct UserCounter final : Common::BaseObject<UserCounter> {
 
         /**
          * MongoDB OID

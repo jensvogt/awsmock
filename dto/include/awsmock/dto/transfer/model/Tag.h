@@ -11,11 +11,11 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Transfer {
 
-    struct Tag final : Common::BaseCounter<Tag> {
+    struct Tag final : Common::BaseObject<Tag> {
 
         /**
          * Key

@@ -20,7 +20,7 @@ namespace Awsmock::Dto::SNS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Record final : Common::BaseCounter<Record> {
+    struct Record final : Common::BaseObject<Record> {
 
         /**
          * Message ID

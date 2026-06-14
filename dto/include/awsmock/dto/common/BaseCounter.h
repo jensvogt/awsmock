@@ -2,34 +2,29 @@
 // Created by vogje01 on 5/18/24.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_BASE_COUNTER_H
-#define AWSMOCK_DTO_COMMON_BASE_COUNTER_H
-
-// Boost includes
-#include <boost/describe.hpp>
-#include <boost/json.hpp>
+#pragma once
 
 // AwsMock includes
-#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Common {
 
     class BaseClientCommand;
 
     /**
-     * @brief Base Counter for the frontend
+     * @brief Base counter for top-level request/response DTOs
      *
      * @par
-     * This base class declares generalized ToString and &lt;&lt; operator methods, as well as generalized ToJson, FromJson methods.
+     * Extends BaseObject with request-level metadata: region, requestId, user, contentType.
+     * Also provides FromJson overloads that populate those fields from a client command.
+     * Child DTO objects (model/*) should use BaseObject instead.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     template<typename T>
-    struct BaseCounter {
-
-        virtual ~BaseCounter() = default;
+    struct BaseCounter : BaseObject<T> {
 
         /**
          * Request ID
@@ -51,34 +46,7 @@ namespace Awsmock::Dto::Common {
          */
         std::string contentType{};
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] virtual std::string ToJson() const {
-            std::stringstream ss;
-            ss << boost::json::value_from(*dynamic_cast<const T *>(this));
-            return ss.str();
-        }
-
-        /**
-         * @brief Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         * @return object of class <T>
-         */
-        static T FromJson(const std::string &jsonString) {
-            if (jsonString.empty()) {
-                return {};
-            }
-            const boost::json::value jv = boost::json::parse(jsonString);
-            T t = boost::json::value_to<T>(jv);
-            if (jv.is_array()) {
-                return t;
-            }
-            return t;
-        }
+        using BaseObject<T>::FromJson;
 
         /**
          * @brief Convert from JSON representation
@@ -95,9 +63,6 @@ namespace Awsmock::Dto::Common {
             }
             const boost::json::value jv = boost::json::parse(jsonString);
             T t = boost::json::value_to<T>(jv);
-            if (jv.is_array()) {
-                return t;
-            }
             t.region = region;
             t.user = user;
             t.requestId = requestId;
@@ -111,54 +76,7 @@ namespace Awsmock::Dto::Common {
          * @return object of class <T>
          */
         static T FromJson(const BaseClientCommand &clientCommand) {
-            return FromJson(clientCommand.payload, clientCommand.region, clientCommand.user, clientCommand.requestId);
-        }
-
-#ifndef _WIN32
-        /**
-         * @brief Return the demangled type name.
-         *
-         * @param name C++ mangled class name
-         * @return demangled name
-         */
-        static std::string GetDemangledName(const std::string &name) {
-            int status = -1;
-            // abi::__cxa_demangle liefert einen mit malloc() allozierten char*
-
-            if (char *demangled = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status); status == 0 && demangled != nullptr) {
-                std::string result(demangled);
-                std::free(demangled);// WICHTIG: Speicher freigeben
-                return result;
-            }
-            return name;
-        }
-#endif
-
-        /**
-         * @brief Generalized toString method
-         *
-         * @return JSON serialized object
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream s;
-#ifdef _WIN32
-            std::operator<<(s, typeid(T).name());
-#else
-            std::operator<<(s, GetDemangledName(typeid(T).name()));
-#endif
-            std::operator<<(s, std::string("="));
-            std::operator<<(s, ToJson());
-            return s.str();
-        }
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const BaseCounter &e) {
-            std::operator<<(os, e.ToString());
-            return os;
+            return BaseCounter<T>::FromJson(clientCommand.payload, clientCommand.region, clientCommand.user, clientCommand.requestId);
         }
 
       private:
@@ -193,5 +111,3 @@ namespace Awsmock::Dto::Common {
     };
 
 }// namespace Awsmock::Dto::Common
-
-#endif// AWSMOCK_DTO_COMMON_BASE_COUNTER_H

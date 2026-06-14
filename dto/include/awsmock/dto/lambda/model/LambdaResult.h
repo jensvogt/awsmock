@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Lambda {
 
@@ -30,7 +30,7 @@ namespace Awsmock::Dto::Lambda {
      * @endcode
      *
      */
-    struct LambdaResult final : Common::BaseCounter<LambdaResult> {
+    struct LambdaResult final : Common::BaseObject<LambdaResult> {
 
         /**
          * Function ARN

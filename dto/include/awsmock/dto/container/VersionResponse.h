@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/container/model/Platform.h>
 
 namespace Awsmock::Dto::Docker {
@@ -20,7 +21,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Details final : Common::BaseCounter<Details> {
+    struct Details final : Common::BaseObject<Details> {
 
         /**
          * API version
@@ -75,7 +76,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Component final : Common::BaseCounter<Component> {
+    struct Component final : Common::BaseObject<Component> {
 
         /**
          * Platform name

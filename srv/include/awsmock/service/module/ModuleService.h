@@ -52,7 +52,8 @@ namespace Awsmock::Service {
      */
     class ModuleService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -170,11 +171,12 @@ namespace Awsmock::Service {
          */
         Dto::Module::GetLogLevelResponse getLogLevels(const Dto::Module::GetLogLevelRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
-        mutable logger_t _logger{boost::log::keywords::channel = "Module"};
+        mutable logger_t _logger{boost::log::keywords::channel = "Core"};
 
         /**
          * @brief Import a local S3 file
@@ -192,4 +194,4 @@ namespace Awsmock::Service {
         std::shared_ptr<Database::IModuleRepository> _moduleDatabase = Database::RepositoryFactory::instance().moduleRepository();
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

@@ -54,7 +54,7 @@ namespace Awsmock::Database::Entity::Cognito {
         /**
          * Precedence
          */
-        long precedence{};
+        std::int64_t precedence{};
 
         /**
          * Creation date

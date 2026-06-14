@@ -5,7 +5,7 @@
 #pragma once
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
@@ -14,7 +14,7 @@ namespace Awsmock::Dto::ApiGateway {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Authorizer final : Common::BaseCounter<Authorizer> {
+    struct Authorizer final : Common::BaseObject<Authorizer> {
 
         /**
          * @brief Authorizer ID

@@ -22,7 +22,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EventRecord final : Common::BaseCounter<EventRecord> {
+    struct EventRecord final : Common::BaseObject<EventRecord> {
 
         /**
          * Message ID

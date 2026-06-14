@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SQS {
 
@@ -19,7 +19,7 @@ namespace Awsmock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RedrivePolicy final : Common::BaseCounter<RedrivePolicy> {
+    struct RedrivePolicy final : Common::BaseObject<RedrivePolicy> {
 
         /**
          * Dead letter queue target ARN

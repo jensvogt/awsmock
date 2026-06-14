@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Docker {
 
@@ -23,7 +23,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Image final : Common::BaseCounter<Image> {
+    struct Image final : Common::BaseObject<Image> {
 
         /**
          * Image ID

@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 #define LAMBDA_INTERNAL_PORT 8080
 
@@ -22,7 +22,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct State final : Common::BaseCounter<State> {
+    struct State final : Common::BaseObject<State> {
 
         /**
          * Error

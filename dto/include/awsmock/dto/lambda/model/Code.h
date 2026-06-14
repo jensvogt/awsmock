@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Lambda {
 
@@ -30,7 +30,7 @@ namespace Awsmock::Dto::Lambda {
      * @endcode
      *
      */
-    struct Code final : Common::BaseCounter<Code> {
+    struct Code final : Common::BaseObject<Code> {
 
         /**
          * URI of a container image in the Amazon ECR registry.

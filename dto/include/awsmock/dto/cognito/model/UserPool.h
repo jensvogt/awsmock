@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Cognito {
 
@@ -22,7 +22,7 @@ namespace Awsmock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserPool final : Common::BaseCounter<UserPool> {
+    struct UserPool final : Common::BaseObject<UserPool> {
 
         /**
          * ID

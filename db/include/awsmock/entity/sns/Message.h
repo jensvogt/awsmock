@@ -73,7 +73,7 @@ namespace Awsmock::Database::Entity::SNS {
         /**
          * Message size
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Last send datetime

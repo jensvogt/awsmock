@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::S3 {
 
@@ -19,7 +19,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct BucketConstraint final : Common::BaseCounter<BucketConstraint> {
+    struct BucketConstraint final : Common::BaseObject<BucketConstraint> {
 
         /**
          * Bucket location

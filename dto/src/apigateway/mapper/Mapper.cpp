@@ -5,7 +5,6 @@
 #include "awsmock/dto/apigateway/CreateRestApiRequest.h"
 #include "awsmock/entity/apigateway/RestApi.h"
 
-
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/entity/apigateway/Resource.h>
@@ -167,6 +166,17 @@ namespace Awsmock::Dto::ApiGateway {
             result.emplace_back(map(resourceEntity));
         }
         return result;
+    }
+
+    GetResourcesResponse Mapper::map(const GetResourcesRequest &request, const std::map<std::string, Database::Entity::ApiGateway::Resource> &resources) {
+        GetResourcesResponse response{};
+        response.region = request.region;
+        response.user = request.user;
+        response.requestId = request.requestId;
+        for (const auto &[id, resourceEntity]: resources) {
+            response.resources.emplace_back(map(resourceEntity));
+        }
+        return response;
     }
 
     // ========================================================================================================================

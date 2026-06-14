@@ -14,7 +14,7 @@
 
 namespace Awsmock::Dto::SNS {
 
-    struct Message final : Common::BaseCounter<Message> {
+    struct Message final : Common::BaseObject<Message> {
 
         /**
          * Topic ARM

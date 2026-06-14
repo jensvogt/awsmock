@@ -29,7 +29,7 @@ namespace Awsmock::Database::Entity::SecretsManager {
         /**
          * Automatic rotation period
          */
-        long automaticallyAfterDays{};
+        std::int64_t automaticallyAfterDays{};
 
         /**
          * Duration

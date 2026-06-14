@@ -11,7 +11,7 @@
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::SecretsManager {
 
@@ -30,7 +30,7 @@ namespace Awsmock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SecretValue final : Common::BaseCounter<SecretValue> {
+    struct SecretValue final : Common::BaseObject<SecretValue> {
 
         /**
          * Key

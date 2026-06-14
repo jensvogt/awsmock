@@ -96,7 +96,7 @@ namespace Awsmock::Database::Entity::DynamoDb {
         /**
          * Item size in bytes
          */
-        long size{};
+        std::int64_t size{};
 
         /**
          * Attributes

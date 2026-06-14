@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/container/model/MemoryStats.h>
 
 namespace Awsmock::Dto::Docker {
@@ -22,7 +22,7 @@ namespace Awsmock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct MemoryStat final : Common::BaseCounter<MemoryStat> {
+    struct MemoryStat final : Common::BaseObject<MemoryStat> {
 
         /**
          * Maximal usage in bytes

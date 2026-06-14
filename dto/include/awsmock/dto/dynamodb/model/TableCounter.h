@@ -7,11 +7,11 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::DynamoDb {
 
-    struct TableCounter final : Common::BaseCounter<TableCounter> {
+    struct TableCounter final : Common::BaseObject<TableCounter> {
 
         /**
          * AWS region

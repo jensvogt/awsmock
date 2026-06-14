@@ -112,7 +112,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         /**
          * Minimal compression size
          */
-        long minimumCompressionSize{};
+        std::int64_t minimumCompressionSize{};
 
         /**
          * @brief Enabled flag

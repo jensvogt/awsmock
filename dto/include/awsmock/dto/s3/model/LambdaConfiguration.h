@@ -45,7 +45,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaConfiguration final : Common::BaseCounter<LambdaConfiguration> {
+    struct LambdaConfiguration final : Common::BaseObject<LambdaConfiguration> {
 
         /**
          * ID, optional, if empty, a random ID will be generated

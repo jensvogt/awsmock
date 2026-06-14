@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Module {
 
@@ -20,7 +20,7 @@ namespace Awsmock::Dto::Module {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GatewayConfig final : Common::BaseCounter<GatewayConfig> {
+    struct GatewayConfig final : Common::BaseObject<GatewayConfig> {
 
         /**
          * Endpoint

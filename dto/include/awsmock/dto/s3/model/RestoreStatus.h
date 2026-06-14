@@ -9,7 +9,7 @@
 #include <chrono>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::S3 {
 
@@ -20,7 +20,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RestoreStatus final : Common::BaseCounter<RestoreStatus> {
+    struct RestoreStatus final : Common::BaseObject<RestoreStatus> {
 
         /**
          * Is restore in progress

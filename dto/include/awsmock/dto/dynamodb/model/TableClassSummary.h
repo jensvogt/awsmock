@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::DynamoDb {
 
@@ -25,7 +25,7 @@ namespace Awsmock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct TableClassSummary final : Common::BaseCounter<TableClassSummary> {
+    struct TableClassSummary final : Common::BaseObject<TableClassSummary> {
 
         /**
          * Last update Unix timestamp

@@ -46,7 +46,7 @@ namespace Awsmock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueueConfiguration final : Common::BaseCounter<QueueConfiguration> {
+    struct QueueConfiguration final : Common::BaseObject<QueueConfiguration> {
 
         /**
          * ID, optional, if empty, a random ID will be generated
