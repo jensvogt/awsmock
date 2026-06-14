@@ -905,7 +905,6 @@ namespace Awsmock::Service {
 
             Dto::S3::ObjectCounter objectCounter;
             objectCounter.oid = object.oid;
-            objectCounter.region = object.region;
             objectCounter.bucketName = object.bucket;
             objectCounter.key = object.key;
             objectCounter.owner = object.owner;
@@ -1255,7 +1254,6 @@ namespace Awsmock::Service {
                     s3.object = s3Object;
 
                     Dto::S3::Record record;
-                    record.region = region;
                     record.eventName = event;
                     record.s3 = s3;
                     Dto::S3::EventNotification eventNotification;
@@ -1288,7 +1286,6 @@ namespace Awsmock::Service {
                     s3.object = s3Object;
 
                     Dto::S3::Record record;
-                    record.region = region;
                     record.eventName = event;
                     record.s3 = s3;
 
@@ -1321,7 +1318,6 @@ namespace Awsmock::Service {
                     s3.object = s3Object;
 
                     Dto::S3::Record record;
-                    record.region = region;
                     record.eventName = event;
                     record.s3 = s3;
                     Dto::S3::EventNotification eventNotification;
@@ -1705,4 +1701,4 @@ namespace Awsmock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

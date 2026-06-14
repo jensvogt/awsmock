@@ -24,7 +24,6 @@ namespace Awsmock::Service {
                 int port = configuration.get<int>("awsmock.gateway.http.port");
                 std::string endpoint = "http://" + host + ":" + std::to_string(port);
                 Dto::Module::GatewayConfig config;
-                config.region = configuration.get<std::string>("awsmock.region");
                 config.endpoint = endpoint;
                 config.host = host;
                 config.address = address;

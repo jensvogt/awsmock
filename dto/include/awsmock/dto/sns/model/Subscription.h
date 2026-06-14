@@ -63,7 +63,6 @@ namespace Awsmock::Dto::SNS {
 
                 document document;
                 Core::Bson::BsonUtils::SetStringValue(document, "id", id);
-                Core::Bson::BsonUtils::SetStringValue(document, "region", region);
                 Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
                 Core::Bson::BsonUtils::SetStringValue(document, "protocol", protocol);
                 Core::Bson::BsonUtils::SetStringValue(document, "subscriptionArn", subscriptionArn);
@@ -93,9 +92,6 @@ namespace Awsmock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Subscription const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"id", obj.id},
                     {"topicArn", obj.topicArn},
                     {"protocol", obj.protocol},

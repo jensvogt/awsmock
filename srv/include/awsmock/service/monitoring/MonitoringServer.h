@@ -7,7 +7,7 @@
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/service/apps/ApplicationService.h>
+#include <awsmock/service/application/ApplicationService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/monitoring/MetricDockerCollector.h>

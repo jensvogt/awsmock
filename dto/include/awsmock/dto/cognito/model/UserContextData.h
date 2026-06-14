@@ -67,9 +67,6 @@ namespace Awsmock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UserContextData const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"EncodedData", obj.encodedData},
                     {"IpAddress", obj.ipAddress},
             };

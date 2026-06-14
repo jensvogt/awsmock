@@ -2,8 +2,7 @@
 // Created by vogje01 on 1/9/26.
 //
 
-#ifndef AWSMOCK_DTO_S3_LIFECYCLE_TRANSITION_H
-#define AWSMOCK_DTO_S3_LIFECYCLE_TRANSITION_H
+#pragma once
 
 // Boost includes
 #include <boost/property_tree/ptree.hpp>
@@ -74,9 +73,6 @@ namespace Awsmock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LifecycleTransition const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Date", Core::DateTimeUtils::ToISO8601(obj.date)},
                     {"Days", obj.days},
                     {"StorageClass", StorageClassToString(obj.storageClass)},
@@ -85,5 +81,3 @@ namespace Awsmock::Dto::S3 {
     };
 
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_LIFECYCLE_TRANSITION_H

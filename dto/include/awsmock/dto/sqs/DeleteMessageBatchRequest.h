@@ -2,15 +2,13 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H
-#define AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/dto/common//BaseCounter.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchEntry.h>
 
 namespace Awsmock::Dto::SQS {
@@ -57,5 +55,3 @@ namespace Awsmock::Dto::SQS {
     };
 
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_DELETE_MESSAGE_BATCH_REQUEST_H

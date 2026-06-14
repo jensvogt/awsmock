@@ -1,5 +1,5 @@
 
-#include <awsmock/service/apps/ApplicationHandler.h>
+#include <awsmock/service/application/ApplicationHandler.h>
 
 namespace Awsmock::Service {
 
@@ -32,7 +32,6 @@ namespace Awsmock::Service {
                 case Dto::Common::ApplicationCommandType::UPDATE_APPLICATION: {
 
                     Dto::Apps::UpdateApplicationRequest serviceRequest = Dto::Apps::UpdateApplicationRequest::FromJson(clientCommand);
-                    serviceRequest.application.region = region;
                     Dto::Apps::GetApplicationResponse serviceResponse = _applicationService.UpdateApplication(serviceRequest);
                     log_info << "Application updated, name: " << serviceRequest.application.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());

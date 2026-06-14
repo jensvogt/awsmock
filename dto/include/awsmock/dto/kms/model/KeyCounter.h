@@ -37,6 +37,11 @@ namespace Awsmock::Dto::KMS {
     struct KeyCounter final : Common::BaseObject<KeyCounter> {
 
         /**
+         * Region
+         */
+        std::string region;
+
+        /**
          * Key ID
          */
         std::string keyId;
@@ -116,9 +121,6 @@ namespace Awsmock::Dto::KMS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, KeyCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"keyId", obj.keyId},
                     {"keyArn", obj.arn},
                     {"description", obj.description},

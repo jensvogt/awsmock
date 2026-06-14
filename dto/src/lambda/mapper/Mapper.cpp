@@ -2,7 +2,6 @@
 // Created by vogje01 on 5/10/24.
 //
 
-
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 
 namespace Awsmock::Dto::Lambda {
@@ -10,8 +9,6 @@ namespace Awsmock::Dto::Lambda {
     Function Mapper::mapFunction(const Database::Entity::Lambda::Lambda &lambdaEntity) {
 
         Function function;
-        function.region = lambdaEntity.region;
-        function.user = lambdaEntity.user;
         function.functionName = lambdaEntity.function;
         function.functionArn = lambdaEntity.arn;
         function.codeSha256 = lambdaEntity.codeSha256;
@@ -142,7 +139,6 @@ namespace Awsmock::Dto::Lambda {
         ListFunctionCountersResponse response;
         for (auto &lambdaEntity: lambdaEntities) {
             FunctionCounter counter;
-            counter.region = lambdaEntity.region;
             counter.functionName = lambdaEntity.function;
             counter.functionArn = lambdaEntity.arn;
             counter.invocations = lambdaEntity.invocations;

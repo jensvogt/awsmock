@@ -2,7 +2,7 @@
 // Created by vogje01 on 7/19/25.
 //
 
-#include <awsmock/service/apps/ApplicationLogSession.h>
+#include <awsmock/service/application/ApplicationLogSession.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Application"};

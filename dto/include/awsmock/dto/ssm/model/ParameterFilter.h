@@ -2,8 +2,7 @@
 // Created by vogje01 on 8/23/24.
 //
 
-#ifndef AWSMOCK_DTO_SSM_MODEL_PARAMETER_FILTERS_H
-#define AWSMOCK_DTO_SSM_MODEL_PARAMETER_FILTERS_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -112,9 +111,6 @@ namespace Awsmock::Dto::SSM {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ParameterFilter const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Key", obj.key},
                     {"Option", obj.option},
                     {"ParameterFilters", boost::json::value_from(obj.parameterFilters)},
@@ -123,5 +119,3 @@ namespace Awsmock::Dto::SSM {
     };
 
 }// namespace Awsmock::Dto::SSM
-
-#endif// AWSMOCK_DTO_SSM_MODEL_PARAMETER_FILTERS_H

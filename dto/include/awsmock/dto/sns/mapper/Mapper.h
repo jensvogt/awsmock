@@ -28,7 +28,6 @@ namespace Awsmock::Dto::SNS {
 
         static Topic toDto(const Database::Entity::SNS::Topic &e) {
             Topic d;
-            d.region = e.region;
             d.topicArn = e.topicArn;
             d.topicName = e.topicName;
             d.messages = e.messages;
@@ -42,7 +41,6 @@ namespace Awsmock::Dto::SNS {
 
         static Database::Entity::SNS::Topic toEntity(const Topic &d) {
             Database::Entity::SNS::Topic e;
-            e.region = d.region;
             e.topicArn = d.topicArn;
             e.topicName = d.topicName;
             e.messages = d.messages;
@@ -60,7 +58,6 @@ namespace Awsmock::Dto::SNS {
 
         static TopicCounter toDto(const Database::Entity::SNS::Topic &e) {
             TopicCounter d;
-            d.region = e.region;
             d.topicArn = e.topicArn;
             d.topicName = e.topicName;
             d.messages = e.messages;
@@ -74,7 +71,6 @@ namespace Awsmock::Dto::SNS {
 
         static Database::Entity::SNS::Topic toEntity(const TopicCounter &d) {
             Database::Entity::SNS::Topic e;
-            e.region = d.region;
             e.topicArn = d.topicArn;
             e.topicName = d.topicName;
             e.messages = d.messages;
@@ -131,7 +127,6 @@ namespace Awsmock::Dto::SNS {
 
         static Message toDto(const Database::Entity::SNS::Message &e) {
             Message d;
-            d.region = e.region;
             d.topicArn = e.topicArn;
             d.targetArn = e.targetArn;
             d.contentType = e.contentType;
@@ -146,7 +141,6 @@ namespace Awsmock::Dto::SNS {
 
         static Database::Entity::SNS::Message toEntity(const Message &d) {
             Database::Entity::SNS::Message e;
-            e.region = d.region;
             e.topicArn = d.topicArn;
             e.targetArn = d.targetArn;
             e.contentType = d.contentType;
@@ -166,7 +160,6 @@ namespace Awsmock::Dto::SNS {
 
         static MessageCounter toDto(const Database::Entity::SNS::Message &e) {
             MessageCounter d;
-            d.region = e.region;
             d.topicArn = e.topicArn;
             d.contentType = e.contentType;
             d.messageId = e.messageId;

@@ -49,6 +49,24 @@ namespace Awsmock::Dto::Common {
         using BaseObject<T>::FromJson;
 
         /**
+         * @brief Serialize to JSON, automatically injecting region/user/requestId metadata.
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const override {
+            boost::json::value jv = boost::json::value_from(*dynamic_cast<const T *>(this));
+            if (jv.is_object()) {
+                auto &obj = jv.as_object();
+                obj["region"] = region;
+                obj["user"] = user;
+                obj["requestId"] = requestId;
+            }
+            std::stringstream ss;
+            ss << jv;
+            return ss.str();
+        }
+
+        /**
          * @brief Convert from JSON representation
          *
          * @param jsonString JSON string
@@ -76,7 +94,19 @@ namespace Awsmock::Dto::Common {
          * @return object of class <T>
          */
         static T FromJson(const BaseClientCommand &clientCommand) {
-            return BaseCounter<T>::FromJson(clientCommand.payload, clientCommand.region, clientCommand.user, clientCommand.requestId);
+            return BaseCounter::FromJson(clientCommand.payload, clientCommand.region, clientCommand.user, clientCommand.requestId);
+        }
+
+        /**
+         * @brief Copy region, user, requestId from another BaseCounter into this object.
+         *
+         * @param source request DTO to copy metadata from
+         */
+        template<typename U>
+        void copyMetadata(const BaseCounter<U> &source) {
+            region = source.region;
+            user = source.user;
+            requestId = source.requestId;
         }
 
       private:

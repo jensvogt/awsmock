@@ -41,6 +41,11 @@ namespace Awsmock::Dto::Transfer {
     struct User final : Common::BaseObject<User> {
 
         /**
+         * Region
+         */
+        std::string region;
+
+        /**
          * User name
          */
         std::string userName;
@@ -103,7 +108,6 @@ namespace Awsmock::Dto::Transfer {
 
             try {
 
-                region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
                 arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
                 role = Core::Bson::BsonUtils::GetStringValue(document, "Role");
                 userName = Core::Bson::BsonUtils::GetStringValue(document, "UserName");
@@ -134,9 +138,6 @@ namespace Awsmock::Dto::Transfer {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, User const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"Arn", obj.arn},
                     {"UserName", obj.userName},
                     {"Role", obj.role},

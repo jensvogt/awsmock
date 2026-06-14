@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_MODEL_TOKEN_VALIDITY_UNITS_H
-#define AWSMOCK_DTO_COGNITO_MODEL_TOKEN_VALIDITY_UNITS_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -75,16 +74,10 @@ namespace Awsmock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TokenValidityUnits const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"AccessToken", ValidityUnitToString(obj.accessToken)},
                     {"IdToken", ValidityUnitToString(obj.idToken)},
                     {"RefreshToken", ValidityUnitToString(obj.refreshToken)},
             };
         }
     };
-
 }// namespace Awsmock::Dto::Cognito
-
-#endif// AWSMOCK_DTO_COGNITO_MODEL_TOKEN_VALIDITY_UNITS_H

@@ -1150,7 +1150,6 @@ namespace Awsmock::Service {
 
         // Create the event record
         Dto::SNS::Record record;
-        record.region = lambda.region;
         record.messageId = message.messageId;
         record.receiptHandle = Core::AwsUtils::CreateSnsReceiptHandler();
         record.body = message.message;

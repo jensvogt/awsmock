@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include <awsmock/service/apps/ApplicationLogServer.h>
+#include <awsmock/service/application/ApplicationLogServer.h>
 
 namespace Awsmock::Service {
     ApplicationLogServer::ApplicationLogServer() : AbstractServer("application-log") {}

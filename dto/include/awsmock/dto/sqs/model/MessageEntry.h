@@ -46,6 +46,11 @@ namespace Awsmock::Dto::SQS {
     struct MessageEntry final : Common::BaseObject<MessageEntry> {
 
         /**
+         * Region
+         */
+        std::string region;
+
+        /**
          * Message ID
          */
         std::string messageId;
@@ -236,9 +241,6 @@ namespace Awsmock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageEntry const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"MessageId", obj.messageId},
                     {"Id", obj.id},
                     {"MessageBody", obj.body},

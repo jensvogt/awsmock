@@ -10,7 +10,7 @@
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
 #include <awsmock/repository/RepositoryFactory.h>
-#include <awsmock/service/apps/ApplicationServer.h>
+#include <awsmock/service/application/ApplicationServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>

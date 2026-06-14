@@ -100,9 +100,6 @@ namespace Awsmock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Queue const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"name", obj.name},
                     {"owner", obj.owner},
                     {"queueUrl", obj.url},

@@ -22,10 +22,10 @@
 #include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueResponse.h>
 #include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
-#include <awsmock/dto/secretsmanager/ListSecretsRequest.h>
-#include <awsmock/dto/secretsmanager/ListSecretsResponse.h>
 #include <awsmock/dto/secretsmanager/ListSecretVersionIdsRequest.h>
 #include <awsmock/dto/secretsmanager/ListSecretVersionIdsResponse.h>
+#include <awsmock/dto/secretsmanager/ListSecretsRequest.h>
+#include <awsmock/dto/secretsmanager/ListSecretsResponse.h>
 #include <awsmock/dto/secretsmanager/PutSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/PutSecretValueResponse.h>
 #include <awsmock/dto/secretsmanager/RotateSecretRequest.h>
@@ -39,8 +39,6 @@
 #include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersRequest.h>
 #include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersResponse.h>
 #include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsRequest.h>
-#include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsRequest.h>
-#include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h>
 #include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h>
 #include <awsmock/dto/secretsmanager/mapper/Mapper.h>
 #include <awsmock/dto/secretsmanager/model/VersionStage.h>
@@ -59,7 +57,8 @@ namespace Awsmock::Service {
      */
     class SecretsManagerService {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -169,7 +168,8 @@ namespace Awsmock::Service {
          */
         [[nodiscard]] Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -217,7 +217,7 @@ namespace Awsmock::Service {
          * @param lambda lambda entity
          * @param body message body
          */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body);
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) const;
 
         /**
          * @brief Create a new KMS key for the secret
@@ -283,4 +283,4 @@ namespace Awsmock::Service {
         boost::mutex _mutex;
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

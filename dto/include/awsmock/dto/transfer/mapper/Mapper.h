@@ -2,8 +2,7 @@
 // Created by vogje01 on 6/2/24.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_MAPPER_H
-#define AWSMOCK_DTO_TRANSFER_MAPPER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/transfer/ListUsersRequest.h>
@@ -36,5 +35,3 @@ namespace Awsmock::Dto::Transfer {
     };
 
 }// namespace Awsmock::Dto::Transfer
-
-#endif// AWSMOCK_DTO_TRANSFER_MAPPER_H

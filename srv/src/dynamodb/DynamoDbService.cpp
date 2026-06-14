@@ -425,7 +425,6 @@ namespace Awsmock::Service {
 
             Dto::DynamoDb::PutItemResponse response;
             response.consumedCapacity.tableName = item.tableName;
-            response.item.region = item.region;
             response.item.tableName = item.tableName;
             response.item.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
             response.item.attributes[table.GetPartitionKeyName()] = Dto::DynamoDb::Mapper::map(item.partitionKey);

@@ -2,8 +2,7 @@
 // Created by vogje01 on 10/23/23.
 //
 
-#ifndef AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H
-#define AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -121,7 +120,6 @@ namespace Awsmock::Dto::Module {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GatewayConfig const &obj) {
             jv = {
-                    {"region", obj.region},
                     {"endpoint", obj.endpoint},
                     {"protocol", obj.protocol},
                     {"host", obj.host},
@@ -142,5 +140,3 @@ namespace Awsmock::Dto::Module {
     };
 
 }// namespace Awsmock::Dto::Module
-
-#endif// AWSMOCK_DTO_MODULE_GATEWAY_CONFIG_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H
-#define AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -90,9 +89,6 @@ namespace Awsmock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RequestParameter const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"requestParameters", obj.requestParameters},
                     {"sourceIPAddress", obj.sourceIPAddress},
             };
@@ -181,9 +177,6 @@ namespace Awsmock::Dto::S3 {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Object const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"key", obj.key},
                     {"size", obj.size},
                     {"etag", obj.etag},
@@ -378,5 +371,3 @@ namespace Awsmock::Dto::S3 {
     };
 
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_EVENT_NOTIFICATION_H

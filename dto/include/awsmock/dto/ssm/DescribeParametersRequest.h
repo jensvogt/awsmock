@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
 
 namespace Awsmock::Dto::SSM {

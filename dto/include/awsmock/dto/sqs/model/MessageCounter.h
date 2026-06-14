@@ -2,8 +2,7 @@
 // Created by vogje01 on 7/6/24.
 //
 
-#ifndef AWSMOCK_DTO_SQS_MESSAGE_COUNTER_H
-#define AWSMOCK_DTO_SQS_MESSAGE_COUNTER_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -115,9 +114,6 @@ namespace Awsmock::Dto::SQS {
 
         friend MessageCounter tag_invoke(boost::json::value_to_tag<MessageCounter>, boost::json::value const &v) {
             MessageCounter r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
             r.queueName = v.at("queueName").as_string();
             r.queueUrl = v.at("queueUrl").as_string();
             r.queueArn = v.at("queueArn").as_string();
@@ -139,9 +135,6 @@ namespace Awsmock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageCounter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
                     {"contentType", obj.contentType},
                     {"queueName", obj.queueName},
                     {"queueUrl", obj.queueUrl},
@@ -164,5 +157,3 @@ namespace Awsmock::Dto::SQS {
     };
 
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_MESSAGE_COUNTER_H
