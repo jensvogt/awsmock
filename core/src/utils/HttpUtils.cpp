@@ -95,13 +95,11 @@ namespace Awsmock::Core {
             return {};
         }
 
+        if (!StringUtils::Contains(uri, "?")) return {};
+
         std::map<std::string, std::string> queryParameters;
         std::string localUri = StringUtils::UrlDecode(uri);
-        if (StringUtils::Contains(uri, "?")) {
-            localUri = localUri.substr(uri.find('?') + 1);
-        }
-
-        if (!localUri.contains("?")) return {};
+        localUri = localUri.substr(localUri.find('?') + 1);
 
         if (!localUri.contains("&") && !localUri.contains("=")) {
             // Special case: localUri=enabled
