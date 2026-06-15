@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.69](https://github.com/jensvogt/awsmock/compare/v1.18.68...v1.18.69) (2026-06-14)
+
+
+### Bug Fixes
+
+* api gateway authorizer ([e4a2346](https://github.com/jensvogt/awsmock/commit/e4a23469434f8c241d0bd79e6c9ea6adfff5c8d7))
+* api gateway authorizer ([256cafb](https://github.com/jensvogt/awsmock/commit/256cafbb7def29416e541ce34ac1b3b0f886b9ad))
+
 ## [1.18.68](https://github.com/jensvogt/awsmock/compare/1.18.67...v1.18.68) (2026-06-14)
 
 
