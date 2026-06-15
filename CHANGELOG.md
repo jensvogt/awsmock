@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18.70](https://github.com/jensvogt/awsmock/compare/v1.18.69...v1.18.70) (2026-06-15)
+
+
+### Bug Fixes
+
+* add resource to rest api ([1cc57ab](https://github.com/jensvogt/awsmock/commit/1cc57abca01d6f3c8f7c2dab197ada4147b48032))
+* add resource to rest api ([925831f](https://github.com/jensvogt/awsmock/commit/925831fdedaba3cf74873140ce5dac8950130527))
+* s3 service when used by transfer manager ([9a5cd95](https://github.com/jensvogt/awsmock/commit/9a5cd95fb1db600e2bd4d88cf82807a7177cb43b))
+* s3 service when used by transfer manager ([0b82c95](https://github.com/jensvogt/awsmock/commit/0b82c9514b003e3b766f2ab16b8109412666a2cb))
+
 ## [1.18.69](https://github.com/jensvogt/awsmock/compare/v1.18.68...v1.18.69) (2026-06-14)
 
 
