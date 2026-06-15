@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.71](https://github.com/jensvogt/awsmock/compare/v1.18.70...v1.18.71) (2026-06-15)
+
+
+### Bug Fixes
+
+* s3 service when used by transfer manager ([4f8133e](https://github.com/jensvogt/awsmock/commit/4f8133e4ef003f8fbe62a5721bb12fc642b13065))
+
 ## [1.18.70](https://github.com/jensvogt/awsmock/compare/v1.18.69...v1.18.70) (2026-06-15)
 
 
