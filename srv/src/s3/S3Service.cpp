@@ -465,7 +465,7 @@ namespace Awsmock::Service {
             // Calculate the hashes asynchronously
             if (!request.checksumAlgorithm.empty()) {
 
-                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, &object]() {
+                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object]() mutable {
                     const std::vector algorithms = {request.checksumAlgorithm};
                     S3HashCreator{}(algorithms, object);
                     log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
@@ -1468,7 +1468,7 @@ namespace Awsmock::Service {
             log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
             if (!request.checksumAlgorithm.empty()) {
 
-                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, &object]() {
+                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object]() mutable {
                     const std::vector algorithms = {request.checksumAlgorithm};
                     S3HashCreator{}(algorithms, object);
                     log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
@@ -1550,14 +1550,14 @@ namespace Awsmock::Service {
         // Metadata
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
         log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", md5: " << object.md5sum;
-        if (!request.checksumAlgorithm.empty()) {
-
-            Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, &object]() {
-                const std::vector algorithms = {request.checksumAlgorithm};
-                S3HashCreator{}(algorithms, object);
-                log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-            });
-        }
+        // if (!request.checksumAlgorithm.empty()) {
+        //
+        //     Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object]() mutable {
+        //         const std::vector algorithms = {request.checksumAlgorithm};
+        //         S3HashCreator{}(algorithms, object);
+        //         log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+        //     });
+        // }
 
         // Update database
         object = _s3Database->createOrUpdateObject(object);

@@ -78,9 +78,10 @@ namespace Awsmock::Service {
 
     void ApplicationServer::StartApplicationLogServer() const {
         log_info << "Starting application log server";
-        ApplicationLogServer applicationLogServer;
-        boost::thread t(boost::ref(applicationLogServer), "0.0.0.0", _logServerPort);
-        t.detach();
+        Core::Scheduler::instance().AddOneTimeTask("application-log-server", [this] {
+            ApplicationLogServer applicationLogServer;
+            applicationLogServer("0.0.0.0", _logServerPort);
+        });
         log_info << "Application log server started";
     }
 
@@ -231,6 +232,7 @@ namespace Awsmock::Service {
         Core::Scheduler::instance().Shutdown("application-restart");
         Core::Scheduler::instance().Shutdown("application-watchdog");
         Core::Scheduler::instance().Shutdown("application-backup");
+        Core::Scheduler::instance().Shutdown("application-log-server");
 
         for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase->listApplications({}, {}, 0, 0, {}); auto &application: applications) {
             ContainerService::instance().KillContainer(application.containerId);
