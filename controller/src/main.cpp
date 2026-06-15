@@ -163,7 +163,7 @@ int main(const int argc, char *argv[]) {
         Awsmock::Core::Configuration::instance().set<std::string>("awsmock.logging.level", value);
         Awsmock::Core::LogStream::SetSeverity(value);
     } else {
-        Awsmock::Core::LogStream::SetSeverity("warn");
+        Awsmock::Core::LogStream::SetSeverity("warning");
     }
 
     // Set the log file

@@ -282,7 +282,6 @@ namespace Awsmock::Controller {
             Dto::Apps::EnableApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
-            appRequest.application.region = application.region;
             if (const auto response = SendPostCommand("application", "enable-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
@@ -306,7 +305,6 @@ namespace Awsmock::Controller {
             Dto::Apps::DisableApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
-            appRequest.application.region = application.region;
             if (const auto response = SendPostCommand("application", "disable-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
@@ -330,7 +328,6 @@ namespace Awsmock::Controller {
             Dto::Apps::StartApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
-            appRequest.application.region = application.region;
             if (const auto response = SendPostCommand("application", "start-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
@@ -354,7 +351,6 @@ namespace Awsmock::Controller {
             Dto::Apps::RestartApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
-            appRequest.application.region = application.region;
             if (const auto response = SendPostCommand("application", "restart-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;
@@ -376,7 +372,6 @@ namespace Awsmock::Controller {
             Dto::Apps::StopApplicationRequest appRequest;
             appRequest.region = _region;
             appRequest.application.name = application.name;
-            appRequest.application.region = application.region;
             if (const auto response = SendPostCommand("application", "stop-application", appRequest.ToJson()); response.statusCode != boost::beast::http::status::ok) {
                 std::cerr << "Error: application: " << application.name << ", httpStatus: " << response.statusCode << ", body: " << response.body << std::endl;
                 return;

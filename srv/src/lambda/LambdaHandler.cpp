@@ -267,10 +267,10 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER) {
                 Dto::Lambda::DeleteLambdaResultCounterRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCounterRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("delete-lambda-results", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         const long count = LambdaService{}.DeleteLambdaResultCounter(lambdaRequest);
-                        log_trace << "Delete lambda result counter, count: " << count;
+                        log_debug << "Delete lambda result counter, count: " << count;
                     } catch (const std::exception &e) {
                         log_error << "Delete lambda counters failed: " << e.what();
                     }
@@ -280,7 +280,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS) {
                 Dto::Lambda::DeleteLambdaResultCountersRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCountersRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("delete-lambda-results", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         const long count = LambdaService{}.DeleteLambdaResultCounters(lambdaRequest);
                         log_trace << "Delete lambda result counters, count: " << count;
@@ -300,7 +300,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_EVENT_SOURCE_COUNTER) {
                 Dto::Lambda::AddEventSourceRequest lambdaRequest = Dto::Lambda::AddEventSourceRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("add-event-source", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.AddEventSource(lambdaRequest);
                         log_trace << "Add event source, functionArn: " << lambdaRequest.functionArn;
@@ -313,7 +313,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_EVENT_SOURCE_COUNTER) {
                 Dto::Lambda::DeleteEventSourceRequest lambdaRequest = Dto::Lambda::DeleteEventSourceRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("delete-event-source", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.DeleteEventSource(lambdaRequest);
                         log_trace << "Delete event source, functionArn: " << lambdaRequest.functionArn;
@@ -326,7 +326,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ENABLE_LAMBDA) {
                 Dto::Lambda::EnableLambdaRequest lambdaRequest = Dto::Lambda::EnableLambdaRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("enable-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.EnableLambda(lambdaRequest);
                         log_info << "Lambda enabled, region: " << lambdaRequest.region << ", name: " << lambdaRequest.function.functionName;
@@ -339,7 +339,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ENABLE_ALL_LAMBDAS) {
                 Dto::Lambda::EnableAllLambdasRequest lambdaRequest = Dto::Lambda::EnableAllLambdasRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("enable-all-lambdas", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.EnableAllLambdas(lambdaRequest);
                         log_info << "All lambdas enabled, region: " << lambdaRequest.region;
@@ -352,7 +352,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DISABLE_LAMBDA) {
                 Dto::Lambda::DisableLambdaRequest lambdaRequest = Dto::Lambda::DisableLambdaRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("disable-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.DisableLambda(lambdaRequest);
                         log_info << "All lambdas disabled, region: " << lambdaRequest.region;
@@ -365,7 +365,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DISABLE_ALL_LAMBDAS) {
                 Dto::Lambda::DisableAllLambdasRequest lambdaRequest = Dto::Lambda::DisableAllLambdasRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("disable-all-lambdas", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.DisableAllLambdas(lambdaRequest);
                         log_info << "All lambdas disabled, region: " << lambdaRequest.region;
@@ -378,7 +378,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_LAMBDA) {
                 Dto::Lambda::StartLambdaRequest lambdaRequest = Dto::Lambda::StartLambdaRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("start-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.StartLambda(lambdaRequest);
                         log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
@@ -390,7 +390,7 @@ namespace Awsmock::Service {
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_ALL_LAMBDAS) {
-                boost::asio::post(GatewayServer::WorkerPool(), [this]() {
+                Core::Scheduler::instance().AddOneTimeTask("start-all-lambda", [_logger = _logger]() mutable {
                     try {
                         LambdaService{}.StartAllLambdas();
                         log_trace << "Started all lambda function";
@@ -403,7 +403,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_LAMBDA) {
                 Dto::Lambda::StopLambdaRequest lambdaRequest = Dto::Lambda::StopLambdaRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("stop-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.StopLambda(lambdaRequest);
                         log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
@@ -415,7 +415,7 @@ namespace Awsmock::Service {
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_ALL_LAMBDAS) {
-                boost::asio::post(GatewayServer::WorkerPool(), [this]() {
+                Core::Scheduler::instance().AddOneTimeTask("stop-all-lambda", [_logger = _logger]() mutable {
                     try {
                         LambdaService{}.StopAllLambdas();
                         log_trace << "Stopped all lambda functions";
@@ -428,7 +428,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_LAMBDA_INSTANCE) {
                 Dto::Lambda::StopLambdaInstanceRequest lambdaRequest = Dto::Lambda::StopLambdaInstanceRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("stop-all-lambda-instances", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.StopLambdaInstance(lambdaRequest);
                         log_trace << "Stop lambda instance, functionArn: " << lambdaRequest.functionArn << ", instanceId: " << lambdaRequest.instanceId;
@@ -441,7 +441,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::REBUILD_LAMBDA) {
                 Dto::Lambda::RebuildLambdaRequest lambdaRequest = Dto::Lambda::RebuildLambdaRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("rebuild-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.RebuildLambda(lambdaRequest);
                         log_trace << "Rebuild function, name: " << lambdaRequest.name << ":" << lambdaRequest.version;
@@ -454,7 +454,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_IMAGE) {
                 Dto::Lambda::DeleteImageRequest lambdaRequest = Dto::Lambda::DeleteImageRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("delete-image", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.DeleteImage(lambdaRequest);
                         log_trace << "Delete image, functionArn: " << lambdaRequest.functionArn;
@@ -467,7 +467,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA) {
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = Dto::Lambda::DeleteFunctionRequest::FromJson(clientCommand);
-                boost::asio::post(GatewayServer::WorkerPool(), [this, lambdaRequest]() {
+                Core::Scheduler::instance().AddOneTimeTask("delete-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.DeleteFunction(lambdaRequest);
                         log_info << "Function deleted, functionName: " << lambdaRequest.functionName;
@@ -480,7 +480,6 @@ namespace Awsmock::Service {
 
             log_error << "Unknown method";
             return SendResponse(request, http::status::bad_request, "Unknown method");
-
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendResponse(request, http::status::internal_server_error, exc.message());

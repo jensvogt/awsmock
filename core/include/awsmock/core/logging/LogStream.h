@@ -211,7 +211,12 @@ namespace Awsmock::Core {
         /**
          * Web socket sink
          */
-        static boost::shared_ptr<webSocketSink_t> webSocketSink;
+        static boost::shared_ptr<webSocketSink_t> web_socket_sink;
+
+        /**
+         * Logging web socket sink (from AddLoggingWebSocket)
+         */
+        static boost::shared_ptr<boost::log::sinks::basic_sink_frontend> logging_ws_sink;
     };
 
 }// namespace Awsmock::Core

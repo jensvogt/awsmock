@@ -22,7 +22,8 @@ namespace Awsmock::Core {
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> LogStream::file_sink;
     boost::shared_ptr<websocket::stream<beast::tcp_stream>> LogStream::_ws;
     boost::shared_ptr<LogWebsocketSink> LogStream::webSocketBackend(new LogWebsocketSink(_ws));
-    boost::shared_ptr<webSocketSink_t> LogStream::webSocketSink(new webSocketSink_t(webSocketBackend));
+    boost::shared_ptr<webSocketSink_t> LogStream::web_socket_sink(new webSocketSink_t(webSocketBackend));
+    boost::shared_ptr<boost::log::sinks::basic_sink_frontend> LogStream::logging_ws_sink;
 
     inline std::string processFuncName(const char *func) {
 #if (defined(_WIN32) && !defined(__MINGW32__)) || defined(__OBJC__)
@@ -157,14 +158,20 @@ namespace Awsmock::Core {
     }
 
     void LogStream::SetSeverity(const std::string &lvl) {
+        if (!from_string(lvl.c_str(), lvl.length(), _severity)) {
+            log_warning << "Unknown log level ignored: " << lvl;
+            return;
+        }
         _currentLevel = lvl;
-        from_string(lvl.c_str(), lvl.length(), _severity);
         UpdateFilter();
     }
 
     void LogStream::SetChannelSeverity(const std::string &channel, const std::string &lvl) {
         boost::log::trivial::severity_level sev;
-        from_string(lvl.c_str(), lvl.length(), sev);
+        if (!from_string(lvl.c_str(), lvl.length(), sev)) {
+            log_warning << "Unknown log level ignored for channel " << channel << ": " << lvl;
+            return;
+        }
         _channelLevels[channel] = sev;
         UpdateFilter();
     }
@@ -181,6 +188,8 @@ namespace Awsmock::Core {
         }
         if (console_sink) console_sink->set_filter(boost::log::trivial::severity >= minLevel);
         if (file_sink) file_sink->set_filter(boost::log::trivial::severity >= minLevel);
+        if (web_socket_sink) web_socket_sink->set_filter(boost::log::trivial::severity >= minLevel);
+        if (logging_ws_sink) logging_ws_sink->set_filter(boost::log::trivial::severity >= minLevel);
 
         boost::log::core::get()->set_filter(
                 [channelLevels, globalLevel](boost::log::attribute_value_set const &attrs) {
@@ -224,10 +233,10 @@ namespace Awsmock::Core {
     void LogStream::AddWebSocket(websocket::stream<beast::tcp_stream> &ws) {
         const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
         webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<websocket::stream<beast::tcp_stream>>(std::move(ws)));
-        webSocketSink = boost::make_shared<webSocketSink_t>(webSocketBackend);
-        webSocketSink->set_formatter(&LogFormatter);
-        webSocketSink->set_filter(boost::log::trivial::severity >= _severity);
-        core->add_sink(webSocketSink);
+        web_socket_sink = boost::make_shared<webSocketSink_t>(webSocketBackend);
+        web_socket_sink->set_formatter(&LogFormatter);
+        web_socket_sink->set_filter(boost::log::trivial::severity >= _severity);
+        core->add_sink(web_socket_sink);
     }
 
     void LogStream::AddLoggingWebSocket(boost::asio::io_context &ioc, unsigned int port) {
@@ -243,20 +252,21 @@ namespace Awsmock::Core {
         using sink_t = boost::log::sinks::synchronous_sink<Service::Logging::WebSocketSinkBackend>;
         const auto sink = boost::make_shared<sink_t>(backend);
         sink->set_formatter(&LogFormatter);
-        sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+        sink->set_filter(boost::log::trivial::severity >= _severity);
+        logging_ws_sink = sink;
 
         boost::log::core::get()->add_sink(sink);
     }
 
     void LogStream::RemoveWebSocketSink() {
         const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
-        core->remove_sink(webSocketSink);
+        core->remove_sink(web_socket_sink);
     }
 
     void LogStream::RemoveConsoleLogs() {
         boost::log::core::get()->remove_sink(console_sink);
     }
-    
+
     void LogStream::LogRaw(const std::string &message) {
         BOOST_LOG_SEV(_logger, boost::log::trivial::info)
                 << boost::log::add_value("Raw", true)
