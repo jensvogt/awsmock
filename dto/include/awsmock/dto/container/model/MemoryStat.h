@@ -2,8 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_MEMORY_STAT_H
-#define AWSMOCK_DTO_DOCKER_MEMORY_STAT_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -44,8 +43,7 @@ namespace Awsmock::Dto::Docker {
          */
         MemoryStats stats;
 
-      private:
-
+    private:
         friend MemoryStat tag_invoke(boost::json::value_to_tag<MemoryStat>, boost::json::value const &v) {
             MemoryStat r;
             r.maxUsage = Core::Json::GetLongLongValue(v, "max_usage");
@@ -59,14 +57,12 @@ namespace Awsmock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MemoryStat const &obj) {
             jv = {
-                    {"max_usage", obj.maxUsage},
-                    {"usage", obj.usage},
-                    {"limit", obj.limit},
-                    {"stats", boost::json::value_from(obj.stats)},
+                {"max_usage", obj.maxUsage},
+                {"usage", obj.usage},
+                {"limit", obj.limit},
+                {"stats", boost::json::value_from(obj.stats)},
             };
         }
     };
 
-}// namespace Awsmock::Dto::Docker
-
-#endif// AWSMOCK_DTO_DOCKER_CONTAINER_H
+} // namespace Awsmock::Dto::Docker

@@ -2,18 +2,9 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_MEMORY_STATS_H
-#define AWSMOCK_DTO_DOCKER_MEMORY_STATS_H
-
-// C++ includes
-#include <string>
-#include <vector>
+#pragma once
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::Docker {
@@ -38,8 +29,7 @@ namespace Awsmock::Dto::Docker {
          */
         long rss{};
 
-      private:
-
+    private:
         friend MemoryStats tag_invoke(boost::json::value_to_tag<MemoryStats>, boost::json::value const &v) {
             MemoryStats r;
             r.cache = Core::Json::GetLongValue(v, "cache");
@@ -49,12 +39,10 @@ namespace Awsmock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MemoryStats const &obj) {
             jv = {
-                    {"cache", obj.cache},
-                    {"rss", obj.rss},
+                {"cache", obj.cache},
+                {"rss", obj.rss},
             };
         }
     };
 
-}// namespace Awsmock::Dto::Docker
-
-#endif// AWSMOCK_DTO_DOCKER_MEMORY_STATS_H
+} // namespace Awsmock::Dto::Docker

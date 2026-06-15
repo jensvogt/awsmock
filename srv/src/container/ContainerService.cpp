@@ -148,8 +148,7 @@ namespace Awsmock::Service {
         for (const auto &line: Core::StringUtils::SplitOnNewline(body)) {
             if (line.empty()) continue;
             boost::system::error_code ec;
-            const boost::json::value jv = boost::json::parse(line, ec);
-            if (!ec && jv.is_object()) {
+            if (const boost::json::value jv = boost::json::parse(line, ec); !ec && jv.is_object()) {
                 if (const auto *err = jv.as_object().if_contains("error")) {
                     log_error << "Build image failed, name: " << applicationEntity.name << ":" << applicationEntity.version << " error: " << boost::json::serialize(*err);
                     return {};
@@ -761,10 +760,10 @@ namespace Awsmock::Service {
 
         std::ofstream cfgOfs(Core::FileUtils::appendPath(codeDir, "config"));
         cfgOfs << "[default]\n"
-               << "region=" << region << "\n"
-               << "output=json\n";
+                << "region=" << region << "\n"
+                << "output=json\n";
 
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
