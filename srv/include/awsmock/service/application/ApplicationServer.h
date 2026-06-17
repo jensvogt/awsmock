@@ -40,6 +40,7 @@ namespace Awsmock::Service {
          * @brief Shutdown server
          */
         void shutdown() override;
+        std::string extractApplicationName(const std::string &containerName) const;
 
       private:
 
@@ -140,12 +141,17 @@ namespace Awsmock::Service {
         /**
          * Application log server startup
          */
-        bool _logServer;
+        bool _logServerActive;
 
         /**
          * Application log server port
          */
         int _logServerPort;
+
+        /**
+         * Application log server address
+         */
+        std::string _logServerAddress;
     };
 
 }// namespace Awsmock::Service

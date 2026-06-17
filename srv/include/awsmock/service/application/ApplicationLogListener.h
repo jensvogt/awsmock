@@ -7,6 +7,7 @@
 
 // C++ includes
 #include <memory>
+#include <thread>
 
 // Boost includes
 #include <boost/asio/strand.hpp>
@@ -81,8 +82,10 @@ namespace Awsmock::Service {
             if (ec) {
                 log_error << "Accept failed, errorCode: " << ec.message() << std::endl;
             } else {
-                // Create the session and run it
-                std::make_shared<ApplicationLogSession>(std::move(socket))->Run();
+                // Run each session on its own thread: Run() blocks for the lifetime
+                // of the streaming connection, so it must not occupy an io_context thread.
+                auto session = std::make_shared<ApplicationLogSession>(std::move(socket));
+                std::thread([session]() { session->Run(); }).detach();
             }
 
             // Accept another connection
