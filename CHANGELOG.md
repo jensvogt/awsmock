@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.72](https://github.com/jensvogt/awsmock/compare/1.18.71...v1.18.72) (2026-06-17)
+
+
+### Bug Fixes
+
+* memory management improvements ([33af5f0](https://github.com/jensvogt/awsmock/commit/33af5f09e2e350a6564bffbedf89d77a0fa085fd))
+* memory management improvements ([a06b551](https://github.com/jensvogt/awsmock/commit/a06b551070e200ce0585c3e758ba3bb920e33226))
+
 ## [1.18.71](https://github.com/jensvogt/awsmock/compare/v1.18.70...v1.18.71) (2026-06-15)
 
 
