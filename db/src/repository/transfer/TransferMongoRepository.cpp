@@ -146,13 +146,13 @@ namespace Awsmock::Database {
             }
 
             std::vector<Entity::Transfer::Transfer> transfers;
-            for (auto transferCursor = _transferCollection.find(query.extract(), opts); auto transfer: transferCursor) {
+            for (auto transferCursor = _transferCollection.find(query.extract(), opts); const auto transfer: transferCursor) {
                 Entity::Transfer::Transfer result;
                 result.FromDocument(transfer);
                 transfers.push_back(result);
             }
-
             log_trace << "Got transfer list, size:" << transfers.size();
+            return transfers;
 
         } catch (std::exception &e) {
             log_error << "List servers failed, error: " << e.what();
