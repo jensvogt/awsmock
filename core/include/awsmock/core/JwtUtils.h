@@ -17,7 +17,6 @@
 
 // JWT-cpp includes
 #include <jwt-cpp/jwt.h>
-#include <jwt-cpp/traits/kazuho-picojson/traits.h>
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
