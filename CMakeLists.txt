@@ -48,9 +48,9 @@ endif ()
 # -fno-var-tracking-assignments removes per-assignment location lists,
 # which are the main source of DWARF bloat from Boost/mongocxx templates.
 # -------------------------------------------------------------------------
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-gsplit-dwarf -fno-var-tracking-assignments)
-endif ()
+#if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+#    add_compile_options(-gsplit-dwarf -fno-var-tracking-assignments)
+#endif ()
 
 # -------------------------------------------------------------------------
 # Dependencies
@@ -67,6 +67,18 @@ find_package(pcre2 CONFIG REQUIRED)
 
 if (WIN32)
     find_package(Boost REQUIRED COMPONENTS system)
+endif ()
+
+# -------------------------------------------------------------------------
+# TCMalloc
+# -------------------------------------------------------------------------
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_library(TCMALLOC_LIB NAMES tcmalloc_minimal tcmalloc HINTS /usr/lib/x86_64-linux-gnu)
+    if (TCMALLOC_LIB)
+        message(STATUS "tcmalloc found: ${TCMALLOC_LIB}")
+    else ()
+        message(WARNING "tcmalloc not found — install libgoogle-perftools-dev")
+    endif ()
 endif ()
 
 # -------------------------------------------------------------------------
@@ -249,6 +261,10 @@ if (WIN32)
     target_link_libraries(awsmockmgr PUBLIC Boost::system crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
     # magic.lib and ssh.lib both define strndup (POSIX fn absent from MSVC runtime)
     target_link_options(awsmockmgr PRIVATE /FORCE:MULTIPLE)
+endif ()
+
+if (TCMALLOC_LIB)
+    target_link_libraries(awsmockmgr PRIVATE ${TCMALLOC_LIB})
 endif ()
 
 # -------------------------------------------------------------------------

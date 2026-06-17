@@ -218,8 +218,9 @@
         },
         "monitoring-period": 300,
         "watchdog-period": 300,
-        "log-server": false,
-        "log-server-port": 4568
+        "log-server-active": true,
+        "log-server-port": 4568,
+        "log-server-address": "0.0.0.0"
       },
       "api-gateway": {
         "active": true,

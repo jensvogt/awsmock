@@ -4,6 +4,28 @@
 
 #include <awsmock/service/container/ContainerService.h>
 
+namespace {
+    // Docker /logs API returns a multiplexed stream: each frame has an 8-byte header
+    // [stream_type:1][0:3][size:4 big-endian] followed by `size` bytes of payload.
+    // We must strip these headers before sending the payload as a UTF-8 WebSocket text frame.
+    std::string StripDockerStreamHeaders(const std::string &input) {
+        std::string result;
+        size_t pos = 0;
+        while (pos + 8 <= input.size()) {
+            const uint32_t size =
+                    (static_cast<uint8_t>(input[pos + 4]) << 24) |
+                    (static_cast<uint8_t>(input[pos + 5]) << 16) |
+                    (static_cast<uint8_t>(input[pos + 6]) << 8) |
+                    static_cast<uint8_t>(input[pos + 7]);
+            pos += 8;
+            if (pos + size > input.size()) break;
+            result.append(input, pos, size);
+            pos += size;
+        }
+        return result;
+    }
+}// namespace
+
 namespace Awsmock::Service {
 
     thread_local std::shared_ptr<Core::DomainSocket> ContainerService::_domainSocket;
@@ -419,44 +441,57 @@ namespace Awsmock::Service {
             log_warning << "Docker not initialized, container commands not available";
             return;
         }
-        ws.control_callback([&ws](const boost::beast::websocket::frame_type kind, const boost::beast::string_view message) {
-            if (kind == boost::beast::websocket::frame_type::close) {
-                ws.close(boost::beast::websocket::close_code::abnormal);
-            } else if (kind == boost::beast::websocket::frame_type::ping) {
-                ws.pong(boost::beast::websocket::ping_data(message));
+        // Control callback is called from within read/write — never call ws operations here.
+        // Beast automatically sends pong replies and handles the close handshake during read().
+        ws.control_callback([](const boost::beast::websocket::frame_type, const boost::beast::string_view) {});
+        {
+            if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=" + std::to_string(tail) + "&stdout=true&stderr=true"); statusCode == http::status::ok && !body.empty()) {
+                boost::beast::error_code ec;
+                ws.text(true);
+                const std::string initial = Core::StringUtils::RemoveColorCoding(StripDockerStreamHeaders(body));
+                ws.write(boost::asio::buffer(initial), ec);
+                if (ec) {
+                    log_info << "Container initial write failed, containerId: " << containerId << ", ec: " << ec.message();
+                    return;
+                }
             }
-        });
-
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=" + std::to_string(tail) + "&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
-            ws.text(true);
-            ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
         }
 
         try {
-            boost::asio::streambuf buffer;
             system_clock::time_point last = system_clock::now();
             while (ws.is_open()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+                // Process any pending incoming frames (e.g. CLOSE sent by the client).
+                // Beast only updates is_open() during read operations, so without this
+                // the loop never terminates after a graceful client-side close.
+                if (boost::system::error_code availEc; ws.next_layer().socket().available(availEc) > 0 && !availEc) {
+                    boost::beast::flat_buffer tmpBuf;
+                    boost::beast::error_code readEc;
+                    ws.read(tmpBuf, readEc);
+                    if (readEc) {
+                        log_info << "WebSocket closed by client, containerId: " << containerId << ", ec: " << readEc.message();
+                        break;
+                    }
+                }
+
+                if (!ws.is_open()) break;
+
                 const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(last));
-                if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true&tail=1000"); statusCode == http::status::ok && contentLength > 0) {
-                    if (ws.is_open()) {
-                        ws.text(true);
-                        ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
+                if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true&tail=1000"); statusCode == http::status::ok && !body.empty()) {
+                    boost::beast::error_code wec;
+                    ws.text(true);
+                    const std::string chunk = Core::StringUtils::RemoveColorCoding(StripDockerStreamHeaders(body));
+                    ws.write(boost::asio::buffer(chunk), wec);
+                    if (wec) {
+                        log_info << "Container write failed, containerId: " << containerId << ", ec: " << wec.message();
+                        break;
                     }
                 }
                 last = system_clock::now();
-
-                ws.read(buffer);
-                log_trace << "Container read, message: " << boost::beast::make_printable(buffer.data());
-                if (const Dto::Apps::WebSocketCommand webSocketCommand = Dto::Apps::WebSocketCommand::FromJson(boost::beast::buffers_to_string(buffer.data()));
-                    webSocketCommand.command == Dto::Apps::WebSoketCommandType::CLOSE_LOG || webSocketCommand.command == Dto::Apps::WebSoketCommandType::UNKNOWN) {
-                    ws.close({"Graceful shutdown"});
-                    log_info << "Container logging connection closed, containerId: " << containerId;
-                    break;
-                }
-                buffer.consume(buffer.size());
             }
-        } catch (boost::exception &e) {
-            log_info << "Websocket killed, containerId: " << containerId;
+        } catch (const std::exception &e) {
+            log_info << "Websocket killed, containerId: " << containerId << ", error: " << e.what();
         }
         log_info << "Attached to container finished, containerId: " << containerId;
     }
@@ -760,10 +795,10 @@ namespace Awsmock::Service {
 
         std::ofstream cfgOfs(Core::FileUtils::appendPath(codeDir, "config"));
         cfgOfs << "[default]\n"
-                << "region=" << region << "\n"
-                << "output=json\n";
+               << "region=" << region << "\n"
+               << "output=json\n";
 
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

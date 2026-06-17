@@ -4,11 +4,6 @@
 
 #include <awsmock/server/Manager.h>
 
-#include "awsmock/service/apigateway/ApiGatewayServer.h"
-
-#ifdef __linux__
-#include <malloc.h>
-#endif
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
 #endif
@@ -25,13 +20,6 @@ namespace Awsmock::Manager {
 
         // Initialize logging
         InitializeLogging();
-
-#ifdef __linux__
-        // Periodically return freed memory to the OS on Linux.
-        // glibc keeps freed blocks in per-arena pools; malloc_trim coalesces
-        // them and releases contiguous free pages back via sbrk/madvise.
-        Core::Scheduler::instance().AddTask("malloc-trim", [] { malloc_trim(0); }, 60);
-#endif
 
         // Initialize websocket logging
         InitializeWebsocketLogging();
@@ -315,4 +303,4 @@ namespace Awsmock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-} // namespace Awsmock::Manager
+}// namespace Awsmock::Manager

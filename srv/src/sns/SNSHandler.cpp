@@ -404,20 +404,26 @@ namespace Awsmock::Service {
     std::map<std::string, Dto::SNS::MessageAttribute> SNSHandler::GetMessageAttributes(const std::string &payload) const {
 
         std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes;
-        const int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttributes");
+        const int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix("/?" + payload, "MessageAttributes");
         log_debug << "Got message attribute count: " << attributeCount;
 
         if (attributeCount == 0) {
             return messageAttributes;
         }
 
-        for (int i = 1; i <= attributeCount / 2; i++) {
+        for (int i = 1; i <= attributeCount / 3; i++) {
             const std::string attributeName = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttributes.entry." + std::to_string(i) + ".Name");
+            const std::string dataType = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.DataType");
 
-            if (const std::string attributeValue = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue"); !attributeName.empty() && !attributeValue.empty()) {
+            std::string attributeValue;
+            if (dataType == "String" || dataType.starts_with("Number")) {
+                attributeValue = Core::HttpUtils::GetStringParameterFromBody(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
+            }
+
+            if (!attributeName.empty()) {
                 Dto::SNS::MessageAttribute attribute;
                 attribute.stringValue = attributeValue;
-                attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString("String");
+                attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString(dataType.starts_with("Number") ? "Number" : dataType);
                 messageAttributes[attributeName] = attribute;
             }
         }

@@ -10,6 +10,7 @@
 // AwsMock includes
 #include <awsmock/core/EventBus.h>
 #include <awsmock/repository/RepositoryFactory.h>
+#include <awsmock/service/apigateway/ApiGatewayServer.h>
 #include <awsmock/service/application/ApplicationServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
@@ -44,7 +45,7 @@ namespace Awsmock::Manager {
      *   - Wait for a termination signal
      *
      * @par
-     * Incoming REST request are handles first by the gateway service, which distributed the requests to the different modules. Each request is handled by its
+     * Incoming REST request is handles first by the gateway service, which distributed the requests to the different modules. Each request is handled by its
      * own handler thread. In total, there are 256 handler threads available. The module handlers are calling the different service methods on demand.
      *
      * @author jens.vogt@opitz-consulting.com

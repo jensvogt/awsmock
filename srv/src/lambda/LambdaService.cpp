@@ -1043,7 +1043,7 @@ namespace Awsmock::Service {
         lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Prune containers
-        dockerService.PruneContainers();
+        //dockerService.PruneContainers();
         log_info << "Lambda function stopped, functionArn: " + lambda.arn;
     }
 
@@ -1094,7 +1094,7 @@ namespace Awsmock::Service {
         lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Prune containers
-        dockerService.PruneContainers();
+        //dockerService.PruneContainers();
         log_info << "Lambda instance stopped, functionArn: " + lambda.arn << ", instanceId: " + request.instanceId;
     }
 
@@ -1118,7 +1118,7 @@ namespace Awsmock::Service {
         lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Prune containers
-        ContainerService::instance().PruneContainers();
+        //ContainerService::instance().PruneContainers();
         log_info << "Lambda function stopped, functionArn: " + lambda.arn;
     }
 
@@ -1197,7 +1197,7 @@ namespace Awsmock::Service {
         }
 
         // Prune containers
-        dockerService.PruneContainers();
+        //dockerService.PruneContainers();
         log_debug << "Docker image deleted, function: " + request.functionName;
 
         _lambdaDatabase->deleteLambda(request.functionName);
