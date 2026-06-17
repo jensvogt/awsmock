@@ -12,14 +12,14 @@ namespace Awsmock::Core {
 
     std::string JwtUtils::CreateTokenRs256(const std::string &privateKey, const std::string &issuer, const std::map<std::string, std::string> &payload) {
 
-        auto token = jwt::create<jwt::traits::kazuho_picojson>()
+        auto token = jwt::create()
                              .set_issuer(issuer)
                              .set_type("JWT")
                              .set_id("awsmock-rsa256")
                              .set_issued_at(jwt::date::clock::now())
                              .set_expires_at(jwt::date::clock::now() + std::chrono::seconds{36000});
         for (const auto &[fst, snd]: payload) {
-            token.set_payload_claim(fst, jwt::basic_claim<jwt::traits::kazuho_picojson>(snd));
+            token.set_payload_claim(fst, jwt::claim(snd));
         }
         return token.sign(jwt::algorithm::rs256("", privateKey, "", ""));
     }

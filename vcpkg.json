@@ -2,13 +2,7 @@
   "name": "awsmock",
   "version": "1.0.0",
   "dependencies": [
-    {
-      "name": "jwt-cpp",
-      "default-features": false,
-      "features": [
-        "picojson"
-      ]
-    },
+    "jwt-cpp",
     "boost",
     "libarchive",
     "libmagic",
@@ -17,5 +11,5 @@
     "mongo-cxx-driver",
     "pcre2"
   ],
-  "builtin-baseline": "c3867e714dd3a51c272826eea77267876517ed99"
+  "builtin-baseline": "5d35de2ee8b13d0bcec328153605638a74fbbf84"
 }

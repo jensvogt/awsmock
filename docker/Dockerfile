@@ -75,7 +75,6 @@ COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/loca
 COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/awsmock/bin
 COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/awsmock/bin
 COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/awsmock/bin
-COPY --from=build /usr/src/awsmock/build/awsmock-agw /usr/local/awsmock/bin
 COPY --from=build /usr/src/awsmock/dist/etc/magic.mgc /usr/local/awsmock/etc
 COPY --from=build /usr/src/awsmock/dist/etc/awsmock_docker.json /usr/local/awsmock/etc/awsmock.json
 COPY --from=build /usr/src/awsmock/dist/etc/ssh_host_key /usr/local/awsmock/etc/ssh_host_key
