@@ -2,13 +2,8 @@
   "name": "awsmock",
   "version": "1.0.0",
   "dependencies": [
-    {
-      "name": "jwt-cpp",
-      "default-features": false,
-      "features": [
-        "picojson"
-      ]
-    },
+    "jwt-cpp",
+    "picojson",
     "boost",
     "libarchive",
     "libmagic",

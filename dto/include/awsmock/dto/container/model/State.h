@@ -69,6 +69,11 @@ namespace Awsmock::Dto::Docker {
          */
         std::string status;
 
+        /**
+         * Health status: "healthy", "unhealthy", "starting", or empty when no healthcheck is defined.
+         */
+        std::string healthStatus;
+
       private:
 
         friend State tag_invoke(boost::json::value_to_tag<State>, boost::json::value const &v) {
@@ -82,6 +87,9 @@ namespace Awsmock::Dto::Docker {
             r.paused = Core::Json::GetBoolValue(v, "Paused");
             r.restarting = Core::Json::GetBoolValue(v, "Restarting");
             r.oomKilled = Core::Json::GetBoolValue(v, "OOMKilled");
+            if (Core::Json::AttributeExists(v, "Health")) {
+                r.healthStatus = Core::Json::GetStringValue(v.at("Health"), "Status");
+            }
             return r;
         }
 
@@ -96,6 +104,7 @@ namespace Awsmock::Dto::Docker {
                     {"Paused", obj.paused},
                     {"Restarting", obj.restarting},
                     {"OOMKilled", obj.oomKilled},
+                    {"HealthStatus", obj.healthStatus},
             };
         }
     };

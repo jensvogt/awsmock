@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.18.74](https://github.com/jensvogt/awsmock/compare/1.18.73...v1.18.74) (2026-06-18)
+
+
+### Bug Fixes
+
+* memory management improvements ([5eb0043](https://github.com/jensvogt/awsmock/commit/5eb0043bf628f3396b6957586e1fbfd6a9e3aed2))
+* memory management improvements ([0b8925f](https://github.com/jensvogt/awsmock/commit/0b8925fb8d6b9d27c6e781e1707a1bcc68213b59))
+* memory management improvements ([c7c5556](https://github.com/jensvogt/awsmock/commit/c7c5556012e0af6ff925877f43ed65fac6cbf568))
+
+## [1.18.73](https://github.com/jensvogt/awsmock/compare/v1.18.72...v1.18.73) (2026-06-17)
+
+
+### Bug Fixes
+
+* memory management improvements ([39b5fca](https://github.com/jensvogt/awsmock/commit/39b5fcadc4638300500593c90bfa3d142495ef00))
+* memory management improvements ([2e4fdd6](https://github.com/jensvogt/awsmock/commit/2e4fdd651790f15280b793c3a3a4da3cc4358ae5))
+* memory management improvements ([d6e874a](https://github.com/jensvogt/awsmock/commit/d6e874a6559b39500680320af7287c656e7a21a3))
+
+## [1.18.72](https://github.com/jensvogt/awsmock/compare/1.18.71...v1.18.72) (2026-06-17)
+
+
+### Bug Fixes
+
+* memory management improvements ([33af5f0](https://github.com/jensvogt/awsmock/commit/33af5f09e2e350a6564bffbedf89d77a0fa085fd))
+* memory management improvements ([a06b551](https://github.com/jensvogt/awsmock/commit/a06b551070e200ce0585c3e758ba3bb920e33226))
+
+## [1.18.71](https://github.com/jensvogt/awsmock/compare/v1.18.70...v1.18.71) (2026-06-15)
+
+
+### Bug Fixes
+
+* s3 service when used by transfer manager ([4f8133e](https://github.com/jensvogt/awsmock/commit/4f8133e4ef003f8fbe62a5721bb12fc642b13065))
+
 ## [1.18.70](https://github.com/jensvogt/awsmock/compare/v1.18.69...v1.18.70) (2026-06-15)
 
 

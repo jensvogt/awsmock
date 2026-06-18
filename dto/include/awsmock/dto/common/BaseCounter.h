@@ -19,7 +19,7 @@ namespace Awsmock::Dto::Common {
      * @par
      * Extends BaseObject with request-level metadata: region, requestId, user, contentType.
      * Also provides FromJson overloads that populate those fields from a client command.
-     * Child DTO objects (model/*) should use BaseObject instead.
+     * Child DTO objects (model) should use BaseObject instead.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

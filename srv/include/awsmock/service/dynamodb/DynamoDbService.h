@@ -31,7 +31,6 @@
 #include <awsmock/dto/dynamodb/DeleteTableResponse.h>
 #include <awsmock/dto/dynamodb/DescribeTableRequest.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
-#include <awsmock/dto/dynamodb/DynamoDbResponse.h>
 #include <awsmock/dto/dynamodb/GetItemRequest.h>
 #include <awsmock/dto/dynamodb/GetItemResponse.h>
 #include <awsmock/dto/dynamodb/ListStreamsRequest.h>

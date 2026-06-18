@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H
-#define AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H
+#pragma once
 
 namespace Awsmock::Dto::DynamoDb {
 
@@ -43,7 +42,4 @@ namespace Awsmock::Dto::DynamoDb {
         }
         return ReturnConsumedCapacityType::NONE;
     }
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H

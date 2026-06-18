@@ -101,6 +101,23 @@ namespace Awsmock::Database {
         std::vector<Entity::Apps::Application> listApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
 
         /**
+         * @brief Returns a list of applications of a region
+         *
+         * @param region AWS region name
+         * @return list of applications
+         */
+        [[nodiscard]]
+        std::vector<Entity::Apps::Application> listApplications(const std::string &region) const override;
+
+        /**
+         * @brief Returns a list of all applications
+         *
+         * @return list of all applications
+         */
+        [[nodiscard]]
+        std::vector<Entity::Apps::Application> listApplications() const override;
+
+        /**
          * @brief Count all applications by region and prefix
          *
          * @param region AWS region
@@ -124,7 +141,7 @@ namespace Awsmock::Database {
         /**
          * @brief Deletes all applications
          *
-         * @return true if application exists
+         * @return true if the application exists
          * @throws DatabaseException
          */
         [[nodiscard]]

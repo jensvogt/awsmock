@@ -122,6 +122,14 @@ namespace Awsmock::Database {
         }
     }
 
+    std::vector<Entity::Apps::Application> ApplicationMongoRepository::listApplications(const std::string &region) const {
+        return listApplications(region, "", 0, 0, {});
+    }
+
+    std::vector<Entity::Apps::Application> ApplicationMongoRepository::listApplications() const {
+        return listApplications({}, "", 0, 0, {});
+    }
+
     long ApplicationMongoRepository::countApplications(const std::string &region, const std::string &prefix) const {
         Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "count_applications");
 

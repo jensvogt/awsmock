@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
-#define AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -159,5 +158,3 @@ namespace Awsmock::Dto::DynamoDb {
     };
 
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_CREATE_TABLE_RESPONSE_H

@@ -4,11 +4,6 @@
 
 #include <awsmock/server/Manager.h>
 
-#include "awsmock/service/apigateway/ApiGatewayServer.h"
-
-#ifdef __linux__
-#include <malloc.h>
-#endif
 #ifdef _WIN32
 extern HANDLE g_ServiceStopEvent;
 #endif
@@ -25,13 +20,6 @@ namespace Awsmock::Manager {
 
         // Initialize logging
         InitializeLogging();
-
-#ifdef __linux__
-        // Periodically return freed memory to the OS on Linux.
-        // glibc keeps freed blocks in per-arena pools; malloc_trim coalesces
-        // them and releases contiguous free pages back via sbrk/madvise.
-        Core::Scheduler::instance().AddTask("malloc-trim", [] { malloc_trim(0); }, 60);
-#endif
 
         // Initialize websocket logging
         InitializeWebsocketLogging();
@@ -50,7 +38,7 @@ namespace Awsmock::Manager {
                 const std::string &channelName = channel.at("name");
                 const std::string &level = channel.at("level");
                 std::string moduleName = channelName;
-                std::ranges::transform(moduleName, moduleName.begin(), ::tolower);
+                std::ranges::transform(moduleName, moduleName.begin(), tolower);
                 Core::LogStream::SetChannelSeverity(channelName, level);
                 if (moduleDatabase->moduleExists(moduleName)) {
                     moduleDatabase->setModuleLogChannelAndLevel(moduleName, channelName, level);
@@ -203,7 +191,7 @@ namespace Awsmock::Manager {
         log_info << "Scheduler initialized";
 
         // Initialize monitoring
-        const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+        const auto monitoringServer = std::make_shared<Service::MonitoringServer>();
         log_info << "Monitoring server started";
 
         // Autoload the init files before modules start
@@ -217,21 +205,21 @@ namespace Awsmock::Manager {
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::S3Server>());
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SQSServer>());
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SNSServer>());
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::LambdaServer>());
             } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler, _ioc));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::TransferServer>());
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::DynamoDbServer>());
             } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::KMSServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::KMSServer>());
             } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
+                Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SSMServer>());
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 Service::ModuleMap::instance().AddModule(module.name, std::make_shared<Service::SecretsManagerServer>());
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -315,4 +303,4 @@ namespace Awsmock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-} // namespace Awsmock::Manager
+}// namespace Awsmock::Manager

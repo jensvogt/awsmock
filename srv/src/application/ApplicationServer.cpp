@@ -13,13 +13,14 @@ namespace Awsmock::Service {
         _watchdogPeriod = Core::Configuration::instance().get<int>("awsmock.modules.application.watchdog-period");
         _backupActive = Core::Configuration::instance().get<bool>("awsmock.modules.application.backup.active");
         _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.application.backup.cron");
-        _logServer = Core::Configuration::instance().get<bool>("awsmock.modules.application.log-server");
+        _logServerActive = Core::Configuration::instance().get<bool>("awsmock.modules.application.log-server-active");
         _logServerPort = Core::Configuration::instance().get<int>("awsmock.modules.application.log-server-port");
+        _logServerAddress = Core::Configuration::instance().get<std::string>("awsmock.modules.application.log-server-address");
 
         // Start application background threads
         Core::Scheduler::instance().AddTask("application-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
-        Core::Scheduler::instance().AddTask("application-restart", [this] { RestartApplications(); }, -1);
         Core::Scheduler::instance().AddTask("application-watchdog", [this] { WatchdogApplications(); }, _watchdogPeriod);
+        Core::Scheduler::instance().AddOneTimeTask("application-restart", [this] { RestartApplications(); });
 
         // Start backup
         if (_backupActive) {
@@ -27,7 +28,7 @@ namespace Awsmock::Service {
         }
 
         // Start the application log server (websocket)
-        if (_logServer) {
+        if (_logServerActive) {
             StartApplicationLogServer();
         }
 
@@ -44,7 +45,7 @@ namespace Awsmock::Service {
         Core::EventBus::instance().sigMetricGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationDatabase->countApplications({}, {})));
 
         // CPU / memory usage
-        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications()) {
 
             if (!application.containerId.empty() && ContainerService::instance().ContainerExists(application.containerId)) {
                 const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId, application.name);
@@ -78,10 +79,8 @@ namespace Awsmock::Service {
 
     void ApplicationServer::StartApplicationLogServer() const {
         log_info << "Starting application log server";
-        Core::Scheduler::instance().AddOneTimeTask("application-log-server", [this] {
-            ApplicationLogServer applicationLogServer;
-            applicationLogServer("0.0.0.0", _logServerPort);
-        });
+        boost::thread t(boost::ref(_applicationLogServer), _logServerAddress, _logServerPort);
+        t.detach();
         log_info << "Application log server started";
     }
 
@@ -146,27 +145,36 @@ namespace Awsmock::Service {
         const auto stopped = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
 
         // Check status
-        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications()) {
+
+            // Don't consider disabled applications
+            if (!application.enabled) {
+                continue;
+            }
 
             // If containerId is empty and the application is enabled, start it
-            if (application.containerId.empty() && application.enabled) {
+            if (application.containerId.empty()) {
                 StartApplication(application);
                 log_info << "Application started, name: " << application.name;
                 continue;
             }
 
-            // If containerId is not empty and the application is disabled, stop it
-            if (!application.containerId.empty() && !application.enabled) {
-                StopApplication(application);
-                log_info << "Application stopped, name: " << application.name;
-                continue;
-            }
-
             // Container exists in Docker but is not running — restart it
-            if (!application.containerId.empty() && application.enabled && application.status == stopped) {
+            if (!application.containerId.empty() && application.status == stopped) {
                 StartApplication(application);
                 log_info << "Application restarted (was stopped), name: " << application.name;
                 continue;
+            }
+
+            // Container is running, but health check reports unhealthy (manager was down) — cycle it so
+            // the app reconnects cleanly now that the manager is back up.
+            if (!application.containerId.empty()) {
+                if (const Dto::Docker::InspectContainerResponse inspect = ContainerService::instance().InspectContainer(application.containerId); inspect.state.healthStatus == "unhealthy") {
+                    StopApplication(application);
+                    StartApplication(application);
+                    log_info << "Application recycled after unhealthy healthcheck, name: " << application.name;
+                    continue;
+                }
             }
 
             // Safety net: if image is gone from Docker, clear the stale DB record
@@ -190,16 +198,11 @@ namespace Awsmock::Service {
 
             activeContainerIds.insert(container.id);
 
-            std::string name{}, version{};
-            if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ":"); parts.size() == 2) {
-                name = parts[0];
-                version = parts[1];
-            } else if (parts.size() == 1) {
-                name = parts[0];
-            } else {
-                log_error << "Invalid container name: " << container.image;
+            const std::string name = extractApplicationName(container.image);
+            if (name.empty()) {
                 continue;
             }
+
             if (_applicationDatabase->applicationExists(region, name)) {
                 Database::Entity::Apps::Application application = _applicationDatabase->getApplication(region, name);
                 application.region = region;
@@ -207,7 +210,6 @@ namespace Awsmock::Service {
                 application.containerName = container.GetContainerName();
                 application.imageName = container.image;
                 application.imageId = container.imageId;
-                application.version = version;
                 application.status = container.state.running ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application = _applicationDatabase->updateApplication(application);
                 log_debug << "Application updated, imageName: " << application.imageName;
@@ -240,4 +242,15 @@ namespace Awsmock::Service {
         }
         log_info << "Application server stopped";
     }
+
+    std::string ApplicationServer::extractApplicationName(const std::string &containerName) const {
+        std::string name{};
+        if (const std::vector<std::string> parts = Core::StringUtils::Split(containerName, ":"); parts.size() > 0) {
+            name = parts[0];
+        } else {
+            log_error << "Invalid application name: " << containerName;
+        }
+        return name;
+    }
+
 }// namespace Awsmock::Service

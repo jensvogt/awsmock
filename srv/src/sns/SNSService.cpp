@@ -17,7 +17,7 @@ namespace Awsmock::Service {
             log_debug << "Got topic: " << topic.topicArn;
 
             Dto::SNS::CreateTopicResponse response;
-            response.region = topic.region;
+            response.copyMetadata(request);
             response.topicName = topic.topicName;
             response.owner = topic.owner;
             response.topicArn = topic.topicArn;
@@ -38,7 +38,7 @@ namespace Awsmock::Service {
             log_trace << "SNS topic created: " << topic.ToJson();
 
             Dto::SNS::CreateTopicResponse response;
-            response.region = topic.region;
+            response.copyMetadata(request);
             response.topicName = topic.topicName;
             response.owner = topic.owner;
             response.topicArn = topic.topicArn;
@@ -58,13 +58,14 @@ namespace Awsmock::Service {
 
             const Database::Entity::SNS::TopicList topicList = _snsDatabase->listTopics(region);
             // TODO: Write mapper
-            Dto::SNS::ListTopicsResponse listTopicsResponse;
+            Dto::SNS::ListTopicsResponse response;
+            response.region = region;
             for (const auto &it: topicList) {
-                listTopicsResponse.topics.emplace_back(it.topicArn);
+                response.topics.emplace_back(it.topicArn);
             }
-            log_trace << "SNS list topics response: " << listTopicsResponse.ToXml();
+            log_trace << "SNS list topics response: " << response.ToXml();
 
-            return listTopicsResponse;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS list topics request failed, message: " << ex.what();
@@ -80,13 +81,14 @@ namespace Awsmock::Service {
 
             const Database::Entity::SNS::TopicList topicList = _snsDatabase->listTopics(region);
 
-            Dto::SNS::ListTopicArnsResponse listTopicArnsResponse;
+            Dto::SNS::ListTopicArnsResponse response;
+            response.region = region;
             for (const auto &it: topicList) {
-                listTopicArnsResponse.topicArns.emplace_back(it.topicArn);
+                response.topicArns.emplace_back(it.topicArn);
             }
-            log_trace << "SNS list topic ARNs response: " << listTopicArnsResponse.ToJson();
+            log_trace << "SNS list topic ARNs response: " << response.ToJson();
 
-            return listTopicArnsResponse;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS list topic ARNs request failed, message: " << ex.what();
@@ -102,6 +104,7 @@ namespace Awsmock::Service {
 
             const Database::Entity::SNS::TopicList topicList = _snsDatabase->listTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns), request.region);
             Dto::SNS::ListTopicCountersResponse response;
+            response.copyMetadata(request);
             response.total = _snsDatabase->countTopics(request.region, request.prefix);
             response.topicCounters = Dto::SNS::TopicCounterMapper::toDtoList(topicList);
             log_trace << "SNS list topic counters response: " << response.topicCounters.size();
@@ -128,6 +131,7 @@ namespace Awsmock::Service {
             log_debug << "Topic returned, topic: " << topic.topicName;
 
             Dto::SNS::GetEventSourceResponse response;
+            response.copyMetadata(request);
             response.lambdaConfiguration.arn = topic.topicArn;
             response.lambdaConfiguration.enabled = true;
             response.lambdaConfiguration.uuid = topic.oid;
@@ -294,6 +298,7 @@ namespace Awsmock::Service {
         }
 
         Dto::SNS::DeleteTopicResponse response;
+        response.copyMetadata(request);
         try {
 
             // Update database
@@ -348,6 +353,7 @@ namespace Awsmock::Service {
             CheckSubscriptions(request, topic, message);
 
             Dto::SNS::PublishResponse response;
+            response.copyMetadata(request);
             response.requestId = request.requestId;
             response.messageId = message.messageId;
             response.region = request.region;
@@ -393,6 +399,7 @@ namespace Awsmock::Service {
             }
 
             Dto::SNS::SubscribeResponse response;
+            response.copyMetadata(request);
             response.requestId = request.requestId;
             response.subscriptionArn = subscriptionArn;
             response.region = request.region;
@@ -441,6 +448,7 @@ namespace Awsmock::Service {
             log_debug << "Subscription updated, topic: " << topic.ToJson();
 
             Dto::SNS::UpdateSubscriptionResponse response;
+            response.copyMetadata(request);
             response.requestId = request.requestId;
             response.subscriptionArn = request.subscriptionArn;
             response.region = request.region;
@@ -479,6 +487,7 @@ namespace Awsmock::Service {
                 log_debug << "Subscription added, topic: " << topic.ToJson();
             }
             Dto::SNS::UnsubscribeResponse response;
+            response.copyMetadata(request);
             response.requestId = request.requestId;
             response.subscriptionArn = request.subscriptionArn;
             response.region = request.region;
@@ -506,6 +515,7 @@ namespace Awsmock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionsByTopicResponse response;
+            response.copyMetadata(request);
             for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
                 Dto::SNS::Subscription subscription;
                 subscription.topicArn = request.topicArn;
@@ -538,6 +548,7 @@ namespace Awsmock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase->getTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionCountersResponse response;
+            response.copyMetadata(request);
             response.total = static_cast<long>(topic.subscriptions.size());
             for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
                 const std::string id = subscriptionArn.substr(subscriptionArn.rfind(':') + 1);
@@ -619,6 +630,7 @@ namespace Awsmock::Service {
             response.attributeCounters.emplace_back(attributeCounter);
 
             response.attributeCounters = Core::PageVector<Dto::SNS::AttributeCounter>(response.attributeCounters, request.pageSize, request.pageIndex);
+            response.copyMetadata(request);
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -649,6 +661,7 @@ namespace Awsmock::Service {
                 tagCounter.tagValue = snd;
                 response.tagCounters.emplace_back(tagCounter);
             }
+            response.copyMetadata(request);
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -673,6 +686,7 @@ namespace Awsmock::Service {
             response.region = topic.region;
             response.topicArn = topic.topicArn;
             response.owner = topic.owner;
+            response.copyMetadata(request);
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -703,6 +717,7 @@ namespace Awsmock::Service {
             response.owner = topic.owner;
             response.created = topic.created;
             response.modified = topic.modified;
+            response.copyMetadata(request);
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -726,6 +741,7 @@ namespace Awsmock::Service {
             log_debug << "Got message , messageId: " << request.messageId;
             Dto::SNS::GetMessageCountersResponse response;
             response.message = Dto::SNS::MessageMapper::toDto(message);
+            response.copyMetadata(request);
             return response;
 
         } catch (Core::DatabaseException &ex) {

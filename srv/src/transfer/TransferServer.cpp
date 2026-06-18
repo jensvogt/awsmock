@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    TransferServer::TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("transfer"), _ioc(ioc), _scheduler(scheduler) {
+    TransferServer::TransferServer() : AbstractServer("transfer") {
 
         // REST manager configuration
         _region = Core::Configuration::instance().get<std::string>("awsmock.region");
@@ -17,11 +17,11 @@ namespace Awsmock::Service {
         log_info << "Transfer server starting";
 
         // Start SNS monitoring update counters
-        _scheduler.AddTask("transfer-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("transfer-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("transfer-backup", [] { BackupTransfer(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("transfer-backup", [] { BackupTransfer(); }, _backupCron);
         }
 
         // Create transfer bucket
@@ -82,7 +82,7 @@ namespace Awsmock::Service {
         const auto address = Core::Configuration::instance().get<std::string>("awsmock.modules.transfer.ftp.address");
 
         // Create a transfer manager thread
-        _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address, _ioc);
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address);
         _transferServerList[server.serverId] = _ftpServer;
 
         // Start server
@@ -168,8 +168,8 @@ namespace Awsmock::Service {
 
     void TransferServer::shutdown() {
         log_info << "Transfer server shutting down";
-        _scheduler.Shutdown("ssm-monitoring");
-        _scheduler.Shutdown("ssm-backup");
+        Core::Scheduler::instance().Shutdown("transfer-monitoring");
+        Core::Scheduler::instance().Shutdown("transfer-backup");
     }
 
 }// namespace Awsmock::Service

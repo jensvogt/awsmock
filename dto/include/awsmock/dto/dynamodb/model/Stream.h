@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_STREAM_H
-#define AWSMOCK_DTO_DYNAMODB_STREAM_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -68,7 +67,4 @@ namespace Awsmock::Dto::DynamoDb {
             };
         }
     };
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_STREAM_H

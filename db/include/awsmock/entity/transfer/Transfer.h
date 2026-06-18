@@ -220,7 +220,6 @@ namespace Awsmock::Database::Entity::Transfer {
         friend std::ostream &operator<<(std::ostream &os, const Transfer &m);
     };
 
-    typedef Transfer Transfer;
     typedef std::vector<Transfer> TransferList;
 
 }// namespace Awsmock::Database::Entity::Transfer

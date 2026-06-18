@@ -27,7 +27,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSServer(Core::Scheduler &scheduler);
+        explicit SNSServer();
 
         /**
          * @brief Shutdown server
@@ -101,11 +101,6 @@ namespace Awsmock::Service {
          * @see @link(https://github.com/mariusbancila/croncpp)croncpp
          */
         std::string _backupCron;
-
-        /**
-         * @brif Asynchronous tasks scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service

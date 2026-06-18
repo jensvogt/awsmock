@@ -61,7 +61,7 @@ namespace Awsmock::Core {
                                                      const std::string &body = {});
 
         /**
-         * @brief Send a binary to an HTTP endpoint
+         * @brief Send a binary to an HTTP endpoint.
          *
          * This is usually a file to send ay application/octet-stream.
          *

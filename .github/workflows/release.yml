@@ -271,7 +271,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool g++-14 rpm
+          sudo apt install -y ninja-build doxygen pandoc linux-libc-dev autoconf autoconf-archive automake libtool g++-14 rpm libgoogle-perftools-dev
           sudo gem install --no-document fpm
 
       - name: Create vcpkg binary cache dir

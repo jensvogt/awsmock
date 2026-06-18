@@ -71,7 +71,7 @@ namespace Awsmock::Service {
         CleanupInstances();
 
         // Cleanup container
-        CleanupDocker();
+        //CleanupDocker();
 
         // Create a local network if it does not exist yet
         CreateLocalNetwork();
@@ -81,8 +81,8 @@ namespace Awsmock::Service {
     }
 
     void LambdaServer::CleanupDocker() const {
-        _dockerService.PruneContainers();
-        log_debug << "Docker containers cleaned up";
+        //_dockerService.PruneContainers();
+        //log_debug << "Docker containers cleaned up";
     }
 
     void LambdaServer::CleanupInstances() const {
