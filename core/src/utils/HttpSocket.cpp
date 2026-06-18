@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by vogje01 on 5/28/24.
 //
 
@@ -41,20 +41,18 @@ namespace Awsmock::Core {
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
-            // Read the response
+            // Read the response — eof/connection_reset are benign when server sends Connection: close
             boost::beast::flat_buffer buffer;
             http::response<http::string_body> response;
-            http::read(stream, buffer, response);
-            if (ec) {
+            http::read(stream, buffer, response, ec);
+            if (ec && ec != boost::asio::error::eof && ec != boost::asio::error::connection_reset) {
                 log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
             // Cleanup
-            ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
-            if (ec) {
-                log_warning << "Shutdown socket failed, error: " << ec.message();
-            }
+            stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+
             return PrepareResult(response);
 
         } catch (const boost::exception &e) {
@@ -96,20 +94,18 @@ namespace Awsmock::Core {
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
-            // Read the response
+            // Read the response — eof/connection_reset are benign when server sends Connection: close
             boost::beast::flat_buffer buffer;
             http::response<http::string_body> response;
-            http::read(stream, buffer, response);
-            if (ec) {
+            http::read(stream, buffer, response, ec);
+            if (ec && ec != boost::asio::error::eof && ec != boost::asio::error::connection_reset) {
                 log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
             // Cleanup
-            ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
-            if (ec) {
-                log_warning << "Shutdown socket failed, error: " << ec.message();
-            }
+            stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+
             return PrepareResult(response);
 
         } catch (const boost::exception &e) {
@@ -130,25 +126,23 @@ namespace Awsmock::Core {
 
             // Write to socket
             boost::system::error_code ec;
-            http::write(stream, request);
+            http::write(stream, request, ec);
             if (ec) {
                 log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
-            // Read the response
+            // Read the response — eof/connection_reset are benign when server sends Connection: close
             boost::beast::flat_buffer buffer;
             http::response<http::dynamic_body> response;
-            read(stream, buffer, response, ec);
-            if (ec) {
+            http::read(stream, buffer, response, ec);
+            if (ec && ec != boost::asio::error::eof && ec != boost::asio::error::connection_reset) {
                 log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
-            ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-            if (ec) {
-                log_warning << "Shutdown socket failed, error: " << ec.message();
-            }
+            stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+
             return PrepareResult(response);
 
         } catch (const boost::exception &e) {
