@@ -4,6 +4,10 @@
 
 #pragma once
 
+#ifdef WIN32
+#include <process.h>
+#endif
+
 // AwsMock includes
 #include <awsmock/dto/module/GetLogLevelRequest.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>

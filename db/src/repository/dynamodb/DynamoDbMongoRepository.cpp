@@ -289,7 +289,7 @@ namespace Awsmock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
 
-            // Set limit to 1 (Very important for performance!)
+            // Set limit to 1
             mongocxx::options::count options;
             options.limit(1);
 
@@ -304,18 +304,22 @@ namespace Awsmock::Database {
             // Partition key
             if (item.partitionKey.index() == 0)
                 query.append(kvp("partitionKey", std::get<std::string>(item.partitionKey)));
-            if (item.partitionKey.index() == 1)
+            else if (item.partitionKey.index() == 1)
                 query.append(kvp("partitionKey", std::get<double>(item.partitionKey)));
-            // if (item.partitionKey.index() == 2)
-            //     query.append(kvp("partitionKey", std::get<std::vector<uint8_t>>(item.partitionKey)));
+            else if (item.partitionKey.index() == 2) {
+                const auto &bin = std::get<std::vector<uint8_t>>(item.partitionKey);
+                query.append(kvp("partitionKey", bsoncxx::types::b_binary{bsoncxx::binary_sub_type::k_binary, static_cast<uint32_t>(bin.size()), bin.data()}));
+            }
 
-            // Sort key
-            if (item.sortKey.index() == 0)
+            // Sort key — only include if set
+            if (item.sortKey.index() == 0 && !std::get<std::string>(item.sortKey).empty())
                 query.append(kvp("sortKey", std::get<std::string>(item.sortKey)));
-            if (item.sortKey.index() == 1)
+            else if (item.sortKey.index() == 1)
                 query.append(kvp("sortKey", std::get<double>(item.sortKey)));
-            // if (item.sortKey.index() == 2)
-            //     query.append(kvp("sortKey", std::get<std::vector<uint8_t>>(item.sortKey)));
+            else if (item.sortKey.index() == 2) {
+                const auto &bin = std::get<std::vector<uint8_t>>(item.sortKey);
+                query.append(kvp("sortKey", bsoncxx::types::b_binary{bsoncxx::binary_sub_type::k_binary, static_cast<uint32_t>(bin.size()), bin.data()}));
+            }
 
             return _itemCollection.count_documents(query.view(), options) > 0;
 
@@ -349,7 +353,7 @@ namespace Awsmock::Database {
             if (!partitionKey.empty()) {
                 query.append(kvp("partitionKey", partitionKey));
             }
-            if (!partitionKey.empty()) {
+            if (!sortKey.empty()) {
                 query.append(kvp("sortKey", sortKey));
             }
 
@@ -454,14 +458,20 @@ namespace Awsmock::Database {
             // Primary keys
             if (partitionKey.index() == 0) {
                 query.append(kvp("partitionKey", std::get<std::string>(partitionKey)));
+            } else if (partitionKey.index() == 1) {
+                query.append(kvp("partitionKey", std::get<double>(partitionKey)));
+            } else if (partitionKey.index() == 2) {
+                const auto &bin = std::get<std::vector<uint8_t>>(partitionKey);
+                query.append(kvp("partitionKey", bsoncxx::types::b_binary{bsoncxx::binary_sub_type::k_binary, static_cast<uint32_t>(bin.size()), bin.data()}));
             }
 
             if (sortKey.index() == 0 && !std::get<std::string>(sortKey).empty()) {
                 query.append(kvp("sortKey", std::get<std::string>(sortKey)));
             } else if (sortKey.index() == 1) {
                 query.append(kvp("sortKey", std::get<double>(sortKey)));
-                // } else if (sortKey.index() == 2) {
-                //     query.append(kvp("sortKey", std::get<std::vector<uint8_t>>(sortKey)));
+            } else if (sortKey.index() == 2) {
+                const auto &bin = std::get<std::vector<uint8_t>>(sortKey);
+                query.append(kvp("sortKey", bsoncxx::types::b_binary{bsoncxx::binary_sub_type::k_binary, static_cast<uint32_t>(bin.size()), bin.data()}));
             }
 
             if (const auto mResult = _itemCollection.find_one(query.view())) {

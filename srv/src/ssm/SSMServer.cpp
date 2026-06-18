@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    SSMServer::SSMServer(Core::Scheduler &scheduler) : AbstractServer("ssm"), _scheduler(scheduler) {
+    SSMServer::SSMServer() : AbstractServer("ssm") {
 
         // HTTP manager configuration
         _workerPeriod = Core::Configuration::instance().get<int>("awsmock.modules.ssm.worker-period");
@@ -16,11 +16,11 @@ namespace Awsmock::Service {
         log_debug << "SSM server initialized";
 
         // Start SNS monitoring update counters
-        _scheduler.AddTask("ssm-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("ssm-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("ssm-backup", [this] { BackupSsm(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("ssm-backup", [this] { BackupSsm(); }, _backupCron);
         }
 
         // Connect stop signal
@@ -46,7 +46,7 @@ namespace Awsmock::Service {
 
     void SSMServer::shutdown() {
         log_info << "SSM manager server shutting down";
-        _scheduler.Shutdown("ssm-monitoring");
-        _scheduler.Shutdown("ssm-backup");
+        Core::Scheduler::instance().Shutdown("ssm-monitoring");
+        Core::Scheduler::instance().Shutdown("ssm-backup");
     }
 }// namespace Awsmock::Service

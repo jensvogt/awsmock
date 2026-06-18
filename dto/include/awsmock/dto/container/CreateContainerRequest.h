@@ -38,6 +38,53 @@ namespace Awsmock::Dto::Docker {
     };
 
     /**
+     * @brief Docker container healthcheck configuration.
+     */
+    struct Healthcheck final : Common::BaseObject<Healthcheck> {
+
+        /**
+         * Test command: ["CMD-SHELL", "<shell-cmd>"] or ["NONE"] to disable.
+         */
+        std::vector<std::string> test;
+
+        /**
+         * Interval between checks in nanoseconds (default 5s).
+         */
+        long long interval = 5'000'000'000LL;
+
+        /**
+         * Per-check timeout in nanoseconds (default 2s).
+         */
+        long long timeout = 2'000'000'000LL;
+
+        /**
+         * Number of consecutive failures before marking unhealthy.
+         */
+        int retries = 3;
+
+        /**
+         * Grace period before health checks start in nanoseconds (default 30s).
+         */
+        long long startPeriod = 30'000'000'000LL;
+
+      private:
+
+        friend Healthcheck tag_invoke(boost::json::value_to_tag<Healthcheck>, boost::json::value const &) {
+            return {};
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Healthcheck const &obj) {
+            jv = {
+                    {"Test", boost::json::value_from(obj.test)},
+                    {"Interval", obj.interval},
+                    {"Timeout", obj.timeout},
+                    {"Retries", obj.retries},
+                    {"StartPeriod", obj.startPeriod},
+            };
+        }
+    };
+
+    /**
      * @brief Create container request.
      *
      * @par
@@ -98,6 +145,11 @@ namespace Awsmock::Dto::Docker {
          */
         std::vector<std::string> environment;
 
+        /**
+         * Container healthcheck configuration.
+         */
+        Healthcheck healthcheck;
+
       private:
 
         friend CreateContainerRequest tag_invoke(boost::json::value_to_tag<CreateContainerRequest>, boost::json::value const &v) {
@@ -133,6 +185,7 @@ namespace Awsmock::Dto::Docker {
                     {"HostConfig", boost::json::value_from(obj.hostConfig)},
                     {"ExposedPorts", boost::json::value_from(obj.exposedPorts)},
                     {"Env", boost::json::value_from(obj.environment)},
+                    {"Healthcheck", boost::json::value_from(obj.healthcheck)},
             };
         }
     };

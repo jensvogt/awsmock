@@ -12,7 +12,6 @@
 
 // C++ includes
 #include <awsmock/ftpserver/Permissions.h>
-#include <boost/asio/io_context.hpp>
 
 #include "awsmock/core/logging/LogStream.h"
 
@@ -62,9 +61,8 @@ namespace Awsmock::FtpServer {
          * @param serverName: server name
          * @param port: the port to StartServer the FTP manager on. Defaults to 21.
          * @param address: listen to the address
-         * @param awsIoc boost IO context
          */
-        explicit FtpServer(std::string serverName, int port, std::string address, boost::asio::io_context &awsIoc);
+        explicit FtpServer(std::string serverName, int port, std::string address);
 
         /**
          * Destructor
@@ -209,10 +207,6 @@ namespace Awsmock::FtpServer {
          */
         std::string _dataDir;
 
-        /**
-         * AwsMock IOC
-         */
-        boost::asio::io_context &_awsIoc;
     };
 
 }// namespace Awsmock::FtpServer

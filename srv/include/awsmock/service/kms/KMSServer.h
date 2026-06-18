@@ -25,18 +25,20 @@ namespace Awsmock::Service {
      */
     class KMSServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit KMSServer(Core::Scheduler &scheduler);
+        explicit KMSServer();
 
         /**
          * @brief Shutdown the server
          */
         void shutdown() override;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -45,17 +47,17 @@ namespace Awsmock::Service {
         /**
          * @brief Update counters
          */
-        void UpdateCounter() const;
+        void updateCounter() const;
 
         /**
          * @brief Delete keys which are pending for deletion
          */
-        void DeleteKeys() const;
+        void deleteKeys() const;
 
         /**
-         * @brief Backup the KMS objects
+         * @brief Back up the KMS objects
          */
-        static void BackupKms();
+        static void backupKms();
 
         /**
          * KMS database
@@ -103,11 +105,6 @@ namespace Awsmock::Service {
          * KMS monitoring period
          */
         int _monitoringPeriod;
-
-        /**
-         * Asynchronous task scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

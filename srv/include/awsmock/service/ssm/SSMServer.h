@@ -30,7 +30,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SSMServer(Core::Scheduler &scheduler);
+        explicit SSMServer();
 
       private:
 
@@ -87,10 +87,6 @@ namespace Awsmock::Service {
          * @brief SNS monitoring period
          */
         int _monitoringPeriod;
-        /**
-         * Asynchronous task scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service

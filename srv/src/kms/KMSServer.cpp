@@ -2,14 +2,11 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/module/ModuleService.h"
-
-
 #include <awsmock/service/kms/KMSServer.h>
 
 namespace Awsmock::Service {
 
-    KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _scheduler((scheduler)) {
+    KMSServer::KMSServer() : AbstractServer("kms") {
 
         // HTTP manager configuration
         _removePeriod = Core::Configuration::instance().get<int>("awsmock.modules.kms.remove-period");
@@ -19,14 +16,14 @@ namespace Awsmock::Service {
         log_debug << "KMS server initialized";
 
         // Start lambda monitoring update counters
-        _scheduler.AddTask("kms-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("kms-monitoring", [this] { this->updateCounter(); }, _monitoringPeriod);
 
         // Start the deleting old keys task
-        _scheduler.AddTask("kms-delete-keys", [this] { this->DeleteKeys(); }, _removePeriod);
+        Core::Scheduler::instance().AddTask("kms-delete-keys", [this] { this->deleteKeys(); }, _removePeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("kms-backup", [] { BackupKms(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("kms-backup", [] { backupKms(); }, _backupCron);
         }
 
         // Connect stop signal
@@ -35,7 +32,7 @@ namespace Awsmock::Service {
         log_debug << "KMS server initialized, removePeriod: " << _removePeriod << " monitoringPeriod: " << _monitoringPeriod;
     }
 
-    void KMSServer::UpdateCounter() const {
+    void KMSServer::updateCounter() const {
         log_trace << "KMS monitoring starting";
 
         // Get total counts
@@ -45,7 +42,7 @@ namespace Awsmock::Service {
         log_trace << "KMS monitoring finished";
     }
 
-    void KMSServer::DeleteKeys() const {
+    void KMSServer::deleteKeys() const {
         log_trace << "Starting delete keys";
 
         for (const auto &key: _kmsDatabase->listKeys({}, {}, 0, 0, {})) {
@@ -57,15 +54,15 @@ namespace Awsmock::Service {
         log_trace << "Finished key deletion";
     }
 
-    void KMSServer::BackupKms() {
+    void KMSServer::backupKms() {
         ModuleService{}.BackupModule("kms", Dto::Module::ExportType::INFRA_STRUCTURE);
     }
 
     void KMSServer::shutdown() {
         log_debug << "KMS server shutdown";
-        _scheduler.Shutdown("kms-monitoring");
-        _scheduler.Shutdown("kms-delete-keys");
-        _scheduler.Shutdown("kms-backup");
+        Core::Scheduler::instance().Shutdown("kms-monitoring");
+        Core::Scheduler::instance().Shutdown("kms-delete-keys");
+        Core::Scheduler::instance().Shutdown("kms-backup");
         log_info << "KMS server stopped";
     }
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service
