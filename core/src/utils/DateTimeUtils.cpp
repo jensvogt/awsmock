@@ -54,7 +54,11 @@ namespace Awsmock::Core {
         char buf[256];
         const time_t timeT = system_clock::to_time_t(timePoint);
         struct tm tm {};
+#ifdef _WIN32
+        gmtime_s(&tm, &timeT);
+#else
         gmtime_r(&timeT, &tm);
+#endif
         strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S GMT", &tm);
         return {buf};
     }
