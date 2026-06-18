@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_RETURN_VALUES_H
-#define AWSMOCK_DTO_DYNAMODB_RETURN_VALUES_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -61,7 +60,4 @@ namespace Awsmock::Dto::DynamoDb {
         }
         return ReturnValuesType::NONE;
     }
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_RETURN_VALUES_H

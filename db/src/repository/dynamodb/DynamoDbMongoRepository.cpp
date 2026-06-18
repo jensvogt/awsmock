@@ -447,7 +447,7 @@ namespace Awsmock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
 
-            document query;
+            document query{};
             if (!region.empty()) {
                 query.append(kvp("region", region));
             }

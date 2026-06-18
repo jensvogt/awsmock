@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/21/23.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H
-#define AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -40,7 +39,7 @@ namespace Awsmock::Dto::DynamoDb {
         /**
          * String set value
          */
-        std::vector<std::string> stringSetValue;
+        std::vector<std::string> stringSetValue{};
 
         /**
          * Number value
@@ -50,17 +49,17 @@ namespace Awsmock::Dto::DynamoDb {
         /**
          * Number set value
          */
-        std::vector<std::string> numberSetValue;
+        std::vector<std::string> numberSetValue{};
 
         /**
          * Boolean value
          */
-        bool boolValue;
+        bool boolValue{};
 
         /**
          * Binary value
          */
-        std::vector<uint8_t> binaryValue;
+        std::vector<uint8_t> binaryValue{};
 
         /**
          * Binary set value
@@ -70,17 +69,17 @@ namespace Awsmock::Dto::DynamoDb {
         /**
          * Null value
          */
-        std::shared_ptr<bool> nullValue;
+        std::shared_ptr<bool> nullValue{};
 
         /**
          * List value
          */
-        std::vector<AttributeValue> listValue;
+        std::vector<AttributeValue> listValue{};
 
         /**
          * Map value
          */
-        std::map<std::string, AttributeValue> mapValue;
+        std::map<std::string, AttributeValue> mapValue{};
 
       private:
 
@@ -137,7 +136,4 @@ namespace Awsmock::Dto::DynamoDb {
             }
         }
     };
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H

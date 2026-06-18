@@ -318,6 +318,11 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "get_item");
         log_debug << "Start get item, region: " << request.region << " name: " << request.tableName;
 
+        if (!_dynamoDbDatabase->tableExists(request.region, request.tableName)) {
+            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+            throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
+        }
+
         try {
 
             // Get the table and the primary keys (throws DatabaseException if table not found)
@@ -325,27 +330,33 @@ namespace Awsmock::Service {
             std::string partitionKey = request.keys[table.GetPartitionKeyName()].stringValue;
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
 
-            // Get item — return empty response if not found
+            // Return empty response if not found
+            if (!_dynamoDbDatabase->itemExists(request.region, request.tableName, partitionKey, sortKey)) {
+                log_debug << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
+                Dto::DynamoDb::GetItemResponse response;
+                response.copyMetadata(request);
+                return response;
+            }
+
+            // Get item — catch DatabaseException in case item was deleted between itemExists and here
             try {
+
                 const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, partitionKey, sortKey);
                 Dto::DynamoDb::GetItemResponse getItemResponse;
-                getItemResponse.region = request.region;
-                getItemResponse.user = request.user;
-                getItemResponse.requestId = request.requestId;
+                getItemResponse.copyMetadata(request);
                 getItemResponse.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
                 return getItemResponse;
+
             } catch (Core::DatabaseException &) {
-                log_debug << "DynamoDb item not found, region: " << request.region << " table: " << request.tableName;
-                Dto::DynamoDb::GetItemResponse getItemResponse;
-                getItemResponse.region = request.region;
-                getItemResponse.user = request.user;
-                getItemResponse.requestId = request.requestId;
-                return getItemResponse;
+                // Item not found (race condition or concurrent delete): AWS returns 200 with empty body
+                Dto::DynamoDb::GetItemResponse response;
+                response.copyMetadata(request);
+                return response;
             }
 
         } catch (Core::DatabaseException &exc) {
-            log_warning << "DynamoDb table does not exist, region: " << request.region << " name: " << request.tableName;
-            throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
+            log_warning << "DynamoDb table error, region: " << request.region << " name: " << request.tableName << ", error: " << exc.message();
+            throw Core::BadRequestException("DynamoDb table error, region: " + request.region + " name: " + request.tableName);
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd get item failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd get item failed, error: " + exc.message());
@@ -526,7 +537,7 @@ namespace Awsmock::Service {
             std::string sortKey = request.keys[table.GetSortKeyName()].stringValue;
 
             // Get the item
-            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, item.partitionKey, item.sortKey);
+            const Database::Entity::DynamoDb::Item item = _dynamoDbDatabase->getItemByKeys(request.region, request.tableName, partitionKey, sortKey);
 
             // Delete item
             _dynamoDbDatabase->deleteItem(request.region, request.tableName, partitionKey, sortKey);

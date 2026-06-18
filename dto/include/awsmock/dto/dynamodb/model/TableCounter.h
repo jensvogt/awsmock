@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_TABLE_COUNTER_H
-#define AWSMOCK_DTO_DYNAMODB_TABLE_COUNTER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -81,7 +80,4 @@ namespace Awsmock::Dto::DynamoDb {
             };
         }
     };
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_TABLE_COUNTER_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/21/23.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_DEFINITION_H
-#define AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_DEFINITION_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -48,7 +47,4 @@ namespace Awsmock::Dto::DynamoDb {
             };
         }
     };
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_ATTRIBUTE_VALUE_H

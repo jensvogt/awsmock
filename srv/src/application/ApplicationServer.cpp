@@ -79,8 +79,7 @@ namespace Awsmock::Service {
 
     void ApplicationServer::StartApplicationLogServer() const {
         log_info << "Starting application log server";
-        ApplicationLogServer applicationLogServer;
-        boost::thread t(boost::ref(applicationLogServer), _logServerAddress, _logServerPort);
+        boost::thread t(boost::ref(_applicationLogServer), _logServerAddress, _logServerPort);
         t.detach();
         log_info << "Application log server started";
     }

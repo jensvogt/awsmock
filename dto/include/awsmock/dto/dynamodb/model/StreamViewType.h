@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_STREAM_VIEW_TYPE_H
-#define AWSMOCK_DTO_DYNAMODB_STREAM_VIEW_TYPE_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -49,7 +48,4 @@ namespace Awsmock::Dto::DynamoDb {
         }
         return StreamViewType::UNKNOWN;
     }
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_STREAM_VIEW_TYPE_H

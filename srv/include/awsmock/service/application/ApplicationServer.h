@@ -152,6 +152,11 @@ namespace Awsmock::Service {
          * Application log server address
          */
         std::string _logServerAddress;
+
+        /**
+         * Application log server instance (must outlive the detached thread)
+         */
+        ApplicationLogServer _applicationLogServer;
     };
 
 }// namespace Awsmock::Service

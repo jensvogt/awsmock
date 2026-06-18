@@ -168,17 +168,17 @@ namespace Awsmock::Service {
             }
 
         } catch (Core::BadRequestException &exc) {
-            log_error << exc.message();
-            return SendResponse(request, http::status::internal_server_error, exc.message());
+            log_error << exc.what();
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (Core::ServiceException &exc) {
-            log_error << exc.message();
-            return SendResponse(request, http::status::internal_server_error, exc.message());
+            log_error << exc.what();
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (Core::JsonException &exc) {
-            log_error << exc.message();
-            return SendResponse(request, http::status::internal_server_error, exc.message());
+            log_error << exc.what();
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (Core::DatabaseException &exc) {
-            log_error << exc.message();
-            return SendResponse(request, http::status::internal_server_error, exc.message());
+            log_error << exc.what();
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (boost::exception &exc) {
             log_error << diagnostic_information(exc);
             return SendResponse(request, http::status::internal_server_error, "Unknown exception");
