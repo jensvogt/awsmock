@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_TAG_H
-#define AWSMOCK_DTO_DYNAMODB_TAG_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseObject.h>
@@ -38,7 +37,4 @@ namespace Awsmock::Dto::DynamoDb {
             };
         }
     };
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_SECRETSMANAGER_TAG_COUNTER_H

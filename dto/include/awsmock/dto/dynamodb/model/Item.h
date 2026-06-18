@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_ITEM_H
-#define AWSMOCK_DTO_DYNAMODB_ITEM_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -236,9 +235,5 @@ namespace Awsmock::Dto::DynamoDb {
             };
         }
     };
-
     typedef std::vector<Item> ItemList;
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_ITEM_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H
-#define AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -44,7 +43,7 @@ namespace Awsmock::Dto::DynamoDb {
         /**
          * Attributes
          */
-        std::unordered_map<std::string, AttributeValue> attributes;
+        std::unordered_map<std::string, AttributeValue> attributes{};
 
       private:
 
@@ -57,13 +56,11 @@ namespace Awsmock::Dto::DynamoDb {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetItemResponse const &obj) {
-            jv = boost::json::object();
+            auto &o = jv.emplace_object();
             if (!obj.attributes.empty()) {
-                jv.as_object().emplace("Item", boost::json::value_from(obj.attributes));
+                o.emplace("Item", boost::json::value_from(obj.attributes));
             }
         }
     };
 
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif// AWSMOCK_DTO_DYNAMODB_GET_ITEM_RESPONSE_H

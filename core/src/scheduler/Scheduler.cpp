@@ -182,7 +182,13 @@ namespace Awsmock::Core {
     void Scheduler::CronEntry::Execute(const boost::system::error_code &e) {
         if (e != boost::asio::error::operation_aborted) {
             log_debug << "Execute cron task '" << name << "'";
-            task();
+            try {
+                task();
+            } catch (const std::exception &exc) {
+                log_error << "Cron task '" << name << "' threw: " << exc.what();
+            } catch (...) {
+                log_error << "Cron task '" << name << "' threw an unknown exception";
+            }
             next = CronUtils::GetNextExecutionTimeSeconds(cronExpression);
             timer.expires_after(std::chrono::seconds(next));
             StartWait();

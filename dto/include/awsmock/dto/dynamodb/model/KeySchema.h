@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/22/24.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_KEY_SCHEMA_H
-#define AWSMOCK_DTO_DYNAMODB_KEY_SCHEMA_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -50,7 +49,4 @@ namespace Awsmock::Dto::DynamoDb {
             };
         }
     };
-
 }// namespace Awsmock::Dto::DynamoDb
-
-#endif//AWSMOCK_DTO_DYNAMODB_KEY_H
