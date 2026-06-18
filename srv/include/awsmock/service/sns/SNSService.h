@@ -29,6 +29,8 @@
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
+#include <awsmock/dto/sns/PublishBatchRequest.h>
+#include <awsmock/dto/sns/PublishBatchResponse.h>
 #include <awsmock/dto/sns/PurgeTopicRequest.h>
 #include <awsmock/dto/sns/SqsNotificationRequest.h>
 #include <awsmock/dto/sns/SubscribeRequest.h>
@@ -93,8 +95,7 @@ namespace Awsmock::Service {
      */
     class SNSService {
 
-      public:
-
+    public:
         /**
          * @brief Constructor
          */
@@ -429,8 +430,7 @@ namespace Awsmock::Service {
          */
         void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "SNS"};
 
         /**
@@ -521,4 +521,4 @@ namespace Awsmock::Service {
         LambdaService _lambdaService;
     };
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

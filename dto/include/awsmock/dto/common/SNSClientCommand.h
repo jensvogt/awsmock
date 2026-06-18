@@ -2,10 +2,10 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_SNS_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_SNS_CLIENT_COMMAND_H
+#pragma once
 
 // C++ includes
+#include <algorithm>
 #include <string>
 
 // Boost includes
@@ -37,6 +37,7 @@ namespace Awsmock::Dto::Common {
         PURGE_TOPIC,
         PURGE_ALL_TOPICS,
         PUBLISH,
+        PUBLISH_BATCH,
         SUBSCRIBE,
         UNSUBSCRIBE,
         LIST_SUBSCRIPTIONS_BY_TOPIC,
@@ -71,43 +72,44 @@ namespace Awsmock::Dto::Common {
     };
 
     static std::map<SNSCommandType, std::string> SNSCommandTypeNames{
-            {SNSCommandType::CREATE_TOPIC, "create-topic"},
-            {SNSCommandType::LIST_TOPICS, "list-topics"},
-            {SNSCommandType::GET_TOPIC_ATTRIBUTES, "get-topic-attributes"},
-            {SNSCommandType::GET_TOPIC_DETAILS, "get-topic-details"},
-            {SNSCommandType::PURGE_TOPIC, "purge-topic"},
-            {SNSCommandType::PURGE_ALL_TOPICS, "purge-all-topics"},
-            {SNSCommandType::PUBLISH, "publish"},
-            {SNSCommandType::SUBSCRIBE, "subscribe"},
-            {SNSCommandType::UNSUBSCRIBE, "unsubscribe"},
-            {SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC, "list-subscriptions-by-topic"},
-            {SNSCommandType::TAG_RESOURCE, "tag-resource"},
-            {SNSCommandType::UNTAG_RESOURCE, "untag-resource"},
-            {SNSCommandType::DELETE_TOPIC, "delete-topic"},
-            {SNSCommandType::LIST_MESSAGES, "list-messages"},
-            {SNSCommandType::DELETE_MESSAGE, "delete-message"},
-            // AwsMock
-            {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
-            {SNSCommandType::LIST_SUBSCRIPTION_COUNTERS, "list-subscription-counters"},
-            {SNSCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
-            {SNSCommandType::LIST_ATTRIBUTE_COUNTERS, "list-attribute-counters"},
-            {SNSCommandType::UPDATE_SUBSCRIPTION, "update-subscription"},
-            {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
-            {SNSCommandType::LIST_TOPIC_ARNS, "list-topic-arns"},
-            {SNSCommandType::GET_EVENT_SOURCE, "get-event-source"},
-            {SNSCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
-            {SNSCommandType::GET_SUBSCRIPTION_COUNTER, "get-subscription-counter"},
-            {SNSCommandType::ADD_SUBSCRIPTION_COUNTER, "add-subscription-counter"},
-            {SNSCommandType::UPDATE_SUBSCRIPTION_COUNTER, "update-subscription-counter"},
-            {SNSCommandType::DELETE_SUBSCRIPTION_COUNTER, "delete-subscription-counter"},
-            {SNSCommandType::PUBLISH_COUNTER, "publish-counter"},
-            {SNSCommandType::LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS, "list-default-message-attribute-counters"},
-            {SNSCommandType::ADD_DEFAULT_MESSAGE_ATTRIBUTE, "add-default-message-attribute-counter"},
-            {SNSCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE, "update-default-message-attribute-counter"},
-            {SNSCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
-            {SNSCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
-            {SNSCommandType::RESEND_TOPIC, "resend-topic"},
-            {SNSCommandType::RESEND_MESSAGE, "resend-message"},
+        {SNSCommandType::CREATE_TOPIC, "create-topic"},
+        {SNSCommandType::LIST_TOPICS, "list-topics"},
+        {SNSCommandType::GET_TOPIC_ATTRIBUTES, "get-topic-attributes"},
+        {SNSCommandType::GET_TOPIC_DETAILS, "get-topic-details"},
+        {SNSCommandType::PURGE_TOPIC, "purge-topic"},
+        {SNSCommandType::PURGE_ALL_TOPICS, "purge-all-topics"},
+        {SNSCommandType::PUBLISH, "publish"},
+        {SNSCommandType::PUBLISH_BATCH, "publish-batch"},
+        {SNSCommandType::SUBSCRIBE, "subscribe"},
+        {SNSCommandType::UNSUBSCRIBE, "unsubscribe"},
+        {SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC, "list-subscriptions-by-topic"},
+        {SNSCommandType::TAG_RESOURCE, "tag-resource"},
+        {SNSCommandType::UNTAG_RESOURCE, "untag-resource"},
+        {SNSCommandType::DELETE_TOPIC, "delete-topic"},
+        {SNSCommandType::LIST_MESSAGES, "list-messages"},
+        {SNSCommandType::DELETE_MESSAGE, "delete-message"},
+        // AwsMock
+        {SNSCommandType::LIST_TOPIC_COUNTERS, "list-topic-counters"},
+        {SNSCommandType::LIST_SUBSCRIPTION_COUNTERS, "list-subscription-counters"},
+        {SNSCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+        {SNSCommandType::LIST_ATTRIBUTE_COUNTERS, "list-attribute-counters"},
+        {SNSCommandType::UPDATE_SUBSCRIPTION, "update-subscription"},
+        {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
+        {SNSCommandType::LIST_TOPIC_ARNS, "list-topic-arns"},
+        {SNSCommandType::GET_EVENT_SOURCE, "get-event-source"},
+        {SNSCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
+        {SNSCommandType::GET_SUBSCRIPTION_COUNTER, "get-subscription-counter"},
+        {SNSCommandType::ADD_SUBSCRIPTION_COUNTER, "add-subscription-counter"},
+        {SNSCommandType::UPDATE_SUBSCRIPTION_COUNTER, "update-subscription-counter"},
+        {SNSCommandType::DELETE_SUBSCRIPTION_COUNTER, "delete-subscription-counter"},
+        {SNSCommandType::PUBLISH_COUNTER, "publish-counter"},
+        {SNSCommandType::LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS, "list-default-message-attribute-counters"},
+        {SNSCommandType::ADD_DEFAULT_MESSAGE_ATTRIBUTE, "add-default-message-attribute-counter"},
+        {SNSCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE, "update-default-message-attribute-counter"},
+        {SNSCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
+        {SNSCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
+        {SNSCommandType::RESEND_TOPIC, "resend-topic"},
+        {SNSCommandType::RESEND_MESSAGE, "resend-message"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {
@@ -115,12 +117,10 @@ namespace Awsmock::Dto::Common {
     }
 
     [[maybe_unused]] static SNSCommandType SNSCommandTypeFromString(const std::string &commandType) {
-        for (auto &[fst, snd]: SNSCommandTypeNames) {
-            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
-                return fst;
-            }
-        }
-        return SNSCommandType::UNKNOWN;
+        const auto it = std::ranges::find_if(SNSCommandTypeNames, [&](const auto &p) {
+            return Core::StringUtils::EqualsIgnoreCase(commandType, p.second);
+        });
+        return it != SNSCommandTypeNames.end() ? it->first : SNSCommandType::UNKNOWN;
     }
 
     /**
@@ -172,10 +172,7 @@ namespace Awsmock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const SNSClientCommand &i);
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
-}// namespace Awsmock::Dto::Common
-
-#endif// AWSMOCK_DTO_COMMON_SNS_CLIENT_COMMAND_H
+} // namespace Awsmock::Dto::Common

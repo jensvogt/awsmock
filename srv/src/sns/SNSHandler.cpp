@@ -81,6 +81,28 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, snsResponse.ToXml());
                 }
 
+                case Dto::Common::SNSCommandType::PUBLISH_BATCH: {
+
+                    Dto::SNS::PublishBatchRequest snsRequest;
+                    snsRequest.region = clientCommand.region;
+                    snsRequest.user = clientCommand.user;
+                    snsRequest.requestId = clientCommand.requestId;
+                    snsRequest.contentType = clientCommand.contentType;
+                    snsRequest.topicArn = Core::HttpUtils::GetStringParameterFromBody(clientCommand.payload, "TopicArn");
+                    snsRequest.targetArn = Core::HttpUtils::GetStringParameterFromBody(clientCommand.payload, "TargetArn", "");
+                    snsRequest.message = Core::HttpUtils::GetStringParameterFromBody(clientCommand.payload, "Message", "");
+                    snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
+                    Dto::SNS::PublishBatchResponse snsResponse; //= _snsService.Publish(snsRequest);
+
+                    std::map<std::string, std::string> headers;
+                    headers["Content-Type"] = "application/xml";
+                    headers["Content-Length"] = std::to_string(snsResponse.ToXml().length());
+                    headers["amz-sdk-invocation-id"] = snsResponse.requestId;
+
+                    log_info << "Message published, topic: " << snsRequest.topicArn;
+                    return SendResponse(request, http::status::ok, snsResponse.ToXml());
+                }
+
                 case Dto::Common::SNSCommandType::SUBSCRIBE: {
                     Dto::SNS::SubscribeRequest snsRequest;
                     snsRequest.region = clientCommand.region;
@@ -172,7 +194,7 @@ namespace Awsmock::Service {
                     Dto::SNS::UntagResourceResponse snsResponse = _snsService.UntagResource(snsRequest);
 
                     log_info << "Topic untagged, resourceArn: " << resourceArn;
-                    return SendResponse(request, http::status::ok, snsResponse.ToXml());
+                    return SendResponse(request, http::status::ok, Dto::SNS::UntagResourceResponse::ToXml());
                 }
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
@@ -388,7 +410,8 @@ namespace Awsmock::Service {
 
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
-                    log_error << "Unknown method";
+                    log_error << "Unknown command: " << Dto::Common::SNSCommandTypeToString(clientCommand.command);
+                    Core::HttpUtils::DumpRequest(request);
                     return SendResponse(request, http::status::bad_request, "Unknown method");
                 }
             }
@@ -450,4 +473,4 @@ namespace Awsmock::Service {
         return tags;
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
