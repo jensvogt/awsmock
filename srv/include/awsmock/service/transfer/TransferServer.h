@@ -24,18 +24,20 @@ namespace Awsmock::Service {
      */
     class TransferServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
-        explicit TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
+        explicit TransferServer();
 
         /**
          * @brief Shutdown server
          */
         void shutdown() override;
 
-    private:
+      private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "Transfer"};
 
         /**
@@ -79,7 +81,7 @@ namespace Awsmock::Service {
         void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
         /**
-         * @brief Start all transfer servers, if they are not existing
+         * @brief Start all transfer servers if they are not existing
          */
         void StartTransferServers();
 
@@ -164,7 +166,7 @@ namespace Awsmock::Service {
         /**
          * List of transfer servers
          */
-        std::map<std::string, std::shared_ptr<FtpServer::FtpServer> > _transferServerList;
+        std::map<std::string, std::shared_ptr<FtpServer::FtpServer>> _transferServerList;
 
         /**
          * Actual FTP manager
@@ -176,15 +178,6 @@ namespace Awsmock::Service {
          */
         std::shared_ptr<SftpServer> _sftpServer;
 
-        /**
-         * Asynchronous task scheduler
-         */
-        boost::asio::io_context &_ioc;
-
-        /**
-         * @brif Asynchronous tasks scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

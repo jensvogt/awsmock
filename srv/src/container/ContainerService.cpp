@@ -381,6 +381,11 @@ namespace Awsmock::Service {
         hostConfig.extraHosts.emplace_back("localstack:host-gateway");
 
         request.hostConfig = hostConfig;
+
+        const int gatewayPort = Core::Configuration::instance().get<int>("awsmock.gateway.http.port");
+        const std::string healthUrl = "http://host.docker.internal:" + std::to_string(gatewayPort) + "/health";
+        request.healthcheck.test = {"CMD-SHELL", "curl -sf " + healthUrl + " 2>/dev/null || wget -qO- " + healthUrl + " >/dev/null 2>&1 || exit 1"};
+
         log_debug << "Create container request: " << request.ToJson();
 
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/create?name=" + urlName, request.ToJson());

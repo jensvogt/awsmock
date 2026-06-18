@@ -28,10 +28,8 @@ namespace Awsmock::Service {
 
         /**
          * @brief Constructor
-         *
-         * @param scheduler periodic task scheduler
          */
-        explicit MonitoringServer(Core::Scheduler &scheduler);
+        explicit MonitoringServer();
 
         /**
          * @brief Delete monitoring data older than the retention period.
@@ -39,7 +37,8 @@ namespace Awsmock::Service {
          * @par
          * Delete all monitoring data older than the retention period. Default is 3 days, which means monitoring data older than 3 days will be deleted.
          */
-        [[maybe_unused]] void DeleteMonitoringData() const;
+        [[maybe_unused]]
+        void deleteMonitoringData() const;
 
         /**
          * @brief Shutdown the server
@@ -61,12 +60,7 @@ namespace Awsmock::Service {
          * @param labelValue metric label value
          * @return true if supplied values are not in exclusion list
          */
-        bool CheckExclusions(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
-
-        /**
-         * @brief Asynchronous task scheduler
-         */
-        Core::Scheduler &_scheduler;
+        bool checkExclusions(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
         /**
          * @brief Monitoring system collector

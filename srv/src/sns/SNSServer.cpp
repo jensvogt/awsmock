@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _scheduler(scheduler) {
+    SNSServer::SNSServer() : AbstractServer("sns") {
 
         // Configuration
         _deletePeriod = Core::Configuration::instance().get<int>("awsmock.modules.sns.delete-period");
@@ -16,14 +16,14 @@ namespace Awsmock::Service {
         _backupCron = Core::Configuration::instance().get<std::string>("awsmock.modules.sns.backup.cron");
 
         // Start SNS monitoring update counters
-        _scheduler.AddTask("sns-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
+        Core::Scheduler::instance().AddTask("sns-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
 
         // Start the delete old messages task
-        _scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _deletePeriod);
+        Core::Scheduler::instance().AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _deletePeriod);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("sns-backup", [] { BackupSns(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("sns-backup", [] { BackupSns(); }, _backupCron);
         }
 
         // Connect stop signal
@@ -66,8 +66,8 @@ namespace Awsmock::Service {
 
     void SNSServer::shutdown() {
         log_info << "SNS manager server shutting down";
-        _scheduler.Shutdown("sns-monitoring");
-        _scheduler.Shutdown("sns-delete-messages");
-        _scheduler.Shutdown("sns-backup");
+        Core::Scheduler::instance().Shutdown("sns-monitoring");
+        Core::Scheduler::instance().Shutdown("sns-delete-messages");
+        Core::Scheduler::instance().Shutdown("sns-backup");
     }
 }// namespace Awsmock::Service

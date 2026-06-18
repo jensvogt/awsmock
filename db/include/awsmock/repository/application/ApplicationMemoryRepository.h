@@ -32,7 +32,8 @@ namespace Awsmock::Database {
      */
     class ApplicationMemoryRepository final : public IApplicationRepository {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -89,17 +90,32 @@ namespace Awsmock::Database {
         void setEnabled(const std::string &region, const std::string &name, bool enabled) const override;
 
         /**
-         * @brief Returns a list of cognito user pools.
+         * @brief Returns a list of applications
          *
          * @param region AWS region name
          * @param prefix name prefix
          * @param pageSize page size
          * @param pageIndex page index
          * @param sortColumns vector of sort columns and direction
-         * @return list of cognito user pools
+         * @return list of application
          */
         [[nodiscard]]
         std::vector<Entity::Apps::Application> listApplications(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
+
+        /**
+         * @brief Returns a list of all applications of a region
+         *
+         * @param region AWS region name
+         * @return list of all application of a region
+         */
+        std::vector<Entity::Apps::Application> listApplications(const std::string &region) const override;
+
+        /**
+         * @brief Returns a list of all applications
+         *
+         * @return list of all applications
+         */
+        std::vector<Entity::Apps::Application> listApplications() const override;
 
         /**
          * @brief Count all applications by region and prefix
@@ -140,7 +156,8 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllApplications() const override;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -157,4 +174,4 @@ namespace Awsmock::Database {
         static boost::mutex _applicationMutex;
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

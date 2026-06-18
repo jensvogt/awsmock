@@ -45,7 +45,7 @@ namespace Awsmock::Service {
         Core::EventBus::instance().sigMetricGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationDatabase->countApplications({}, {})));
 
         // CPU / memory usage
-        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications()) {
 
             if (!application.containerId.empty() && ContainerService::instance().ContainerExists(application.containerId)) {
                 const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId, application.name);
@@ -146,27 +146,36 @@ namespace Awsmock::Service {
         const auto stopped = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
 
         // Check status
-        for (auto &application: _applicationDatabase->listApplications({}, {}, 0, 0, {})) {
+        for (auto &application: _applicationDatabase->listApplications()) {
+
+            // Don't consider disabled applications
+            if (!application.enabled) {
+                continue;
+            }
 
             // If containerId is empty and the application is enabled, start it
-            if (application.containerId.empty() && application.enabled) {
+            if (application.containerId.empty()) {
                 StartApplication(application);
                 log_info << "Application started, name: " << application.name;
                 continue;
             }
 
-            // If containerId is not empty and the application is disabled, stop it
-            if (!application.containerId.empty() && !application.enabled) {
-                StopApplication(application);
-                log_info << "Application stopped, name: " << application.name;
-                continue;
-            }
-
             // Container exists in Docker but is not running — restart it
-            if (!application.containerId.empty() && application.enabled && application.status == stopped) {
+            if (!application.containerId.empty() && application.status == stopped) {
                 StartApplication(application);
                 log_info << "Application restarted (was stopped), name: " << application.name;
                 continue;
+            }
+
+            // Container is running, but health check reports unhealthy (manager was down) — cycle it so
+            // the app reconnects cleanly now that the manager is back up.
+            if (!application.containerId.empty()) {
+                if (const Dto::Docker::InspectContainerResponse inspect = ContainerService::instance().InspectContainer(application.containerId); inspect.state.healthStatus == "unhealthy") {
+                    StopApplication(application);
+                    StartApplication(application);
+                    log_info << "Application recycled after unhealthy healthcheck, name: " << application.name;
+                    continue;
+                }
             }
 
             // Safety net: if image is gone from Docker, clear the stale DB record

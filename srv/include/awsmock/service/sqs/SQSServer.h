@@ -26,7 +26,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSServer(Core::Scheduler &scheduler);
+        explicit SQSServer();
 
         /**
          * @brief Adjust queue counters
@@ -40,6 +40,9 @@ namespace Awsmock::Service {
 
       private:
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
 
         /**
@@ -76,7 +79,7 @@ namespace Awsmock::Service {
         void SetUrl() const;
 
         /**
-         * @brief Backup the SQS queues and messages
+         * @brief Back up the SQS queues and messages
          */
         static void BackupSqs();
 
@@ -117,11 +120,6 @@ namespace Awsmock::Service {
          * @see @link(https://github.com/mariusbancila/croncpp)croncpp
          */
         std::string _backupCron;
-
-        /**
-         * @brif Asynchronous tasks scheduler
-         */
-        Core::Scheduler &_scheduler;
     };
 
 }// namespace Awsmock::Service

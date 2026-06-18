@@ -106,9 +106,20 @@ namespace Awsmock::Service {
         }
 
         // Request path must be absolute and not contain "..".
-        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
+        if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != beast::string_view::npos) {
             log_error << "Illegal request-target";
             return Core::HttpUtils::BadRequest(request, "Invalid target path");
+        }
+
+        // Health probe — respond immediately without routing so that unauthenticated
+        // liveness checks (e.g. Docker HEALTHCHECK) don't flood the error log.
+        if (request.target() == "/health") {
+            http::response<http::string_body> res{http::status::ok, request.version()};
+            res.set(http::field::content_type, "text/plain");
+            res.keep_alive(request.keep_alive());
+            res.body() = "ok";
+            res.prepare_payload();
+            return res;
         }
 
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {

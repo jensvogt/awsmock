@@ -94,6 +94,14 @@ namespace Awsmock::Database {
         return Core::PageVector<Entity::Apps::Application>(q.to_vector(), pageSize, pageIndex);
     }
 
+    std::vector<Entity::Apps::Application> ApplicationMemoryRepository::listApplications(const std::string &region) const {
+        return listApplications(region, {}, 0, 0, {});
+    }
+
+    std::vector<Entity::Apps::Application> ApplicationMemoryRepository::listApplications() const {
+        return listApplications({}, {}, 0, 0, {});
+    }
+
     long ApplicationMemoryRepository::countApplications(const std::string &region, const std::string &prefix) const {
 
         auto q = Core::from(Core::NumberUtils::toVector(_applications));
@@ -131,4 +139,4 @@ namespace Awsmock::Database {
         log_debug << "All applications deleted";
         return count;
     }
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

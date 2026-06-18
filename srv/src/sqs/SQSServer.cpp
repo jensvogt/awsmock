@@ -7,7 +7,7 @@
 #include "awsmock/dto/sqs/internal/ExportMessagesRequest.h"
 
 namespace Awsmock::Service {
-    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _scheduler(scheduler) {
+    SQSServer::SQSServer() : AbstractServer("sqs") {
 
         _monitoringPeriod = Core::Configuration::instance().get<int>("awsmock.modules.sqs.monitoring-period");
         _resetPeriod = Core::Configuration::instance().get<int>("awsmock.modules.sqs.reset-period");
@@ -18,17 +18,17 @@ namespace Awsmock::Service {
         log_info << "SQS server starting";
 
         // Start SQS monitoring update counters
-        _scheduler.AddTask("sqs-adjust-counter", [this] { this->AdjustCounter(); }, _counterPeriod);
-        _scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
-        _scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("sqs-adjust-counter", [this] { this->AdjustCounter(); }, _counterPeriod);
+        Core::Scheduler::instance().AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        Core::Scheduler::instance().AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, _monitoringPeriod);
 
         // Start reset messages task
-        _scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
-        _scheduler.AddTask("sqs-seturl", [this] { this->SetUrl(); }, -1);
+        Core::Scheduler::instance().AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
+        Core::Scheduler::instance().AddTask("sqs-set-url", [this] { this->SetUrl(); }, -1);
 
         // Start backup
         if (_backupActive) {
-            _scheduler.AddTask("sqs-backup", [] { BackupSqs(); }, _backupCron);
+            Core::Scheduler::instance().AddTask("sqs-backup", [] { BackupSqs(); }, _backupCron);
         }
 
         // Connect stop signal
@@ -138,8 +138,11 @@ namespace Awsmock::Service {
 
     void SQSServer::shutdown() {
         log_info << "SQS manager server shutting down";
-        _scheduler.Shutdown("sns-monitoring");
-        _scheduler.Shutdown("sns-delete-messages");
-        _scheduler.Shutdown("sns-backup");
+        Core::Scheduler::instance().Shutdown("sqs-adjust-counter");
+        Core::Scheduler::instance().Shutdown("sqs-monitoring");
+        Core::Scheduler::instance().Shutdown("sqs-monitoring-wait-time");
+        Core::Scheduler::instance().Shutdown("sqs-reset-messages");
+        Core::Scheduler::instance().Shutdown("sqs-set-url");
+        Core::Scheduler::instance().Shutdown("sqs-backup");
     }
 }// namespace Awsmock::Service

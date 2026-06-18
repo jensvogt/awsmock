@@ -29,9 +29,8 @@ namespace Awsmock::FtpServer {
          * @param serverName name of the manager
          * @param address listen address
          * @param port listen port
-         * @param awsIoc AwsMock IO context
          */
-        FtpServerImpl(std::string serverName, std::string address, uint16_t port, boost::asio::io_context &awsIoc);
+        FtpServerImpl(std::string serverName, std::string address, uint16_t port);
 
         /**
          * Copy (constructor disabled)
@@ -99,7 +98,7 @@ namespace Awsmock::FtpServer {
         /**
          * Stop the manager
          */
-        void stop() const;
+        void stop();
 
         /**
          * Return the number of open connections
@@ -158,9 +157,9 @@ namespace Awsmock::FtpServer {
         std::vector<std::thread> _threadPool;
 
         /**
-         * Asio IO module
+         * Owned IO context for FTP operations (isolated from the main application ioc)
          */
-        //boost::asio::io_context _ioService;
+        boost::asio::io_context _ioService;
 
         /**
          * Asio session acceptor
@@ -177,9 +176,5 @@ namespace Awsmock::FtpServer {
          */
         std::string _serverName;
 
-        /**
-         * AwsMock IOC
-         */
-        boost::asio::io_context &_awsIoc;
     };
 }// namespace Awsmock::FtpServer
