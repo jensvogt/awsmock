@@ -191,7 +191,7 @@ namespace Awsmock::Database {
         return _lambdas | std::views::values | std::ranges::to<std::vector>();
     }
 
-    void LambdaMemoryRepository::setInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
+    void LambdaMemoryRepository::setInstanceValues(const std::string &containerId, const Entity::Lambda::RuntimeStatus &status) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         for (auto &val: _lambdas | std::views::values) {

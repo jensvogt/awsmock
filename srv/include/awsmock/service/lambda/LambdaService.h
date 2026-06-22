@@ -80,6 +80,8 @@
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/lambda/model/InvocationType.h>
+#include <awsmock/dto/lambda/model/LambdaRuntimeStatus.h>
+#include <awsmock/dto/lambda/model/LambdaStatus.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
@@ -461,9 +463,17 @@ namespace Awsmock::Service {
         [[nodiscard]] long DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const;
 
         /**
+         * @brief Applies a GRT heartbeat status report from awsmock-grt to the lambda instance in the database.
+         *
+         * @param region AWS region
+         * @param status GRT runtime status (functionName and port identify the instance)
+         */
+        void UpdateLambdaRuntimeStatus(const std::string &region, const Dto::Lambda::LambdaStatus &status) const;
+
+        /**
          * @brief Starts the lambda function by starting a docker container
          *
-         * @param request start lambda function request
+         * @param request start a lambda function request
          * @throws Core::ServiceException
          * @see Dto::Lambda::StartFunctionRequest
          */

@@ -72,7 +72,7 @@ namespace Awsmock::Database::Entity::Lambda {
         /**
          * Lambda status
          */
-        LambdaInstanceStatus lambdaStatus = InstanceUnknown;
+        // RuntimeStatus lambdaStatus = InstanceUnknown;
 
         /**
          * Duration in milliseconds

@@ -28,7 +28,8 @@ namespace Awsmock::Database {
      */
     class LambdaMongoRepository final : public ILambdaRepository {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -169,7 +170,7 @@ namespace Awsmock::Database {
          * @param status lambda instance status
          * @throws DatabaseException
          */
-        void setInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const override;
+        void setInstanceValues(const std::string &containerId, const Entity::Lambda::RuntimeStatus &status) const override;
 
         /**
          * @brief Sets the status of a lambda instance
@@ -322,7 +323,8 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteAllLambdas() const override;
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
@@ -344,4 +346,4 @@ namespace Awsmock::Database {
         static constexpr auto _lambdaResultCollectionName = "lambda_result";
     };
 
-} // namespace Awsmock::Database
+}// namespace Awsmock::Database

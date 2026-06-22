@@ -21,8 +21,8 @@ namespace Awsmock::Service {
             lambda.averageRuntime = 0;
             lambda.invocations = 0;
             lambda.lastStarted = system_clock::now();
-            lambda.state = Database::Entity::Lambda::LambdaState::Active;
-            lambda.stateReason = "Activated";
+            // lambda.state = Database::Entity::Lambda::LambdaState::Active;
+            // lambda.stateReason = "Activated";
             lambda.codeSize = static_cast<long>(lambda.code.zipFile.size());
             lambda = _lambdaDatabase->updateLambda(lambda);
 
@@ -73,7 +73,7 @@ namespace Awsmock::Service {
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         Database::Entity::Lambda::Instance instance;
         instance.instanceId = instanceId;
-        instance.status = Database::Entity::Lambda::InstanceIdle;
+        // instance.status = Database::Entity::Lambda::InstanceIdle;
         instance.containerName = containerName;
         instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
@@ -94,7 +94,7 @@ namespace Awsmock::Service {
         try {
             CreateInstance(instanceId, lambda, lambda.code.zipFile);
             lambda.lastStarted = system_clock::now();
-            lambda.state = Database::Entity::Lambda::LambdaState::Active;
+            // lambda.state = Database::Entity::Lambda::LambdaState::Active;
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_info << "Lambda instance added, function: " << lambda.function << ", instanceId: " << instanceId << ", total instances: " << lambda.instances.size();
             return lambda;
@@ -141,7 +141,7 @@ namespace Awsmock::Service {
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         Database::Entity::Lambda::Instance instance;
         instance.instanceId = instanceId;
-        instance.status = Database::Entity::Lambda::InstanceIdle;
+        // instance.status = Database::Entity::Lambda::InstanceIdle;
         instance.containerName = containerName;
         instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
@@ -154,7 +154,7 @@ namespace Awsmock::Service {
         lambda.instances.emplace_back(instance);
 
         // Set status and update database
-        lambda.state = Database::Entity::Lambda::LambdaState::Active;
+        // lambda.state = Database::Entity::Lambda::LambdaState::Active;
         lambda = _lambdaDatabase->updateLambda(lambda);
     }
 

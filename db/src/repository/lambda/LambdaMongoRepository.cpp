@@ -201,7 +201,7 @@ namespace Awsmock::Database {
     }
 
 
-    void LambdaMongoRepository::setInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
+    void LambdaMongoRepository::setInstanceValues(const std::string &containerId, const Entity::Lambda::RuntimeStatus &status) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
@@ -209,7 +209,7 @@ namespace Awsmock::Database {
         try {
             _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
                                          make_document(kvp("$set", make_document(
-                                                                           kvp("instances.$.status", LambdaInstanceStatusToString(status)),
+                                                                           kvp("instances.$.status", RuntimeStatusToString(status)),
                                                                            kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
         } catch (mongocxx::exception::system_error &e) {
             log_error << "Get lambda by ARN failed, error: " << e.what();

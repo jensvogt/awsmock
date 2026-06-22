@@ -64,6 +64,7 @@ find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
 find_package(unofficial-libmagic REQUIRED)
 find_package(pcre2 CONFIG REQUIRED)
+find_package(JNI REQUIRED)
 
 if (WIN32)
     find_package(Boost REQUIRED COMPONENTS system)
@@ -101,7 +102,10 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/include/awsmock/core/BsonConverter.h
         core/include/awsmock/core/BsonCursorRange.h dto/include/awsmock/dto/common/mapper/Mapper.h
         core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp
-        db/include/awsmock/entity/apigateway/Resource.h)
+        db/include/awsmock/entity/apigateway/Resource.h
+        dto/include/awsmock/dto/lambda/model/LambdaConfig.h
+        dto/include/awsmock/dto/lambda/model/LambdaStatus.h
+        dto/include/awsmock/dto/lambda/model/LambdaRuntimeStatus.h)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)

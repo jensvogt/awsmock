@@ -95,7 +95,6 @@ namespace Awsmock::Service {
                 ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
-            lambda.state = Database::Entity::Lambda::Inactive;
             lambda = _lambdaDatabase->updateLambda(lambda);
         }
         log_debug << "Lambda instances cleaned up";

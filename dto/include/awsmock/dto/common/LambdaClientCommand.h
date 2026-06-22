@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_LAMBDA_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_LAMBDA_CLIENT_COMMAND_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -18,8 +17,6 @@
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace Awsmock::Dto::Common {
-    namespace http = boost::beast::http;
-    namespace ip = boost::asio::ip;
 
     /**
      * @brief Supported Lambda client commands
@@ -77,6 +74,7 @@ namespace Awsmock::Dto::Common {
         ADD_EVENT_SOURCE_COUNTER,
         DELETE_EVENT_SOURCE_COUNTER,
         REBUILD_LAMBDA,
+        LAMBDA_RUNTIME_STATUS,
         UNKNOWN
     };
 
@@ -132,6 +130,7 @@ namespace Awsmock::Dto::Common {
             {LambdaCommandType::ADD_EVENT_SOURCE_COUNTER, "add-event-source-counter"},
             {LambdaCommandType::DELETE_EVENT_SOURCE_COUNTER, "delete-event-source-counter"},
             {LambdaCommandType::REBUILD_LAMBDA, "rebuild-lambda"},
+            {LambdaCommandType::LAMBDA_RUNTIME_STATUS, "lambda-runtime-status"},
     };
 
     [[maybe_unused]] static std::string LambdaCommandTypeToString(const LambdaCommandType &commandType) {
@@ -203,5 +202,3 @@ namespace Awsmock::Dto::Common {
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 }// namespace Awsmock::Dto::Common
-
-#endif// AWSMOCK_DTO_COMMON_LAMBDA_CLIENT_COMMAND_H
