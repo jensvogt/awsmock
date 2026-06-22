@@ -4,6 +4,8 @@
 
 #include <awsmock/entity/lambda/Instance.h>
 
+#include "awsmock/dto/lambda/model/LambdaRuntimeStatus.h"
+
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Lambda"};
 }
@@ -20,7 +22,7 @@ namespace Awsmock::Database::Entity::Lambda {
             hostName = Core::Bson::BsonUtils::GetStringValue(mResult, "hostName");
             publicPort = Core::Bson::BsonUtils::GetIntValue(mResult, "publicPort");
             privatePort = Core::Bson::BsonUtils::GetIntValue(mResult, "privatePort");
-            status = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
+            status = RuntimeStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult, "lastInvocation");
 
@@ -41,7 +43,7 @@ namespace Awsmock::Database::Entity::Lambda {
             instanceDoc.append(kvp("hostName", hostName));
             instanceDoc.append(kvp("publicPort", publicPort));
             instanceDoc.append(kvp("privatePort", privatePort));
-            instanceDoc.append(kvp("status", LambdaInstanceStatusToString(status)));
+            instanceDoc.append(kvp("status", RuntimeStatusToString(status)));
             instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));
             instanceDoc.append(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)));
             return instanceDoc.extract();

@@ -15,9 +15,9 @@ namespace Awsmock::Dto::Lambda {
         function.runtime = lambdaEntity.runtime;
         function.handler = lambdaEntity.handler;
         function.timeout = lambdaEntity.timeout;
-        function.state = Database::Entity::Lambda::LambdaStateToString(lambdaEntity.state);
-        function.stateReason = lambdaEntity.stateReason;
-        function.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCodeToString(lambdaEntity.stateReasonCode);
+        // function.state = Database::Entity::Lambda::LambdaStateToString(lambdaEntity.state);
+        // function.stateReason = lambdaEntity.stateReason;
+        // function.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCodeToString(lambdaEntity.stateReasonCode);
 
         // Environment
         function.environment.variables = lambdaEntity.environment.variables;
@@ -146,7 +146,7 @@ namespace Awsmock::Dto::Lambda {
             counter.handler = lambdaEntity.handler;
             counter.zipFile = lambdaEntity.code.zipFile;
             counter.enabled = lambdaEntity.enabled;
-            counter.state = LambdaStateToString(lambdaEntity.state);
+            // counter.state = LambdaStateToString(lambdaEntity.state);
             counter.version = lambdaEntity.dockerTag;
             counter.averageRuntime = lambdaEntity.averageRuntime;
             counter.instances = static_cast<long>(lambdaEntity.instances.size());
@@ -169,7 +169,7 @@ namespace Awsmock::Dto::Lambda {
         counter.requestBody = resultEntity.requestBody;
         counter.responseBody = resultEntity.responseBody;
         counter.logMessages = resultEntity.logMessages;
-        counter.lambdaStatus = resultEntity.lambdaStatus;
+        // counter.lambdaStatus = resultEntity.lambdaStatus;
         counter.httpStatusCode = resultEntity.httpStatusCode;
         counter.timestamp = resultEntity.timestamp;
         return counter;
@@ -193,7 +193,42 @@ namespace Awsmock::Dto::Lambda {
         LambdaResult result;
         result.functionArn = resultEntity.lambdaArn;
         result.responseBody = resultEntity.responseBody;
-        result.status = (int) resultEntity.status;
+        result.status = static_cast<int>(resultEntity.status);
         return result;
+    }
+
+    Database::Entity::Lambda::RuntimeStatus Mapper::mapRuntimeStatus(const LambdaRuntimeStatus status) {
+        switch (status) {
+            case LambdaRuntimeStatus::starting:
+                return Database::Entity::Lambda::RuntimeStatus::starting;
+            case LambdaRuntimeStatus::idle:
+                return Database::Entity::Lambda::RuntimeStatus::idle;
+            case LambdaRuntimeStatus::running:
+                return Database::Entity::Lambda::RuntimeStatus::running;
+            case LambdaRuntimeStatus::failed:
+                return Database::Entity::Lambda::RuntimeStatus::failed;
+            case LambdaRuntimeStatus::stopped:
+                return Database::Entity::Lambda::RuntimeStatus::stopped;
+            case LambdaRuntimeStatus::unknown:
+                return Database::Entity::Lambda::RuntimeStatus::unknown;
+        }
+        return Database::Entity::Lambda::RuntimeStatus::unknown;
+    }
+
+    LambdaRuntimeStatus Mapper::mapRuntimeStatus(const Database::Entity::Lambda::RuntimeStatus status) {
+        switch (status) {
+            case Database::Entity::Lambda::RuntimeStatus::starting:
+                return LambdaRuntimeStatus::starting;
+            case Database::Entity::Lambda::RuntimeStatus::idle:
+                return LambdaRuntimeStatus::idle;
+            case Database::Entity::Lambda::RuntimeStatus::running:
+                return LambdaRuntimeStatus::running;
+            case Database::Entity::Lambda::RuntimeStatus::failed:
+                return LambdaRuntimeStatus::failed;
+            case Database::Entity::Lambda::RuntimeStatus::stopped:
+            case Database::Entity::Lambda::RuntimeStatus::unknown:
+                return LambdaRuntimeStatus::stopped;
+        }
+        return LambdaRuntimeStatus::stopped;
     }
 }// namespace Awsmock::Dto::Lambda

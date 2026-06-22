@@ -12,7 +12,13 @@ namespace Awsmock::Service {
 
         // Send request to lambda docker container
         const system_clock::time_point start = system_clock::now();
-        Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/2015-03-31/functions/function/invocations", payload);
+        Core::HttpSocketResponse response;
+        if (lambda.function == "ftp-file-copy") {
+            response = Core::HttpSocket::SendJson(http::verb::post, "localhost", 8080, "/invoke", payload);
+        } else {
+            response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/2015-03-31/functions/function/invocations", payload);
+        }
+
         const long runtime = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
 
         // Get lambda log messages
@@ -22,7 +28,7 @@ namespace Awsmock::Service {
         // update lambda
         lambda.invocations++;
         lambda.averageRuntime = static_cast<long>(std::ceil((lambda.averageRuntime + runtime) / lambda.invocations));
-        _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceIdle);
+        _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::idle);
         _lambdaDatabase->setLambdaValues(lambda, lambda.invocations, lambda.averageRuntime);
 
         // Sanitize logs
@@ -36,7 +42,7 @@ namespace Awsmock::Service {
         lambdaResult.containerId = instance.containerId;
         lambdaResult.status = response.statusCode;
         lambdaResult.httpStatusCode = Core::HttpUtils::StatusCodeToString(response.statusCode);
-        lambdaResult.lambdaStatus = response.statusCode == http::status::ok ? Database::Entity::Lambda::InstanceSuccess : Database::Entity::Lambda::InstanceFailed;
+        // lambdaResult.lambdaStatus = response.statusCode == http::status::ok ? Database::Entity::Lambda::InstanceSuccess : Database::Entity::Lambda::InstanceFailed;
         lambdaResult.requestBody = payload;
         lambdaResult.responseBody = response.body;
         lambdaResult.logMessages = logs;

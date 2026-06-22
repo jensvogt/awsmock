@@ -17,6 +17,7 @@
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
 #include <awsmock/dto/lambda/model/LambdaResult.h>
+#include <awsmock/dto/lambda/model/LambdaRuntimeStatus.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 
@@ -151,6 +152,22 @@ namespace Awsmock::Dto::Lambda {
          * @return lambda result DTO
          */
         static LambdaResult mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity);
+
+        /**
+         * @brief Maps a DTO runtime status to a gamma entity runtime status
+         *
+         * @param status DTO runtime status
+         * @return gamma entity runtime status
+         */
+        static Database::Entity::Lambda::RuntimeStatus mapRuntimeStatus(LambdaRuntimeStatus status);
+
+        /**
+         * @brief Maps a gamma entity runtime status to a DTO runtime status
+         *
+         * @param status gamma entity runtime status
+         * @return DTO runtime status
+         */
+        static LambdaRuntimeStatus mapRuntimeStatus(Database::Entity::Lambda::RuntimeStatus status);
     };
 
 }// namespace Awsmock::Dto::Lambda

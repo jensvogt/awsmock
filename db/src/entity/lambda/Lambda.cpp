@@ -72,16 +72,16 @@ namespace Awsmock::Database::Entity::Lambda {
         }
         log_error << "Lambda instance not found, id: " << instanceId;
     }
-
-    void Lambda::SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status) {
-        for (auto &instance: instances) {
-            if (instanceId == instance.instanceId) {
-                instance.status = status;
-                return;
-            }
-        }
-        log_error << "Lambda instance not found, id: " << instanceId;
-    }
+    //
+    // void Lambda::SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status) {
+    //     for (auto &instance: instances) {
+    //         if (instanceId == instance.instanceId) {
+    //             instance.status = status;
+    //             return;
+    //         }
+    //     }
+    //     log_error << "Lambda instance not found, id: " << instanceId;
+    // }
 
     void Lambda::RemoveInstance(const Instance &instance) {
         RemoveInstance(instance.instanceId);
@@ -147,9 +147,9 @@ namespace Awsmock::Database::Entity::Lambda {
         Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "codeSha256", codeSha256);
         Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "environment", varDoc);
         Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "code", code.ToDocument());
-        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "state", LambdaStateToString(state));
-        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "stateReason", stateReason);
-        Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode));
+        // Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "state", LambdaStateToString(state));
+        // Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "stateReason", stateReason);
+        // Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode));
         Core::Bson::BsonUtils::SetArrayValue(lambdaDoc, "instances", instancesDoc);
         Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "invocations", invocations);
         Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "averageRuntime", averageRuntime);
@@ -184,12 +184,9 @@ namespace Awsmock::Database::Entity::Lambda {
         codeSha256 = Core::Bson::BsonUtils::GetStringValue(mResult, "codeSha256");
         timeout = Core::Bson::BsonUtils::GetIntValue(mResult, "timeout");
         concurrency = Core::Bson::BsonUtils::GetIntValue(mResult, "concurrency");
-        state = LambdaStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
-        stateReason = Core::Bson::BsonUtils::GetStringValue(mResult, "stateReason");
-        stateReasonCode = LambdaStateReasonCodeFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "stateReasonCode"));
-        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastStarted"]);
-        lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastInvocation"]);
-        invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
+        //        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastStarted"]);
+        //        lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastInvocation"]);
+        //        invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
         averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
         dockerTag = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerTag");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");

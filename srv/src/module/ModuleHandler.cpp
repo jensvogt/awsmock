@@ -28,11 +28,7 @@ namespace Awsmock::Service {
                 config.host = host;
                 config.address = address;
                 config.port = port;
-#ifdef WIN32
-                config.pid = _getpid();
-#else
-                config.pid = getpid();
-#endif
+                config.pid = Core::SystemUtils::GetPid();
                 config.user = configuration.get<std::string>("awsmock.user");
                 config.accessId = configuration.get<std::string>("awsmock.access.account-id");
                 config.clientId = configuration.get<std::string>("awsmock.access.client-id");

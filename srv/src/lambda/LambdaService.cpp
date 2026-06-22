@@ -29,9 +29,9 @@ namespace Awsmock::Service {
 
         // Update database
         lambda.timeout = request.timeout;
-        lambda.state = Database::Entity::Lambda::LambdaState::Pending;
-        lambda.stateReason = "Initializing";
-        lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
+        // lambda.state = Database::Entity::Lambda::LambdaState::Pending;
+        // lambda.stateReason = "Initializing";
+        // lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambda = _lambdaDatabase->createOrUpdateLambda(lambda);
 
         // Create instance
@@ -41,7 +41,7 @@ namespace Awsmock::Service {
         // Create lambda
         const LambdaCreator lambdaCreator;
         lambda = lambdaCreator.CreateLambda(lambda, instanceId);
-        log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", status: " << Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status) << ", totalSize: " << lambda.instances.size();
+        log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", status: " << Database::Entity::Lambda::RuntimeStatusToString(instance.status) << ", totalSize: " << lambda.instances.size();
 
         return Dto::Lambda::Mapper::map(request, lambda);
     }
@@ -71,14 +71,14 @@ namespace Awsmock::Service {
         WriteBase64File(lambda.code.zipFile, request.functionCode);
 
         // Update lambda attributes
-        lambda.state = Database::Entity::Lambda::LambdaState::Pending;
+        // lambda.status = Database::Entity::Lambda::LambdaState::Pending;
         lambda.invocations = 0;
         lambda.averageRuntime = 0;
         lambda.dockerTag = request.version;
         lambda.tags["version"] = request.version;
         lambda.tags["dockerTag"] = request.version;
-        lambda.stateReason = "Initializing";
-        lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
+        // lambda.stateReason = "Initializing";
+        // lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Clear lambda results
@@ -493,7 +493,7 @@ namespace Awsmock::Service {
                 Dto::Lambda::InstanceCounter instanceCounter;
                 instanceCounter.instanceId = instance.instanceId;
                 instanceCounter.containerId = instance.containerId;
-                instanceCounter.status = Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status);
+                instanceCounter.status = Database::Entity::Lambda::RuntimeStatusToString(instance.status);
                 instanceCounter.hostname = instance.hostName;
                 instanceCounter.publicPort = instance.publicPort;
                 instanceCounter.privatePort = instance.privatePort;
@@ -609,11 +609,11 @@ namespace Awsmock::Service {
             function.functionName = lambda.function,
             function.handler = lambda.handler,
             function.runtime = lambda.runtime,
-            function.lastUpdateStatus = "Successful",
-            function.state = LambdaStateToString(lambda.state),
-            function.stateReason = lambda.stateReason,
-            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
-            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+            function.lastUpdateStatus = "Successful";
+            // function.state = LambdaStateToString(lambda.state),
+            // function.stateReason = lambda.stateReason,
+            // function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+            // function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response;
             response.region = lambda.region;
@@ -654,7 +654,7 @@ namespace Awsmock::Service {
             response.invocations = lambda.invocations;
             response.averageRuntime = lambda.averageRuntime;
             response.enabled = lambda.enabled;
-            response.state = Database::Entity::Lambda::LambdaStateToString(lambda.state);
+            // response.state = Database::Entity::Lambda::RuntimeStatusToString(lambda.r);
             response.lastStarted = lambda.lastStarted;
             response.lastInvocation = lambda.lastInvocation;
             response.created = lambda.created;
@@ -961,6 +961,41 @@ namespace Awsmock::Service {
         log_debug << "All lambdas disabled, region: " << request.region;
     }
 
+    void LambdaService::UpdateLambdaRuntimeStatus(const std::string &region, const Dto::Lambda::LambdaStatus &status) const {
+        log_debug << "Lambda runtime status update, function: " << status.functionName << ", status: " << Dto::Lambda::runtimeStatusToString(status.runtimeStatus) << ", instanceId: " << status.instanceId;
+
+        if (!_lambdaDatabase->lambdaExists(status.functionName)) {
+            log_warning << "GRT status update: lambda not found, function: " << status.functionName;
+            return;
+        }
+
+        // Update the matching instance status by instanceId; create a new instance if not found
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(region, status.functionName);
+        bool found = false;
+        for (auto &instance: lambda.instances) {
+            if (instance.instanceId == status.instanceId) {
+                instance.status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            Database::Entity::Lambda::Instance newInstance;
+            newInstance.instanceId = status.instanceId;
+            newInstance.publicPort = status.port;
+            newInstance.status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
+            lambda.instances.push_back(newInstance);
+            log_info << "Lambda instance not found, adding new instance, function: " << status.functionName << ", instanceId: " << status.instanceId;
+        }
+
+        // Propagate aggregate stats to the lambda entity
+        lambda.invocations = status.invocations;
+        lambda.averageRuntime = static_cast<long>(status.avgDuration);
+        lambda = _lambdaDatabase->updateLambda(lambda);
+        log_debug << "Lambda runtime status applied, function: " << lambda.function << ", invocations: " << status.invocations;
+    }
+
     void LambdaService::StartLambda(const Dto::Lambda::StartLambdaRequest &request) const {
         Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "start_function");
         log_debug << "Start function, functionArn: " + request.functionArn;
@@ -974,13 +1009,12 @@ namespace Awsmock::Service {
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
         // Check state
-        if (lambda.state == Database::Entity::Lambda::Active && lambda.instances.size() > lambda.concurrency) {
+        if (lambda.instances.size() > lambda.concurrency) {
             log_warning << "Maximal number of instances exceeded, functionArn: " << request.functionArn << ", concurrency: " << lambda.concurrency;
             return;
         }
 
         // Update state
-        lambda.state = Database::Entity::Lambda::Pending;
         lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Create the lambda function asynchronously
@@ -1020,12 +1054,6 @@ namespace Awsmock::Service {
         // Get lambda function
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
 
-        // Check state
-        if (lambda.state == Database::Entity::Lambda::Inactive) {
-            log_info << "Lambda function already inactive, functionArn: " << request.functionArn;
-            return;
-        }
-
         // Delete the containers, if existing
         const ContainerService &dockerService = ContainerService::instance();
         for (const auto &instance: lambda.instances) {
@@ -1038,7 +1066,6 @@ namespace Awsmock::Service {
         }
 
         // Update state
-        lambda.state = Database::Entity::Lambda::Inactive;
         lambda.instances.clear();
         lambda = _lambdaDatabase->updateLambda(lambda);
 
@@ -1071,12 +1098,6 @@ namespace Awsmock::Service {
 
         // Get lambda function
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(request.functionArn);
-
-        // Check state
-        if (lambda.state == Database::Entity::Lambda::Inactive) {
-            log_info << "Lambda function not running, functionArn: " << request.functionArn;
-            return;
-        }
 
         // Delete the containers, if existing
         const ContainerService &dockerService = ContainerService::instance();
@@ -1114,7 +1135,6 @@ namespace Awsmock::Service {
         CleanupDocker(lambda);
 
         // Update state
-        lambda.state = Database::Entity::Lambda::Inactive;
         lambda = _lambdaDatabase->updateLambda(lambda);
 
         // Prune containers

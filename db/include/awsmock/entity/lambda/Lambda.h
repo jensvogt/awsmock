@@ -19,105 +19,105 @@
 #include <awsmock/entity/lambda/Instance.h>
 
 namespace Awsmock::Database::Entity::Lambda {
-
-    /**
-     * @brief Lambda entity
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    enum LambdaState {
-        Pending,
-        Active,
-        Inactive,
-        Failed
-    };
-
-    static std::map<LambdaState, std::string> LambdaStateNames{
-            {Pending, "Pending"},
-            {Active, "Active"},
-            {Inactive, "Inactive"},
-            {Failed, "Failed"},
-    };
-
-    [[maybe_unused]] static std::string LambdaStateToString(const LambdaState &lambdaState) {
-        return LambdaStateNames[lambdaState];
-    }
-
-    [[maybe_unused]] static LambdaState LambdaStateFromString(const std::string &lambdaState) {
-        for (auto &[fst, snd]: LambdaStateNames) {
-            if (snd == lambdaState) {
-                return fst;
-            }
-        }
-        return Inactive;
-    }
-
-    enum LambdaStateReasonCode {
-        Idle,
-        Creating,
-        Restoring,
-        EniLimitExceeded,
-        InsufficientRolePermissions,
-        InvalidConfiguration,
-        InternalError,
-        SubnetOutOfIPAddresses,
-        InvalidSubnet,
-        InvalidSecurityGroup,
-        ImageDeleted,
-        ImageAccessDenied,
-        InvalidImage,
-        KMSKeyAccessDenied,
-        KMSKeyNotFound,
-        InvalidStateKMSKey,
-        DisabledKMSKey,
-        EFSIOError,
-        EFSMountConnectivityError,
-        EFSMountFailure,
-        EFSMountTimeout,
-        InvalidRuntime,
-        InvalidZipFileException,
-        FunctionError
-    };
-
-    static std::map<LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
-            {Idle, "Idle"},
-            {Creating, "Creating"},
-            {Restoring, "Restoring"},
-            {EniLimitExceeded, "EniLimitExceeded"},
-            {InsufficientRolePermissions, "InsufficientRolePermissions"},
-            {InvalidConfiguration, "InvalidConfiguration"},
-            {InternalError, "InternalError"},
-            {SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
-            {InvalidSubnet, "InvalidSubnet"},
-            {InvalidSecurityGroup, "InvalidSecurityGroup"},
-            {ImageDeleted, "ImageDeleted"},
-            {ImageAccessDenied, "ImageAccessDenied"},
-            {InvalidImage, "InvalidImage"},
-            {KMSKeyAccessDenied, "KMSKeyAccessDenied"},
-            {KMSKeyNotFound, "KMSKeyNotFound"},
-            {InvalidStateKMSKey, "InvalidStateKMSKey"},
-            {DisabledKMSKey, "DisabledKMSKey"},
-            {EFSIOError, "EFSIOError"},
-            {EFSMountConnectivityError, "EFSMountConnectivityError"},
-            {EFSMountFailure, "EFSMountFailure"},
-            {EFSMountTimeout, "EFSMountTimeout"},
-            {InvalidRuntime, "InvalidRuntime"},
-            {InvalidZipFileException, "InvalidZipFileException"},
-            {FunctionError, "FunctionError"},
-    };
-
-    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode &lambdaStateReasonCode) {
-        return LambdaStateReasonCodeNames[lambdaStateReasonCode];
-    }
-
-    [[maybe_unused]] static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
-        for (auto &[fst, snd]: LambdaStateReasonCodeNames) {
-            if (snd == lambdaStateReasonCode) {
-                return fst;
-            }
-        }
-        return Idle;
-    }
+    //
+    // /**
+    //  * @brief Lambda entity
+    //  *
+    //  * @author jens.vogt\@opitz-consulting.com
+    //  */
+    // enum LambdaState {
+    //     Pending,
+    //     Active,
+    //     Inactive,
+    //     Failed
+    // };
+    //
+    // static std::map<LambdaState, std::string> LambdaStateNames{
+    //         {Pending, "Pending"},
+    //         {Active, "Active"},
+    //         {Inactive, "Inactive"},
+    //         {Failed, "Failed"},
+    // };
+    //
+    // [[maybe_unused]] static std::string LambdaStateToString(const LambdaState &lambdaState) {
+    //     return LambdaStateNames[lambdaState];
+    // }
+    //
+    // [[maybe_unused]] static LambdaState LambdaStateFromString(const std::string &lambdaState) {
+    //     for (auto &[fst, snd]: LambdaStateNames) {
+    //         if (snd == lambdaState) {
+    //             return fst;
+    //         }
+    //     }
+    //     return Inactive;
+    // }
+    //
+    // enum LambdaStateReasonCode {
+    //     Idle,
+    //     Creating,
+    //     Restoring,
+    //     EniLimitExceeded,
+    //     InsufficientRolePermissions,
+    //     InvalidConfiguration,
+    //     InternalError,
+    //     SubnetOutOfIPAddresses,
+    //     InvalidSubnet,
+    //     InvalidSecurityGroup,
+    //     ImageDeleted,
+    //     ImageAccessDenied,
+    //     InvalidImage,
+    //     KMSKeyAccessDenied,
+    //     KMSKeyNotFound,
+    //     InvalidStateKMSKey,
+    //     DisabledKMSKey,
+    //     EFSIOError,
+    //     EFSMountConnectivityError,
+    //     EFSMountFailure,
+    //     EFSMountTimeout,
+    //     InvalidRuntime,
+    //     InvalidZipFileException,
+    //     FunctionError
+    // };
+    //
+    // static std::map<LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
+    //         {Idle, "Idle"},
+    //         {Creating, "Creating"},
+    //         {Restoring, "Restoring"},
+    //         {EniLimitExceeded, "EniLimitExceeded"},
+    //         {InsufficientRolePermissions, "InsufficientRolePermissions"},
+    //         {InvalidConfiguration, "InvalidConfiguration"},
+    //         {InternalError, "InternalError"},
+    //         {SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
+    //         {InvalidSubnet, "InvalidSubnet"},
+    //         {InvalidSecurityGroup, "InvalidSecurityGroup"},
+    //         {ImageDeleted, "ImageDeleted"},
+    //         {ImageAccessDenied, "ImageAccessDenied"},
+    //         {InvalidImage, "InvalidImage"},
+    //         {KMSKeyAccessDenied, "KMSKeyAccessDenied"},
+    //         {KMSKeyNotFound, "KMSKeyNotFound"},
+    //         {InvalidStateKMSKey, "InvalidStateKMSKey"},
+    //         {DisabledKMSKey, "DisabledKMSKey"},
+    //         {EFSIOError, "EFSIOError"},
+    //         {EFSMountConnectivityError, "EFSMountConnectivityError"},
+    //         {EFSMountFailure, "EFSMountFailure"},
+    //         {EFSMountTimeout, "EFSMountTimeout"},
+    //         {InvalidRuntime, "InvalidRuntime"},
+    //         {InvalidZipFileException, "InvalidZipFileException"},
+    //         {FunctionError, "FunctionError"},
+    // };
+    //
+    // [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode &lambdaStateReasonCode) {
+    //     return LambdaStateReasonCodeNames[lambdaStateReasonCode];
+    // }
+    //
+    // [[maybe_unused]] static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
+    //     for (auto &[fst, snd]: LambdaStateReasonCodeNames) {
+    //         if (snd == lambdaStateReasonCode) {
+    //             return fst;
+    //         }
+    //     }
+    //     return Idle;
+    // }
 
     struct Lambda {
 
@@ -219,21 +219,6 @@ namespace Awsmock::Database::Entity::Lambda {
          * Environment
          */
         Environment environment;
-
-        /**
-         * lambda state
-         */
-        mutable LambdaState state = Pending;
-
-        /**
-         * State reason
-         */
-        std::string stateReason;
-
-        /**
-         * State reason code
-         */
-        LambdaStateReasonCode stateReasonCode = Creating;
 
         /**
          * Code SHA256
@@ -423,7 +408,7 @@ namespace Awsmock::Database::Entity::Lambda {
          * @param instanceId instance ID
          * @param status instance status
          */
-        void SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status);
+        // void SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status);
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -467,13 +452,13 @@ namespace Awsmock::Database::Entity::Lambda {
 
     inline bool Lambda::HasIdleInstance() {
         return std::ranges::find_if(instances, [](const Instance &i) {
-                   return i.status == InstanceIdle;
+                   return i.status == idle;
                }) != instances.end();
     }
 
     inline Instance Lambda::GetIdleInstance() {
         const auto it = std::ranges::find_if(instances, [](const Instance &i) {
-            return i.status == InstanceIdle;
+            return i.status == idle;
         });
         if (it != instances.end()) {
             return *it;
@@ -483,13 +468,13 @@ namespace Awsmock::Database::Entity::Lambda {
 
     inline long Lambda::CountIdleInstances() {
         return std::ranges::count_if(instances, [](const Instance &i) {
-            return i.status == InstanceIdle;
+            return i.status == idle;
         });
     }
 
     inline long Lambda::CountRunningInstances() {
         return std::ranges::count_if(instances, [](const Instance &i) {
-            return i.status == InstanceRunning;
+            return i.status == running;
         });
     }
 

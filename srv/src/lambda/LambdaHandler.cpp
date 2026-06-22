@@ -478,6 +478,13 @@ namespace Awsmock::Service {
                 return SendResponse(request, http::status::ok);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LAMBDA_RUNTIME_STATUS) {
+                const Dto::Lambda::LambdaStatus status = Dto::Lambda::LambdaStatus::FromJson(clientCommand.payload);
+                _lambdaService.UpdateLambdaRuntimeStatus(region, status);
+                log_info << "Lambda runtime status applied, function: " << status.functionName << ", pid: " << status.pid << ", status: " << status.runtimeStatus;
+                return SendResponse(request, http::status::ok);
+            }
+
             log_error << "Unknown method";
             return SendResponse(request, http::status::bad_request, "Unknown method");
         } catch (Core::ServiceException &exc) {

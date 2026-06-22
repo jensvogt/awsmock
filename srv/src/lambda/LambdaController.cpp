@@ -16,33 +16,33 @@ namespace Awsmock::Service {
         // Connect EventBus signals ------------------------------------------------
 
         Core::EventBus::instance().sigLambdaStart.connect(
-            boost::signals2::signal<void(std::string, std::string)>::slot_type(
-                &LambdaController::OnStartLambda, this,
-                std::placeholders::_1, std::placeholders::_2));
+                boost::signals2::signal<void(std::string, std::string)>::slot_type(
+                        &LambdaController::OnStartLambda, this,
+                        std::placeholders::_1, std::placeholders::_2));
 
         Core::EventBus::instance().sigLambdaStop.connect(
-            boost::signals2::signal<void(std::string, std::string)>::slot_type(
-                &LambdaController::OnStopLambda, this,
-                std::placeholders::_1, std::placeholders::_2));
+                boost::signals2::signal<void(std::string, std::string)>::slot_type(
+                        &LambdaController::OnStopLambda, this,
+                        std::placeholders::_1, std::placeholders::_2));
 
         Core::EventBus::instance().sigLambdaStartAll.connect(
-            boost::signals2::signal<void(std::string)>::slot_type(
-                &LambdaController::OnStartAllLambdas, this, std::placeholders::_1));
+                boost::signals2::signal<void(std::string)>::slot_type(
+                        &LambdaController::OnStartAllLambdas, this, std::placeholders::_1));
 
         Core::EventBus::instance().sigLambdaStopAll.connect(
-            boost::signals2::signal<void(std::string)>::slot_type(
-                &LambdaController::OnStopAllLambdas, this, std::placeholders::_1));
+                boost::signals2::signal<void(std::string)>::slot_type(
+                        &LambdaController::OnStopAllLambdas, this, std::placeholders::_1));
 
         Core::EventBus::instance().sigLambdaInvoke.connect(
-            boost::signals2::signal<void(std::string, std::string, std::string, std::string,
-                                         std::shared_ptr<std::promise<std::pair<int, std::string> > >)>::slot_type(&LambdaController::OnInvokeLambda, this,
-                                                                                                                   std::placeholders::_1, std::placeholders::_2,
-                                                                                                                   std::placeholders::_3, std::placeholders::_4,
-                                                                                                                   std::placeholders::_5));
+                boost::signals2::signal<void(std::string, std::string, std::string, std::string,
+                                             std::shared_ptr<std::promise<std::pair<int, std::string>>>)>::slot_type(&LambdaController::OnInvokeLambda, this,
+                                                                                                                     std::placeholders::_1, std::placeholders::_2,
+                                                                                                                     std::placeholders::_3, std::placeholders::_4,
+                                                                                                                     std::placeholders::_5));
 
         Core::EventBus::instance().sigLambdaCheck.connect(
-            boost::signals2::signal<void(std::string)>::slot_type(
-                &LambdaController::OnCheckLambda, this, std::placeholders::_1));
+                boost::signals2::signal<void(std::string)>::slot_type(
+                        &LambdaController::OnCheckLambda, this, std::placeholders::_1));
 
         // Periodic health check task ----------------------------------------------
         Core::Scheduler::instance().AddTask("lambda-controller-health", [this] { CheckContainerHealth(); }, _healthCheckPeriod, _healthCheckPeriod);
@@ -106,7 +106,7 @@ namespace Awsmock::Service {
     }
 
     void LambdaController::OnInvokeLambda(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &invocationType,
-                                          const std::shared_ptr<std::promise<std::pair<int, std::string> > > &promise) const {
+                                          const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) const {
         log_info << "Lambda invoke requested, function: " << functionName << ", type: " << invocationType;
         try {
             const auto accountId = Core::Configuration::instance().getAccountId();
@@ -157,7 +157,7 @@ namespace Awsmock::Service {
                 }
 
                 // Step 3 — claim the instance before releasing the lock
-                _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceRunning);
+                _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::running);
             }
 
             // Invoke outside the lock so other requests can claim their own instance in parallel
@@ -210,9 +210,9 @@ namespace Awsmock::Service {
             }
 
             if (updated) {
-                if (lambda.instances.empty()) {
-                    lambda.state = Database::Entity::Lambda::Inactive;
-                }
+                // if (lambda.instances.empty()) {
+                //     lambda.state = Database::Entity::Lambda::Inactive;
+                // }
                 lambda = _lambdaDatabase->updateLambda(lambda);
             }
             Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
@@ -251,9 +251,9 @@ namespace Awsmock::Service {
                 }
 
                 if (updated) {
-                    if (lambda.instances.empty()) {
-                        lambda.state = Database::Entity::Lambda::Inactive;
-                    }
+                    // if (lambda.instances.empty()) {
+                    //     lambda.state = Database::Entity::Lambda::Inactive;
+                    // }
                     lambda = _lambdaDatabase->updateLambda(lambda);
                     log_debug << "Health-check: lambda updated, function: " << lambda.function << ", remaining instances: " << lambda.instances.size();
                 }
@@ -265,4 +265,4 @@ namespace Awsmock::Service {
         log_debug << "Lambda controller health-check finished";
     }
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service
