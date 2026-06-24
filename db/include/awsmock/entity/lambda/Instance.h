@@ -12,42 +12,45 @@
 // AwsMOck includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
+#include <awsmock/entity/lambda/RuntimeStatus.h>
 
 namespace Awsmock::Database::Entity::Lambda {
-
-    /**
-     * @brief Lambda instance status enum
-     *
-     * @author jens.vogt\@opitz-consulting.com
-     */
-    enum LambdaInstanceStatus {
-        InstanceIdle,
-        InstanceRunning,
-        InstanceSuccess,
-        InstanceFailed,
-        InstanceUnknown
-    };
-
-    static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
-            {InstanceIdle, "Idle"},
-            {InstanceRunning, "Running"},
-            {InstanceSuccess, "Success"},
-            {InstanceFailed, "Failed"},
-            {InstanceUnknown, "Unknown"},
-    };
-
-    [[maybe_unused]] static std::string LambdaInstanceStatusToString(const LambdaInstanceStatus &lambdaInstanceStatus) {
-        return LambdaInstanceStatusNames[lambdaInstanceStatus];
-    }
-
-    [[maybe_unused]] static LambdaInstanceStatus LambdaInstanceStatusFromString(const std::string &lambdaInstanceStatus) {
-        for (auto &[fst, snd]: LambdaInstanceStatusNames) {
-            if (snd == lambdaInstanceStatus) {
-                return fst;
-            }
-        }
-        return InstanceUnknown;
-    }
+    //
+    // /**
+    //  * @brief Lambda instance status enum
+    //  *
+    //  * @author jens.vogt\@opitz-consulting.com
+    //  */
+    // enum LambdaInstanceStatus {
+    //     InstanceStarting,
+    //     InstanceIdle,
+    //     InstanceRunning,
+    //     InstanceSuccess,
+    //     InstanceFailed,
+    //     InstanceUnknown
+    // };
+    //
+    // static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
+    //         {InstanceStarting, "Starting"},
+    //         {InstanceIdle, "Idle"},
+    //         {InstanceRunning, "Running"},
+    //         {InstanceSuccess, "Success"},
+    //         {InstanceFailed, "Failed"},
+    //         {InstanceUnknown, "Unknown"},
+    // };
+    //
+    // [[maybe_unused]] static std::string LambdaInstanceStatusToString(const LambdaInstanceStatus &lambdaInstanceStatus) {
+    //     return LambdaInstanceStatusNames[lambdaInstanceStatus];
+    // }
+    //
+    // [[maybe_unused]] static LambdaInstanceStatus LambdaInstanceStatusFromString(const std::string &lambdaInstanceStatus) {
+    //     for (auto &[fst, snd]: LambdaInstanceStatusNames) {
+    //         if (snd == lambdaInstanceStatus) {
+    //             return fst;
+    //         }
+    //     }
+    //     return InstanceUnknown;
+    // }
 
     /**
      * @brief Lambda instance entity
@@ -95,7 +98,7 @@ namespace Awsmock::Database::Entity::Lambda {
         /**
          * Status
          */
-        LambdaInstanceStatus status = InstanceUnknown;
+        RuntimeStatus status = unknown;
 
         /**
          * Last invocation timestamp
@@ -118,7 +121,7 @@ namespace Awsmock::Database::Entity::Lambda {
         /**
          * @brief Converts the entity to a MongoDB document
          *
-         * @return entity as MongoDB document.
+         * @return entity as a MongoDB document.
          */
         [[nodiscard]]
         view_or_value<view, value> ToDocument() const override;

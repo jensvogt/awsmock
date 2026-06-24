@@ -37,7 +37,7 @@ namespace Awsmock::Core {
         if (!_periodicTasks.contains(name)) {
             _periodicTasks[name] = std::make_unique<PeriodicEntry>(std::ref(_ioc), name, interval, std::move(task), delay);
         }
-        log_info << "Periodic task size:" << _periodicTasks.size();
+        log_debug << "Periodic task size:" << _periodicTasks.size();
     }
 
     void Scheduler::AddOneTimeTask(const std::string &name, handler_fn task, long delay) {
@@ -54,7 +54,7 @@ namespace Awsmock::Core {
             };
             _periodicTasks[name] = std::make_unique<PeriodicEntry>(std::ref(_ioc), name, 0, std::move(wrapped), delay);
         }
-        log_info << "Periodic task size:" << _periodicTasks.size();
+        log_debug << "Periodic task size:" << _periodicTasks.size();
     }
 
     std::shared_future<void> Scheduler::AddWaitableOneTimeTask(const std::string &name, handler_fn task, long delay) {
@@ -72,7 +72,7 @@ namespace Awsmock::Core {
             };
             _periodicTasks[name] = std::make_unique<PeriodicEntry>(std::ref(_ioc), name, 0, std::move(wrapped), delay);
         }
-        log_info << "Periodic task size:" << _periodicTasks.size();
+        log_debug << "Periodic task size:" << _periodicTasks.size();
         return future;
     }
 
@@ -80,7 +80,7 @@ namespace Awsmock::Core {
         if (!_cronTasks.contains(name)) {
             _cronTasks[name] = std::make_unique<CronEntry>(std::ref(_ioc), name, cronExpression, std::move(task));
         }
-        log_info << "Cron task size:" << _periodicTasks.size();
+        log_debug << "Cron task size:" << _periodicTasks.size();
     }
 
     void Scheduler::Shutdown() const {
@@ -101,6 +101,7 @@ namespace Awsmock::Core {
             _cronTasks[name]->Stop();
             _cronTasks.erase(name);
         }
+        log_info << "Shutdown task, name: " << name;
     }
 
     // ---- PeriodicEntry ----
@@ -155,9 +156,9 @@ namespace Awsmock::Core {
     }
 
     void Scheduler::PeriodicEntry::Stop() {
-        log_debug << "Stopping periodic task '" << name << "'";
+        log_debug << "Stopping periodic task, name: " << name;
         timer.cancel();
-        log_debug << "Periodic task '" << name << "' stopped";
+        log_info << "Periodic task stopped, name: " << name;
     }
 
     void Scheduler::PeriodicEntry::StartWait() {
@@ -196,9 +197,9 @@ namespace Awsmock::Core {
     }
 
     void Scheduler::CronEntry::Stop() {
-        log_debug << "Stopping cron task '" << name << "'";
+        log_debug << "Stopping cron task, name: " << name;
         timer.cancel();
-        log_debug << "Cron task '" << name << "' stopped";
+        log_debug << "Cron task stopped, name: " << name;
     }
 
     void Scheduler::CronEntry::StartWait() {

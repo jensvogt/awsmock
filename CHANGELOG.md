@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.18.76](https://github.com/jensvogt/awsmock/compare/v1.18.75...v1.18.76) (2026-06-18)
+
+
+### Bug Fixes
+
+* add resource to rest api ([#2486](https://github.com/jensvogt/awsmock/issues/2486)) ([6f5f89a](https://github.com/jensvogt/awsmock/commit/6f5f89a2bbdc4845101821a595d7b645815c8ff8))
+
+## [1.18.75](https://github.com/jensvogt/awsmock/compare/v1.18.74...v1.18.75) (2026-06-18)
+
+
+### Bug Fixes
+
+* memory management improvements ([71f5764](https://github.com/jensvogt/awsmock/commit/71f5764135e0da3a984a4266a27ae019c4581329))
+
 ## [1.18.74](https://github.com/jensvogt/awsmock/compare/1.18.73...v1.18.74) (2026-06-18)
 
 

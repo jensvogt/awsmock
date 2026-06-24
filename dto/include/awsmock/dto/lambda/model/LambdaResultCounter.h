@@ -87,7 +87,7 @@ namespace Awsmock::Dto::Lambda {
         /**
          * Lambda status
          */
-        Database::Entity::Lambda::LambdaInstanceStatus lambdaStatus = Database::Entity::Lambda::InstanceUnknown;
+        // Database::Entity::Lambda::RuntimeStatus lambdaStatus = unknown;
 
         /**
          *
@@ -110,7 +110,7 @@ namespace Awsmock::Dto::Lambda {
             r.instanceId = Core::Json::GetStringValue(v, "instanceId");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.httpStatusCode = Core::Json::GetStringValue(v, "httpStatusCode");
-            r.lambdaStatus = Database::Entity::Lambda::LambdaInstanceStatusFromString(Core::Json::GetStringValue(v, "lambdaStatus"));
+            // r.status = Database::Entity::Lambda::LambdaInstanceStatusFromString(Core::Json::GetStringValue(v, "lambdaStatus"));
             r.timestamp = Core::DateTimeUtils::FromISO8601(v.at("timestamp").as_string().data());
             return r;
         }
@@ -128,7 +128,7 @@ namespace Awsmock::Dto::Lambda {
                     {"instanceId", obj.instanceId},
                     {"containerId", obj.containerId},
                     {"httpStatusCode", obj.httpStatusCode},
-                    {"lambdaStatus", Database::Entity::Lambda::LambdaInstanceStatusToString(obj.lambdaStatus)},
+                    // {"lambdaStatus", Database::Entity::Lambda::LambdaInstanceStatusToString(obj.lambdaStatus)},
                     {"timestamp", Core::DateTimeUtils::ToISO8601(obj.timestamp)},
             };
         }

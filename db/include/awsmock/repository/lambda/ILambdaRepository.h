@@ -169,7 +169,7 @@ namespace Awsmock::Database {
          * @param status lambda instance status
          * @throws DatabaseException
          */
-        virtual void setInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const = 0;
+        virtual void setInstanceValues(const std::string &containerId, const Entity::Lambda::RuntimeStatus &status) const = 0;
 
         /**
          * @brief Sets the status of a lambda instance
