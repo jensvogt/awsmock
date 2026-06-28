@@ -216,7 +216,7 @@ namespace Awsmock::Dto::DynamoDb {
             Item r;
             r.oid = Core::Json::GetStringValue(v, "oid");
             r.tableName = Core::Json::GetStringValue(v, "tableName");
-            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.created = Core::Json::GetDatetimeValue(v, "lastStarted");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
 
             if (Core::Json::AttributeExists(v, "attributes")) {
@@ -230,7 +230,7 @@ namespace Awsmock::Dto::DynamoDb {
                     {"oid", obj.oid},
                     {"tableName", obj.tableName},
                     {"attributes", boost::json::value_from(obj.attributes)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

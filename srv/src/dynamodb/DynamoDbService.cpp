@@ -66,7 +66,7 @@ namespace Awsmock::Service {
             createTableResponse.tableArn = table.arn;
             createTableResponse.keySchemas = Dto::DynamoDb::Mapper::map(table.keySchema);
             createTableResponse.attributeDefinitions = Dto::DynamoDb::Mapper::map(table.attributeDefinitions);
-            log_debug << "DynamoDb table created, name: " << table.name;
+            log_debug << "DynamoDb table lastStarted, name: " << table.name;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd create table failed, error: " << exc.message();

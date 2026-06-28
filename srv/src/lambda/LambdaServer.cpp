@@ -28,8 +28,8 @@ namespace Awsmock::Service {
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
         // Start the delete old lambda task
-        Core::Scheduler::instance().AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _removePeriod, _removePeriod);
-        log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
+        // Core::Scheduler::instance().AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _removePeriod, _removePeriod);
+        // log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
 
         // Start delete old lambda logs
         const long interval = _logRetentionPeriod * 24 * 60 * 60;
@@ -109,7 +109,7 @@ namespace Awsmock::Service {
             request.driver = "bridge";
 
             Dto::Docker::CreateNetworkResponse response = _dockerService.CreateNetwork(request);
-            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << response.id;
+            log_debug << "Docker network lastStart, name: " << request.name << " driver: " << request.driver << " id: " << response.id;
         } else {
             log_debug << "Docker network exists already, name: local";
         }
@@ -136,7 +136,7 @@ namespace Awsmock::Service {
 
             const bool hasExpired = std::ranges::any_of(lambda.instances,
                                                         [expired](const Database::Entity::Lambda::Instance &instance) {
-                                                            return instance.created > system_clock::time_point::min() && instance.created < expired;
+                                                            return instance.lastStart > system_clock::time_point::min() && instance.lastStart < expired;
                                                         });
 
             if (hasExpired) {
@@ -167,7 +167,7 @@ namespace Awsmock::Service {
         }
 
         for (const auto &lambda: lambdas) {
-            Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambdas.size()));
+            Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
         }
         log_trace << "Lambda monitoring finished";
     }

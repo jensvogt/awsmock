@@ -94,7 +94,7 @@ namespace Awsmock::Dto::S3 {
             r.size = Core::Json::GetLongValue(v, "size");
             r.internalName = Core::Json::GetStringValue(v, "internalName");
             r.body = Core::Json::GetStringValue(v, "body");
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             if (Core::Json::AttributeExists(v, "metadata")) {
                 r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
@@ -113,7 +113,7 @@ namespace Awsmock::Dto::S3 {
                     {"size", obj.size},
                     {"internalName", obj.internalName},
                     {"body", obj.body},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
 

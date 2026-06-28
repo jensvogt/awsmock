@@ -134,8 +134,7 @@ namespace Awsmock::Service {
                 } else if (static_cast<int>(lambda.instances.size()) < lambda.concurrency) {
                     // Below maxConcurrency: start a new container
                     const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-                    const LambdaCreator creator;
-                    lambda = creator.AddInstance(lambda, instanceId);
+                    lambda = _lambdaService.AddInstance(lambda, instanceId);
                     instance = lambda.GetInstance(instanceId);
                     log_info << "New instance started, function: " << functionName << ", instanceId: " << instanceId << ", total: " << lambda.instances.size();
 
@@ -155,22 +154,13 @@ namespace Awsmock::Service {
                     instance = lambda.GetIdleInstance();
                     log_debug << "Idle instance available after wait, function: " << functionName << ", instanceId: " << instance.instanceId;
                 }
-
-                // Step 3 — claim the instance before releasing the lock
-                _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::running);
             }
 
             // Invoke outside the lock so other requests can claim their own instance in parallel
-            const std::string &body = payload;
-            const LambdaExecutor executor;
-            const Database::Entity::Lambda::LambdaResult lambdaResult = executor.Invocation(lambda, instance, body);
-
-            if (promise) {
-                promise->set_value({static_cast<int>(lambdaResult.status), lambdaResult.responseBody});
-            }
+            InvokeInstance(lambda, instance, payload, promise);
 
             Core::EventBus::instance().sigMetricRate(LAMBDA_INVOCATION_COUNT, "function_name", functionName);
-            log_info << "Lambda invoked, function: " << functionName << ", status: " << lambdaResult.status;
+            log_info << "Lambda invoked, function: " << functionName;
 
         } catch (std::exception &e) {
             if (promise) {
@@ -219,6 +209,47 @@ namespace Awsmock::Service {
         } catch (std::exception &e) {
             log_error << "Lambda check failed, arn: " << functionArn << ", error: " << e.what();
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Instance invocation (moved from LambdaExecutor)
+    // -------------------------------------------------------------------------
+
+    void LambdaController::InvokeInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload,
+                                          const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) const {
+        Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
+        log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.publicPort;
+
+        const system_clock::time_point start = system_clock::now();
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/invoke", payload);
+
+        log_info << "Getting lambda logs, containerId: " << instance.containerId;
+        std::string logs = _containerService.GetContainerLogs(instance.containerId, start);
+
+        logs = Core::StringUtils::RemoveColorCoding(logs);
+        logs = Core::StringUtils::SanitizeUtf8(logs);
+        logs = Core::StringUtils::RemoveUnprintableAscii(logs);
+
+        Database::Entity::Lambda::LambdaResult lambdaResult;
+        lambdaResult.instanceId = instance.instanceId;
+        lambdaResult.containerId = instance.containerId;
+        lambdaResult.status = response.statusCode;
+        lambdaResult.httpStatusCode = Core::HttpUtils::StatusCodeToString(response.statusCode);
+        lambdaResult.requestBody = payload;
+        lambdaResult.responseBody = response.body;
+        lambdaResult.logMessages = logs;
+        lambdaResult.lambdaName = lambda.function;
+        lambdaResult.lambdaArn = lambda.arn;
+        lambdaResult.duration = duration;
+        lambdaResult = _lambdaDatabase->createLambdaResult(lambdaResult);
+
+        Core::EventBus::instance().sigMetricGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, duration);
+
+        if (promise) {
+            promise->set_value({static_cast<int>(lambdaResult.status), lambdaResult.responseBody});
+        }
+
+        log_info << "Lambda invocation finished, lambda: " << lambda.function;
     }
 
     // -------------------------------------------------------------------------

@@ -47,7 +47,7 @@ namespace Awsmock::Service {
 
             // Store in the database
             parameterEntity = _ssmDatabase->createParameter(parameterEntity);
-            log_trace << "SSM parameter created: " << parameterEntity.ToString();
+            log_trace << "SSM parameter lastStarted: " << parameterEntity.ToString();
 
             Dto::SSM::PutParameterResponse response;
             response.tier = parameterEntity.tier;
@@ -98,7 +98,7 @@ namespace Awsmock::Service {
 
             // Store in the database
             parameterEntity = _ssmDatabase->createParameter(parameterEntity);
-            log_trace << "SSM parameter created: " << parameterEntity.ToString();
+            log_trace << "SSM parameter lastStarted: " << parameterEntity.ToString();
 
             Dto::SSM::ListParameterCountersRequest response;
             response.prefix = request.prefix;
@@ -144,7 +144,7 @@ namespace Awsmock::Service {
 
             // Store in the database
             parameterEntity = _ssmDatabase->updateParameter(parameterEntity);
-            log_trace << "SSM parameter created: " << parameterEntity.ToString();
+            log_trace << "SSM parameter lastStarted: " << parameterEntity.ToString();
 
             Dto::SSM::ListParameterCountersRequest response;
             response.prefix = request.prefix;

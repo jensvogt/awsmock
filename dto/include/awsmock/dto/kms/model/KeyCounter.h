@@ -114,7 +114,7 @@ namespace Awsmock::Dto::KMS {
             r.description = Core::Json::GetStringValue(v, "description");
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.scheduledDeletion = Core::Json::GetDatetimeValue(v, "scheduledDeletion");
-            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.created = Core::Json::GetDatetimeValue(v, "lastStarted");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             return r;
         }
@@ -130,7 +130,7 @@ namespace Awsmock::Dto::KMS {
                     {"origin", OriginToString(obj.origin)},
                     {"enabled", obj.enabled},
                     {"scheduledDeletion", Core::DateTimeUtils::ToISO8601(obj.scheduledDeletion)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

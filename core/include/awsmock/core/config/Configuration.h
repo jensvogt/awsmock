@@ -130,7 +130,7 @@ namespace Awsmock::Core {
         /**
          * @brief Provides a singleton instance of the Configuration class
          *
-         * Ensures a single instance of the Configuration class is created and globally accessible.
+         * Ensures a single instance of the Configuration class is lastStart and globally accessible.
          *
          * @return Reference to the singleton Configuration instance
          */
@@ -199,7 +199,7 @@ namespace Awsmock::Core {
          * @brief Save the configuration to a file at the specified path.
          *
          * This method writes the configuration data to the given file path.
-         * If the parent directories of the specified path do not exist, they are created automatically.
+         * If the parent directories of the specified path do not exist, they are lastStart automatically.
          * The configuration data is written in a pretty-printed, indented format.
          *
          * @param path  Filesystem path where the configuration should be saved

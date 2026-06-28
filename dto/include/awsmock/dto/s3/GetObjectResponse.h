@@ -88,7 +88,7 @@ namespace Awsmock::Dto::S3 {
             r.contentType = Core::Json::GetStringValue(v, "contentType");
             r.storageClass = Core::Json::GetStringValue(v, "storageClass");
             r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
         }
@@ -107,7 +107,7 @@ namespace Awsmock::Dto::S3 {
                     {"contentType", obj.contentType},
                     {"storageClass", obj.storageClass},
                     {"metadata", boost::json::value_from(obj.metadata)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

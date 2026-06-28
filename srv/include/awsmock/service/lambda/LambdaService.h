@@ -88,8 +88,9 @@
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/lambda/LambdaMongoRepository.h>
+#include <awsmock/core/ZipUtils.h>
+#include <awsmock/core/exception/ContainerException.h>
 #include <awsmock/service/container/ContainerService.h>
-#include <awsmock/service/lambda/LambdaCreator.h>
 
 // Maximal output length for a synchronous invocation call
 #define MAX_OUTPUT_LENGTH (4 * 1024)
@@ -111,8 +112,8 @@ namespace Awsmock::Service {
      *
      * @par
      * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda function is run in a customized docker
-     * container (@see AwsMock::Worker::LambdaExecutor). Each invocation first checks the database for an idle instance of the lambda function.
-     * If no idle instance is found, the lambda creator will create a new instance of the docker container and start it with a random name.
+     * container. Each invocation first checks the database for an idle instance of the lambda function.
+     * If no idle instance is found, a new instance of the docker container is started with a random name.
      *
      * @par
      * The execution commands are sent via HTTP to the docker image. RIE is using port 8080 for the REST invocation requests. This port is mapped to the docker host on a randomly chosen port,
@@ -320,7 +321,20 @@ namespace Awsmock::Service {
          * @param invocationType invocation type synchronous/asynchronous
          * @return lambda result in case of synchronous invocation, otherwise empty struct
          */
-        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const;
+        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const;
+
+        /**
+         * @brief Add a new container instance to an already-running lambda function.
+         *
+         * @par
+         * Unlike CreateLambdaInstance, this method does NOT reset invocation counters.
+         * Used when spawning additional concurrent instances of an active lambda.
+         *
+         * @param lambda lambda entity (modified in-place and persisted to DB)
+         * @param instanceId new instance ID
+         * @return updated lambda entity with the new instance attached
+         */
+        Database::Entity::Lambda::Lambda AddInstance(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const;
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -563,6 +577,78 @@ namespace Awsmock::Service {
       private:
 
         /**
+         * @brief Create a new lambda function instance (resets invocation counters).
+         *
+         * @param lambda lambda entity
+         * @param instanceId instance ID
+         * @return updated lambda entity
+         */
+        Database::Entity::Lambda::Lambda CreateLambdaInstance(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const;
+
+        /**
+         * @brief Create a single Docker container instance for a lambda function.
+         *
+         * @param instanceId name of the instance (function + '-' + 8 random hex digits)
+         * @param lambda lambda entity (modified in-place: instance appended to instances list)
+         * @param functionCode base64 filename of the function code
+         * @return container ID
+         */
+        std::string CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode) const;
+
+        /**
+         * @brief Build the Docker image for a lambda function.
+         *
+         * @param zipFile base64 filename of the function code
+         * @param lambdaEntity lambda entity (imageId/imageSize/codeSha256 set on return)
+         * @param dockerTag docker tag to use
+         */
+        static void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+
+        /**
+         * @brief Create a Docker container for a lambda instance.
+         *
+         * @param lambda lambda entity
+         * @param instanceId instance ID suffix
+         * @param hostPort host-side port mapped to the container's RIE port
+         * @param dockerTag docker tag to use
+         */
+        static void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, int hostPort, const std::string &dockerTag);
+
+        /**
+         * @brief Convert lambda environment variables to Docker key=value pairs.
+         *
+         * @param lambda lambda entity
+         * @return vector of "KEY=VALUE" strings
+         */
+        static std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Lambda &lambda);
+
+        /**
+         * @brief Build the Docker CMD array for a lambda container.
+         *
+         * @param lambda lambda entity
+         * @return CMD tokens; empty means "use the image default"
+         */
+        static std::vector<std::string> GetCmd(const Database::Entity::Lambda::Lambda &lambda);
+
+        /**
+         * @brief Determine the Docker tag for a lambda function.
+         *
+         * @param lambda lambda entity
+         * @return docker tag (version > dockerTag > tag > "latest")
+         */
+        static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
+
+        /**
+         * @brief Decode and unpack a base64-encoded ZIP file into a temporary directory.
+         *
+         * @param codeDir temporary directory for unpacked code
+         * @param functionCode base64-encoded ZIP content
+         * @param runtime AWS lambda runtime name
+         * @return code directory path
+         */
+        static std::string UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime);
+
+        /**
          * @brief Stops all running instances and deleted any existing containers and images.
          *
          * @param lambda lambda entity to cleanup
@@ -604,6 +690,11 @@ namespace Awsmock::Service {
          * @brief Lambda database connection
          */
         std::shared_ptr<Database::ILambdaRepository> _lambdaDatabase = Database::RepositoryFactory::instance().lambdaRepository();
+
+        /**
+         * @brief Running inside a Docker/Podman network
+         */
+        bool _dockerized = Core::Configuration::instance().get<bool>("awsmock.dockerized");
 
         /**
          * @brief S3 database connection

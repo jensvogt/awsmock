@@ -150,6 +150,12 @@ namespace Awsmock::Dto::Docker {
          */
         Healthcheck healthcheck;
 
+        /**
+         * Override the image CMD instruction.
+         * Empty → Docker uses the CMD baked into the image.
+         */
+        std::vector<std::string> cmd;
+
       private:
 
         friend CreateContainerRequest tag_invoke(boost::json::value_to_tag<CreateContainerRequest>, boost::json::value const &v) {
@@ -170,11 +176,14 @@ namespace Awsmock::Dto::Docker {
             if (Core::Json::AttributeExists(v, "Env")) {
                 r.environment = boost::json::value_to<std::vector<std::string>>(v.at("Env"));
             }
+            if (Core::Json::AttributeExists(v, "Cmd")) {
+                r.cmd = boost::json::value_to<std::vector<std::string>>(v.at("Cmd"));
+            }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateContainerRequest const &obj) {
-            jv = {
+            boost::json::object o{
                     {"HostName", obj.hostName},
                     {"DomainName", obj.domainName},
                     {"User", obj.user},
@@ -187,6 +196,10 @@ namespace Awsmock::Dto::Docker {
                     {"Env", boost::json::value_from(obj.environment)},
                     {"Healthcheck", boost::json::value_from(obj.healthcheck)},
             };
+            if (!obj.cmd.empty()) {
+                o["Cmd"] = boost::json::value_from(obj.cmd);
+            }
+            jv = std::move(o);
         }
     };
 

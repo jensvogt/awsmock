@@ -62,7 +62,7 @@ namespace Awsmock::Dto::DynamoDb {
             r.status = Core::Json::GetStringValue(v, "status");
             r.items = Core::Json::GetLongValue(v, "items");
             r.size = Core::Json::GetLongValue(v, "size");
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 
             return r;
@@ -75,7 +75,7 @@ namespace Awsmock::Dto::DynamoDb {
                     {"status", obj.status},
                     {"items", obj.items},
                     {"size", obj.size},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

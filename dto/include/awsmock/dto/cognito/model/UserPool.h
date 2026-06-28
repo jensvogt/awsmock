@@ -62,7 +62,7 @@ namespace Awsmock::Dto::Cognito {
                 Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
                 Core::Bson::BsonUtils::SetStringValue(document, "name", name);
                 Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
-                Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+                Core::Bson::BsonUtils::SetDateValue(document, "lastStarted", created);
                 Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
                 return document.extract();
 

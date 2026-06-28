@@ -41,7 +41,7 @@ namespace Awsmock::Dto::Docker {
      *       "com.amazonaws.lambda.platform.kernel" : "k510ga",
      *       "com.amazonaws.lambda.platform.version" : "sbxv2brave"
      *     },
-     *     "State" : "created",
+     *     "State" : "lastStart",
      *     "Status" : "Created",
      *     "HostConfig" : {
      *       "NetworkMode" : "local"

@@ -4,8 +4,6 @@
 
 #include <awsmock/entity/lambda/Instance.h>
 
-#include "awsmock/dto/lambda/model/LambdaRuntimeStatus.h"
-
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Lambda"};
 }
@@ -23,7 +21,10 @@ namespace Awsmock::Database::Entity::Lambda {
             publicPort = Core::Bson::BsonUtils::GetIntValue(mResult, "publicPort");
             privatePort = Core::Bson::BsonUtils::GetIntValue(mResult, "privatePort");
             status = RuntimeStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
-            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
+            avgDuration = Core::Bson::BsonUtils::GetDoubleValue(mResult, "avgDuration");
+            lastStart = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStart");
+            lastStop = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStop");
             lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult, "lastInvocation");
 
         } catch (bsoncxx::exception &exc) {
@@ -43,9 +44,12 @@ namespace Awsmock::Database::Entity::Lambda {
             instanceDoc.append(kvp("hostName", hostName));
             instanceDoc.append(kvp("publicPort", publicPort));
             instanceDoc.append(kvp("privatePort", privatePort));
+            instanceDoc.append(kvp("invocations", invocations));
+            instanceDoc.append(kvp("avgDuration", avgDuration));
             instanceDoc.append(kvp("status", RuntimeStatusToString(status)));
-            instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+            instanceDoc.append(kvp("lastStart", bsoncxx::types::b_date(lastStart)));
             instanceDoc.append(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)));
+            instanceDoc.append(kvp("lastStop", bsoncxx::types::b_date(lastStop)));
             return instanceDoc.extract();
 
         } catch (bsoncxx::exception &exc) {

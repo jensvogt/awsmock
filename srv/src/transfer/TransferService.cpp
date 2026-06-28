@@ -39,7 +39,7 @@ namespace Awsmock::Service {
         response.region = transferEntity.region;
         response.serverId = serverId;
         response.arn = transferArn;
-        log_info << "Transfer manager created, address: " << listenAddress << " port: " << ftpPort;
+        log_info << "Transfer manager lastStart, address: " << listenAddress << " port: " << ftpPort;
 
         return response;
     }

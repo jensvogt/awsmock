@@ -200,35 +200,6 @@ namespace Awsmock::Database {
         return createOrUpdateLambda(lambda);
     }
 
-
-    void LambdaMongoRepository::setInstanceValues(const std::string &containerId, const Entity::Lambda::RuntimeStatus &status) const {
-
-        const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-
-        try {
-            _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
-                                         make_document(kvp("$set", make_document(
-                                                                           kvp("instances.$.status", RuntimeStatusToString(status)),
-                                                                           kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
-        } catch (mongocxx::exception::system_error &e) {
-            log_error << "Get lambda by ARN failed, error: " << e.what();
-        }
-    }
-
-    void LambdaMongoRepository::setLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) const {
-
-        const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-
-        try {
-            _lambdaCollection.update_one(make_document(kvp("_id", bsoncxx::oid(lambda.oid))),
-                                         make_document(kvp("$set", make_document(kvp("invocations", bsoncxx::types::b_int64(invocations)), kvp("averageRuntime", bsoncxx::types::b_int64(avgRuntime))))));
-        } catch (mongocxx::exception::system_error &e) {
-            log_error << "Set last invocation failed, error: " << e.what();
-        }
-    }
-
     std::vector<Entity::Lambda::Lambda> LambdaMongoRepository::listLambdas(const std::string &region) const {
 
         try {
@@ -262,7 +233,7 @@ namespace Awsmock::Database {
         // Remove instances, as they will confuse the re-import
         for (auto &lambda: lambdas) {
             lambda.invocations = 0;
-            lambda.averageRuntime = 0;
+            lambda.avgDuration = 0;
             lambda.instances.clear();
         }
         return lambdas;
@@ -298,7 +269,7 @@ namespace Awsmock::Database {
             }
 
             std::vector<Entity::Lambda::Lambda> lambdas;
-            for (auto lambdaCursor = _lambdaCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
+            for (auto lambdaCursor = _lambdaCollection.find(query.view(), opts); auto lambda: lambdaCursor) {
                 Entity::Lambda::Lambda result;
                 result.FromDocument(lambda);
                 lambdas.push_back(result);

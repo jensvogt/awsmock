@@ -82,7 +82,7 @@ namespace Awsmock::Dto::Docker {
                     {"scope", obj.scope},
                     {"EnableIPv4", obj.enableIPv4},
                     {"EnableIPv6", obj.enableIPv6},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
             };
         }
     };

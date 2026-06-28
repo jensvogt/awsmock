@@ -97,7 +97,7 @@ namespace Awsmock::Dto::SecretsManager {
             r.lastRotatedDate = Core::DateTimeUtils::FromISO8601(v.at("lastRotatedDate").as_string().data());
             r.nextRotatedDate = Core::DateTimeUtils::FromISO8601(v.at("nextRotatedDate").as_string().data());
             r.lastAccessedDate = Core::DateTimeUtils::FromISO8601(v.at("lastAccessedDate").as_string().data());
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
         }
@@ -114,7 +114,7 @@ namespace Awsmock::Dto::SecretsManager {
                     {"lastRotatedDate", Core::DateTimeUtils::ToISO8601(obj.lastRotatedDate)},
                     {"nextRotatedDate", Core::DateTimeUtils::ToISO8601(obj.nextRotatedDate)},
                     {"lastAccessedDate", Core::DateTimeUtils::ToISO8601(obj.lastAccessedDate)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

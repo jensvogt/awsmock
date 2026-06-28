@@ -11,46 +11,11 @@
 
 // AwsMOck includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/lambda/model/LambdaRuntimeStatus.h>
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/lambda/RuntimeStatus.h>
 
 namespace Awsmock::Database::Entity::Lambda {
-    //
-    // /**
-    //  * @brief Lambda instance status enum
-    //  *
-    //  * @author jens.vogt\@opitz-consulting.com
-    //  */
-    // enum LambdaInstanceStatus {
-    //     InstanceStarting,
-    //     InstanceIdle,
-    //     InstanceRunning,
-    //     InstanceSuccess,
-    //     InstanceFailed,
-    //     InstanceUnknown
-    // };
-    //
-    // static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
-    //         {InstanceStarting, "Starting"},
-    //         {InstanceIdle, "Idle"},
-    //         {InstanceRunning, "Running"},
-    //         {InstanceSuccess, "Success"},
-    //         {InstanceFailed, "Failed"},
-    //         {InstanceUnknown, "Unknown"},
-    // };
-    //
-    // [[maybe_unused]] static std::string LambdaInstanceStatusToString(const LambdaInstanceStatus &lambdaInstanceStatus) {
-    //     return LambdaInstanceStatusNames[lambdaInstanceStatus];
-    // }
-    //
-    // [[maybe_unused]] static LambdaInstanceStatus LambdaInstanceStatusFromString(const std::string &lambdaInstanceStatus) {
-    //     for (auto &[fst, snd]: LambdaInstanceStatusNames) {
-    //         if (snd == lambdaInstanceStatus) {
-    //             return fst;
-    //         }
-    //     }
-    //     return InstanceUnknown;
-    // }
 
     /**
      * @brief Lambda instance entity
@@ -101,14 +66,29 @@ namespace Awsmock::Database::Entity::Lambda {
         RuntimeStatus status = unknown;
 
         /**
-         * Last invocation timestamp
+         * @brief Last invocation timestamp
          */
-        system_clock::time_point lastInvocation;
+        long invocations{};
 
         /**
-         * Created timestamp
+         * @brief Average invocation duration
          */
-        system_clock::time_point created = system_clock::now();
+        double avgDuration{};
+
+        /**
+         * @brief Last started timestamp
+         */
+        system_clock::time_point lastStart{};
+
+        /**
+         * @brief Last invocation timestamp
+         */
+        system_clock::time_point lastInvocation{};
+
+        /**
+         * @brief Last stopped timestamp
+         */
+        system_clock::time_point lastStop{};
 
         /**
          * @brief Converts the MongoDB document to an entity

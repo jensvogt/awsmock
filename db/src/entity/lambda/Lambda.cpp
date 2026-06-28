@@ -152,13 +152,13 @@ namespace Awsmock::Database::Entity::Lambda {
         // Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "stateReasonCode", LambdaStateReasonCodeToString(stateReasonCode));
         Core::Bson::BsonUtils::SetArrayValue(lambdaDoc, "instances", instancesDoc);
         Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "invocations", invocations);
-        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "averageRuntime", averageRuntime);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "avgDuration", avgDuration);
         Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "dockerTag", dockerTag);
         Core::Bson::BsonUtils::SetBoolValue(lambdaDoc, "enabled", enabled);
         Core::Bson::BsonUtils::SetArrayValue(lambdaDoc, "eventSources", eventSourcesDoc);
-        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastStarted", lastStarted);
+        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastStart", lastStarted);
         Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastInvocation", lastInvocation);
-        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "created", created);
+        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastStart", created);
         Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "modified", modified);
 
         return lambdaDoc.extract();
@@ -184,13 +184,13 @@ namespace Awsmock::Database::Entity::Lambda {
         codeSha256 = Core::Bson::BsonUtils::GetStringValue(mResult, "codeSha256");
         timeout = Core::Bson::BsonUtils::GetIntValue(mResult, "timeout");
         concurrency = Core::Bson::BsonUtils::GetIntValue(mResult, "concurrency");
-        //        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastStarted"]);
+        //        lastStart = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastStart"]);
         //        lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastInvocation"]);
         //        invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
-        averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
+        avgDuration = Core::Bson::BsonUtils::GetLongValue(mResult, "avgDuration");
         dockerTag = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerTag");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
-        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStart");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Environment

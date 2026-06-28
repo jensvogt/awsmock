@@ -98,17 +98,7 @@ namespace Awsmock::Dto::Lambda {
         /**
          * State
          */
-        std::string state;
-
-        /**
-         * State reason
-         */
-        std::string stateReason;
-
-        /**
-         * State reason code
-         */
-        std::string stateReasonCode;
+        bool active;
 
         /**
          * Timeout in minutes
@@ -164,15 +154,13 @@ namespace Awsmock::Dto::Lambda {
             r.lastUpdateStatusReason = Core::Json::GetStringValue(v, "lastUpdateStatusReason");
             r.lastUpdateStatusReasonCode = Core::Json::GetStringValue(v, "lastUpdateStatusReasonCode");
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
-            r.state = Core::Json::GetStringValue(v, "state");
-            r.stateReason = Core::Json::GetStringValue(v, "stateReason");
-            r.stateReasonCode = Core::Json::GetStringValue(v, "stateReasonCode");
+            r.active = Core::Json::GetBoolValue(v, "active");
             r.timeout = Core::Json::GetLongValue(v, "timeout");
             r.environment = boost::json::value_to<EnvironmentVariables>(v.at("environment"));
             r.instances = Core::Json::GetLongValue(v, "instances");
             r.invocations = Core::Json::GetLongValue(v, "invocations");
-            r.averageRuntime = Core::Json::GetLongValue(v, "averageRuntime");
-            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            r.averageRuntime = Core::Json::GetLongValue(v, "avgDuration");
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             return r;
         }
@@ -194,15 +182,13 @@ namespace Awsmock::Dto::Lambda {
                     {"lastUpdateStatusReason", obj.lastUpdateStatusReason},
                     {"lastUpdateStatusReasonCode", obj.lastUpdateStatusReasonCode},
                     {"enabled", obj.enabled},
-                    {"state", obj.state},
-                    {"stateReason", obj.stateReason},
-                    {"stateReasonCode", obj.stateReasonCode},
+                    {"active", obj.active},
                     {"timeout", obj.timeout},
                     {"environment", boost::json::value_from(obj.environment)},
                     {"instances", obj.instances},
                     {"invocations", obj.invocations},
-                    {"averageRuntime", obj.averageRuntime},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"avgDuration", obj.averageRuntime},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

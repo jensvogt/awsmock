@@ -210,8 +210,8 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/s3/S3Handler.cpp srv/src/s3/S3Service.cpp srv/src/s3/S3HashCreator.cpp srv/src/sqs/SQSServer.cpp
         srv/src/sqs/SQSHandler.cpp srv/src/sqs/SQSService.cpp srv/src/sns/SNSServer.cpp srv/src/sns/SNSHandler.cpp
         srv/src/sns/SNSService.cpp srv/src/lambda/LambdaServer.cpp srv/src/lambda/LambdaHandler.cpp
-        srv/src/lambda/LambdaController.cpp srv/src/lambda/LambdaService.cpp srv/src/lambda/LambdaCreator.cpp
-        srv/src/lambda/LambdaExecutor.cpp srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoHandler.cpp
+        srv/src/lambda/LambdaController.cpp srv/src/lambda/LambdaService.cpp
+        srv/src/cognito/CognitoHandler.cpp srv/src/cognito/CognitoHandler.cpp
         srv/src/cognito/CognitoService.cpp srv/src/cognito/CognitoServer.cpp srv/src/transfer/TransferServer.cpp
         srv/src/transfer/TransferHandler.cpp srv/src/transfer/TransferService.cpp srv/src/dynamodb/DynamoDbServer.cpp
         srv/src/dynamodb/DynamoDbHandler.cpp srv/src/dynamodb/DynamoDbService.cpp srv/src/secretsmanager/SecretsManagerServer.cpp

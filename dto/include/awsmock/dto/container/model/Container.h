@@ -109,7 +109,7 @@ namespace Awsmock::Dto::Docker {
      *     "com.amazonaws.lambda.platform.kernel" : "k510ga",
      *     "com.amazonaws.lambda.platform.version" : "sbxv2brave"
      *   },
-     *   "State" : "created",
+     *   "State" : "lastStart",
      *   "Status" : "Created",
      *   "HostConfig" : {
      *     "NetworkMode" : "local"
@@ -184,7 +184,7 @@ namespace Awsmock::Dto::Docker {
         std::vector<ContainerPort> ports{};
 
         /**
-         * The size of files that have been created or changed by this container
+         * The size of files that have been lastStart or changed by this container
          */
         long sizeRw = 0;
 
