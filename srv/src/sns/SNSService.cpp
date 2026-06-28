@@ -35,7 +35,7 @@ namespace Awsmock::Service {
             topic.topicArn = topicArn;
 
             topic = _snsDatabase->createTopic(topic);
-            log_trace << "SNS topic created: " << topic.ToJson();
+            log_trace << "SNS topic lastStarted: " << topic.ToJson();
 
             Dto::SNS::CreateTopicResponse response;
             response.copyMetadata(request);

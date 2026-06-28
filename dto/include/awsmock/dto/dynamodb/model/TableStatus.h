@@ -13,7 +13,7 @@ namespace Awsmock::Dto::DynamoDb {
     /**
      * @brief Table status
      *
-     * CREATING - The table is being created.
+     * CREATING - The table is being lastStart.
      * UPDATING - The table/index configuration is being updated. The table/index remains available for data operations when UPDATING.
      * DELETING - The table is being deleted.
      * ACTIVE - The table is ready for use.

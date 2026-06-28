@@ -45,7 +45,7 @@ namespace Awsmock::Dto::Lambda {
      *    },
      *   "RevisionId": "24e41752-636b-4f0f-840d-92bcc4e572ff",
      *   "State": "Pending",
-     *   "StateReason": "The function is being created.",
+     *   "StateReason": "The function is being lastStart.",
      *   "StateReasonCode": "Creating",
      *   "PackageType": "Zip",
      *   "Architectures": [

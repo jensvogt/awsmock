@@ -130,3 +130,6 @@ src/service/btst/srv_sqs_service
 
 # Vcpkg
 vcpkg_installed
+
+# Claude
+CLAUDE.md

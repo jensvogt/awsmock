@@ -52,7 +52,7 @@ namespace Awsmock::Dto::Docker {
         HostConfig hostConfig;
 
         /**
-         * The size of files that have been created or changed by this container.
+         * The size of files that have been lastStart or changed by this container.
          */
         long sizeRw{};
 

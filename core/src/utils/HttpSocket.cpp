@@ -56,7 +56,7 @@ namespace Awsmock::Core {
             return PrepareResult(response);
 
         } catch (const boost::exception &e) {
-            log_error << "Send JSON message failed, host:" << host << ", port: " << port << ", error: " << boost::diagnostic_information(e);
+            log_error << "Send JSON message failed, host: " << host << ", port: " << port << ", error: " << boost::diagnostic_information(e);
         }
         return {.statusCode = http::status::internal_server_error};
     }

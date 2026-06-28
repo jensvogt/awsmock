@@ -72,7 +72,7 @@ namespace Awsmock::Dto::ApiGateway {
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.generateDistinct = Core::Json::GetBoolValue(v, "generateDistinct");
             r.value = Core::Json::GetStringValue(v, "value");
-            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.created = Core::Json::GetDatetimeValue(v, "lastStarted");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "tags")) {
                 r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
@@ -90,7 +90,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"generateDistinct", obj.generateDistinct},
                     {"value", obj.value},
                     {"tags", boost::json::value_from(obj.tags)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

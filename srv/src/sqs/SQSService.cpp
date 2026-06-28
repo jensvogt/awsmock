@@ -24,7 +24,7 @@ namespace Awsmock::Service {
             // Update database
             Database::Entity::SQS::Queue queue = Dto::SQS::CreateQueueRequestMapper::toEntity(request);
             queue = _sqsDatabase->createQueue(queue);
-            log_trace << "SQS queue created: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
+            log_trace << "SQS queue lastStarted: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
             Dto::SQS::CreateQueueResponse response = Dto::SQS::CreateQueueResponseMapper::toDto(queue);
             response.copyMetadata(request);
             return response;

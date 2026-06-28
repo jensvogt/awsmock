@@ -110,7 +110,7 @@ namespace Awsmock::Service {
 
             // Store in a database
             keyEntity = _kmsDatabase->createKey(keyEntity);
-            log_trace << "KMS keyEntity created: " << keyEntity;
+            log_trace << "KMS keyEntity lastStarted: " << keyEntity;
 
             // Create key material asynchronously via scheduler; callers use WaitForAesKey/WaitForRsaKey to synchronize
             const std::string taskName = "create-kms-key-" + keyId;

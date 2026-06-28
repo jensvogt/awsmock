@@ -81,7 +81,7 @@ namespace Awsmock::Dto::SNS {
             r.messageStatus = MessageStatusFromString(v.at("messageStatus").as_string().data());
             r.messageAttributes = boost::json::value_to<std::vector<MessageAttributeCounter>>(v.at("messageAttributes"));
             r.lastSend = Core::DateTimeUtils::FromISO8601(v.at("lastSend").as_string().data());
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
         }
@@ -96,7 +96,7 @@ namespace Awsmock::Dto::SNS {
                     {"messageStatus", MessageStatusToString(obj.messageStatus)},
                     {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
                     {"lastSend", Core::DateTimeUtils::ToISO8601(obj.lastSend)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

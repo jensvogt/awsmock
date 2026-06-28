@@ -263,7 +263,7 @@ namespace Awsmock::Database::Entity::Lambda {
         /**
          * Average runtime in milliseconds
          */
-        long averageRuntime = 0;
+        long avgDuration = 0;
 
         /**
          * Enabled flag
@@ -345,14 +345,28 @@ namespace Awsmock::Database::Entity::Lambda {
          *
          * @return number of running instances
          */
-        long CountIdleInstances();
+        long countIdleInstances();
 
         /**
          * @brief Returns the count of running instances
          *
          * @return number of running instances
          */
-        long CountRunningInstances();
+        long countRunningInstances();
+
+        /**
+         * @brief Returns the total number of invocations for all instances
+         *
+         * @return total number of invocations for all instances
+         */
+        long getTotalInvocations();
+
+        /**
+         * @brief Returns the average duration across all instances (weighted by invocation count).
+         *
+         * @return average duration in milliseconds, or 0 if there are no invocations
+         */
+        long getAvgDuration();
 
         /**
          * @brief Checks whether an event source with the given ARN exists already.
@@ -466,16 +480,31 @@ namespace Awsmock::Database::Entity::Lambda {
         return {};
     }
 
-    inline long Lambda::CountIdleInstances() {
+    inline long Lambda::countIdleInstances() {
         return std::ranges::count_if(instances, [](const Instance &i) {
             return i.status == idle;
         });
     }
 
-    inline long Lambda::CountRunningInstances() {
+    inline long Lambda::countRunningInstances() {
         return std::ranges::count_if(instances, [](const Instance &i) {
             return i.status == running;
         });
+    }
+
+    inline long Lambda::getTotalInvocations() {
+        return std::ranges::fold_left(instances, 0L, [](const long acc, const Instance &i) {
+            return acc + i.invocations;
+        });
+    }
+
+    inline long Lambda::getAvgDuration() {
+        const long totalInvocations = getTotalInvocations();
+        if (totalInvocations == 0) return 0;
+        const double weightedSum = std::ranges::fold_left(instances, 0.0, [](const double acc, const Instance &i) {
+            return acc + i.avgDuration * static_cast<double>(i.invocations);
+        });
+        return static_cast<long>(weightedSum / static_cast<double>(totalInvocations));
     }
 
 }// namespace Awsmock::Database::Entity::Lambda

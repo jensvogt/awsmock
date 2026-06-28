@@ -88,7 +88,7 @@ namespace Awsmock::Dto::Cognito {
                 Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
                 Core::Bson::BsonUtils::SetStringValue(document, "userStatus", Database::Entity::Cognito::UserStatusToString(userStatus));
                 Core::Bson::BsonUtils::SetBoolValue(document, "enabled", enabled);
-                Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+                Core::Bson::BsonUtils::SetDateValue(document, "lastStarted", created);
                 Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
                 return document.extract();
 

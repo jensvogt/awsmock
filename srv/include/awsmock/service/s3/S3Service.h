@@ -81,7 +81,6 @@
 #include <awsmock/entity/s3/TopicNotification.h>
 #include <awsmock/repository/s3/S3MongoRepository.h>
 #include <awsmock/service/kms/KMSService.h>
-#include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/s3/S3HashCreator.h>
 #include <awsmock/service/sns/SNSService.h>

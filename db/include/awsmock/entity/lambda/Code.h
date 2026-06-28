@@ -40,7 +40,7 @@ namespace Awsmock::Database::Entity::Lambda {
          * startup. All lambdas, which are saved in the database and found in the lambda directory get
          * automatically started.
          *
-         * In case the lambda does not exist and the lambda is created by the AWS CLI, zipFile contains the
+         * In case the lambda does not exist and the lambda is lastStart by the AWS CLI, zipFile contains the
          * base64 encoded lambda code.
          */
         std::string zipFile;

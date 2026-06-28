@@ -58,7 +58,7 @@ namespace Awsmock::Dto::SecretsManager {
             SecretVersionCounter r;
             r.versionId = Core::Json::GetStringValue(v, "secretName");
             r.states = boost::json::value_to<std::vector<std::string>>(v.at("states"));
-            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.created = Core::Json::GetDatetimeValue(v, "lastStarted");
             return r;
         }
 

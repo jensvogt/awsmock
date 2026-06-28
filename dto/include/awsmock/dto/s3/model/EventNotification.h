@@ -111,15 +111,15 @@ namespace Awsmock::Dto::S3 {
 
         friend ResponseElements tag_invoke(boost::json::value_to_tag<ResponseElements>, boost::json::value const &v) {
             ResponseElements r;
-            r.xAmzRequestId = Core::Json::GetStringValue(v, "xAmzRequestId");
-            r.xAmzId2 = Core::Json::GetStringValue(v, "xAmzId2");
+            r.xAmzRequestId = Core::Json::GetStringValue(v, "x-amz-request-id");
+            r.xAmzId2 = Core::Json::GetStringValue(v, "x-amz-id-2");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ResponseElements const &obj) {
             jv = {
-                    {"xAmzRequestId", obj.xAmzRequestId},
-                    {"xAmzId2", obj.xAmzId2},
+                    {"x-amz-request-id", obj.xAmzRequestId},
+                    {"x-amz-id-2", obj.xAmzId2},
             };
         }
     };
@@ -167,11 +167,9 @@ namespace Awsmock::Dto::S3 {
             Object r;
             r.key = Core::Json::GetStringValue(v, "key");
             r.size = Core::Json::GetLongValue(v, "size");
-            r.etag = Core::Json::GetStringValue(v, "etag");
+            r.etag = Core::Json::GetStringValue(v, "eTag");
             r.versionId = Core::Json::GetStringValue(v, "versionId");
             r.sequencer = Core::Json::GetStringValue(v, "sequencer");
-            r.created = Core::Json::GetDatetimeValue(v, "created");
-            r.modified = Core::Json::GetDatetimeValue(v, "modified");
             return r;
         }
 
@@ -179,11 +177,9 @@ namespace Awsmock::Dto::S3 {
             jv = {
                     {"key", obj.key},
                     {"size", obj.size},
-                    {"etag", obj.etag},
+                    {"eTag", obj.etag},
                     {"versionId", obj.versionId},
                     {"sequencer", obj.sequencer},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
@@ -209,7 +205,7 @@ namespace Awsmock::Dto::S3 {
 
         friend NotificationBucket tag_invoke(boost::json::value_to_tag<NotificationBucket>, boost::json::value const &v) {
             NotificationBucket r;
-            r.name = Core::Json::GetStringValue(v, "s3SchemaVersion");
+            r.name = Core::Json::GetStringValue(v, "name");
             r.arn = Core::Json::GetStringValue(v, "arn");
             r.ownerIdentity = boost::json::value_to<Owner>(v.at("ownerIdentity"));
             return r;
@@ -280,6 +276,11 @@ namespace Awsmock::Dto::S3 {
         std::string eventSource = "aws:s3";
 
         /**
+         * AWS region
+         */
+        std::string awsRegion;
+
+        /**
          * Event time
          */
         system_clock::time_point eventTime = system_clock::now();
@@ -315,10 +316,11 @@ namespace Awsmock::Dto::S3 {
             Record r;
             r.eventVersion = Core::Json::GetStringValue(v, "eventVersion");
             r.eventSource = Core::Json::GetStringValue(v, "eventSource");
+            r.awsRegion = Core::Json::GetStringValue(v, "awsRegion");
             r.eventTime = Core::Json::GetDatetimeValue(v, "eventTime");
             r.eventName = Core::Json::GetStringValue(v, "eventName");
-            r.userIdentity = boost::json::value_to<UserIdentity>(v.at("eventName"));
-            r.requestParameter = boost::json::value_to<RequestParameter>(v.at("requestParameter"));
+            r.userIdentity = boost::json::value_to<UserIdentity>(v.at("userIdentity"));
+            r.requestParameter = boost::json::value_to<RequestParameter>(v.at("requestParameters"));
             r.responseElements = boost::json::value_to<ResponseElements>(v.at("responseElements"));
             r.s3 = boost::json::value_to<S3>(v.at("s3"));
             return r;
@@ -328,10 +330,11 @@ namespace Awsmock::Dto::S3 {
             jv = {
                     {"eventVersion", obj.eventVersion},
                     {"eventSource", obj.eventSource},
+                    {"awsRegion", obj.awsRegion},
                     {"eventTime", Core::DateTimeUtils::ToISO8601(obj.eventTime)},
                     {"eventName", obj.eventName},
                     {"userIdentity", boost::json::value_from(obj.userIdentity)},
-                    {"requestParameter", boost::json::value_from(obj.requestParameter)},
+                    {"requestParameters", boost::json::value_from(obj.requestParameter)},
                     {"responseElements", boost::json::value_from(obj.responseElements)},
                     {"s3", boost::json::value_from(obj.s3)},
             };
@@ -357,7 +360,7 @@ namespace Awsmock::Dto::S3 {
 
         friend EventNotification tag_invoke(boost::json::value_to_tag<EventNotification>, boost::json::value const &v) {
             EventNotification r;
-            if (!r.records.empty()) {
+            if (v.as_object().contains("Records")) {
                 r.records = boost::json::value_to<std::vector<Record>>(v.at("Records"));
             }
             return r;

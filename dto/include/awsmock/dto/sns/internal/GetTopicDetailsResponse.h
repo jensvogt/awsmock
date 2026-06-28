@@ -67,7 +67,7 @@ namespace Awsmock::Dto::SNS {
             r.messageCount = Core::Json::GetLongValue(v, "messageCount");
             r.size = Core::Json::GetLongValue(v, "size");
             r.owner = Core::Json::GetStringValue(v, "owner");
-            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             return r;
         }
@@ -82,7 +82,7 @@ namespace Awsmock::Dto::SNS {
                     {"messageCount", obj.messageCount},
                     {"size", obj.size},
                     {"owner", obj.owner},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

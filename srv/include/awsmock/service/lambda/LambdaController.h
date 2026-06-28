@@ -26,10 +26,12 @@
 #include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/lambda/ILambdaRepository.h>
+#include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/HttpSocketResponse.h>
+#include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
-#include <awsmock/service/lambda/LambdaCreator.h>
-#include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace Awsmock::Service {
@@ -115,6 +117,18 @@ namespace Awsmock::Service {
          * @param functionArn lambda function ARN
          */
         void OnCheckLambda(const std::string &functionArn) const;
+
+        /**
+         * @brief Invoke a lambda instance synchronously and fulfil the promise.
+         *
+         * @param lambda lambda entity
+         * @param instance the selected instance
+         * @param payload JSON payload
+         * @param promise result channel; nullptr for fire-and-forget (EVENT) invocations
+         */
+        void InvokeInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance,
+                            const std::string &payload,
+                            const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) const;
 
         /**
          * @brief Periodic health-check task

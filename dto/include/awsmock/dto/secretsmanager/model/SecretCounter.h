@@ -146,7 +146,7 @@ namespace Awsmock::Dto::SecretsManager {
             r.nextRotatedDate = Core::Json::GetDatetimeValue(v, "nextRotatedDate");
             r.rotationEnabled = Core::Json::GetBoolValue(v, "rotationEnabled");
             r.rotationLambdaARN = Core::Json::GetStringValue(v, "rotationLambdaARN");
-            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.created = Core::Json::GetDatetimeValue(v, "lastStarted");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "rotationRules")) {
                 r.rotationRules = boost::json::value_to<RotationRules>(v.at("rotationRules"));
@@ -169,7 +169,7 @@ namespace Awsmock::Dto::SecretsManager {
                     {"rotationEnabled", obj.rotationEnabled},
                     {"rotationLambdaARN", obj.rotationLambdaARN},
                     {"rotationRules", boost::json::value_from(obj.rotationRules)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

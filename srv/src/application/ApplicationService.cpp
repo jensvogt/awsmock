@@ -46,7 +46,7 @@ namespace Awsmock::Service {
             listRequest.pageSize = request.pageSize;
             listRequest.pageIndex = request.pageIndex;
             listRequest.copyMetadata(request);
-            log_trace << "Application created, application: " + application.ToJson();
+            log_trace << "Application lastStarted, application: " + application.ToJson();
             return ListApplications(listRequest);
 
         } catch (bsoncxx::exception &exc) {

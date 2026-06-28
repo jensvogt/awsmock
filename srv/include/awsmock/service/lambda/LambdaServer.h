@@ -13,7 +13,6 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaController.h>
-#include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/module/ModuleService.h>
 
 namespace Awsmock::Service {

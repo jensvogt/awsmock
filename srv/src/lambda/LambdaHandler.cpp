@@ -1,5 +1,4 @@
 
-
 #include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace Awsmock::Service {

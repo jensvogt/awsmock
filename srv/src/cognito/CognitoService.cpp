@@ -700,7 +700,7 @@ namespace Awsmock::Service {
         try {
             Database::Entity::Cognito::Group group = Dto::Cognito::Mapper::map(request);
             group = _cognitoDatabase->createGroup(group);
-            log_trace << "Cognito group created, group: " + response.ToJson();
+            log_trace << "Cognito group lastStarted, group: " + response.ToJson();
             return Dto::Cognito::Mapper::map(request, group);
         } catch (bsoncxx::exception &ex) {
             log_error << "Create group request failed, message: " << ex.what();

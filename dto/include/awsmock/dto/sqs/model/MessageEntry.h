@@ -134,7 +134,7 @@ namespace Awsmock::Dto::SQS {
         //         Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5SystemAttributes", md5SystemAttributes);
         //         Core::Bson::BsonUtils::SetIntValue(rootDocument, "retries", retries);
         //         Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
-        //         Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+        //         Core::Bson::BsonUtils::SetDateValue(rootDocument, "lastStart", lastStart);
         //         Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
         //
         //         // Message attributes
@@ -184,7 +184,7 @@ namespace Awsmock::Dto::SQS {
         //         receiptHandle = Core::Bson::BsonUtils::GetStringValue(object, "receiptHandle");
         //         size = Core::Bson::BsonUtils::GetLongValue(object, "size");
         //         retries = Core::Bson::BsonUtils::GetLongValue(object, "retries");
-        //         created = Core::Bson::BsonUtils::GetDateValue(object, "created");
+        //         lastStart = Core::Bson::BsonUtils::GetDateValue(object, "lastStart");
         //         modified = Core::Bson::BsonUtils::GetDateValue(object, "modified");
         //
         //         // Attributes
