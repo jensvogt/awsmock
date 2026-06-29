@@ -48,7 +48,6 @@ namespace Awsmock::Database::Entity::Lambda {
         if (const auto &it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             return *it;
         }
-        log_error << "Lambda instance not found, id: " << instanceId;
         return {};
     }
 

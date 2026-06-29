@@ -142,8 +142,7 @@ namespace Awsmock::Service {
                     do {
                         std::this_thread::sleep_for(std::chrono::milliseconds(500));
                         lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
-                    } while (lambda.GetInstance(instanceId).status != Database::Entity::Lambda::RuntimeStatus::idle &&
-                             system_clock::now() < startDeadline);
+                    } while (lambda.GetInstance(instanceId).status != Database::Entity::Lambda::RuntimeStatus::idle && system_clock::now() < startDeadline);
 
                     if (lambda.GetInstance(instanceId).status != Database::Entity::Lambda::RuntimeStatus::idle) {
                         log_error << "New instance did not become idle within timeout, function: " << functionName << ", instanceId: " << instanceId;

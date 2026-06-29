@@ -29,6 +29,7 @@ namespace Awsmock::Core {
         Configuration::instance().set<std::string>("awsmock.temp-dir", "/tmp/awsmock/data/tmp");
         Configuration::instance().set<std::string>("awsmock.data-dir", "/tmp/awsmock/data");
         Configuration::instance().set<std::string>("awsmock.magic-file", "/usr/local/awsmock/etc/magic.mgc");
+        Configuration::instance().set<bool>("awsmock.dockerized", false);
 
         // Gateway
         Configuration::instance().set<bool>("awsmock.gateway.active", true);
