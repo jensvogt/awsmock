@@ -11,7 +11,6 @@
 
 // AwsMOck includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/lambda/model/LambdaRuntimeStatus.h>
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/lambda/RuntimeStatus.h>
 
@@ -22,8 +21,8 @@ namespace Awsmock::Database::Entity::Lambda {
      *
      * @par
      * An instance is an invocation of the lambda function. Each invocation (until max. concurrency) will start a new instance of the lambda function. The status will be
-     * set 'RUNNING'. Default status is 'IDLE'. Each lambda runs in its own docker container having a distinguished name like 'lambda-function-s7654d'. Private ports are
-     * always the same (usually 8080), whereas the public port will be a random integer between 32.768 and 65.535. The public port is chosen between this two numbers taken
+     * set 'RUNNING'. The default status is 'IDLE'. Each lambda runs in its own docker container having a distinguished name like 'lambda-function-s7654d'. Private ports are
+     * always the same (usually 8080), whereas the public port will be a random integer between 32.768 and 65.535. The public port is chosen between these two numbers taken
      * into account that the port must be free on the local machine. Otherwise, a new random number is selected in the given range.
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -31,7 +30,7 @@ namespace Awsmock::Database::Entity::Lambda {
     struct Instance final : Common::BaseEntity<Instance> {
 
         /**
-         * Instance ID, will be appended to the container name, in case of multiple instances.
+         * Instance ID will be appended to the container name, in case of multiple instances.
          */
         std::string instanceId{};
 

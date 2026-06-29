@@ -706,8 +706,10 @@ namespace Awsmock::Service {
                    appendCommandLine("--runtime-lib-dir", "/app/lib/java") + "," +
                    appendCommandLine("--lifetime", std::to_string(lambda.timeout)) + "," +
                    appendCommandLine("--report-period", std::to_string(30)) + "," +
+                   appendCommandLine("--jvm-arg", "-Xss8m") + "," +
                    appendCommandLine("--manager-host", "host.docker.internal") + "," +
-                   appendCommandLine("--manager-port", "4566") + "]\n";
+                   appendCommandLine("--manager-port", "4566") +
+                   appendEnvVarArgs(lambda.environment.variables) + "]\n";
         }
 
         // Docker exec-form CMD does not invoke a shell, so ${LAMBDA_TASK_ROOT} would be passed literally. Use the resolved value (/var/task) directly.
@@ -723,7 +725,8 @@ namespace Awsmock::Service {
                appendCommandLine("--report-period", std::to_string(30)) + "," +
                appendCommandLine("--manager-host", "host.docker.internal") + "," +
                appendCommandLine("--manager-port", "4566") + "," +
-               appendCommandLine("--runtime", runtimeArg) + "]\n";
+               appendCommandLine("--runtime", runtimeArg) +
+               appendEnvVarArgs(lambda.environment.variables) + "]\n";
     }
 
     std::string ContainerService::WriteLambdaDockerFile(const std::string &codeDir, Database::Entity::Lambda::Lambda &lambdaEntity) const {
@@ -903,5 +906,13 @@ namespace Awsmock::Service {
         std::string value = argValue;
         std::erase_if(value, [](const char c) { return c == '\n' || c == '\r'; });
         return "\"" + argName + "\",\"" + value + "\"";
+    }
+
+    std::string ContainerService::appendEnvVarArgs(const std::map<std::string, std::string> &variables) {
+        std::string result;
+        for (const auto &[key, value]: variables) {
+            result += "," + appendCommandLine("--env", key + "=" + value);
+        }
+        return result;
     }
 }// namespace Awsmock::Service

@@ -367,6 +367,13 @@ namespace Awsmock::Core {
         static std::string CreateCognitoUserPoolArn(const std::string &region, const std::string &accountId, const std::string &userPoolId);
 
         /**
+         * @brief Create a new lambda instance ID
+         *
+         * @return lambda instance ID
+         */
+        static std::string CreateLambdaInstanceId();
+
+        /**
          * @brief Creates a new Cognito confirmation code
          *
          * @return Cognito confirmation code

@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -256,7 +255,7 @@ namespace Awsmock::Dto::Lambda {
         friend GetFunctionCountersResponse tag_invoke(boost::json::value_to_tag<GetFunctionCountersResponse>, boost::json::value const &v) {
             GetFunctionCountersResponse r;
             r.id = Core::Json::GetStringValue(v, "id");
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.functionArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.functionName = Core::Json::GetStringValue(v, "functionName");
             r.role = Core::Json::GetStringValue(v, "role");
             r.handler = Core::Json::GetStringValue(v, "handler");
@@ -295,7 +294,7 @@ namespace Awsmock::Dto::Lambda {
             o["region"] = obj.region;
             o["user"] = obj.user;
             o["id"] = obj.id;
-            o["functionArn"] = obj.functionArn;
+            o["lambdaArn"] = obj.functionArn;
             o["functionName"] = obj.functionName;
             o["role"] = obj.role;
             o["handler"] = obj.handler;
@@ -329,7 +328,4 @@ namespace Awsmock::Dto::Lambda {
             jv = o;
         }
     };
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H

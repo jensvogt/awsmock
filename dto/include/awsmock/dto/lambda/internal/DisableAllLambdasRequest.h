@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_DISABLE_ALL_APPLICATIONS_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_DISABLE_ALL_APPLICATIONS_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -71,7 +70,4 @@ namespace Awsmock::Dto::Lambda {
             };
         }
     };
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_DISABLE_ALL_APPLICATIONS_REQUEST_H
