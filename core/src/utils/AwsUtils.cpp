@@ -151,19 +151,6 @@ namespace Awsmock::Core {
         return CreateArn("sqs", region, accountId, queueName);
     }
 
-    //
-    // std::string AwsUtils::CreateSQSQueueUrl(const std::string &region, const std::string &accountId, const std::string &queueName) {
-    //     const std::string hostName = SystemUtils::GetHostName();
-    //     const std::string port = Configuration::instance().get<std::string>("awsmock.gateway.port");
-    //     return "http://sqs." + region + "." + hostName + ":" + port + "/" + accountId + "/" + queueName;
-    // }
-    // //
-    // std::string AwsUtils::CreateSQSQueueUrl(const std::string &queueName) {
-    //     const std::string region = Configuration::instance().get<std::string>("awsmock.region");
-    //     const std::string accountId = Configuration::instance().get<std::string>("awsmock.access.account-id");
-    //     return CreateSQSQueueUrl(region, accountId, queueName);
-    // }
-
     std::string AwsUtils::CreateSQSSenderId() {
         return StringUtils::GenerateRandomString(21) + ":none@example.com";
     }
@@ -218,6 +205,10 @@ namespace Awsmock::Core {
 
     std::string AwsUtils::CreateCognitoUserPoolArn(const std::string &region, const std::string &accountId, const std::string &userPoolId) {
         return CreateArn("cognito-idp", region, accountId, userPoolId);
+    }
+
+    std::string AwsUtils::CreateLambdaInstanceId() {
+        return StringUtils::GenerateRandomHexString(12);
     }
 
     std::string AwsUtils::CreateRequestId() {

@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_UPDATE_LAMBDA_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_UPDATE_LAMBDA_REQUEST_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -16,7 +15,7 @@ namespace Awsmock::Dto::Lambda {
      * Example:
      * @code{.json}
      * {
-     *   "functionArn": "string",
+     *   "lambdaArn": "string",
      *   "enabled": boolean,
      * }
      * @endcode
@@ -28,7 +27,7 @@ namespace Awsmock::Dto::Lambda {
         /**
          * Lambda function ARN
          */
-        std::string functionArn;
+        std::string lambdaArn;
 
         /**
          * Enabled
@@ -39,19 +38,16 @@ namespace Awsmock::Dto::Lambda {
 
         friend UpdateLambdaRequest tag_invoke(boost::json::value_to_tag<UpdateLambdaRequest>, boost::json::value const &v) {
             UpdateLambdaRequest r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateLambdaRequest const &obj) {
             jv = {
-                    {"functionArn", obj.functionArn},
+                    {"lambdaArn", obj.lambdaArn},
                     {"enabled", obj.enabled},
             };
         }
     };
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_UPDATE_LAMBDA_REQUEST_H

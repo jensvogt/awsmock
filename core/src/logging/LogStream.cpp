@@ -22,7 +22,7 @@ namespace Awsmock::Core {
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> LogStream::file_sink;
     boost::shared_ptr<websocket::stream<beast::tcp_stream>> LogStream::_ws;
     boost::shared_ptr<LogWebsocketSink> LogStream::webSocketBackend(new LogWebsocketSink(_ws));
-    boost::shared_ptr<webSocketSink_t> LogStream::web_socket_sink(new webSocketSink_t(webSocketBackend));
+    boost::shared_ptr<webSocketSink_t> LogStream::web_socket_sink;
     boost::shared_ptr<boost::log::sinks::basic_sink_frontend> LogStream::logging_ws_sink;
 
     inline std::string processFuncName(const char *func) {
@@ -180,8 +180,9 @@ namespace Awsmock::Core {
         auto channelLevels = _channelLevels;
         auto globalLevel = _severity;
 
-        // Per-sink filters must be at least as permissive as the most verbose channel override,
-        // otherwise they block records before the channel-aware core filter can evaluate them.
+        // Per-sink filters must be at least as permissive as the most verbose channel override.
+        // The core filter runs first; a stale restrictive sink filter would silently drop records
+        // the core correctly passed for a verbose channel.
         auto minLevel = globalLevel;
         for (const auto &lv: channelLevels | std::views::values) {
             if (lv < minLevel) minLevel = lv;
@@ -218,14 +219,12 @@ namespace Awsmock::Core {
                 boost::log::keywords::format = &LogColorFormatter);
 #endif
 
-        // Set level
-        file_sink->set_filter(boost::log::trivial::severity >= _severity);
-
         file_sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
                 boost::log::keywords::target = dir,
                 boost::log::keywords::max_files = count));
 
         file_sink->locked_backend()->scan_for_files();
+        UpdateFilter();
 
         log_info << "Start logging to file, dir: " << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
@@ -235,8 +234,8 @@ namespace Awsmock::Core {
         webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<websocket::stream<beast::tcp_stream>>(std::move(ws)));
         web_socket_sink = boost::make_shared<webSocketSink_t>(webSocketBackend);
         web_socket_sink->set_formatter(&LogFormatter);
-        web_socket_sink->set_filter(boost::log::trivial::severity >= _severity);
         core->add_sink(web_socket_sink);
+        UpdateFilter();
     }
 
     void LogStream::AddLoggingWebSocket(boost::asio::io_context &ioc, unsigned int port) {
@@ -252,10 +251,10 @@ namespace Awsmock::Core {
         using sink_t = boost::log::sinks::synchronous_sink<Service::Logging::WebSocketSinkBackend>;
         const auto sink = boost::make_shared<sink_t>(backend);
         sink->set_formatter(&LogFormatter);
-        sink->set_filter(boost::log::trivial::severity >= _severity);
         logging_ws_sink = sink;
 
         boost::log::core::get()->add_sink(sink);
+        UpdateFilter();
     }
 
     void LogStream::RemoveWebSocketSink() {

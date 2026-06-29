@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ standard includes
+#include <map>
 #include <memory>
 #include <ranges>
 #include <string>
@@ -574,6 +575,13 @@ namespace Awsmock::Service {
          * @return part of the CMD command
          */
         static std::string appendCommandLine(const std::string &argName, const std::string &argValue);
+
+        /**
+         * @brief Builds the --env-var KEY=VALUE argument entries for the CMD line.
+         * @param variables environment variable map
+         * @return comma-prefixed CMD argument pairs, one per variable
+         */
+        static std::string appendEnvVarArgs(const std::map<std::string, std::string> &variables);
 
         /**
          * @brief Builds the Dockerfile CMD line for a Lambda function.

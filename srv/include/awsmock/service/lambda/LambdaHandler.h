@@ -90,6 +90,9 @@ namespace Awsmock::Service {
 
       private:
 
+        /**
+         * @brief  @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**

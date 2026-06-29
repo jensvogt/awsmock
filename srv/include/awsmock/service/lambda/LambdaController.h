@@ -71,18 +71,18 @@ namespace Awsmock::Service {
         /**
          * @brief Handle sigLambdaStart — start a single lambda by ARN
          *
-         * @param functionArn lambda function ARN
+         * @param lambdaArn lambda function ARN
          * @param region AWS region
          */
-        void OnStartLambda(const std::string &functionArn, const std::string &region) const;
+        void OnStartLambda(const std::string &lambdaArn, const std::string &region) const;
 
         /**
          * @brief Handle sigLambdaStop — stop all running containers of a single lambda
          *
-         * @param functionArn lambda function ARN
+         * @param lambdaArn lambda function ARN
          * @param region AWS region
          */
-        void OnStopLambda(const std::string &functionArn, const std::string &region) const;
+        void OnStopLambda(const std::string &lambdaArn, const std::string &region) const;
 
         /**
          * @brief Handle sigLambdaStartAll — start every enabled lambda in the given region

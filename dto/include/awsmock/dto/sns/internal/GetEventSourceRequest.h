@@ -34,7 +34,7 @@ namespace Awsmock::Dto::SNS {
 
         friend GetEventSourceRequest tag_invoke(boost::json::value_to_tag<GetEventSourceRequest>, boost::json::value const &v) {
             GetEventSourceRequest r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.functionArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.eventSourceArn = Core::Json::GetStringValue(v, "eventSourceArn");
             return r;
         }
@@ -44,7 +44,7 @@ namespace Awsmock::Dto::SNS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"functionArn", obj.functionArn},
+                    {"lambdaArn", obj.functionArn},
                     {"eventSourceArn", obj.eventSourceArn},
             };
         }
