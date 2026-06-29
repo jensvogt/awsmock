@@ -1,10 +1,6 @@
 
 #include <awsmock/service/s3/S3Handler.h>
 
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "S3"};
-}
-
 namespace Awsmock::Service {
 
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
@@ -716,7 +712,7 @@ namespace Awsmock::Service {
                 case Dto::Common::S3CommandType::GET_EVENT_SOURCE: {
                     Dto::S3::GetEventSourceRequest s3Request = Dto::S3::GetEventSourceRequest::FromJson(clientCommand);
                     Dto::S3::GetEventSourceResponse s3Response = _s3Service.GetEventSource(s3Request);
-                    log_trace << "Get event source, functionArn: " << s3Request.functionArn;
+                    log_trace << "Get event source, lambdaArn: " << s3Request.functionArn;
 
                     return SendResponse(request, http::status::ok);
                 }
@@ -856,6 +852,7 @@ namespace Awsmock::Service {
 
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
+        log_info << "Get metadata request, region: " << clientCommand.region << ", bucket: " << clientCommand.bucket << ", key: " << clientCommand.key;
 
         try {
             Dto::S3::GetObjectMetadataResponse s3Response;
@@ -876,7 +873,7 @@ namespace Awsmock::Service {
 
             // Content size should be set to the size the GET would reply.
             std::map<std::string, std::string> headers;
-            headers["Content-Type"] = "text/plain";
+            headers["Content-Type"] = s3Response.contentType;
             headers["Content-Length"] = std::to_string(s3Response.size);
             headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
             headers["x-amz-request-id"] = Core::StringUtils::GenerateRandomHexString(16);
@@ -898,8 +895,8 @@ namespace Awsmock::Service {
                 std::string body = "<Error><Code>InvalidObjectState</Code><Message>The action is not valid for the object's storage class</Message></Error>";
                 return SendResponse(request, http::status::forbidden, body, headers);
             }
-
             return SendResponse(request, http::status::ok, {}, headers);
+
         } catch ([[maybe_unused]] Core::NotFoundException &exc) {
             return SendResponse(request, http::status::not_found);
         } catch (std::exception &exc) {

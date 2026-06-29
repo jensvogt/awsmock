@@ -8,6 +8,8 @@ namespace Awsmock::Service {
 
     S3Server::S3Server() : AbstractServer("s3") {
 
+        log_info << "S3 server starting";
+
         // Get HTTP configuration values
         _syncPeriod = Core::Configuration::instance().get<int>("awsmock.modules.s3.sync-period");
         _counterPeriod = Core::Configuration::instance().get<int>("awsmock.modules.s3.counter-period");

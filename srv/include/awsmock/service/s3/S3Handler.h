@@ -19,7 +19,7 @@ namespace Awsmock::Service {
     /**
      * @brief S3 request handler
      *
-     * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
+     * AWS S3 HTTP request handler. All S3-related REST calls are ending here. Depending on the request header, the S3 module will be selected in case the
      * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structures, the requests
      * are first sent to the S3CmdHandler, which normalizes the commands.
      *
@@ -93,6 +93,11 @@ namespace Awsmock::Service {
       private:
 
         /**
+         * @brief  @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "S3"};
+
+        /**
          * @brief Get the range for a range request
          *
          * @param request HTTP request
@@ -100,7 +105,7 @@ namespace Awsmock::Service {
          * @param max maximum byte
          * @param size content length
          */
-        static void GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size);
+        void GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size);
 
         /**
          * @brief Returns the metadata has string key/value map.
@@ -111,7 +116,7 @@ namespace Awsmock::Service {
          * @param request HTTP request
          * @return hash map of key/value pairs.
          */
-        static std::map<std::string, std::string> GetMetadata(const http::request<http::dynamic_body> &request);
+        std::map<std::string, std::string> GetMetadata(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Prepare the body for further processing
@@ -121,7 +126,7 @@ namespace Awsmock::Service {
          * @param request HTTP request
          * @param sb prepared stream buffer
          */
-        static long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
+        long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
 
         /**
          * @brief Gets bucket and key from the source header
@@ -130,7 +135,7 @@ namespace Awsmock::Service {
          * @param bucket bucket name
          * @param key S3 object key
          */
-        static void GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key);
+        void GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key);
 
         /**
          * S3 service

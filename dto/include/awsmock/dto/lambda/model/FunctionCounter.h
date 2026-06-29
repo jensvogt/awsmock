@@ -139,7 +139,7 @@ namespace Awsmock::Dto::Lambda {
 
         friend FunctionCounter tag_invoke(boost::json::value_to_tag<FunctionCounter>, boost::json::value const &v) {
             FunctionCounter r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.functionArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.functionName = Core::Json::GetStringValue(v, "functionName");
             r.description = Core::Json::GetStringValue(v, "description");
             r.codeSha256 = Core::Json::GetStringValue(v, "codeSha256");
@@ -167,7 +167,7 @@ namespace Awsmock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, FunctionCounter const &obj) {
             jv = {
-                    {"functionArn", obj.functionArn},
+                    {"lambdaArn", obj.functionArn},
                     {"functionName", obj.functionName},
                     {"description", obj.description},
                     {"codeSha256", obj.codeSha256},

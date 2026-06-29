@@ -2,8 +2,7 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_START_LAMBDA_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_START_LAMBDA_REQUEST_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -20,13 +19,13 @@ namespace Awsmock::Dto::Lambda {
         /**
          * Function ARN
          */
-        std::string functionArn;
+        std::string lambdaArn;
 
       private:
 
         friend StartLambdaRequest tag_invoke(boost::json::value_to_tag<StartLambdaRequest>, boost::json::value const &v) {
             StartLambdaRequest r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
             return r;
         }
 
@@ -35,11 +34,8 @@ namespace Awsmock::Dto::Lambda {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"functionArn", obj.functionArn},
+                    {"lambdaArn", obj.lambdaArn},
             };
         }
     };
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif//AWSMOCK_DTO_LAMBDA_START_LAMBDA_REQUEST_H

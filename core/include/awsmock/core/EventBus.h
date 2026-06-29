@@ -68,7 +68,7 @@ namespace Awsmock::Core {
         /**
          * @brief Signal to start a single lambda function by ARN.
          *
-         * @tparam functionArn lambda function ARN
+         * @tparam lambdaArn lambda function ARN
          * @tparam region AWS region
          */
         boost::signals2::signal<void(std::string, std::string)> sigLambdaStart;
@@ -76,7 +76,7 @@ namespace Awsmock::Core {
         /**
          * @brief Signal to stop a single lambda function by ARN.
          *
-         * @tparam functionArn lambda function ARN
+         * @tparam lambdaArn lambda function ARN
          * @tparam region AWS region
          */
         boost::signals2::signal<void(std::string, std::string)> sigLambdaStop;
@@ -111,7 +111,7 @@ namespace Awsmock::Core {
         /**
          * @brief Signal to check the Docker daemon status of a lambda function.
          *
-         * @tparam functionArn lambda function ARN
+         * @tparam lambdaArn lambda function ARN
          */
         boost::signals2::signal<void(std::string)> sigLambdaCheck;
     };

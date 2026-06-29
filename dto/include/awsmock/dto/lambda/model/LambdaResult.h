@@ -51,7 +51,7 @@ namespace Awsmock::Dto::Lambda {
 
         friend LambdaResult tag_invoke(boost::json::value_to_tag<LambdaResult>, boost::json::value const &v) {
             LambdaResult r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.functionArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.responseBody = Core::Json::GetStringValue(v, "responseBody");
             r.status = Core::Json::GetIntValue(v, "status");
             return r;
@@ -59,7 +59,7 @@ namespace Awsmock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LambdaResult const &obj) {
             jv = {
-                    {"functionArn", obj.functionArn},
+                    {"lambdaArn", obj.functionArn},
                     {"responseBody", obj.responseBody},
                     {"status", obj.status},
             };

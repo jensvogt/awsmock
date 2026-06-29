@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_LIST_LAMBDA_RESULT_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_LAMBDA_LIST_LAMBDA_RESULT_COUNTERS_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <sstream>
@@ -52,7 +51,4 @@ namespace Awsmock::Dto::Lambda {
             };
         }
     };
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_LIST_LAMBDA_RESULT_COUNTERS_RESPONSE_H

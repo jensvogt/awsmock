@@ -69,6 +69,7 @@ namespace Awsmock::Dto::Common {
         STOP_LAMBDA_INSTANCE,
         DELETE_IMAGE,
         LIST_INSTANCE_COUNTERS,
+        GET_INSTANCE_COUNTER,
         // Event sources
         LIST_EVENT_SOURCE_COUNTERS,
         ADD_EVENT_SOURCE_COUNTER,
@@ -123,6 +124,7 @@ namespace Awsmock::Dto::Common {
             {LambdaCommandType::STOP_ALL_LAMBDAS, "stop-all-lambdas"},
             // Instances
             {LambdaCommandType::LIST_INSTANCE_COUNTERS, "list-instance-counters"},
+            {LambdaCommandType::GET_INSTANCE_COUNTER, "get-instance-counter"},
             {LambdaCommandType::STOP_LAMBDA_INSTANCE, "stop-instance"},
             {LambdaCommandType::DELETE_IMAGE, "delete-image"},
             // Event sources

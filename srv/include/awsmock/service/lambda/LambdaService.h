@@ -18,7 +18,9 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/ZipUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
+#include <awsmock/core/exception/ContainerException.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -54,6 +56,8 @@
 #include <awsmock/dto/lambda/internal/EnableLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/internal/GetLambdaInstanceCounterRequest.h>
+#include <awsmock/dto/lambda/internal/GetLambdaInstanceCounterResponse.h>
 #include <awsmock/dto/lambda/internal/GetLambdaResultCounterRequest.h>
 #include <awsmock/dto/lambda/internal/GetLambdaResultCounterResponse.h>
 #include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
@@ -88,8 +92,6 @@
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/repository/lambda/LambdaMongoRepository.h>
-#include <awsmock/core/ZipUtils.h>
-#include <awsmock/core/exception/ContainerException.h>
 #include <awsmock/service/container/ContainerService.h>
 
 // Maximal output length for a synchronous invocation call
@@ -174,6 +176,16 @@ namespace Awsmock::Service {
          * @see Dto::Lambda::ListFunctionCountersResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaInstanceCountersResponse ListLambdaInstanceCounters(const Dto::Lambda::ListLambdaInstanceCountersRequest &request) const;
+
+        /**
+         * @brief Get a single lambda instance counter
+         *
+         * @param request get lambda instances counter request
+         * @return GetLambdaInstanceCounterResponse
+         * @see Dto::Lambda::GetLambdaInstanceCounterRequest
+         * @see Dto::Lambda::GetLambdaInstanceCounterResponse
+         */
+        [[nodiscard]] Dto::Lambda::GetLambdaInstanceCounterResponse GetLambdaInstanceCounter(const Dto::Lambda::GetLambdaInstanceCounterRequest &request) const;
 
         /**
          * @brief List lambda environment counters
