@@ -314,7 +314,7 @@ namespace Awsmock::Service {
                 stopRequest.lambdaArn = request.lambdaArn;
                 stopRequest.region = request.region;
                 StopLambda(stopRequest);
-            } else {
+            } else if (lambda.instances.empty()) {
                 Dto::Lambda::StartLambdaRequest startRequest;
                 startRequest.lambdaArn = request.lambdaArn;
                 startRequest.region = request.region;
@@ -332,7 +332,7 @@ namespace Awsmock::Service {
 
         std::string lambdaArn = Core::AwsUtils::ConvertLambdaNameToArn(request.region, Core::AwsUtils::GetDefaultAccountId(), request.functionName);
 
-        std::vector<Database::Entity::Lambda::Lambda> lambads = _lambdaDatabase->listLambdas({});
+        std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase->listLambdas({});
 
         if (!_lambdaDatabase->lambdaExistsByArn(lambdaArn)) {
             log_warning << "Lambda function does not exist, arn: " << lambdaArn;

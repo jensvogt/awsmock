@@ -9,10 +9,10 @@
 #include <thread>
 
 // Awsmock includes
-#include <../../db/include/awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
+#include <awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace {
