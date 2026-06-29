@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.18.77](https://github.com/jensvogt/awsmock/compare/1.18.76...v1.18.77) (2026-06-29)
+
+
+### Bug Fixes
+
+* new lambda handling ([59c4b70](https://github.com/jensvogt/awsmock/commit/59c4b70c4317fffddf301d2e42b2f0c06ac31607))
+* new lambda instance handling ([4a0e2f5](https://github.com/jensvogt/awsmock/commit/4a0e2f53d1d424c99d8522fbe25f4e90bf52a241))
+* remove lambda creator/executor ([fbb2474](https://github.com/jensvogt/awsmock/commit/fbb24746edc7e45898ec504292a49e383d023a21))
+* remove lambda creator/executor ([d95351a](https://github.com/jensvogt/awsmock/commit/d95351a35f81269402e9105d9240fa0d8d169d07))
+* service tests, update log messages ([0fb5c28](https://github.com/jensvogt/awsmock/commit/0fb5c28f85020ce2d9f8cffe20d58bfdef33dc21))
+
 ## [1.18.76](https://github.com/jensvogt/awsmock/compare/v1.18.75...v1.18.76) (2026-06-18)
 
 
