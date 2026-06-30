@@ -64,7 +64,6 @@ find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 find_package(libssh CONFIG REQUIRED)
 find_package(unofficial-libmagic REQUIRED)
 find_package(pcre2 CONFIG REQUIRED)
-find_package(JNI REQUIRED)
 
 if (WIN32)
     find_package(Boost REQUIRED COMPONENTS system)

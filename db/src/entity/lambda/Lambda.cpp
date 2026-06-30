@@ -185,7 +185,7 @@ namespace Awsmock::Database::Entity::Lambda {
         concurrency = Core::Bson::BsonUtils::GetIntValue(mResult, "concurrency");
         //        lastStart = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastStart"]);
         //        lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastInvocation"]);
-        //        invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
+        invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
         avgDuration = Core::Bson::BsonUtils::GetLongValue(mResult, "avgDuration");
         dockerTag = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerTag");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
