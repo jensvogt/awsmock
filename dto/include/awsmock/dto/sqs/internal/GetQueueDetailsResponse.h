@@ -123,7 +123,7 @@ namespace Awsmock::Dto::SQS {
             r.available = Core::Json::GetLongValue(v, "available");
             r.invisible = Core::Json::GetLongValue(v, "invisible");
             r.delayed = Core::Json::GetLongValue(v, "delayed");
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
         }
@@ -147,7 +147,7 @@ namespace Awsmock::Dto::SQS {
                     {"available", obj.available},
                     {"invisible", obj.invisible},
                     {"delayed", obj.delayed},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

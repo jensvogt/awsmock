@@ -49,6 +49,21 @@ namespace Awsmock::Dto::Lambda {
          */
         std::string instanceId;
 
+        /**
+         * @brief Last start timestamp
+         */
+        system_clock::time_point lastStart;
+
+        /**
+         * @brief Last invocation timestamp
+         */
+        system_clock::time_point lastInvocation;
+
+        /**
+         * @brief Last stop timestamp
+         */
+        system_clock::time_point lastStop;
+
       private:
 
         friend LambdaStatus tag_invoke(boost::json::value_to_tag<LambdaStatus>, boost::json::value const &v) {
@@ -59,6 +74,9 @@ namespace Awsmock::Dto::Lambda {
             r.invocations = Core::Json::GetIntValue(v, "invocations");
             r.avgDuration = Core::Json::GetDoubleValue(v, "avgDuration");
             r.functionName = Core::Json::GetStringValue(v, "functionName");
+            r.lastStart = Core::Json::GetDatetimeValue(v, "lastStart");
+            r.lastInvocation = Core::Json::GetDatetimeValue(v, "lastInvocation");
+            r.lastStop = Core::Json::GetDatetimeValue(v, "lastStop");
             r.port = Core::Json::GetIntValue(v, "port");
             return r;
         }
@@ -71,6 +89,9 @@ namespace Awsmock::Dto::Lambda {
                     {"invocations", obj.invocations},
                     {"avgDuration", obj.avgDuration},
                     {"functionName", obj.functionName},
+                    {"lastStart", Core::DateTimeUtils::ToISO8601(obj.lastStart)},
+                    {"lastInvocation", Core::DateTimeUtils::ToISO8601(obj.lastInvocation)},
+                    {"lastStop", Core::DateTimeUtils::ToISO8601(obj.lastStop)},
                     {"port", obj.port},
             };
         }

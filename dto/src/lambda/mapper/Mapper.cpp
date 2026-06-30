@@ -146,9 +146,9 @@ namespace Awsmock::Dto::Lambda {
             counter.handler = lambdaEntity.handler;
             counter.zipFile = lambdaEntity.code.zipFile;
             counter.enabled = lambdaEntity.enabled;
-            // counter.state = LambdaStateToString(lambdaEntity.state);
+            counter.active = !lambdaEntity.instances.empty();
             counter.version = lambdaEntity.dockerTag;
-            counter.averageRuntime = lambdaEntity.averageRuntime;
+            counter.averageRuntime = lambdaEntity.avgDuration;
             counter.instances = static_cast<long>(lambdaEntity.instances.size());
             counter.created = lambdaEntity.created;
             counter.modified = lambdaEntity.modified;

@@ -1,10 +1,6 @@
 
 #include <awsmock/service/s3/S3Handler.h>
 
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "S3"};
-}
-
 namespace Awsmock::Service {
 
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
@@ -666,62 +662,63 @@ namespace Awsmock::Service {
                     Dto::S3::GetObjectCounterRequest s3Request = Dto::S3::GetObjectCounterRequest::FromJson(clientCommand);
                     Dto::S3::GetObjectCounterResponse s3Response = _s3Service.GetObjectCounters(s3Request);
 
-                    log_info << "Get object counter, name: " << s3Request.oid;
+                    log_info << "Get object counter, oid: " << s3Request.oid;
                     return SendResponse(request, http::status::ok, s3Response.ToJson());
                 }
 
                 case Dto::Common::S3CommandType::UPLOAD_OBJECT_COUNTER: {
-                    log_debug << "Upload upload counter request";
 
                     // Build request
                     Dto::S3::UploadObjectCounterRequest s3Request = Dto::S3::UploadObjectCounterRequest::FromJson(clientCommand);
                     _s3Service.UploadObjectCounter(s3Request);
 
-                    log_info << "Upload object counter, bucketName: " << s3Request.bucketName << ", key: " << s3Request.objectKey;
+                    log_info << "Upload object counter, region: " << s3Request.region << ", bucketName: " << s3Request.bucketName << ", key: " << s3Request.objectKey;
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::S3CommandType::TOUCH_OBJECT: {
-                    log_debug << "S3 touch object";
 
                     // Build request
                     Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
                     Core::Scheduler::instance().AddOneTimeTask("touch-objects", [s3Request, _logger = _logger]() mutable {
                         try {
                             S3Service{}.TouchObject(s3Request);
-                            log_info << "Touched all S3 object, region: " << s3Request.region;
+                            log_info << "Touched all S3 object, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", key: " << s3Request.key;
                         } catch (const std::exception &e) {
-                            log_error << "Disable all lambdas failed: " << e.what();
+                            log_error << "Touched all S3 object failed, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", key: " << s3Request.key << ": " << e.what();
                         }
                     });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::S3CommandType::UPDATE_OBJECT: {
-                    log_debug << "S3 update object";
 
                     // Build request
                     Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
                     Core::Scheduler::instance().AddOneTimeTask("update-object", [s3Request, _logger = _logger]() mutable {
                         try {
                             S3Service{}.UpdateObject(s3Request);
-                            log_info << "Updated S3 object, region: " << s3Request.region;
+                            log_info << "Updated S3 object, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", key: " << s3Request.key;
                         } catch (const std::exception &e) {
-                            log_error << "Update object failed: " << e.what();
+                            log_error << "Update object failed, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", key: " << s3Request.key << ", error: " << e.what();
                         }
                     });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::S3CommandType::GET_EVENT_SOURCE: {
+
+                    log_info << "Get event source, bucket: " << clientCommand.bucket;
                     Dto::S3::GetEventSourceRequest s3Request = Dto::S3::GetEventSourceRequest::FromJson(clientCommand);
                     Dto::S3::GetEventSourceResponse s3Response = _s3Service.GetEventSource(s3Request);
-                    log_trace << "Get event source, functionArn: " << s3Request.functionArn;
+                    log_trace << "Get event source, lambdaArn: " << s3Request.functionArn;
 
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::S3CommandType::DELETE_BUCKET_COUNTER: {
+
+                    log_info << "Delete bucket counter, bucket: " << clientCommand.bucket;
                     Dto::S3::DeleteBucketRequest s3Request = Dto::S3::DeleteBucketRequest::FromJson(clientCommand);
                     _s3Service.DeleteBucket(s3Request);
                     log_trace << "Bucket deleted, bucketName: " << s3Request.bucket;
@@ -730,6 +727,8 @@ namespace Awsmock::Service {
                 }
 
                 case Dto::Common::S3CommandType::ADD_BUCKET_COUNTER: {
+
+                    log_info << "Add bucket counter, bucket: " << clientCommand.bucket;
                     Dto::S3::CreateBucketRequest s3Request = Dto::S3::CreateBucketRequest::FromJson(clientCommand);
                     Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
                     log_trace << "Bucket added, bucketName: " << s3Request.name;
@@ -799,7 +798,6 @@ namespace Awsmock::Service {
                     deleteBucketRequest.region = clientCommand.region;
                     deleteBucketRequest.bucket = clientCommand.bucket;
                     _s3Service.DeleteBucket(deleteBucketRequest);
-
                     log_info << "Delete bucket, bucket: " << clientCommand.bucket;
                     return SendResponse(request, http::status::no_content);
                 }
@@ -856,6 +854,7 @@ namespace Awsmock::Service {
 
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
+        log_info << "Get metadata request, region: " << clientCommand.region << ", bucket: " << clientCommand.bucket << ", key: " << clientCommand.key;
 
         try {
             Dto::S3::GetObjectMetadataResponse s3Response;
@@ -876,7 +875,7 @@ namespace Awsmock::Service {
 
             // Content size should be set to the size the GET would reply.
             std::map<std::string, std::string> headers;
-            headers["Content-Type"] = "text/plain";
+            headers["Content-Type"] = s3Response.contentType;
             headers["Content-Length"] = std::to_string(s3Response.size);
             headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
             headers["x-amz-request-id"] = Core::StringUtils::GenerateRandomHexString(16);
@@ -898,8 +897,8 @@ namespace Awsmock::Service {
                 std::string body = "<Error><Code>InvalidObjectState</Code><Message>The action is not valid for the object's storage class</Message></Error>";
                 return SendResponse(request, http::status::forbidden, body, headers);
             }
-
             return SendResponse(request, http::status::ok, {}, headers);
+
         } catch ([[maybe_unused]] Core::NotFoundException &exc) {
             return SendResponse(request, http::status::not_found);
         } catch (std::exception &exc) {

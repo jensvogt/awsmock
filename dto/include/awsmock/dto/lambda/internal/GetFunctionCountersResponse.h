@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -209,7 +208,7 @@ namespace Awsmock::Dto::Lambda {
         /**
          * Invocation
          */
-        long averageRuntime{};
+        long avgDuration{};
 
         /**
          * Enabled
@@ -256,7 +255,7 @@ namespace Awsmock::Dto::Lambda {
         friend GetFunctionCountersResponse tag_invoke(boost::json::value_to_tag<GetFunctionCountersResponse>, boost::json::value const &v) {
             GetFunctionCountersResponse r;
             r.id = Core::Json::GetStringValue(v, "id");
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.functionArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.functionName = Core::Json::GetStringValue(v, "functionName");
             r.role = Core::Json::GetStringValue(v, "role");
             r.handler = Core::Json::GetStringValue(v, "handler");
@@ -270,7 +269,7 @@ namespace Awsmock::Dto::Lambda {
             r.concurrency = Core::Json::GetLongValue(v, "concurrency");
             r.instances = Core::Json::GetLongValue(v, "instances");
             r.invocations = Core::Json::GetLongValue(v, "invocations");
-            r.averageRuntime = Core::Json::GetLongValue(v, "averageRuntime");
+            r.avgDuration = Core::Json::GetLongValue(v, "avgDuration");
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.state = Core::Json::GetStringValue(v, "state");
             r.environment = boost::json::value_to<std::map<std::string, std::string>>(v.at("environment"));
@@ -278,11 +277,11 @@ namespace Awsmock::Dto::Lambda {
             if (Core::Json::AttributeExists(v, "lastInvocation")) {
                 r.lastInvocation = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastInvocation"));
             }
-            if (Core::Json::AttributeExists(v, "lastStarted")) {
-                r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
+            if (Core::Json::AttributeExists(v, "lastStart")) {
+                r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStart"));
             }
-            if (Core::Json::AttributeExists(v, "created")) {
-                r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            if (Core::Json::AttributeExists(v, "lastStart")) {
+                r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStart"));
             }
             if (Core::Json::AttributeExists(v, "modified")) {
                 r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
@@ -295,7 +294,7 @@ namespace Awsmock::Dto::Lambda {
             o["region"] = obj.region;
             o["user"] = obj.user;
             o["id"] = obj.id;
-            o["functionArn"] = obj.functionArn;
+            o["lambdaArn"] = obj.functionArn;
             o["functionName"] = obj.functionName;
             o["role"] = obj.role;
             o["handler"] = obj.handler;
@@ -309,19 +308,19 @@ namespace Awsmock::Dto::Lambda {
             o["concurrency"] = obj.concurrency;
             o["instances"] = obj.instances;
             o["invocations"] = obj.invocations;
-            o["averageRuntime"] = obj.averageRuntime;
+            o["avgDuration"] = obj.avgDuration;
             o["enabled"] = obj.enabled;
             o["state"] = obj.state;
             o["environment"] = boost::json::value_from(obj.environment);
             o["tags"] = boost::json::value_from(obj.tags);
             if (obj.lastInvocation.has_value()) {
-                o["lastStarted"] = Core::DateTimeUtils::ToISO8601(obj.lastInvocation.value());
+                o["lastStart"] = Core::DateTimeUtils::ToISO8601(obj.lastInvocation.value());
             }
             if (obj.lastStarted.has_value()) {
-                o["lastStarted"] = Core::DateTimeUtils::ToISO8601(obj.lastStarted.value());
+                o["lastStart"] = Core::DateTimeUtils::ToISO8601(obj.lastStarted.value());
             }
             if (obj.created.has_value()) {
-                o["created"] = Core::DateTimeUtils::ToISO8601(obj.created.value());
+                o["lastStart"] = Core::DateTimeUtils::ToISO8601(obj.created.value());
             }
             if (obj.modified.has_value()) {
                 o["modified"] = Core::DateTimeUtils::ToISO8601(obj.modified.value());
@@ -329,7 +328,4 @@ namespace Awsmock::Dto::Lambda {
             jv = o;
         }
     };
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_RESPONSE_H

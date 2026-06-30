@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ standard includes
+#include <map>
 #include <memory>
 #include <ranges>
 #include <string>
@@ -47,6 +48,7 @@
 #include <awsmock/dto/container/VersionResponse.h>
 #include <awsmock/dto/container/model/ContainerStat.h>
 #include <awsmock/entity/apps/Application.h>
+#include <awsmock/entity/lambda/Lambda.h>
 
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
@@ -142,15 +144,11 @@ namespace Awsmock::Service {
          * @brief Build a docker image for a lambda
          *
          * @param codeDir code directory
-         * @param name lambda function name, used as image name
-         * @param tag
-         * @param handler lambda function handler
-         * @param runtime lambda AWS runtime
-         * @param environment runtime environment
-         * @return file size in bytes
+         * @param lambdaEntity lambda function entity
+         * @return image file
          */
         [[nodiscard]]
-        std::string BuildLambdaImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+        std::string BuildLambdaImage(const std::string &codeDir, Database::Entity::Lambda::Lambda &lambdaEntity) const;
 
         /**
          * @brief Build a docker image for an application
@@ -248,6 +246,24 @@ namespace Awsmock::Service {
          */
         [[nodiscard]]
         Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) const;
+
+        /**
+         * @brief Creates a Lambda container with an explicit CMD override.
+         *
+         * @par
+         * Passes the Lambda handler as the Docker CMD so the runtime interface client
+         * receives it without relying on the image CMD baked in at build time.
+         *
+         * @param imageName image name
+         * @param instanceName name of the instance
+         * @param tag image tags
+         * @param environment runtime environment variables
+         * @param hostPort external port of the lambda
+         * @param cmd Docker CMD tokens (e.g. {"lambda_function.handler"})
+         * @return CreateContainerResponse
+         */
+        [[nodiscard]]
+        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort, const std::vector<std::string> &cmd) const;
 
         /**
          * @brief Creates a container for an application
@@ -474,12 +490,10 @@ namespace Awsmock::Service {
          * @brief Write the lambda docker file.
          *
          * @param codeDir code directory
-         * @param handler handler function
-         * @param runtime docker image runtime
-         * @param environment runtime environment
+         * @param lambdaEntity lambda function entity
          * @return return docker file path
          */
-        std::string WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+        std::string WriteLambdaDockerFile(const std::string &codeDir, Database::Entity::Lambda::Lambda &lambdaEntity) const;
 
         /**
          * @brief Write the application docker file.
@@ -528,7 +542,7 @@ namespace Awsmock::Service {
          * @param handler handler
          * @return name of the handler file to copy to the docker file
          */
-        static std::string GetHandlerFileNodeJs22(const std::string &handler);
+        static std::string GetHandlerFileNodeJs22(const std::string &codeDir, const std::string &handler);
 
         /**
          * @brief Add environment variables to the Dockerfile
@@ -547,6 +561,43 @@ namespace Awsmock::Service {
         static std::string AddCredentials(const std::string &codeDir, const std::string &region = "eu-central-1");
 
         /**
+         * @brief Copy Java runtime JARs from the host lib dir into the build context.
+         *
+         * @param codeDir build context directory
+         * @return Dockerfile COPY instruction string
+         */
+        static std::string AddJavaRuntimeLibs(const std::string &codeDir);
+
+        /**
+         * @brief Append to the command line
+         * @param argName argument name
+         * @param argValue argument value
+         * @return part of the CMD command
+         */
+        static std::string appendCommandLine(const std::string &argName, const std::string &argValue);
+
+        /**
+         * @brief Builds the --env-var KEY=VALUE argument entries for the CMD line.
+         * @param variables environment variable map
+         * @return comma-prefixed CMD argument pairs, one per variable
+         */
+        static std::string appendEnvVarArgs(const std::map<std::string, std::string> &variables);
+
+        /**
+         * @brief Builds the Dockerfile CMD line for a Lambda function.
+         *
+         * @par
+         * When @p isAwsmockLrt is true the base image is jensvogt/awsmock-lrt and expects
+         * structured CLI flags (--function-name, --code-path, --handler, --runtime, etc.).
+         * When false the standard AWS Lambda base image is used and CMD is just the handler.
+         *
+         * @param lambda lambda entity
+         * @param isAwsmockLrt true when the runtime image is awsmock-lrt
+         * @return Dockerfile CMD line including the trailing newline
+         */
+        static std::string GetDockerCmd(const Database::Entity::Lambda::Lambda &lambda, bool isAwsmockLrt);
+
+        /**
          * @brief Builds and sends a container create request.
          *
          * @param imageName image name
@@ -556,11 +607,12 @@ namespace Awsmock::Service {
          * @param containerPortStr container-side port as string (e.g. "8080")
          * @param hostPort host-side port number
          * @param environment environment variables
+         * @param cmd optional CMD override; empty means "use image default"
          * @return CreateContainerResponse
          */
         [[nodiscard]]
         Dto::Docker::CreateContainerResponse SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, int hostPort,
-                                                                 const std::vector<std::string> &environment) const;
+                                                                 const std::vector<std::string> &environment, const std::vector<std::string> &cmd = {}) const;
 
         /**
          * @brief Guarded domain socket helper

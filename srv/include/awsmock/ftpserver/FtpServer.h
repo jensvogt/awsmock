@@ -139,9 +139,9 @@ namespace Awsmock::FtpServer {
         /**
          * @brief Get the control port that the FTP manager is listening on
          *
-         * When the manager was created with a specific port (not 0), this port will
+         * When the manager was lastStart with a specific port (not 0), this port will
          * be returned.
-         * If the manager however was created with port 0, the operating system will
+         * If the manager however was lastStart with port 0, the operating system will
          * choose a free port. This method will return that port.
          *
          * @return The control port the manager is listening on

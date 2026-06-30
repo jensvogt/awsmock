@@ -1,5 +1,4 @@
 
-
 #include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace Awsmock::Service {
@@ -170,21 +169,21 @@ namespace Awsmock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_ENVIRONMENT) {
                 Dto::Lambda::AddEnvironmentRequest lambdaRequest = Dto::Lambda::AddEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.AddLambdaEnvironment(lambdaRequest);
-                log_trace << "Lambda environment added, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
+                log_trace << "Lambda environment added, lambdaArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
                 return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_ENVIRONMENT) {
                 Dto::Lambda::UpdateFunctionEnvironmentRequest lambdaRequest = Dto::Lambda::UpdateFunctionEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.UpdateLambdaEnvironment(lambdaRequest);
-                log_trace << "Lambda environment updated, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
+                log_trace << "Lambda environment updated, lambdaArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
                 return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_ENVIRONMENT) {
                 Dto::Lambda::DeleteEnvironmentRequest lambdaRequest = Dto::Lambda::DeleteEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.DeleteLambdaEnvironment(lambdaRequest);
-                log_trace << "Lambda environment deleted, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
+                log_trace << "Lambda environment deleted, lambdaArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
                 return SendResponse(request, http::status::ok);
             }
 
@@ -198,7 +197,7 @@ namespace Awsmock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_TAG) {
                 Dto::Lambda::AddTagRequest lambdaRequest = Dto::Lambda::AddTagRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.AddLambdaTag(lambdaRequest); });
-                log_info << "Lambda tag added, functionArn: " << lambdaRequest.functionArn << ", tag: " << lambdaRequest.tagKey;
+                log_info << "Lambda tag added, lambdaArn: " << lambdaRequest.functionArn << ", tag: " << lambdaRequest.tagKey;
                 return SendResponse(request, http::status::ok);
             }
 
@@ -223,6 +222,13 @@ namespace Awsmock::Service {
                 return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::GET_INSTANCE_COUNTER) {
+                Dto::Lambda::GetLambdaInstanceCounterRequest lambdaRequest = Dto::Lambda::GetLambdaInstanceCounterRequest::FromJson(clientCommand);
+                Dto::Lambda::GetLambdaInstanceCounterResponse lambdaResponse = _lambdaService.GetLambdaInstanceCounter(lambdaRequest);
+                log_trace << "Get instance counter, lambdaArn: " << lambdaRequest.lambdaArn << ", instanceId: " << lambdaRequest.instanceId;
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
                 Dto::Lambda::ResetFunctionCountersRequest lambdaRequest = Dto::Lambda::ResetFunctionCountersRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.ResetFunctionCounters(lambdaRequest); });
@@ -232,7 +238,7 @@ namespace Awsmock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPLOAD_FUNCTION_CODE) {
                 Dto::Lambda::UploadFunctionCodeRequest lambdaRequest = Dto::Lambda::UploadFunctionCodeRequest::FromJson(clientCommand);
-                log_info << "Starting upload function code, functionArn: " << lambdaRequest.functionArn;
+                log_info << "Starting upload function code, lambdaArn: " << lambdaRequest.functionArn;
                 _lambdaService.UploadFunctionCode(lambdaRequest);
                 return SendResponse(request, http::status::ok);
             }
@@ -240,7 +246,7 @@ namespace Awsmock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_LAMBDA) {
                 Dto::Lambda::UpdateLambdaRequest lambdaRequest = Dto::Lambda::UpdateLambdaRequest::FromJson(clientCommand);
                 _lambdaService.UpdateLambda(lambdaRequest);
-                log_info << "Starting update lambda function, functionArn: " << lambdaRequest.functionArn;
+                log_info << "Starting update lambda function, lambdaArn: " << lambdaRequest.lambdaArn;
                 return SendResponse(request, http::status::ok);
             }
 
@@ -303,7 +309,7 @@ namespace Awsmock::Service {
                 Core::Scheduler::instance().AddOneTimeTask("add-event-source", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.AddEventSource(lambdaRequest);
-                        log_trace << "Add event source, functionArn: " << lambdaRequest.functionArn;
+                        log_trace << "Add event source, lambdaArn: " << lambdaRequest.functionArn;
                     } catch (const std::exception &e) {
                         log_error << "Add event source failed: " << e.what();
                     }
@@ -316,7 +322,7 @@ namespace Awsmock::Service {
                 Core::Scheduler::instance().AddOneTimeTask("delete-event-source", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.DeleteEventSource(lambdaRequest);
-                        log_trace << "Delete event source, functionArn: " << lambdaRequest.functionArn;
+                        log_trace << "Delete event source, lambdaArn: " << lambdaRequest.functionArn;
                     } catch (const std::exception &e) {
                         log_error << "Delete event source failed: " << e.what();
                     }
@@ -381,7 +387,7 @@ namespace Awsmock::Service {
                 Core::Scheduler::instance().AddOneTimeTask("start-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.StartLambda(lambdaRequest);
-                        log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
+                        log_trace << "Start lambda function, lambdaArn: " << lambdaRequest.lambdaArn;
                     } catch (const std::exception &e) {
                         log_error << "Start lambda function failed: " << e.what();
                     }
@@ -406,7 +412,7 @@ namespace Awsmock::Service {
                 Core::Scheduler::instance().AddOneTimeTask("stop-lambda", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.StopLambda(lambdaRequest);
-                        log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
+                        log_trace << "Stop lambda function, lambdaArn: " << lambdaRequest.lambdaArn;
                     } catch (const std::exception &e) {
                         log_error << "Stop lambda functions failed: " << e.what();
                     }
@@ -431,7 +437,7 @@ namespace Awsmock::Service {
                 Core::Scheduler::instance().AddOneTimeTask("stop-all-lambda-instances", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.StopLambdaInstance(lambdaRequest);
-                        log_trace << "Stop lambda instance, functionArn: " << lambdaRequest.functionArn << ", instanceId: " << lambdaRequest.instanceId;
+                        log_trace << "Stop lambda instance, lambdaArn: " << lambdaRequest.functionArn << ", instanceId: " << lambdaRequest.instanceId;
                     } catch (const std::exception &e) {
                         log_error << "Stop lambda functions failed: " << e.what();
                     }
@@ -457,7 +463,7 @@ namespace Awsmock::Service {
                 Core::Scheduler::instance().AddOneTimeTask("delete-image", [_logger = _logger, lambdaRequest]() mutable {
                     try {
                         LambdaService{}.DeleteImage(lambdaRequest);
-                        log_trace << "Delete image, functionArn: " << lambdaRequest.functionArn;
+                        log_trace << "Delete image, lambdaArn: " << lambdaRequest.functionArn;
                     } catch (const std::exception &e) {
                         log_error << "Delete lambda function failed: " << e.what();
                     }

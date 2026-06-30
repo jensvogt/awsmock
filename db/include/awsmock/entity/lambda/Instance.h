@@ -15,50 +15,14 @@
 #include <awsmock/entity/lambda/RuntimeStatus.h>
 
 namespace Awsmock::Database::Entity::Lambda {
-    //
-    // /**
-    //  * @brief Lambda instance status enum
-    //  *
-    //  * @author jens.vogt\@opitz-consulting.com
-    //  */
-    // enum LambdaInstanceStatus {
-    //     InstanceStarting,
-    //     InstanceIdle,
-    //     InstanceRunning,
-    //     InstanceSuccess,
-    //     InstanceFailed,
-    //     InstanceUnknown
-    // };
-    //
-    // static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
-    //         {InstanceStarting, "Starting"},
-    //         {InstanceIdle, "Idle"},
-    //         {InstanceRunning, "Running"},
-    //         {InstanceSuccess, "Success"},
-    //         {InstanceFailed, "Failed"},
-    //         {InstanceUnknown, "Unknown"},
-    // };
-    //
-    // [[maybe_unused]] static std::string LambdaInstanceStatusToString(const LambdaInstanceStatus &lambdaInstanceStatus) {
-    //     return LambdaInstanceStatusNames[lambdaInstanceStatus];
-    // }
-    //
-    // [[maybe_unused]] static LambdaInstanceStatus LambdaInstanceStatusFromString(const std::string &lambdaInstanceStatus) {
-    //     for (auto &[fst, snd]: LambdaInstanceStatusNames) {
-    //         if (snd == lambdaInstanceStatus) {
-    //             return fst;
-    //         }
-    //     }
-    //     return InstanceUnknown;
-    // }
 
     /**
      * @brief Lambda instance entity
      *
      * @par
      * An instance is an invocation of the lambda function. Each invocation (until max. concurrency) will start a new instance of the lambda function. The status will be
-     * set 'RUNNING'. Default status is 'IDLE'. Each lambda runs in its own docker container having a distinguished name like 'lambda-function-s7654d'. Private ports are
-     * always the same (usually 8080), whereas the public port will be a random integer between 32.768 and 65.535. The public port is chosen between this two numbers taken
+     * set 'RUNNING'. The default status is 'IDLE'. Each lambda runs in its own docker container having a distinguished name like 'lambda-function-s7654d'. Private ports are
+     * always the same (usually 8080), whereas the public port will be a random integer between 32.768 and 65.535. The public port is chosen between these two numbers taken
      * into account that the port must be free on the local machine. Otherwise, a new random number is selected in the given range.
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -66,7 +30,7 @@ namespace Awsmock::Database::Entity::Lambda {
     struct Instance final : Common::BaseEntity<Instance> {
 
         /**
-         * Instance ID, will be appended to the container name, in case of multiple instances.
+         * Instance ID will be appended to the container name, in case of multiple instances.
          */
         std::string instanceId{};
 
@@ -101,14 +65,29 @@ namespace Awsmock::Database::Entity::Lambda {
         RuntimeStatus status = unknown;
 
         /**
-         * Last invocation timestamp
+         * @brief Last invocation timestamp
          */
-        system_clock::time_point lastInvocation;
+        long invocations{};
 
         /**
-         * Created timestamp
+         * @brief Average invocation duration
          */
-        system_clock::time_point created = system_clock::now();
+        double avgDuration{};
+
+        /**
+         * @brief Last started timestamp
+         */
+        system_clock::time_point lastStart{};
+
+        /**
+         * @brief Last invocation timestamp
+         */
+        system_clock::time_point lastInvocation{};
+
+        /**
+         * @brief Last stopped timestamp
+         */
+        system_clock::time_point lastStop{};
 
         /**
          * @brief Converts the MongoDB document to an entity

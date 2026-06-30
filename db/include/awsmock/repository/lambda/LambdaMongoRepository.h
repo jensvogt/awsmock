@@ -164,25 +164,6 @@ namespace Awsmock::Database {
         Entity::Lambda::Lambda getLambdaByName(const std::string &region, const std::string &name) const override;
 
         /**
-         * @brief Sets the status of a lambda instance
-         *
-         * @param containerId lambda container ID
-         * @param status lambda instance status
-         * @throws DatabaseException
-         */
-        void setInstanceValues(const std::string &containerId, const Entity::Lambda::RuntimeStatus &status) const override;
-
-        /**
-         * @brief Sets the status of a lambda instance
-         *
-         * @param lambda lambda function
-         * @param invocations number of invocations
-         * @param avgRuntime average runtime
-         * @throws DatabaseException
-         */
-        void setLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) const override;
-
-        /**
          * @brief Returns a list of lambda functions.
          *
          * @param region AWS region name

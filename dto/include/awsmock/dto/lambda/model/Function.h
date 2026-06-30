@@ -2,8 +2,7 @@
 // Created by vogje01 on 06/09/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_FUNCTION_H
-#define AWSMOCK_DTO_LAMBDA_FUNCTION_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -87,7 +86,15 @@ namespace Awsmock::Dto::Lambda {
          */
         std::string lastUpdateStatusReasonCode = {};
 
-        // TODO: Layers
+        /**
+         * Minimal concurrency
+         */
+        int minConcurrency{};
+
+        /**
+         * Maximal concurrency
+         */
+        int maxConcurrency{};
 
         /**
          * State
@@ -129,69 +136,7 @@ namespace Awsmock::Dto::Lambda {
          */
         std::map<std::string, std::string> tags = {};
 
-        /**
-         * Converts the DTO to a BSON document string.
-         *
-         * @return DTO as BSON document
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "FunctionArn", functionArn);
-                Core::Bson::BsonUtils::SetStringValue(document, "FunctionName", functionName);
-                Core::Bson::BsonUtils::SetStringValue(document, "Handler", handler);
-                Core::Bson::BsonUtils::SetStringValue(document, "Runtime", runtime);
-                Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
-                Core::Bson::BsonUtils::SetLongValue(document, "CodeSize", codeSize);
-                Core::Bson::BsonUtils::SetStringValue(document, "CodeSha256", codeSha256);
-                Core::Bson::BsonUtils::SetStringValue(document, "Version", version);
-                Core::Bson::BsonUtils::SetLongValue(document, "Timeout", timeout);
-                Core::Bson::BsonUtils::SetStringValue(document, "State", state);
-                Core::Bson::BsonUtils::SetStringValue(document, "StateReason", stateReason);
-                Core::Bson::BsonUtils::SetStringValue(document, "StateReasonCode", stateReasonCode);
-                Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatus", lastUpdateStatusReason);
-                Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatusCode", lastUpdateStatusReasonCode);
-
-                Core::Bson::BsonUtils::SetDateValue(document, "LastModified", lastModified);
-
-                // Tags
-                if (!tags.empty()) {
-                    array jsonArray;
-                    for (const auto &[fst, snd]: tags) {
-                        bsoncxx::builder::basic::document jsonObject;
-                        jsonObject.append(kvp(fst, snd));
-                    }
-                    document.append(kvp("Tags", jsonArray));
-                }
-
-                // Environment
-                document.append(kvp("Environment", environment.ToDocument()));
-
-                // Architectures
-                if (!architectures.empty()) {
-                    array jsonArray;
-                    for (const auto &architecture: architectures) {
-                        jsonArray.append(architecture);
-                    }
-                    document.append(kvp("Architectures", jsonArray));
-                }
-
-                // Dead letter config
-                document.append(kvp("DeadLetterConfig", deadLetterConfig.ToDocument()));
-
-                return document.extract();
-
-            } catch (std::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
       private:
-
-        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         friend Function tag_invoke(boost::json::value_to_tag<Function>, boost::json::value const &v) {
             Function r;
@@ -207,6 +152,8 @@ namespace Awsmock::Dto::Lambda {
             r.lastUpdateStatusReason = Core::Json::GetStringValue(v, "LastUpdateStatusReason");
             r.lastUpdateStatusReasonCode = Core::Json::GetStringValue(v, "LastUpdateStatusReasonCode");
             r.state = Core::Json::GetStringValue(v, "State");
+            r.minConcurrency = Core::Json::GetIntValue(v, "MinConcurrency");
+            r.maxConcurrency = Core::Json::GetIntValue(v, "Concurrency");
             r.stateReason = Core::Json::GetStringValue(v, "StateReason");
             r.stateReasonCode = Core::Json::GetStringValue(v, "StateReasonCode");
             r.timeout = Core::Json::GetIntValue(v, "Timeout");
@@ -249,9 +196,4 @@ namespace Awsmock::Dto::Lambda {
             };
         }
     };
-
-    typedef std::vector<Function> FunctionList;
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_FUNCTION_H

@@ -81,7 +81,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"path", obj.path},
                     {"pathPart", obj.pathPart},
                     {"url", obj.url},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

@@ -13,7 +13,6 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaController.h>
-#include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/module/ModuleService.h>
 
 namespace Awsmock::Service {
@@ -25,7 +24,8 @@ namespace Awsmock::Service {
      */
     class LambdaServer final : public AbstractServer {
 
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -41,16 +41,12 @@ namespace Awsmock::Service {
          */
         void Initialize();
 
-    private:
+      private:
+
         /**
          * @brief Channeled logger
          */
         mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
-
-        /**
-         * @brief Delete dangling, stopped containers
-         */
-        void CleanupDocker() const;
 
         /**
          * @brief Delete instances from the database, which are not running
@@ -77,14 +73,6 @@ namespace Awsmock::Service {
          * For each lambda function, the container will be created, if not existing already
          */
         void CreateContainers() const;
-
-        /**
-         * @brief Remove expired lambda functions
-         *
-         * @par
-         * Loops over all lambda functions and removes the lambda container when the lambdas are expired.
-         */
-        void RemoveExpiredLambdas() const;
 
         /**
          * @brief Remove expired lambda logs
@@ -168,4 +156,4 @@ namespace Awsmock::Service {
         int _logRetentionPeriod{};
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service

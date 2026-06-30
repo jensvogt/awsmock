@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -16,25 +15,22 @@ namespace Awsmock::Dto::Lambda {
     struct GetFunctionCountersRequest final : Common::BaseCounter<GetFunctionCountersRequest> {
 
         /**
-         * function name
+         * @brief Lambda ARN
          */
-        std::string functionArn;
+        std::string lambdaArn;
 
       private:
 
         friend GetFunctionCountersRequest tag_invoke(boost::json::value_to_tag<GetFunctionCountersRequest>, boost::json::value const &v) {
             GetFunctionCountersRequest r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetFunctionCountersRequest const &obj) {
             jv = {
-                    {"functionArn", obj.functionArn},
+                    {"lambdaArn", obj.lambdaArn},
             };
         }
     };
-
 }// namespace Awsmock::Dto::Lambda
-
-#endif// AWSMOCK_DTO_LAMBDA_GET_FUNCTION_COUNTERS_REQUEST_H

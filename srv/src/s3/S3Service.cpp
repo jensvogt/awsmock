@@ -87,7 +87,7 @@ namespace Awsmock::Service {
             // Update database
             Database::Entity::S3::Bucket bucket = Dto::S3::BucketCreateRequestMapper::toEntity(request);
             bucket = _s3Database->createBucket(bucket);
-            log_debug << "Bucket created, bucket: " << request.name;
+            log_debug << "Bucket lastStarted, bucket: " << request.name;
             return Dto::S3::BucketCreateResponseMapper::toDto(bucket);
 
         } catch (Core::JsonException &exc) {
@@ -513,7 +513,7 @@ namespace Awsmock::Service {
 
             Dto::S3::GetEventSourceResponse response;
             // TODO: fix, as it is now a vector, what to do with a vector?
-            //Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotifications(request.functionArn);
+            //Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotifications(request.lambdaArn);
             //response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
             return response;
         } catch (bsoncxx::exception &ex) {
@@ -1255,6 +1255,7 @@ namespace Awsmock::Service {
 
                     Dto::S3::Record record;
                     record.eventName = event;
+                    record.awsRegion = region;
                     record.s3 = s3;
                     Dto::S3::EventNotification eventNotification;
 
@@ -1263,8 +1264,8 @@ namespace Awsmock::Service {
 
                     // Queue notification
                     SendQueueNotificationRequest(eventNotification, notification);
-                    log_trace << "SQS message created, eventNotification: " + eventNotification.ToString();
-                    log_debug << "SQS message created, queueArn: " << notification.queueArn;
+                    log_trace << "SQS message lastStarted, eventNotification: " + eventNotification.ToString();
+                    log_debug << "SQS message lastStarted, queueArn: " << notification.queueArn;
                 }
             }
         }
@@ -1287,6 +1288,7 @@ namespace Awsmock::Service {
 
                     Dto::S3::Record record;
                     record.eventName = event;
+                    record.awsRegion = region;
                     record.s3 = s3;
 
                     Dto::S3::EventNotification eventNotification;
@@ -1296,8 +1298,8 @@ namespace Awsmock::Service {
 
                     // Queue notification
                     SendTopicNotificationRequest(eventNotification, notification);
-                    log_trace << "SNS message created, eventNotification: " + eventNotification.ToString();
-                    log_debug << "SNS message created, topicArn: " << notification.topicArn;
+                    log_trace << "SNS message lastStarted, eventNotification: " + eventNotification.ToString();
+                    log_debug << "SNS message lastStarted, topicArn: " << notification.topicArn;
                 }
             }
         }
@@ -1319,6 +1321,7 @@ namespace Awsmock::Service {
 
                     Dto::S3::Record record;
                     record.eventName = event;
+                    record.awsRegion = region;
                     record.s3 = s3;
                     Dto::S3::EventNotification eventNotification;
 

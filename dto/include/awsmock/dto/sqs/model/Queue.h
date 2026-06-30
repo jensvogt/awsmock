@@ -84,7 +84,7 @@ namespace Awsmock::Dto::SQS {
             r.url = Core::Json::GetStringValue(v, "queueUrl");
             r.arn = Core::Json::GetStringValue(v, "queueArn");
             r.size = Core::Json::GetLongValue(v, "size");
-            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             if (Core::Json::AttributeExists(v, "attributes")) {
                 r.attributes = boost::json::value_to<QueueAttribute>(v.at("attributes"));
@@ -105,7 +105,7 @@ namespace Awsmock::Dto::SQS {
                     {"queueUrl", obj.url},
                     {"queueArn", obj.arn},
                     {"size", obj.size},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
                     {"attributes", boost::json::value_from(obj.attributes)},
                     {"defaultMessageAttributes", boost::json::value_from(obj.defaultMessageAttributes)},

@@ -74,7 +74,7 @@ namespace Awsmock::Dto::DynamoDb {
             r.partitionKey = Core::Json::GetStringValue(v, "partitionKey");
             r.sortKey = Core::Json::GetStringValue(v, "sortKey");
             r.attributes = boost::json::value_to<std::unordered_map<std::string, AttributeValue>>(v.at("attributes"));
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 
             return r;
@@ -88,7 +88,7 @@ namespace Awsmock::Dto::DynamoDb {
                     {"partitionKey", boost::json::value_from(obj.partitionKey)},
                     {"sortKey", boost::json::value_from(obj.sortKey)},
                     {"attributes", boost::json::value_from(obj.attributes)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }// namespace Awsmock::Dto::DynamoDb

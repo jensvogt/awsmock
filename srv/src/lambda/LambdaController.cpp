@@ -59,29 +59,29 @@ namespace Awsmock::Service {
     // Signal handlers
     // -------------------------------------------------------------------------
 
-    void LambdaController::OnStartLambda(const std::string &functionArn, const std::string &region) const {
-        log_info << "Lambda start requested, arn: " << functionArn;
+    void LambdaController::OnStartLambda(const std::string &lambdaArn, const std::string &region) const {
+        log_info << "Lambda start requested, arn: " << lambdaArn;
         try {
             Dto::Lambda::StartLambdaRequest request;
             request.region = region;
-            request.functionArn = functionArn;
+            request.lambdaArn = lambdaArn;
             _lambdaService.StartLambda(request);
-            log_info << "Lambda started, arn: " << functionArn;
+            log_info << "Lambda started, arn: " << lambdaArn;
         } catch (std::exception &e) {
-            log_error << "Lambda start failed, arn: " << functionArn << ", error: " << e.what();
+            log_error << "Lambda start failed, arn: " << lambdaArn << ", error: " << e.what();
         }
     }
 
-    void LambdaController::OnStopLambda(const std::string &functionArn, const std::string &region) const {
-        log_info << "Lambda stop requested, arn: " << functionArn;
+    void LambdaController::OnStopLambda(const std::string &lambdaArn, const std::string &region) const {
+        log_info << "Lambda stop requested, arn: " << lambdaArn;
         try {
             Dto::Lambda::StopLambdaRequest request;
             request.region = region;
-            request.functionArn = functionArn;
+            request.lambdaArn = lambdaArn;
             _lambdaService.StopLambda(request);
-            log_info << "Lambda stopped, arn: " << functionArn;
+            log_info << "Lambda stopped, arn: " << lambdaArn;
         } catch (std::exception &e) {
-            log_error << "Lambda stop failed, arn: " << functionArn << ", error: " << e.what();
+            log_error << "Lambda stop failed, arn: " << lambdaArn << ", error: " << e.what();
         }
     }
 
@@ -133,11 +133,25 @@ namespace Awsmock::Service {
 
                 } else if (static_cast<int>(lambda.instances.size()) < lambda.concurrency) {
                     // Below maxConcurrency: start a new container
-                    const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-                    const LambdaCreator creator;
-                    lambda = creator.AddInstance(lambda, instanceId);
-                    instance = lambda.GetInstance(instanceId);
+                    const std::string instanceId = Core::AwsUtils::CreateLambdaInstanceId();
+                    lambda = _lambdaService.AddInstance(lambda, instanceId);
                     log_info << "New instance started, function: " << functionName << ", instanceId: " << instanceId << ", total: " << lambda.instances.size();
+
+                    // Wait until the Lambda Runtime inside the new container reports idle
+                    const auto startDeadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
+                    do {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                        lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
+                    } while (lambda.GetInstance(instanceId).status != Database::Entity::Lambda::RuntimeStatus::idle && system_clock::now() < startDeadline);
+
+                    if (lambda.GetInstance(instanceId).status != Database::Entity::Lambda::RuntimeStatus::idle) {
+                        log_error << "New instance did not become idle within timeout, function: " << functionName << ", instanceId: " << instanceId;
+                        if (promise) {
+                            promise->set_value({500, "Lambda instance did not start within timeout"});
+                        }
+                        return;
+                    }
+                    instance = lambda.GetInstance(instanceId);
 
                 } else {
                     // At maxConcurrency: wait for a slot to become idle
@@ -156,21 +170,32 @@ namespace Awsmock::Service {
                     log_debug << "Idle instance available after wait, function: " << functionName << ", instanceId: " << instance.instanceId;
                 }
 
-                // Step 3 — claim the instance before releasing the lock
-                _lambdaDatabase->setInstanceValues(instance.containerId, Database::Entity::Lambda::running);
+                // Set runtime status immediately, so no other invocation can use this instance
+                instance.status = Database::Entity::Lambda::RuntimeStatus::running;
+                if (const auto it = std::ranges::find_if(lambda.instances, [&](const Database::Entity::Lambda::Instance &i) { return i.instanceId == instance.instanceId; });
+                    it != lambda.instances.end()) {
+                    it->status = Database::Entity::Lambda::RuntimeStatus::running;
+                }
+                lambda = _lambdaDatabase->updateLambda(lambda);
             }
 
             // Invoke outside the lock so other requests can claim their own instance in parallel
-            const std::string &body = payload;
-            const LambdaExecutor executor;
-            const Database::Entity::Lambda::LambdaResult lambdaResult = executor.Invocation(lambda, instance, body);
+            InvokeInstance(lambda, instance, payload, promise);
 
-            if (promise) {
-                promise->set_value({static_cast<int>(lambdaResult.status), lambdaResult.responseBody});
+            // Reset instance to idle so it can accept further invocations
+            {
+                boost::mutex::scoped_lock lock(*GetOrCreateMutex(functionName));
+                lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
+                if (const auto it = std::ranges::find_if(lambda.instances, [&](const Database::Entity::Lambda::Instance &i) { return i.instanceId == instance.instanceId; });
+                    it != lambda.instances.end()) {
+                    it->status = Database::Entity::Lambda::RuntimeStatus::idle;
+                }
+                lambda = _lambdaDatabase->updateLambda(lambda);
+                log_debug << "Instance reset to idle, function: " << lambda.function << ", instanceId: " << instance.instanceId;
             }
 
             Core::EventBus::instance().sigMetricRate(LAMBDA_INVOCATION_COUNT, "function_name", functionName);
-            log_info << "Lambda invoked, function: " << functionName << ", status: " << lambdaResult.status;
+            log_info << "Lambda invoked, function: " << functionName;
 
         } catch (std::exception &e) {
             if (promise) {
@@ -210,15 +235,54 @@ namespace Awsmock::Service {
             }
 
             if (updated) {
-                // if (lambda.instances.empty()) {
-                //     lambda.state = Database::Entity::Lambda::Inactive;
-                // }
                 lambda = _lambdaDatabase->updateLambda(lambda);
             }
             Core::EventBus::instance().sigMetricGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
         } catch (std::exception &e) {
             log_error << "Lambda check failed, arn: " << functionArn << ", error: " << e.what();
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Instance invocation (moved from LambdaExecutor)
+    // -------------------------------------------------------------------------
+
+    void LambdaController::InvokeInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload,
+                                          const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) const {
+        Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
+        log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.publicPort;
+
+        const system_clock::time_point start = system_clock::now();
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/invoke", payload);
+        const long duration = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
+
+        log_info << "Getting lambda logs, containerId: " << instance.containerId;
+        std::string logs = _containerService.GetContainerLogs(instance.containerId, start);
+
+        logs = Core::StringUtils::RemoveColorCoding(logs);
+        logs = Core::StringUtils::SanitizeUtf8(logs);
+        logs = Core::StringUtils::RemoveUnprintableAscii(logs);
+
+        Database::Entity::Lambda::LambdaResult lambdaResult;
+        lambdaResult.instanceId = instance.instanceId;
+        lambdaResult.containerId = instance.containerId;
+        lambdaResult.status = response.statusCode;
+        lambdaResult.httpStatusCode = Core::HttpUtils::StatusCodeToString(response.statusCode);
+        lambdaResult.requestBody = payload;
+        lambdaResult.responseBody = response.body;
+        lambdaResult.logMessages = logs;
+        lambdaResult.lambdaName = lambda.function;
+        lambdaResult.lambdaArn = lambda.arn;
+        lambdaResult.duration = duration;
+        lambdaResult = _lambdaDatabase->createLambdaResult(lambdaResult);
+
+        Core::EventBus::instance().sigMetricGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, duration);
+
+        if (promise) {
+            promise->set_value({static_cast<int>(lambdaResult.status), lambdaResult.responseBody});
+        }
+
+        log_info << "Lambda invocation finished, lambda: " << lambda.function;
     }
 
     // -------------------------------------------------------------------------

@@ -101,7 +101,7 @@ namespace Awsmock::Service {
             while (GetImageByName(name, tag, true).size == 0) {
                 std::this_thread::sleep_for(500ms);
             }
-            log_debug << "Docker image created, name: " << name << ":" << tag;
+            log_debug << "Docker image lastStarted, name: " << name << ":" << tag;
         } else {
             log_error << "Docker image create failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
         }
@@ -124,16 +124,16 @@ namespace Awsmock::Service {
         return response;
     }
 
-    std::string ContainerService::BuildLambdaImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const {
+    std::string ContainerService::BuildLambdaImage(const std::string &codeDir, Database::Entity::Lambda::Lambda &lambdaEntity) const {
         if (!_initialized) {
-            log_warning << "Docker not initialized, container commands not available, name: " << name << ":" << tag;
+            log_warning << "Docker not initialized, container commands not available, name: " << lambdaEntity.function << ":" << lambdaEntity.dockerTag;
             return {};
         }
-        log_debug << "Build image request, name: " << name << " tags: " << tag << " runtime: " << runtime;
-        std::string dockerFile = WriteLambdaDockerFile(codeDir, handler, runtime, environment);
-        std::string imageFile = BuildImageFile(codeDir, name);
+        log_debug << "Build image request, name: " << lambdaEntity.function << " tags: " << lambdaEntity.dockerTag << " runtime: " << lambdaEntity.handler;
+        std::string dockerFile = WriteLambdaDockerFile(codeDir, lambdaEntity);
+        std::string imageFile = BuildImageFile(codeDir, lambdaEntity.function);
 
-        auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
+        auto [statusCode, body, contentLength] = GetSocket()->SendBinary(http::verb::post, "/build?t=" + lambdaEntity.function + ":" + lambdaEntity.dockerTag, imageFile);
         log_trace << "Build image, status: " << statusCode << ", body: " << body;
         if (statusCode != http::status::ok) {
             log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
@@ -144,12 +144,12 @@ namespace Awsmock::Service {
             boost::system::error_code ec;
             if (const boost::json::value jv = boost::json::parse(line, ec); !ec && jv.is_object()) {
                 if (const auto *err = jv.as_object().if_contains("error")) {
-                    log_error << "Build image failed, name: " << name << ":" << tag << " error: " << boost::json::serialize(*err);
+                    log_error << "Build image failed, name: " << lambdaEntity.function << ":" << lambdaEntity.dockerTag << " error: " << boost::json::serialize(*err);
                     return {};
                 }
             }
         }
-        log_info << "Build image request finished, name: " << name << " version: " << tag << " runtime: " << runtime;
+        log_info << "Build image request finished, name: " << lambdaEntity.function << " version: " << lambdaEntity.dockerTag << " runtime: " << lambdaEntity.runtime;
         return imageFile;
     }
 
@@ -350,7 +350,7 @@ namespace Awsmock::Service {
     }
 
     Dto::Docker::CreateContainerResponse ContainerService::SendCreateContainer(const std::string &imageName, const std::string &tag, const std::string &hostName, const std::string &urlName, const std::string &containerPortStr, const int hostPort,
-                                                                               const std::vector<std::string> &environment) const {
+                                                                               const std::vector<std::string> &environment, const std::vector<std::string> &cmd) const {
         if (!_initialized) {
             log_warning << "Docker not initialized, container commands not available, name: " << imageName << ":" << tag;
             return {};
@@ -364,6 +364,7 @@ namespace Awsmock::Service {
         request.containerPort = containerPortStr;
         request.hostPort = std::to_string(hostPort);
         request.environment = environment;
+        request.cmd = cmd;
         request.exposedPorts[containerPortStr + "/tcp"] = {};
 
         Dto::Docker::LogConfig logConfig;
@@ -396,12 +397,17 @@ namespace Awsmock::Service {
 
         Dto::Docker::CreateContainerResponse response = Dto::Docker::CreateContainerResponse::FromJson(body);
         response.hostPort = hostPort;
-        log_debug << "Docker container created, name: " << imageName << ":" << tag << " id: " << response.id;
+        log_debug << "Docker container lastStarted, name: " << imageName << ":" << tag << " id: " << response.id;
         return response;
     }
 
     Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort) const {
         return SendCreateContainer(imageName, tag, instanceName, instanceName, _containerPort, hostPort, environment);
+    }
+
+    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort,
+                                                                           const std::vector<std::string> &cmd) const {
+        return SendCreateContainer(imageName, tag, instanceName, instanceName, _containerPort, hostPort, environment, cmd);
     }
 
     Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort,
@@ -525,7 +531,7 @@ namespace Awsmock::Service {
             log_error << "Docker network create failed, name: " << request.name << ", statusCode: " << statusCode;
             return {};
         }
-        log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+        log_debug << "Docker network lastStarted, name: " << request.name << " driver: " << request.driver;
         return Dto::Docker::CreateNetworkResponse::FromJson(body);
     }
 
@@ -679,29 +685,81 @@ namespace Awsmock::Service {
         log_debug << "Prune containers, count: " << response.containersDeleted.size() << " spaceReclaimed: " << response.spaceReclaimed;
     }
 
-    std::string ContainerService::WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const {
+    std::string ContainerService::GetDockerCmd(const Database::Entity::Lambda::Lambda &lambda, const bool isAwsmockLrt) {
+        const bool isJava = Core::StringUtils::StartsWithIgnoringCase(lambda.runtime, "java");
+        const bool isProvided = Core::StringUtils::StartsWithIgnoringCase(lambda.runtime, "provided") ||
+                                Core::StringUtils::StartsWithIgnoringCase(lambda.runtime, "go");
+
+        if (!isAwsmockLrt) {
+            // Standard AWS Lambda base image: CMD is the handler, with: handleRequest appended for Java.
+            const std::string handler = isJava ? lambda.handler + "::handleRequest" : lambda.handler;
+            return "CMD [\"" + handler + "\"]\n";
+        }
+
+        // awsmock-lrt: structured CLI flags consumed by the custom runtime entrypoint.
+        if (isJava) {
+            return "CMD [" +
+                   appendCommandLine("--function-name", lambda.function) + "," +
+                   appendCommandLine("--code-path", "/app") + "," +
+                   appendCommandLine("--handler", lambda.handler + "::handleRequest") + "," +
+                   appendCommandLine("--runtime", lambda.runtime) + "," +
+                   appendCommandLine("--runtime-lib-dir", "/app/lib/java") + "," +
+                   appendCommandLine("--lifetime", std::to_string(lambda.timeout)) + "," +
+                   appendCommandLine("--report-period", std::to_string(30)) + "," +
+                   appendCommandLine("--jvm-arg", "-Xss8m") + "," +
+                   appendCommandLine("--manager-host", "host.docker.internal") + "," +
+                   appendCommandLine("--manager-port", "4566") +
+                   appendEnvVarArgs(lambda.environment.variables) + "]\n";
+        }
+
+        // Docker exec-form CMD does not invoke a shell, so ${LAMBDA_TASK_ROOT} would be passed literally. Use the resolved value (/var/task) directly.
+        // The handler already carries any subdirectory prefix (e.g. "dist/app.handler"),so the code-path must NOT repeat it.
+        const auto codePath = "/var/task";
+        const auto runtimeArg = isProvided ? "provided" : lambda.runtime;
+
+        return "CMD [" +
+               appendCommandLine("--code-path", codePath) + "," +
+               appendCommandLine("--function-name", lambda.function) + "," +
+               appendCommandLine("--lifetime", std::to_string(lambda.timeout)) + "," +
+               appendCommandLine("--handler", lambda.handler) + "," +
+               appendCommandLine("--report-period", std::to_string(30)) + "," +
+               appendCommandLine("--manager-host", "host.docker.internal") + "," +
+               appendCommandLine("--manager-port", "4566") + "," +
+               appendCommandLine("--runtime", runtimeArg) +
+               appendEnvVarArgs(lambda.environment.variables) + "]\n";
+    }
+
+    std::string ContainerService::WriteLambdaDockerFile(const std::string &codeDir, Database::Entity::Lambda::Lambda &lambdaEntity) const {
         const std::string dockerFilename = Core::FileUtils::appendPath(codeDir, "Dockerfile");
-        std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
+        std::string providedRuntime = boost::algorithm::to_lower_copy(lambdaEntity.runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
         const auto supportedRuntime = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
         log_debug << "Using supported runtime: " << supportedRuntime;
 
+        const bool isAwsmockLrt = Core::StringUtils::ContainsIgnoreCase(supportedRuntime, "awsmock-lrt");
         const std::string credentialsCopy = AddCredentials(codeDir, region);
-        const std::string envLines = AddEnvironment(environment);
+        const std::string envLines = AddEnvironment(lambdaEntity.environment.variables);
 
+        // Create dockerfile and put common docker commands
         std::ofstream ofs(dockerFilename);
         ofs << "FROM " << supportedRuntime << "\n";
         ofs << envLines;
 
-        if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
+        if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "java")) {
             ofs << "RUN mkdir -p /root/.aws\n";
             ofs << credentialsCopy;
-            ofs << "COPY classes ${LAMBDA_TASK_ROOT}\n";
-            ofs << "CMD [ \"" + handler + "::handleRequest\" ]\n";
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "postgres")) {
-            ofs << "CMD [ \"" + handler + "\" ]\n";
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
+            if (isAwsmockLrt) {
+                ofs << "RUN mkdir -p /app\n";
+                ofs << "COPY classes /app\n";
+                ofs << AddJavaRuntimeLibs(codeDir);
+            } else {
+                ofs << "COPY classes ${LAMBDA_TASK_ROOT}\n";
+            }
+            ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
+        } else if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "postgres")) {
+            ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
+        } else if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "provided") || Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "go")) {
             ofs << credentialsCopy;
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}\n";
             ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap\n";
@@ -711,31 +769,54 @@ namespace Awsmock::Service {
             ofs << "COPY lib/* ${LAMBDA_TASK_ROOT}/lib/\n";
             ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/lib\n";
             ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/bin\n";
-            ofs << "CMD [ \"" + handler + "\" ]\n";
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
+            ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
+        } else if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "python")) {
             ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}/\n";
             ofs << "RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt\n";
             ofs << "RUN mkdir -p /root/.aws\n";
             ofs << credentialsCopy;
             ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/\n";
-            ofs << "CMD [\"" + handler + "\"]\n";
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
-            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/dist\n";
-            if (Core::DirUtils::DirectoryExists(Core::FileUtils::appendPath(codeDir, "node_modules"))) {
-                ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
+            ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
+        } else if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "nodejs22")) {
+            // awsmock-lrt images are based on node:22-alpine and do not define LAMBDA_TASK_ROOT,
+            // so always use the resolved path directly.
+            ofs << "RUN mkdir -p /var/task\n";
+            if (Core::FileUtils::FileExists(Core::FileUtils::appendPath(codeDir, "package-lock.json"))) {
+                ofs << "COPY package.json package-lock.json /var/task/\n";
+                ofs << "RUN cd /var/task && npm ci --omit=dev\n";
+            } else if (Core::FileUtils::FileExists(Core::FileUtils::appendPath(codeDir, "package.json"))) {
+                ofs << "COPY package.json /var/task/\n";
+                if (Core::DirUtils::DirectoryExists(Core::FileUtils::appendPath(codeDir, "node_modules"))) {
+                    ofs << "COPY node_modules/ /var/task/node_modules/\n";
+                } else {
+                    ofs << "RUN cd /var/task && npm install --omit=dev\n";
+                }
+            } else if (Core::DirUtils::DirectoryExists(Core::FileUtils::appendPath(codeDir, "node_modules"))) {
+                ofs << "COPY node_modules/ /var/task/node_modules/\n";
             }
-            ofs << "COPY " << GetHandlerFileNodeJs22(handler) << " ${LAMBDA_TASK_ROOT}/dist\n";
-            ofs << "CMD [\"" + handler + "\"]\n";
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
+            ofs << "RUN mkdir -p /var/task/dist\n";
+            const std::string handlerFile = GetHandlerFileNodeJs22(codeDir, lambdaEntity.handler);
+            if (Core::DirUtils::DirectoryExists(Core::FileUtils::appendPath(codeDir, "dist"))) {
+                ofs << "COPY dist/ /var/task/dist/\n";
+            } else {
+                ofs << "COPY " << handlerFile << " /var/task/dist\n";
+            }
+            if (Core::StringUtils::EndsWith(handlerFile, ".mjs")) {
+                // Node.js require() does not resolve .mjs by extension.  Generate a tiny
+                // CJS shim so the GRT's require('/var/task/dist/app') finds a .js entry
+                // that re-exports the ESM module.  Node.js ≥22.12 supports require(esm)
+                // synchronously for modules without top-level await.
+                const std::string mjsName = handlerFile.substr(handlerFile.rfind('/') + 1);
+                const std::string jsName = mjsName.substr(0, mjsName.rfind('.')) + ".js";
+                ofs << "RUN printf 'module.exports = require(\"./" << mjsName << "\");' > /var/task/dist/" << jsName << "\n";
+            }
+            ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
+        } else if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "nodejs")) {
             if (Core::DirUtils::DirectoryExists(Core::FileUtils::appendPath(codeDir, "node_modules"))) {
                 ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/\n";
             }
             ofs << "COPY index.js ${LAMBDA_TASK_ROOT}\n";
-            ofs << "CMD [\"" + handler + "\"]\n";
-        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
-            ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}\n";
-            ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap\n";
-            ofs << "CMD [\"" + handler + "\"]\n";
+            ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
         }
 
         log_debug << "Dockerfile written, filename: " << dockerFilename;
@@ -771,8 +852,12 @@ namespace Awsmock::Service {
         return Core::Configuration::instance().get<std::string>("awsmock.docker.network-name");
     }
 
-    std::string ContainerService::GetHandlerFileNodeJs22(const std::string &handler) {
-        return handler.substr(0, handler.find('.')) + ".mjs";
+    std::string ContainerService::GetHandlerFileNodeJs22(const std::string &codeDir, const std::string &handler) {
+        const std::string base = handler.substr(0, handler.find('.'));
+        if (Core::FileUtils::FileExists(Core::FileUtils::appendPath(codeDir, base + ".mjs"))) {
+            return base + ".mjs";
+        }
+        return base + ".js";
     }
 
     std::string ContainerService::AddEnvironment(const std::map<std::string, std::string> &environment) {
@@ -806,4 +891,28 @@ namespace Awsmock::Service {
         return "COPY credentials /root/.aws/\nCOPY config /root/.aws/\n";
     }
 
+    std::string ContainerService::AddJavaRuntimeLibs(const std::string &codeDir) {
+        const auto hostLibDir = "/usr/local/awsmock/lib/java";
+        const auto destDir = Core::FileUtils::appendPath(codeDir, "lib/java");
+        Core::DirUtils::MakeDirectory(destDir);
+        for (const auto &jar: Core::DirUtils::ListFilesByExtension(hostLibDir, ".jar")) {
+            const std::string dest = Core::FileUtils::appendPath(destDir, std::filesystem::path(jar).filename().string());
+            std::filesystem::copy_file(jar, dest, std::filesystem::copy_options::overwrite_existing);
+        }
+        return "COPY lib/java /app/lib/java/\n";
+    }
+
+    std::string ContainerService::appendCommandLine(const std::string &argName, const std::string &argValue) {
+        std::string value = argValue;
+        std::erase_if(value, [](const char c) { return c == '\n' || c == '\r'; });
+        return "\"" + argName + "\",\"" + value + "\"";
+    }
+
+    std::string ContainerService::appendEnvVarArgs(const std::map<std::string, std::string> &variables) {
+        std::string result;
+        for (const auto &[key, value]: variables) {
+            result += "," + appendCommandLine("--env", key + "=" + value);
+        }
+        return result;
+    }
 }// namespace Awsmock::Service
