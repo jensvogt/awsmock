@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.79](https://github.com/jensvogt/awsmock/compare/v1.18.78...v1.18.79) (2026-06-30)
+
+
+### Bug Fixes
+
+* service tests, update log messages ([9ac28d5](https://github.com/jensvogt/awsmock/commit/9ac28d5afb54708f7795aa741058368fa8af2c3b))
+
 ## [1.18.78](https://github.com/jensvogt/awsmock/compare/v1.18.77...v1.18.78) (2026-06-30)
 
 
