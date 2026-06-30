@@ -44,7 +44,7 @@ namespace Awsmock::Database::Entity::Lambda {
             instanceDoc.append(kvp("hostName", hostName));
             instanceDoc.append(kvp("publicPort", publicPort));
             instanceDoc.append(kvp("privatePort", privatePort));
-            instanceDoc.append(kvp("invocations", invocations));
+            instanceDoc.append(kvp("invocations", static_cast<bsoncxx::types::b_int64>(invocations)));
             instanceDoc.append(kvp("avgDuration", avgDuration));
             instanceDoc.append(kvp("status", RuntimeStatusToString(status)));
             instanceDoc.append(kvp("lastStart", bsoncxx::types::b_date(lastStart)));
