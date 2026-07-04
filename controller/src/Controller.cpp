@@ -537,6 +537,7 @@ namespace Awsmock::Controller {
         request.functionArn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, functionName);
         request.version = Core::FileUtils::ExtractVersionFromFileName(filename);
         request.functionCode = Core::Crypto::Base64Encode(Core::FileUtils::ReadFile(filename));
+        std::cout << "Starting code upload, lambda: " << functionName << ", file: " << filename << ", size: " << Core::FileUtils::FileSizeHumanReadable(filename) << ". This could take some time." << std::endl;
         if (const auto response = SendPostCommand("lambda", "upload-function-code", request.ToJson()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Error: '" << response.statusCode << "', body: " << response.body << std::endl;
             return;
@@ -760,9 +761,9 @@ namespace Awsmock::Controller {
             for (boost::json::array lambdaArray = jv.at("functionCounters").as_array(); const auto &element: lambdaArray) {
                 Dto::Lambda::Function lambda;
                 lambda.functionName = element.at("functionName").as_string().data();
-                lambda.state = element.at("state").as_string().data();
+                //  lambda.state = element.at("state").as_string().data();
                 lambda.enabled = element.at("enabled").as_bool();
-                lambda.functionArn = element.at("functionArn").as_string().data();
+                lambda.functionArn = element.at("lambdaArn").as_string().data();
                 lambdas.push_back(lambda);
             }
         }

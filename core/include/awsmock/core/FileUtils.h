@@ -187,6 +187,7 @@ namespace Awsmock::Core {
          * @return size of the in bytes.
          */
         static long FileSize(const std::string &fileName);
+        static std::string FileSizeHumanReadable(const std::string &fileName);
 
         /**
          * @brief Moves a file to a new directory.

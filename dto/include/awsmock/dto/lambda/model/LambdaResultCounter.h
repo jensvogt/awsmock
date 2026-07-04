@@ -87,7 +87,7 @@ namespace Awsmock::Dto::Lambda {
         /**
          * Lambda status
          */
-        // Database::Entity::Lambda::RuntimeStatus lambdaStatus = unknown;
+        Database::Entity::Lambda::RuntimeStatus lambdaStatus = Database::Entity::Lambda::RuntimeStatus::unknown;
 
         /**
          *

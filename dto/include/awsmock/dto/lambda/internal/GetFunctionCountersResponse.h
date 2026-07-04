@@ -231,6 +231,11 @@ namespace Awsmock::Dto::Lambda {
         std::map<std::string, std::string> tags;
 
         /**
+         * @brief Lifetime in seconds
+         */
+        int lifetime{};
+
+        /**
          * Last invocation
          */
         std::optional<system_clock::time_point> lastInvocation{};
@@ -270,6 +275,7 @@ namespace Awsmock::Dto::Lambda {
             r.instances = Core::Json::GetLongValue(v, "instances");
             r.invocations = Core::Json::GetLongValue(v, "invocations");
             r.avgDuration = Core::Json::GetLongValue(v, "avgDuration");
+            r.lifetime = Core::Json::GetIntValue(v, "lifetime");
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.state = Core::Json::GetStringValue(v, "state");
             r.environment = boost::json::value_to<std::map<std::string, std::string>>(v.at("environment"));
@@ -309,6 +315,7 @@ namespace Awsmock::Dto::Lambda {
             o["instances"] = obj.instances;
             o["invocations"] = obj.invocations;
             o["avgDuration"] = obj.avgDuration;
+            o["lifetime"] = obj.lifetime;
             o["enabled"] = obj.enabled;
             o["state"] = obj.state;
             o["environment"] = boost::json::value_from(obj.environment);
