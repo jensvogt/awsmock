@@ -19,105 +19,6 @@
 #include <awsmock/entity/lambda/Instance.h>
 
 namespace Awsmock::Database::Entity::Lambda {
-    //
-    // /**
-    //  * @brief Lambda entity
-    //  *
-    //  * @author jens.vogt\@opitz-consulting.com
-    //  */
-    // enum LambdaState {
-    //     Pending,
-    //     Active,
-    //     Inactive,
-    //     Failed
-    // };
-    //
-    // static std::map<LambdaState, std::string> LambdaStateNames{
-    //         {Pending, "Pending"},
-    //         {Active, "Active"},
-    //         {Inactive, "Inactive"},
-    //         {Failed, "Failed"},
-    // };
-    //
-    // [[maybe_unused]] static std::string LambdaStateToString(const LambdaState &lambdaState) {
-    //     return LambdaStateNames[lambdaState];
-    // }
-    //
-    // [[maybe_unused]] static LambdaState LambdaStateFromString(const std::string &lambdaState) {
-    //     for (auto &[fst, snd]: LambdaStateNames) {
-    //         if (snd == lambdaState) {
-    //             return fst;
-    //         }
-    //     }
-    //     return Inactive;
-    // }
-    //
-    // enum LambdaStateReasonCode {
-    //     Idle,
-    //     Creating,
-    //     Restoring,
-    //     EniLimitExceeded,
-    //     InsufficientRolePermissions,
-    //     InvalidConfiguration,
-    //     InternalError,
-    //     SubnetOutOfIPAddresses,
-    //     InvalidSubnet,
-    //     InvalidSecurityGroup,
-    //     ImageDeleted,
-    //     ImageAccessDenied,
-    //     InvalidImage,
-    //     KMSKeyAccessDenied,
-    //     KMSKeyNotFound,
-    //     InvalidStateKMSKey,
-    //     DisabledKMSKey,
-    //     EFSIOError,
-    //     EFSMountConnectivityError,
-    //     EFSMountFailure,
-    //     EFSMountTimeout,
-    //     InvalidRuntime,
-    //     InvalidZipFileException,
-    //     FunctionError
-    // };
-    //
-    // static std::map<LambdaStateReasonCode, std::string> LambdaStateReasonCodeNames{
-    //         {Idle, "Idle"},
-    //         {Creating, "Creating"},
-    //         {Restoring, "Restoring"},
-    //         {EniLimitExceeded, "EniLimitExceeded"},
-    //         {InsufficientRolePermissions, "InsufficientRolePermissions"},
-    //         {InvalidConfiguration, "InvalidConfiguration"},
-    //         {InternalError, "InternalError"},
-    //         {SubnetOutOfIPAddresses, "SubnetOutOfIPAddresses"},
-    //         {InvalidSubnet, "InvalidSubnet"},
-    //         {InvalidSecurityGroup, "InvalidSecurityGroup"},
-    //         {ImageDeleted, "ImageDeleted"},
-    //         {ImageAccessDenied, "ImageAccessDenied"},
-    //         {InvalidImage, "InvalidImage"},
-    //         {KMSKeyAccessDenied, "KMSKeyAccessDenied"},
-    //         {KMSKeyNotFound, "KMSKeyNotFound"},
-    //         {InvalidStateKMSKey, "InvalidStateKMSKey"},
-    //         {DisabledKMSKey, "DisabledKMSKey"},
-    //         {EFSIOError, "EFSIOError"},
-    //         {EFSMountConnectivityError, "EFSMountConnectivityError"},
-    //         {EFSMountFailure, "EFSMountFailure"},
-    //         {EFSMountTimeout, "EFSMountTimeout"},
-    //         {InvalidRuntime, "InvalidRuntime"},
-    //         {InvalidZipFileException, "InvalidZipFileException"},
-    //         {FunctionError, "FunctionError"},
-    // };
-    //
-    // [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode &lambdaStateReasonCode) {
-    //     return LambdaStateReasonCodeNames[lambdaStateReasonCode];
-    // }
-    //
-    // [[maybe_unused]] static LambdaStateReasonCode LambdaStateReasonCodeFromString(const std::string &lambdaStateReasonCode) {
-    //     for (auto &[fst, snd]: LambdaStateReasonCodeNames) {
-    //         if (snd == lambdaStateReasonCode) {
-    //             return fst;
-    //         }
-    //     }
-    //     return Idle;
-    // }
 
     struct Lambda {
 
@@ -208,7 +109,7 @@ namespace Awsmock::Database::Entity::Lambda {
         /**
          * Timeout in seconds
          */
-        long timeout = 3600;
+        int timeout = 3600;
 
         /**
          * Concurrency
@@ -417,17 +318,9 @@ namespace Awsmock::Database::Entity::Lambda {
         void SetInstanceLastInvocation(const std::string &instanceId);
 
         /**
-         * @brief Set the last invocation time for an instance
-         *
-         * @param instanceId instance ID
-         * @param status instance status
-         */
-        // void SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status);
-
-        /**
          * @brief Converts the entity to a MongoDB document
          *
-         * @return entity as MongoDB document.
+         * @return entity as a MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 

@@ -30,6 +30,11 @@ namespace Awsmock::Database::Entity::Lambda {
         std::string lambdaArn;
 
         /**
+         * Lambda runtime status
+         */
+        RuntimeStatus lambdaStatus;
+        
+        /**
          * Request body
          */
         std::string requestBody;

@@ -128,7 +128,7 @@ namespace Awsmock::Service {
                 log_debug << "Found lambda arn, arn: " << arn;
 
                 std::string body = Core::HttpUtils::GetBodyAsString(request);
-                Dto::Lambda::CreateTagRequest lambdaRequest = lambdaRequest.FromJson(body);
+                Dto::Lambda::CreateTagRequest lambdaRequest = Dto::Lambda::CreateTagRequest::FromJson(body);
 
                 _lambdaService.CreateTag(lambdaRequest);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
@@ -487,7 +487,7 @@ namespace Awsmock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::LAMBDA_RUNTIME_STATUS) {
                 const Dto::Lambda::LambdaStatus status = Dto::Lambda::LambdaStatus::FromJson(clientCommand.payload);
                 _lambdaService.UpdateLambdaRuntimeStatus(region, status);
-                log_info << "Lambda runtime status applied, function: " << status.functionName << ", pid: " << status.pid << ", status: " << status.runtimeStatus;
+                log_debug << "Lambda runtime status applied, function: " << status.functionName << ", instanceId: " << status.instanceId << ", status: " << status.runtimeStatus;
                 return SendResponse(request, http::status::ok);
             }
 

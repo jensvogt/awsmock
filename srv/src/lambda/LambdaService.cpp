@@ -691,6 +691,7 @@ namespace Awsmock::Service {
             response.instances = static_cast<long>(lambda.instances.size());
             response.invocations = lambda.invocations;
             response.avgDuration = lambda.avgDuration;
+            response.lifetime = lambda.timeout;
             response.enabled = lambda.enabled;
             response.state = lambda.instances.empty() ? "Inactive" : "Active";
             response.lastStarted = lambda.lastStarted;

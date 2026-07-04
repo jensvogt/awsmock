@@ -21,7 +21,7 @@ namespace Awsmock::Database::Entity::Lambda {
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "responseBody", responseBody);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "logMessages", logMessages);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "statusCode", httpStatusCode);
-        // Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "lambdaStatus", RuntimeStatusToString(lambdaStatus));
+        Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "lambdaStatus", RuntimeStatusToString(lambdaStatus));
         Core::Bson::BsonUtils::SetDateValue(lambdaDocResult, "timestamp", timestamp);
 
         return lambdaDocResult.extract();
@@ -41,7 +41,7 @@ namespace Awsmock::Database::Entity::Lambda {
         requestBody = Core::Bson::BsonUtils::GetStringValue(mResult, "requestBody");
         responseBody = Core::Bson::BsonUtils::GetStringValue(mResult, "responseBody");
         logMessages = Core::Bson::BsonUtils::GetStringValue(mResult, "logMessages");
-        // lambdaStatus = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "lambdaStatus"));
+        lambdaStatus = RuntimeStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "lambdaStatus"));
         timestamp = Core::Bson::BsonUtils::GetDateValue(mResult, "timestamp");
     }
 

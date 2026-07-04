@@ -745,8 +745,10 @@ namespace Awsmock::FtpServer {
         if (const auto file_status = FileStatus(local_path); file_status.isOk()) {
             if (file_status.type() == FileType::RegularFile && static_cast<int>(_logged_in_user->permissions_ & Permission::FileDelete) == 0) {
                 sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED, "File already exists. Permission denied to overwrite file.");
+                return;
             } else if (file_status.type() == FileType::Dir) {
                 sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN_FILENAME_NOT_ALLOWED, "Cannot create file. A directory with that name already exists.");
+                return;
             }
         }
 
@@ -1376,8 +1378,12 @@ namespace Awsmock::FtpServer {
             file->file_stream_.close();
             me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
 
-            // Send to AWS S3
-            me->SendCreateObjectRequest(file->_user, file->_fileName);
+            // Post S3 upload outside the strand so it does not block subsequent file operations
+            const std::string user = file->_user;
+            const std::string fileName = file->_fileName;
+            boost::asio::post(me->_awsIoc, [me, user, fileName] {
+                me->SendCreateObjectRequest(user, fileName);
+            });
         },
                              nullptr);
     }

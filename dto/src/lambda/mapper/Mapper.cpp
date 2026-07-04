@@ -169,7 +169,7 @@ namespace Awsmock::Dto::Lambda {
         counter.requestBody = resultEntity.requestBody;
         counter.responseBody = resultEntity.responseBody;
         counter.logMessages = resultEntity.logMessages;
-        // counter.lambdaStatus = resultEntity.lambdaStatus;
+        counter.lambdaStatus = resultEntity.lambdaStatus;
         counter.httpStatusCode = resultEntity.httpStatusCode;
         counter.timestamp = resultEntity.timestamp;
         return counter;

@@ -143,6 +143,31 @@ namespace Awsmock::Core {
         return -1;
     }
 
+    std::string FileUtils::FileSizeHumanReadable(const std::string &fileName) {
+        if (!FileExists(fileName)) {
+            return "0 B";
+        }
+        const auto size = static_cast<double>(std::filesystem::file_size(fileName));
+        constexpr double kB = 1024.0;
+        constexpr double MB = kB * 1024.0;
+        constexpr double GB = MB * 1024.0;
+        constexpr double TB = GB * 1024.0;
+
+        char buf[32];
+        if (size >= TB) {
+            std::snprintf(buf, sizeof(buf), "%.2f TB", size / TB);
+        } else if (size >= GB) {
+            std::snprintf(buf, sizeof(buf), "%.2f GB", size / GB);
+        } else if (size >= MB) {
+            std::snprintf(buf, sizeof(buf), "%.2f MB", size / MB);
+        } else if (size >= kB) {
+            std::snprintf(buf, sizeof(buf), "%.2f kB", size / kB);
+        } else {
+            std::snprintf(buf, sizeof(buf), "%.0f B", size);
+        }
+        return buf;
+    }
+
     void FileUtils::MoveTo(const std::string &sourceFileName, const std::string &targetFileName, const bool createDir) {
         try {
             if (createDir) {
