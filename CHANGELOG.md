@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.81](https://github.com/jensvogt/awsmock/compare/v1.18.80...v1.18.81) (2026-07-04)
+
+
+### Bug Fixes
+
+* controller, update lambda ([892f231](https://github.com/jensvogt/awsmock/commit/892f231724b1e664618abdde8b7f5303d86c93ee))
+
 ## [1.18.80](https://github.com/jensvogt/awsmock/compare/v1.18.79...v1.18.80) (2026-07-01)
 
 
