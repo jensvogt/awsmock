@@ -292,13 +292,13 @@ namespace Awsmock::Database {
         for (auto &table: _tables | std::views::values) {
 
             // Count items belonging to this table
-            table.items = static_cast<long>(std::ranges::count_if(_items, [&table](const auto &pair) {
+            table.items = std::ranges::count_if(_items, [&table](const auto &pair) {
                 return pair.second.tableName == table.name;
-            }));
+            });
 
             // Sum size of items belonging to this table
-            table.size = std::accumulate(_items.begin(), _items.end(), 0L,
-                                         [&table](long sum, const auto &pair) {
+            table.size = std::accumulate(_items.begin(), _items.end(), std::int64_t{0},
+                                         [&table](std::int64_t sum, const auto &pair) {
                                              return pair.second.tableName == table.name ? sum + pair.second.size : sum;
                                          });
         }

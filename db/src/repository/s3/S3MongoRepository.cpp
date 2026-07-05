@@ -349,7 +349,7 @@ namespace Awsmock::Database {
         return objectList;
     }
 
-    long S3MongoRepository::getBucketSize(const std::string &region, const std::string &bucket) const {
+    std::int64_t S3MongoRepository::getBucketSize(const std::string &region, const std::string &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket_size");
 
         const auto client = ConnectionPool::instance().GetConnection();

@@ -164,9 +164,9 @@ namespace Awsmock::Database {
         });
     }
 
-    long S3MemoryRepository::getBucketSize(const std::string &region, const std::string &bucket) const {
-        return std::accumulate(_objects.begin(), _objects.end(), 0L,
-                               [region, bucket](long sum, const auto &item) {
+    std::int64_t S3MemoryRepository::getBucketSize(const std::string &region, const std::string &bucket) const {
+        return std::accumulate(_objects.begin(), _objects.end(), std::int64_t{0},
+                               [region, bucket](std::int64_t sum, const auto &item) {
                                    return item.second.region == region && item.second.bucket == bucket ? sum + item.second.size : sum;
                                });
     }

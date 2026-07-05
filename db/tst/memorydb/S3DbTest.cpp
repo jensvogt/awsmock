@@ -198,7 +198,7 @@ namespace Awsmock::Database {
         object2 = s3Database->createObject(object2);
 
         // act
-        const long totalSize = s3Database->getBucketSize(TEST_REGION, TEST_BUCKET_NAME);
+        const std::int64_t totalSize = s3Database->getBucketSize(TEST_REGION, TEST_BUCKET_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(totalSize, 10);
