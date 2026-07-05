@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.82](https://github.com/jensvogt/awsmock/compare/v1.18.81...v1.18.82) (2026-07-05)
+
+
+### Bug Fixes
+
+* entities on Windows ([8cec6c8](https://github.com/jensvogt/awsmock/commit/8cec6c896f14253bbdcac90ce2b4178513ef1e13))
+* entities on Windows ([ba285af](https://github.com/jensvogt/awsmock/commit/ba285af160199e799d1e4fa67e28eb94cbdce89e))
+
 ## [1.18.81](https://github.com/jensvogt/awsmock/compare/v1.18.80...v1.18.81) (2026-07-04)
 
 
