@@ -220,7 +220,7 @@ namespace Awsmock::Database {
          * @return bucket size in bytes
          */
         [[nodiscard]]
-        virtual long getBucketSize(const std::string &region, const std::string &bucket) const = 0;
+        virtual std::int64_t getBucketSize(const std::string &region, const std::string &bucket) const = 0;
 
         /**
          * @brief Create a new bucket or updated a existing bucket

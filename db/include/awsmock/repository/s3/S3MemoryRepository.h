@@ -181,7 +181,7 @@ namespace Awsmock::Database {
          * @return size of S3 objects in bytes
          */
         [[nodiscard]]
-        long getBucketSize(const std::string &region, const std::string &bucket) const override;
+        std::int64_t getBucketSize(const std::string &region, const std::string &bucket) const override;
 
         /**
          * @brief List all objects of a bucket
