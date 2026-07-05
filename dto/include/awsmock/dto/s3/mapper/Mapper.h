@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_S3_MAPPER_H
-#define AWSMOCK_DTO_S3_MAPPER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/mapper/Mapper.h>
@@ -354,7 +353,4 @@ namespace Awsmock::Dto::S3 {
             return e;
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_MAPPER_H

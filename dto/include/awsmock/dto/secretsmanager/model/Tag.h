@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_TAG_COUNTER_H
-#define AWSMOCK_DTO_SECRETSMANAGER_TAG_COUNTER_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -42,7 +41,4 @@ namespace Awsmock::Dto::SecretsManager {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif// AWSMOCK_DTO_SECRETSMANAGER_TAG_COUNTER_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_EVENT_NOTIFICATION_H
-#define AWSMOCK_DTO_SNS_EVENT_NOTIFICATION_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -77,7 +76,4 @@ namespace Awsmock::Dto::SNS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_EVENT_NOTIFICATION_H

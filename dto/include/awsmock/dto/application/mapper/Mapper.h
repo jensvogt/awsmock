@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_APPS_MAPPER_H
-#define AWSMOCK_DTO_APPS_MAPPER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/application/model/Application.h>
@@ -56,7 +55,4 @@ namespace Awsmock::Dto::Apps {
          */
         static std::vector<Database::Entity::Apps::Application> map(const std::vector<Application> &applicationDtos);
     };
-
 }// namespace Awsmock::Dto::Apps
-
-#endif// AWSMOCK_DTO_APPS_MAPPER_H

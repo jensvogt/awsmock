@@ -2,8 +2,7 @@
 // Created by vogje01 on 3/8/26.
 //
 
-#ifndef AWSMOCK_REPOSITORY_DYNAMODB_TO_MONGO_TRANSLATOR_H
-#define AWSMOCK_REPOSITORY_DYNAMODB_TO_MONGO_TRANSLATOR_H
+#pragma once
 
 // C++ includes
 #include <iostream>
@@ -68,7 +67,4 @@ namespace Awsmock::Database {
             return token;// Return as-is if not in map (e.g. raw field name)
         }
     };
-
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_DYNAMODB_TO_MONGO_TRANSLATOR_H

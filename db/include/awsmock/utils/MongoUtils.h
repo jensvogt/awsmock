@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/28/24.
 //
 
-#ifndef AWSMOCK_CORE_MONGO_UTILS_H
-#define AWSMOCK_CORE_MONGO_UTILS_H
+#pragma once
 
 // Boost includes
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -44,7 +43,4 @@ namespace Awsmock::Database {
          */
         static system_clock::time_point GetDatetime(const std::optional<bsoncxx::document::view> &result, const std::string &attribute);
     };
-
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_CORE_MONGO_UTILS_H

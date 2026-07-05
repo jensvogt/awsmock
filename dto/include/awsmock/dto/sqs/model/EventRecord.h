@@ -2,8 +2,7 @@
 // Created by vogje01 on 7/6/24.
 //
 
-#ifndef AWSMOCK_DTO_SQS_EVENT_RECORD_H
-#define AWSMOCK_DTO_SQS_EVENT_RECORD_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -96,7 +95,4 @@ namespace Awsmock::Dto::SQS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_EVENT_RECORD_H

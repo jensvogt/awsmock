@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/05/2024.
 //
 
-#ifndef AWSMOCK_CORE_CONNECTION_POOL_H
-#define AWSMOCK_CORE_CONNECTION_POOL_H
+#pragma once
 
 // C++ includes
 #include <memory>
@@ -72,7 +71,4 @@ namespace Awsmock::Database {
          */
         std::shared_ptr<mongocxx::pool> _pool = nullptr;
     };
-
 }// namespace Awsmock::Database
-
-#endif//AWSMOCK_CORE_CONNECTION_POOL_H

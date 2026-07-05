@@ -2,8 +2,7 @@
 // Created by vogje01 on 7/6/24.
 //
 
-#ifndef AWSMOCK_DTO_SQS_MESSAGE_H
-#define AWSMOCK_DTO_SQS_MESSAGE_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -136,7 +135,4 @@ namespace Awsmock::Dto::SQS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_MESSAGE_H

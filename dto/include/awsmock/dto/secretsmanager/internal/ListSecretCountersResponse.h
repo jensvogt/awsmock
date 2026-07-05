@@ -2,9 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRET_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRET_COUNTERS_RESPONSE_H
-
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/SecretCounter.h>
@@ -45,7 +42,4 @@ namespace Awsmock::Dto::SecretsManager {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif// AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRET_COUNTERS_RESPONSE_H

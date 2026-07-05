@@ -2,8 +2,7 @@
 // Created by vogje01 on 10/9/24.
 //
 
-#ifndef AWSMOCK_DTO_SNS_MESSAGE_COUNTER_H
-#define AWSMOCK_DTO_SNS_MESSAGE_COUNTER_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -101,7 +100,4 @@ namespace Awsmock::Dto::SNS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_MESSAGE_COUNTER_H

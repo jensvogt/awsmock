@@ -2,8 +2,7 @@
 // Created by vogje01 on 6/7/25.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_MAPPER_H
-#define AWSMOCK_DTO_SECRETSMANAGER_MAPPER_H
+#pragma once
 
 // AwsMock includes)
 #include "awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h"
@@ -71,7 +70,4 @@ namespace Awsmock::Dto::SecretsManager {
          */
         static Database::Entity::SecretsManager::RotationRules map(const RotationRules &rotationRule);
     };
-
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif//AWSMOCK_DTO_SECRETSMANAGER_MAPPER_H

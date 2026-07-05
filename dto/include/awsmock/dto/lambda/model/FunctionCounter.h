@@ -160,7 +160,7 @@ namespace Awsmock::Dto::Lambda {
             r.instances = Core::Json::GetLongValue(v, "instances");
             r.invocations = Core::Json::GetLongValue(v, "invocations");
             r.averageRuntime = Core::Json::GetLongValue(v, "avgDuration");
-            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             return r;
         }
@@ -188,7 +188,7 @@ namespace Awsmock::Dto::Lambda {
                     {"instances", obj.instances},
                     {"invocations", obj.invocations},
                     {"avgDuration", obj.averageRuntime},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

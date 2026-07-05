@@ -157,7 +157,7 @@ namespace Awsmock::Database::Entity::Lambda {
         Core::Bson::BsonUtils::SetArrayValue(lambdaDoc, "eventSources", eventSourcesDoc);
         Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastStart", lastStarted);
         Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastInvocation", lastInvocation);
-        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastStart", created);
+        Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "created", created);
         Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "modified", modified);
 
         return lambdaDoc.extract();
@@ -189,7 +189,7 @@ namespace Awsmock::Database::Entity::Lambda {
         avgDuration = Core::Bson::BsonUtils::GetLongValue(mResult, "avgDuration");
         dockerTag = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerTag");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
-        created = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStart");
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Environment
