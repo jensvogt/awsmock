@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/28/24.
 //
 
-#ifndef AWSMOCK_DTO_S3_FILTER_RULE_H
-#define AWSMOCK_DTO_S3_FILTER_RULE_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -13,8 +12,8 @@
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseObject.h>
 
 namespace Awsmock::Dto::S3 {
 
@@ -101,7 +100,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_FILTER_RULE_H

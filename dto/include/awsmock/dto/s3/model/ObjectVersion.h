@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_S3_OBJECT_VERSION_H
-#define AWSMOCK_DTO_S3_OBJECT_VERSION_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -105,7 +104,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_OBJECT_VERSION_H

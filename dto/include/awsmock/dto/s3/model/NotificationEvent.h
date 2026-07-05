@@ -2,8 +2,7 @@
 // Created by JVO on 29.04.2024.
 //
 
-#ifndef AWSMOCK_DTO_S3_EVENT_H
-#define AWSMOCK_DTO_S3_EVENT_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -70,5 +69,3 @@ namespace Awsmock::Dto::S3 {
                         OBJECT_TAGGING);
 
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_EVENT_H

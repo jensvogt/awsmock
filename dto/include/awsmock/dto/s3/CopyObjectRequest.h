@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H
-#define AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -65,7 +64,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H

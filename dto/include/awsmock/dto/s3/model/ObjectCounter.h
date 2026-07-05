@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_S3_OBJECT_COUNTER_H
-#define AWSMOCK_DTO_S3_OBJECT_COUNTER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
@@ -94,7 +93,7 @@ namespace Awsmock::Dto::S3 {
             r.size = Core::Json::GetLongValue(v, "size");
             r.internalName = Core::Json::GetStringValue(v, "internalName");
             r.body = Core::Json::GetStringValue(v, "body");
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             if (Core::Json::AttributeExists(v, "metadata")) {
                 r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
@@ -113,7 +112,7 @@ namespace Awsmock::Dto::S3 {
                     {"size", obj.size},
                     {"internalName", obj.internalName},
                     {"body", obj.body},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
 
@@ -128,5 +127,3 @@ namespace Awsmock::Dto::S3 {
         }
     };
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_OBJECT_COUNTER_H

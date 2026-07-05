@@ -286,8 +286,8 @@ namespace Awsmock::Dto::Lambda {
             if (Core::Json::AttributeExists(v, "lastStart")) {
                 r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStart"));
             }
-            if (Core::Json::AttributeExists(v, "lastStart")) {
-                r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStart"));
+            if (Core::Json::AttributeExists(v, "created")) {
+                r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             }
             if (Core::Json::AttributeExists(v, "modified")) {
                 r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
@@ -321,13 +321,13 @@ namespace Awsmock::Dto::Lambda {
             o["environment"] = boost::json::value_from(obj.environment);
             o["tags"] = boost::json::value_from(obj.tags);
             if (obj.lastInvocation.has_value()) {
-                o["lastStart"] = Core::DateTimeUtils::ToISO8601(obj.lastInvocation.value());
+                o["lastInvocation"] = Core::DateTimeUtils::ToISO8601(obj.lastInvocation.value());
             }
             if (obj.lastStarted.has_value()) {
                 o["lastStart"] = Core::DateTimeUtils::ToISO8601(obj.lastStarted.value());
             }
             if (obj.created.has_value()) {
-                o["lastStart"] = Core::DateTimeUtils::ToISO8601(obj.created.value());
+                o["created"] = Core::DateTimeUtils::ToISO8601(obj.created.value());
             }
             if (obj.modified.has_value()) {
                 o["modified"] = Core::DateTimeUtils::ToISO8601(obj.modified.value());
