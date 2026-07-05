@@ -2,9 +2,7 @@
 // Created by vogje01 on 26/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_METRIC_DEFINITION_H
-#define AWSMOCK_CORE_METRIC_DEFINITION_H
-
+#pragma once
 // System counter
 #define CPU_USAGE_AWSMOCK "cpu_usage_awsmock"
 #define CPU_USAGE_TOTAL "cpu_usage_total"
@@ -134,4 +132,3 @@
 #define DOCKER_CPU_SYSTEM "docker_cpu_system_counter"
 #define DOCKER_MEMORY_TOTAL "docker_memory_counter"
 
-#endif// AWSMOCK_CORE_METRIC_DEFINITION_H

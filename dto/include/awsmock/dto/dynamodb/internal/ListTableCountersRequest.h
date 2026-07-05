@@ -2,9 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_LIST_TABLE_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_DYNAMODB_LIST_TABLE_COUNTERS_REQUEST_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -66,4 +64,3 @@ namespace Awsmock::Dto::DynamoDb {
 
 }// namespace Awsmock::Dto::DynamoDb
 
-#endif// AWSMOCK_DTO_DYNAMODB_LIST_TABLE_COUNTERS_REQUEST_H

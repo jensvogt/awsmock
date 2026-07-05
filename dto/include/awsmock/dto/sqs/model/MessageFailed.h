@@ -2,8 +2,7 @@
 // Created by vogje01 on 8/23/24.
 //
 
-#ifndef AWSMOCK_DTO_SQS_MESSAGE_ENTRY_FAILED_H
-#define AWSMOCK_DTO_SQS_MESSAGE_ENTRY_FAILED_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -72,7 +71,4 @@ namespace Awsmock::Dto::SQS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_MESSAGE_ENTRY_FAILED_H

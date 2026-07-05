@@ -2,8 +2,12 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_SYSTEM_UTILS_TEST_H
-#define AWSMOCK_CORE_SYSTEM_UTILS_TEST_H
+#pragma once
+
+// Boost includes
+#include <boost/test/tools/old/interface.hpp>
+#include <boost/test/unit_test_log.hpp>
+#include <boost/test/unit_test_suite.hpp>
 
 // Local includes
 #include <awsmock/core/SystemUtils.h>
@@ -22,5 +26,3 @@ namespace Awsmock::Core {
     }
 
 }// namespace Awsmock::Core
-
-#endif// AWSMOCK_CORE_SYSTEM_UTILS_TEST_H

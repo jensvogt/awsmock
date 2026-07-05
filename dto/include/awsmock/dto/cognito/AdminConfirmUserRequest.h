@@ -2,9 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_CONFIRM_USER_REQUEST_H
-#define AWSMOCK_DTO_COGNITO_CONFIRM_USER_REQUEST_H
-
+#pragma once
 // C++ standard includes
 #include <map>
 #include <string>
@@ -84,4 +82,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_CONFIRM_USER_REQUEST_H

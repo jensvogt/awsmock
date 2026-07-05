@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_SERVICES_H
-#define AWSMOCK_DTO_COMMON_SERVICES_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -77,4 +75,3 @@ namespace Awsmock::Dto::Common {
 
 }// namespace Awsmock::Dto::Common
 
-#endif// AWSMOCK_DTO_COMMON_SERVICES_H

@@ -2,9 +2,7 @@
 // Created by vogje01 on 3/8/26.
 //
 
-#ifndef AWSMOCK_DTO_MODULE_EXPORT_TYPE_H
-#define AWSMOCK_DTO_MODULE_EXPORT_TYPE_H
-
+#pragma once
 // C++ includes
 #include <map>
 #include <string>
@@ -38,4 +36,3 @@ namespace Awsmock::Dto::Module {
     }
 }// namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_MODULE_EXPORT_TYPE_H

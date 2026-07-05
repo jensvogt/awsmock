@@ -2,9 +2,7 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_LAMBDA_INVOCATION_TYPE_H
-#define AWSMOCK_DB_ENTITY_LAMBDA_INVOCATION_TYPE_H
-
+#pragma once
 // C++ includes
 #include <map>
 #include <string>
@@ -51,4 +49,3 @@ namespace Awsmock::Dto::Lambda {
 
 }// namespace Awsmock::Dto::Lambda
 
-#endif// AWSMOCK_DB_ENTITY_LAMBDA_INVOCATION_TYPE_H

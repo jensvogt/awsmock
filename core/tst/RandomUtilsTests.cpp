@@ -2,10 +2,10 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_CORE_RANDOM_UTILS_TEST_H
-#define AWSMOCK_CORE_RANDOM_UTILS_TEST_H
+// Boost includes
+#include <boost/test/unit_test.hpp>
 
-// Local includes
+// Awsmock includes
 #include <awsmock/core/RandomUtils.h>
 
 namespace Awsmock::Core {
@@ -25,7 +25,7 @@ namespace Awsmock::Core {
 
         // assert
         for (int i = 0; i < 100; i++) {
-            BOOST_CHECK_EQUAL(result[i] >= min && result[i] <= max, true);
+            BOOST_CHECK(result[i] >= min && result[i] <= max);
         }
         result.clear();
     }
@@ -42,7 +42,7 @@ namespace Awsmock::Core {
 
         // assert
         for (int i = 0; i < size; i++) {
-            BOOST_CHECK_EQUAL(result[i] >= min && result[i] <= max, true);
+            BOOST_CHECK(result[i] >= min && result[i] <= max);
         }
         result.clear();
     }
@@ -62,7 +62,7 @@ namespace Awsmock::Core {
 
         // assert
         for (int i = 0; i < 100; i++) {
-            BOOST_CHECK_EQUAL(result[i] > min && result[i] < max, true);
+            BOOST_CHECK(result[i] > min && result[i] < max);
         }
         result.clear();
     }
@@ -79,11 +79,8 @@ namespace Awsmock::Core {
 
         // assert
         for (int i = 0; i < size; i++) {
-            BOOST_CHECK_EQUAL(result[i] > min && result[i] < max, true);
+            BOOST_CHECK(result[i] > min && result[i] < max);
         }
         result.clear();
     }
-
 }// namespace Awsmock::Core
-
-#endif// AWSMOCK_CORE_RANDOM_UTILS_TEST_H

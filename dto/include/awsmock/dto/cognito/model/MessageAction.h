@@ -2,9 +2,7 @@
 // Created by vogje01 on 12/2/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_MESSAGE_ACTION_H
-#define AWSMOCK_DTO_COGNITO_MESSAGE_ACTION_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/entity/cognito/User.h>
 
@@ -39,4 +37,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_MESSAGE_ACTION_H

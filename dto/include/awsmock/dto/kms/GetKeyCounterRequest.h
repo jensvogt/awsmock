@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/25/24.
 //
 
-#ifndef AWSMOCK_DTO_KMS_GET_KEY_COUNTER_REQUEST_H
-#define AWSMOCK_DTO_KMS_GET_KEY_COUNTER_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -50,7 +49,4 @@ namespace Awsmock::Dto::KMS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::KMS
-
-#endif// AWSMOCK_DTO_KMS_GET_KEY_COUNTER_REQUEST_H

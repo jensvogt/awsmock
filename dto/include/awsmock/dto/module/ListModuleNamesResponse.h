@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_MODULE_LIST_NAMES_RESPONSE_H
-#define AWSMOCK_DTO_MODULE_LIST_NAMES_RESPONSE_H
-
+#pragma once
 // C++ Standard includes
 #include <string>
 #include <vector>
@@ -57,4 +55,3 @@ namespace Awsmock::Dto::Module {
 
 }// namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_MODULE_LIST_NAMES_RESPONSE_H

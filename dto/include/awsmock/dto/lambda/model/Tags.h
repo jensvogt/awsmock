@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 4/30/24.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_TAGS_H
-#define AWSMOCK_DTO_LAMBDA_TAGS_H
-
+#pragma once
 // C++ standard includes
 #include <algorithm>
 #include <map>
@@ -122,4 +120,3 @@ namespace Awsmock::Dto::Lambda {
 
 }// namespace Awsmock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_TAGS_H

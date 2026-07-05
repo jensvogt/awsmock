@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_USER_IDENTITY_H
-#define AWSMOCK_DTO_LAMBDA_USER_IDENTITY_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -64,4 +62,3 @@ namespace Awsmock::Dto::Lambda {
 
 }// namespace Awsmock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_USER_IDENTITY_H

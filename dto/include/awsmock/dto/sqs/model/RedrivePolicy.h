@@ -2,9 +2,7 @@
 // Created by vogje01 on 12/10/23.
 //
 
-#ifndef AWSMOCK_DTO_SQS_REDRIVE_POLICY_H
-#define AWSMOCK_DTO_SQS_REDRIVE_POLICY_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -50,4 +48,3 @@ namespace Awsmock::Dto::SQS {
 
 }// namespace Awsmock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_REDRIVE_POLICY_H

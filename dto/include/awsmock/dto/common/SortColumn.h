@@ -2,8 +2,7 @@
 // Created by vogje01 on 9/30/24.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_SORT_COLUMN_H
-#define AWSMOCK_DTO_COMMON_SORT_COLUMN_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -44,7 +43,4 @@ namespace Awsmock::Dto::Common {
             };
         }
     };
-
 }// namespace Awsmock::Dto::Common
-
-#endif// AWSMOCK_DTO_COMMON_SORT_COLUMN_H

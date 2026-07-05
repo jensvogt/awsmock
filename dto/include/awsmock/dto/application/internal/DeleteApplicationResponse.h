@@ -2,9 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_UPDATE_APPLICATION_RESPONSE_H
-#define AWSMOCK_DTO_APPS_UPDATE_APPLICATION_RESPONSE_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/dto/apps/model/Application.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -79,4 +77,3 @@ namespace Awsmock::Dto::Apps {
 
 }// namespace Awsmock::Dto::Apps
 
-#endif// AWSMOCK_DTO_APPS_CREATE_APPLICATION_RESPONSE_H

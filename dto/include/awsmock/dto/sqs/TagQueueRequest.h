@@ -2,8 +2,7 @@
 // Created by vogje01 on 22/012/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_TAG_QUEUE_REQUEST_H
-#define AWSMOCK_DTO_SQS_TAG_QUEUE_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -49,7 +48,4 @@ namespace Awsmock::Dto::SQS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_TAG_QUEUE_REQUEST_H

@@ -2,9 +2,7 @@
 // Created by jensv on 10/04/2026.
 //
 
-#ifndef AWSMOCK_DTO_MAPPER_H
-#define AWSMOCK_DTO_MAPPER_H
-
+#pragma once
 #pragma once
 
 #include <algorithm>
@@ -550,4 +548,3 @@ namespace Awsmock::Dto {
     };
 }// namespace Awsmock::Dto
 
-#endif//AWSMOCK_DTO_MAPPER_H

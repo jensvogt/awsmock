@@ -2,9 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_MONITORING_MAPPER_H
-#define AWSMOCK_DTO_MONITORING_MAPPER_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/dto/monitoring/Counter.h>
 #include <awsmock/entity/monitoring/Counter.h>
@@ -55,4 +53,3 @@ namespace Awsmock::Dto::Monitoring {
 
 }// namespace Awsmock::Dto::Monitoring
 
-#endif// AWSMOCK_DTO_MONITORING_MAPPER_H

@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 8/23/24.
 //
 
-#ifndef AWSMOCK_DTO_SSM_MODEL_PARAMETER_H
-#define AWSMOCK_DTO_SSM_MODEL_PARAMETER_H
-
+#pragma once
 // C++ standard includes
 #include <chrono>
 #include <map>
@@ -187,4 +185,3 @@ namespace Awsmock::Dto::SSM {
 
 }// namespace Awsmock::Dto::SSM
 
-#endif// AWSMOCK_DTO_SSM_MODEL_PARAMETER_H

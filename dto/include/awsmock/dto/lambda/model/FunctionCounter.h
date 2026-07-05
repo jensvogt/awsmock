@@ -2,9 +2,7 @@
 // Created by vogje01 on 06/09/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_FUNCTION_COUNTER_H
-#define AWSMOCK_DTO_LAMBDA_FUNCTION_COUNTER_H
-
+#pragma once
 // C++ standard includes
 #include <chrono>
 #include <map>
@@ -198,4 +196,3 @@ namespace Awsmock::Dto::Lambda {
 
 }// namespace Awsmock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_FUNCTION_COUNTER_H

@@ -2,9 +2,7 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_PRUNE_CONTAINER_RESPONSE_H
-#define AWSMOCK_DTO_DOCKER_PRUNE_CONTAINER_RESPONSE_H
-
+#pragma once
 // C++ includes
 #include <string>
 #include <vector>
@@ -53,4 +51,3 @@ namespace Awsmock::Dto::Docker {
 
 }// namespace Awsmock::Dto::Docker
 
-#endif// AWSMOCK_DTO_DOCKER_PRUNE_CONTAINER_RESPONSE_H

@@ -2,9 +2,7 @@
 // Created by vogje01 on 8/4/24.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_SIGN_UP_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_SIGN_UP_RESPONSE_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -68,4 +66,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_SIGN_UP_RESPONSE_H

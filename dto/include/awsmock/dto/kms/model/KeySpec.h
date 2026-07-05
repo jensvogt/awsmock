@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_KMS_MASTER_KEY_SPEC_H
-#define AWSMOCK_DTO_KMS_MASTER_KEY_SPEC_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -62,7 +61,4 @@ namespace Awsmock::Dto::KMS {
     inline std::ostream &operator<<(std::ostream &os, const KeySpec &keySpec) {
         return os << KeySpecToString(keySpec);
     }
-
 }// namespace Awsmock::Dto::KMS
-
-#endif// AWSMOCK_DTO_KMS_MASTER_KEY_SPEC_H

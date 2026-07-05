@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 10/23/23.
 //
 
-#ifndef AWSMOCK_DTO_MODULE_MODULE_H
-#define AWSMOCK_DTO_MODULE_MODULE_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -123,4 +121,3 @@ namespace Awsmock::Dto::Module {
 
 }// namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_MODULE_MODULE_H

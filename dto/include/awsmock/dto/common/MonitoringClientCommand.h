@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_MONITORING_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_MONITORING_CLIENT_COMMAND_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -106,4 +104,3 @@ namespace Awsmock::Dto::Common {
 
 }// namespace Awsmock::Dto::Common
 
-#endif// AWSMOCK_DTO_COMMON_MONITORING_CLIENT_COMMAND_H

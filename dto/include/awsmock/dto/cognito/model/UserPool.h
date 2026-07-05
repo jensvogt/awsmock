@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
-#define AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H
-
+#pragma once
 // C++ includes
 #include <chrono>
 #include <string>
@@ -99,4 +97,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_MODEL_USER_POOL_H

@@ -2,9 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_RESPONSE_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -92,4 +90,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_RESPOND_TO_AUTH_CHALLENGE_RESPONSE_H

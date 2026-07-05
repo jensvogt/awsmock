@@ -2,9 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_EXPORT_ITEMS_REQUEST_H
-#define AWSMOCK_DTO_DYNAMODB_EXPORT_ITEMS_REQUEST_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -40,4 +38,3 @@ namespace Awsmock::Dto::DynamoDb {
 
 }// namespace Awsmock::Dto::DynamoDb
 
-#endif// AWSMOCK_DTO_DYNAMODB_EXPORT_ITEMS_REQUEST_H

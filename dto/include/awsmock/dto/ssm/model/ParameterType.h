@@ -2,8 +2,7 @@
 // Created by vogje01 on 8/22/24.
 //
 
-#ifndef AWSMOCK_DTO_SSM_MODEL_PARAMETER_TYPE_H
-#define AWSMOCK_DTO_SSM_MODEL_PARAMETER_TYPE_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -33,9 +32,9 @@ namespace Awsmock::Dto::SSM {
     }
 
     [[maybe_unused]] static ParameterType ParameterTypeFromString(const std::string &parameterType) {
-        for (auto &it: ParameterTypeNames) {
-            if (it.second == parameterType) {
-                return it.first;
+        for (auto &[fst, snd]: ParameterTypeNames) {
+            if (snd == parameterType) {
+                return fst;
             }
         }
         return ParameterType::string;
@@ -44,7 +43,4 @@ namespace Awsmock::Dto::SSM {
     inline std::ostream &operator<<(std::ostream &os, ParameterType t) {
         return os << ParameterTypeToString(t);
     }
-
 }// namespace Awsmock::Dto::SSM
-
-#endif// AWSMOCK_DTO_SSM_MODEL_PARAMETER_TYPE_H

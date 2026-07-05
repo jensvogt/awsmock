@@ -1,9 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 3/30/25.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H
-#define AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H
+#pragma once
 /**
  * This is a sample implementation of a libssh based SSH server
  * Copyright 2014 Audrius Butkevicius
@@ -362,4 +361,3 @@ namespace Awsmock::Service {
     };
 }// namespace Awsmock::Service
 
-#endif// AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H

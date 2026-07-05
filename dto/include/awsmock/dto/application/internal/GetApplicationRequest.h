@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_GET_APPLICATION_REQUEST_H
-#define AWSMOCK_DTO_APPS_GET_APPLICATION_REQUEST_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/application/model/Application.h>
@@ -48,7 +47,4 @@ namespace Awsmock::Dto::Apps {
             };
         }
     };
-
 }// namespace Awsmock::Dto::Apps
-
-#endif// AWSMOCK_DTO_APPS_GET_APPLICATION_REQUEST_H

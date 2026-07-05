@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_SERVER_H
-#define AWSMOCK_DTO_TRANSFER_SERVER_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -198,4 +196,3 @@ namespace Awsmock::Dto::Transfer {
 
 }// namespace Awsmock::Dto::Transfer
 
-#endif//AWSMOCK_DTO_TRANSFER_SERVER_H

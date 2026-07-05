@@ -2,9 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_MODULE_MAPPER_H
-#define AWSMOCK_DTO_MODULE_MAPPER_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
@@ -31,4 +29,3 @@ namespace Awsmock::Dto::Module {
 
 }// namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_MODULE_MAPPER_H

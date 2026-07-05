@@ -2,9 +2,7 @@
 // Created by vogje01 on 6/5/24.
 //
 
-#ifndef AWSMOCK_DTO_APPS_RUNTIME_H
-#define AWSMOCK_DTO_APPS_RUNTIME_H
-
+#pragma once
 // C++ includes
 #include <map>
 #include <string>
@@ -61,4 +59,3 @@ namespace Awsmock::Dto::Apps {
 
 }// namespace Awsmock::Dto::Apps
 
-#endif//AWSMOCK_DTO_APPS_RUNTIME_H

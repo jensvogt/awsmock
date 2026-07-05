@@ -2,8 +2,7 @@
 // Created by vogje01 on 7/6/24.
 //
 
-#ifndef AWSMOCK_DTO_SQS_MODEL_DELETE_MESSAGE_BATCH_RESULT_ENTRY_H
-#define AWSMOCK_DTO_SQS_MODEL_DELETE_MESSAGE_BATCH_RESULT_ENTRY_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -59,7 +58,4 @@ namespace Awsmock::Dto::SQS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_MODEL_DELETE_MESSAGE_BATCH_RESULT_ENTRY_H

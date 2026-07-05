@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_WEB_SOCKET_COMMAND_H
-#define AWSMOCK_DTO_APPS_WEB_SOCKET_COMMAND_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -88,7 +87,4 @@ namespace Awsmock::Dto::Apps {
             };
         }
     };
-
 }// namespace Awsmock::Dto::Apps
-
-#endif// AWSMOCK_DTO_APPS_START_APPLICATION_REQUEST_H

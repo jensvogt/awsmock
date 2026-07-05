@@ -2,9 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_LIST_APPLICATION_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_APPS_LIST_APPLICATION_COUNTERS_REQUEST_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -70,4 +68,3 @@ namespace Awsmock::Dto::Apps {
 
 }// namespace Awsmock::Dto::Apps
 
-#endif// AWSMOCK_DTO_APPS_LIST_APPLICATION_COUNTERS_REQUEST_H
