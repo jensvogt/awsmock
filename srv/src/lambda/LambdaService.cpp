@@ -147,7 +147,7 @@ namespace Awsmock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string>> environments;
+            std::vector<std::pair<std::string, std::string> > environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -443,7 +443,7 @@ namespace Awsmock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string>> tags;
+            std::vector<std::pair<std::string, std::string> > tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -499,6 +499,8 @@ namespace Awsmock::Service {
                 instanceCounter.publicPort = instance.publicPort;
                 instanceCounter.privatePort = instance.privatePort;
                 instanceCounter.lastInvocation = instance.lastInvocation;
+                instanceCounter.lastStart = instance.lastStart;
+                instanceCounter.lastStop = instance.lastStop;
                 response.instanceCounters.emplace_back(instanceCounter);
             }
 
@@ -645,9 +647,9 @@ namespace Awsmock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-            function.handler = lambda.handler,
-            function.runtime = lambda.runtime,
-            function.lastUpdateStatus = "Successful";
+                    function.handler = lambda.handler,
+                    function.runtime = lambda.runtime,
+                    function.lastUpdateStatus = "Successful";
             // function.state = LambdaStateToString(lambda.state),
             // function.stateReason = lambda.stateReason,
             // function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
@@ -730,7 +732,7 @@ namespace Awsmock::Service {
 
         // REQUEST_RESPONSE
         if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
-            const auto promise = std::make_shared<std::promise<std::pair<int, std::string>>>();
+            const auto promise = std::make_shared<std::promise<std::pair<int, std::string> > >();
             auto future = promise->get_future();
             Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), promise);
             const auto [status, body] = future.get();
@@ -901,7 +903,8 @@ namespace Awsmock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase->listLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase->
+                    listLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             const long count = _lambdaDatabase->lambdaResultsCount(request.lambdaArn);
 
             Dto::Lambda::ListLambdaResultCountersResponse response = Dto::Lambda::Mapper::map(lambdaResults);
@@ -1612,4 +1615,4 @@ namespace Awsmock::Service {
         }
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

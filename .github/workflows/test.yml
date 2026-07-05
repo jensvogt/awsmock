@@ -40,7 +40,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev
+          sudo apt install -y ninja-build linux-libc-dev autoconf autoconf-archive automake libtool g++-14 libmagic-dev libgoogle-perftools-dev
 
       - name: Create vcpkg binary cache dir
         run: mkdir -p ${{ github.workspace }}/vcpkg-bincache
