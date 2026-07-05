@@ -163,6 +163,7 @@ namespace Awsmock::Core {
             return;
         }
         _currentLevel = lvl;
+        _channelLevels.clear();
         UpdateFilter();
     }
 
