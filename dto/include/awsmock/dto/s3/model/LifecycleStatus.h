@@ -2,8 +2,7 @@
 // Created by vogje01 on 1/9/26.
 //
 
-#ifndef AWSMOCK_DTO_S3_LIFECYCLE_STATUS_H
-#define AWSMOCK_DTO_S3_LIFECYCLE_STATUS_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
@@ -35,7 +34,4 @@ namespace Awsmock::Dto::S3 {
         }
         return LIFECYCLE_DISABLED;
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_LIFECYCLE_STATUS_H

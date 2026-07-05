@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_PUT_BUCKET_ENCRYPTION_REQUEST_H
-#define AWSMOCK_DTO_S3_PUT_BUCKET_ENCRYPTION_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -103,7 +102,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_PUT_BUCKET_ENCRYPTION_REQUEST_H

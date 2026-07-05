@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_STORAGE_CLASS_H
-#define AWSMOCK_DTO_S3_STORAGE_CLASS_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -55,5 +54,3 @@ namespace Awsmock::Dto::S3 {
         return StorageClass::UNKNOWN;
     }
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_STORAGE_CLASS_H

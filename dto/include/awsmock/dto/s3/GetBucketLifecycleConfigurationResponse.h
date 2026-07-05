@@ -2,8 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_GET_BUCKET_LIFECYCLE_CONFIGURATION_RESPONSE_H
-#define AWSMOCK_DTO_S3_GET_BUCKET_LIFECYCLE_CONFIGURATION_RESPONSE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/core/XmlUtils.h>
@@ -118,7 +117,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_GET_BUCKET_LIFECYCLE_CONFIGURATION_RESPONSE_H

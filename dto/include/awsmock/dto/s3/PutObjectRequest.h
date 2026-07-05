@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_CORE_DTO_PUT_OBJECT_REQUEST_H
-#define AWSMOCK_CORE_DTO_PUT_OBJECT_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -95,7 +94,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif//AWSMOCK_CORE_DTO_PUT_OBJECT_REQUEST_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_S3_CONTENT_H
-#define AWSMOCK_DTO_S3_CONTENT_H
+#pragma once
 
 // C++ includes
 #include <chrono>
@@ -91,7 +90,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_CONTENT_H

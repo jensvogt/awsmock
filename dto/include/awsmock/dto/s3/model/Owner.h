@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#ifndef AWSMOCK_DTO_S3_OWNER_H
-#define AWSMOCK_DTO_S3_OWNER_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -48,7 +47,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif// AWSMOCK_DTO_S3_OWNER_H
