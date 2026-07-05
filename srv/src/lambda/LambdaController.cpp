@@ -300,7 +300,8 @@ namespace Awsmock::Service {
                 bool updated = false;
                 for (auto it = lambda.instances.begin(); it != lambda.instances.end();) {
                     try {
-                        if (const Dto::Docker::InspectContainerResponse inspection = _containerService.InspectContainer(it->containerId); !inspection.state.running) {
+                        if (const Dto::Docker::InspectContainerResponse inspection = _containerService.InspectContainer(it->containerId);
+                            inspection.status == http::status::ok && !inspection.state.running) {
                             log_info << "Health-check: container not running, removing, containerId: " << it->containerId << ", function: " << lambda.function;
                             it = lambda.instances.erase(it);
                             updated = true;
