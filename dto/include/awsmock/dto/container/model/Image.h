@@ -2,9 +2,7 @@
 // Created by JVO on 22.04.2024.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_IMAGE_H
-#define AWSMOCK_DTO_DOCKER_IMAGE_H
-
+#pragma once
 // C++ includes
 #include <string>
 #include <vector>
@@ -107,4 +105,3 @@ namespace Awsmock::Dto::Docker {
 
 }// namespace Awsmock::Dto::Docker
 
-#endif// AWSMOCK_DTO_DOCKER_IMAGE_H

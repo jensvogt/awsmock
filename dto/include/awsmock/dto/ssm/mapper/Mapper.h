@@ -2,8 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_SSM_MAPPER_H
-#define AWSMOCK_DTO_SSM_MAPPER_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/ssm/DescribeParametersRequest.h>
@@ -83,7 +82,7 @@ namespace Awsmock::Dto::SSM {
         static DescribeParametersResponse map(const DescribeParametersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities);
 
         /**
-         * @brief Maps a list of SSM parameter entities to a parameter list response
+         * @brief Maps a list of SSM parameter entities to a parameter list response.
          *
          * Some values will be pulled over from the request.
          *
@@ -94,7 +93,4 @@ namespace Awsmock::Dto::SSM {
          */
         static ListParameterCountersResponse map(const ListParameterCountersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities);
     };
-
 }// namespace Awsmock::Dto::SSM
-
-#endif// AWSMOCK_DTO_S3_MAPPER_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 9/30/24.
 //
 
-#ifndef AWSMOCK_DATABASE_COMMON_SORT_COLUMN_H
-#define AWSMOCK_DATABASE_COMMON_SORT_COLUMN_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -61,7 +60,4 @@ namespace Awsmock::Database {
 
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
-
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_DATABASE_COMMON_SORT_COLUMN_H

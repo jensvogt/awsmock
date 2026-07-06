@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 21/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_ENVIRONMENT_H
-#define AWSMOCK_DTO_LAMBDA_ENVIRONMENT_H
-
+#pragma once
 // C++ standard includes
 #include <map>
 #include <string>
@@ -100,4 +98,3 @@ namespace Awsmock::Dto::Lambda {
 
 }// namespace Awsmock::Dto::Lambda
 
-#endif//AWSMOCK_DTO_LAMBDA_ENVIRONMENT_H

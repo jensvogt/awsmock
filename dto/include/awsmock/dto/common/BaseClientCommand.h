@@ -2,9 +2,7 @@
 // Created by vogje01 on 5/12/24.
 //
 
-#ifndef AWSMOCK_DTO_BASE_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_BASE_CLIENT_COMMAND_H
-
+#pragma once
 // C++ standard includes
 #include <map>
 
@@ -75,4 +73,3 @@ namespace Awsmock::Dto::Common {
 
 }// namespace Awsmock::Dto::Common
 
-#endif//AWSMOCK_DTO_BASE_CLIENT_COMMAND_H

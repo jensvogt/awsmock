@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_KMS_MASTER_KEY_STATE_H
-#define AWSMOCK_DTO_KMS_MASTER_KEY_STATE_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -49,7 +48,4 @@ namespace Awsmock::Dto::KMS {
         }
         return KeyState::UNAVAILABLE;
     }
-
 }// namespace Awsmock::Dto::KMS
-
-#endif// AWSMOCK_DTO_KMS_MASTER_KEY_STATE_H

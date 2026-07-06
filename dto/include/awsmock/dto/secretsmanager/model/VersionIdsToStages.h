@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/8/24.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_VERSION_IDS_TO_STAGES_H
-#define AWSMOCK_DTO_SECRETSMANAGER_VERSION_IDS_TO_STAGES_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -57,7 +56,4 @@ namespace Awsmock::Dto::SecretsManager {
             }
         }
     };
-
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif// AWSMOCK_DTO_SECRETSMANAGER_VERSION_IDS_TO_STAGES_H

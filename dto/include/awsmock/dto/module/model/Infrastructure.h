@@ -2,9 +2,7 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_INFRASTRUCTURE_H
-#define AWSMOCK_DTO_COMMON_INFRASTRUCTURE_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -163,4 +161,3 @@ namespace Awsmock::Dto::Module {
 
 } // namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_COMMON_INFRASTRUCTURE_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/26/23.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_S3_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_S3_CLIENT_COMMAND_H
+#pragma once
 
 // C++ includes
 #include <string>
@@ -260,5 +259,3 @@ namespace Awsmock::Dto::Common {
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 }// namespace Awsmock::Dto::Common
-
-#endif// AWSMOCK_DTO_COMMON_S3_CLIENT_COMMAND_H

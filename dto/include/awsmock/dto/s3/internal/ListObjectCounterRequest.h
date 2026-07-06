@@ -2,8 +2,7 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_S3_LIST_OBJECT_COUNTER_REQUEST_H
-#define AWSMOCK_DTO_S3_LIST_OBJECT_COUNTER_REQUEST_H
+#pragma once
 
 // C++ Standard includes
 #include <string>
@@ -68,7 +67,4 @@ namespace Awsmock::Dto::S3 {
             };
         }
     };
-
 }// namespace Awsmock::Dto::S3
-
-#endif//AWSMOCK_DTO_S3_LIST_OBJECT_REQUEST_H

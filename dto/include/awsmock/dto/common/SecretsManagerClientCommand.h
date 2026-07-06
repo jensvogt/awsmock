@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 07/04/2024.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_SECRETSMANAGER_CLIENT_COMMAND_H
-#define AWSMOCK_DTO_COMMON_SECRETSMANAGER_CLIENT_COMMAND_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -129,4 +127,3 @@ namespace Awsmock::Dto::Common {
 
 }// namespace Awsmock::Dto::Common
 
-#endif// AWSMOCK_DTO_COMMON_SECRETSMANAGER_CLIENT_COMMAND_H

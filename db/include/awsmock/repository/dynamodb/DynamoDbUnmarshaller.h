@@ -2,8 +2,7 @@
 // Created by vogje01 on 3/8/26.
 //
 
-#ifndef AWSMOCK_REPOSITORY_DYNAMODB_UNMARSHALL_H
-#define AWSMOCK_REPOSITORY_DYNAMODB_UNMARSHALL_H
+#pragma once
 
 // MongoDB includes
 #include <bsoncxx/builder/basic/document.hpp>
@@ -34,5 +33,3 @@ namespace Awsmock::Database {
         }*/
     };
 }// namespace Awsmock::Database
-
-#endif// AWSMOCK_REPOSITORY_DYNAMODB_UNMARSHALL_H

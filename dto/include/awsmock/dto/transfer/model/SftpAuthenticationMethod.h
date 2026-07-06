@@ -2,9 +2,7 @@
 // Created by JVO on 29.04.2024.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_SERVER_SFTP_AUTHENTICATION_METHOD_H
-#define AWSMOCK_DTO_TRANSFER_SERVER_SFTP_AUTHENTICATION_METHOD_H
-
+#pragma once
 // C++ standard includes
 #include <map>
 #include <string>
@@ -47,4 +45,3 @@ namespace Awsmock::Dto::Transfer {
 
 }// namespace Awsmock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_TRANSFER_SERVER_SFTP_AUTHENTICATION_METHOD_H

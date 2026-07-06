@@ -2,8 +2,7 @@
 // Created by vogje01 on 07/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
-#define AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
+#pragma once
 
 // C++ includes
 #include <set>
@@ -176,7 +175,4 @@ namespace Awsmock::Database::Entity::DynamoDb {
     };
 
     typedef std::vector<Item> ItemList;
-
 }// namespace Awsmock::Database::Entity::DynamoDb
-
-#endif// AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H

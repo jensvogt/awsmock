@@ -2,8 +2,7 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_MESSAGE_STATUS_H
-#define AWSMOCK_DTO_SNS_MESSAGE_STATUS_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -39,7 +38,4 @@ namespace Awsmock::Dto::SNS {
         }
         return INITIAL;
     }
-
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_MESSAGE_STATUS_H

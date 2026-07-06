@@ -2,9 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_GET_QUEUE_DETAILS_RESPONSE_H
-#define AWSMOCK_DTO_SQS_GET_QUEUE_DETAILS_RESPONSE_H
-
+#pragma once
 // C++ standard includes
 #include <chrono>
 #include <string>
@@ -155,4 +153,3 @@ namespace Awsmock::Dto::SQS {
 
 }// namespace Awsmock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_GET_QUEUE_DETAILS_RESPONSE_H

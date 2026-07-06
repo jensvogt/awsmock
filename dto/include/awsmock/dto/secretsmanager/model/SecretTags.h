@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/9/24.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_SECRET_TAGS_H
-#define AWSMOCK_DTO_SECRETSMANAGER_SECRET_TAGS_H
+#pragma once
 
 // C++ standard includes
 #include <map>
@@ -71,6 +70,4 @@ namespace Awsmock::Dto::SecretsManager {
          */
         friend std::ostream &operator<<(std::ostream &os, const SecretTags &r);
     };
-
 }// namespace Awsmock::Dto::SecretsManager
-#endif// AWSMOCK_DTO_SECRETSMANAGER_SECRET_TAGS_H

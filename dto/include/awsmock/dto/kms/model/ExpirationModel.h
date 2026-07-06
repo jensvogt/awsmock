@@ -2,8 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_KMS_EXPIRATION_MODEL_H
-#define AWSMOCK_DTO_KMS_EXPIRATION_MODEL_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -37,7 +36,4 @@ namespace Awsmock::Dto::KMS {
         }
         return ExpirationModel::KEY_MATERIAL_DOES_NOT_EXPIRE;
     }
-
 }// namespace Awsmock::Dto::KMS
-
-#endif// AWSMOCK_DTO_KMS_EXPIRATION_MODEL_H

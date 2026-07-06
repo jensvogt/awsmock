@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 7/13/24.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_EVENT_SOURCE_MAPPING_H
-#define AWSMOCK_DTO_LAMBDA_EVENT_SOURCE_MAPPING_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -101,4 +99,3 @@ namespace Awsmock::Dto::Lambda {
 
 }// namespace Awsmock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_LAMBDA_EVENT_SOURCE_MAPPING_H

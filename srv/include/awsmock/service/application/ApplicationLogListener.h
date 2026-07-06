@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 7/19/25.
 //
 
-#ifndef AWSMOCK_SERVICE_APPLICATION_LOG_LISTENER_H
-#define AWSMOCK_SERVICE_APPLICATION_LOG_LISTENER_H
-
+#pragma once
 // C++ includes
 #include <memory>
 #include <thread>
@@ -95,4 +93,3 @@ namespace Awsmock::Service {
 
 }// namespace Awsmock::Service
 
-#endif// AWSMOCK_SERVICE_APPLICATION_LOG_LISTENER_H

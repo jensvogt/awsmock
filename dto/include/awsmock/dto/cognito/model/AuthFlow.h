@@ -2,9 +2,7 @@
 // Created by vogje01 on 6/5/24.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_AUTH_FLOW_H
-#define AWSMOCK_DTO_COGNITO_AUTH_FLOW_H
-
+#pragma once
 // C++ includes
 #include <map>
 #include <string>
@@ -51,4 +49,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_AUTH_FLOW_H

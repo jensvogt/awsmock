@@ -2,9 +2,7 @@
 // Created by vogje01 on 23/04/2025.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_MAPPER_H
-#define AWSMOCK_DTO_COMMON_MAPPER_H
-
+#pragma once
 // C++ standard includes
 #include <vector>
 
@@ -53,4 +51,3 @@ namespace Awsmock::Dto::Common {
 
 }// namespace Awsmock::Dto::Common
 
-#endif// AWSMOCK_DTO_COMMON_MAPPER_H

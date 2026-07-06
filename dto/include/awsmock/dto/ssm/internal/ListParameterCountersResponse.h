@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SSM_LIST_PARAMETER_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SSM_LIST_PARAMETER_COUNTERS_RESPONSE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -49,7 +48,4 @@ namespace Awsmock::Dto::SSM {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SSM
-
-#endif// AWSMOCK_DTO_SSM_LIST_PARAMETER_COUNTERS_RESPONSE_H

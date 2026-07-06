@@ -2,9 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_GET_SERVER_DETAILS_RESPONSE_H
-#define AWSMOCK_DTO_TRANSFER_GET_SERVER_DETAILS_RESPONSE_H
-
+#pragma once
 // C++ standard includes
 #include <chrono>
 #include <string>
@@ -48,4 +46,3 @@ namespace Awsmock::Dto::Transfer {
 
 }// namespace Awsmock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_TRANSFER_GET_SERVER_DETAILS_RESPONSE_H

@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_TOPIC_COUNTER_H
-#define AWSMOCK_DTO_SNS_TOPIC_COUNTER_H
+#pragma once
 
 // C++ standard includes
 #include <chrono>
@@ -90,7 +89,7 @@ namespace Awsmock::Dto::SNS {
             r.messagesSend = Core::Json::GetLongValue(v, "messagesSend");
             r.messagesResend = Core::Json::GetLongValue(v, "messagesResend");
             r.size = Core::Json::GetLongValue(v, "size");
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
         }
@@ -105,12 +104,9 @@ namespace Awsmock::Dto::SNS {
                     {"messagesSend", obj.messagesSend},
                     {"messagesResend", obj.messagesResend},
                     {"size", obj.size},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
-
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_TOPIC_COUNTER_H

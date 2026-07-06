@@ -2,9 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_MAPPER_H
-#define AWSMOCK_DTO_COGNITO_MAPPER_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/cognito/CreateGroupRequest.h>
@@ -232,4 +230,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_MAPPER_H

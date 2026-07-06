@@ -2,9 +2,7 @@
 // Created by vogje01 on 3/30/25.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_USER_H
-#define AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_USER_H
-
+#pragma once
 // C++ includes
 #include <string>
 #include <vector>
@@ -33,4 +31,3 @@ namespace Awsmock::Service {
 
 }// namespace Awsmock::Service
 
-#endif// AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_USER_H

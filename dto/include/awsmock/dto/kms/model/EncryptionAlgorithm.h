@@ -2,9 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_KMS_ENCRYPTION_ALGORITHMS_H
-#define AWSMOCK_DTO_KMS_ENCRYPTION_ALGORITHMS_H
-
+#pragma once
 // C++ includes
 #include <map>
 #include <string>
@@ -46,4 +44,3 @@ namespace Awsmock::Dto::KMS {
 
 }// namespace Awsmock::Dto::KMS
 
-#endif// AWSMOCK_DTO_KMS_ENCRYPTION_ALGORITHMS_H

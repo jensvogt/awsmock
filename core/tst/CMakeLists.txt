@@ -1,7 +1,7 @@
 set(BINARY core_tst)
 
 set(SOURCES Main.cpp CryptoUtilsTest.cpp AwsUtilsTests.cpp ConfigurationTests.cpp CronUtilsTests.cpp
-        DateTimeUtilsTests.cpp StringUtilsTests.cpp)
+        DateTimeUtilsTests.cpp StringUtilsTests.cpp RandomUtilsTests.cpp)
 
 add_executable(${BINARY} ${SOURCES})
 target_include_directories(${BINARY} PUBLIC ${CMAKE_SOURCE_DIR}/core/include)

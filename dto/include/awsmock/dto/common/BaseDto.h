@@ -2,9 +2,7 @@
 // Created by vogje01 on 5/18/24.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_BASE_DTO_H
-#define AWSMOCK_DTO_COMMON_BASE_DTO_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -128,4 +126,3 @@ namespace Awsmock::Dto::Common {
 
 }// namespace Awsmock::Dto::Common
 
-#endif// AWSMOCK_DTO_COMMON_BASEREQUEST_H

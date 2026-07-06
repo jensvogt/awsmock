@@ -2,9 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#ifndef AWSMOCK_DTO_DYNAMODB_MAPPER_H
-#define AWSMOCK_DTO_DYNAMODB_MAPPER_H
-
+#pragma once
 // C++ includes
 #include <ranges>
 
@@ -189,4 +187,3 @@ namespace Awsmock::Dto::DynamoDb {
 
 }// namespace Awsmock::Dto::DynamoDb
 
-#endif// AWSMOCK_DTO_S3_MAPPER_H

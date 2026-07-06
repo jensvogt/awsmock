@@ -2,8 +2,7 @@
 // Created by vogje01 on 12/2/23.
 //
 
-#ifndef AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_DATA_TYPE_H
-#define AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_DATA_TYPE_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -41,7 +40,4 @@ namespace Awsmock::Dto::SQS {
         }
         return STRING;
     }
-
 }// namespace Awsmock::Dto::SQS
-
-#endif// AWSMOCK_DTO_SQS_MESSAGE_ATTRIBUTE_DATA_TYPE_H

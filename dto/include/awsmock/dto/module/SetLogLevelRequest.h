@@ -2,9 +2,7 @@
 // Created by vogje01 on 06/07/2025
 //
 
-#ifndef AWSMOCK_DTO_SET_LOG_LEVEL_REQUEST_H
-#define AWSMOCK_DTO_SET_LOG_LEVEL_REQUEST_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -61,4 +59,3 @@ namespace Awsmock::Dto::Module {
 
 }// namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_SET_LOG_LEVEL_REQUEST_H

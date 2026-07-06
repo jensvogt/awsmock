@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 10/6/24.
 //
 
-#ifndef AWSMOCK_DTO_IMPORT_INFRASTRUCTURE_REQUEST_H
-#define AWSMOCK_DTO_IMPORT_INFRASTRUCTURE_REQUEST_H
-
+#pragma once
 // C++ includes
 #include <string>
 #include <vector>
@@ -72,4 +70,3 @@ namespace Awsmock::Dto::Module {
 
 }// namespace Awsmock::Dto::Module
 
-#endif//AWSMOCK_DTO_IMPORT_INFRASTRUCTURE_REQUEST_H

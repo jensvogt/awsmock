@@ -2,9 +2,7 @@
 // Created by vogje01 on 10/2/24.
 //
 
-#ifndef AWSMOCK_DTO_MONITORING_COUNTER_H
-#define AWSMOCK_DTO_MONITORING_COUNTER_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -52,4 +50,3 @@ namespace Awsmock::Dto::Monitoring {
 
 };// namespace Awsmock::Dto::Monitoring
 
-#endif// AWSMOCK_DTO_MONITORING_COUNTER_H

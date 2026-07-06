@@ -2,9 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_DESCRIBE_USERPOOL_CLIENT_RESPONSE_H
-#define AWSMOCK_DTO_COGNITO_DESCRIBE_USERPOOL_CLIENT_RESPONSE_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/dto/cognito/model/UserPoolClient.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -86,4 +84,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_DESCRIBE_USERPOOL_CLIENT_RESPONSE_H

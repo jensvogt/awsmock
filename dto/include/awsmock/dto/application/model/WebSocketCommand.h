@@ -2,8 +2,7 @@
 // Created by vogje01 on 6/5/24.
 //
 
-#ifndef AWSMOCK_DTO_APPS_WEBSOCKET_COMMAND_H
-#define AWSMOCK_DTO_APPS_WEBSOCKET_COMMAND_H
+#pragma once
 
 // C++ includes
 #include <map>
@@ -44,7 +43,4 @@ namespace Awsmock::Dto::Apps {
         }
         return WebSoketCommandType::UNKNOWN;
     }
-
 }// namespace Awsmock::Dto::Apps
-
-#endif// AWSMOCK_DTO_APPS_WEBSOCKET_COMMAND_H

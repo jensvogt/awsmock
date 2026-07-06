@@ -4,7 +4,6 @@
 
 #pragma once
 
-
 // C++ standard includes
 #include <string>
 

@@ -2,9 +2,7 @@
 // Created by vogje01 on 10/6/24.
 //
 
-#ifndef AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
-#define AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
-
+#pragma once
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -84,4 +82,3 @@ namespace Awsmock::Dto::Module {
 
 }// namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H

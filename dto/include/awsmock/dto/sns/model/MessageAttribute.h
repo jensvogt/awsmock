@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_MESSAGE_ATTRIBUTE_H
-#define AWSMOCK_DTO_SNS_MESSAGE_ATTRIBUTE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -94,9 +93,5 @@ namespace Awsmock::Dto::SNS {
             jv = std::move(o);
         }
     };
-
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;
-
 }// namespace Awsmock::Dto::SNS
-
-#endif// AWSMOCK_DTO_SNS_MESSAGE_ATTRIBUTE_H

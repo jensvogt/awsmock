@@ -2,8 +2,7 @@
 // Created by vogje01 on 4/9/24.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_REQUEST_H
-#define AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_REQUEST_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -66,7 +65,4 @@ namespace Awsmock::Dto::SecretsManager {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif// AWSMOCK_DTO_SECRETSMANAGER_GET_SECRET_VALUE_REQUEST_H

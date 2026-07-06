@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SECRETSMANAGER_UPDATE_SECRET_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SECRETSMANAGER_UPDATE_SECRET_COUNTERS_RESPONSE_H
+#pragma once
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
@@ -38,7 +37,4 @@ namespace Awsmock::Dto::SecretsManager {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SecretsManager
-
-#endif// AWSMOCK_DTO_SECRETSMANAGER_UPDATE_SECRET_COUNTERS_RESPONSE_H

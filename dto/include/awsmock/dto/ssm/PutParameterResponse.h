@@ -2,8 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SSM_PUT_PARAMETER_RESPONSE_H
-#define AWSMOCK_DTO_SSM_PUT_PARAMETER_RESPONSE_H
+#pragma once
 
 // C++ standard includes
 #include <string>
@@ -49,7 +48,4 @@ namespace Awsmock::Dto::SSM {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SSM
-
-#endif// AWSMOCK_DTO_SSM_PUT_PARAMETER_RESPONSE_H

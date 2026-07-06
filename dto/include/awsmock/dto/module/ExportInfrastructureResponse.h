@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 10/6/24.
 //
 
-#ifndef AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_RESPONSE_H
-#define AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_RESPONSE_H
-
+#pragma once
 // C++ includes
 #include <string>
 
@@ -74,4 +72,3 @@ namespace Awsmock::Dto::Module {
 
 }// namespace Awsmock::Dto::Module
 
-#endif// AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_RESPONSE_H

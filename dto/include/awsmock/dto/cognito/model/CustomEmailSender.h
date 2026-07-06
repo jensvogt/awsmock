@@ -1,10 +1,8 @@
-﻿//
+//
 // Created by vogje01 on 4/20/24.
 //
 
-#ifndef AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
-#define AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -84,4 +82,3 @@ namespace Awsmock::Dto::Cognito {
 
 }// namespace Awsmock::Dto::Cognito
 
-#endif// AWSMOCK_DTO_COGNITO_CUSTOM_EMAIL_SENDER_H

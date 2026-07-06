@@ -2,9 +2,7 @@
 // Created by vogje01 on 4/30/24.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_ERROR_H
-#define AWSMOCK_DTO_LAMBDA_ERROR_H
-
+#pragma once
 // C++ standard includes
 #include <string>
 
@@ -45,4 +43,3 @@ namespace Awsmock::Dto::Lambda {
 
 }// namespace Awsmock::Dto::Lambda
 
-#endif//AWSMOCK_DTO_LAMBDA_ERROR_H
