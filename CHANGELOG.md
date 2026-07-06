@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.85](https://github.com/jensvogt/awsmock/compare/1.18.84...v1.18.85) (2026-07-06)
+
+
+### Bug Fixes
+
+* cleanup code ([6be7768](https://github.com/jensvogt/awsmock/commit/6be7768bceb75d19782acc48ac99771f8b7ccd89))
+* cleanup code ([95274b2](https://github.com/jensvogt/awsmock/commit/95274b22ea9c728db3952ea7864e19ecd0543d78))
+* cleanup code ([0e236e6](https://github.com/jensvogt/awsmock/commit/0e236e65ac52b4572d7b7e0bf3adc2256395504f))
+
 ## [1.18.84](https://github.com/jensvogt/awsmock/compare/v1.18.83...v1.18.84) (2026-07-05)
 
 
