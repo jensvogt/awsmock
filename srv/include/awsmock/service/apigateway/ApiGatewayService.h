@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
@@ -232,6 +233,26 @@ namespace Awsmock::Service {
          */
         void putIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod,
                             const std::string &integrationType, const std::string &integrationUri, const std::string &integrationHttpMethod) const;
+
+        /**
+         * @brief Returns the integration for a given REST API resource method
+         *
+         * @param restApiId AWS REST API ID
+         * @param resourceId resource ID
+         * @param httpMethod HTTP verb
+         * @return ResourceMethod containing integration fields
+         */
+        [[nodiscard]]
+        Database::Entity::ApiGateway::ResourceMethod getIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod) const;
+
+        /**
+         * @brief Removes the integration from a given REST API resource method
+         *
+         * @param restApiId AWS REST API ID
+         * @param resourceId resource ID
+         * @param httpMethod HTTP verb
+         */
+        void deleteIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod) const;
 
         /**
          * @brief Validates an API key by its raw key value

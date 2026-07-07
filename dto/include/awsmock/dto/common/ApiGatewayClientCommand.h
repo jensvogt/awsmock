@@ -36,6 +36,8 @@ namespace Awsmock::Dto::Common {
         DELETE_RESOURCE,
         PUT_METHOD,
         PUT_INTEGRATION,
+        GET_INTEGRATION,
+        DELETE_INTEGRATION,
         GET_RESOURCES,
         GET_RESOURCE,
         // AwsMock internal
@@ -61,6 +63,8 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::DELETE_RESOURCE, "delete-resource"},
             {ApiGatewayCommandType::PUT_METHOD, "put-method"},
             {ApiGatewayCommandType::PUT_INTEGRATION, "put-integration"},
+            {ApiGatewayCommandType::GET_INTEGRATION, "get-integration"},
+            {ApiGatewayCommandType::DELETE_INTEGRATION, "delete-integration"},
             {ApiGatewayCommandType::GET_RESOURCES, "get-resources"},
             {ApiGatewayCommandType::GET_RESOURCE, "get-resource"},
             // AwsMock internal commands

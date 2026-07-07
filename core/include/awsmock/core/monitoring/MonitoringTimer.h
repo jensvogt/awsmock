@@ -11,7 +11,7 @@
 // Awsmock include
 #include <awsmock/core/EventBus.h>
 
-#define TIME_DIFF (duration_cast<std::chrono::milliseconds>(system_clock::now() - _start).count())
+#define TIME_DIFF (duration_cast<std::chrono::microseconds>(system_clock::now() - _start).count() / 1000.0)
 
 namespace Awsmock::Monitoring {
 

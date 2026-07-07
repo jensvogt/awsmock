@@ -405,7 +405,7 @@ namespace Awsmock::Service {
         try {
 
             // Get the rest api
-            Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.restApiId);
+            const Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(request.restApiId);
 
             return Dto::ApiGateway::Mapper::map(request, restApi.resources);
 
@@ -481,7 +481,45 @@ namespace Awsmock::Service {
         method.integrationType = integrationType;
         method.integrationUri = integrationUri;
         method.integrationHttpMethod = integrationHttpMethod;
+        restApi = _apiGatewayDatabase->upsertRestApi(restApi);
+        log_debug << "Put integration created, restApiId: " << restApi.id << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod << ", type: " << integrationType;
+    }
+
+    Database::Entity::ApiGateway::ResourceMethod ApiGatewayService::getIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_integration");
+        log_debug << "Get integration, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
+
+        const Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(restApiId);
+        if (!restApi.resources.contains(resourceId)) {
+            throw Core::NotFoundException("Resource not found, resourceId: " + resourceId);
+        }
+        const auto &resource = restApi.resources.at(resourceId);
+        const auto it = resource.resourceMethods.find(httpMethod);
+        if (it == resource.resourceMethods.end()) {
+            throw Core::NotFoundException("Method not found, httpMethod: " + httpMethod);
+        }
+        return it->second;
+    }
+
+    void ApiGatewayService::deleteIntegration(const std::string &restApiId, const std::string &resourceId, const std::string &httpMethod) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_integration");
+        log_debug << "Delete integration, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
+
+        Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(restApiId);
+        if (!restApi.resources.contains(resourceId)) {
+            throw Core::NotFoundException("Resource not found, resourceId: " + resourceId);
+        }
+        auto &resource = restApi.resources.at(resourceId);
+        const auto it = resource.resourceMethods.find(httpMethod);
+        if (it == resource.resourceMethods.end()) {
+            throw Core::NotFoundException("Method not found, httpMethod: " + httpMethod);
+        }
+        auto &method = it->second;
+        method.integrationType.clear();
+        method.integrationUri.clear();
+        method.integrationHttpMethod.clear();
         _apiGatewayDatabase->upsertRestApi(restApi);
+        log_debug << "Integration deleted, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
     }
 
     bool ApiGatewayService::validateApiKey(const std::string &keyValue) const {
