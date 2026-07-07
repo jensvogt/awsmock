@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.86](https://github.com/jensvogt/awsmock/compare/1.18.85...v1.18.86) (2026-07-07)
+
+
+### Bug Fixes
+
+* service tests - add secretsmanager tests, add get_integration, delete_integration ([11f5264](https://github.com/jensvogt/awsmock/commit/11f52641eeaf3f8d2f13393a5aebe18610f8957f))
+
 ## [1.18.85](https://github.com/jensvogt/awsmock/compare/1.18.84...v1.18.85) (2026-07-06)
 
 
