@@ -212,6 +212,15 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApiGatewayCommandType::GET_INTEGRATION: {
+                    const std::string restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const std::string resourceId = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                    const std::string httpMethod = Core::HttpUtils::GetPathParameter(request.target(), 5);
+                    const auto method = _apiGatewayService.getIntegration(restApiId, resourceId, httpMethod);
+                    log_info << "Get integration, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
+                    return SendResponse(request, http::status::ok, method.ToJson());
+                }
+
                 case Dto::Common::ApiGatewayCommandType::GET_RESOURCE: {
 
                     Dto::ApiGateway::GetResourcesRequest serviceRequest = Dto::ApiGateway::GetResourcesRequest::FromJson(clientCommand);
@@ -452,6 +461,15 @@ namespace Awsmock::Service {
                     _apiGatewayService.deleteResource(serviceRequest);
                     log_info << "REST API deleted, restApiId: " << serviceRequest.restApiId;
                     return SendResponse(request, http::status::accepted);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::DELETE_INTEGRATION: {
+                    const std::string restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const std::string resourceId = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                    const std::string httpMethod = Core::HttpUtils::GetPathParameter(request.target(), 5);
+                    _apiGatewayService.deleteIntegration(restApiId, resourceId, httpMethod);
+                    log_info << "Integration deleted, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
+                    return SendResponse(request, http::status::no_content);
                 }
 
                 default:

@@ -204,6 +204,8 @@ namespace Awsmock::Service {
             // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretByArn(arn);
 
+            const std::string versionId = request.clientRequestToken.empty() ? Core::StringUtils::CreateRandomUuid() : request.clientRequestToken;
+
             std::string currentVersionId = secret.GetCurrentVersionId();
             secret.versions[currentVersionId].stages.clear();
             secret.versions[currentVersionId].stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPREVIOUS));
@@ -212,11 +214,7 @@ namespace Awsmock::Service {
             newVersion.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
 
             if (!secret.kmsKeyId.empty()) {
-                Dto::KMS::EncryptRequest encryptRequest;
-                encryptRequest.keyId = secret.kmsKeyId;
-                encryptRequest.plaintext = Core::Crypto::Base64Encode(request.secretString);
-                Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
-                newVersion.secretString = Core::Crypto::Base64Decode(kmsResponse.ciphertext);
+                EncryptSecret(newVersion, secret.kmsKeyId, request.secretString);
             } else if (!request.secretBinary.empty()) {
                 Dto::KMS::EncryptRequest encryptRequest;
                 encryptRequest.keyId = secret.kmsKeyId;
@@ -226,12 +224,12 @@ namespace Awsmock::Service {
             } else {
                 log_warning << "Neither string nor binary, secretId: " << request.secretId;
             }
-            secret.versions[request.clientRequestToken] = newVersion;
+            secret.versions[versionId] = newVersion;
 
             // Convert to DTO
             response.arn = secret.arn;
             response.name = secret.name;
-            response.versionId = request.clientRequestToken;
+            response.versionId = versionId;
             response.versionStages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
 
             log_debug << "Put secret value, secretId: " << request.secretId;
