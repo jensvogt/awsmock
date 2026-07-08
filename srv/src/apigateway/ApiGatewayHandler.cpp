@@ -2,14 +2,15 @@
 // Created by vogje01 on 9/2/25.
 //
 
+// C++ includes
 #include <sstream>
 
-#include <awsmock/service/apigateway/ApiGatewayHandler.h>
-
-#include "awsmock/dto/apigateway/DeleteResourceRequest.h"
-#include "awsmock/dto/apigateway/DeleteUsagePlanRequest.h"
-#include "awsmock/dto/apigateway/GetResourceRequest.h"
+// Awsmock includes
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/apigateway/DeleteResourceRequest.h>
+#include <awsmock/dto/apigateway/DeleteUsagePlanRequest.h>
+#include <awsmock/dto/apigateway/GetResourceRequest.h>
+#include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 namespace Awsmock::Service {
 
@@ -52,8 +53,7 @@ namespace Awsmock::Service {
             Core::Bson::BsonUtils::SetStringValue(event, "resource", resourcePath);
             Core::Bson::BsonUtils::SetStringValue(event, "path", resourcePath);
             Core::Bson::BsonUtils::SetStringValue(event, "httpMethod", httpMethod);
-            Core::Bson::BsonUtils::SetStringValue(event, "methodArn",
-                                                  "arn:aws:execute-api::" + restApiId + "/test/" + httpMethod + resourcePath);
+            Core::Bson::BsonUtils::SetStringValue(event, "methodArn", "arn:aws:execute-api::" + restApiId + "/test/" + httpMethod + resourcePath);
             Core::Bson::BsonUtils::SetDocumentValue(event, "requestContext", requestContext);
             return Core::Bson::BsonUtils::ToJsonString(event.view());
         }
