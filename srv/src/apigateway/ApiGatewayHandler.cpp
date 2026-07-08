@@ -2,6 +2,8 @@
 // Created by vogje01 on 9/2/25.
 //
 
+#include <sstream>
+
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 #include "awsmock/dto/apigateway/DeleteResourceRequest.h"
@@ -132,6 +134,30 @@ namespace Awsmock::Service {
             boost::beast::ostream(response.body()) << body;
             response.prepare_payload();
             return response;
+        }
+
+        // Match a resource path pattern (which may contain {param} segments) against a concrete request path.
+        bool PathMatches(const std::string &pattern, const std::string &path) {
+            if (pattern == path) return true;
+
+            const auto split = [](const std::string &s) {
+                std::vector<std::string> parts;
+                std::istringstream ss(s);
+                std::string tok;
+                while (std::getline(ss, tok, '/')) {
+                    if (!tok.empty()) parts.push_back(tok);
+                }
+                return parts;
+            };
+
+            const auto pp = split(pattern);
+            const auto rp = split(path);
+            if (pp.size() != rp.size()) return false;
+            for (size_t i = 0; i < pp.size(); ++i) {
+                if (pp[i].front() == '{' && pp[i].back() == '}') continue;
+                if (pp[i] != rp[i]) return false;
+            }
+            return true;
         }
 
         // Forward an HTTP request synchronously to an external URI (HTTP/HTTP_PROXY integration).
@@ -547,9 +573,9 @@ namespace Awsmock::Service {
             return SendResponse(request, http::status::not_found, "REST API not found");
         }
 
-        // Find the resource matching the path
+        // Find the resource matching the path (supports {param} segments)
         const auto resourceIt = std::ranges::find_if(restApi.resources, [&resourcePath](const auto &pair) {
-            return pair.second.path == resourcePath;
+            return PathMatches(pair.second.path, resourcePath);
         });
         if (resourceIt == restApi.resources.end()) {
             log_warning << "Resource not found, path: " << resourcePath;
@@ -586,8 +612,11 @@ namespace Awsmock::Service {
             }
         }
 
-        // Dispatch to the configured integration
-        const auto methodIt = resource.resourceMethods.find(httpMethod);
+        // Dispatch to the configured integration; fall back to ANY method if exact verb not found
+        auto methodIt = resource.resourceMethods.find(httpMethod);
+        if (methodIt == resource.resourceMethods.end()) {
+            methodIt = resource.resourceMethods.find("ANY");
+        }
         if (methodIt == resource.resourceMethods.end()) {
             log_warning << "No method configured for HTTP verb: " << httpMethod << ", path: " << resourcePath;
             return SendResponse(request, http::status::method_not_allowed, "Method not allowed");

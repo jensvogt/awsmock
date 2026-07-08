@@ -40,7 +40,7 @@ namespace Awsmock::Service {
         if (routingKey == "application") {
             return std::make_shared<ApplicationHandler>(ioc);
         }
-        if (routingKey == "apigateway") {
+        if (routingKey == "apigateway" || routingKey == "execute-api") {
             return std::make_shared<ApiGatewayHandler>(ioc);
         }
         if (routingKey == "monitoring") {
