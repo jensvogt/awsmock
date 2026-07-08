@@ -603,7 +603,7 @@ namespace Awsmock::Service {
         method.integrationType.clear();
         method.integrationUri.clear();
         method.integrationHttpMethod.clear();
-        _apiGatewayDatabase->upsertRestApi(restApi);
+        std::ignore = _apiGatewayDatabase->upsertRestApi(restApi);
         log_debug << "Integration deleted, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
     }
 
