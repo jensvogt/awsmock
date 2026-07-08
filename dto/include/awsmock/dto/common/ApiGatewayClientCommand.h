@@ -40,6 +40,9 @@ namespace Awsmock::Dto::Common {
         DELETE_INTEGRATION,
         GET_RESOURCES,
         GET_RESOURCE,
+        CREATE_USAGE_PLAN,
+        CREATE_USAGE_PLAN_KEY,
+        DELETE_USAGE_PLAN,
         // AwsMock internal
         LIST_API_KEY_COUNTERS,
         GET_API_KEY_COUNTER,
@@ -67,6 +70,9 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::DELETE_INTEGRATION, "delete-integration"},
             {ApiGatewayCommandType::GET_RESOURCES, "get-resources"},
             {ApiGatewayCommandType::GET_RESOURCE, "get-resource"},
+            {ApiGatewayCommandType::CREATE_USAGE_PLAN, "create-usage-plan"},
+            {ApiGatewayCommandType::CREATE_USAGE_PLAN_KEY, "create-usage-plan-key"},
+            {ApiGatewayCommandType::DELETE_USAGE_PLAN, "delete-usage-plan"},
             // AwsMock internal commands
             {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
             {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},

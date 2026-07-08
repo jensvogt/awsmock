@@ -181,7 +181,7 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/entity/dynamodb/Tag.cpp
         db/src/repository/apigateway/ApiGatewayMongoRepository.cpp db/src/repository/apigateway/ApiGatewayMemoryRepository.cpp
         db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/RestApi.cpp db/src/entity/apigateway/Resource.cpp
-        db/src/entity/apigateway/Authorizer.cpp db/src/entity/apigateway/ResourceMethod.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
+        db/src/entity/apigateway/Authorizer.cpp db/src/entity/apigateway/ResourceMethod.cpp db/src/entity/apigateway/UsagePlan.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
         db/src/repository/monitoring/MonitoringMongoRepository.cpp db/src/repository/monitoring/MonitoringMemoryRepository.cpp
         db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp
         db/src/repository/RepositoryFactory.cpp

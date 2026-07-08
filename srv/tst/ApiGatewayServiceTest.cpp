@@ -21,6 +21,8 @@ namespace {
 #define TEST_INTEGRATION_TYPE "AWS_PROXY"
 #define TEST_INTEGRATION_URI "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:000000000000:function:test-fn/invocations"
 #define TEST_INTEGRATION_HTTP_METHOD "POST"
+#define TEST_API_KEY_NAME "test-api-key"
+#define TEST_USAGE_PLAN_NAME "test-usage-plan"
 
 namespace Awsmock::Database {
 
@@ -29,6 +31,26 @@ namespace Awsmock::Database {
         request.region = TEST_REGION;
         request.name = TEST_REST_API_NAME;
         return svc.createRestApi(request);
+    }
+
+    Dto::ApiGateway::CreateApiKeyResponse CreateDefaultApiKey(const Service::ApiGatewayService &svc) {
+        Dto::ApiGateway::CreateApiKeyRequest request;
+        request.region = TEST_REGION;
+        request.name = TEST_API_KEY_NAME;
+        request.enabled = true;
+        return svc.createApiKey(request);
+    }
+
+    Dto::ApiGateway::CreateUsagePlanResponse CreateDefaultUsagePlan(const Service::ApiGatewayService &svc) {
+        Dto::ApiGateway::CreateUsagePlanRequest request;
+        request.region = TEST_REGION;
+        request.name = TEST_USAGE_PLAN_NAME;
+        request.description = "test usage plan";
+        request.quota.limit = 1000;
+        request.quota.period = "DAY";
+        request.throttle.burstLimit = 50;
+        request.throttle.rateLimit = 10.0;
+        return svc.createUsagePlan(request);
     }
 
     Dto::ApiGateway::CreateResourceResponse CreateDefaultResource(const Service::ApiGatewayService &svc, const std::string &restApiId, const std::string &parentId) {
@@ -51,6 +73,7 @@ namespace Awsmock::Database {
                     Database::RepositoryFactory::instance().apigatewayRepository()->deleteRestApi(api.id);
                 }
                 Database::RepositoryFactory::instance().apigatewayRepository()->deleteAllKeys();
+                Database::RepositoryFactory::instance().apigatewayRepository()->deleteAllUsagePlans();
             } catch (const std::exception &exc) {
                 log_error << "ApiGateway fixture cleanup failed: " << exc.what();
             }
@@ -265,6 +288,62 @@ namespace Awsmock::Database {
         listRequest.region = TEST_REGION;
         const auto listResponse = svc.getRestApis(listRequest);
         BOOST_CHECK_EQUAL(0, listResponse.restApis.size());
+    }
+
+    BOOST_AUTO_TEST_CASE(CreateApiKeyTest) {
+
+        // arrange
+        Service::ApiGatewayService svc{_ioc};
+
+        // act
+        const auto response = CreateDefaultApiKey(svc);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, response.id.empty());
+        BOOST_CHECK_EQUAL(TEST_API_KEY_NAME, response.name);
+        BOOST_CHECK_EQUAL(true, response.enabled);
+    }
+
+    BOOST_AUTO_TEST_CASE(CreateUsagePlanTest) {
+
+        // arrange
+        Service::ApiGatewayService svc{_ioc};
+
+        // act
+        const auto response = CreateDefaultUsagePlan(svc);
+
+        // assert
+        BOOST_CHECK_EQUAL(false, response.id.empty());
+        BOOST_CHECK_EQUAL(TEST_USAGE_PLAN_NAME, response.name);
+        BOOST_CHECK_EQUAL(1000, response.quotaLimit);
+        BOOST_CHECK_EQUAL("DAY", response.quotaPeriod);
+        BOOST_CHECK_EQUAL(50, response.throttleBurstLimit);
+        BOOST_CHECK_EQUAL(10.0, response.throttleRateLimit);
+    }
+
+    BOOST_AUTO_TEST_CASE(CreateUsagePlanKeyTest) {
+
+        // arrange
+        Service::ApiGatewayService svc{_ioc};
+        const auto key = CreateDefaultApiKey(svc);
+        BOOST_CHECK_EQUAL(false, key.id.empty());
+        const auto plan = CreateDefaultUsagePlan(svc);
+        BOOST_CHECK_EQUAL(false, plan.id.empty());
+
+        Dto::ApiGateway::CreateUsagePlanKeyRequest request;
+        request.region = TEST_REGION;
+        request.usagePlanId = plan.id;
+        request.keyId = key.id;
+        request.keyType = "API_KEY";
+
+        // act
+        const auto response = svc.createUsagePlanKey(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(key.id, response.id);
+        BOOST_CHECK_EQUAL(TEST_API_KEY_NAME, response.name);
+        BOOST_CHECK_EQUAL("API_KEY", response.type);
+        BOOST_CHECK_EQUAL(false, response.value.empty());
     }
 
     BOOST_AUTO_TEST_SUITE_END()

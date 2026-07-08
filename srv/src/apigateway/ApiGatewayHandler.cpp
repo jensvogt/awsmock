@@ -5,6 +5,7 @@
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 #include "awsmock/dto/apigateway/DeleteResourceRequest.h"
+#include "awsmock/dto/apigateway/DeleteUsagePlanRequest.h"
 #include "awsmock/dto/apigateway/GetResourceRequest.h"
 #include <awsmock/core/JsonUtils.h>
 
@@ -167,7 +168,7 @@ namespace Awsmock::Service {
                 http::response<http::dynamic_body> res;
                 http::read(stream, buf, res);
                 beast::error_code ec;
-                stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+                std::ignore = stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
                 return res;
 
             } catch (const std::exception &exc) {
@@ -356,6 +357,23 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApiGatewayCommandType::CREATE_USAGE_PLAN: {
+
+                    Dto::ApiGateway::CreateUsagePlanRequest serviceRequest = Dto::ApiGateway::CreateUsagePlanRequest::FromJson(clientCommand);
+                    const Dto::ApiGateway::CreateUsagePlanResponse serviceResponse = _apiGatewayService.createUsagePlan(serviceRequest);
+                    log_info << "Usage plan created, id: " << serviceResponse.id;
+                    return SendResponse(request, http::status::created, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::CREATE_USAGE_PLAN_KEY: {
+
+                    Dto::ApiGateway::CreateUsagePlanKeyRequest serviceRequest = Dto::ApiGateway::CreateUsagePlanKeyRequest::FromJson(clientCommand);
+                    serviceRequest.usagePlanId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const Dto::ApiGateway::CreateUsagePlanKeyResponse serviceResponse = _apiGatewayService.createUsagePlanKey(serviceRequest);
+                    log_info << "Usage plan key created, usagePlanId: " << serviceRequest.usagePlanId << " keyId: " << serviceRequest.keyId;
+                    return SendResponse(request, http::status::created, serviceResponse.ToJson());
+                }
+
                 default:
                     return HandleResourceInvocation(request, region, user);
             }
@@ -470,6 +488,15 @@ namespace Awsmock::Service {
                     _apiGatewayService.deleteIntegration(restApiId, resourceId, httpMethod);
                     log_info << "Integration deleted, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
                     return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::DELETE_USAGE_PLAN: {
+
+                    Dto::ApiGateway::DeleteUsagePlanRequest serviceRequest;
+                    serviceRequest.usagePlanId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    _apiGatewayService.deleteUsagePlan(serviceRequest);
+                    log_info << "Usage plan deleted, id: " << serviceRequest.usagePlanId;
+                    return SendResponse(request, http::status::accepted);
                 }
 
                 default:

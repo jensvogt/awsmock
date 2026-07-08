@@ -1,5 +1,5 @@
 //
-// Created by vogje01 on 11/25/23.
+// Created by vogje01 on 07/08/2026
 //
 
 #pragma once
@@ -11,11 +11,41 @@
 namespace Awsmock::Database::Entity::ApiGateway {
 
     /**
-     * @brief API gateway key entity
+     * @brief API gateway usage plan quota settings
+     */
+    struct UsagePlanQuota {
+
+        long limit{};
+
+        long offset{};
+
+        std::string period;
+
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        void FromDocument(const std::optional<view> &doc);
+    };
+
+    /**
+     * @brief API gateway usage plan throttle settings
+     */
+    struct UsagePlanThrottle {
+
+        long burstLimit{};
+
+        double rateLimit{};
+
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        void FromDocument(const std::optional<view> &doc);
+    };
+
+    /**
+     * @brief API gateway usage plan entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ApiKey final : Common::BaseEntity<ApiKey> {
+    struct UsagePlan final : Common::BaseEntity<UsagePlan> {
 
         /**
          * MongoDB OID
@@ -23,24 +53,19 @@ namespace Awsmock::Database::Entity::ApiGateway {
         std::string oid;
 
         /**
-         * API ID
-         */
-        std::string id;
-
-        /**
-         * Aws region
+         * AWS region
          */
         std::string region;
 
         /**
-         * Application name
+         * Usage plan ID
          */
-        std::string name;
+        std::string id;
 
         /**
-         * Customer ID
+         * Usage plan name
          */
-        std::string customerId;
+        std::string name;
 
         /**
          * Description
@@ -48,29 +73,19 @@ namespace Awsmock::Database::Entity::ApiGateway {
         std::string description;
 
         /**
-         * Enabled
+         * Quota settings
          */
-        bool enabled{};
+        UsagePlanQuota quota;
 
         /**
-         * Generate distinct
+         * Throttle settings
          */
-        bool generateDistinct{};
+        UsagePlanThrottle throttle;
 
         /**
          * Tags
          */
         std::map<std::string, std::string> tags;
-
-        /**
-         * Usage plan ID this key is associated with
-         */
-        std::string usagePlanId;
-
-        /**
-         * Value
-         */
-        std::string keyValue;
 
         /**
          * Creation date
@@ -85,14 +100,14 @@ namespace Awsmock::Database::Entity::ApiGateway {
         /**
          * @brief Converts the entity to a MongoDB document
          *
-         * @return entity as MongoDB document.
+         * @return entity as MongoDB document
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
          *
-         * @param mResult query result.
+         * @param mResult query result
          */
         void FromDocument(const std::optional<view> &mResult);
     };

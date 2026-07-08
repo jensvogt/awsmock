@@ -558,4 +558,87 @@ namespace Awsmock::Database {
         }
     }
 
+    // ========================================================================================================================
+    // Usage plan
+    // ========================================================================================================================
+    bool ApiGatewayMongoRepository::usagePlanExists(const std::string &id) const {
+        try {
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+            return col.count_documents(make_document(kvp("id", id))) > 0;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    Entity::ApiGateway::UsagePlan ApiGatewayMongoRepository::createUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const {
+        usagePlan.created = system_clock::now();
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+        try {
+            const auto result = col.insert_one(usagePlan.ToDocument());
+            usagePlan.oid = result->inserted_id().get_oid().value.to_string();
+            return usagePlan;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    Entity::ApiGateway::UsagePlan ApiGatewayMongoRepository::getUsagePlanById(const std::string &id) const {
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+        try {
+            const auto result = col.find_one(make_document(kvp("id", id)));
+            if (!result) throw Core::DatabaseException("Usage plan not found, id: " + id);
+            Entity::ApiGateway::UsagePlan plan;
+            plan.FromDocument(result->view());
+            return plan;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    std::vector<Entity::ApiGateway::UsagePlan> ApiGatewayMongoRepository::listUsagePlans() const {
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+        try {
+            std::vector<Entity::ApiGateway::UsagePlan> result;
+            for (auto cursor = col.find({}); const auto &doc: cursor) {
+                Entity::ApiGateway::UsagePlan plan;
+                plan.FromDocument(doc);
+                result.push_back(plan);
+            }
+            return result;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    void ApiGatewayMongoRepository::deleteUsagePlan(const std::string &id) const {
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+        try {
+            col.delete_one(make_document(kvp("id", id)));
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    long ApiGatewayMongoRepository::deleteAllUsagePlans() const {
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+        try {
+            const auto result = col.delete_many({});
+            return result->deleted_count();
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
 }// namespace Awsmock::Database

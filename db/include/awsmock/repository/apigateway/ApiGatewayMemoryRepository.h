@@ -14,6 +14,8 @@
 // AwsMock includes
 #include <awsmock/core/Linq.h>
 #include <awsmock/core/NumberUtils.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/RestApi.h>
 #include <awsmock/repository/apigateway/IApiGatewayRepository.h>
@@ -275,6 +277,23 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::vector<Entity::ApiGateway::RestApi> listRestApis() const override;
 
+        [[nodiscard]]
+        bool usagePlanExists(const std::string &id) const override;
+
+        [[nodiscard]]
+        Entity::ApiGateway::UsagePlan createUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const override;
+
+        [[nodiscard]]
+        Entity::ApiGateway::UsagePlan getUsagePlanById(const std::string &id) const override;
+
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::UsagePlan> listUsagePlans() const override;
+
+        void deleteUsagePlan(const std::string &id) const override;
+
+        [[nodiscard]]
+        long deleteAllUsagePlans() const override;
+
     private:
         /**
          * @brief Channeled logger
@@ -300,6 +319,10 @@ namespace Awsmock::Database {
          * REST API mutex
          */
         static boost::mutex _restApiMutex;
+
+        mutable std::unordered_map<std::string, Entity::ApiGateway::UsagePlan> _usagePlans{};
+
+        static boost::mutex _usagePlanMutex;
     };
 
 } // namespace Awsmock::Database

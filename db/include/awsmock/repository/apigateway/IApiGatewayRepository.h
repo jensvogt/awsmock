@@ -12,6 +12,7 @@
 // Awsmock includes
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/RestApi.h>
+#include <awsmock/entity/apigateway/UsagePlan.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace Awsmock::Database {
@@ -273,6 +274,23 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         virtual long deleteRestApi(const std::string &restApiId) const = 0;
+
+        [[nodiscard]]
+        virtual bool usagePlanExists(const std::string &id) const = 0;
+
+        [[nodiscard]]
+        virtual Entity::ApiGateway::UsagePlan createUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const = 0;
+
+        [[nodiscard]]
+        virtual Entity::ApiGateway::UsagePlan getUsagePlanById(const std::string &id) const = 0;
+
+        [[nodiscard]]
+        virtual std::vector<Entity::ApiGateway::UsagePlan> listUsagePlans() const = 0;
+
+        virtual void deleteUsagePlan(const std::string &id) const = 0;
+
+        [[nodiscard]]
+        virtual long deleteAllUsagePlans() const = 0;
     };
 
 }// namespace Awsmock::Database

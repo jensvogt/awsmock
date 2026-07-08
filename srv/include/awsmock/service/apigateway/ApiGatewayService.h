@@ -16,11 +16,16 @@
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/apigateway/CreateApiKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
+#include <awsmock/dto/apigateway/CreateUsagePlanKeyRequest.h>
+#include <awsmock/dto/apigateway/CreateUsagePlanKeyResponse.h>
+#include <awsmock/dto/apigateway/CreateUsagePlanRequest.h>
+#include <awsmock/dto/apigateway/CreateUsagePlanResponse.h>
 #include <awsmock/dto/apigateway/CreateResourceRequest.h>
 #include <awsmock/dto/apigateway/CreateResourceResponse.h>
 #include <awsmock/dto/apigateway/CreateRestApiRequest.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
+#include <awsmock/dto/apigateway/DeleteUsagePlanRequest.h>
 #include <awsmock/dto/apigateway/DeleteResourceRequest.h>
 #include <awsmock/dto/apigateway/DeleteRestApiRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysRequest.h>
@@ -91,11 +96,36 @@ namespace Awsmock::Service {
         Dto::ApiGateway::GetApiKeysResponse getApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
 
         /**
+         * @brief Creates a usage plan
+         *
+         * @param request create usage plan request
+         * @return create usage plan response
+         */
+        [[nodiscard]]
+        Dto::ApiGateway::CreateUsagePlanResponse createUsagePlan(const Dto::ApiGateway::CreateUsagePlanRequest &request) const;
+
+        /**
+         * @brief Associates an API key with a usage plan
+         *
+         * @param request create usage plan key request
+         * @return create usage plan key response
+         */
+        [[nodiscard]]
+        Dto::ApiGateway::CreateUsagePlanKeyResponse createUsagePlanKey(const Dto::ApiGateway::CreateUsagePlanKeyRequest &request) const;
+
+        /**
          * @brief Deletes an API gateway key
          *
          * @param request delete API key request
          */
         void deleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
+
+        /**
+         * @brief Deletes a usage plan
+         *
+         * @param request delete usage plan request
+         */
+        void deleteUsagePlan(const Dto::ApiGateway::DeleteUsagePlanRequest &request) const;
 
         /**
          * @brief Creates a new REST API
