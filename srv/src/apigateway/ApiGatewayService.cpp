@@ -45,6 +45,73 @@ namespace Awsmock::Service {
         }
     }
 
+    Dto::ApiGateway::CreateUsagePlanResponse ApiGatewayService::createUsagePlan(const Dto::ApiGateway::CreateUsagePlanRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_usage_plan");
+        log_debug << "Create usage plan, name: " << request.name;
+
+        try {
+            Database::Entity::ApiGateway::UsagePlan plan;
+            plan.region = request.region;
+            plan.id = Core::AwsUtils::CreateApiKeyId();
+            plan.name = request.name;
+            plan.description = request.description;
+            plan.quota.limit = request.quota.limit;
+            plan.quota.offset = request.quota.offset;
+            plan.quota.period = request.quota.period;
+            plan.throttle.burstLimit = request.throttle.burstLimit;
+            plan.throttle.rateLimit = request.throttle.rateLimit;
+            plan.tags = request.tags;
+            plan = _apiGatewayDatabase->createUsagePlan(plan);
+
+            Dto::ApiGateway::CreateUsagePlanResponse response;
+            response.copyMetadata(request);
+            response.id = plan.id;
+            response.name = plan.name;
+            response.description = plan.description;
+            response.quotaLimit = plan.quota.limit;
+            response.quotaOffset = plan.quota.offset;
+            response.quotaPeriod = plan.quota.period;
+            response.throttleBurstLimit = plan.throttle.burstLimit;
+            response.throttleRateLimit = plan.throttle.rateLimit;
+            response.tags = plan.tags;
+            log_info << "Usage plan created, id: " << plan.id;
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::CreateUsagePlanKeyResponse ApiGatewayService::createUsagePlanKey(const Dto::ApiGateway::CreateUsagePlanKeyRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_usage_plan_key");
+        log_debug << "Create usage plan key, usagePlanId: " << request.usagePlanId << " keyId: " << request.keyId;
+
+        if (!_apiGatewayDatabase->apiKeyExists(request.keyId)) {
+            log_error << "API key not found, keyId: " << request.keyId;
+            throw Core::NotFoundException("API key not found, keyId: " + request.keyId);
+        }
+
+        try {
+            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->getApiKeyById(request.keyId);
+            key.usagePlanId = request.usagePlanId;
+            key = _apiGatewayDatabase->updateApiKey(key);
+
+            Dto::ApiGateway::CreateUsagePlanKeyResponse response;
+            response.copyMetadata(request);
+            response.id = key.id;
+            response.name = key.name;
+            response.type = request.keyType;
+            response.value = key.keyValue;
+            log_info << "Usage plan key created, usagePlanId: " << request.usagePlanId << " keyId: " << key.id;
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
     Dto::ApiGateway::GetApiKeysResponse ApiGatewayService::getApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_keys");
         log_debug << "Get API keys request, region:  " << request.region;

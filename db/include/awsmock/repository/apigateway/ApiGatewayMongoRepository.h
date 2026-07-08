@@ -271,6 +271,23 @@ namespace Awsmock::Database {
         [[nodiscard]]
         long deleteRestApi(const std::string &restApiId) const override;
 
+        [[nodiscard]]
+        bool usagePlanExists(const std::string &id) const override;
+
+        [[nodiscard]]
+        Entity::ApiGateway::UsagePlan createUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const override;
+
+        [[nodiscard]]
+        Entity::ApiGateway::UsagePlan getUsagePlanById(const std::string &id) const override;
+
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::UsagePlan> listUsagePlans() const override;
+
+        void deleteUsagePlan(const std::string &id) const override;
+
+        [[nodiscard]]
+        long deleteAllUsagePlans() const override;
+
     private:
         /**
          * @brief Channeled logger
@@ -291,6 +308,8 @@ namespace Awsmock::Database {
          * @brief User pool collection name
          */
         static constexpr auto _restApiCollectionName = "apigateway_rest";
+
+        static constexpr auto _usagePlanCollectionName = "apigateway_usage_plan";
     };
 
 } // namespace Awsmock::Database

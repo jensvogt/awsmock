@@ -16,6 +16,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         keyDocument.append(kvp("description", description));
         keyDocument.append(kvp("enabled", enabled));
         keyDocument.append(kvp("generateDistinct", generateDistinct));
+        keyDocument.append(kvp("usagePlanId", usagePlanId));
         keyDocument.append(kvp("value", keyValue));
         keyDocument.append(kvp("created", bsoncxx::types::b_date(created)));
         keyDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
@@ -41,6 +42,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
         generateDistinct = Core::Bson::BsonUtils::GetBoolValue(mResult, "generateDistinct");
+        usagePlanId = Core::Bson::BsonUtils::GetStringValue(mResult, "usagePlanId");
         keyValue = Core::Bson::BsonUtils::GetStringValue(mResult, "value");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");

@@ -167,7 +167,7 @@ namespace Awsmock::Service {
                 http::response<http::dynamic_body> res;
                 http::read(stream, buf, res);
                 beast::error_code ec;
-                stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+                std::ignore = stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
                 return res;
 
             } catch (const std::exception &exc) {
@@ -354,6 +354,23 @@ namespace Awsmock::Service {
                     const Dto::ApiGateway::CreateResourceResponse serviceResponse = _apiGatewayService.createResource(serviceRequest);
                     log_info << "REST resource created, pathPart: " << serviceRequest.pathPart;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::CREATE_USAGE_PLAN: {
+
+                    Dto::ApiGateway::CreateUsagePlanRequest serviceRequest = Dto::ApiGateway::CreateUsagePlanRequest::FromJson(clientCommand);
+                    const Dto::ApiGateway::CreateUsagePlanResponse serviceResponse = _apiGatewayService.createUsagePlan(serviceRequest);
+                    log_info << "Usage plan created, id: " << serviceResponse.id;
+                    return SendResponse(request, http::status::created, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::CREATE_USAGE_PLAN_KEY: {
+
+                    Dto::ApiGateway::CreateUsagePlanKeyRequest serviceRequest = Dto::ApiGateway::CreateUsagePlanKeyRequest::FromJson(clientCommand);
+                    serviceRequest.usagePlanId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const Dto::ApiGateway::CreateUsagePlanKeyResponse serviceResponse = _apiGatewayService.createUsagePlanKey(serviceRequest);
+                    log_info << "Usage plan key created, usagePlanId: " << serviceRequest.usagePlanId << " keyId: " << serviceRequest.keyId;
+                    return SendResponse(request, http::status::created, serviceResponse.ToJson());
                 }
 
                 default:

@@ -10,6 +10,7 @@ namespace Awsmock::Database {
 
     boost::mutex ApiGatewayMemoryRepository::_apiKeyMutex;
     boost::mutex ApiGatewayMemoryRepository::_restApiMutex;
+    boost::mutex ApiGatewayMemoryRepository::_usagePlanMutex;
 
     logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
 
@@ -303,6 +304,53 @@ namespace Awsmock::Database {
             return value.id == restApiId;
         });
         log_debug << "REST API deleted, count: " << count;
+        return count;
+    }
+
+    // ========================================================================================================================
+    // Usage plan
+    // ========================================================================================================================
+    bool ApiGatewayMemoryRepository::usagePlanExists(const std::string &id) const {
+        return std::ranges::find_if(_usagePlans,
+                                    [id](const std::pair<std::string, Entity::ApiGateway::UsagePlan> &p) {
+                                        return p.second.id == id;
+                                    }) != _usagePlans.end();
+    }
+
+    Entity::ApiGateway::UsagePlan ApiGatewayMemoryRepository::createUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const {
+        boost::mutex::scoped_lock lock(_usagePlanMutex);
+        usagePlan.oid = Core::StringUtils::CreateRandomUuid();
+        _usagePlans[usagePlan.oid] = usagePlan;
+        return _usagePlans[usagePlan.oid];
+    }
+
+    Entity::ApiGateway::UsagePlan ApiGatewayMemoryRepository::getUsagePlanById(const std::string &id) const {
+        boost::mutex::scoped_lock lock(_usagePlanMutex);
+        const auto it = std::ranges::find_if(_usagePlans,
+                                              [id](const std::pair<std::string, Entity::ApiGateway::UsagePlan> &p) {
+                                                  return p.second.id == id;
+                                              });
+        if (it == _usagePlans.end()) throw Core::DatabaseException("Usage plan not found, id: " + id);
+        return it->second;
+    }
+
+    std::vector<Entity::ApiGateway::UsagePlan> ApiGatewayMemoryRepository::listUsagePlans() const {
+        boost::mutex::scoped_lock lock(_usagePlanMutex);
+        std::vector<Entity::ApiGateway::UsagePlan> result;
+        result.reserve(_usagePlans.size());
+        for (const auto &[k, v]: _usagePlans) result.push_back(v);
+        return result;
+    }
+
+    void ApiGatewayMemoryRepository::deleteUsagePlan(const std::string &id) const {
+        boost::mutex::scoped_lock lock(_usagePlanMutex);
+        std::erase_if(_usagePlans, [id](const auto &item) { return item.second.id == id; });
+    }
+
+    long ApiGatewayMemoryRepository::deleteAllUsagePlans() const {
+        boost::mutex::scoped_lock lock(_usagePlanMutex);
+        const long count = static_cast<long>(_usagePlans.size());
+        _usagePlans.clear();
         return count;
     }
 
