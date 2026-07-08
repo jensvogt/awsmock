@@ -5,6 +5,7 @@
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 #include "awsmock/dto/apigateway/DeleteResourceRequest.h"
+#include "awsmock/dto/apigateway/DeleteUsagePlanRequest.h"
 #include "awsmock/dto/apigateway/GetResourceRequest.h"
 #include <awsmock/core/JsonUtils.h>
 
@@ -487,6 +488,15 @@ namespace Awsmock::Service {
                     _apiGatewayService.deleteIntegration(restApiId, resourceId, httpMethod);
                     log_info << "Integration deleted, restApiId: " << restApiId << ", resourceId: " << resourceId << ", httpMethod: " << httpMethod;
                     return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::DELETE_USAGE_PLAN: {
+
+                    Dto::ApiGateway::DeleteUsagePlanRequest serviceRequest;
+                    serviceRequest.usagePlanId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    _apiGatewayService.deleteUsagePlan(serviceRequest);
+                    log_info << "Usage plan deleted, id: " << serviceRequest.usagePlanId;
+                    return SendResponse(request, http::status::accepted);
                 }
 
                 default:

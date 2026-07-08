@@ -25,6 +25,7 @@
 #include <awsmock/dto/apigateway/CreateRestApiRequest.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
+#include <awsmock/dto/apigateway/DeleteUsagePlanRequest.h>
 #include <awsmock/dto/apigateway/DeleteResourceRequest.h>
 #include <awsmock/dto/apigateway/DeleteRestApiRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysRequest.h>
@@ -118,6 +119,13 @@ namespace Awsmock::Service {
          * @param request delete API key request
          */
         void deleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
+
+        /**
+         * @brief Deletes a usage plan
+         *
+         * @param request delete usage plan request
+         */
+        void deleteUsagePlan(const Dto::ApiGateway::DeleteUsagePlanRequest &request) const;
 
         /**
          * @brief Creates a new REST API

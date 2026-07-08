@@ -159,6 +159,24 @@ namespace Awsmock::Service {
         }
     }
 
+    void ApiGatewayService::deleteUsagePlan(const Dto::ApiGateway::DeleteUsagePlanRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_usage_plan");
+        log_debug << "Delete usage plan request, region: " << request.region << " usagePlanId: " << request.usagePlanId;
+
+        if (!_apiGatewayDatabase->usagePlanExists(request.usagePlanId)) {
+            log_error << "Usage plan does not exist, region: " << request.region << " usagePlanId: " << request.usagePlanId;
+            throw Core::ServiceException("Usage plan does not exist, region: " + request.region + " usagePlanId: " + request.usagePlanId);
+        }
+
+        try {
+            _apiGatewayDatabase->deleteUsagePlan(request.usagePlanId);
+            log_trace << "Usage plan deleted, id: " << request.usagePlanId;
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
     Dto::ApiGateway::CreateRestApiResponse ApiGatewayService::createRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_rest_api");
         log_debug << "Create REST API request, region:  " << request.region << ", name: " << request.name;
