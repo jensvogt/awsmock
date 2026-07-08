@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.87](https://github.com/jensvogt/awsmock/compare/v1.18.86...v1.18.87) (2026-07-08)
+
+
+### Bug Fixes
+
+* add api gateway lambda integration support ([51bdbfc](https://github.com/jensvogt/awsmock/commit/51bdbfcd382dc7126f97402d8ab2c25e31c80658))
+* add usage plans to api gateway service and repository implementations ([37ac7de](https://github.com/jensvogt/awsmock/commit/37ac7de1862bf4e5b7f75514d21af88a4fa04115))
+
 ## [1.18.86](https://github.com/jensvogt/awsmock/compare/1.18.85...v1.18.86) (2026-07-07)
 
 
