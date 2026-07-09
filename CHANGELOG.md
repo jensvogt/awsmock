@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.88](https://github.com/jensvogt/awsmock/compare/v1.18.87...v1.18.88) (2026-07-09)
+
+
+### Bug Fixes
+
+* cap macOS release build parallelism to prevent CI hangs ([4b6af87](https://github.com/jensvogt/awsmock/commit/4b6af87d15b2651b20c68bf62b001ae331346a9c))
+* cap macOS release build parallelism to prevent CI hangs ([86377a1](https://github.com/jensvogt/awsmock/commit/86377a1a0e0460ed7fcc4d815531c4a8bbabdcf8))
+
 ## [1.18.87](https://github.com/jensvogt/awsmock/compare/v1.18.86...v1.18.87) (2026-07-08)
 
 
