@@ -146,6 +146,20 @@ namespace Awsmock::Core {
          * @param port HTTP port
          */
         static void GetHostPort(const std::string &url, std::string &host, int &port);
+
+        /**
+         * @brief Resolve a host/port to a TCP endpoint, skipping the OS resolver for loopback addresses.
+         *
+         * @par
+         * On Windows, resolving "localhost" via the OS resolver can take hundreds of milliseconds to
+         * multiple seconds, especially with VPN or virtual (Hyper-V/WSL) network adapters present.
+         *
+         * @param resolver TCP resolver, used as a fallback for real hostnames
+         * @param host HTTP host
+         * @param port HTTP port
+         * @return resolved TCP endpoint(s)
+         */
+        static boost::asio::ip::tcp::resolver::results_type Resolve(boost::asio::ip::tcp::resolver &resolver, const std::string &host, int port);
     };
 
 }// namespace Awsmock::Core

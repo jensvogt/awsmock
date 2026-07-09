@@ -11,6 +11,15 @@ namespace {
 
 namespace Awsmock::Core {
 
+    boost::asio::ip::tcp::resolver::results_type HttpSocket::Resolve(boost::asio::ip::tcp::resolver &resolver, const std::string &host, int port) {
+        boost::system::error_code ec;
+        const std::string address = host == "localhost" ? "127.0.0.1" : host;
+        if (const auto ip = boost::asio::ip::make_address(address, ec); !ec) {
+            return boost::asio::ip::tcp::resolver::results_type::create(boost::asio::ip::tcp::endpoint(ip, port), host, std::to_string(port));
+        }
+        return resolver.resolve(host, std::to_string(port));
+    }
+
     HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         boost::asio::io_context ctx;
@@ -21,7 +30,7 @@ namespace Awsmock::Core {
 
             // Resolve host/port
             boost::system::error_code ec;
-            auto const results = resolver.resolve(host, std::to_string(port));
+            auto const results = Resolve(resolver, host, port);
 
             // Connect
             stream.connect(results, ec);
@@ -71,7 +80,7 @@ namespace Awsmock::Core {
 
             // Resolve host/port
             boost::system::error_code ec;
-            const auto result = resolver.resolve(host, std::to_string(port));
+            const auto result = Resolve(resolver, host, port);
 
             // Connect
             stream.connect(result, ec);

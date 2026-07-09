@@ -78,6 +78,22 @@ namespace Awsmock::Core {
       private:
 
         /**
+         * @brief Resolve a host/port to a TCP endpoint.
+         *
+         * @par
+         * On Windows, resolving "localhost" (or any hostname) via the OS resolver can take hundreds of
+         * milliseconds to multiple seconds, especially with VPN or virtual (Hyper-V/WSL) network adapters
+         * present. Since almost every call is to a loopback address, this skips the OS resolver entirely
+         * for "localhost" and for hosts that are already a literal IP address.
+         *
+         * @param resolver TCP resolver, used as a fallback for real hostnames
+         * @param host HTTP host
+         * @param port HTTP port
+         * @return resolved TCP endpoint(s)
+         */
+        static boost::asio::ip::tcp::resolver::results_type Resolve(boost::asio::ip::tcp::resolver &resolver, const std::string &host, int port);
+
+        /**
          * @brief Prepare an HTTP message
          *
          * @param method HTTP method

@@ -5,6 +5,16 @@
 #include <awsmock/core/container/WindowsSocket.h>
 
 namespace Awsmock::Core {
+
+    boost::asio::ip::tcp::resolver::results_type WindowsSocket::Resolve(boost::asio::ip::tcp::resolver &resolver, const std::string &host, int port) {
+        boost::system::error_code ec;
+        const std::string address = host == "localhost" ? "127.0.0.1" : host;
+        if (const auto ip = boost::asio::ip::make_address(address, ec); !ec) {
+            return boost::asio::ip::tcp::resolver::results_type::create(boost::asio::ip::tcp::endpoint(ip, port), host, std::to_string(port));
+        }
+        return resolver.resolve(host, std::to_string(port));
+    }
+
     DomainSocketResult WindowsSocket::SendJson(const verb method, const std::string &path) {
         return SendJson(method, path, {}, {});
     }
@@ -25,7 +35,7 @@ namespace Awsmock::Core {
             std::string host = "localhost";
             int port = 2375;
             GetHostPort(_basePath, host, port);
-            auto const results = resolver.resolve(host, std::to_string(port));
+            auto const results = Resolve(resolver, host, port);
 
             // Connect
             stream.connect(results, ec);
@@ -83,7 +93,7 @@ namespace Awsmock::Core {
             std::string host = "localhost";
             int port = 2375;
             GetHostPort(_basePath, host, port);
-            auto const results = resolver.resolve(host, std::to_string(port));
+            auto const results = Resolve(resolver, host, port);
 
             // Connect
             stream.connect(results, ec);
