@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.89](https://github.com/jensvogt/awsmock/compare/1.18.88...v1.18.89) (2026-07-10)
+
+
+### Bug Fixes
+
+* monitoring performance on Windows ([9acc7b7](https://github.com/jensvogt/awsmock/commit/9acc7b7a2adc4f2f486f56c55ce1b45ae5951ba0))
+
 ## [1.18.88](https://github.com/jensvogt/awsmock/compare/v1.18.87...v1.18.88) (2026-07-09)
 
 
