@@ -2,6 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/service/sns/SNSService.h>
 
 namespace Awsmock::Service {
@@ -1122,7 +1123,7 @@ namespace Awsmock::Service {
             beast::tcp_stream stream(ioc);
 
             stream.expires_after(std::chrono::seconds(5));
-            auto const results = resolver.resolve(host, port);
+            auto const results = Core::HttpUtils::ResolveHost(resolver, host, port);
             stream.connect(results);
 
             http::request<http::string_body> req{http::verb::post, path, 11};

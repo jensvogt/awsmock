@@ -179,7 +179,7 @@ namespace Awsmock::Service {
                 boost::asio::io_context ioc;
                 ip::tcp::resolver resolver(ioc);
                 beast::tcp_stream stream(ioc);
-                stream.connect(resolver.resolve(host, port));
+                stream.connect(Core::HttpUtils::ResolveHost(resolver, host, port));
 
                 const http::verb verb = integrationHttpMethod.empty() ? inbound.method() : http::string_to_verb(integrationHttpMethod);
                 http::request<http::string_body> req{verb, target, 11};

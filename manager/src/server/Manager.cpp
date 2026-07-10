@@ -231,7 +231,7 @@ namespace Awsmock::Manager {
         log_info << "Modules started, count: " << Service::ModuleMap::instance().GetSize();
 
         // Start listener threads
-        auto const maxThreads = std::thread::hardware_concurrency();
+        auto const maxThreads = 2 * std::thread::hardware_concurrency();
         for (auto i = 0; i < maxThreads; i++) {
             _threadGroup.create_thread([this] { return _ioc.run(); });
         }
@@ -303,4 +303,4 @@ namespace Awsmock::Manager {
         log_info << "Manager::Stop() called.";
         _ioc.stop();
     }
-}// namespace Awsmock::Manager
+} // namespace Awsmock::Manager
