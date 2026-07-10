@@ -115,7 +115,6 @@ namespace Awsmock::Service {
         response.version(request.version());
         response.result(status);
         response.keep_alive(request.keep_alive());
-        response.set(http::field::connection, "close");
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, std::to_string(body.length()));

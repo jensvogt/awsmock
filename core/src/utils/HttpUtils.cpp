@@ -362,6 +362,24 @@ namespace Awsmock::Core {
         return request.base()[http::field::host];
     }
 
+    boost::asio::ip::tcp::resolver::results_type HttpUtils::ResolveHost(boost::asio::ip::tcp::resolver &resolver, const std::string &host, const std::string &port) {
+        boost::system::error_code ec;
+        const std::string address = host == "localhost" ? "127.0.0.1" : host;
+        if (const auto ip = boost::asio::ip::make_address(address, ec); !ec) {
+            return boost::asio::ip::tcp::resolver::results_type::create(boost::asio::ip::tcp::endpoint(ip, static_cast<unsigned short>(std::stoi(port))), host, port);
+        }
+        return resolver.resolve(host, port);
+    }
+
+    boost::asio::ip::tcp::resolver::results_type HttpUtils::ResolveHost(boost::asio::ip::tcp::resolver &resolver, const std::string &host, const std::string &port, boost::system::error_code &ec) {
+        const std::string address = host == "localhost" ? "127.0.0.1" : host;
+        if (const auto ip = boost::asio::ip::make_address(address, ec); !ec) {
+            return boost::asio::ip::tcp::resolver::results_type::create(boost::asio::ip::tcp::endpoint(ip, static_cast<unsigned short>(std::stoi(port))), host, port);
+        }
+        ec.clear();
+        return resolver.resolve(host, port, ec);
+    }
+
     bool HttpUtils::IsUrlEncoded(const std::string &value) {
         return !StringUtils::Equals(StringUtils::UrlDecode(value), value);
     }

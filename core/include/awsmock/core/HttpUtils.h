@@ -438,6 +438,37 @@ namespace Awsmock::Core {
         static std::string GetHost(const http::request<http::dynamic_body> &request);
 
         /**
+         * @brief Resolve a host/port to a TCP endpoint, skipping the OS resolver for loopback addresses.
+         *
+         * @par
+         * On Windows, resolving "localhost" (or any hostname) via the OS resolver can take hundreds of
+         * milliseconds to multiple seconds, especially with VPN or virtual (Hyper-V/WSL) network adapters
+         * present. Since most outbound calls in this codebase target loopback services, this skips the OS
+         * resolver entirely for "localhost" and for hosts that are already a literal IP address. Real
+         * hostnames still fall back to the resolver.
+         *
+         * @param resolver TCP resolver, used as a fallback for real hostnames
+         * @param host HTTP host
+         * @param port HTTP port
+         * @return resolved TCP endpoint(s)
+         */
+        static boost::asio::ip::tcp::resolver::results_type ResolveHost(boost::asio::ip::tcp::resolver &resolver, const std::string &host, const std::string &port);
+
+        /**
+         * @brief Resolve a host/port to a TCP endpoint, non-throwing.
+         *
+         * @par
+         * Same as ResolveHost(), but reports resolver errors via the given error code instead of throwing.
+         *
+         * @param resolver TCP resolver, used as a fallback for real hostnames
+         * @param host HTTP host
+         * @param port HTTP port
+         * @param ec set if the fallback OS resolver fails
+         * @return resolved TCP endpoint(s)
+         */
+        static boost::asio::ip::tcp::resolver::results_type ResolveHost(boost::asio::ip::tcp::resolver &resolver, const std::string &host, const std::string &port, boost::system::error_code &ec);
+
+        /**
          * @brief Return a simple ok response (200)
          *
          * @param request HTTP request

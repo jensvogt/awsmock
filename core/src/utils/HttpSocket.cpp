@@ -4,21 +4,13 @@
 
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/HttpUtils.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
 }
 
 namespace Awsmock::Core {
-
-    boost::asio::ip::tcp::resolver::results_type HttpSocket::Resolve(boost::asio::ip::tcp::resolver &resolver, const std::string &host, int port) {
-        boost::system::error_code ec;
-        const std::string address = host == "localhost" ? "127.0.0.1" : host;
-        if (const auto ip = boost::asio::ip::make_address(address, ec); !ec) {
-            return boost::asio::ip::tcp::resolver::results_type::create(boost::asio::ip::tcp::endpoint(ip, port), host, std::to_string(port));
-        }
-        return resolver.resolve(host, std::to_string(port));
-    }
 
     HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
@@ -30,7 +22,7 @@ namespace Awsmock::Core {
 
             // Resolve host/port
             boost::system::error_code ec;
-            auto const results = Resolve(resolver, host, port);
+            auto const results = HttpUtils::ResolveHost(resolver, host, std::to_string(port));
 
             // Connect
             stream.connect(results, ec);
@@ -80,7 +72,7 @@ namespace Awsmock::Core {
 
             // Resolve host/port
             boost::system::error_code ec;
-            const auto result = Resolve(resolver, host, port);
+            const auto result = HttpUtils::ResolveHost(resolver, host, std::to_string(port));
 
             // Connect
             stream.connect(result, ec);
