@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.91](https://github.com/jensvogt/awsmock/compare/1.18.90...v1.18.91) (2026-07-12)
+
+
+### Bug Fixes
+
+* api gateway lambda execution ([2f197c7](https://github.com/jensvogt/awsmock/commit/2f197c78050ac52103e7a882244ac1b84e8c4162))
+* api gateway lambda execution ([da25b89](https://github.com/jensvogt/awsmock/commit/da25b893fc4859b3a3c41a5ceb67d951e7205da9))
+
 ## [1.18.90](https://github.com/jensvogt/awsmock/compare/1.18.89...v1.18.90) (2026-07-12)
 
 
