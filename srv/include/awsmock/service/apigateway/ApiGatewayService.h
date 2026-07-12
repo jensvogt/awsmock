@@ -14,8 +14,10 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
+#include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/dto/apigateway/CreateApiKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
+#include <awsmock/dto/apigateway/CreateDeploymentResponse.h>
 #include <awsmock/dto/apigateway/CreateUsagePlanKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateUsagePlanKeyResponse.h>
 #include <awsmock/dto/apigateway/CreateUsagePlanRequest.h>
@@ -78,6 +80,22 @@ namespace Awsmock::Service {
         }
 
         /**
+         * @brief Creates a Lambda authorizer on a REST API
+         *
+         * @param restApiId AWS REST API ID
+         * @param name authorizer name
+         * @param type TOKEN, REQUEST, or COGNITO_USER_POOLS
+         * @param authorizerUri Lambda invocation URI
+         * @param identitySource identity source expression
+         * @param ttl result cache TTL in seconds
+         * @return created Authorizer entity
+         */
+        [[nodiscard]]
+        Database::Entity::ApiGateway::Authorizer createAuthorizer(const std::string &restApiId, const std::string &name,
+                                                                   const std::string &type, const std::string &authorizerUri,
+                                                                   const std::string &identitySource, std::int64_t ttl) const;
+
+        /**
          * @brief Creates a new API key
          *
          * @param request Api gateway create key request
@@ -94,6 +112,21 @@ namespace Awsmock::Service {
          */
         [[nodiscard]]
         Dto::ApiGateway::GetApiKeysResponse getApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
+
+        /**
+         * @brief Creates a deployment for a REST API stage
+         *
+         * @param restApiId REST API id
+         * @param stageName stage name
+         * @return create deployment response
+         */
+        [[nodiscard]]
+        Dto::ApiGateway::CreateDeploymentResponse createDeployment(const std::string &restApiId, const std::string &stageName) const;
+
+        [[nodiscard]]
+        Dto::ApiGateway::CreateDeploymentResponse updateDeployment(const std::string &restApiId, const std::string &deploymentId, const std::string &description) const;
+
+        void deleteDeployment(const std::string &restApiId, const std::string &deploymentId) const;
 
         /**
          * @brief Creates a usage plan

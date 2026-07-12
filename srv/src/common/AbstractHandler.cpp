@@ -27,6 +27,11 @@ namespace Awsmock::Service {
         return {};
     }
 
+    http::response<http::dynamic_body> AbstractHandler::HandlePatchRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        log_error << "Real method not implemented";
+        return {};
+    }
+
     http::response<http::dynamic_body> AbstractHandler::HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};

@@ -101,7 +101,7 @@ namespace Awsmock::Service {
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
-            request.method() != http::verb::head) {
+            request.method() != http::verb::patch && request.method() != http::verb::head) {
             return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
         }
 
@@ -172,6 +172,10 @@ namespace Awsmock::Service {
                 case http::verb::delete_: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "DELETE"};
                     return _handler->HandleDeleteRequest(request, _region, _user);
+                }
+                case http::verb::patch: {
+                    Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "PATCH"};
+                    return _handler->HandlePatchRequest(request, _region, _user);
                 }
                 case http::verb::head: {
                     Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "HEAD"};

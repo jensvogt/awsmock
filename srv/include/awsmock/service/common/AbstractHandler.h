@@ -85,6 +85,16 @@ namespace Awsmock::Service {
     virtual http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
     /**
+     * @brief Handles the HTTP method PATCH.
+     *
+     * @param request HTTP request
+     * @param region AWS region
+     * @param user current user
+     * @return HTTP response
+     */
+    virtual http::response<http::dynamic_body> HandlePatchRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+
+    /**
      * @brief Handles the HTTP method HEAD.
      *
      * @param request HTTP request

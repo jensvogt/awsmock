@@ -48,6 +48,11 @@ namespace Awsmock::Dto::ApiGateway {
         bool enabled{};
 
         /**
+         * The API key value
+         */
+        std::string value;
+
+        /**
          * Stage keys
          */
         std::vector<std::string> stageKeys;
@@ -76,6 +81,7 @@ namespace Awsmock::Dto::ApiGateway {
             r.customerId = Core::Json::GetStringValue(v, "customerId");
             r.description = Core::Json::GetStringValue(v, "description");
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.value = Core::Json::GetStringValue(v, "value");
             r.created = Core::Json::GetDatetimeValue(v, "createdDate");
             r.modified = Core::Json::GetDatetimeValue(v, "lastUpdatedDate");
             if (Core::Json::AttributeExists(v, "stageKeys")) {
@@ -97,6 +103,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"customerId", obj.customerId},
                     {"description", obj.description},
                     {"enabled", obj.enabled},
+                    {"value", obj.value},
                     {"createdDate", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"lastUpdatedDate", Core::DateTimeUtils::ToISO8601(obj.modified)},
                     {"stageKeys", boost::json::value_from(obj.stageKeys)},

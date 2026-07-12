@@ -4,6 +4,7 @@
 
 // C++ includes
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
+#include <awsmock/dto/apigateway/CreateDeploymentResponse.h>
 
 namespace Awsmock::Service {
 
@@ -28,32 +29,74 @@ namespace Awsmock::Service {
             return lambdaArn;
         }
 
-        // Build the minimal JSON event sent to a Lambda authorizer.
+        // Build the JSON event sent to a Lambda authorizer.
+        // TOKEN type: minimal event — only type, authorizationToken (from identity-source header), methodArn.
+        // REQUEST type: full proxy-style event with headers, query params, and request context.
         std::string BuildAuthorizerPayload(const http::request<http::dynamic_body> &request, const std::string &restApiId, const std::string &resourcePath, const Database::Entity::ApiGateway::Authorizer &authorizer) {
             const auto httpMethod = boost::lexical_cast<std::string>(request.method());
+            const std::string authorizerType = authorizer.type.empty() ? "REQUEST" : authorizer.type;
+            const std::string methodArn = "arn:aws:execute-api::" + restApiId + "/test/" + httpMethod + resourcePath;
 
-            // Build the request context
-            document requestContext;
-            Core::Bson::BsonUtils::SetStringValue(requestContext, "apiId", restApiId);
-            Core::Bson::BsonUtils::SetStringValue(requestContext, "resourcePath", resourcePath);
-            Core::Bson::BsonUtils::SetStringValue(requestContext, "httpMethod", httpMethod);
-            Core::Bson::BsonUtils::SetStringValue(requestContext, "stage", "test");
-            Core::Bson::BsonUtils::SetStringValue(requestContext, "requestId", Core::StringUtils::GenerateRandomHexString(16));
-
-            // Build the event
             document event;
-            Core::Bson::BsonUtils::SetStringValue(event, "type", authorizer.type.empty() ? "REQUEST" : authorizer.type);
-            Core::Bson::BsonUtils::SetStringValue(event, "resource", resourcePath);
-            Core::Bson::BsonUtils::SetStringValue(event, "path", resourcePath);
-            Core::Bson::BsonUtils::SetStringValue(event, "httpMethod", httpMethod);
-            Core::Bson::BsonUtils::SetStringValue(event, "methodArn", "arn:aws:execute-api::" + restApiId + "/test/" + httpMethod + resourcePath);
-            Core::Bson::BsonUtils::SetDocumentValue(event, "requestContext", requestContext);
+            Core::Bson::BsonUtils::SetStringValue(event, "type", authorizerType);
+            Core::Bson::BsonUtils::SetStringValue(event, "methodArn", methodArn);
+
+            if (authorizerType == "TOKEN") {
+                // Extract token from the identity-source header (e.g. "method.request.header.Authorization")
+                std::string token;
+                constexpr std::string_view headerPrefix = "method.request.header.";
+                if (authorizer.identitySource.starts_with(headerPrefix)) {
+                    token = Core::HttpUtils::GetHeaderValue(request, std::string(authorizer.identitySource.substr(headerPrefix.size())));
+                }
+                Core::Bson::BsonUtils::SetStringValue(event, "authorizationToken", token);
+            } else {
+                document requestContext;
+                Core::Bson::BsonUtils::SetStringValue(requestContext, "apiId", restApiId);
+                Core::Bson::BsonUtils::SetStringValue(requestContext, "resourcePath", resourcePath);
+                Core::Bson::BsonUtils::SetStringValue(requestContext, "httpMethod", httpMethod);
+                Core::Bson::BsonUtils::SetStringValue(requestContext, "stage", "test");
+                Core::Bson::BsonUtils::SetStringValue(requestContext, "requestId", Core::StringUtils::GenerateRandomHexString(16));
+
+                document headersDoc;
+                for (const auto &field: request.base()) {
+                    Core::Bson::BsonUtils::SetStringValue(headersDoc, std::string(field.name_string()), std::string(field.value()));
+                }
+
+                Core::Bson::BsonUtils::SetStringValue(event, "resource", resourcePath);
+                Core::Bson::BsonUtils::SetStringValue(event, "path", resourcePath);
+                Core::Bson::BsonUtils::SetStringValue(event, "httpMethod", httpMethod);
+                Core::Bson::BsonUtils::SetDocumentValue(event, "headers", headersDoc);
+                Core::Bson::BsonUtils::SetDocumentValue(event, "requestContext", requestContext);
+            }
             return Core::Bson::BsonUtils::ToJsonString(event.view());
         }
 
         // Returns true if the authorizer Lambda response contains an Allow statement.
+        // Handles both a direct IAM policy document and a Lambda proxy-wrapped response.
+        // Returns false (not throws) for Lambda execution errors so the caller can
+        // distinguish a deny from an error.
+        bool IsLambdaExecutionError(const std::string &responseBody) {
+            return responseBody.find("\"errorType\"") != std::string::npos ||
+                   responseBody.find("\"errorMessage\"") != std::string::npos;
+        }
+
         bool IsInvocationAllowed(const std::string &responseBody) {
-            return responseBody.find("\"Allow\"") != std::string::npos;
+            // Direct policy document: {"policyDocument": {"Statement": [{"Effect": "Allow"}]}}
+            if (responseBody.find("\"Allow\"") != std::string::npos) {
+                return true;
+            }
+            // GRT may wrap the Lambda return value in a proxy envelope:
+            // {"statusCode": 200, "body": "{...\"Effect\":\"Allow\"...}"}
+            // After JSON-parsing, the "body" string value is unescaped, so a second
+            // search for "Allow" (with literal quotes) will succeed.
+            try {
+                const auto parsed = Core::Json::ParseJsonString(responseBody);
+                if (Core::Json::AttributeExists(parsed, "body")) {
+                    const std::string inner = Core::Json::GetStringValue(parsed, "body");
+                    return inner.find("\"Allow\"") != std::string::npos;
+                }
+            } catch (...) {}
+            return false;
         }
 
         // Extract {param} values from a resource template path matched against an actual request path.
@@ -382,6 +425,34 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::ApiGatewayCommandType::CREATE_DEPLOYMENT: {
+
+                    const std::string restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    std::string stageName;
+                    if (!clientCommand.payload.empty()) {
+                        const auto body = Core::Json::ParseJsonString(clientCommand.payload);
+                        stageName = Core::Json::GetStringValue(body, "stageName");
+                    }
+                    const Dto::ApiGateway::CreateDeploymentResponse serviceResponse = _apiGatewayService.createDeployment(restApiId, stageName);
+                    log_info << "Deployment created, restApiId: " << restApiId << " stageName: " << stageName;
+                    return SendResponse(request, http::status::created, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::CREATE_AUTHORIZER: {
+                    const std::string restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const auto body = Core::Json::ParseJsonString(clientCommand.payload);
+                    const std::string name = Core::Json::GetStringValue(body, "name");
+                    const std::string type = Core::Json::GetStringValue(body, "type");
+                    const std::string authorizerUri = Core::Json::GetStringValue(body, "authorizerUri");
+                    const std::string identitySource = Core::Json::GetStringValue(body, "identitySource");
+                    const auto ttl = Core::Json::AttributeExists(body, "authorizerResultTtlInSeconds")
+                                             ? static_cast<std::int64_t>(Core::Json::GetIntValue(body, "authorizerResultTtlInSeconds"))
+                                             : 300LL;
+                    const auto authorizer = _apiGatewayService.createAuthorizer(restApiId, name, type, authorizerUri, identitySource, ttl);
+                    log_info << "Authorizer created, restApiId: " << restApiId << ", name: " << name;
+                    return SendResponse(request, http::status::created, authorizer.ToJson());
+                }
+
                 case Dto::Common::ApiGatewayCommandType::CREATE_REST_API: {
 
                     Dto::ApiGateway::CreateRestApiRequest serviceRequest = Dto::ApiGateway::CreateRestApiRequest::FromJson(clientCommand);
@@ -565,6 +636,15 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::no_content);
                 }
 
+                case Dto::Common::ApiGatewayCommandType::DELETE_DEPLOYMENT: {
+
+                    const std::string restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const std::string deploymentId = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                    _apiGatewayService.deleteDeployment(restApiId, deploymentId);
+                    log_info << "Deployment deleted, restApiId: " << restApiId << " deploymentId: " << deploymentId;
+                    return SendResponse(request, http::status::accepted);
+                }
+
                 case Dto::Common::ApiGatewayCommandType::DELETE_USAGE_PLAN: {
 
                     Dto::ApiGateway::DeleteUsagePlanRequest serviceRequest;
@@ -652,11 +732,16 @@ namespace Awsmock::Service {
         // Validate API key if the matching method requires it
         if (const auto methodIt = resource.resourceMethods.find(httpMethod); methodIt != resource.resourceMethods.end()) {
             if (methodIt->second.apiKeyRequired) {
-                if (const std::string apiKey = Core::HttpUtils::GetHeaderValue(request, "x-api-key"); apiKey.empty() || !_apiGatewayService.validateApiKey(apiKey)) {
-                    log_warning << "API key missing or invalid, path: " << resourcePath;
+                const std::string apiKey = Core::HttpUtils::GetHeaderValue(request, "x-api-key");
+                log_debug << "API key check, key: " << apiKey << ", path: " << resourcePath;
+                if (apiKey.empty() || !_apiGatewayService.validateApiKey(apiKey)) {
+                    log_warning << "API key missing or invalid, key: '" << apiKey << "', path: " << resourcePath;
                     return SendResponse(request, http::status::forbidden, "Forbidden");
                 }
+                log_debug << "API key valid, path: " << resourcePath;
             }
+        } else {
+            log_debug << "No method '" << httpMethod << "' configured, skipping API key check, path: " << resourcePath;
         }
 
         // Invoke the Lambda authorizer if one is configured on this REST API
@@ -665,9 +750,19 @@ namespace Awsmock::Service {
             if (const std::string functionName = ExtractFunctionNameFromUri(authorizer.authorizerUri); !functionName.empty()) {
                 std::string payload = BuildAuthorizerPayload(request, restApiId, resourcePath, authorizer);
                 try {
-                    if (const Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, payload, Dto::Lambda::REQUEST_RESPONSE); !IsInvocationAllowed(result.responseBody)) {
-                        log_warning << "Authorization denied by authorizer: " << authorizer.name;
-                        return SendResponse(request, http::status::forbidden, "Forbidden");
+                    const Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, payload, Dto::Lambda::REQUEST_RESPONSE);
+                    log_debug << "Authorizer result, function: " << functionName << ", status: " << result.status << ", body: " << result.responseBody;
+                    if (result.status == 200) {
+                        if (IsLambdaExecutionError(result.responseBody)) {
+                            log_error << "Authorizer Lambda execution error, skipping authorization: " << functionName << " body: " << result.responseBody;
+                        } else if (!IsInvocationAllowed(result.responseBody)) {
+                            log_warning << "Authorization denied by authorizer: " << authorizer.name;
+                            return SendResponse(request, http::status::forbidden, "Forbidden");
+                        }
+                    } else {
+                        // Non-200: Lambda not found (404), infrastructure error (500/503), or timeout (504).
+                        // Skip authorization rather than blocking the request.
+                        log_warning << "Authorizer Lambda returned non-200 status " << result.status << ", skipping authorization: " << functionName;
                     }
                 } catch (const std::exception &exc) {
                     log_error << "Authorizer invocation failed: " << exc.what();
@@ -712,6 +807,45 @@ namespace Awsmock::Service {
         }
         log_warning << "Unsupported integration type: " << method.integrationType;
         return SendResponse(request, http::status::not_implemented, "Integration type not supported: " + method.integrationType);
+    }
+
+    http::response<http::dynamic_body> ApiGatewayHandler::HandlePatchRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        log_debug << "API Gateway PATCH request, URI: " << request.target() << " region: " << region << " user: " << user;
+
+        Dto::Common::ApiGatewayClientCommand clientCommand;
+        clientCommand.FromRequest(request, region, user);
+
+        try {
+            switch (clientCommand.command) {
+
+                case Dto::Common::ApiGatewayCommandType::UPDATE_DEPLOYMENT: {
+
+                    const std::string restApiId = Core::HttpUtils::GetPathParameter(request.target(), 1);
+                    const std::string deploymentId = Core::HttpUtils::GetPathParameter(request.target(), 3);
+                    std::string description;
+                    if (!clientCommand.payload.empty()) {
+                        const auto body = Core::Json::ParseJsonString(clientCommand.payload);
+                        description = Core::Json::GetStringValue(body, "description");
+                    }
+                    const Dto::ApiGateway::CreateDeploymentResponse serviceResponse = _apiGatewayService.updateDeployment(restApiId, deploymentId, description);
+                    log_info << "Deployment updated, restApiId: " << restApiId << " deploymentId: " << deploymentId;
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                default:
+                    return SendResponse(request, http::status::method_not_allowed, "Method not allowed");
+            }
+
+        } catch (Core::JsonException &exc) {
+            log_error << exc.message();
+            return SendResponse(request, http::status::bad_request, exc.message());
+        } catch (Core::ServiceException &exc) {
+            log_error << exc.message();
+            return SendResponse(request, http::status::internal_server_error, exc.message());
+        } catch (Core::NotFoundException &exc) {
+            log_error << exc.what();
+            return SendResponse(request, http::status::not_found, exc.what());
+        }
     }
 
 }// namespace Awsmock::Service
