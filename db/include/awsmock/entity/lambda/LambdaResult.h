@@ -20,6 +20,11 @@ namespace Awsmock::Database::Entity::Lambda {
     struct LambdaResult final : Common::BaseEntity<LambdaResult> {
 
         /**
+         * Region
+         */
+        std::string region;
+
+        /**
          * Lambda name
          */
         std::string lambdaName;
@@ -33,7 +38,7 @@ namespace Awsmock::Database::Entity::Lambda {
          * Lambda runtime status
          */
         RuntimeStatus lambdaStatus;
-        
+
         /**
          * Request body
          */

@@ -199,6 +199,26 @@ namespace Awsmock::Database {
         Entity::SQS::QueueList listQueues() const override;
 
         /**
+         * @brief List all available queue URLs of a region
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        std::vector<std::string> listQueueUrls(const std::string &region, const std::string &prefix) const override;
+
+        /**
+         * @brief List all available queue URLs
+         *
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        std::vector<std::string> listQueueUrls() const override;
+
+        /**
          * @brief Export the queues
          *
          * @param sortColumns vector of sort columns

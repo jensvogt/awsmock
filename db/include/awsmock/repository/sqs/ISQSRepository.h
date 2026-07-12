@@ -183,6 +183,26 @@ namespace Awsmock::Database {
         virtual Entity::SQS::QueueList listQueues() const = 0;
 
         /**
+         * @brief List all available queue URLs of a region
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        virtual std::vector<std::string> listQueueUrls(const std::string &region, const std::string &prefix) const = 0;
+
+        /**
+         * @brief List all available queue URLs
+         *
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        virtual std::vector<std::string> listQueueUrls() const = 0;
+
+        /**
          * @brief List available queues using paging
          *
          * @param sortColumns vector of sort columns

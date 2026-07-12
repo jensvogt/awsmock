@@ -72,7 +72,15 @@ namespace Awsmock::Service {
         sortColumn.column = "name";
         sortColumn.sortDirection = 1;
 
-        for (const auto &module: request.modules) {
+        std::vector<std::string> allModules;
+        if (request.modules.empty()) {
+            for (const auto &m: Database::RepositoryFactory::instance().moduleRepository()->listModules()) {
+                allModules.emplace_back(m.name);
+            }
+        }
+        const std::vector<std::string> &modules = request.modules.empty() ? allModules : request.modules;
+
+        for (const auto &module: modules) {
 
             if (module == "s3") {
 
@@ -492,8 +500,8 @@ namespace Awsmock::Service {
     }
 
     // ReSharper disable once CppMemberFunctionMayBeStatic
-    void ModuleService::UpdateLambda(const std::string &name) const {
-        const Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure();
+    void ModuleService::UpdateLambda(const Dto::Module::ExportInfrastructureRequest &request) const {
+        const Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure(request);
         const auto filename = Core::Configuration::instance().get<std::string>("awsmock.autoload.file");
         std::ofstream ofs(filename, std::ios::trunc);
         ofs << response.ToJson();

@@ -3,13 +3,6 @@
 //
 
 // C++ includes
-#include <sstream>
-
-// Awsmock includes
-#include <awsmock/core/JsonUtils.h>
-#include <awsmock/dto/apigateway/DeleteResourceRequest.h>
-#include <awsmock/dto/apigateway/DeleteUsagePlanRequest.h>
-#include <awsmock/dto/apigateway/GetResourceRequest.h>
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 namespace Awsmock::Service {
@@ -63,8 +56,37 @@ namespace Awsmock::Service {
             return responseBody.find("\"Allow\"") != std::string::npos;
         }
 
+        // Extract {param} values from a resource template path matched against an actual request path.
+        // E.g. template="/{isbn}", actual="/9783911244381" -> {"isbn": "9783911244381"}
+        std::map<std::string, std::string> ExtractPathParameters(const std::string &templatePath, const std::string &actualPath) {
+            std::map<std::string, std::string> params;
+            const auto split = [](const std::string &s) {
+                std::vector<std::string> parts;
+                std::istringstream ss(s);
+                std::string tok;
+                while (std::getline(ss, tok, '/')) {
+                    if (!tok.empty()) parts.push_back(tok);
+                }
+                return parts;
+            };
+            const auto tp = split(templatePath);
+            const auto ap = split(actualPath);
+            if (tp.size() != ap.size()) return params;
+            for (size_t i = 0; i < tp.size(); ++i) {
+                if (tp[i].front() == '{' && tp[i].back() == '}') {
+                    params[tp[i].substr(1, tp[i].size() - 2)] = ap[i];
+                }
+            }
+            return params;
+        }
+
         // Build an API Gateway Lambda proxy event (version 1.0).
-        std::string BuildLambdaProxyEvent(const http::request<http::dynamic_body> &request, const std::string &restApiId, const std::string &resourcePath, const std::string &rawUrl) {
+        // resourceTemplate: the matched resource path template, e.g. "/{isbn}" or "/small/{isbn}"
+        // resourcePath:     the actual request path, e.g. "/9783911244381"
+        // stage:            the stage name extracted from the URL, e.g. "small"
+        std::string BuildLambdaProxyEvent(const http::request<http::dynamic_body> &request, const std::string &restApiId,
+                                          const std::string &resourceTemplate, const std::string &resourcePath,
+                                          const std::string &stage, const std::string &rawUrl) {
             const auto httpMethod = boost::lexical_cast<std::string>(request.method());
 
             // Headers
@@ -79,22 +101,29 @@ namespace Awsmock::Service {
                 Core::Bson::BsonUtils::SetStringValue(queryDoc, name, value);
             }
 
+            // Path parameters extracted from the template
+            document pathParamsDoc;
+            for (const auto &[name, value]: ExtractPathParameters(resourceTemplate, resourcePath)) {
+                Core::Bson::BsonUtils::SetStringValue(pathParamsDoc, name, value);
+            }
+
             // Build the requestContext
             document requestContext;
             Core::Bson::BsonUtils::SetStringValue(requestContext, "apiId", restApiId);
-            Core::Bson::BsonUtils::SetStringValue(requestContext, "resourcePath", resourcePath);
+            Core::Bson::BsonUtils::SetStringValue(requestContext, "resourcePath", resourceTemplate);
             Core::Bson::BsonUtils::SetStringValue(requestContext, "httpMethod", httpMethod);
-            Core::Bson::BsonUtils::SetStringValue(requestContext, "stage", "local");
+            Core::Bson::BsonUtils::SetStringValue(requestContext, "stage", stage);
             Core::Bson::BsonUtils::SetStringValue(requestContext, "requestId", Core::StringUtils::GenerateRandomHexString(16));
 
             // Build the event
             document event;
             Core::Bson::BsonUtils::SetStringValue(event, "version", "1.0");
-            Core::Bson::BsonUtils::SetStringValue(event, "resource", resourcePath);
+            Core::Bson::BsonUtils::SetStringValue(event, "resource", resourceTemplate);
             Core::Bson::BsonUtils::SetStringValue(event, "path", resourcePath);
             Core::Bson::BsonUtils::SetStringValue(event, "httpMethod", httpMethod);
             Core::Bson::BsonUtils::SetDocumentValue(event, "headers", headersDoc);
             Core::Bson::BsonUtils::SetDocumentValue(event, "queryStringParameters", queryDoc);
+            Core::Bson::BsonUtils::SetDocumentValue(event, "pathParameters", pathParamsDoc);
             Core::Bson::BsonUtils::SetDocumentValue(event, "requestContext", requestContext);
             Core::Bson::BsonUtils::SetStringValue(event, "body", Core::HttpUtils::GetBodyAsString(request));
             Core::Bson::BsonUtils::SetBoolValue(event, "isBase64Encoded", false);
@@ -553,12 +582,27 @@ namespace Awsmock::Service {
             return SendResponse(request, http::status::not_found, "REST API ID missing");
         }
 
-        // Compute resource path: strip "/restapis/{restApiId}" prefix, drop query string
+        // Compute resource path: strip "/restapis/{restApiId}/{stage}" prefix, drop query string.
+        // URL format: /restapis/{restApiId}/{stage}/{resource-path...}
         const auto url = std::string(request.target());
         const auto prefix = "/restapis/" + restApiId;
-        std::string resourcePath = url.starts_with(prefix) ? url.substr(prefix.size()) : "/";
-        if (const auto qPos = resourcePath.find('?'); qPos != std::string::npos) {
-            resourcePath = resourcePath.substr(0, qPos);
+        std::string remaining = url.starts_with(prefix) ? url.substr(prefix.size()) : "/";
+        if (const auto qPos = remaining.find('?'); qPos != std::string::npos) {
+            remaining = remaining.substr(0, qPos);
+        }
+
+        // Strip the stage segment: remaining is "/{stage}/{path...}" or "/{stage}"
+        std::string stageName;
+        std::string resourcePath = remaining;
+        if (remaining.size() > 1 && remaining.front() == '/') {
+            const auto secondSlash = remaining.find('/', 1);
+            if (secondSlash != std::string::npos) {
+                stageName = remaining.substr(1, secondSlash - 1);
+                resourcePath = remaining.substr(secondSlash);
+            } else {
+                stageName = remaining.substr(1);
+                resourcePath = "/";
+            }
         }
         if (resourcePath.empty()) {
             resourcePath = "/";
@@ -629,7 +673,7 @@ namespace Awsmock::Service {
                 log_warning << "Cannot extract function name from integration URI: " << method.integrationUri;
                 return SendResponse(request, http::status::bad_gateway, "Invalid Lambda integration URI");
             }
-            std::string payload = BuildLambdaProxyEvent(request, restApiId, resourcePath, url);
+            std::string payload = BuildLambdaProxyEvent(request, restApiId, resource.path, resourcePath, stageName, url);
             log_info << "Invoking Lambda integration, function: " << functionName << ", restApiId: " << restApiId;
             const Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, payload, Dto::Lambda::REQUEST_RESPONSE);
             return BuildLambdaProxyResponse(request, result.status, result.responseBody);

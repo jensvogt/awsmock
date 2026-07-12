@@ -160,6 +160,7 @@ namespace Awsmock::Dto::Lambda {
     LambdaResultCounter Mapper::mapCounter(const Database::Entity::Lambda::LambdaResult &resultEntity) {
         LambdaResultCounter counter;
         counter.oid = resultEntity.oid;
+        counter.region = resultEntity.region;
         counter.lambdaArn = resultEntity.lambdaArn;
         counter.lambdaName = resultEntity.lambdaName;
         counter.runtime = resultEntity.runtime;

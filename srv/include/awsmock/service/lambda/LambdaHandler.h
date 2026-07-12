@@ -27,7 +27,7 @@ namespace Awsmock::Service {
      * @brief Lambda request handler
      *
      * @par
-     * All lambda-related REST call are ending here.
+     * All lambda-related REST calls are ending here.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -38,11 +38,7 @@ namespace Awsmock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc) {
-            _moduleService = std::make_shared<ModuleService>();
-            _lambdaService.sigLambdaCodeUpdated.connect(
-                    boost::signals2::signal<void(std::string)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), std::placeholders::_1).track_foreign(_moduleService));
-        }
+        explicit LambdaHandler(boost::asio::io_context &ioc);
 
         /**
          * @brief HTTP GET request.

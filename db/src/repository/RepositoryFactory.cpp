@@ -13,6 +13,8 @@ namespace Awsmock::Database {
             {"sqs_message_idx5", {"sqs_message", {{"queueArn", 1}, {"created", 1}}, false}},
             // SQS queues
             {"sqs_queue_idx1", {"sqs_queue", {{"region", 1}, {"name", 1}}, true}},
+            {"sqs_queue_idx2", {"sqs_queue", {{"url", 1}}, true}},
+            {"sqs_queue_idx3", {"sqs_queue", {{"arn", 1}}, true}},
             // SNS messages
             {"sns_message_idx1", {"sns_message", {{"region", 1}, {"topicArn", 1}}, false}},
             // SNS topics

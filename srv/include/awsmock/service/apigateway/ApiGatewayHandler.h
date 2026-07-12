@@ -4,9 +4,16 @@
 
 #pragma once
 
-// AwsMock includes
+// C++ includes
+#include <sstream>
+
+// Awsmock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/dto/apigateway/DeleteResourceRequest.h>
+#include <awsmock/dto/apigateway/DeleteUsagePlanRequest.h>
+#include <awsmock/dto/apigateway/GetResourceRequest.h>
 #include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/service/apigateway/ApiGatewayService.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -82,8 +89,11 @@ namespace Awsmock::Service {
          */
         http::response<http::dynamic_body> HandleResourceInvocation(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) const;
 
+        /**
+         * @brief Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "ApiGateway"};
-
+        
         /**
          * API gateway service
          */

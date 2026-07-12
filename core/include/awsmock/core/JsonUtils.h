@@ -7,6 +7,7 @@
 // C++ includes
 #include <chrono>
 #include <map>
+#include <sstream>
 
 // Boost JSON includes
 #include <boost/json.hpp>
@@ -144,5 +145,58 @@ namespace Awsmock::Core::Json {
 
     inline bool findObject(boost::json::value &value, const std::string &name) {
         return value.as_object().if_contains(name);
+    }
+
+    namespace {
+        inline void PrettyPrintValue(const boost::json::value &v, std::ostream &out, int indent) {
+            const std::string pad(indent * 2, ' ');
+            const std::string childPad((indent + 1) * 2, ' ');
+            switch (v.kind()) {
+                case boost::json::kind::object: {
+                    const auto &obj = v.get_object();
+                    if (obj.empty()) { out << "{}"; return; }
+                    out << "{\n";
+                    std::size_t i = 0;
+                    for (const auto &[key, val]: obj) {
+                        out << childPad << boost::json::serialize(boost::json::value(key)) << ": ";
+                        PrettyPrintValue(val, out, indent + 1);
+                        if (++i < obj.size()) out << ",";
+                        out << "\n";
+                    }
+                    out << pad << "}";
+                    break;
+                }
+                case boost::json::kind::array: {
+                    const auto &arr = v.get_array();
+                    if (arr.empty()) { out << "[]"; return; }
+                    out << "[\n";
+                    for (std::size_t i = 0; i < arr.size(); ++i) {
+                        out << childPad;
+                        PrettyPrintValue(arr[i], out, indent + 1);
+                        if (i + 1 < arr.size()) out << ",";
+                        out << "\n";
+                    }
+                    out << pad << "]";
+                    break;
+                }
+                default:
+                    out << boost::json::serialize(v);
+                    break;
+            }
+        }
+    }
+
+    inline std::string PrettyPrint(const boost::json::value &root) {
+        std::ostringstream out;
+        PrettyPrintValue(root, out, 0);
+        out << "\n";
+        return out.str();
+    }
+
+    inline std::string PrettyPrint(const std::string &json) {
+        boost::system::error_code ec;
+        const boost::json::value jv = boost::json::parse(json, ec);
+        if (ec) return json;
+        return PrettyPrint(jv);
     }
 }// namespace Awsmock::Core::Json

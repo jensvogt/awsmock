@@ -86,6 +86,7 @@
 #include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/dto/lambda/model/LambdaRuntimeStatus.h>
 #include <awsmock/dto/lambda/model/LambdaStatus.h>
+#include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
@@ -349,6 +350,15 @@ namespace Awsmock::Service {
         Database::Entity::Lambda::Lambda AddInstance(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const;
 
         /**
+         * @brief
+         * @param instanceId lambda instance ID
+         * @param lambda lambda entity
+         * @param functionCode lambda function code
+         * @return
+         */
+        std::string CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode) const;
+
+        /**
          * @brief Create a new tag for a lambda function.
          *
          * @param request lambda create tag request
@@ -584,9 +594,14 @@ namespace Awsmock::Service {
          *
          * @tparam name of the lambda
          */
-        boost::signals2::signal<void(std::string)> sigLambdaCodeUpdated;
+        boost::signals2::signal<void(Dto::Module::ExportInfrastructureRequest)> sigLambdaCodeUpdated;
 
       private:
+
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "Lambda"};
 
         /**
          * @brief Create a new lambda function instance (resets invocation counters).
@@ -600,31 +615,22 @@ namespace Awsmock::Service {
         /**
          * @brief Create a single Docker container instance for a lambda function.
          *
-         * @param instanceId name of the instance (function + '-' + 8 random hex digits)
-         * @param lambda lambda entity (modified in-place: instance appended to instances list)
-         * @param functionCode base64 filename of the function code
+         * @param zipFile base64 filename of the function code
+         * @param lambdaEntity lambda entity (imageId/imageSize/codeSha256 set on return)
+         * @param dockerTag docker tag to use
          * @return container ID
          */
-        std::string CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode) const;
+        void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) const;
 
         /**
          * @brief Build the Docker image for a lambda function.
          *
-         * @param zipFile base64 filename of the function code
-         * @param lambdaEntity lambda entity (imageId/imageSize/codeSha256 set on return)
+         * @param lambda lambda entity (modified in-place: instance appended to instances list)
+         * @param instanceId lambda instance ID
+         * @param hostPort public port
          * @param dockerTag docker tag to use
          */
-        static void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
-
-        /**
-         * @brief Create a Docker container for a lambda instance.
-         *
-         * @param lambda lambda entity
-         * @param instanceId instance ID suffix
-         * @param hostPort host-side port mapped to the container's RIE port
-         * @param dockerTag docker tag to use
-         */
-        static void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, int hostPort, const std::string &dockerTag);
+        void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, int hostPort, const std::string &dockerTag) const;
 
         /**
          * @brief Convert lambda environment variables to Docker key=value pairs.
@@ -632,7 +638,7 @@ namespace Awsmock::Service {
          * @param lambda lambda entity
          * @return vector of "KEY=VALUE" strings
          */
-        static std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Lambda &lambda);
+        std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Build the Docker CMD array for a lambda container.
@@ -640,7 +646,7 @@ namespace Awsmock::Service {
          * @param lambda lambda entity
          * @return CMD tokens; empty means "use the image default"
          */
-        static std::vector<std::string> GetCmd(const Database::Entity::Lambda::Lambda &lambda);
+        std::vector<std::string> GetCmd(const Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Determine the Docker tag for a lambda function.
@@ -648,7 +654,7 @@ namespace Awsmock::Service {
          * @param lambda lambda entity
          * @return docker tag (version > dockerTag > tag > "latest")
          */
-        static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
+        std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Decode and unpack a base64-encoded ZIP file into a temporary directory.
@@ -658,14 +664,14 @@ namespace Awsmock::Service {
          * @param runtime AWS lambda runtime name
          * @return code directory path
          */
-        static std::string UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime);
+        std::string UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) const;
 
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
          *
          * @param lambda lambda entity to cleanup
          */
-        static void CleanupDocker(Database::Entity::Lambda::Lambda &lambda);
+        void CleanupDocker(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Returns the full path to the base64 encoded lambda function code.
@@ -673,7 +679,7 @@ namespace Awsmock::Service {
          * @return full path to base64 function code
          * @see Database::Entity::Lambda::Lambda
          */
-        static std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
+        std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * @brief Get the lambda code from a S3 bucket and key
@@ -696,7 +702,7 @@ namespace Awsmock::Service {
          * @param base64File name of the file
          * @param content base64 encoded content
          */
-        static void WriteBase64File(const std::string &base64File, const std::string &content);
+        void WriteBase64File(const std::string &base64File, const std::string &content) const;
 
         /**
          * @brief Lambda database connection

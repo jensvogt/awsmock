@@ -75,7 +75,7 @@ namespace Awsmock::Dto::ApiGateway {
             r.path = Core::Json::GetStringValue(v, "path");
             r.pathPart = Core::Json::GetStringValue(v, "pathPart");
             r.url = Core::Json::GetStringValue(v, "url");
-            r.created = Core::Json::GetDatetimeValue(v, "lastStarted");
+            r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "resourceMethods")) {
                 r.resourceMethods = boost::json::value_to<std::map<std::string, ResourceMethod>>(v.at("resourceMethods"));
@@ -91,7 +91,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"pathPart", obj.pathPart},
                     {"url", obj.url},
                     {"resourceMethods", boost::json::value_from(obj.resourceMethods)},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

@@ -173,6 +173,16 @@ namespace Awsmock::Service {
         int _healthCheckPeriod{};
 
         /**
+         * @brief Max seconds to wait for a new Lambda container to become idle (LRT startup).
+         */
+        int _startupTimeout{};
+
+        /**
+         * @brief Max seconds for a single Lambda invocation HTTP call.
+         */
+        int _invocationTimeout{};
+
+        /**
          * @brief Per-function mutex map — serialises instance selection so that two concurrent
          * invocations of the same function never claim the same idle instance.
          */

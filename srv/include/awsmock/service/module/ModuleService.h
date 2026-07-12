@@ -151,11 +151,14 @@ namespace Awsmock::Service {
         void BackupRetention(const std::string &module) const;
 
         /**
-         * @brief Update lambda slot, signaled whenever a lambda function is updated
+         * @brief Update lambda slot, signaled whenever a lambda function is updated.
          *
-         * @param name lambda name
+         * @par
+         * Start an export of the infrastructure to a JSON file.
+         *
+         * @param request export infrastructure request
          */
-        void UpdateLambda(const std::string &name) const;
+        void UpdateLambda(const Dto::Module::ExportInfrastructureRequest &request) const;
 
         /**
          * @brief Update the log level for a module.

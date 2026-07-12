@@ -2,6 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/module/ExportInfrastructureResponse.h>
 
 namespace Awsmock::Dto::Module {
@@ -14,7 +15,8 @@ namespace Awsmock::Dto::Module {
             document.append(kvp("exportType", ExportTypeToString(exportType)));
             document.append(kvp("prettyPrint", prettyPrint));
             document.append(kvp("infrastructure", infrastructure.ToDocument()));
-            return bsoncxx::to_json(document);
+            const std::string json = bsoncxx::to_json(document);
+            return prettyPrint ? Core::Json::PrettyPrint(json) : json;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

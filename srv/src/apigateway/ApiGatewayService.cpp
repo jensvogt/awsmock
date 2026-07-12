@@ -201,9 +201,17 @@ namespace Awsmock::Service {
                 restApi.endpointUrl = Core::AwsUtils::CreateApiGatewayRestApiUrl(restApi.id, restApi.region);
             }
 
-            // Root resourceId
+            // Root resourceId and root resource entry
             if (restApi.rootResourceId.empty()) {
                 restApi.rootResourceId = Core::AwsUtils::CreateRestApiId();
+            }
+            if (!restApi.resources.contains(restApi.rootResourceId)) {
+                Database::Entity::ApiGateway::Resource rootResource;
+                rootResource.id = restApi.rootResourceId;
+                rootResource.path = "/";
+                rootResource.pathPart = "/";
+                rootResource.region = restApi.region;
+                restApi.resources[restApi.rootResourceId] = rootResource;
             }
 
             // Save to the database

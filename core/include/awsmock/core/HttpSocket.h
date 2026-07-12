@@ -42,7 +42,7 @@ namespace Awsmock::Core {
          * @param headers HTTP headers
          * @return HTTP response
          */
-        static HttpSocketResponse SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+        static HttpSocketResponse SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {}, int timeoutSeconds = 0);
 
         /**
          * @brief Send a JSON string to an HTTP endpoint

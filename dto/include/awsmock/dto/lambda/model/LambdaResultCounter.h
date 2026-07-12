@@ -35,6 +35,11 @@ namespace Awsmock::Dto::Lambda {
         std::string oid;
 
         /**
+         * Region
+         */
+        std::string region;
+
+        /**
          * Lambda name
          */
         std::string lambdaName;
@@ -100,6 +105,7 @@ namespace Awsmock::Dto::Lambda {
         friend LambdaResultCounter tag_invoke(boost::json::value_to_tag<LambdaResultCounter>, boost::json::value const &v) {
             LambdaResultCounter r;
             r.oid = Core::Json::GetStringValue(v, "oid");
+            r.region = Core::Json::GetStringValue(v, "region");
             r.lambdaName = Core::Json::GetStringValue(v, "lambdaName");
             r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.runtime = Core::Json::GetStringValue(v, "runtime");
@@ -118,6 +124,7 @@ namespace Awsmock::Dto::Lambda {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LambdaResultCounter const &obj) {
             jv = {
                     {"oid", obj.oid},
+                    {"region", obj.region},
                     {"lambdaName", obj.lambdaName},
                     {"lambdaArn", obj.lambdaArn},
                     {"runtime", obj.runtime},

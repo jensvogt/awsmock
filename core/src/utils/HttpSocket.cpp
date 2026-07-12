@@ -11,11 +11,15 @@ namespace {
 
 namespace Awsmock::Core {
 
-    HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
+    HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers, const int timeoutSeconds) {
 
         boost::asio::io_context ctx;
         boost::asio::ip::tcp::resolver resolver(ctx);
         boost::beast::tcp_stream stream(ctx);
+
+        if (timeoutSeconds > 0) {
+            stream.expires_after(std::chrono::seconds(timeoutSeconds));
+        }
 
         try {
 

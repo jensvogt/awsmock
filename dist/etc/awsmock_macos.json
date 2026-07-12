@@ -89,7 +89,8 @@
         "log-retention-period": 1,
         "private-port": 8080,
         "max-invocation-count": 3,
-        "invocation-timeout": 5,
+        "startup-timeout": 120,
+        "invocation-timeout": 60,
         "runtime": {
           "java17": "jensvogt/awsmock-lrt-java17:latest",
           "java21": "jensvogt/awsmock-lrt-java21:latest",
@@ -366,6 +367,10 @@
         },
         {
           "name": "Monitoring",
+          "level": "info"
+        },
+        {
+          "name": "ApiGateway",
           "level": "info"
         }
       ]

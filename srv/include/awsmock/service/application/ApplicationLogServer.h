@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 // C++ includes
 #include <algorithm>
 #include <cstdlib>

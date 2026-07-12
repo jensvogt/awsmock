@@ -11,7 +11,9 @@ namespace Awsmock::Service {
         const Core::Configuration &config = Core::Configuration::instance();
         _region = config.get<std::string>("awsmock.region");
         _healthCheckPeriod = config.getOr<int>("awsmock.modules.lambda.health-check-period", 30);
-        log_debug << "Lambda controller health-check period: " << _healthCheckPeriod << "s";
+        _startupTimeout = config.getOr<int>("awsmock.modules.lambda.startup-timeout", 120);
+        _invocationTimeout = config.getOr<int>("awsmock.modules.lambda.invocation-timeout", 60);
+        log_debug << "Lambda controller health-check period: " << _healthCheckPeriod << "s, startup-timeout: " << _startupTimeout << "s, invocation-timeout: " << _invocationTimeout << "s";
 
         // Connect EventBus signals ------------------------------------------------
 
@@ -115,6 +117,9 @@ namespace Awsmock::Service {
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
             if (!lambda.enabled) {
                 log_warning << "Lambda disabled, function: " << functionName;
+                if (promise) {
+                    promise->set_value({403, "Lambda function is disabled"});
+                }
                 return;
             }
 
@@ -138,7 +143,7 @@ namespace Awsmock::Service {
                     log_info << "New instance started, function: " << functionName << ", instanceId: " << instanceId << ", total: " << lambda.instances.size();
 
                     // Wait until the Lambda Runtime inside the new container reports idle
-                    const auto startDeadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
+                    const auto startDeadline = system_clock::now() + std::chrono::seconds(_startupTimeout);
                     do {
                         std::this_thread::sleep_for(std::chrono::milliseconds(500));
                         lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
@@ -156,7 +161,7 @@ namespace Awsmock::Service {
                 } else {
                     // At maxConcurrency: wait for a slot to become idle
                     log_info << "Max concurrency reached, waiting for idle instance, function: " << functionName << ", concurrency: " << lambda.concurrency;
-                    const auto deadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
+                    const auto deadline = system_clock::now() + std::chrono::seconds(_invocationTimeout);
                     do {
                         std::this_thread::sleep_for(std::chrono::milliseconds(500));
                         lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
@@ -164,6 +169,9 @@ namespace Awsmock::Service {
 
                     if (!lambda.HasIdleInstance()) {
                         log_error << "No idle instance available within timeout, function: " << functionName;
+                        if (promise) {
+                            promise->set_value({503, "No idle Lambda instance available within timeout"});
+                        }
                         return;
                     }
                     instance = lambda.GetIdleInstance();
@@ -253,7 +261,7 @@ namespace Awsmock::Service {
         log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.publicPort;
 
         const system_clock::time_point start = system_clock::now();
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/invoke", payload);
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/invoke", payload, {}, _invocationTimeout > 0 ? _invocationTimeout : 60);
         const long duration = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
 
         log_info << "Getting lambda logs, containerId: " << instance.containerId;
@@ -264,6 +272,7 @@ namespace Awsmock::Service {
         logs = Core::StringUtils::RemoveUnprintableAscii(logs);
 
         Database::Entity::Lambda::LambdaResult lambdaResult;
+        lambdaResult.region = lambda.region;
         lambdaResult.instanceId = instance.instanceId;
         lambdaResult.containerId = instance.containerId;
         lambdaResult.status = response.statusCode;

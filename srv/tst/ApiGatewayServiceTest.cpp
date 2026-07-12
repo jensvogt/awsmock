@@ -150,9 +150,9 @@ namespace Awsmock::Database {
         // act
         const auto response = svc.getResources(request);
 
-        // assert — only the resource we created (no auto root resource in map)
+        // assert — root resource + the resource we created
         BOOST_CHECK_EQUAL(false, response.resources.empty());
-        BOOST_CHECK_EQUAL(1, response.resources.size());
+        BOOST_CHECK_EQUAL(2, response.resources.size());
     }
 
     BOOST_AUTO_TEST_CASE(PutMethodTest) {
@@ -262,12 +262,12 @@ namespace Awsmock::Database {
         // act
         BOOST_CHECK_NO_THROW(svc.deleteResource(deleteRequest));
 
-        // assert — resources map is now empty
+        // assert — only root resource remains
         Dto::ApiGateway::GetResourcesRequest getRequest;
         getRequest.region = TEST_REGION;
         getRequest.restApiId = api.id;
         const auto getResponse = svc.getResources(getRequest);
-        BOOST_CHECK_EQUAL(0, getResponse.resources.size());
+        BOOST_CHECK_EQUAL(1, getResponse.resources.size());
     }
 
     BOOST_AUTO_TEST_CASE(DeleteRestApiTest) {

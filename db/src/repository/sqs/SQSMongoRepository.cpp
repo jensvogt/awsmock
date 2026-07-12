@@ -212,8 +212,7 @@ namespace Awsmock::Database {
         Entity::SQS::QueueList queueList;
         for (auto queueCursor = queueCollection.find(query.view(), opts); auto queue: queueCursor) {
             Entity::SQS::Queue result;
-            result.FromDocument(queue);
-            queueList.push_back(result);
+            queueList.push_back(result.FromDocument(queue));
         }
         log_trace << "Got queue list, size: " << queueList.size();
         return queueList;
@@ -225,6 +224,35 @@ namespace Awsmock::Database {
 
     Entity::SQS::QueueList SQSMongoRepository::listQueues() const {
         return listQueues({});
+    }
+
+    std::vector<std::string> SQSMongoRepository::listQueueUrls(const std::string &region, const std::string &prefix) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_queue_urls");
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+
+        document query = {};
+        if (!region.empty()) {
+            query.append(kvp("region", region));
+        }
+        if (!prefix.empty()) {
+            query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+        }
+
+        mongocxx::options::find opts;
+        opts.projection(make_document(kvp("_id", 0), kvp("url", 1)));
+
+        std::vector<std::string> queueList;
+        for (auto queueCursor = queueCollection.find(query.view(), opts); auto queue: queueCursor) {
+            queueList.push_back(Core::Bson::BsonUtils::GetStringValue(queue, "url"));
+        }
+        log_trace << "Got queue URL list, size: " << queueList.size();
+        return queueList;
+    }
+
+    std::vector<std::string> SQSMongoRepository::listQueueUrls() const {
+        return listQueueUrls({}, {});
     }
 
     Entity::SQS::QueueList SQSMongoRepository::exportQueues(const std::vector<SortColumn> &sortColumns) const {

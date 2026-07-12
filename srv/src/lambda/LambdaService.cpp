@@ -4,14 +4,6 @@
 
 #include <awsmock/service/lambda/LambdaService.h>
 
-// These are only needed for the Docker-lifecycle helpers moved from LambdaCreator
-#include <awsmock/core/ZipUtils.h>
-#include <awsmock/core/exception/ContainerException.h>
-
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "Lambda"};
-}
-
 namespace Awsmock::Service {
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
@@ -95,7 +87,9 @@ namespace Awsmock::Service {
         CreateLambdaInstance(lambda, instanceId);
 
         // Update init file
-        sigLambdaCodeUpdated(lambda.function);
+        Dto::Module::ExportInfrastructureRequest exportRequest;
+        exportRequest.modules = {lambda.function};
+        sigLambdaCodeUpdated(exportRequest);
         log_debug << "Lambda function code updated, function: " << lambda.function;
     }
 
@@ -735,6 +729,17 @@ namespace Awsmock::Service {
             const auto promise = std::make_shared<std::promise<std::pair<int, std::string>>>();
             auto future = promise->get_future();
             Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), promise);
+            // sigLambdaInvoke is synchronous — the signal handler runs before this line and
+            // has already fulfilled the promise. future.get() returns immediately in the
+            // normal case. The wait_for guard protects against the case where the Lambda
+            // module is inactive (no connected slot) so the promise is never set.
+            if (future.wait_for(std::chrono::seconds(60)) == std::future_status::timeout) {
+                log_error << "Lambda invocation timed out, function: " << functionName;
+                Dto::Lambda::LambdaResult result;
+                result.status = 504;
+                result.responseBody = "Lambda invocation timed out";
+                return result;
+            }
             const auto [status, body] = future.get();
             Dto::Lambda::LambdaResult result;
             result.status = status;
@@ -1315,7 +1320,7 @@ namespace Awsmock::Service {
         return Core::FileUtils::appendPath(s3DataDir, object.internalName);
     }
 
-    void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {
+    void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) const {
         // Delete docker containers
         for (const auto &container: ContainerService::instance().ListContainerByImageName(lambda.function)) {
             ContainerService::instance().KillContainer(container.id);
@@ -1419,7 +1424,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void LambdaService::WriteBase64File(const std::string &base64File, const std::string &content) {
+    void LambdaService::WriteBase64File(const std::string &base64File, const std::string &content) const {
         auto lambdaDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.data-dir");
         std::string base64FullFile = Core::FileUtils::appendPath(lambdaDir, base64File);
         log_debug << "Using Base64File: " << base64FullFile;
@@ -1511,7 +1516,7 @@ namespace Awsmock::Service {
         return inspectContainerResponse.id;
     }
 
-    void LambdaService::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
+    void LambdaService::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) const {
         log_info << "Start creating docker image, name: " << lambdaEntity.function << ":" << dockerTag;
 
         std::string codeDir = Core::DirUtils::CreateTempDir();
@@ -1542,7 +1547,7 @@ namespace Awsmock::Service {
         log_info << "Finished creating docker image, name: " << lambdaEntity.function << " size: " << std::to_string(lambdaEntity.codeSize);
     }
 
-    void LambdaService::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {
+    void LambdaService::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, const int hostPort, const std::string &dockerTag) const {
         log_info << "Creating docker container, function: " << lambda.function << " hostPort: " << hostPort << " dockerTag: " << dockerTag;
         try {
             const std::string containerName = lambda.function + "-" + instanceId;
@@ -1557,17 +1562,18 @@ namespace Awsmock::Service {
         }
     }
 
-    std::vector<std::string> LambdaService::GetEnvironment(const Database::Entity::Lambda::Lambda &lambda) {
+    std::vector<std::string> LambdaService::GetEnvironment(const Database::Entity::Lambda::Lambda &lambda) const {
         std::vector<std::string> environment;
         environment.reserve(lambda.environment.variables.size() + 1);
         for (const auto &[fst, snd]: lambda.environment.variables) {
             environment.emplace_back(fst + "=" + snd);
         }
         environment.emplace_back("AWS_LAMBDA_FUNCTION_TIMEOUT=" + std::to_string(lambda.timeout));
+        log_debug << "Lambda environment variables: " << lambda.environment.variables.size();
         return environment;
     }
 
-    std::vector<std::string> LambdaService::GetCmd(const Database::Entity::Lambda::Lambda &lambda) {
+    std::vector<std::string> LambdaService::GetCmd(const Database::Entity::Lambda::Lambda &lambda) const {
         if (lambda.handler.empty()) {
             return {};
         }
@@ -1577,10 +1583,11 @@ namespace Awsmock::Service {
         if (Core::StringUtils::ContainsIgnoreCase(supportedRuntime, "awsmock-lrt")) {
             return {};
         }
+        log_debug << "Lambda handler: " << lambda.handler;
         return {lambda.handler};
     }
 
-    std::string LambdaService::GetDockerTag(const Database::Entity::Lambda::Lambda &lambda) {
+    std::string LambdaService::GetDockerTag(const Database::Entity::Lambda::Lambda &lambda) const {
         if (lambda.HasTag("version")) {
             return lambda.GetTagValue("version");
         }
@@ -1590,10 +1597,11 @@ namespace Awsmock::Service {
         if (lambda.HasTag("tag")) {
             return lambda.GetTagValue("tag");
         }
+        log_debug << "Lambda does not have a tag, function: " << lambda.function;
         return "latest";
     }
 
-    std::string LambdaService::UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) {
+    std::string LambdaService::UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) const {
         const auto tempDir = Core::Configuration::instance().get<std::string>("awsmock.temp-dir");
         const std::string zipFile = Core::FileUtils::appendPath(tempDir, Core::AwsUtils::CreateLambdaInstanceId() + ".zip");
         Core::Crypto::Base64Decode(functionCode, zipFile);

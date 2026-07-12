@@ -178,6 +178,25 @@ namespace Awsmock::Database {
         return listQueues({});
     }
 
+    std::vector<std::string> SQSMemoryRepository::listQueueUrls(const std::string &region, const std::string &prefix) const {
+
+        auto q = Core::from(_queues | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q = q.where([region](const Entity::SQS::Queue &item) { return item.region == region; });
+        }
+
+        if (!region.empty()) {
+            q = q.where([region](const Entity::SQS::Queue &item) { return item.region == region; });
+        }
+
+        log_trace << "Got queue URL list, size: " << q.count();
+        return q.to_vector() | std::views::transform([](const Entity::SQS::Queue &queue) { return queue.url; }) | std::ranges::to<std::vector<std::string>>();
+    }
+
+    std::vector<std::string> SQSMemoryRepository::listQueueUrls() const {
+        return listQueueUrls({}, {});
+    }
+
     Entity::SQS::QueueList SQSMemoryRepository::exportQueues(const std::vector<SortColumn> &sortColumns) const {
 
         auto q = _queues | std::views::values | std::ranges::to<std::vector>();

@@ -41,10 +41,8 @@ namespace Awsmock::Service {
 
         try {
             Dto::SQS::ListQueuesResponse listQueueResponse;
-            listQueueResponse.total = _sqsDatabase->countQueues(request.region, {});
             if (request.maxResults > 0) {
-
-                // Get the total number
+                listQueueResponse.total = _sqsDatabase->countQueues(request.region, {});
                 const Database::Entity::SQS::QueueList queueList = _sqsDatabase->listQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
                 const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
 
@@ -54,8 +52,8 @@ namespace Awsmock::Service {
                 return listQueueResponse;
             }
 
-            const Database::Entity::SQS::QueueList queueList = _sqsDatabase->listQueues(request.region);
-            listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
+            listQueueResponse.queueUrls = _sqsDatabase->listQueueUrls(request.region, request.queueNamePrefix);
+            listQueueResponse.total = static_cast<long>(listQueueResponse.queueUrls.size());
             listQueueResponse.copyMetadata(request);
 
             log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();

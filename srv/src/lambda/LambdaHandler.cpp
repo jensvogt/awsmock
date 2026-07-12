@@ -2,6 +2,18 @@
 #include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace Awsmock::Service {
+
+    LambdaHandler::LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc) {
+
+        _moduleService = std::make_shared<ModuleService>();
+        Dto::Module::ExportInfrastructureRequest exportRequest;
+        exportRequest.prettyPrint = true;
+        exportRequest.exportType = Dto::Module::INFRA_STRUCTURE;
+        exportRequest.modules = _moduleService->ListModuleNames().moduleNames;
+        _lambdaService.sigLambdaCodeUpdated.connect(
+                boost::signals2::signal<void(Dto::Module::ExportInfrastructureRequest)>::slot_type(&ModuleService::UpdateLambda, _moduleService.get(), exportRequest).track_foreign(_moduleService));
+    }
+
     http::response<http::dynamic_body> LambdaHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda GET request, URI: " << request.target() << " region: " << region << " user: " << user;
 

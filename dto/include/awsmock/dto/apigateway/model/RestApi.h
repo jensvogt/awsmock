@@ -112,7 +112,7 @@ namespace Awsmock::Dto::ApiGateway {
             r.policy = Core::Json::GetStringValue(v, "policy");
             r.rootResourceId = Core::Json::GetStringValue(v, "policy");
             r.apiKeySource = ApiKeySourceTypeFromString(Core::Json::GetStringValue(v, "apiKeySource"));
-            r.created = Core::Json::GetDatetimeValue(v, "lastStarted");
+            r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "binaryMediaTypes")) {
                 r.binaryMediaTypes = boost::json::value_to<std::vector<std::string>>(v.at("binaryMediaTypes"));
@@ -149,7 +149,7 @@ namespace Awsmock::Dto::ApiGateway {
                     {"warnings", boost::json::value_from(obj.warnings)},
                     {"authorizers", boost::json::value_from(obj.authorizers)},
                     {"resources", boost::json::value_from(obj.resources)},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }

@@ -3,15 +3,13 @@
 //
 
 #pragma once
+
 // C++ standard includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/Queue.h>
-#include <awsmock/entity/sqs/Queue.h>
 
 namespace Awsmock::Dto::SQS {
 
@@ -60,6 +58,4 @@ namespace Awsmock::Dto::SQS {
             };
         }
     };
-
 }// namespace Awsmock::Dto::SQS
-

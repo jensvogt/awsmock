@@ -85,7 +85,7 @@ namespace Awsmock::Database::Entity::ApiGateway {
         /**
          * @brief Converts the entity to a MongoDB document
          *
-         * @return entity as MongoDB document.
+         * @return entity as a MongoDB document.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
