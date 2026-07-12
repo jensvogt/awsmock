@@ -131,11 +131,12 @@ namespace Awsmock::Service {
         }
 
         // Parse a Lambda proxy response and return the corresponding HTTP response.
-        // Expected Lambda output: {"statusCode": 200, "headers": {...}, "body": "..."}
+        // Expected Lambda output: {"statusCode": 200, "headers": {...}, "body": "...", "isBase64Encoded": false}
         http::response<http::dynamic_body> BuildLambdaProxyResponse(const http::request<http::dynamic_body> &request, const int lambdaStatus, const std::string &responseBody) {
             int statusCode = lambdaStatus;
             std::string body;
             std::map<std::string, std::string> headers;
+            bool isBase64Encoded = false;
 
             if (!responseBody.empty()) {
                 try {
@@ -144,13 +145,25 @@ namespace Awsmock::Service {
                         statusCode = Core::Json::GetIntValue(parsed, "statusCode");
                     }
                     body = Core::Json::GetStringValue(parsed, "body");
+                    if (Core::Json::AttributeExists(parsed, "isBase64Encoded")) {
+                        isBase64Encoded = Core::Json::GetBoolValue(parsed, "isBase64Encoded");
+                    }
                     if (Core::Json::AttributeExists(parsed, "headers") && parsed.at("headers").is_object()) {
                         for (const auto &[k, v]: parsed.at("headers").as_object()) {
-                            headers[k] = v.as_string().data();
+                            if (v.is_string()) {
+                                headers[std::string(k)] = v.as_string().data();
+                            } else if (v.is_int64()) {
+                                headers[std::string(k)] = std::to_string(v.as_int64());
+                            } else if (v.is_uint64()) {
+                                headers[std::string(k)] = std::to_string(v.as_uint64());
+                            } else if (v.is_double()) {
+                                headers[std::string(k)] = std::to_string(static_cast<long long>(v.as_double()));
+                            }
                         }
                     }
                 } catch (...) {
                     body = responseBody;
+                    isBase64Encoded = false;
                 }
             }
 
@@ -160,7 +173,14 @@ namespace Awsmock::Service {
             for (const auto &[k, v]: headers) {
                 response.set(k, v);
             }
-            boost::beast::ostream(response.body()) << body;
+            if (isBase64Encoded) {
+                const auto decoded = Core::Crypto::Base64DecodeRaw(body);
+                auto &bodyBuf = response.body();
+                auto buf = boost::beast::ostream(bodyBuf);
+                buf.write(reinterpret_cast<const char *>(decoded.data()), static_cast<std::streamsize>(decoded.size()));
+            } else {
+                boost::beast::ostream(response.body()) << body;
+            }
             response.prepare_payload();
             return response;
         }
