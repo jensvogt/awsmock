@@ -4,9 +4,9 @@
 
 #include <awsmock/service/s3/S3Service.h>
 
-namespace {
-    logger_t _logger{boost::log::keywords::channel = "S3"};
-}
+// namespace {
+//     logger_t _logger{boost::log::keywords::channel = "S3"};
+// }
 
 namespace Awsmock::Service {
 
@@ -373,7 +373,7 @@ namespace Awsmock::Service {
         return response;
     }
 
-    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId, long length) {
+    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId, long length) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "upload_part");
         log_trace << "UploadPart request, part: " << part << ", updateId: " << updateId;
 
@@ -465,7 +465,7 @@ namespace Awsmock::Service {
             // Calculate the hashes asynchronously
             if (!request.checksumAlgorithm.empty()) {
 
-                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object]() mutable {
+                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [this, request, object]() mutable {
                     const std::vector algorithms = {request.checksumAlgorithm};
                     S3HashCreator{}(algorithms, object);
                     log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
@@ -1176,7 +1176,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) {
+    void S3Service::SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) const {
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
 
         // Get queue URL
@@ -1191,7 +1191,7 @@ namespace Awsmock::Service {
         log_debug << "SQS message request send, messageId: " << response.messageId;
     }
 
-    void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) {
+    void S3Service::SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) const {
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
 
         SNSService _snsService;
@@ -1337,7 +1337,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object) {
+    void S3Service::CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object) const {
         const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectoryExists(dataS3Dir);
         if (bucket.HasEncryption()) {
@@ -1351,7 +1351,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::CheckBucketExistence(const std::string &region, const std::string &name) {
+    void S3Service::CheckBucketExistence(const std::string &region, const std::string &name) const {
         // Check existence
         if (!Database::RepositoryFactory::instance().s3Repository()->bucketExists(region, name)) {
             log_warning << "Bucket does not exists, region: " << region << " name: " << name;
@@ -1359,7 +1359,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::CheckBucketNonExistence(const std::string &region, const std::string &name) {
+    void S3Service::CheckBucketNonExistence(const std::string &region, const std::string &name) const {
         // Check existence
         if (Database::RepositoryFactory::instance().s3Repository()->bucketExists(region, name)) {
             log_warning << "Bucket exists already, region: " << region << " name: " << name;
@@ -1367,7 +1367,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile) {
+    void S3Service::CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile) const {
         const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectoryExists(dataS3Dir);
         if (bucket.HasEncryption()) {
@@ -1391,7 +1391,7 @@ namespace Awsmock::Service {
         _s3Database->adjustObjectCounters();
     }
 
-    void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) {
+    void S3Service::DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_object");
 
         const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
@@ -1412,7 +1412,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::DeleteBucket(const std::string &bucket) {
+    void S3Service::DeleteBucket(const std::string &bucket) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "delete_bucket");
 
         const auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
@@ -1471,7 +1471,7 @@ namespace Awsmock::Service {
             log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
             if (!request.checksumAlgorithm.empty()) {
 
-                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object]() mutable {
+                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object, this]() mutable {
                     const std::vector algorithms = {request.checksumAlgorithm};
                     S3HashCreator{}(algorithms, object);
                     log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
@@ -1588,7 +1588,7 @@ namespace Awsmock::Service {
         return response;
     }
 
-    void S3Service::PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) {
+    void S3Service::PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) const {
         for (const auto &queueConfiguration: queueConfigurations) {
             // Check existence
             if (!queueConfiguration.id.empty() && bucket.HasQueueNotificationId(queueConfiguration.id)) {
@@ -1619,7 +1619,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) {
+    void S3Service::PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) const {
         for (const auto &topicConfiguration: topicConfigurations) {
             // Check existence
             if (!topicConfiguration.id.empty() && bucket.HasTopicNotificationId(topicConfiguration.id)) {

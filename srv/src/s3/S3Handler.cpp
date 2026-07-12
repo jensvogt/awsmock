@@ -375,10 +375,10 @@ namespace Awsmock::Service {
                     log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
                     // If chunked, we take the content length from the decoded content length header field.
-                    boost::beast::net::streambuf sb;
+                    beast::net::streambuf sb;
                     contentLength = PrepareBody(request, sb);
                     std::istream stream(&sb);
-                    std::string eTag = S3Service::UploadPart(stream, std::stoi(partNumber), uploadId, contentLength);
+                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId, contentLength);
 
                     std::map<std::string, std::string> headerMap;
                     headerMap["ETag"] = Core::StringUtils::Quoted(eTag);

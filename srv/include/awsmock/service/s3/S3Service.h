@@ -94,7 +94,8 @@ namespace Awsmock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class S3Service {
-    public:
+      public:
+
         /**
          * @brief Constructor
          */
@@ -236,7 +237,7 @@ namespace Awsmock::Service {
          * @param length content length
          * @return ETag
          */
-        static std::string UploadPart(std::istream &stream, int part, const std::string &updateId, long length);
+        std::string UploadPart(std::istream &stream, int part, const std::string &updateId, long length) const;
 
         /**
          * @brief Upload a partial file copy.
@@ -347,14 +348,12 @@ namespace Awsmock::Service {
          */
         [[nodiscard]] Dto::S3::GetObjectCounterResponse GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const;
 
-        void UploadObjectCounter(const Dto::S3::UploadObjectCounterRequest &request);
-
         /**
          * @brief Uploads a S3 object
          *
          * @param request S3 upload object counter request
          */
-        void UploadObjectCounter(const Dto::S3::UploadObjectCounterRequest &request) const;
+        void UploadObjectCounter(const Dto::S3::UploadObjectCounterRequest &request);
 
         /**
          * @brief Delete object
@@ -411,14 +410,20 @@ namespace Awsmock::Service {
          */
         void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
-    private:
+      private:
+
+        /**
+         * @brief Channeled logger
+         */
+        mutable logger_t _logger{boost::log::keywords::channel = "S3"};
+
         /**
          * @brief Sends a message to the corresponding SQS queue.
          *
          * @param eventNotification S3 event notification.
          * @param queueNotification queue notification.
          */
-        static void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
+        void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification) const;
 
         /**
          * @brief Sends a message to the corresponding SNS topic.
@@ -426,7 +431,7 @@ namespace Awsmock::Service {
          * @param eventNotification S3 event notification.
          * @param topicNotification topic notification.
          */
-        static void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification);
+        void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification) const;
 
         /**
          * @brief Send lambda function invocation request to lambda module.
@@ -458,7 +463,7 @@ namespace Awsmock::Service {
          * @param bucket S3 bucket
          * @param object S3 object
          */
-        static void CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object);
+        void CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object) const;
 
         /**
          * @brief Checks the existence of a bucket by region and name.
@@ -466,7 +471,7 @@ namespace Awsmock::Service {
          * @param region AWS region
          * @param name S3 bucket name
          */
-        static void CheckBucketExistence(const std::string &region, const std::string &name);
+        void CheckBucketExistence(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Checks whether the bucket exists already.
@@ -474,7 +479,7 @@ namespace Awsmock::Service {
          * @param region AWS region
          * @param name S3 bucket name
          */
-        static void CheckBucketNonExistence(const std::string &region, const std::string &name);
+        void CheckBucketNonExistence(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Checks the decryption status and decrypts the internal file using
@@ -489,7 +494,7 @@ namespace Awsmock::Service {
          * @param object S3 object
          * @param outFile name of the output file
          */
-        static void CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile);
+        void CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile) const;
 
         /**
          * @brief Get the temporary upload directory for a uploadId.
@@ -506,7 +511,7 @@ namespace Awsmock::Service {
          * @param key S3 object key
          * @param internalName S3 internal name
          */
-        static void DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName);
+        void DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName) const;
 
         /**
          * @brief Deletes a bucket
@@ -516,7 +521,7 @@ namespace Awsmock::Service {
          *
          * @param bucket S3 bucket name
          */
-        static void DeleteBucket(const std::string &bucket);
+        void DeleteBucket(const std::string &bucket) const;
 
         /**
          * @brief Save a versioned S3 object.
@@ -545,7 +550,7 @@ namespace Awsmock::Service {
          * @param bucket bucket entity.
          * @param queueConfigurations queue notification configurations vector.
          */
-        static void PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations);
+        void PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) const;
 
         /**
          * @brief Adds the topic notification configuration to the provided bucket.
@@ -553,7 +558,7 @@ namespace Awsmock::Service {
          * @param bucket bucket entity.
          * @param topicConfigurations topic notification configurations vector.
          */
-        static void PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations);
+        void PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) const;
 
         /**
          * @brief Adds the lambda notification configuration to the provided bucket.
@@ -591,4 +596,4 @@ namespace Awsmock::Service {
         LambdaService _lambdaService;
     };
 
-} // namespace Awsmock::Service
+}// namespace Awsmock::Service
