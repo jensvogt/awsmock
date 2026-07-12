@@ -6,22 +6,41 @@
 
 namespace Awsmock::Service {
 
+    Database::Entity::ApiGateway::Authorizer ApiGatewayService::createAuthorizer(const std::string &restApiId, const std::string &name,
+                                                                                 const std::string &type, const std::string &authorizerUri,
+                                                                                 const std::string &identitySource, const std::int64_t ttl) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_authorizer");
+        log_debug << "Create authorizer, restApiId: " << restApiId << ", name: " << name;
+
+        Database::Entity::ApiGateway::RestApi restApi = _apiGatewayDatabase->getRestApi(restApiId);
+
+        Database::Entity::ApiGateway::Authorizer authorizer;
+        authorizer.id = Core::StringUtils::GenerateRandomHexString(6);
+        authorizer.name = name;
+        authorizer.type = type;
+        authorizer.authorizerUri = authorizerUri;
+        authorizer.identitySource = identitySource;
+        authorizer.authorizerResultTtlInSeconds = ttl;
+
+        restApi.authorizers[authorizer.id] = authorizer;
+        restApi = _apiGatewayDatabase->upsertRestApi(restApi);
+        log_info << "Authorizer created, restApiId: " << restApi.id << ", authorizerId: " << authorizer.id;
+        return authorizer;
+    }
+
     Dto::ApiGateway::CreateApiKeyResponse ApiGatewayService::createApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_api_key");
         log_debug << "Create API key request, region:  " << request.region << " customerId: " << request.customerId;
 
         if (_apiGatewayDatabase->apiKeyExists(request.region, request.name)) {
-            log_error << "API key exists already, region: " << request.region << " name: " << request.customerId;
-            throw Core::ServiceException("API key exists already, region: " + request.region + " name: " + request.customerId);
+            log_error << "API key exists already, region: " << request.region << " name: " << request.name;
+            throw Core::ServiceException("API key exists already, region: " + request.region + " name: " + request.name);
         }
 
         try {
 
             // Generate API key
             Database::Entity::ApiGateway::ApiKey key = Dto::ApiGateway::Mapper::map(request);
-
-            // Set enabled
-            key.enabled = true;
 
             // ID
             if (key.id.empty()) {
@@ -43,6 +62,34 @@ namespace Awsmock::Service {
             log_error << exc.what();
             throw Core::ServiceException(exc.what());
         }
+    }
+
+    Dto::ApiGateway::CreateDeploymentResponse ApiGatewayService::createDeployment(const std::string &restApiId, const std::string &stageName) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_deployment");
+        log_debug << "Create deployment, restApiId: " << restApiId << " stageName: " << stageName;
+
+        Dto::ApiGateway::CreateDeploymentResponse response;
+        response.id = Core::AwsUtils::CreateApiKeyId();
+        response.createdDate = system_clock::now();
+        log_info << "Deployment created, restApiId: " << restApiId << " stageName: " << stageName << " deploymentId: " << response.id;
+        return response;
+    }
+
+    Dto::ApiGateway::CreateDeploymentResponse ApiGatewayService::updateDeployment(const std::string &restApiId, const std::string &deploymentId, const std::string &description) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "update_deployment");
+        log_debug << "Update deployment, restApiId: " << restApiId << " deploymentId: " << deploymentId;
+
+        Dto::ApiGateway::CreateDeploymentResponse response;
+        response.id = deploymentId;
+        response.description = description;
+        response.createdDate = system_clock::now();
+        log_info << "Deployment updated, restApiId: " << restApiId << " deploymentId: " << deploymentId;
+        return response;
+    }
+
+    void ApiGatewayService::deleteDeployment(const std::string &restApiId, const std::string &deploymentId) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_deployment");
+        log_info << "Deployment deleted, restApiId: " << restApiId << " deploymentId: " << deploymentId;
     }
 
     Dto::ApiGateway::CreateUsagePlanResponse ApiGatewayService::createUsagePlan(const Dto::ApiGateway::CreateUsagePlanRequest &request) const {

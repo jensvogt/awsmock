@@ -30,6 +30,7 @@ namespace Awsmock::Dto::ApiGateway {
         response.customerId = keyEntity.customerId;
         response.description = keyEntity.description;
         response.enabled = keyEntity.enabled;
+        response.value = keyEntity.keyValue;
         response.tags = keyEntity.tags;
         response.created = keyEntity.created;
         response.modified = keyEntity.modified;

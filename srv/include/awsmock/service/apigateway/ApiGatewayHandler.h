@@ -78,6 +78,8 @@ namespace Awsmock::Service {
          */
         http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
+        http::response<http::dynamic_body> HandlePatchRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+
       private:
 
         /**

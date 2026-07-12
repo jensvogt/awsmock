@@ -114,6 +114,14 @@ namespace Awsmock::Service {
             const auto accountId = Core::Configuration::instance().getAccountId();
             const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
+            if (!_lambdaDatabase->lambdaExistsByArn(lambdaArn)) {
+                log_warning << "Lambda function not found, arn: " << lambdaArn;
+                if (promise) {
+                    promise->set_value({404, "Lambda function not found: " + functionName});
+                }
+                return;
+            }
+
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
             if (!lambda.enabled) {
                 log_warning << "Lambda disabled, function: " << functionName;

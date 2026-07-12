@@ -609,7 +609,7 @@ namespace Awsmock::Service {
         }
         auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
         if (statusCode != http::status::ok) {
-            log_error << "Get container stats failed, name: " << applicationName << ", containerId: " << containerId << ", statusCode: " << statusCode;
+            log_debug << "Get container stats failed, name: " << applicationName << ", containerId: " << containerId << ", statusCode: " << statusCode;
             return {};
         }
         log_debug << "Container statistics received, containerId: " << containerId;
