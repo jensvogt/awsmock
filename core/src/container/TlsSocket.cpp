@@ -10,6 +10,7 @@
 #include <boost/exception/diagnostic_information.hpp>
 
 // AwsMock includes
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/container/TlsSocket.h>
 
 namespace Awsmock::Core {
@@ -52,7 +53,7 @@ namespace Awsmock::Core {
         }
 
         boost::asio::ip::tcp::resolver resolver(ctx);
-        const auto endpoints = resolver.resolve(_tlsHost, std::to_string(_tlsPort), ec);
+        const auto endpoints = HttpUtils::ResolveHost(resolver, _tlsHost, std::to_string(_tlsPort), ec);
         if (ec) {
             log_error << "DNS resolution of " << _tlsHost << ":" << _tlsPort << " failed: " << ec.message();
             return stream;

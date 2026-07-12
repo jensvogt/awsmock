@@ -79,6 +79,11 @@ namespace Awsmock::Monitoring {
         explicit MetricSystemCollector();
 
         /**
+         * @brief Destructor, releases the PDH query handle on Windows.
+         */
+        ~MetricSystemCollector();
+
+        /**
          * @brief Updates the system counter
          */
         void CollectSystemCounter();
@@ -149,29 +154,15 @@ namespace Awsmock::Monitoring {
 #elif _WIN32
 
         /**
-         * @brief Get total CPU utilization on Windows
+         * @brief Collect all Windows performance counters and emit the corresponding gauges.
+         *
+         * @par
+         * Uses a single, persistent PDH query that is sampled once per collection cycle. Since
+         * consecutive cycles are already systemPeriod seconds apart, PDH's rate counters get a
+         * valid delta without needing a second, artificially-delayed sample within the call
+         * (which used to block the calling thread with Sleep(1000) per counter).
          */
-        void GetCpuInfoWin32();
-
-        /**
-         * @brief Get CPU utilization on Windows
-         */
-        void GetCpuInfoAwsmockWin32();
-
-        /**
-         * @brief Get total memory utilization on Win32
-         */
-        void GetMemoryInfoWin32();
-
-        /**
-         * @brief Get memory utilization on Win32
-         */
-        void GetMemoryInfoAwsmockWin32();
-
-        /**
-         * @brief Get memory utilization on Win32
-         */
-        void GetThreadInfoWin32();
+        void CollectSystemCounterWin32() const;
 
 #endif
 
@@ -231,12 +222,38 @@ namespace Awsmock::Monitoring {
 #elif _WIN32
 
         /**
-         * @brief Returns value from WMI
-         *
-         * @param counter name of the WMI counter
-         * @return value of the WMI counter
+         * @brief Open the PDH query and add all counters once. Called from the constructor.
          */
-        double GetPerformanceValue(const std::string &counter) const;
+        void InitPdhQuery();
+
+        /**
+         * @brief Read the current formatted value of a previously-added PDH counter.
+         *
+         * @param counter counter handle, may be null if adding it failed
+         * @return counter value, or 0 if the counter is invalid or unreadable
+         */
+        double ReadCounterValue(HCOUNTER counter) const;
+
+        /**
+         * Persistent PDH query, opened once and reused for every collection cycle.
+         */
+        HQUERY _pdhQuery = nullptr;
+
+        /**
+         * Set once the PDH query and all counters have been added successfully.
+         */
+        bool _pdhInitialized = false;
+
+        HCOUNTER _cpuTotalCounter = nullptr;
+        HCOUNTER _cpuSystemCounter = nullptr;
+        HCOUNTER _cpuUserCounter = nullptr;
+        HCOUNTER _cpuAwsmockTotalCounter = nullptr;
+        HCOUNTER _cpuAwsmockSystemCounter = nullptr;
+        HCOUNTER _cpuAwsmockUserCounter = nullptr;
+        HCOUNTER _memTotalCounter = nullptr;
+        HCOUNTER _memAwsmockVirtualCounter = nullptr;
+        HCOUNTER _memAwsmockRealCounter = nullptr;
+        HCOUNTER _threadCounter = nullptr;
 
 #endif
 

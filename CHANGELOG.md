@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.18.89](https://github.com/jensvogt/awsmock/compare/1.18.88...v1.18.89) (2026-07-10)
+
+
+### Bug Fixes
+
+* monitoring performance on Windows ([9acc7b7](https://github.com/jensvogt/awsmock/commit/9acc7b7a2adc4f2f486f56c55ce1b45ae5951ba0))
+
+## [1.18.88](https://github.com/jensvogt/awsmock/compare/v1.18.87...v1.18.88) (2026-07-09)
+
+
+### Bug Fixes
+
+* cap macOS release build parallelism to prevent CI hangs ([4b6af87](https://github.com/jensvogt/awsmock/commit/4b6af87d15b2651b20c68bf62b001ae331346a9c))
+* cap macOS release build parallelism to prevent CI hangs ([86377a1](https://github.com/jensvogt/awsmock/commit/86377a1a0e0460ed7fcc4d815531c4a8bbabdcf8))
+
+## [1.18.87](https://github.com/jensvogt/awsmock/compare/v1.18.86...v1.18.87) (2026-07-08)
+
+
+### Bug Fixes
+
+* add api gateway lambda integration support ([51bdbfc](https://github.com/jensvogt/awsmock/commit/51bdbfcd382dc7126f97402d8ab2c25e31c80658))
+* add usage plans to api gateway service and repository implementations ([37ac7de](https://github.com/jensvogt/awsmock/commit/37ac7de1862bf4e5b7f75514d21af88a4fa04115))
+
 ## [1.18.86](https://github.com/jensvogt/awsmock/compare/1.18.85...v1.18.86) (2026-07-07)
 
 

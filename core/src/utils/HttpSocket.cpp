@@ -4,6 +4,7 @@
 
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/HttpUtils.h>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Core"};
@@ -25,7 +26,7 @@ namespace Awsmock::Core {
 
             // Resolve host/port
             boost::system::error_code ec;
-            auto const results = resolver.resolve(host, std::to_string(port));
+            auto const results = HttpUtils::ResolveHost(resolver, host, std::to_string(port));
 
             // Connect
             stream.connect(results, ec);
@@ -75,7 +76,7 @@ namespace Awsmock::Core {
 
             // Resolve host/port
             boost::system::error_code ec;
-            const auto result = resolver.resolve(host, std::to_string(port));
+            const auto result = HttpUtils::ResolveHost(resolver, host, std::to_string(port));
 
             // Connect
             stream.connect(result, ec);

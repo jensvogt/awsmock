@@ -2,9 +2,11 @@
 // Created by vogje01 on 5/28/24.
 //
 
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/container/WindowsSocket.h>
 
 namespace Awsmock::Core {
+
     DomainSocketResult WindowsSocket::SendJson(const verb method, const std::string &path) {
         return SendJson(method, path, {}, {});
     }
@@ -25,7 +27,7 @@ namespace Awsmock::Core {
             std::string host = "localhost";
             int port = 2375;
             GetHostPort(_basePath, host, port);
-            auto const results = resolver.resolve(host, std::to_string(port));
+            auto const results = HttpUtils::ResolveHost(resolver, host, std::to_string(port));
 
             // Connect
             stream.connect(results, ec);
@@ -83,7 +85,7 @@ namespace Awsmock::Core {
             std::string host = "localhost";
             int port = 2375;
             GetHostPort(_basePath, host, port);
-            auto const results = resolver.resolve(host, std::to_string(port));
+            auto const results = HttpUtils::ResolveHost(resolver, host, std::to_string(port));
 
             // Connect
             stream.connect(results, ec);
