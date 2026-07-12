@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.18.90](https://github.com/jensvogt/awsmock/compare/1.18.89...v1.18.90) (2026-07-12)
+
+
+### Bug Fixes
+
+* add logging to api gateway service, fix lambda invocation. ([c238eb8](https://github.com/jensvogt/awsmock/commit/c238eb839da967c70d05f1e95356065fc7d6cdfe))
+* add logging to api gateway service, fix lambda invocation. ([287c0f0](https://github.com/jensvogt/awsmock/commit/287c0f088d2381b3d7dd3a1493b5519b5e5853e4))
+* add logging to api gateway service, fix lambda invocation. ([73fcbd9](https://github.com/jensvogt/awsmock/commit/73fcbd90e2cae1da7a4623f207725f4ee3ec7387))
+* add logging to api gateway service, fix lambda invocation. ([a349a78](https://github.com/jensvogt/awsmock/commit/a349a782e21e778b956f8adaa4d2e2401cfabfeb))
+* add logging to api gateway service, fix lambda invocation. ([e32d5de](https://github.com/jensvogt/awsmock/commit/e32d5de31cab685eacca6cbddfd9e512995bdf57))
+
 ## [1.18.89](https://github.com/jensvogt/awsmock/compare/1.18.88...v1.18.89) (2026-07-10)
 
 
