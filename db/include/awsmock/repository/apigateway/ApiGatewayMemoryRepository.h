@@ -284,10 +284,15 @@ namespace Awsmock::Database {
         Entity::ApiGateway::UsagePlan createUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const override;
 
         [[nodiscard]]
+        Entity::ApiGateway::UsagePlan upsertUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const override;
+
+        [[nodiscard]]
         Entity::ApiGateway::UsagePlan getUsagePlanById(const std::string &id) const override;
 
         [[nodiscard]]
         std::vector<Entity::ApiGateway::UsagePlan> listUsagePlans() const override;
+
+        void importUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const override;
 
         void deleteUsagePlan(const std::string &id) const override;
 

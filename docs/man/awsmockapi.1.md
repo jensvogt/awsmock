@@ -105,82 +105,82 @@ lambdaArn="arn:aws:lambda:eu-central-1:000000000000:function:my-function"
 stageName="prod"
 
 # 1. Create the REST API
-apiJson=$(awslocal apigateway create-rest-api --name my-api)
-restApiId=$(echo "$apiJson" | jq -r .id)
+apiJson=$$(awslocal apigateway create-rest-api --name my-api)
+restApiId=$$(echo "$$apiJson" | jq -r .id)
 
 # 2. Get the root resource ID
-rootResourceId=$(awslocal apigateway get-resources --rest-api-id "$restApiId" \
+rootResourceId=$$(awslocal apigateway get-resources --rest-api-id "$$restApiId" \
   | jq -r '.items[] | select(.path == "/") | .id')
 
 # 3. Attach a GET method (API key required)
 awslocal apigateway put-method \
-  --rest-api-id "$restApiId" --resource-id "$rootResourceId" \
+  --rest-api-id "$$restApiId" --resource-id "$$rootResourceId" \
   --http-method GET --authorization-type NONE --api-key-required
 
 # 4. Point the method at the Lambda function
 awslocal apigateway put-integration \
-  --rest-api-id "$restApiId" --resource-id "$rootResourceId" \
+  --rest-api-id "$$restApiId" --resource-id "$$rootResourceId" \
   --http-method GET --type AWS_PROXY --integration-http-method POST \
-  --uri "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+  --uri "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/$${lambdaArn}/invocations"
 
 # 5. Deploy to a stage
-deploymentId=$(awslocal apigateway create-deployment \
-  --rest-api-id "$restApiId" --stage-name "$stageName" | jq -r .id)
+deploymentId=$$(awslocal apigateway create-deployment \
+  --rest-api-id "$$restApiId" --stage-name "$$stageName" | jq -r .id)
 
 # 6. Create a usage plan linked to the stage
-usagePlanId=$(awslocal apigateway create-usage-plan \
+usagePlanId=$$(awslocal apigateway create-usage-plan \
   --name my-plan \
-  --api-stages "apiId=${restApiId},stage=${stageName}" \
+  --api-stages "apiId=$${restApiId},stage=$${stageName}" \
   --throttle "burstLimit=100,rateLimit=50" \
   --quota "limit=10000,period=MONTH" | jq -r .id)
 
 # 7. Create an API key
-apiKeyJson=$(awslocal apigateway create-api-key --name my-key --enabled)
-apiKeyId=$(echo "$apiKeyJson" | jq -r .id)
-apiKeyValue=$(echo "$apiKeyJson" | jq -r .value)
+apiKeyJson=$$(awslocal apigateway create-api-key --name my-key --enabled)
+apiKeyId=$$(echo "$$apiKeyJson" | jq -r .id)
+apiKeyValue=$$(echo "$$apiKeyJson" | jq -r .value)
 
 # 8. Associate the key with the usage plan
 awslocal apigateway create-usage-plan-key \
-  --usage-plan-id "$usagePlanId" --key-id "$apiKeyId" --key-type API_KEY
+  --usage-plan-id "$$usagePlanId" --key-id "$$apiKeyId" --key-type API_KEY
 
 # 9. Invoke the endpoint
-curl -s -H "x-api-key: ${apiKeyValue}" \
-  "http://localhost:4566/restapis/${restApiId}/${stageName}/"
+curl -s -H "x-api-key: $${apiKeyValue}" \
+  "http://localhost:4566/restapis/$${restApiId}/$${stageName}/"
 ```
 
 ### Create a REST API with path parameters
 
 ```bash
 # Create REST API
-restApiId=$(awslocal apigateway create-rest-api --name books-api | jq -r .id)
-rootId=$(awslocal apigateway get-resources --rest-api-id "$restApiId" \
+restApiId=$$(awslocal apigateway create-rest-api --name books-api | jq -r .id)
+rootId=$$(awslocal apigateway get-resources --rest-api-id "$$restApiId" \
   | jq -r '.items[] | select(.path == "/") | .id')
 
 # Create /books resource
-booksId=$(awslocal apigateway create-resource \
-  --rest-api-id "$restApiId" --parent-id "$rootId" \
+booksId=$$(awslocal apigateway create-resource \
+  --rest-api-id "$$restApiId" --parent-id "$$rootId" \
   --path-part books | jq -r .id)
 
 # Create /books/{isbn} resource
-isbnId=$(awslocal apigateway create-resource \
-  --rest-api-id "$restApiId" --parent-id "$booksId" \
+isbnId=$$(awslocal apigateway create-resource \
+  --rest-api-id "$$restApiId" --parent-id "$$booksId" \
   --path-part '{isbn}' | jq -r .id)
 
 # Attach GET method and Lambda integration
 awslocal apigateway put-method \
-  --rest-api-id "$restApiId" --resource-id "$isbnId" \
+  --rest-api-id "$$restApiId" --resource-id "$$isbnId" \
   --http-method GET --authorization-type NONE
 
 awslocal apigateway put-integration \
-  --rest-api-id "$restApiId" --resource-id "$isbnId" \
+  --rest-api-id "$$restApiId" --resource-id "$$isbnId" \
   --http-method GET --type AWS_PROXY --integration-http-method POST \
   --uri "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:000000000000:function:get-book/invocations"
 
 awslocal apigateway create-deployment \
-  --rest-api-id "$restApiId" --stage-name v1
+  --rest-api-id "$$restApiId" --stage-name v1
 
 # Call it — {isbn} is passed as pathParameters.isbn in the Lambda event
-curl -s "http://localhost:4566/restapis/${restApiId}/v1/books/9783911244381"
+curl -s "http://localhost:4566/restapis/$${restApiId}/v1/books/9783911244381"
 ```
 
 ### List all API keys (with values)

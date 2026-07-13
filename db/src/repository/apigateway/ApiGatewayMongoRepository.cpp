@@ -641,4 +641,31 @@ namespace Awsmock::Database {
         }
     }
 
+    Entity::ApiGateway::UsagePlan ApiGatewayMongoRepository::upsertUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const {
+        usagePlan.modified = system_clock::now();
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+        try {
+            const auto filter = make_document(kvp("region", usagePlan.region), kvp("id", usagePlan.id));
+            const auto update = make_document(kvp("$set", usagePlan.ToDocument()));
+
+            mongocxx::options::find_one_and_update opts;
+            opts.upsert(true);
+            opts.return_document(mongocxx::options::return_document::k_after);
+            const auto mResult = col.find_one_and_update(filter.view(), update.view(), opts);
+            if (!mResult) {
+                throw Core::DatabaseException("find_one_and_update returned no document");
+            }
+            usagePlan.FromDocument(mResult->view());
+            return usagePlan;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    void ApiGatewayMongoRepository::importUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const {
+        usagePlan = upsertUsagePlan(usagePlan);
+    }
+
 }// namespace Awsmock::Database

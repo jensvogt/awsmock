@@ -78,9 +78,8 @@ namespace Awsmock::Service {
                 allModules.emplace_back(m.name);
             }
         }
-        const std::vector<std::string> &modules = request.modules.empty() ? allModules : request.modules;
 
-        for (const auto &module: modules) {
+        for (const std::vector<std::string> &modules = request.modules.empty() ? allModules : request.modules; const auto &module: modules) {
 
             if (module == "s3") {
 
@@ -180,6 +179,7 @@ namespace Awsmock::Service {
                     const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
                     infrastructure.apiKeys = _apiGatewayDatabase->listApiKeys();
                     infrastructure.restApis = _apiGatewayDatabase->listRestApis();
+                    infrastructure.usagePlans = _apiGatewayDatabase->listUsagePlans();
                 }
             }
         }
@@ -384,6 +384,15 @@ namespace Awsmock::Service {
                 _apiGatewayDatabase->importRestApis(restApi);
             }
             log_info << "Api gateway rest apis imported, count: " << infrastructure.restApis.size();
+        }
+
+        // API gateway usage plans
+        if (!infrastructure.usagePlans.empty()) {
+            const std::shared_ptr<Database::IApiGatewayRepository> _apiGatewayDatabase = Database::RepositoryFactory::instance().apigatewayRepository();
+            for (auto &usagePlan: infrastructure.usagePlans) {
+                _apiGatewayDatabase->importUsagePlan(usagePlan);
+            }
+            log_info << "Api gateway usage plans imported, count: " << infrastructure.usagePlans.size();
         }
     }
 

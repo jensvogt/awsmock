@@ -347,6 +347,32 @@ namespace Awsmock::Database {
         std::erase_if(_usagePlans, [id](const auto &item) { return item.second.id == id; });
     }
 
+    Entity::ApiGateway::UsagePlan ApiGatewayMemoryRepository::upsertUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const {
+        boost::mutex::scoped_lock lock(_usagePlanMutex);
+
+        const auto it = std::ranges::find_if(_usagePlans,
+                                             [&usagePlan](const std::pair<const std::string, Entity::ApiGateway::UsagePlan> &entry) {
+                                                 return entry.second.region == usagePlan.region && entry.second.id == usagePlan.id;
+                                             });
+        if (it != _usagePlans.end()) {
+            usagePlan.oid = it->first;
+            usagePlan.modified = system_clock::now();
+            _usagePlans[it->first] = usagePlan;
+            log_trace << "Usage plan updated, oid: " << it->first;
+            return _usagePlans[it->first];
+        }
+
+        usagePlan.oid = Core::StringUtils::CreateRandomUuid();
+        usagePlan.created = system_clock::now();
+        _usagePlans[usagePlan.oid] = usagePlan;
+        log_trace << "Usage plan created, oid: " << usagePlan.oid;
+        return _usagePlans[usagePlan.oid];
+    }
+
+    void ApiGatewayMemoryRepository::importUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const {
+        usagePlan = upsertUsagePlan(usagePlan);
+    }
+
     long ApiGatewayMemoryRepository::deleteAllUsagePlans() const {
         boost::mutex::scoped_lock lock(_usagePlanMutex);
         const long count = static_cast<long>(_usagePlans.size());
