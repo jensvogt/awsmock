@@ -2,9 +2,9 @@
 
 lambdaArn="arn:aws:lambda:eu-central-1:000000000000:function:image-publishing-scaling"
 authorizerLambdaArn="arn:aws:lambda:eu-central-1:000000000000:function:image-publishing-authorizer"
-stageName="small"
-restApiName="test-api"
-restApiKeyName="test-api-key"
+stageName="medium"
+restApiName="image-publishing-medium"
+restApiKeyName="image-publishing-medium-key"
 
 # 0. Cleanup: delete any existing API key with the same name so the script is reentrant
 existingKeyId=$(awslocal apigateway get-api-keys 2>/dev/null \
@@ -24,12 +24,10 @@ rootResourceId=$(awslocal apigateway get-resources --rest-api-id "$restApiId" | 
 echo "Root resource ID: $rootResourceId"
 
 # 3. Create a Lambda authorizer
-authorizerJson=$(awslocal apigateway create-authorizer --rest-api-id "$restApiId" \
-  --name "image-publishing-authorizer" \
+authorizerJson=$(awslocal apigateway create-authorizer --rest-api-id "$restApiId" --name "image-publishing-authorizer" \
   --type TOKEN \
   --authorizer-uri "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/${authorizerLambdaArn}/invocations" \
-  --identity-source "method.request.header.Authorization" \
-  --authorizer-result-ttl-in-seconds 300)
+  --identity-source "method.request.header.Authorization" --authorizer-result-ttl-in-seconds 300)
 authorizerId=$(echo "$authorizerJson" | jq -r .id)
 echo "Authorizer ID: $authorizerId"
 

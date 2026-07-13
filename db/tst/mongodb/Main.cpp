@@ -8,6 +8,7 @@
 // Awsmock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace {
@@ -51,6 +52,21 @@ struct GlobalTestFixture {
     }
 
     ~GlobalTestFixture() {
+        auto &rf = Awsmock::Database::RepositoryFactory::instance();
+        rf.s3Repository()->deleteAllObjects();
+        rf.s3Repository()->deleteAllBuckets();
+        rf.sqsRepository()->deleteAllMessages();
+        rf.sqsRepository()->deleteAllQueues();
+        rf.snsRepository()->deleteAllMessages();
+        rf.snsRepository()->deleteAllTopics();
+        rf.dynamodbRepository()->deleteAllItems();
+        rf.dynamodbRepository()->deleteAllTables();
+        rf.lambdaRepository()->deleteAllLambdas();
+        rf.ssmRepository()->deleteAllParameters();
+        rf.apigatewayRepository()->deleteAllKeys();
+        rf.apigatewayRepository()->deleteAllUsagePlans();
+        rf.applicationRepository()->deleteAllApplications();
+        rf.secretsmanagerRepository()->DeleteAllSecrets();
     }
 };
 

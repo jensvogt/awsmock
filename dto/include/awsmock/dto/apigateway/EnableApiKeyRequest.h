@@ -1,5 +1,5 @@
 //
-// Created by vogje01 on 11/25/23.
+// Created by vogje01 on 01/09/2025
 //
 
 #pragma once
@@ -9,31 +9,30 @@
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/common/SortColumn.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
     /**
-     * @brief Returns a single API key
+     * @brief Enable API gateway key request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetApiKeyCounterRequest final : Common::BaseCounter<GetApiKeyCounterRequest> {
+    struct EnableApiKeyRequest final : Common::BaseCounter<EnableApiKeyRequest> {
 
         /**
-         * API Key ID
+         * API key ID
          */
         std::string keyId;
 
       private:
 
-        friend GetApiKeyCounterRequest tag_invoke(boost::json::value_to_tag<GetApiKeyCounterRequest>, boost::json::value const &v) {
-            GetApiKeyCounterRequest r;
+        friend EnableApiKeyRequest tag_invoke(boost::json::value_to_tag<EnableApiKeyRequest>, boost::json::value const &v) {
+            EnableApiKeyRequest r;
             r.keyId = Core::Json::GetStringValue(v, "keyId");
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetApiKeyCounterRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EnableApiKeyRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},

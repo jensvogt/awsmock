@@ -3,8 +3,8 @@
 //
 
 // C++ includes
-#include <awsmock/service/apigateway/ApiGatewayHandler.h>
 #include <awsmock/dto/apigateway/CreateDeploymentResponse.h>
+#include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 namespace Awsmock::Service {
 
@@ -395,10 +395,26 @@ namespace Awsmock::Service {
 
                 case Dto::Common::ApiGatewayCommandType::DELETE_API_KEY: {
 
-                    Dto::ApiGateway::CreateApiKeyRequest serviceRequest = Dto::ApiGateway::CreateApiKeyRequest::FromJson(clientCommand);
-                    const Dto::ApiGateway::CreateApiKeyResponse serviceResponse = _apiGatewayService.createApiKey(serviceRequest);
-                    log_info << "API key created, name: " << serviceRequest.name;
-                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                    Dto::ApiGateway::DeleteApiKeyRequest serviceRequest = Dto::ApiGateway::DeleteApiKeyRequest::FromJson(clientCommand);
+                    _apiGatewayService.deleteApiKey(serviceRequest);
+                    log_info << "API key created, apiKey: " << serviceRequest.apiKey;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::ENABLE_API_KEY: {
+
+                    Dto::ApiGateway::EnableApiKeyRequest serviceRequest = Dto::ApiGateway::EnableApiKeyRequest::FromJson(clientCommand);
+                    _apiGatewayService.enableApiKey(serviceRequest);
+                    log_info << "API key enabled, keyId: " << serviceRequest.keyId;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::DISABLE_API_KEY: {
+
+                    Dto::ApiGateway::DisableApiKeyRequest serviceRequest = Dto::ApiGateway::DisableApiKeyRequest::FromJson(clientCommand);
+                    _apiGatewayService.disableApiKey(serviceRequest);
+                    log_info << "API key disabled, keyId: " << serviceRequest.keyId;
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApiGatewayCommandType::LIST_API_KEY_COUNTERS: {
@@ -413,7 +429,7 @@ namespace Awsmock::Service {
 
                     Dto::ApiGateway::GetApiKeyCounterRequest serviceRequest = Dto::ApiGateway::GetApiKeyCounterRequest::FromJson(clientCommand);
                     const Dto::ApiGateway::GetApiKeyCounterResponse serviceResponse = _apiGatewayService.getApiKeyCounter(serviceRequest);
-                    log_info << "Get API key counter, id: " << serviceRequest.id;
+                    log_info << "Get API key counter, keyId: " << serviceRequest.keyId;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 

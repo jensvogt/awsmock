@@ -206,6 +206,50 @@ namespace Awsmock::Service {
         }
     }
 
+    void ApiGatewayService::enableApiKey(const Dto::ApiGateway::EnableApiKeyRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "enable_api_key");
+        log_debug << "Enable API key request, region: " << request.region << " keyId: " << request.keyId;
+
+        if (!_apiGatewayDatabase->apiKeyExists(request.keyId)) {
+            log_error << "API key does not exist, region: " << request.region << " keyId: " << request.keyId;
+            throw Core::NotFoundException("API key does not exist, keyId: " + request.keyId);
+        }
+
+        try {
+
+            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->getApiKeyById(request.keyId);
+            key.enabled = true;
+            _apiGatewayDatabase->updateApiKey(key);
+            log_info << "API key enabled, keyId: " << request.keyId;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::disableApiKey(const Dto::ApiGateway::DisableApiKeyRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "disable_api_key");
+        log_debug << "Disable API key request, region: " << request.region << " keyId: " << request.keyId;
+
+        if (!_apiGatewayDatabase->apiKeyExists(request.keyId)) {
+            log_error << "API key does not exist, region: " << request.region << " keyId: " << request.keyId;
+            throw Core::NotFoundException("API key does not exist, keyId: " + request.keyId);
+        }
+
+        try {
+
+            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->getApiKeyById(request.keyId);
+            key.enabled = false;
+            _apiGatewayDatabase->updateApiKey(key);
+            log_info << "API key disabled, keyId: " << request.keyId;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
     void ApiGatewayService::deleteUsagePlan(const Dto::ApiGateway::DeleteUsagePlanRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_usage_plan");
         log_debug << "Delete usage plan request, region: " << request.region << " usagePlanId: " << request.usagePlanId;
@@ -322,15 +366,15 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_key");
         log_debug << "Get API key counter request, region:  " << request.region;
 
-        if (!_apiGatewayDatabase->apiKeyExists(request.id)) {
-            log_error << "API key does not exist, region: " << request.region << ", id: " << request.id;
-            throw Core::ServiceException("API key does not exist, region: " + request.region + ", apiKey: " + request.id);
+        if (!_apiGatewayDatabase->apiKeyExists(request.keyId)) {
+            log_error << "API key does not exist, region: " << request.region << ", keyId: " << request.keyId;
+            throw Core::ServiceException("API key does not exist, region: " + request.region + ", keyId: " + request.keyId);
         }
 
         try {
 
             // Get the API key
-            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->getApiKeyById(request.id);
+            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->getApiKeyById(request.keyId);
 
             Dto::ApiGateway::GetApiKeyCounterResponse response{};
             response.apiKey = Dto::ApiGateway::Mapper::map(key);
