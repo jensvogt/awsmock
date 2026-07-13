@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.92](https://github.com/jensvogt/awsmock/compare/1.18.91...v1.18.92) (2026-07-13)
+
+
+### Bug Fixes
+
+* api gateway import export usage plans ([3766203](https://github.com/jensvogt/awsmock/commit/376620347160e3a517b015ac2f7ee2596075b165))
+
 ## [1.18.91](https://github.com/jensvogt/awsmock/compare/1.18.90...v1.18.91) (2026-07-12)
 
 
