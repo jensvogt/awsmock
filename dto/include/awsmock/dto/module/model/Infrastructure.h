@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 // C++ standard includes
 #include <string>
 
@@ -11,6 +12,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/RestApi.h>
+#include <awsmock/entity/apigateway/UsagePlan.h>
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
@@ -138,6 +140,11 @@ namespace Awsmock::Dto::Module {
         std::vector<Database::Entity::ApiGateway::RestApi> restApis;
 
         /**
+         * @brief API gateway usage plans
+         */
+        std::vector<Database::Entity::ApiGateway::UsagePlan> usagePlans;
+
+        /**
          * @brief Convert to a BSON object
          *
          * @return bson document
@@ -145,7 +152,7 @@ namespace Awsmock::Dto::Module {
         [[nodiscard]] document ToDocument() const;
 
         /**
-         * @brief Convert from BSON document
+         * @brief Convert from a BSON document
          *
          * @param document BSON document
          */
@@ -159,5 +166,4 @@ namespace Awsmock::Dto::Module {
         void FromJson(const std::string &jsonString);
     };
 
-} // namespace Awsmock::Dto::Module
-
+}// namespace Awsmock::Dto::Module

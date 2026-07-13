@@ -110,7 +110,7 @@ namespace Awsmock::Database {
         virtual void importApiKey(Entity::ApiGateway::ApiKey &key) const = 0;
 
         /**
-         * @brief Import an REST APIs.
+         * @brief Import REST APIs.
          *
          * @par
          * If the provided REST API exists already, it will be updated, otherwise inserted. The modified/created timestamp will be updated accordingly.
@@ -118,6 +118,16 @@ namespace Awsmock::Database {
          * @param restApi REST API to import
          */
         virtual void importRestApis(Entity::ApiGateway::RestApi &restApi) const = 0;
+
+        /**
+         * @brief Import API gateway usage plans
+         *
+         * @par
+         * If the provided usage plan exists already, it will be updated, otherwise inserted. The modified/created timestamp will be updated accordingly.
+         *
+         * @param usagePlan API gateway usage plan
+         */
+        virtual void importUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const = 0;
 
         /**
          * @brief Returns the total number of keys
@@ -280,6 +290,9 @@ namespace Awsmock::Database {
 
         [[nodiscard]]
         virtual Entity::ApiGateway::UsagePlan createUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const = 0;
+
+        [[nodiscard]]
+        virtual Entity::ApiGateway::UsagePlan upsertUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const = 0;
 
         [[nodiscard]]
         virtual Entity::ApiGateway::UsagePlan getUsagePlanById(const std::string &id) const = 0;
