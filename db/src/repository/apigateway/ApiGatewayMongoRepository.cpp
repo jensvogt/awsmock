@@ -163,8 +163,9 @@ namespace Awsmock::Database {
 
         if (apiKeyExists(key.id)) {
             key = updateApiKey(key);
+        } else {
+            key = createKey(key);
         }
-        key = createKey(key);
     }
 
     void ApiGatewayMongoRepository::importRestApis(Entity::ApiGateway::RestApi &restApi) const {

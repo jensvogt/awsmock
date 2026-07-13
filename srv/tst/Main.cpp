@@ -12,7 +12,7 @@
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/repository/dynamodb/DynamoDbMongoRepository.h>
+#include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace {
@@ -68,6 +68,23 @@ struct GlobalTestFixture {
     }
 
     ~GlobalTestFixture() {
+        auto &rf = Awsmock::Database::RepositoryFactory::instance();
+        rf.s3Repository()->deleteAllObjects();
+        rf.s3Repository()->deleteAllBuckets();
+        rf.sqsRepository()->deleteAllMessages();
+        rf.sqsRepository()->deleteAllQueues();
+        rf.snsRepository()->deleteAllMessages();
+        rf.snsRepository()->deleteAllTopics();
+        rf.dynamodbRepository()->deleteAllItems();
+        rf.dynamodbRepository()->deleteAllTables();
+        rf.cognitoRepository()->deleteAllGroups({});
+        rf.cognitoRepository()->deleteAllUsers();
+        rf.cognitoRepository()->deleteAllUserPools();
+        rf.kmsRepository()->deleteAllKeys();
+        rf.ssmRepository()->deleteAllParameters();
+        rf.apigatewayRepository()->deleteAllKeys();
+        rf.apigatewayRepository()->deleteAllUsagePlans();
+        rf.secretsmanagerRepository()->DeleteAllSecrets();
         _iocWork.reset();
         _ioc.stop();
         if (_iocThread.joinable()) {

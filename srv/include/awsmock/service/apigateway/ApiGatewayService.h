@@ -27,6 +27,8 @@
 #include <awsmock/dto/apigateway/CreateRestApiRequest.h>
 #include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
+#include <awsmock/dto/apigateway/DisableApiKeyRequest.h>
+#include <awsmock/dto/apigateway/EnableApiKeyRequest.h>
 #include <awsmock/dto/apigateway/DeleteUsagePlanRequest.h>
 #include <awsmock/dto/apigateway/DeleteResourceRequest.h>
 #include <awsmock/dto/apigateway/DeleteRestApiRequest.h>
@@ -152,6 +154,20 @@ namespace Awsmock::Service {
          * @param request delete API key request
          */
         void deleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
+
+        /**
+         * @brief Enables an API gateway key
+         *
+         * @param request enable API key request
+         */
+        void enableApiKey(const Dto::ApiGateway::EnableApiKeyRequest &request) const;
+
+        /**
+         * @brief Disables an API gateway key
+         *
+         * @param request disable API key request
+         */
+        void disableApiKey(const Dto::ApiGateway::DisableApiKeyRequest &request) const;
 
         /**
          * @brief Deletes a usage plan
