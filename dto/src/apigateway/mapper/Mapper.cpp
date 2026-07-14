@@ -283,4 +283,47 @@ namespace Awsmock::Dto::ApiGateway {
         return restApiDtos;
     }
 
+    // ========================================================================================================================
+    // Usage Plan
+    // ========================================================================================================================
+    UsagePlan Mapper::map(const Database::Entity::ApiGateway::UsagePlan &usagePlanEntity) {
+        UsagePlan usagePlan{};
+        usagePlan.id = usagePlanEntity.id;
+        usagePlan.name = usagePlanEntity.name;
+        usagePlan.description = usagePlanEntity.description;
+        usagePlan.quota.limit = usagePlanEntity.quota.limit;
+        usagePlan.quota.offset = usagePlanEntity.quota.offset;
+        usagePlan.quota.period = usagePlanEntity.quota.period;
+        usagePlan.throttle.burstLimit = usagePlanEntity.throttle.burstLimit;
+        usagePlan.throttle.rateLimit = usagePlanEntity.throttle.rateLimit;
+        usagePlan.tags = usagePlanEntity.tags;
+        usagePlan.created = usagePlanEntity.created;
+        usagePlan.modified = usagePlanEntity.modified;
+        return usagePlan;
+    }
+
+    Database::Entity::ApiGateway::UsagePlan Mapper::map(const UsagePlan &usagePlanDto) {
+        Database::Entity::ApiGateway::UsagePlan usagePlan{};
+        usagePlan.id = usagePlanDto.id;
+        usagePlan.name = usagePlanDto.name;
+        usagePlan.description = usagePlanDto.description;
+        usagePlan.quota.limit = usagePlanDto.quota.limit;
+        usagePlan.quota.offset = usagePlanDto.quota.offset;
+        usagePlan.quota.period = usagePlanDto.quota.period;
+        usagePlan.throttle.burstLimit = usagePlanDto.throttle.burstLimit;
+        usagePlan.throttle.rateLimit = usagePlanDto.throttle.rateLimit;
+        usagePlan.tags = usagePlanDto.tags;
+        usagePlan.created = usagePlanDto.created;
+        usagePlan.modified = usagePlanDto.modified;
+        return usagePlan;
+    }
+
+    std::vector<UsagePlan> Mapper::map(const std::vector<Database::Entity::ApiGateway::UsagePlan> &usagePlanEntities) {
+        std::vector<UsagePlan> usagePlanDtos;
+        for (const auto &usagePlan: usagePlanEntities) {
+            usagePlanDtos.emplace_back(map(usagePlan));
+        }
+        return usagePlanDtos;
+    }
+
 }// namespace Awsmock::Dto::ApiGateway

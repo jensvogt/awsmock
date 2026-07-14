@@ -300,6 +300,12 @@ namespace Awsmock::Database {
         [[nodiscard]]
         virtual std::vector<Entity::ApiGateway::UsagePlan> listUsagePlans() const = 0;
 
+        [[nodiscard]]
+        virtual std::vector<Entity::ApiGateway::UsagePlan> listUsagePlanCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const = 0;
+
+        [[nodiscard]]
+        virtual long countUsagePlans(const std::string &region, const std::string &prefix) const = 0;
+
         virtual void deleteUsagePlan(const std::string &id) const = 0;
 
         [[nodiscard]]

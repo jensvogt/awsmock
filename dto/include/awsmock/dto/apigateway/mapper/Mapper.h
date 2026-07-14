@@ -16,10 +16,12 @@
 #include <awsmock/dto/apigateway/model/Authorizer.h>
 #include <awsmock/dto/apigateway/model/Key.h>
 #include <awsmock/dto/apigateway/model/RestApi.h>
+#include <awsmock/dto/apigateway/model/UsagePlan.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/entity/apigateway/Authorizer.h>
 #include <awsmock/entity/apigateway/Resource.h>
 #include <awsmock/entity/apigateway/RestApi.h>
+#include <awsmock/entity/apigateway/UsagePlan.h>
 
 namespace Awsmock::Dto::ApiGateway {
 
@@ -215,6 +217,30 @@ namespace Awsmock::Dto::ApiGateway {
          * @see AwsMock::Dto::ApiGateway::RestApi
          */
         static std::vector<RestApi> map(const std::vector<Database::Entity::ApiGateway::RestApi> &restApiEntities);
+
+        /**
+         * @brief Maps a usage plan entity to a usage plan DTO
+         *
+         * @param usagePlanEntity usage plan entity
+         * @return usage plan DTO
+         */
+        static UsagePlan map(const Database::Entity::ApiGateway::UsagePlan &usagePlanEntity);
+
+        /**
+         * @brief Maps a usage plan DTO to a usage plan entity
+         *
+         * @param usagePlanDto usage plan DTO
+         * @return usage plan entity
+         */
+        static Database::Entity::ApiGateway::UsagePlan map(const UsagePlan &usagePlanDto);
+
+        /**
+         * @brief Maps a list of usage plan entities to a list of usage plan DTOs
+         *
+         * @param usagePlanEntities list of usage plan entities
+         * @return list of usage plan DTOs
+         */
+        static std::vector<UsagePlan> map(const std::vector<Database::Entity::ApiGateway::UsagePlan> &usagePlanEntities);
     };
 
 }// namespace Awsmock::Dto::ApiGateway

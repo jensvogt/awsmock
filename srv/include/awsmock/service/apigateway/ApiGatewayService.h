@@ -39,6 +39,7 @@
 #include <awsmock/dto/apigateway/GetRestApisRequest.h>
 #include <awsmock/dto/apigateway/GetRestApisResponse.h>
 #include <awsmock/dto/apigateway/internal/DeleteRestApiCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/DeleteUsagePlanCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterResponse.h>
 #include <awsmock/dto/apigateway/internal/GetRestApiCounterRequest.h>
@@ -47,8 +48,13 @@
 #include <awsmock/dto/apigateway/internal/ListApiKeyCountersResponse.h>
 #include <awsmock/dto/apigateway/internal/ListRestApiCountersRequest.h>
 #include <awsmock/dto/apigateway/internal/ListRestApiCountersResponse.h>
+#include <awsmock/dto/apigateway/internal/GetUsagePlanCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/GetUsagePlanCounterResponse.h>
+#include <awsmock/dto/apigateway/internal/ListUsagePlanCountersRequest.h>
+#include <awsmock/dto/apigateway/internal/ListUsagePlanCountersResponse.h>
 #include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/internal/UpdateRestApiCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/UpdateUsagePlanCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/dto/common/ApiGatewayClientCommand.h>
 #include <awsmock/dto/common/mapper/SortColumnMapper.h>
@@ -229,6 +235,31 @@ namespace Awsmock::Service {
         Dto::ApiGateway::ListRestApiCountersResponse listRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
 
         /**
+         * @brief List usage plans
+         *
+         * @param request internal usage plan counters request
+         * @return list of usage plan counters
+         */
+        [[nodiscard]]
+        Dto::ApiGateway::ListUsagePlanCountersResponse listUsagePlanCounters(const Dto::ApiGateway::ListUsagePlanCountersRequest &request) const;
+
+        /**
+         * @brief Get a single usage plan
+         *
+         * @param request internal get usage plan counter request
+         * @return usage plan counter response
+         */
+        [[nodiscard]]
+        Dto::ApiGateway::GetUsagePlanCounterResponse getUsagePlanCounter(const Dto::ApiGateway::GetUsagePlanCounterRequest &request) const;
+
+        /**
+         * @brief Update a usage plan
+         *
+         * @param request internal usage plan counter update request
+         */
+        void updateUsagePlanCounter(const Dto::ApiGateway::UpdateUsagePlanCounterRequest &request) const;
+
+        /**
          * @brief Returns a REST API entity
          *
          * @param request get a REST API request
@@ -249,6 +280,13 @@ namespace Awsmock::Service {
          * @param request delete request
          */
         void deleteRestApiCounter(const Dto::ApiGateway::DeleteRestApiCounterRequest &request) const;
+
+        /**
+         * @brief Deletes a usage plan (management internal)
+         *
+         * @param request delete usage plan counter request
+         */
+        void deleteUsagePlanCounter(const Dto::ApiGateway::DeleteUsagePlanCounterRequest &request) const;
 
         /**
          * @brief Deletes a REST API

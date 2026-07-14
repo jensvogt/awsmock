@@ -619,6 +619,66 @@ namespace Awsmock::Database {
         }
     }
 
+    std::vector<Entity::ApiGateway::UsagePlan> ApiGatewayMongoRepository::listUsagePlanCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+
+        try {
+            std::vector<Entity::ApiGateway::UsagePlan> usagePlanList;
+
+            mongocxx::options::find opts;
+            if (!sortColumns.empty()) {
+                document sort = {};
+                for (const auto &sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                }
+                opts.sort(sort.extract());
+            }
+            if (pageIndex > 0) {
+                opts.skip(pageSize * pageIndex);
+            }
+            if (pageSize > 0) {
+                opts.limit(pageSize);
+            }
+
+            document query = {};
+            if (!prefix.empty()) {
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+            }
+
+            for (auto cursor = col.find(query.extract(), opts); const auto &doc: cursor) {
+                Entity::ApiGateway::UsagePlan plan;
+                plan.FromDocument(doc);
+                usagePlanList.push_back(plan);
+            }
+            return usagePlanList;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    long ApiGatewayMongoRepository::countUsagePlans(const std::string &region, const std::string &prefix) const {
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];
+
+        try {
+            document query = {};
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!prefix.empty()) {
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+            }
+            return static_cast<long>(col.count_documents(query.extract()));
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
     void ApiGatewayMongoRepository::deleteUsagePlan(const std::string &id) const {
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection col = client->database(_databaseName)[_usagePlanCollectionName];

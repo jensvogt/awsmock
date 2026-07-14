@@ -50,7 +50,11 @@ namespace Awsmock::Dto::Common {
         CREATE_USAGE_PLAN,
         CREATE_USAGE_PLAN_KEY,
         DELETE_USAGE_PLAN,
+        LIST_USAGE_PLANS,
         // AwsMock internal
+        LIST_USAGE_PLAN_COUNTERS,
+        GET_USAGE_PLAN_COUNTER,
+        UPDATE_USAGE_PLAN_COUNTER,
         LIST_API_KEY_COUNTERS,
         GET_API_KEY_COUNTER,
         UPDATE_API_KEY_COUNTER,
@@ -58,6 +62,7 @@ namespace Awsmock::Dto::Common {
         GET_REST_API_COUNTER,
         UPDATE_REST_API_COUNTER,
         DELETE_REST_API_COUNTER,
+        DELETE_USAGE_PLAN_COUNTER,
         UNKNOWN
     };
 
@@ -87,7 +92,11 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::CREATE_USAGE_PLAN, "create-usage-plan"},
             {ApiGatewayCommandType::CREATE_USAGE_PLAN_KEY, "create-usage-plan-key"},
             {ApiGatewayCommandType::DELETE_USAGE_PLAN, "delete-usage-plan"},
+            {ApiGatewayCommandType::LIST_USAGE_PLANS, "list-usage-plans"},
             // AwsMock internal commands
+            {ApiGatewayCommandType::LIST_USAGE_PLAN_COUNTERS, "list-usage-plan-counters"},
+            {ApiGatewayCommandType::GET_USAGE_PLAN_COUNTER, "get-usage-plan-counter"},
+            {ApiGatewayCommandType::UPDATE_USAGE_PLAN_COUNTER, "update-usage-plan-counter"},
             {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
             {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},
             {ApiGatewayCommandType::UPDATE_API_KEY_COUNTER, "update-api-key-counter"},
@@ -95,6 +104,7 @@ namespace Awsmock::Dto::Common {
             {ApiGatewayCommandType::GET_REST_API_COUNTER, "get-rest-api-counter"},
             {ApiGatewayCommandType::UPDATE_REST_API_COUNTER, "update-rest-api-counter"},
             {ApiGatewayCommandType::DELETE_REST_API_COUNTER, "delete-rest-api-counter"},
+            {ApiGatewayCommandType::DELETE_USAGE_PLAN_COUNTER, "delete-usage-plan-counter"},
             {ApiGatewayCommandType::UNKNOWN, "unknown"},
     };
 
