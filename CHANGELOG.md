@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.94](https://github.com/jensvogt/awsmock/compare/1.18.93...v1.18.94) (2026-07-14)
+
+
+### Bug Fixes
+
+* add/edit usage plan ([00cbf8c](https://github.com/jensvogt/awsmock/commit/00cbf8c533246a9987cd27c1d2eec06711dfd878))
+
 ## [1.18.93](https://github.com/jensvogt/awsmock/compare/1.18.92...v1.18.93) (2026-07-13)
 
 
