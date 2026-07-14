@@ -343,6 +343,40 @@ namespace Awsmock::Database {
         return result;
     }
 
+    std::vector<Entity::ApiGateway::UsagePlan> ApiGatewayMemoryRepository::listUsagePlanCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+        boost::mutex::scoped_lock lock(_usagePlanMutex);
+
+        auto q = Core::from(Core::NumberUtils::toVector(_usagePlans));
+        if (!sortColumns.empty()) {
+            for (const auto &sc: sortColumns) {
+                if (sc.column == "id") {
+                    q = q.order_by([](const Entity::ApiGateway::UsagePlan &a, const Entity::ApiGateway::UsagePlan &b) { return a.id < b.id; });
+                }
+                if (sc.column == "name") {
+                    q = q.order_by([](const Entity::ApiGateway::UsagePlan &a, const Entity::ApiGateway::UsagePlan &b) { return a.name < b.name; });
+                }
+            }
+        }
+
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::ApiGateway::UsagePlan &item) { return Core::StringUtils::StartsWith(item.name, prefix); });
+        }
+        const auto resultVector = q.to_vector();
+        return Core::PageVector(resultVector, pageSize, pageIndex);
+    }
+
+    long ApiGatewayMemoryRepository::countUsagePlans(const std::string &region, const std::string &prefix) const {
+        auto q = Core::from(Core::NumberUtils::toVector(_usagePlans));
+
+        if (!region.empty()) {
+            q = q.where([region](const Entity::ApiGateway::UsagePlan &item) { return item.region == region; });
+        }
+        if (!prefix.empty()) {
+            q = q.where([prefix](const Entity::ApiGateway::UsagePlan &item) { return Core::StringUtils::StartsWith(item.name, prefix); });
+        }
+        return static_cast<long>(q.count());
+    }
+
     void ApiGatewayMemoryRepository::deleteUsagePlan(const std::string &id) const {
         boost::mutex::scoped_lock lock(_usagePlanMutex);
         std::erase_if(_usagePlans, [id](const auto &item) { return item.second.id == id; });

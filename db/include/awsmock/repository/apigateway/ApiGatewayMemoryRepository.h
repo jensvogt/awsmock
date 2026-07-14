@@ -292,6 +292,12 @@ namespace Awsmock::Database {
         [[nodiscard]]
         std::vector<Entity::ApiGateway::UsagePlan> listUsagePlans() const override;
 
+        [[nodiscard]]
+        std::vector<Entity::ApiGateway::UsagePlan> listUsagePlanCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const override;
+
+        [[nodiscard]]
+        long countUsagePlans(const std::string &region, const std::string &prefix) const override;
+
         void importUsagePlan(Entity::ApiGateway::UsagePlan &usagePlan) const override;
 
         void deleteUsagePlan(const std::string &id) const override;

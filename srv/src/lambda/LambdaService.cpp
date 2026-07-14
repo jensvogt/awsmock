@@ -678,7 +678,7 @@ namespace Awsmock::Service {
             response.runtime = lambda.runtime;
             response.user = lambda.user;
             response.role = lambda.role;
-            response.size = lambda.codeSize;
+            response.size = lambda.imageSize;
             response.zipFile = lambda.code.zipFile;
             response.s3Bucket = lambda.code.s3Bucket;
             response.s3Key = lambda.code.s3Key;
@@ -1446,7 +1446,7 @@ namespace Awsmock::Service {
             lambda.avgDuration = 0;
             lambda.invocations = 0;
             lambda.lastStarted = system_clock::now();
-            lambda.codeSize = static_cast<long>(lambda.code.zipFile.size());
+            //lambda.codeSize = static_cast<long>(lambda.code.zipFile.size());
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_info << "Lambda function instance started: " << lambda.function << " instanceId: " << instanceId << ", instances: " << lambda.instances.size();
             return lambda;
@@ -1510,6 +1510,7 @@ namespace Awsmock::Service {
             instance.privatePort = stoi(privatePort);
             instance.containerId = inspectContainerResponse.id;
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
+            lambda.codeSize = inspectContainerResponse.sizeRootFs;
         }
         lambda.instances.emplace_back(instance);
 

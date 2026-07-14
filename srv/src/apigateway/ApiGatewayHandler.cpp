@@ -4,6 +4,12 @@
 
 // C++ includes
 #include <awsmock/dto/apigateway/CreateDeploymentResponse.h>
+#include <awsmock/dto/apigateway/internal/DeleteUsagePlanCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/GetUsagePlanCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/GetUsagePlanCounterResponse.h>
+#include <awsmock/dto/apigateway/internal/ListUsagePlanCountersRequest.h>
+#include <awsmock/dto/apigateway/internal/ListUsagePlanCountersResponse.h>
+#include <awsmock/dto/apigateway/internal/UpdateUsagePlanCounterRequest.h>
 #include <awsmock/service/apigateway/ApiGatewayHandler.h>
 
 namespace Awsmock::Service {
@@ -485,6 +491,30 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApiGatewayCommandType::LIST_USAGE_PLAN_COUNTERS: {
+
+                    Dto::ApiGateway::ListUsagePlanCountersRequest serviceRequest = Dto::ApiGateway::ListUsagePlanCountersRequest::FromJson(clientCommand);
+                    Dto::ApiGateway::ListUsagePlanCountersResponse serviceResponse = _apiGatewayService.listUsagePlanCounters(serviceRequest);
+                    log_info << "List usage plan counters, count: " << serviceResponse.total;
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::GET_USAGE_PLAN_COUNTER: {
+
+                    Dto::ApiGateway::GetUsagePlanCounterRequest serviceRequest = Dto::ApiGateway::GetUsagePlanCounterRequest::FromJson(clientCommand);
+                    const Dto::ApiGateway::GetUsagePlanCounterResponse serviceResponse = _apiGatewayService.getUsagePlanCounter(serviceRequest);
+                    log_info << "Get usage plan counter, usagePlanId: " << serviceRequest.usagePlanId;
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::UPDATE_USAGE_PLAN_COUNTER: {
+
+                    Dto::ApiGateway::UpdateUsagePlanCounterRequest serviceRequest = Dto::ApiGateway::UpdateUsagePlanCounterRequest::FromJson(clientCommand);
+                    _apiGatewayService.updateUsagePlanCounter(serviceRequest);
+                    log_info << "Update usage plan counter, usagePlanId: " << serviceRequest.usagePlan.id;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::ApiGatewayCommandType::GET_REST_API_COUNTER: {
 
                     Dto::ApiGateway::GetRestApiCounterRequest serviceRequest = Dto::ApiGateway::GetRestApiCounterRequest::FromJson(clientCommand);
@@ -506,6 +536,14 @@ namespace Awsmock::Service {
                     Dto::ApiGateway::DeleteRestApiCounterRequest serviceRequest = Dto::ApiGateway::DeleteRestApiCounterRequest::FromJson(clientCommand);
                     _apiGatewayService.deleteRestApiCounter(serviceRequest);
                     log_info << "Delete REST API counter, name: " << serviceRequest.name;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ApiGatewayCommandType::DELETE_USAGE_PLAN_COUNTER: {
+
+                    Dto::ApiGateway::DeleteUsagePlanCounterRequest serviceRequest = Dto::ApiGateway::DeleteUsagePlanCounterRequest::FromJson(clientCommand);
+                    _apiGatewayService.deleteUsagePlanCounter(serviceRequest);
+                    log_info << "Delete usage plan counter, usagePlanId: " << serviceRequest.usagePlanId;
                     return SendResponse(request, http::status::ok);
                 }
 

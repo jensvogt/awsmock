@@ -427,6 +427,24 @@ namespace Awsmock::Service {
         }
     }
 
+    Dto::ApiGateway::ListUsagePlanCountersResponse ApiGatewayService::listUsagePlanCounters(const Dto::ApiGateway::ListUsagePlanCountersRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "list_usage_plans");
+        log_debug << "List usage plan counters request, region: " << request.region;
+
+        try {
+
+            const std::vector<Database::Entity::ApiGateway::UsagePlan> usagePlans = _apiGatewayDatabase->listUsagePlanCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            Dto::ApiGateway::ListUsagePlanCountersResponse response{};
+            response.total = _apiGatewayDatabase->countUsagePlans(request.region, request.prefix);
+            response.usagePlans = Dto::ApiGateway::Mapper::map(usagePlans);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
     Dto::ApiGateway::GetRestApiCounterResponse ApiGatewayService::getRestApiCounter(const Dto::ApiGateway::GetRestApiCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_rest_api");
         log_debug << "Get REST API counter request, region:  " << request.region << ", name: " << request.name;
@@ -473,6 +491,64 @@ namespace Awsmock::Service {
             restApi = _apiGatewayDatabase->upsertRestApi(restApi);
             log_debug << "REST API updated, name: " + restApi.name;
 
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::GetUsagePlanCounterResponse ApiGatewayService::getUsagePlanCounter(const Dto::ApiGateway::GetUsagePlanCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_usage_plan");
+        log_debug << "Get usage plan counter request, region: " << request.region << ", usagePlanId: " << request.usagePlanId;
+
+        if (!_apiGatewayDatabase->usagePlanExists(request.usagePlanId)) {
+            log_error << "Usage plan does not exist, region: " << request.region << ", usagePlanId: " << request.usagePlanId;
+            throw Core::ServiceException("Usage plan does not exist, region: " + request.region + ", usagePlanId: " + request.usagePlanId);
+        }
+
+        try {
+            Database::Entity::ApiGateway::UsagePlan usagePlan = _apiGatewayDatabase->getUsagePlanById(request.usagePlanId);
+            Dto::ApiGateway::GetUsagePlanCounterResponse response{};
+            response.usagePlan = Dto::ApiGateway::Mapper::map(usagePlan);
+            return response;
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::updateUsagePlanCounter(const Dto::ApiGateway::UpdateUsagePlanCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "update_usage_plan");
+        log_debug << "Update usage plan counter request, region: " << request.region << ", usagePlanId: " << request.usagePlan.id;
+
+        if (!_apiGatewayDatabase->usagePlanExists(request.usagePlan.id)) {
+            log_error << "Usage plan does not exist, region: " << request.region << ", usagePlanId: " << request.usagePlan.id;
+            throw Core::ServiceException("Usage plan does not exist, region: " + request.region + ", usagePlanId: " + request.usagePlan.id);
+        }
+
+        try {
+            Database::Entity::ApiGateway::UsagePlan usagePlan = Dto::ApiGateway::Mapper::map(request.usagePlan);
+            usagePlan.modified = Core::DateTimeUtils::LocalDateTimeNow();
+            usagePlan = _apiGatewayDatabase->upsertUsagePlan(usagePlan);
+            log_debug << "Usage plan updated, id: " << usagePlan.id;
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::ServiceException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::deleteUsagePlanCounter(const Dto::ApiGateway::DeleteUsagePlanCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_usage_plan");
+        log_debug << "Delete usage plan counter request, region: " << request.region << " usagePlanId: " << request.usagePlanId;
+
+        if (!_apiGatewayDatabase->usagePlanExists(request.usagePlanId)) {
+            log_error << "Usage plan does not exist, region: " << request.region << " usagePlanId: " << request.usagePlanId;
+            throw Core::ServiceException("Usage plan does not exist, region: " + request.region + " usagePlanId: " + request.usagePlanId);
+        }
+
+        try {
+            _apiGatewayDatabase->deleteUsagePlan(request.usagePlanId);
+            log_trace << "Usage plan deleted, id: " << request.usagePlanId;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::ServiceException(exc.what());
