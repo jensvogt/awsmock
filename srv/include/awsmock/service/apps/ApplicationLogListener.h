@@ -73,13 +73,21 @@ namespace Awsmock::Service {
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         void do_accept() {
+            if (!_acceptor.is_open())
+                return;
             // The new connection gets its own strand
             _acceptor.async_accept(boost::asio::make_strand(_ioc), boost::beast::bind_front_handler(&ApplicationLogListener::on_accept, shared_from_this()));
         }
 
         void on_accept(const boost::beast::error_code &ec, boost::asio::ip::tcp::socket socket) {
             if (ec) {
-                log_error << "Accept failed, errorCode: " << ec.message() << std::endl;
+                // operation_aborted = server shutting down; ECONNABORTED/EINVAL = client reset
+                // before accept (BSD/macOS behaviour) — both are non-fatal, don't log as errors.
+                if (ec != boost::asio::error::operation_aborted &&
+                    ec != boost::asio::error::connection_aborted &&
+                    ec.value() != EINVAL) {
+                    log_error << "Accept failed, errorCode: " << ec.message() << std::endl;
+                }
             } else {
                 // Create the session and run it
                 std::make_shared<ApplicationLogSession>(std::move(socket))->Run();
