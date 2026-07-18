@@ -219,8 +219,8 @@ namespace Awsmock::Service {
 
             Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->getApiKeyById(request.keyId);
             key.enabled = true;
-            _apiGatewayDatabase->updateApiKey(key);
-            log_info << "API key enabled, keyId: " << request.keyId;
+            key = _apiGatewayDatabase->updateApiKey(key);
+            log_info << "API key enabled, keyId: " << key.id;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -241,8 +241,8 @@ namespace Awsmock::Service {
 
             Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase->getApiKeyById(request.keyId);
             key.enabled = false;
-            _apiGatewayDatabase->updateApiKey(key);
-            log_info << "API key disabled, keyId: " << request.keyId;
+            key = _apiGatewayDatabase->updateApiKey(key);
+            log_info << "API key disabled, keyId: " << key.id;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
