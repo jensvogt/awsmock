@@ -106,27 +106,20 @@ namespace Awsmock::Dto::S3 {
                 boost::property_tree::ptree pt;
                 Core::XmlUtils::ReadXml(xmlString, &pt);
 
-                boost::property_tree::ptree notificationTree = pt.get_child("NotificationConfiguration");
-
-                // SQS queues
-                if (notificationTree.find("QueueConfiguration") != notificationTree.not_found()) {
-                    QueueConfiguration queueConfiguration;
-                    queueConfiguration.FromXml(notificationTree.get_child("QueueConfiguration"));
-                    queueConfigurations.emplace_back(queueConfiguration);
-                }
-
-                // SNS topics
-                if (notificationTree.find("TopicConfiguration") != notificationTree.not_found()) {
-                    TopicConfiguration topicConfiguration;
-                    topicConfiguration.FromXml(pt.get_child("TopicConfiguration"));
-                    topicConfigurations.emplace_back(topicConfiguration);
-                }
-
-                // Lambdas
-                if (notificationTree.find("CloudFunctionConfiguration") != notificationTree.not_found()) {
-                    LambdaConfiguration lambdaConfiguration;
-                    lambdaConfiguration.FromXml(notificationTree.get_child("CloudFunctionConfiguration"));
-                    lambdaConfigurations.emplace_back(lambdaConfiguration);
+                for (boost::property_tree::ptree notificationTree = pt.get_child("NotificationConfiguration"); auto &[key, val]: notificationTree) {
+                    if (key == "QueueConfiguration") {
+                        QueueConfiguration queueConfiguration;
+                        queueConfiguration.FromXml(val);
+                        queueConfigurations.emplace_back(queueConfiguration);
+                    } else if (key == "TopicConfiguration") {
+                        TopicConfiguration topicConfiguration;
+                        topicConfiguration.FromXml(val);
+                        topicConfigurations.emplace_back(topicConfiguration);
+                    } else if (key == "CloudFunctionConfiguration") {
+                        LambdaConfiguration lambdaConfiguration;
+                        lambdaConfiguration.FromXml(val);
+                        lambdaConfigurations.emplace_back(lambdaConfiguration);
+                    }
                 }
 
             } catch (std::exception &e) {

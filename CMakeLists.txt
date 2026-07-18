@@ -55,6 +55,7 @@ endif ()
 # -------------------------------------------------------------------------
 # Dependencies
 # -------------------------------------------------------------------------
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 find_package(LibArchive REQUIRED)
 find_package(bsoncxx CONFIG REQUIRED)
 find_package(mongocxx CONFIG REQUIRED)

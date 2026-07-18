@@ -1070,7 +1070,10 @@ namespace Awsmock::Service {
             Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket);
             log_debug << "Bucket received, region:" << bucket.region << " bucket: " << bucket.name;
 
-            // Add notification configurations
+            // Replace notification configurations (clear first so an empty list deletes existing ones)
+            bucket.queueNotifications.clear();
+            bucket.topicNotifications.clear();
+            bucket.lambdaNotifications.clear();
             if (!request.queueConfigurations.empty()) {
                 PutQueueNotificationConfigurations(bucket, request.queueConfigurations);
             }

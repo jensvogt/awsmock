@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 // C++ includes
 #include <string>
 
@@ -149,4 +150,3 @@ namespace Awsmock::Dto::Transfer {
     typedef std::vector<User> UserList;
 
 }// namespace Awsmock::Dto::Transfer
-

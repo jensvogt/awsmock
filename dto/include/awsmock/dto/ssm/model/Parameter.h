@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 // C++ standard includes
 #include <chrono>
 #include <map>
@@ -184,4 +185,3 @@ namespace Awsmock::Dto::SSM {
     };
 
 }// namespace Awsmock::Dto::SSM
-

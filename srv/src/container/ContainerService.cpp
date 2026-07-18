@@ -540,7 +540,7 @@ namespace Awsmock::Service {
             log_warning << "Docker not initialized, container commands not available";
             return;
         }
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content && statusCode != http::status::not_modified) {
             log_warning << "Start container failed, name: " << containerName << ", id: " << containerId.substr(0, 12) << ", statusCode: " << statusCode;
             return;
         }
@@ -641,7 +641,7 @@ namespace Awsmock::Service {
             log_warning << "Docker not initialized, container commands not available";
             return;
         }
-        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content) {
+        if (auto [statusCode, body, contentLength] = GetSocket()->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content && statusCode != http::status::conflict) {
             log_warning << "Kill container failed, containerId: " << containerId << ", statusCode: " << statusCode;
             return;
         }

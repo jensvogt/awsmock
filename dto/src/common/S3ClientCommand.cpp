@@ -6,13 +6,13 @@
 
 namespace Awsmock::Dto::Common {
 
-    void S3ClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
+    void S3ClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
         UserAgent userAgent;
         userAgent.FromRequest(request);
 
-        region = awsRegion;
-        user = awsUser;
+        this->region = region;
+        this->user = user;
         method = request.method();
         contentType = Core::HttpUtils::GetContentType(request);
         contentLength = Core::HttpUtils::GetContentLength(request);
