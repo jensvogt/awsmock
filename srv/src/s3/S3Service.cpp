@@ -1698,6 +1698,7 @@ namespace Awsmock::Service {
     void S3Service::AddLambdaEventSource(const Database::Entity::S3::Bucket &bucket, const Dto::S3::LambdaConfiguration &lambdaConfiguration) const {
         Dto::Lambda::AddEventSourceRequest request;
         request.uuid = lambdaConfiguration.id;
+        request.type = "S3";
         request.enabled = true;
         request.functionArn = lambdaConfiguration.lambdaArn;
         request.eventSourceArn = bucket.arn;

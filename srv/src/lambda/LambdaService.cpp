@@ -395,9 +395,14 @@ namespace Awsmock::Service {
             // If type is SQS, create SQS notification configuration
             CreateResourceNotification(request);
 
-            lambda.eventSources.emplace_back(eventSourceMapping);
+            if (lambda.HasEventSource(request.eventSourceArn)) {
+                std::ranges::replace_if(lambda.eventSources, [&request](const Database::Entity::Lambda::EventSourceMapping &e) { return e.eventSourceArn == request.eventSourceArn; }, eventSourceMapping);
+                log_trace << "Lambda event source updated, lambdaArn: " << lambda.arn;
+            } else {
+                lambda.eventSources.emplace_back(eventSourceMapping);
+                log_trace << "Lambda event source added, lambdaArn: " << lambda.arn;
+            }
             lambda = _lambdaDatabase->updateLambda(lambda);
-            log_trace << "Lambda event sources added, lambdaArn: " << lambda.arn;
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
