@@ -76,9 +76,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/vcpkg-bincache
-          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          key: vcpkg-v2-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ runner.os }}-
+            vcpkg-v2-${{ runner.os }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -161,9 +161,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/vcpkg-bincache
-          key: vcpkg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/vcpkg.json') }}
+          key: vcpkg-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ runner.os }}-${{ runner.arch }}-
+            vcpkg-v2-${{ runner.os }}-${{ runner.arch }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -285,9 +285,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/vcpkg-bincache
-          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          key: vcpkg-v2-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
           restore-keys: |
-            vcpkg-${{ runner.os }}-
+            vcpkg-v2-${{ runner.os }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
