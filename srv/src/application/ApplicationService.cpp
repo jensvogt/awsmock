@@ -424,7 +424,6 @@ namespace Awsmock::Service {
             Database::Entity::Apps::Application application = _applicationDatabase->getApplication(request.region, request.application.name);
 
             if (application.containerName.empty() || !ContainerService::instance().ContainerExists(application.containerName)) {
-                log_warning << "Container does not exist, name: " << request.application.name;
                 return;
             }
 

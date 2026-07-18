@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 // C++ standard includes
 #include <string>
 
@@ -58,4 +59,3 @@ namespace Awsmock::Dto::Transfer {
     };
 
 }// namespace Awsmock::Dto::Transfer
-
