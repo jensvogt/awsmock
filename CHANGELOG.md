@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.18.95](https://github.com/jensvogt/awsmock/compare/1.18.94...v1.18.95) (2026-07-18)
+
+
+### Bug Fixes
+
+* S3 topicConfiguration, queueNotification, lambdaConfiguration ([d6b2066](https://github.com/jensvogt/awsmock/commit/d6b2066bd1475c63ff8b7151bf315499c88d4839))
+* S3 topicConfiguration, queueNotification, lambdaConfiguration ([7f2babf](https://github.com/jensvogt/awsmock/commit/7f2babf03cb0e5bf0f29b66f1f2b3711286a80ec))
+* S3 topicConfiguration, queueNotification, lambdaConfiguration ([599f144](https://github.com/jensvogt/awsmock/commit/599f1445579888f7ef8374b8b79ba1711a596fac))
+* S3 topicConfiguration, queueNotification, lambdaConfiguration ([24b4fdf](https://github.com/jensvogt/awsmock/commit/24b4fdf5042e6a159d507b569362d6916aef0ed7))
+* S3 topicConfiguration, queueNotification, lambdaConfiguration ([734853b](https://github.com/jensvogt/awsmock/commit/734853be5bed83f1f9ed662fbd9470c9f352d63f))
+* S3 topicConfiguration, queueNotification, lambdaConfiguration ([b74f3f7](https://github.com/jensvogt/awsmock/commit/b74f3f7e47dd1dbe3c50a6f181d17dbe0b777bd7))
+
 ## [1.18.94](https://github.com/jensvogt/awsmock/compare/1.18.93...v1.18.94) (2026-07-14)
 
 
