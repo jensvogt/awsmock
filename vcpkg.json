@@ -12,5 +12,5 @@
     "mongo-cxx-driver",
     "pcre2"
   ],
-  "builtin-baseline": "52c9e08cdf8580d2d9762f547d22b96fd81e82f2"
+  "builtin-baseline": "c3867e714dd3a51c272826eea77267876517ed99"
 }
