@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.99](https://github.com/jensvogt/awsmock/compare/v1.18.98...v1.18.99) (2026-07-19)
+
+
+### Bug Fixes
+
+* KMS aliases, IAM, Cloudwatch ([5b23e80](https://github.com/jensvogt/awsmock/commit/5b23e8006b7964959d6369e91c240b97a72212bf))
+
 ## [1.18.98](https://github.com/jensvogt/awsmock/compare/v1.18.97...v1.18.98) (2026-07-19)
 
 
