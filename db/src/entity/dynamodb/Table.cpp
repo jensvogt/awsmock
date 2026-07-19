@@ -16,6 +16,7 @@ namespace Awsmock::Database::Entity::DynamoDb {
                     kvp("name", name),
                     kvp("arn", arn),
                     kvp("status", status),
+                    kvp("billingMode", billingMode),
                     kvp("size", bsoncxx::types::b_int64(size)),
                     kvp("items", bsoncxx::types::b_int64(items)),
                     kvp("created", bsoncxx::types::b_date(created)),
@@ -54,6 +55,8 @@ namespace Awsmock::Database::Entity::DynamoDb {
             // Stream specification
             tableDoc.append(kvp("streamSpecification", streamSpecification.ToDocument()));
 
+            tableDoc.append(kvp("sseEnabled", sseEnabled));
+
             return tableDoc.extract();
 
         } catch (std::exception &e) {
@@ -69,9 +72,9 @@ namespace Awsmock::Database::Entity::DynamoDb {
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
+        billingMode = Core::Bson::BsonUtils::GetStringValue(mResult, "billingMode");
         size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
         items = Core::Bson::BsonUtils::GetLongValue(mResult, "items");
-        status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
@@ -114,6 +117,8 @@ namespace Awsmock::Database::Entity::DynamoDb {
         if (mResult.value().find("streamSpecification") != mResult.value().end()) {
             streamSpecification.FromDocument(mResult.value()["streamSpecification"].get_document().value);
         }
+
+        sseEnabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "sseEnabled");
     }
 
 }// namespace Awsmock::Database::Entity::DynamoDb

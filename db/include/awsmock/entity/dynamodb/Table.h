@@ -84,6 +84,16 @@ namespace Awsmock::Database::Entity::DynamoDb {
         StreamSpecification streamSpecification;
 
         /**
+         * Billing mode (PAY_PER_REQUEST or PROVISIONED)
+         */
+        std::string billingMode;
+
+        /**
+         * Server-side encryption enabled
+         */
+        bool sseEnabled{false};
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();

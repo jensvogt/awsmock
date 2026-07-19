@@ -1,5 +1,7 @@
 
 #include "awsmock/core/exception/UnauthorizedException.h"
+#include "awsmock/dto/dynamodb/UpdateTableRequest.h"
+#include "awsmock/dto/dynamodb/UpdateTableResponse.h"
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 
 namespace Awsmock::Service {
@@ -19,6 +21,14 @@ namespace Awsmock::Service {
                     Dto::DynamoDb::CreateTableRequest tableRequest = Dto::DynamoDb::CreateTableRequest::FromJson(clientCommand);
                     Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
                     log_info << "Table created, name: " << tableRequest.tableName;
+                    return SendResponse(request, http::status::ok, tableResponse.ToJson());
+                }
+
+                case Dto::Common::DynamoDbCommandType::UPDATE_TABLE: {
+
+                    Dto::DynamoDb::UpdateTableRequest tableRequest = Dto::DynamoDb::UpdateTableRequest::FromJson(clientCommand);
+                    Dto::DynamoDb::UpdateTableResponse tableResponse = _dynamoDbService.UpdateTable(tableRequest);
+                    log_info << "Table updated, name: " << tableRequest.tableName;
                     return SendResponse(request, http::status::ok, tableResponse.ToJson());
                 }
 
@@ -182,6 +192,9 @@ namespace Awsmock::Service {
         } catch (boost::exception &exc) {
             log_error << diagnostic_information(exc);
             return SendResponse(request, http::status::internal_server_error, "Unknown exception");
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
 

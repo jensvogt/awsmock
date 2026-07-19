@@ -58,6 +58,11 @@ namespace Awsmock::Dto::DynamoDb {
          */
         StreamSpecification streamSpecification;
 
+        /**
+         * Server-side encryption enabled
+         */
+        bool sseEnabled{false};
+
       private:
 
         friend CreateTableRequest tag_invoke(boost::json::value_to_tag<CreateTableRequest>, boost::json::value const &v) {
@@ -78,6 +83,9 @@ namespace Awsmock::Dto::DynamoDb {
             }
             if (Core::Json::AttributeExists(v, "KeySchema")) {
                 r.keySchema = boost::json::value_to<std::vector<KeySchema>>(v.at("KeySchema"));
+            }
+            if (Core::Json::AttributeExists(v, "SSESpecification")) {
+                r.sseEnabled = Core::Json::GetBoolValue(v.at("SSESpecification"), "Enabled");
             }
             return r;
         }

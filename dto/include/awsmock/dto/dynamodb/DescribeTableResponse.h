@@ -82,6 +82,11 @@ namespace Awsmock::Dto::DynamoDb {
         std::string tableArn;
 
         /**
+         * Billing mode (PAY_PER_REQUEST or PROVISIONED)
+         */
+        std::string billingMode;
+
+        /**
          * Table size
          */
         long size{};
@@ -131,6 +136,11 @@ namespace Awsmock::Dto::DynamoDb {
          */
         bool deletionProtectionEnabled{};
 
+        /**
+         * Server-side encryption enabled
+         */
+        bool sseEnabled{false};
+
       private:
 
         friend DescribeTableResponse tag_invoke(boost::json::value_to_tag<DescribeTableResponse>, boost::json::value const &v) {
@@ -146,6 +156,9 @@ namespace Awsmock::Dto::DynamoDb {
                 r.tableStatus = TableStatusTypeFromString(Core::Json::GetStringValue(tableObject, "TableStatus"));
                 r.createdDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(tableObject, "CreationDateTime"));
                 r.deletionProtectionEnabled = Core::Json::GetBoolValue(tableObject, "DeletionProtectionEnabled");
+                if (Core::Json::AttributeExists(tableObject, "SSEDescription")) {
+                    r.sseEnabled = Core::Json::GetStringValue(tableObject.at("SSEDescription").as_object(), "Status") == "ENABLED";
+                }
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
                     r.tags = boost::json::value_to<std::vector<Tag>>(tableObject.at("Tags"));
                 }
@@ -176,6 +189,12 @@ namespace Awsmock::Dto::DynamoDb {
             tableObject["DeletionProtectionEnabled"] = obj.deletionProtectionEnabled;
             tableObject["ProvisionedThroughput"] = boost::json::value_from(obj.provisionedThroughput);
             tableObject["TableClassSummary"] = boost::json::value_from(obj.tableClassSummary);
+            if (!obj.billingMode.empty()) {
+                tableObject["BillingModeSummary"] = boost::json::object{{"BillingMode", obj.billingMode}};
+            }
+            if (obj.sseEnabled) {
+                tableObject["SSEDescription"] = boost::json::object{{"Status", "ENABLED"}, {"SSEType", "KMS"}};
+            }
 
             if (!obj.tags.empty()) {
                 tableObject["Tags"] = boost::json::value_from(obj.tags);

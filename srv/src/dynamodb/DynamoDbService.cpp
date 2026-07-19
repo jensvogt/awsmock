@@ -4,9 +4,6 @@
 
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
-#include "awsmock/dto/cognito/mapper/Mapper.h"
-#include "awsmock/dto/dynamodb/internal/ExportItemsResponse.h"
-
 namespace Awsmock::Service {
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const {
@@ -37,6 +34,8 @@ namespace Awsmock::Service {
             table.arn = Core::AwsUtils::CreateDynamoDbTableArn(_accountId, request.tableName);
             table.provisionedThroughput = provisionedThroughput;
             table.status = Dto::DynamoDb::TableStatusTypeToString(Dto::DynamoDb::TableStatusType::ACTIVE);
+            table.billingMode = provisionedThroughput.readCapacityUnits > 0 ? "PROVISIONED" : "PAY_PER_REQUEST";
+            table.sseEnabled = request.sseEnabled;
 
             // Attributes
             if (!request.attributes.empty()) {
@@ -74,6 +73,52 @@ namespace Awsmock::Service {
         }
 
         return createTableResponse;
+    }
+
+    Dto::DynamoDb::UpdateTableResponse DynamoDbService::UpdateTable(const Dto::DynamoDb::UpdateTableRequest &request) const {
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, DYNAMODB_SERVICE_COUNTER, "action", "update_table");
+        log_debug << "Update DynamoDb table, region: " << request.region << " name: " << request.tableName;
+
+        try {
+            Database::Entity::DynamoDb::Table table = _dynamoDbDatabase->getTableByRegionName(request.region, request.tableName);
+
+            if (request.provisionedThroughput.readCapacityUnits > 0) {
+                table.provisionedThroughput.readCapacityUnits = request.provisionedThroughput.readCapacityUnits;
+                table.provisionedThroughput.writeCapacityUnits = request.provisionedThroughput.writeCapacityUnits;
+            }
+            if (!request.billingMode.empty()) {
+                table.billingMode = request.billingMode;
+            }
+            if (request.sseEnabled) {
+                table.sseEnabled = request.sseEnabled;
+            }
+            table = _dynamoDbDatabase->updateTable(table);
+
+            Dto::DynamoDb::UpdateTableResponse response;
+            response.region = request.region;
+            response.tableName = table.name;
+            response.tableArn = table.arn;
+            response.billingMode = table.billingMode;
+            response.tableSize = table.size;
+            response.items = table.items;
+            response.tableStatus = Dto::DynamoDb::TableStatusTypeFromString(table.status);
+            response.sseEnabled = table.sseEnabled;
+            response.createdDateTime = table.created;
+            response.provisionedThroughput.readCapacityUnits = table.provisionedThroughput.readCapacityUnits;
+            response.provisionedThroughput.writeCapacityUnits = table.provisionedThroughput.writeCapacityUnits;
+            for (const auto &k: table.keySchema) {
+                response.keySchema.emplace_back(Dto::DynamoDb::Mapper::map(k));
+            }
+            for (const auto &a: table.attributeDefinitions) {
+                response.attributeDefinitions.emplace_back(Dto::DynamoDb::Mapper::map(a));
+            }
+            log_debug << "DynamoDb table updated, name: " << table.name;
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "DynamoDb update table failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDb update table failed, error: " + exc.message());
+        }
     }
 
     bool DynamoDbService::ExistTable(const std::string &region, const std::string &tableName) const {
@@ -221,9 +266,15 @@ namespace Awsmock::Service {
             Dto::DynamoDb::DescribeTableResponse response;
             response.region = request.region;
             response.tableName = request.tableName;
-            response.items = table.items;
             response.tableArn = table.arn;
+            response.size = table.size;
+            response.items = table.items;
             response.tableStatus = Dto::DynamoDb::TableStatusTypeFromString(table.status);
+            response.createdDateTime = table.created;
+            response.billingMode = table.billingMode;
+            response.sseEnabled = table.sseEnabled;
+            response.provisionedThroughput.readCapacityUnits = table.provisionedThroughput.readCapacityUnits;
+            response.provisionedThroughput.writeCapacityUnits = table.provisionedThroughput.writeCapacityUnits;
 
             // Attribute definitions
             if (!table.attributeDefinitions.empty()) {

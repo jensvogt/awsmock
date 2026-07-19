@@ -21,6 +21,7 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
+#include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/dto/common/mapper/SortColumnMapper.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
@@ -43,6 +44,8 @@
 #include <awsmock/dto/dynamodb/QueryResponse.h>
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
+#include <awsmock/dto/dynamodb/UpdateTableRequest.h>
+#include <awsmock/dto/dynamodb/UpdateTableResponse.h>
 #include <awsmock/dto/dynamodb/internal/ExportItemsRequest.h>
 #include <awsmock/dto/dynamodb/internal/ExportItemsResponse.h>
 #include <awsmock/dto/dynamodb/internal/GetItemCounterRequest.h>
@@ -90,6 +93,14 @@ namespace Awsmock::Service {
          * @return CreateTableResponse
          */
         [[nodiscard]] Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const;
+
+        /**
+         * @brief Updates an existing table
+         *
+         * @param request update table request DTO
+         * @return UpdateTableResponse
+         */
+        [[nodiscard]] Dto::DynamoDb::UpdateTableResponse UpdateTable(const Dto::DynamoDb::UpdateTableRequest &request) const;
 
         /**
          * @brief check the existence of the table in DynamoDB docker image.
@@ -176,12 +187,21 @@ namespace Awsmock::Service {
         [[nodiscard]] long DeleteAllTables() const;
 
         /**
-         * Gets an item
+         * @brief Gets an item
          *
          * @param request get item request DTO
          * @return GetItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::GetItemResponse GetItem(Dto::DynamoDb::GetItemRequest &request) const;
+        [[nodiscard]]
+        Dto::DynamoDb::GetItemResponse GetItem(Dto::DynamoDb::GetItemRequest &request) const;
+
+        /**
+         * @brief Gets an item counter
+         *
+         * @param request get item counter response DTO
+         * @return GetItemCounterResponse
+         */
+        [[nodiscard]]
         Dto::DynamoDb::GetItemCounterResponse GetItemCounter(Dto::DynamoDb::GetItemCounterRequest &request) const;
 
         /**
@@ -190,7 +210,8 @@ namespace Awsmock::Service {
          * @param request put item request DTO
          * @return GetItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::PutItemResponse PutItem(Dto::DynamoDb::PutItemRequest &request) const;
+        [[nodiscard]]
+        Dto::DynamoDb::PutItemResponse PutItem(Dto::DynamoDb::PutItemRequest &request) const;
 
         /**
          * @brief Query the database
@@ -198,7 +219,8 @@ namespace Awsmock::Service {
          * @param request query item request DTO
          * @return QueryResponse
          */
-        [[nodiscard]] Dto::DynamoDb::QueryResponse Query(Dto::DynamoDb::QueryRequest &request) const;
+        [[nodiscard]]
+        Dto::DynamoDb::QueryResponse Query(Dto::DynamoDb::QueryRequest &request) const;
 
         /**
          * @brief Scan the database
@@ -206,7 +228,8 @@ namespace Awsmock::Service {
          * @param request scan request DTO
          * @return ScanResponse
          */
-        [[nodiscard]] Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request) const;
+        [[nodiscard]]
+        Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request) const;
 
         /**
          * @brief Deletes a item
@@ -214,7 +237,8 @@ namespace Awsmock::Service {
          * @param request delete item request DTO
          * @return DeleteItemResponse
          */
-        [[nodiscard]] Dto::DynamoDb::DeleteItemResponse DeleteItem(Dto::DynamoDb::DeleteItemRequest &request) const;
+        [[nodiscard]]
+        Dto::DynamoDb::DeleteItemResponse DeleteItem(Dto::DynamoDb::DeleteItemRequest &request) const;
 
         /**
          * @brief delete all items
