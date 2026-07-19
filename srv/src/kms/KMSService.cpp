@@ -332,6 +332,42 @@ namespace Awsmock::Service {
         }
     }
 
+    Dto::KMS::GenerateDataKeyResponse KMSService::GenerateDataKey(const Dto::KMS::GenerateDataKeyRequest &request) const {
+        Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "generate_data_key");
+        log_trace << "GenerateDataKey request, keyId: " << request.keyId;
+
+        if (!_kmsDatabase->keyExists(request.keyId)) {
+            log_error << "Key not found, keyId: " << request.keyId;
+            throw Core::ServiceException("Key not found, keyId: " + request.keyId);
+        }
+
+        try {
+            const Database::Entity::KMS::Key keyEntity = _kmsDatabase->getKeyByKeyId(request.keyId);
+
+            // Generate random plaintext data key (numberOfBytes bytes)
+            const int keyLen = request.numberOfBytes > 0 ? request.numberOfBytes : 32;
+            unsigned char plainBytes[64] = {};
+            unsigned char ivBytes[32] = {};
+            Core::Crypto::CreateAes256Key(plainBytes, ivBytes);
+
+            const std::string plaintextStr(reinterpret_cast<char *>(plainBytes), keyLen);
+            const std::string plaintextB64 = Core::Crypto::Base64Encode(plaintextStr);
+
+            // Encrypt the plaintext data key under the KMS key
+            const std::string ciphertextB64 = EncryptPlaintext(keyEntity, plaintextB64);
+
+            Dto::KMS::GenerateDataKeyResponse response;
+            response.keyId = keyEntity.arn;
+            response.plaintext = plaintextB64;
+            response.ciphertextBlob = ciphertextB64;
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "GenerateDataKey failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) const {
         Monitoring::MonitoringTimer measure(KMS_SERVICE_TIMER, KMS_SERVICE_COUNTER, "method", "decrypt");
         log_trace << "Decrypt plaintext request, keyId: " << request.keyId;
@@ -506,4 +542,134 @@ namespace Awsmock::Service {
         return {};
     }
 
-} // namespace Awsmock::Service
+    Dto::KMS::GetKeyPolicyResponse KMSService::GetKeyPolicy(const Dto::KMS::GetKeyPolicyRequest &request) const {
+        log_trace << "GetKeyPolicy request, keyId: " << request.keyId;
+
+        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
+
+        Dto::KMS::GetKeyPolicyResponse response;
+        if (key.policy.empty()) {
+            // Return a default allow-all policy
+            response.policy = R"({"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::000000000000:root"},"Action":"kms:*","Resource":"*"}]})";
+        } else {
+            response.policy = key.policy;
+        }
+        return response;
+    }
+
+    void KMSService::PutKeyPolicy(const Dto::KMS::PutKeyPolicyRequest &request) const {
+        log_trace << "PutKeyPolicy request, keyId: " << request.keyId;
+
+        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
+        key.policy = request.policy;
+        key.modified = system_clock::now();
+        _kmsDatabase->updateKey(key);
+        log_debug << "PutKeyPolicy done, keyId: " << request.keyId;
+    }
+
+    void KMSService::TagResource(const Dto::KMS::TagResourceRequest &request) const {
+        log_trace << "TagResource request, keyId: " << request.keyId;
+
+        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
+        for (const auto &[k, v]: request.tags) {
+            key.tags[k] = v;
+        }
+        key.modified = system_clock::now();
+        _kmsDatabase->updateKey(key);
+        log_debug << "TagResource done, keyId: " << request.keyId << " tags: " << request.tags.size();
+    }
+
+    void KMSService::UntagResource(const Dto::KMS::UntagResourceRequest &request) const {
+        log_trace << "UntagResource request, keyId: " << request.keyId;
+
+        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
+        for (const auto &tagKey: request.tagKeys) {
+            key.tags.erase(tagKey);
+        }
+        key.modified = system_clock::now();
+        _kmsDatabase->updateKey(key);
+        log_debug << "UntagResource done, keyId: " << request.keyId;
+    }
+
+    Dto::KMS::ListResourceTagsResponse KMSService::ListResourceTags(const Dto::KMS::ListResourceTagsRequest &request) const {
+        log_trace << "ListResourceTags request, keyId: " << request.keyId;
+
+        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
+        Dto::KMS::ListResourceTagsResponse response;
+        response.tags = key.tags;
+        return response;
+    }
+
+    void KMSService::CreateAlias(const Dto::KMS::CreateAliasRequest &request) const {
+        log_trace << "CreateAlias request, aliasName: " << request.aliasName << " targetKeyId: " << request.targetKeyId;
+
+        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.targetKeyId);
+        if (std::find(key.aliases.begin(), key.aliases.end(), request.aliasName) == key.aliases.end()) {
+            key.aliases.push_back(request.aliasName);
+        }
+        key.modified = system_clock::now();
+        _kmsDatabase->updateKey(key);
+        log_debug << "CreateAlias done, aliasName: " << request.aliasName;
+    }
+
+    void KMSService::DeleteAlias(const Dto::KMS::DeleteAliasRequest &request) const {
+        log_trace << "DeleteAlias request, aliasName: " << request.aliasName;
+
+        // Find the key that owns this alias
+        const Database::Entity::KMS::KeyList keys = _kmsDatabase->listKeys({}, {}, 0, 0, {});
+        for (auto key: keys) {
+            auto it = std::find(key.aliases.begin(), key.aliases.end(), request.aliasName);
+            if (it != key.aliases.end()) {
+                key.aliases.erase(it);
+                key.modified = system_clock::now();
+                _kmsDatabase->updateKey(key);
+                break;
+            }
+        }
+        log_debug << "DeleteAlias done, aliasName: " << request.aliasName;
+    }
+
+    void KMSService::UpdateAlias(const Dto::KMS::UpdateAliasRequest &request) const {
+        log_trace << "UpdateAlias request, aliasName: " << request.aliasName << " targetKeyId: " << request.targetKeyId;
+
+        // Remove alias from its current key owner
+        const Database::Entity::KMS::KeyList keys = _kmsDatabase->listKeys({}, {}, 0, 0, {});
+        for (auto key: keys) {
+            auto it = std::find(key.aliases.begin(), key.aliases.end(), request.aliasName);
+            if (it != key.aliases.end()) {
+                key.aliases.erase(it);
+                key.modified = system_clock::now();
+                _kmsDatabase->updateKey(key);
+                break;
+            }
+        }
+
+        // Attach alias to new target key
+        Database::Entity::KMS::Key newKey = _kmsDatabase->getKeyByKeyId(request.targetKeyId);
+        newKey.aliases.push_back(request.aliasName);
+        newKey.modified = system_clock::now();
+        _kmsDatabase->updateKey(newKey);
+        log_debug << "UpdateAlias done, aliasName: " << request.aliasName;
+    }
+
+    Dto::KMS::ListAliasesResponse KMSService::ListAliases(const Dto::KMS::ListAliasesRequest &request) const {
+        log_trace << "ListAliases request, keyId: " << request.keyId;
+
+        Dto::KMS::ListAliasesResponse response;
+        const Database::Entity::KMS::KeyList keys = _kmsDatabase->listKeys({}, {}, 0, 0, {});
+        for (const auto &key: keys) {
+            if (!request.keyId.empty() && key.keyId != request.keyId) {
+                continue;
+            }
+            for (const auto &aliasName: key.aliases) {
+                Dto::KMS::AliasEntry entry;
+                entry.aliasName = aliasName;
+                entry.targetKeyId = key.keyId;
+                entry.aliasArn = "arn:aws:kms:" + key.region + ":000000000000:" + aliasName;
+                response.aliases.push_back(entry);
+            }
+        }
+        return response;
+    }
+
+}// namespace Awsmock::Service

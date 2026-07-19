@@ -52,6 +52,15 @@ namespace Awsmock::Service {
         if (routingKey == "container") {
             return std::make_shared<ContainerHandler>(ioc);
         }
+        if (routingKey == "sts") {
+            return std::make_shared<STSHandler>(ioc);
+        }
+        if (routingKey == "iam") {
+            return std::make_shared<IAMHandler>(ioc);
+        }
+        if (routingKey == "logs") {
+            return std::make_shared<CloudWatchLogsHandler>(ioc);
+        }
         log_error << "Routing table entry not found, routingKey: " << routingKey;
         return nullptr;
     }

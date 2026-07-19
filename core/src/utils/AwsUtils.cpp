@@ -227,7 +227,18 @@ namespace Awsmock::Core {
         if (IsS3HostStyle(request)) {
             return GetS3HostStyleBucket(request);
         }
-        return GetS3PathStyleBucket(request);
+        const std::string pathBucket = GetS3PathStyleBucket(request);
+        if (!pathBucket.empty()) {
+            return pathBucket;
+        }
+        // Fallback: custom-endpoint virtual-hosted style (e.g. bucket.localhost:4566)
+        // where the host doesn't contain ".s3." but still carries the bucket as a subdomain
+        const std::string hostBucket = GetS3HostStyleBucket(request);
+        if (!hostBucket.empty() && hostBucket != "localhost" && hostBucket != "127" &&
+            hostBucket.find_first_not_of("0123456789") != std::string::npos) {
+            return hostBucket;
+        }
+        return {};
     }
 
     std::string AwsUtils::GetS3ObjectKey(const http::request<http::dynamic_body> &request) {

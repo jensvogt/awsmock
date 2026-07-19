@@ -238,6 +238,71 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, s3Response.ToXml());
                 }
 
+                case Dto::Common::S3CommandType::GET_BUCKET_POLICY: {
+                    log_info << "GetBucketPolicy, bucket: " << clientCommand.bucket;
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchBucketPolicy</Code><Message>The bucket policy does not exist</Message><BucketName>)" + clientCommand.bucket + R"(</BucketName></Error>)";
+                    return SendResponse(request, http::status::not_found, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_ACL: {
+                    log_info << "GetBucketAcl, bucket: " << clientCommand.bucket;
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>000000000000</ID><DisplayName>owner</DisplayName></Owner><AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CanonicalUser"><ID>000000000000</ID><DisplayName>owner</DisplayName></Grantee><Permission>FULL_CONTROL</Permission></Grant></AccessControlList></AccessControlPolicy>)";
+                    return SendResponse(request, http::status::ok, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_LOCATION: {
+                    log_info << "GetBucketLocation, bucket: " << clientCommand.bucket;
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">)" + region + R"(</LocationConstraint>)";
+                    return SendResponse(request, http::status::ok, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_CORS: {
+                    log_info << "GetBucketCors, bucket: " << clientCommand.bucket;
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchCORSConfiguration</Code><Message>The CORS configuration does not exist</Message></Error>)";
+                    return SendResponse(request, http::status::not_found, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_TAGGING: {
+                    log_info << "GetBucketTagging, bucket: " << clientCommand.bucket;
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><Tagging xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><TagSet/></Tagging>)";
+                    return SendResponse(request, http::status::ok, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_ACCELERATE: {
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><AccelerateConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"/>)";
+                    return SendResponse(request, http::status::ok, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_OBJECT_LOCK: {
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><Error><Code>ObjectLockConfigurationNotFoundError</Code><Message>Object Lock configuration does not exist for this bucket</Message></Error>)";
+                    return SendResponse(request, http::status::not_found, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_WEBSITE: {
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchWebsiteConfiguration</Code><Message>The specified bucket does not have a website configuration</Message></Error>)";
+                    return SendResponse(request, http::status::not_found, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_REQUEST_PAYMENT: {
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><RequestPaymentConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Payer>BucketOwner</Payer></RequestPaymentConfiguration>)";
+                    return SendResponse(request, http::status::ok, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_OWNERSHIP_CONTROLS: {
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><OwnershipControls xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Rule><ObjectOwnership>BucketOwnerEnforced</ObjectOwnership></Rule></OwnershipControls>)";
+                    return SendResponse(request, http::status::ok, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_PUBLIC_ACCESS_BLOCK: {
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><PublicAccessBlockConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><BlockPublicAcls>true</BlockPublicAcls><IgnorePublicAcls>true</IgnorePublicAcls><BlockPublicPolicy>true</BlockPublicPolicy><RestrictPublicBuckets>true</RestrictPublicBuckets></PublicAccessBlockConfiguration>)";
+                    return SendResponse(request, http::status::ok, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_REPLICATION: {
+                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><Error><Code>ReplicationConfigurationNotFoundError</Code><Message>The replication configuration was not found</Message></Error>)";
+                    return SendResponse(request, http::status::not_found, xml);
+                }
+
                 default:
                     log_error << "Unknown method";
                     return SendResponse(request, http::status::bad_request, "Unknown method");
@@ -474,6 +539,46 @@ namespace Awsmock::Service {
 
                     _s3Service.PutBucketLifecycleConfiguration(s3Request);
 
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_POLICY: {
+                    log_info << "PutBucketPolicy, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_ACL: {
+                    log_info << "PutBucketAcl, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_CORS: {
+                    log_info << "PutBucketCors, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_TAGGING: {
+                    log_info << "PutBucketTagging, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_ACCELERATE: {
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_OBJECT_LOCK: {
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_WEBSITE: {
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_OWNERSHIP_CONTROLS: {
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::PUT_BUCKET_PUBLIC_ACCESS_BLOCK: {
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -829,6 +934,37 @@ namespace Awsmock::Service {
 
                     _s3Service.DeleteBucketLifecycle(s3Request);
 
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET_POLICY: {
+                    log_info << "DeleteBucketPolicy, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET_CORS: {
+                    log_info << "DeleteBucketCors, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET_TAGGING: {
+                    log_info << "DeleteBucketTagging, bucket: " << clientCommand.bucket;
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET_WEBSITE: {
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET_OWNERSHIP_CONTROLS: {
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET_PUBLIC_ACCESS_BLOCK: {
+                    return SendResponse(request, http::status::no_content);
+                }
+
+                case Dto::Common::S3CommandType::DELETE_BUCKET_REPLICATION: {
                     return SendResponse(request, http::status::no_content);
                 }
 

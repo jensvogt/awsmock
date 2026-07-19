@@ -115,6 +115,16 @@ namespace Awsmock::Database::Entity::KMS {
         std::string hmac512Key;
 
         /**
+         * Key policy (JSON string, stored as-is from PutKeyPolicy)
+         */
+        std::string policy;
+
+        /**
+         * Aliases pointing to this key
+         */
+        std::vector<std::string> aliases;
+
+        /**
          * Topic tags
          */
         std::map<std::string, std::string> tags;
