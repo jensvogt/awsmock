@@ -49,7 +49,31 @@ namespace Awsmock::Dto::Common {
                     if (bucket.empty()) {
                         command = S3CommandType::LIST_BUCKETS;
                     } else if (key.empty()) {
-                        if (Core::HttpUtils::HasQueryParameter(request.target(), "versions")) {
+                        if (Core::HttpUtils::HasQueryParameter(request.target(), "policy")) {
+                            command = S3CommandType::GET_BUCKET_POLICY;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "acl")) {
+                            command = S3CommandType::GET_BUCKET_ACL;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "location")) {
+                            command = S3CommandType::GET_BUCKET_LOCATION;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "cors")) {
+                            command = S3CommandType::GET_BUCKET_CORS;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "tagging")) {
+                            command = S3CommandType::GET_BUCKET_TAGGING;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "accelerate")) {
+                            command = S3CommandType::GET_BUCKET_ACCELERATE;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "object-lock")) {
+                            command = S3CommandType::GET_BUCKET_OBJECT_LOCK;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "website")) {
+                            command = S3CommandType::GET_BUCKET_WEBSITE;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "requestPayment")) {
+                            command = S3CommandType::GET_BUCKET_REQUEST_PAYMENT;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "ownershipControls")) {
+                            command = S3CommandType::GET_BUCKET_OWNERSHIP_CONTROLS;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "publicAccessBlock")) {
+                            command = S3CommandType::GET_BUCKET_PUBLIC_ACCESS_BLOCK;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "replication")) {
+                            command = S3CommandType::GET_BUCKET_REPLICATION;
+                        } else if (Core::HttpUtils::HasQueryParameter(request.target(), "versions")) {
                             prefix = Core::HttpUtils::GetStringParameter(request.target(), "prefix");
                             command = S3CommandType::LIST_OBJECT_VERSIONS;
                         } else {
@@ -75,6 +99,24 @@ namespace Awsmock::Dto::Common {
                         command = S3CommandType::PUT_BUCKET_VERSIONING;
                     } else if (lifecycleRequest) {
                         command = S3CommandType::PUT_BUCKET_LIFECYCLE_CONFIGURATION;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "policy")) {
+                        command = S3CommandType::PUT_BUCKET_POLICY;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "acl")) {
+                        command = S3CommandType::PUT_BUCKET_ACL;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "cors")) {
+                        command = S3CommandType::PUT_BUCKET_CORS;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "tagging")) {
+                        command = S3CommandType::PUT_BUCKET_TAGGING;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "accelerate")) {
+                        command = S3CommandType::PUT_BUCKET_ACCELERATE;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "object-lock")) {
+                        command = S3CommandType::PUT_BUCKET_OBJECT_LOCK;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "website")) {
+                        command = S3CommandType::PUT_BUCKET_WEBSITE;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "ownershipControls")) {
+                        command = S3CommandType::PUT_BUCKET_OWNERSHIP_CONTROLS;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "publicAccessBlock")) {
+                        command = S3CommandType::PUT_BUCKET_PUBLIC_ACCESS_BLOCK;
                     } else if (key.empty()) {
                         command = S3CommandType::CREATE_BUCKET;
                     } else {
@@ -100,6 +142,20 @@ namespace Awsmock::Dto::Common {
                 case http::verb::delete_:
                     if (multipartRequest) {
                         command = S3CommandType::ABORT_MULTIPART_UPLOAD;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "policy")) {
+                        command = S3CommandType::DELETE_BUCKET_POLICY;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "cors")) {
+                        command = S3CommandType::DELETE_BUCKET_CORS;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "tagging")) {
+                        command = S3CommandType::DELETE_BUCKET_TAGGING;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "website")) {
+                        command = S3CommandType::DELETE_BUCKET_WEBSITE;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "ownershipControls")) {
+                        command = S3CommandType::DELETE_BUCKET_OWNERSHIP_CONTROLS;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "publicAccessBlock")) {
+                        command = S3CommandType::DELETE_BUCKET_PUBLIC_ACCESS_BLOCK;
+                    } else if (Core::HttpUtils::HasQueryParameter(request.target(), "replication")) {
+                        command = S3CommandType::DELETE_BUCKET_REPLICATION;
                     } else if (key.empty()) {
                         command = S3CommandType::DELETE_BUCKET;
                     } else {

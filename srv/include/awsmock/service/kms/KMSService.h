@@ -28,6 +28,20 @@
 #include <awsmock/dto/kms/DescribeKeyResponse.h>
 #include <awsmock/dto/kms/EncryptRequest.h>
 #include <awsmock/dto/kms/EncryptResponse.h>
+#include <awsmock/dto/kms/GenerateDataKeyRequest.h>
+#include <awsmock/dto/kms/GenerateDataKeyResponse.h>
+#include <awsmock/dto/kms/CreateAliasRequest.h>
+#include <awsmock/dto/kms/DeleteAliasRequest.h>
+#include <awsmock/dto/kms/GetKeyPolicyRequest.h>
+#include <awsmock/dto/kms/GetKeyPolicyResponse.h>
+#include <awsmock/dto/kms/ListAliasesRequest.h>
+#include <awsmock/dto/kms/ListAliasesResponse.h>
+#include <awsmock/dto/kms/ListResourceTagsRequest.h>
+#include <awsmock/dto/kms/ListResourceTagsResponse.h>
+#include <awsmock/dto/kms/PutKeyPolicyRequest.h>
+#include <awsmock/dto/kms/TagResourceRequest.h>
+#include <awsmock/dto/kms/UntagResourceRequest.h>
+#include <awsmock/dto/kms/UpdateAliasRequest.h>
 #include <awsmock/dto/kms/GetKeyCounterRequest.h>
 #include <awsmock/dto/kms/GetKeyCounterResponse.h>
 #include <awsmock/dto/kms/ListKeysRequest.h>
@@ -180,6 +194,30 @@ namespace Awsmock::Service {
          */
         [[nodiscard]]
         Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
+
+        [[nodiscard]]
+        Dto::KMS::GenerateDataKeyResponse GenerateDataKey(const Dto::KMS::GenerateDataKeyRequest &request) const;
+
+        [[nodiscard]]
+        Dto::KMS::GetKeyPolicyResponse GetKeyPolicy(const Dto::KMS::GetKeyPolicyRequest &request) const;
+
+        void PutKeyPolicy(const Dto::KMS::PutKeyPolicyRequest &request) const;
+
+        void TagResource(const Dto::KMS::TagResourceRequest &request) const;
+
+        void UntagResource(const Dto::KMS::UntagResourceRequest &request) const;
+
+        [[nodiscard]]
+        Dto::KMS::ListResourceTagsResponse ListResourceTags(const Dto::KMS::ListResourceTagsRequest &request) const;
+
+        void CreateAlias(const Dto::KMS::CreateAliasRequest &request) const;
+
+        void DeleteAlias(const Dto::KMS::DeleteAliasRequest &request) const;
+
+        void UpdateAlias(const Dto::KMS::UpdateAliasRequest &request) const;
+
+        [[nodiscard]]
+        Dto::KMS::ListAliasesResponse ListAliases(const Dto::KMS::ListAliasesRequest &request) const;
 
         /**
          * @brief Decrypts a cipher text using a given algorithm

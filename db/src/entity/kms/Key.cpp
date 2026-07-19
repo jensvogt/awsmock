@@ -28,6 +28,7 @@ namespace Awsmock::Database::Entity::KMS {
                     kvp("rsaPublicKey", rsaPublicKey),
                     kvp("pendingWindowInDays", bsoncxx::types::b_int64(pendingWindowInDays)),
                     kvp("description", description),
+                    kvp("policy", policy),
                     kvp("created", bsoncxx::types::b_date(created)),
                     kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -46,6 +47,14 @@ namespace Awsmock::Database::Entity::KMS {
                 }
                 keyDoc.append(kvp("tags", tagsDoc));
             }
+
+            // Aliases
+            auto aliasArr = bsoncxx::builder::basic::array{};
+            for (const auto &a: aliases) {
+                aliasArr.append(a);
+            }
+            keyDoc.append(kvp("aliases", aliasArr));
+
             return keyDoc.extract();
 
         } catch (std::exception &e) {
@@ -76,6 +85,7 @@ namespace Awsmock::Database::Entity::KMS {
             pendingWindowInDays = Core::Bson::BsonUtils::GetIntValue(mResult, "pendingWindowInDays");
             scheduledDeletion = Core::Bson::BsonUtils::GetDateValue(mResult, "scheduledDeletion");
             description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
+            policy = Core::Bson::BsonUtils::GetStringValue(mResult, "policy");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
@@ -85,6 +95,13 @@ namespace Awsmock::Database::Entity::KMS {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);
+                }
+            }
+
+            // Get aliases
+            if (mResult.value().find("aliases") != mResult.value().end()) {
+                for (const auto &elem: mResult.value()["aliases"].get_array().value) {
+                    aliases.push_back(bsoncxx::string::to_string(elem.get_string().value));
                 }
             }
 

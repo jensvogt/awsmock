@@ -45,9 +45,6 @@ namespace Awsmock::Service {
 
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
 
-        /**
-         * KMS service
-         */
         KMSService _kmsService;
     };
 

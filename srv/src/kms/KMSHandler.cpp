@@ -1,4 +1,18 @@
 
+#include <awsmock/dto/kms/CreateAliasRequest.h>
+#include <awsmock/dto/kms/DeleteAliasRequest.h>
+#include <awsmock/dto/kms/GenerateDataKeyRequest.h>
+#include <awsmock/dto/kms/GenerateDataKeyResponse.h>
+#include <awsmock/dto/kms/GetKeyPolicyRequest.h>
+#include <awsmock/dto/kms/GetKeyPolicyResponse.h>
+#include <awsmock/dto/kms/ListAliasesRequest.h>
+#include <awsmock/dto/kms/ListAliasesResponse.h>
+#include <awsmock/dto/kms/ListResourceTagsRequest.h>
+#include <awsmock/dto/kms/ListResourceTagsResponse.h>
+#include <awsmock/dto/kms/PutKeyPolicyRequest.h>
+#include <awsmock/dto/kms/TagResourceRequest.h>
+#include <awsmock/dto/kms/UntagResourceRequest.h>
+#include <awsmock/dto/kms/UpdateAliasRequest.h>
 #include <awsmock/service/kms/KMSHandler.h>
 
 namespace Awsmock::Service {
@@ -100,6 +114,13 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, kmsResponse.ToJson());
                 }
 
+                case Dto::Common::KMSCommandType::GENERATE_DATA_KEY: {
+                    Dto::KMS::GenerateDataKeyRequest kmsRequest = Dto::KMS::GenerateDataKeyRequest::FromJson(clientCommand);
+                    Dto::KMS::GenerateDataKeyResponse kmsResponse = _kmsService.GenerateDataKey(kmsRequest);
+                    log_info << "GenerateDataKey received, keyId: " << kmsRequest.keyId;
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
+                }
+
                 case Dto::Common::KMSCommandType::DELETE_KEY: {
                     Dto::KMS::DeleteKeyRequest kmsRequest = Dto::KMS::DeleteKeyRequest::FromJson(clientCommand);
                     _kmsService.DeleteKey(kmsRequest);
@@ -107,9 +128,88 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::KMSCommandType::GET_KEY_POLICY: {
+                    Dto::KMS::GetKeyPolicyRequest kmsRequest = Dto::KMS::GetKeyPolicyRequest::FromJson(clientCommand);
+                    Dto::KMS::GetKeyPolicyResponse kmsResponse = _kmsService.GetKeyPolicy(kmsRequest);
+                    log_info << "GetKeyPolicy, keyId: " << kmsRequest.keyId;
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
+                }
+
+                case Dto::Common::KMSCommandType::PUT_KEY_POLICY: {
+                    Dto::KMS::PutKeyPolicyRequest kmsRequest = Dto::KMS::PutKeyPolicyRequest::FromJson(clientCommand);
+                    _kmsService.PutKeyPolicy(kmsRequest);
+                    log_info << "PutKeyPolicy, keyId: " << kmsRequest.keyId;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::LIST_RESOURCE_TAGS: {
+                    Dto::KMS::ListResourceTagsRequest kmsRequest = Dto::KMS::ListResourceTagsRequest::FromJson(clientCommand);
+                    Dto::KMS::ListResourceTagsResponse kmsResponse = _kmsService.ListResourceTags(kmsRequest);
+                    log_info << "ListResourceTags, keyId: " << kmsRequest.keyId;
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
+                }
+
+                case Dto::Common::KMSCommandType::TAG_RESOURCE: {
+                    Dto::KMS::TagResourceRequest kmsRequest = Dto::KMS::TagResourceRequest::FromJson(clientCommand);
+                    _kmsService.TagResource(kmsRequest);
+                    log_info << "TagResource, keyId: " << kmsRequest.keyId;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::UNTAG_RESOURCE: {
+                    Dto::KMS::UntagResourceRequest kmsRequest = Dto::KMS::UntagResourceRequest::FromJson(clientCommand);
+                    _kmsService.UntagResource(kmsRequest);
+                    log_info << "UntagResource, keyId: " << kmsRequest.keyId;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::GET_KEY_ROTATION_STATUS: {
+                    log_info << "GetKeyRotationStatus received";
+                    return SendResponse(request, http::status::ok, R"({"KeyRotationEnabled":false})");
+                }
+
+                case Dto::Common::KMSCommandType::ENABLE_KEY_ROTATION: {
+                    log_info << "EnableKeyRotation received";
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::DISABLE_KEY_ROTATION: {
+                    log_info << "DisableKeyRotation received";
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::CREATE_ALIAS: {
+                    Dto::KMS::CreateAliasRequest kmsRequest = Dto::KMS::CreateAliasRequest::FromJson(clientCommand);
+                    _kmsService.CreateAlias(kmsRequest);
+                    log_info << "CreateAlias, aliasName: " << kmsRequest.aliasName;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::DELETE_ALIAS: {
+                    Dto::KMS::DeleteAliasRequest kmsRequest = Dto::KMS::DeleteAliasRequest::FromJson(clientCommand);
+                    _kmsService.DeleteAlias(kmsRequest);
+                    log_info << "DeleteAlias, aliasName: " << kmsRequest.aliasName;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::UPDATE_ALIAS: {
+                    Dto::KMS::UpdateAliasRequest kmsRequest = Dto::KMS::UpdateAliasRequest::FromJson(clientCommand);
+                    _kmsService.UpdateAlias(kmsRequest);
+                    log_info << "UpdateAlias, aliasName: " << kmsRequest.aliasName;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::KMSCommandType::LIST_ALIASES: {
+                    Dto::KMS::ListAliasesRequest kmsRequest = Dto::KMS::ListAliasesRequest::FromJson(clientCommand);
+                    Dto::KMS::ListAliasesResponse kmsResponse = _kmsService.ListAliases(kmsRequest);
+                    log_info << "ListAliases, count: " << kmsResponse.aliases.size();
+                    return SendResponse(request, http::status::ok, kmsResponse.ToJson());
+                }
+
                 default:
                 case Dto::Common::KMSCommandType::UNKNOWN: {
                     log_error << "Unknown method";
+                    Core::HttpUtils::DumpRequest(request);
                     return SendResponse(request, http::status::bad_request, "Unknown method");
                 }
             }

@@ -131,7 +131,7 @@ set(DTO_SOURCES dto/src/common/UserAgent.cpp dto/src/common/S3ClientCommand.cpp 
         dto/src/common/KMSClientCommand.cpp dto/src/common/LambdaClientCommand.cpp dto/src/common/SSMClientCommand.cpp
         dto/src/common/MonitoringClientCommand.cpp dto/src/common/CognitoClientCommand.cpp
         dto/src/common/ApiGatewayClientCommand.cpp dto/src/common/ApplicationClientCommand.cpp
-        dto/src/common/ContainerClientCommand.cpp dto/src/lambda/mapper/Mapper.cpp dto/src/cognito/mapper/Mapper.cpp
+        dto/src/common/ContainerClientCommand.cpp dto/src/common/STSClientCommand.cpp dto/src/lambda/mapper/Mapper.cpp dto/src/cognito/mapper/Mapper.cpp
         dto/src/transfer/mapper/Mapper.cpp dto/src/dynamodb/mapper/Mapper.cpp dto/src/secretsmanager/mapper/Mapper.cpp
         dto/src/ssm/mapper/Mapper.cpp dto/src/application/mapper/Mapper.cpp dto/src/apigateway/mapper/Mapper.cpp
         dto/src/module/model/Module.cpp dto/src/module/mapper/Mapper.cpp dto/src/module/ExportInfrastructureResponse.cpp
@@ -218,7 +218,9 @@ set(SRV_SOURCES srv/src/common/AbstractHandler.cpp srv/src/common/AbstractServer
         srv/src/secretsmanager/SecretsManagerHandler.cpp srv/src/secretsmanager/SecretsManagerService.cpp
         srv/src/secretsmanager/SecretRotation.cpp srv/src/kms/KMSServer.cpp srv/src/kms/KMSHandler.cpp
         srv/src/kms/KMSService.cpp srv/src/kms/KMSCreator.cpp srv/src/ssm/SSMServer.cpp srv/src/ssm/SSMHandler.cpp
-        srv/src/ssm/SSMService.cpp srv/src/ftpserver/Filesystem.cpp srv/src/ftpserver/FtpSession.cpp
+        srv/src/ssm/SSMService.cpp srv/src/sts/STSHandler.cpp srv/src/sts/STSService.cpp
+        srv/src/iam/IAMHandler.cpp srv/src/cloudwatch/CloudWatchLogsHandler.cpp
+        srv/src/ftpserver/Filesystem.cpp srv/src/ftpserver/FtpSession.cpp
         srv/src/ftpserver/FtpServer.cpp srv/src/ftpserver/FtpServerImpl.cpp srv/src/ftpserver/UserDatabase.cpp
         srv/src/sftpserver/SftpServer.cpp srv/src/sftpserver/SftpUser.cpp srv/src/gateway/GatewayServer.cpp
         srv/src/gateway/GatewaySession.cpp srv/src/gateway/GatewayListener.cpp srv/src/gateway/GatewayRouter.cpp

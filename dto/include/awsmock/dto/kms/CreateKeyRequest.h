@@ -106,8 +106,20 @@ namespace Awsmock::Dto::KMS {
             r.origin = Core::Json::GetStringValue(v, "Origin");
             r.policy = Core::Json::GetStringValue(v, "Policy");
             r.xksKeyId = Core::Json::GetStringValue(v, "XksKeyId");
+            // AWS SDK sends Tags as [{TagKey,TagValue}] array; handle both array and object forms
             if (Core::Json::AttributeExists(v, "Tags")) {
-                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+                const auto &tagsVal = v.at("Tags");
+                if (tagsVal.is_array()) {
+                    for (const auto &tag: tagsVal.as_array()) {
+                        const std::string k = Core::Json::GetStringValue(tag, "TagKey");
+                        const std::string val = Core::Json::GetStringValue(tag, "TagValue");
+                        if (!k.empty()) {
+                            r.tags[k] = val;
+                        }
+                    }
+                } else if (tagsVal.is_object()) {
+                    r.tags = boost::json::value_to<std::map<std::string, std::string>>(tagsVal);
+                }
             }
             return r;
         }

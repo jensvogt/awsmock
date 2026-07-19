@@ -76,9 +76,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/vcpkg-bincache
-          key: vcpkg-v2-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
           restore-keys: |
-            vcpkg-v2-${{ runner.os }}-
+            vcpkg-${{ runner.os }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -152,9 +152,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install doxygen pandoc file autoconf autoconf-archive automake libtool cmake ninja openssl@3
-          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$(brew --prefix openssl@3)/lib/pkgconfig" >> $GITHUB_ENV
+          brew install doxygen pandoc file autoconf autoconf-archive automake libtool
 
       - name: Create vcpkg binary cache dir
         run: mkdir -p ${{ github.workspace }}/vcpkg-bincache
@@ -163,9 +161,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/vcpkg-bincache
-          key: vcpkg-v3-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/vcpkg.json') }}
+          key: vcpkg-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/vcpkg.json') }}
           restore-keys: |
-            vcpkg-v3-${{ runner.os }}-${{ runner.arch }}-
+            vcpkg-${{ runner.os }}-${{ runner.arch }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -173,10 +171,8 @@ jobs:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
 
       - name: Build (Backend)
-        env:
-          VCPKG_BUILD_TYPE: release
         run: |
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON -DVCPKG_BUILD_TYPE=release -DOPENSSL_ROOT_DIR=${{ env.OPENSSL_ROOT_DIR }}
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel 2
 
       - name: Build (Frontend)
@@ -289,9 +285,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/vcpkg-bincache
-          key: vcpkg-v2-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('**/vcpkg.json') }}
           restore-keys: |
-            vcpkg-v2-${{ runner.os }}-
+            vcpkg-${{ runner.os }}-
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11

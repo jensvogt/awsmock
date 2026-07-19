@@ -22,6 +22,9 @@
 #include <awsmock/service/sns/SNSHandler.h>
 #include <awsmock/service/sqs/SQSHandler.h>
 #include <awsmock/service/ssm/SSMHandler.h>
+#include <awsmock/service/cloudwatch/CloudWatchLogsHandler.h>
+#include <awsmock/service/iam/IAMHandler.h>
+#include <awsmock/service/sts/STSHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
 
 namespace Awsmock::Service {
