@@ -200,6 +200,7 @@ namespace Awsmock::Service {
                 }
 
                 case Dto::Common::KMSCommandType::LIST_ALIASES: {
+                    Core::HttpUtils::DumpRequest(request);
                     Dto::KMS::ListAliasesRequest kmsRequest = Dto::KMS::ListAliasesRequest::FromJson(clientCommand);
                     Dto::KMS::ListAliasesResponse kmsResponse = _kmsService.ListAliases(kmsRequest);
                     log_info << "ListAliases, count: " << kmsResponse.aliases.size();

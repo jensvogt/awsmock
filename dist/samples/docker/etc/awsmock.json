@@ -298,7 +298,7 @@
       "file-count": 5,
       "channels": [
         {
-          "name": "Common",
+          "name": "Core",
           "level": "info"
         },
         {
@@ -359,6 +359,14 @@
         },
         {
           "name": "Monitoring",
+          "level": "info"
+        },
+        {
+          "name": "ApiGateway",
+          "level": "info"
+        },
+        {
+          "name": "STS",
           "level": "info"
         }
       ]

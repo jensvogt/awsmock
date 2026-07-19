@@ -18,6 +18,7 @@ namespace {
 #define TEST_REGION "eu-central-1"
 #define TEST_PLAINTEXT "Hello, KMS!"
 #define TEST_DESCRIPTION "test-key-description"
+#define TEST_POLICY R"({"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::000000000000:root"},"Action":"kms:*","Resource":"*"}]})"
 
 namespace Awsmock::Database {
 
@@ -90,6 +91,26 @@ namespace Awsmock::Database {
         BOOST_CHECK_EQUAL(false, response.keyMetadata.keyId.empty());
         BOOST_CHECK_EQUAL(false, response.keyMetadata.arn.empty());
         BOOST_CHECK_EQUAL(Dto::KMS::KeySpec::RSA_2048, response.keyMetadata.keySpec);
+    }
+
+    BOOST_AUTO_TEST_CASE(KeyCreateWithPolicyTest) {
+
+        // arrange
+        const Service::KMSService kmsService;
+        Dto::KMS::CreateKeyRequest request;
+        request.region = TEST_REGION;
+        request.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+        request.policy = TEST_POLICY;
+
+        // act
+        const Dto::KMS::CreateKeyResponse createResponse = kmsService.CreateKey(request);
+        Dto::KMS::GetKeyPolicyRequest policyRequest;
+        policyRequest.keyId = createResponse.keyMetadata.keyId;
+        const Dto::KMS::GetKeyPolicyResponse policyResponse = kmsService.GetKeyPolicy(policyRequest);
+
+        // assert
+        BOOST_CHECK_EQUAL(TEST_POLICY, policyResponse.policy);
     }
 
     BOOST_AUTO_TEST_CASE(KeyListTest) {
