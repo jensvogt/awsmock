@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.98](https://github.com/jensvogt/awsmock/compare/v1.18.97...v1.18.98) (2026-07-19)
+
+
+### Bug Fixes
+
+* S3 topicConfiguration, queueNotification, lambdaConfiguration ([e708983](https://github.com/jensvogt/awsmock/commit/e7089838e166e8872778de763c051ddd6c1e98bc))
+
 ## [1.18.97](https://github.com/jensvogt/awsmock/compare/v1.18.96...v1.18.97) (2026-07-18)
 
 
