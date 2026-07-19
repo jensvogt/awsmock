@@ -4,15 +4,22 @@
 
 #pragma once
 
+// C++ includes
 #include <string>
 
+// Awsmock includes
 #include <awsmock/core/BsonUtils.h>
 
 namespace Awsmock::Dto::KMS {
 
     struct GetKeyPolicyResponse {
 
-        // Policy is a JSON-encoded string (as AWS returns it)
+        /**
+         * @brief KMS key policy.
+         *
+         * @par
+         * Policy is a JSON-encoded string (as AWS returns it)
+         */
         std::string policy;
 
         [[nodiscard]] std::string ToJson() const {
@@ -27,6 +34,7 @@ namespace Awsmock::Dto::KMS {
         }
 
       private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
     };
 

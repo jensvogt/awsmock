@@ -106,6 +106,7 @@ namespace Awsmock::Service {
             keyEntity.keySpec = KeySpecToString(request.keySpec);
             keyEntity.arn = arn;
             keyEntity.description = request.description;
+            keyEntity.policy = request.policy;
             keyEntity.tags = request.tags;
 
             // Store in a database
@@ -545,7 +546,7 @@ namespace Awsmock::Service {
     Dto::KMS::GetKeyPolicyResponse KMSService::GetKeyPolicy(const Dto::KMS::GetKeyPolicyRequest &request) const {
         log_trace << "GetKeyPolicy request, keyId: " << request.keyId;
 
-        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
+        const Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
 
         Dto::KMS::GetKeyPolicyResponse response;
         if (key.policy.empty()) {
@@ -563,8 +564,8 @@ namespace Awsmock::Service {
         Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
         key.policy = request.policy;
         key.modified = system_clock::now();
-        _kmsDatabase->updateKey(key);
-        log_debug << "PutKeyPolicy done, keyId: " << request.keyId;
+        key = _kmsDatabase->updateKey(key);
+        log_debug << "PutKeyPolicy done, keyId: " << key.keyId;
     }
 
     void KMSService::TagResource(const Dto::KMS::TagResourceRequest &request) const {
@@ -575,8 +576,8 @@ namespace Awsmock::Service {
             key.tags[k] = v;
         }
         key.modified = system_clock::now();
-        _kmsDatabase->updateKey(key);
-        log_debug << "TagResource done, keyId: " << request.keyId << " tags: " << request.tags.size();
+        key = _kmsDatabase->updateKey(key);
+        log_debug << "TagResource done, keyId: " << key.keyId << " tags: " << request.tags.size();
     }
 
     void KMSService::UntagResource(const Dto::KMS::UntagResourceRequest &request) const {
@@ -587,14 +588,14 @@ namespace Awsmock::Service {
             key.tags.erase(tagKey);
         }
         key.modified = system_clock::now();
-        _kmsDatabase->updateKey(key);
-        log_debug << "UntagResource done, keyId: " << request.keyId;
+        key = _kmsDatabase->updateKey(key);
+        log_debug << "UntagResource done, keyId: " << key.keyId;
     }
 
     Dto::KMS::ListResourceTagsResponse KMSService::ListResourceTags(const Dto::KMS::ListResourceTagsRequest &request) const {
         log_trace << "ListResourceTags request, keyId: " << request.keyId;
 
-        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
+        const Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId);
         Dto::KMS::ListResourceTagsResponse response;
         response.tags = key.tags;
         return response;
@@ -604,11 +605,11 @@ namespace Awsmock::Service {
         log_trace << "CreateAlias request, aliasName: " << request.aliasName << " targetKeyId: " << request.targetKeyId;
 
         Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.targetKeyId);
-        if (std::find(key.aliases.begin(), key.aliases.end(), request.aliasName) == key.aliases.end()) {
+        if (std::ranges::find(key.aliases, request.aliasName) == key.aliases.end()) {
             key.aliases.push_back(request.aliasName);
         }
         key.modified = system_clock::now();
-        _kmsDatabase->updateKey(key);
+        key = _kmsDatabase->updateKey(key);
         log_debug << "CreateAlias done, aliasName: " << request.aliasName;
     }
 
@@ -618,11 +619,10 @@ namespace Awsmock::Service {
         // Find the key that owns this alias
         const Database::Entity::KMS::KeyList keys = _kmsDatabase->listKeys({}, {}, 0, 0, {});
         for (auto key: keys) {
-            auto it = std::find(key.aliases.begin(), key.aliases.end(), request.aliasName);
-            if (it != key.aliases.end()) {
+            if (auto it = std::ranges::find(key.aliases, request.aliasName); it != key.aliases.end()) {
                 key.aliases.erase(it);
                 key.modified = system_clock::now();
-                _kmsDatabase->updateKey(key);
+                std::ignore = _kmsDatabase->updateKey(key);
                 break;
             }
         }
@@ -633,13 +633,11 @@ namespace Awsmock::Service {
         log_trace << "UpdateAlias request, aliasName: " << request.aliasName << " targetKeyId: " << request.targetKeyId;
 
         // Remove alias from its current key owner
-        const Database::Entity::KMS::KeyList keys = _kmsDatabase->listKeys({}, {}, 0, 0, {});
-        for (auto key: keys) {
-            auto it = std::find(key.aliases.begin(), key.aliases.end(), request.aliasName);
-            if (it != key.aliases.end()) {
+        for (const Database::Entity::KMS::KeyList keys = _kmsDatabase->listKeys({}, {}, 0, 0, {}); auto key: keys) {
+            if (auto it = std::ranges::find(key.aliases, request.aliasName); it != key.aliases.end()) {
                 key.aliases.erase(it);
                 key.modified = system_clock::now();
-                _kmsDatabase->updateKey(key);
+                std::ignore = _kmsDatabase->updateKey(key);
                 break;
             }
         }
@@ -648,26 +646,20 @@ namespace Awsmock::Service {
         Database::Entity::KMS::Key newKey = _kmsDatabase->getKeyByKeyId(request.targetKeyId);
         newKey.aliases.push_back(request.aliasName);
         newKey.modified = system_clock::now();
-        _kmsDatabase->updateKey(newKey);
-        log_debug << "UpdateAlias done, aliasName: " << request.aliasName;
+        newKey = _kmsDatabase->updateKey(newKey);
+        log_debug << "UpdateAlias done, keyId: " << newKey.keyId << ", aliasName: " << request.aliasName;
     }
 
     Dto::KMS::ListAliasesResponse KMSService::ListAliases(const Dto::KMS::ListAliasesRequest &request) const {
         log_trace << "ListAliases request, keyId: " << request.keyId;
 
         Dto::KMS::ListAliasesResponse response;
-        const Database::Entity::KMS::KeyList keys = _kmsDatabase->listKeys({}, {}, 0, 0, {});
-        for (const auto &key: keys) {
-            if (!request.keyId.empty() && key.keyId != request.keyId) {
-                continue;
-            }
-            for (const auto &aliasName: key.aliases) {
-                Dto::KMS::AliasEntry entry;
-                entry.aliasName = aliasName;
-                entry.targetKeyId = key.keyId;
-                entry.aliasArn = "arn:aws:kms:" + key.region + ":000000000000:" + aliasName;
-                response.aliases.push_back(entry);
-            }
+        for (const Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId); const auto &aliasName: key.aliases) {
+            Dto::KMS::AliasEntry entry;
+            entry.aliasName = aliasName;
+            entry.targetKeyId = key.keyId;
+            entry.aliasArn = "arn:aws:kms:" + key.region + ":000000000000:" + aliasName;
+            response.aliases.push_back(entry);
         }
         return response;
     }

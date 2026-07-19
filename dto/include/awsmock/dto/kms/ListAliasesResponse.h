@@ -4,9 +4,11 @@
 
 #pragma once
 
+// C++ includes
 #include <string>
 #include <vector>
 
+// Awsmock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 
@@ -22,7 +24,8 @@ namespace Awsmock::Dto::KMS {
 
         std::vector<AliasEntry> aliases;
 
-        [[nodiscard]] std::string ToJson() const {
+        [[nodiscard]]
+        std::string ToJson() const {
             try {
                 document doc;
                 auto arr = bsoncxx::builder::basic::array{};
@@ -44,6 +47,7 @@ namespace Awsmock::Dto::KMS {
         }
 
       private:
+
         mutable logger_t _logger{boost::log::keywords::channel = "KMS"};
     };
 

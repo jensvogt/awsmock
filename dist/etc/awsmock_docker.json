@@ -371,6 +371,10 @@
         {
           "name": "ApiGateway",
           "level": "info"
+        },
+        {
+          "name": "STS",
+          "level": "info"
         }
       ]
     }
