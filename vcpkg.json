@@ -9,10 +9,6 @@
     "libmagic",
     "libssh",
     "openssl",
-    {
-      "name": "mongo-c-driver",
-      "features": ["openssl"]
-    },
     "mongo-cxx-driver",
     "pcre2"
   ],
