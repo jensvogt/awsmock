@@ -24,6 +24,7 @@ namespace Awsmock::Dto::Common {
      */
     enum class DynamoDbCommandType {
         CREATE_TABLE,
+        UPDATE_TABLE,
         LIST_TABLES,
         LIST_TABLE_ARNS,
         DESCRIBE_TABLE,
@@ -48,6 +49,7 @@ namespace Awsmock::Dto::Common {
 
     static std::map<DynamoDbCommandType, std::string> DynamoDbCommandTypeNames{
             {DynamoDbCommandType::CREATE_TABLE, "create-table"},
+            {DynamoDbCommandType::UPDATE_TABLE, "update-table"},
             {DynamoDbCommandType::LIST_TABLES, "list-tables"},
             {DynamoDbCommandType::LIST_TABLE_ARNS, "list-table-arns"},
             {DynamoDbCommandType::DESCRIBE_TABLE, "describe-table"},

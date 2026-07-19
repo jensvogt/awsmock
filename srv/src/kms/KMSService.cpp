@@ -604,10 +604,21 @@ namespace Awsmock::Service {
     void KMSService::CreateAlias(const Dto::KMS::CreateAliasRequest &request) const {
         log_trace << "CreateAlias request, aliasName: " << request.aliasName << " targetKeyId: " << request.targetKeyId;
 
-        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.targetKeyId);
-        if (std::ranges::find(key.aliases, request.aliasName) == key.aliases.end()) {
-            key.aliases.push_back(request.aliasName);
+        // Aliases must be globally unique: remove this alias from any key that already holds it
+        for (auto existingKey: _kmsDatabase->listKeys({}, {}, 0, 0, {})) {
+            if (auto it = std::ranges::find(existingKey.aliases, request.aliasName); it != existingKey.aliases.end()) {
+                if (existingKey.keyId == request.targetKeyId) {
+                    log_debug << "CreateAlias: alias already assigned to target key, aliasName: " << request.aliasName;
+                    return;
+                }
+                existingKey.aliases.erase(it);
+                existingKey.modified = system_clock::now();
+                std::ignore = _kmsDatabase->updateKey(existingKey);
+            }
         }
+
+        Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.targetKeyId);
+        key.aliases.push_back(request.aliasName);
         key.modified = system_clock::now();
         key = _kmsDatabase->updateKey(key);
         log_debug << "CreateAlias done, aliasName: " << request.aliasName;
@@ -654,13 +665,24 @@ namespace Awsmock::Service {
         log_trace << "ListAliases request, keyId: " << request.keyId;
 
         Dto::KMS::ListAliasesResponse response;
-        for (const Database::Entity::KMS::Key key = _kmsDatabase->getKeyByKeyId(request.keyId); const auto &aliasName: key.aliases) {
-            Dto::KMS::AliasEntry entry;
-            entry.aliasName = aliasName;
-            entry.targetKeyId = key.keyId;
-            entry.aliasArn = "arn:aws:kms:" + key.region + ":000000000000:" + aliasName;
-            response.aliases.push_back(entry);
+
+        auto addAliases = [&](const Database::Entity::KMS::Key &key) {
+            for (const auto &aliasName: key.aliases) {
+                Dto::KMS::AliasEntry entry;
+                entry.aliasName = aliasName;
+                entry.targetKeyId = key.keyId;
+                entry.aliasArn = "arn:aws:kms:" + key.region + ":000000000000:" + aliasName;
+                response.aliases.push_back(entry);
+            }
+        };
+
+        if (request.keyId.empty()) {
+            for (const auto &key: _kmsDatabase->listKeys(request.region, {}, 0, 0, {}))
+                addAliases(key);
+        } else {
+            addAliases(_kmsDatabase->getKeyByKeyId(request.keyId));
         }
+
         return response;
     }
 
