@@ -44,6 +44,13 @@ namespace Awsmock::Dto::Common {
         IMPORT_ITEMS,
         EXPORT_ITEMS,
         RESET_ITEM_COUNTERS,
+        UPDATE_CONTINUOUS_BACKUPS,
+        DESCRIBE_CONTINUOUS_BACKUPS,
+        TAG_RESOURCE,
+        UNTAG_RESOURCE,
+        LIST_TAGS_OF_RESOURCE,
+        UPDATE_TIME_TO_LIVE,
+        DESCRIBE_TIME_TO_LIVE,
         UNKNOWN
     };
 
@@ -69,6 +76,13 @@ namespace Awsmock::Dto::Common {
             {DynamoDbCommandType::IMPORT_ITEMS, "import-items"},
             {DynamoDbCommandType::EXPORT_ITEMS, "export-items"},
             {DynamoDbCommandType::RESET_ITEM_COUNTERS, "reset-item-counters"},
+            {DynamoDbCommandType::UPDATE_CONTINUOUS_BACKUPS, "update-continuous-backups"},
+            {DynamoDbCommandType::DESCRIBE_CONTINUOUS_BACKUPS, "describe-continuous-backups"},
+            {DynamoDbCommandType::TAG_RESOURCE, "tag-resource"},
+            {DynamoDbCommandType::UNTAG_RESOURCE, "untag-resource"},
+            {DynamoDbCommandType::LIST_TAGS_OF_RESOURCE, "list-tags-of-resource"},
+            {DynamoDbCommandType::UPDATE_TIME_TO_LIVE, "update-time-to-live"},
+            {DynamoDbCommandType::DESCRIBE_TIME_TO_LIVE, "describe-time-to-live"},
             {DynamoDbCommandType::UNKNOWN, "unknown"}};
 
     [[maybe_unused]] static std::string DynamoDbCommandTypeToString(const DynamoDbCommandType &commandType) {
