@@ -2,6 +2,7 @@
 #include "awsmock/core/exception/UnauthorizedException.h"
 #include "awsmock/dto/dynamodb/UpdateTableRequest.h"
 #include "awsmock/dto/dynamodb/UpdateTableResponse.h"
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 
 namespace Awsmock::Service {
@@ -164,6 +165,45 @@ namespace Awsmock::Service {
                     _dynamoDbService.ResetItemCounters();
                     log_info << "Reset item counters";
                     return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::DynamoDbCommandType::UPDATE_CONTINUOUS_BACKUPS: {
+                    log_info << "UpdateContinuousBackups (stub), region: " << region;
+                    const long now = Core::DateTimeUtils::UnixTimestamp(system_clock::now());
+                    const std::string body = R"({"ContinuousBackupsDescription":{"ContinuousBackupsStatus":"ENABLED","PointInTimeRecoveryDescription":{"PointInTimeRecoveryStatus":"ENABLED","EarliestRestorableDateTime":)" + std::to_string(now) + R"(,"LatestRestorableDateTime":)" + std::to_string(now) + R"(}}})";
+                    return SendResponse(request, http::status::ok, body);
+                }
+
+                case Dto::Common::DynamoDbCommandType::DESCRIBE_CONTINUOUS_BACKUPS: {
+                    log_info << "DescribeContinuousBackups (stub), region: " << region;
+                    const long now = Core::DateTimeUtils::UnixTimestamp(system_clock::now());
+                    const std::string body = R"({"ContinuousBackupsDescription":{"ContinuousBackupsStatus":"ENABLED","PointInTimeRecoveryDescription":{"PointInTimeRecoveryStatus":"ENABLED","EarliestRestorableDateTime":)" + std::to_string(now) + R"(,"LatestRestorableDateTime":)" + std::to_string(now) + R"(}}})";
+                    return SendResponse(request, http::status::ok, body);
+                }
+
+                case Dto::Common::DynamoDbCommandType::TAG_RESOURCE: {
+                    log_info << "TagResource (stub), region: " << region;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::DynamoDbCommandType::UNTAG_RESOURCE: {
+                    log_info << "UntagResource (stub), region: " << region;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::DynamoDbCommandType::LIST_TAGS_OF_RESOURCE: {
+                    log_info << "ListTagsOfResource (stub), region: " << region;
+                    return SendResponse(request, http::status::ok, R"({"Tags":[]})");
+                }
+
+                case Dto::Common::DynamoDbCommandType::UPDATE_TIME_TO_LIVE: {
+                    log_info << "UpdateTimeToLive (stub), region: " << region;
+                    return SendResponse(request, http::status::ok, R"({"TimeToLiveSpecification":{"AttributeName":"","Enabled":false}})");
+                }
+
+                case Dto::Common::DynamoDbCommandType::DESCRIBE_TIME_TO_LIVE: {
+                    log_info << "DescribeTimeToLive (stub), region: " << region;
+                    return SendResponse(request, http::status::ok, R"({"TimeToLiveDescription":{"TimeToLiveStatus":"DISABLED"}})");
                 }
 
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {

@@ -7,6 +7,7 @@
 #include <string>
 
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace Awsmock::Dto::STS {
 
@@ -16,9 +17,9 @@ namespace Awsmock::Dto::STS {
         std::string roleArn;
         std::string roleSessionName;
 
-        // Fake static credentials — sufficient for local awsmock testing
-        std::string accessKeyId = "ASIAIOSFODNN7EXAMPLE";
-        std::string secretAccessKey = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
+        // Use configured credentials so subsequent API calls pass signature verification
+        std::string accessKeyId = Core::Configuration::instance().get<std::string>("awsmock.access.key-id");
+        std::string secretAccessKey = Core::Configuration::instance().get<std::string>("awsmock.access.secret-access-key");
         std::string sessionToken = "AQoXnyc4lcK4w4OIaHgBQIGPaFakeSessionTokenForAwsMock";
         std::string expiration = "2099-01-01T00:00:00Z";
 

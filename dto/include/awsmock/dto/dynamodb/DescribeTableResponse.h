@@ -14,10 +14,13 @@
 #include <awsmock/dto/dynamodb/model/AttributeDefinition.h>
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/dto/dynamodb/model/KeySchema.h>
+#include <awsmock/dto/dynamodb/model/OnDemandThroughput.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
+#include <awsmock/dto/dynamodb/model/RestoreSummary.h>
 #include <awsmock/dto/dynamodb/model/TableClassSummary.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 #include <awsmock/dto/dynamodb/model/Tag.h>
+#include <awsmock/dto/dynamodb/model/WarmThroughput.h>
 #include <awsmock/entity/dynamodb/AttributeDefinition.h>
 
 namespace Awsmock::Dto::DynamoDb {
@@ -127,6 +130,21 @@ namespace Awsmock::Dto::DynamoDb {
         TableStatusType tableStatus = TableStatusType::UNKNOWN;
 
         /**
+         * @brief On demand throughput
+         */
+        OnDemandThroughput onDemandThroughput;
+
+        /**
+         * @brief Warm throughput
+         */
+        WarmThroughput warmThroughput;
+
+        /**
+         * @brief Warm throughput
+         */
+        RestoreSummary restoreSummary;
+
+        /**
          * Creates date time
          */
         system_clock::time_point createdDateTime = system_clock::now();
@@ -171,6 +189,15 @@ namespace Awsmock::Dto::DynamoDb {
                 if (Core::Json::AttributeExists(tableObject, "TableClassSummary")) {
                     r.tableClassSummary = boost::json::value_to<TableClassSummary>(v.at("TableClassSummary"));
                 }
+                if (Core::Json::AttributeExists(tableObject, "OnDemandThroughput")) {
+                    r.onDemandThroughput = boost::json::value_to<OnDemandThroughput>(v.at("OnDemandThroughput"));
+                }
+                if (Core::Json::AttributeExists(tableObject, "WarmThroughput")) {
+                    r.warmThroughput = boost::json::value_to<WarmThroughput>(v.at("WarmThroughput"));
+                }
+                if (Core::Json::AttributeExists(tableObject, "RestoreSummary")) {
+                    r.restoreSummary = boost::json::value_to<RestoreSummary>(v.at("RestoreSummary"));
+                }
             }
             return r;
         }
@@ -188,6 +215,9 @@ namespace Awsmock::Dto::DynamoDb {
             tableObject["CreationDateTime"] = Core::DateTimeUtils::UnixTimestamp(obj.createdDateTime);
             tableObject["DeletionProtectionEnabled"] = obj.deletionProtectionEnabled;
             tableObject["ProvisionedThroughput"] = boost::json::value_from(obj.provisionedThroughput);
+            tableObject["OnDemandThroughput"] = boost::json::value_from(obj.onDemandThroughput);
+            tableObject["WarmThroughput"] = boost::json::value_from(obj.warmThroughput);
+            tableObject["RestoreSummary"] = boost::json::value_from(obj.restoreSummary);
             tableObject["TableClassSummary"] = boost::json::value_from(obj.tableClassSummary);
             if (!obj.billingMode.empty()) {
                 tableObject["BillingModeSummary"] = boost::json::object{{"BillingMode", obj.billingMode}};
