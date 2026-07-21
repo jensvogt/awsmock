@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.101](https://github.com/jensvogt/awsmock/compare/v1.18.100...v1.18.101) (2026-07-20)
+
+
+### Bug Fixes
+
+* terraform support ([5e49b73](https://github.com/jensvogt/awsmock/commit/5e49b7381c12e4d8098d230de0c70a56e1f4574a))
+* terraform support ([c805aab](https://github.com/jensvogt/awsmock/commit/c805aabd8e14aa07cc729ef124f5935d2047f4bd))
+* terraform support ([e2e89ed](https://github.com/jensvogt/awsmock/commit/e2e89ed17d535c61550763a6f7aabb244682c83f))
+
 ## [1.18.100](https://github.com/jensvogt/awsmock/compare/v1.18.99...v1.18.100) (2026-07-19)
 
 
