@@ -169,6 +169,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+          vcpkgJsonGlob: 'vcpkg.json'
 
       - name: Build (Backend)
         run: |
@@ -293,6 +294,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: ${{ env.VCPKG_ROOT }}
+          vcpkgJsonGlob: 'vcpkg.json'
 
       - name: Set g++-14 as default
         run: |
