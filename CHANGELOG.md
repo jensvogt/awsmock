@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.102](https://github.com/jensvogt/awsmock/compare/v1.18.101...v1.18.102) (2026-07-30)
+
+
+### Bug Fixes
+
+* resolve vcpkg CI failures from mongo-c-driver overlay port ([#2554](https://github.com/jensvogt/awsmock/issues/2554)) ([0cba57d](https://github.com/jensvogt/awsmock/commit/0cba57d8a59f71fc541d7bb0e5188c3606b27ac2))
+
 ## [1.18.101](https://github.com/jensvogt/awsmock/compare/v1.18.100...v1.18.101) (2026-07-20)
 
 
