@@ -289,6 +289,19 @@ namespace Awsmock::Service {
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/invoke", payload, {}, _invocationTimeout > 0 ? _invocationTimeout : 60);
         const long duration = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
 
+        // Fold the server-measured round-trip time into the instance's running average and
+        // refresh the function-level aggregate. This makes lambda.avgDuration authoritative
+        // regardless of whether the Lambda Runtime container self-reports its own status
+        // (see LambdaService::UpdateLambdaRuntimeStatus, which updates the same fields from
+        // LRT heartbeats).
+        instance.avgDuration = (instance.avgDuration * static_cast<double>(instance.invocations) + static_cast<double>(duration)) / static_cast<double>(instance.invocations + 1);
+        instance.invocations += 1;
+        instance.lastInvocation = start;
+        if (_lambdaDatabase->updateLambdaInstance(lambda.region, lambda.function, lambda.runtime, instance)) {
+            Database::Entity::Lambda::Lambda refreshed = _lambdaDatabase->getLambdaByArn(lambda.arn);
+            _lambdaDatabase->updateLambdaCounters(lambda.region, lambda.function, lambda.runtime, refreshed.getTotalInvocations(), refreshed.getAvgDuration());
+        }
+
         log_info << "Getting lambda logs, containerId: " << instance.containerId;
         std::string logs = _containerService.GetContainerLogs(instance.containerId, start);
 

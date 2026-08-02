@@ -35,6 +35,11 @@ namespace Awsmock::Dto::Lambda {
         std::string status;
 
         /**
+         * @brief Version of the LRT (Lambda Runtime) binary running inside this instance
+         */
+        std::string runtimeVersion;
+
+        /**
          * @brief Invocation duration in milliseconds
          */
         long duration{};
@@ -77,6 +82,7 @@ namespace Awsmock::Dto::Lambda {
             r.instanceId = Core::Json::GetStringValue(v, "instanceId");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.status = Core::Json::GetStringValue(v, "status");
+            r.runtimeVersion = Core::Json::GetStringValue(v, "runtimeVersion");
             r.duration = Core::Json::GetLongValue(v, "duration");
             r.hostname = Core::Json::GetStringValue(v, "hostname");
             r.privatePort = Core::Json::GetLongValue(v, "privatePort");
@@ -93,6 +99,7 @@ namespace Awsmock::Dto::Lambda {
                     {"instanceId", obj.instanceId},
                     {"containerId", obj.containerId},
                     {"status", obj.status},
+                    {"runtimeVersion", obj.runtimeVersion},
                     {"duration", obj.duration},
                     {"hostname", obj.hostname},
                     {"privatePort", obj.privatePort},
