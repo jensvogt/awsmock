@@ -159,6 +159,23 @@ namespace Awsmock::Service {
 
                     if (lambda.GetInstance(instanceId).status != Database::Entity::Lambda::RuntimeStatus::idle) {
                         log_error << "New instance did not become idle within timeout, function: " << functionName << ", instanceId: " << instanceId;
+
+                        // Remove the stuck instance instead of leaving a permanent zombie: a
+                        // never-reporting instance would otherwise stay at status 'unknown'
+                        // forever and hijack the next instance's runtime status report (the
+                        // fallback matcher below adopts the oldest 'unknown' instance).
+                        const std::string containerId = lambda.GetInstance(instanceId).containerId;
+                        lambda.RemoveInstance(instanceId);
+                        lambda = _lambdaDatabase->updateLambda(lambda);
+                        if (!containerId.empty()) {
+                            try {
+                                _containerService.StopContainer(containerId);
+                                _containerService.DeleteContainer(containerId);
+                            } catch (std::exception &e) {
+                                log_warning << "Could not clean up stuck lambda container, containerId: " << containerId << ", error: " << e.what();
+                            }
+                        }
+
                         if (promise) {
                             promise->set_value({500, "Lambda instance did not start within timeout"});
                         }
