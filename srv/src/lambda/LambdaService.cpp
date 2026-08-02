@@ -494,6 +494,8 @@ namespace Awsmock::Service {
                 instanceCounter.instanceId = instance.instanceId;
                 instanceCounter.containerId = instance.containerId;
                 instanceCounter.status = Database::Entity::Lambda::RuntimeStatusToString(instance.status);
+                instanceCounter.runtimeVersion = instance.runtimeVersion;
+                instanceCounter.duration = static_cast<long>(instance.avgDuration);
                 instanceCounter.hostname = instance.hostName;
                 instanceCounter.publicPort = instance.publicPort;
                 instanceCounter.privatePort = instance.privatePort;
@@ -567,6 +569,8 @@ namespace Awsmock::Service {
             response.instanceCounter.instanceId = it->instanceId;
             response.instanceCounter.containerId = it->containerId;
             response.instanceCounter.status = Database::Entity::Lambda::RuntimeStatusToString(it->status);
+            response.instanceCounter.runtimeVersion = it->runtimeVersion;
+            response.instanceCounter.duration = static_cast<long>(it->avgDuration);
             response.instanceCounter.hostname = it->hostName;
             response.instanceCounter.publicPort = it->publicPort;
             response.instanceCounter.privatePort = it->privatePort;
