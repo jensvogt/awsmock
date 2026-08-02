@@ -17,9 +17,6 @@ namespace Awsmock::Service {
         _region = configuration.get<std::string>("awsmock.region");
         _dataDir = configuration.get<std::string>("awsmock.modules.dynamodb.data-dir");
 
-        // Create a local network if it is not existing yet
-        CreateLocalNetwork();
-
         // Start DynamoDB monitoring update counters
         Core::Scheduler::instance().AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
@@ -32,21 +29,6 @@ namespace Awsmock::Service {
         Core::EventBus::instance().sigShutdown.connect(boost::signals2::signal<void()>::slot_type(&DynamoDbServer::shutdown, this));
 
         log_info << "DynamoDB server started";
-    }
-
-    void DynamoDbServer::CreateLocalNetwork() const {
-        log_debug << "Create networks, name: local";
-
-        if (!_containerService.NetworkExists("local")) {
-            Dto::Docker::CreateNetworkRequest request;
-            request.name = "local";
-            request.driver = "bridge";
-
-            Dto::Docker::CreateNetworkResponse response = _containerService.CreateNetwork(request);
-            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << response.id;
-        } else {
-            log_debug << "Docker network exists already, name: local";
-        }
     }
 
     void DynamoDbServer::UpdateCounter() const {

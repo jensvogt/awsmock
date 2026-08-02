@@ -21,6 +21,7 @@ namespace Awsmock::Database::Entity::Lambda {
             publicPort = Core::Bson::BsonUtils::GetIntValue(mResult, "publicPort");
             privatePort = Core::Bson::BsonUtils::GetIntValue(mResult, "privatePort");
             status = RuntimeStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
+            runtimeVersion = Core::Bson::BsonUtils::GetStringValue(mResult, "runtimeVersion");
             invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
             avgDuration = Core::Bson::BsonUtils::GetDoubleValue(mResult, "avgDuration");
             lastStart = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStart");
@@ -47,6 +48,7 @@ namespace Awsmock::Database::Entity::Lambda {
             instanceDoc.append(kvp("invocations", static_cast<bsoncxx::types::b_int64>(invocations)));
             instanceDoc.append(kvp("avgDuration", avgDuration));
             instanceDoc.append(kvp("status", RuntimeStatusToString(status)));
+            instanceDoc.append(kvp("runtimeVersion", runtimeVersion));
             instanceDoc.append(kvp("lastStart", bsoncxx::types::b_date(lastStart)));
             instanceDoc.append(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)));
             instanceDoc.append(kvp("lastStop", bsoncxx::types::b_date(lastStop)));

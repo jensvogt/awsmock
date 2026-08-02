@@ -177,6 +177,67 @@ namespace Awsmock::Database {
         return _lambdas[it->first];
     }
 
+    Entity::Lambda::Lambda LambdaMemoryRepository::addLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
+        boost::mutex::scoped_lock lock(_lambdaMutex);
+
+        const auto it = std::ranges::find_if(_lambdas, [&region, &function, &runtime](const std::pair<std::string, Entity::Lambda::Lambda> &l) {
+            return l.second.region == region && l.second.function == function && l.second.runtime == runtime;
+        });
+
+        if (it == _lambdas.end()) {
+            log_error << "Add lambda instance failed, region: " << region << " function: " << function;
+            throw Core::DatabaseException("Add lambda instance failed, region: " + region + " function: " + function);
+        }
+
+        it->second.instances.emplace_back(instance);
+        it->second.modified = system_clock::now();
+        return it->second;
+    }
+
+    bool LambdaMemoryRepository::updateLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
+        boost::mutex::scoped_lock lock(_lambdaMutex);
+
+        const auto it = std::ranges::find_if(_lambdas, [&region, &function, &runtime](const std::pair<std::string, Entity::Lambda::Lambda> &l) {
+            return l.second.region == region && l.second.function == function && l.second.runtime == runtime;
+        });
+
+        if (it == _lambdas.end()) {
+            return false;
+        }
+
+        const auto instanceIt = std::ranges::find_if(it->second.instances, [&instance](const Entity::Lambda::Instance &i) { return i.instanceId == instance.instanceId; });
+        if (instanceIt == it->second.instances.end()) {
+            return false;
+        }
+
+        instanceIt->status = instance.status;
+        instanceIt->runtimeVersion = instance.runtimeVersion;
+        instanceIt->invocations = instance.invocations;
+        instanceIt->avgDuration = instance.avgDuration;
+        instanceIt->lastStart = instance.lastStart;
+        instanceIt->lastStop = instance.lastStop;
+        instanceIt->lastInvocation = instance.lastInvocation;
+        it->second.modified = system_clock::now();
+        return true;
+    }
+
+    bool LambdaMemoryRepository::updateLambdaCounters(const std::string &region, const std::string &function, const std::string &runtime, const long invocations, const double avgDuration) const {
+        boost::mutex::scoped_lock lock(_lambdaMutex);
+
+        const auto it = std::ranges::find_if(_lambdas, [&region, &function, &runtime](const std::pair<std::string, Entity::Lambda::Lambda> &l) {
+            return l.second.region == region && l.second.function == function && l.second.runtime == runtime;
+        });
+
+        if (it == _lambdas.end()) {
+            return false;
+        }
+
+        it->second.invocations = invocations;
+        it->second.avgDuration = avgDuration;
+        it->second.modified = system_clock::now();
+        return true;
+    }
+
     Entity::Lambda::Lambda LambdaMemoryRepository::importLambda(Entity::Lambda::Lambda &lambda) const {
         if (lambdaExists(lambda)) {
             const Entity::Lambda::Lambda existing = getLambdaByArn(lambda.arn);

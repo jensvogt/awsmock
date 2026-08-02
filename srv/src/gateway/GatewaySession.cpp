@@ -2,6 +2,7 @@
 // Created by vogje01 on 5/27/24.
 //
 
+#include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace Awsmock::Service {
@@ -86,12 +87,42 @@ namespace Awsmock::Service {
             return;
         }
 
+        auto request = _parser->release();
+
+        // Lambda invocations can block for a long time waiting for a cold-start container to
+        // become ready (see LambdaController::OnInvokeLambda). Handle those on the dedicated
+        // worker pool instead of inline, so a slow invocation can never tie up one of the
+        // shared gateway I/O threads that every other connection depends on.
+        if (IsLambdaInvocation(request)) {
+            auto self = shared_from_this();
+            boost::asio::post(GatewayServer::WorkerPool(), [this, self, request = std::move(request)]() mutable {
+                http::message_generator response = [&]() -> http::message_generator {
+                    try {
+                        return self->HandleRequest(std::move(request));
+                    } catch (std::exception &e) {
+                        log_error << "Lambda invocation handling failed, error: " << e.what();
+                        return Core::HttpUtils::InternalServerError(request, e.what());
+                    }
+                }();
+                boost::asio::post(self->_stream.get_executor(), [self, response = std::move(response)]() mutable {
+                    self->QueueWrite(std::move(response));
+                    if (self->_response_queue.size() < self->_queueLimit)
+                        self->DoRead();
+                });
+            });
+            return;
+        }
+
         // Process the request that was just finished by the async operation
-        QueueWrite(HandleRequest(_parser->release()));
+        QueueWrite(HandleRequest(std::move(request)));
 
         // If we aren't at the queue limit, try to pipeline another request
         if (_response_queue.size() < _queueLimit)
             DoRead();
+    }
+
+    bool GatewaySession::IsLambdaInvocation(const http::request<http::dynamic_body> &request) {
+        return request.method() == http::verb::post && Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations";
     }
 
     // Return a response for the given request. The concrete type of the response message (which depends on the request)

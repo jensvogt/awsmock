@@ -1020,51 +1020,64 @@ namespace Awsmock::Service {
             return;
         }
 
-        // Match by instanceId (LRT reads AWSMOCK_INSTANCE_ID env var), then fall back to
-        // adopting the first "unknown"-status instance (GRT not yet updated to use env var).
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase->getLambdaByName(region, status.functionName);
-        bool found = false;
-        for (auto &instance: lambda.instances) {
-            if (instance.instanceId == status.instanceId) {
-                instance.status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
-                instance.invocations = status.invocations;
-                instance.avgDuration = status.avgDuration;
-                instance.lastStart = status.lastStart;
-                instance.lastStop = status.lastStop;
-                instance.lastInvocation = status.lastInvocation;
-                found = true;
-                break;
-            }
+
+        // Match by instanceId (LRT reads AWSMOCK_INSTANCE_ID env var): update just this array
+        // element atomically (Mongo positional $set) rather than mutating this in-memory copy
+        // and writing the whole document back. Fast-starting runtimes (e.g. nodejs) can send
+        // several near-simultaneous status reports, and a full-document replace from one report
+        // silently drops instance changes made by a concurrently racing report or scale-out.
+        Database::Entity::Lambda::Instance instance;
+        instance.instanceId = status.instanceId;
+        instance.status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
+        instance.runtimeVersion = status.runtimeVersion;
+        instance.invocations = status.invocations;
+        instance.avgDuration = status.avgDuration;
+        instance.lastStart = status.lastStart;
+        instance.lastStop = status.lastStop;
+        instance.lastInvocation = status.lastInvocation;
+
+        if (_lambdaDatabase->updateLambdaInstance(region, status.functionName, lambda.runtime, instance)) {
+            // Refresh aggregate stats from the now-current instance list. This is a second,
+            // independent atomic update (never touches the instances array), so it can't
+            // clobber a concurrently racing scale-out or status report either.
+            Database::Entity::Lambda::Lambda refreshed = _lambdaDatabase->getLambdaByName(region, status.functionName);
+            _lambdaDatabase->updateLambdaCounters(region, status.functionName, lambda.runtime, refreshed.getTotalInvocations(), refreshed.getAvgDuration());
+            log_debug << "Lambda runtime status applied, function: " << status.functionName << ", invocations: " << status.invocations;
+            return;
         }
 
-        if (!found) {
-            // LRT reported an ID that doesn't match — adopt the most recently server-created
-            // instance that hasn't registered yet (status==unknown means no LRT contact so
-            // far). Instances are appended in creation order, so picking the *newest* unknown
-            // instance (rather than the first/oldest) avoids misattributing this report to a
-            // stale, never-reporting instance left over from an earlier timed-out start.
-            const auto adopted = std::ranges::max_element(lambda.instances, {}, [](const Database::Entity::Lambda::Instance &i) {
-                return i.status == Database::Entity::Lambda::unknown ? i.lastStart : system_clock::time_point::min();
-            });
-            if (adopted != lambda.instances.end() && adopted->status == Database::Entity::Lambda::unknown) {
-                adopted->instanceId = status.instanceId;
-                adopted->privatePort = status.port;
-                adopted->invocations = status.invocations;
-                adopted->avgDuration = status.avgDuration;
-                adopted->lastStart = status.lastStart;
-                adopted->lastStop = status.lastStop;
-                adopted->lastInvocation = status.lastInvocation;
-                adopted->status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
-                found = true;
-                log_info << "Lambda LRT adopted server instance, function: " << status.functionName << ", instanceId: " << status.instanceId;
-            }
+        // LRT reported an ID that doesn't match any known instance — adopt the most recently
+        // server-created instance that hasn't registered yet (status==unknown means no LRT
+        // contact so far). Instances are appended in creation order, so picking the *newest*
+        // unknown instance (rather than the first/oldest) avoids misattributing this report to
+        // a stale, never-reporting instance left over from an earlier timed-out start. This is
+        // a rare fallback (e.g. an LRT build that predates the AWSMOCK_INSTANCE_ID env var), so
+        // it keeps the simpler, non-atomic full-document update.
+        const auto adopted = std::ranges::max_element(lambda.instances, {}, [](const Database::Entity::Lambda::Instance &i) {
+            return i.status == Database::Entity::Lambda::unknown ? i.lastStart : system_clock::time_point::min();
+        });
+        if (adopted == lambda.instances.end() || adopted->status != Database::Entity::Lambda::unknown) {
+            log_warning << "Lambda runtime status update: no matching or adoptable instance, function: " << status.functionName << ", instanceId: " << status.instanceId;
+            return;
         }
+
+        adopted->instanceId = status.instanceId;
+        adopted->privatePort = status.port;
+        adopted->runtimeVersion = status.runtimeVersion;
+        adopted->invocations = status.invocations;
+        adopted->avgDuration = status.avgDuration;
+        adopted->lastStart = status.lastStart;
+        adopted->lastStop = status.lastStop;
+        adopted->lastInvocation = status.lastInvocation;
+        adopted->status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
+        log_info << "Lambda LRT adopted server instance, function: " << status.functionName << ", instanceId: " << status.instanceId;
 
         // Propagate aggregate stats to the lambda entity
         lambda.invocations = lambda.getTotalInvocations();
         lambda.avgDuration = lambda.getAvgDuration();
         lambda = _lambdaDatabase->updateLambda(lambda);
-        log_debug << "Lambda runtime status applied, function: " << lambda.function << ", invocations: " << status.invocations;
+        log_debug << "Lambda runtime status applied (adopted), function: " << lambda.function << ", invocations: " << status.invocations;
     }
 
     void LambdaService::StartLambda(const Dto::Lambda::StartLambdaRequest &request) const {
@@ -1520,7 +1533,12 @@ namespace Awsmock::Service {
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
             lambda.codeSize = inspectContainerResponse.sizeRootFs;
         }
-        lambda.instances.emplace_back(instance);
+
+        // Append atomically (Mongo $push) rather than mutating this in-memory copy and relying
+        // on the caller's later full-document updateLambda(): fast-starting runtimes (e.g.
+        // nodejs) can trigger several near-simultaneous scale-out calls, and a full-document
+        // replace from one call silently drops instances appended by a concurrently racing call.
+        lambda = _lambdaDatabase->addLambdaInstance(lambda.region, lambda.function, lambda.runtime, instance);
 
         return inspectContainerResponse.id;
     }

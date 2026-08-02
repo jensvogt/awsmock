@@ -11,6 +11,7 @@
 // Boost includes
 #include <boost/asio/buffers_iterator.hpp>
 #include <boost/asio/dispatch.hpp>
+#include <boost/asio/post.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes
@@ -151,6 +152,19 @@ namespace Awsmock::Service {
          * @brief On read callback
          */
         void OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred);
+
+        /**
+         * @brief Detects a Lambda Invoke API request (POST .../functions/{name}/invocations).
+         *
+         * Invoking a Lambda can block for a long time waiting for a cold-start container to
+         * become ready. Such requests are dispatched to GatewayServer::WorkerPool() instead of
+         * being handled inline, so a slow invocation can never tie up one of the shared gateway
+         * I/O threads that every other connection (including container health checks) depends on.
+         *
+         * @param request HTTP request
+         * @return true if this is a Lambda invoke request
+         */
+        static bool IsLambdaInvocation(const http::request<http::dynamic_body> &request);
 
         /**
          * @brief Queue write callback
