@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.103](https://github.com/jensvogt/awsmock/compare/v1.18.102...v1.18.103) (2026-08-02)
+
+
+### Bug Fixes
+
+* multipart upload ([812e1fd](https://github.com/jensvogt/awsmock/commit/812e1fd4cce463e68e842d95f6ee7fbe470d1684))
+
 ## [1.18.102](https://github.com/jensvogt/awsmock/compare/v1.18.101...v1.18.102) (2026-07-30)
 
 
