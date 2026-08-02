@@ -326,8 +326,6 @@ namespace Awsmock::Service {
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
-        //Core::HttpUtils::DumpRequest(request);
-
         try {
             switch (clientCommand.command) {
                 case Dto::Common::S3CommandType::CREATE_BUCKET: {
@@ -888,8 +886,8 @@ namespace Awsmock::Service {
                 }
 
                 default:
-                    //Core::HttpUtils::DumpRequest(request);
                     log_error << "Unknown method";
+                    Core::HttpUtils::DumpRequest(request);
                     return SendResponse(request, http::status::bad_request, "Unknown method");
             }
         } catch (std::exception &exc) {
