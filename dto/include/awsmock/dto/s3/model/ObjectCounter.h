@@ -36,6 +36,11 @@ namespace Awsmock::Dto::S3 {
         std::string key;
 
         /**
+         * Object version ID
+         */
+        std::string versionId;
+
+        /**
          * Object owner
          */
         std::string owner;
@@ -87,6 +92,7 @@ namespace Awsmock::Dto::S3 {
             r.oid = Core::Json::GetStringValue(v, "oid");
             r.bucketName = Core::Json::GetStringValue(v, "bucketName");
             r.key = Core::Json::GetStringValue(v, "key");
+            r.versionId = Core::Json::GetStringValue(v, "versionId");
             r.owner = Core::Json::GetStringValue(v, "owner");
             r.contentType = Core::Json::GetStringValue(v, "contentType");
             r.storageClass = Core::Json::GetStringValue(v, "storageClass");
@@ -106,6 +112,7 @@ namespace Awsmock::Dto::S3 {
                     {"oid", obj.oid},
                     {"bucketName", obj.bucketName},
                     {"key", obj.key},
+                    {"versionId", obj.versionId},
                     {"owner", obj.owner},
                     {"contentType", obj.contentType},
                     {"storageClass", obj.storageClass},

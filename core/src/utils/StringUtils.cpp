@@ -209,7 +209,7 @@ namespace Awsmock::Core {
 
     std::string StringUtils::SubStringAfter(const std::string &string, const std::string &delimiter) {
         if (Contains(string, delimiter)) {
-            return string.substr(string.find(delimiter) + 1);
+            return string.substr(string.find(delimiter) + delimiter.length());
         }
         return {};
     }

@@ -35,6 +35,11 @@ namespace Awsmock::Dto::S3 {
         std::string sourceKey;
 
         /**
+         * Source version ID
+         */
+        std::string sourceVersionId;
+
+        /**
          * Target bucket
          */
         std::string targetBucket;
@@ -62,6 +67,7 @@ namespace Awsmock::Dto::S3 {
             r.partNumber = Core::Json::GetLongValue(v, "partNumber");
             r.sourceBucket = Core::Json::GetStringValue(v, "sourceBucket");
             r.sourceKey = Core::Json::GetStringValue(v, "sourceKey");
+            r.sourceVersionId = Core::Json::GetStringValue(v, "sourceVersionId");
             r.targetBucket = Core::Json::GetStringValue(v, "targetBucket");
             r.targetKey = Core::Json::GetStringValue(v, "targetKey");
             r.min = Core::Json::GetLongValue(v, "min");
@@ -78,6 +84,7 @@ namespace Awsmock::Dto::S3 {
                     {"partNumber", obj.partNumber},
                     {"sourceBucket", obj.sourceBucket},
                     {"sourceKey", obj.sourceKey},
+                    {"sourceVersionId", obj.sourceVersionId},
                     {"targetBucket", obj.targetBucket},
                     {"targetKey", obj.targetKey},
                     {"min", obj.min},

@@ -24,12 +24,18 @@ namespace Awsmock::Dto::S3 {
          */
         std::string key;
 
+        /**
+         * S3 object version Id
+         */
+        std::string versionId;
+
       private:
 
         friend GetObjectMetadataRequest tag_invoke(boost::json::value_to_tag<GetObjectMetadataRequest>, boost::json::value const &v) {
             GetObjectMetadataRequest r;
             r.bucket = Core::Json::GetStringValue(v, "bucket");
             r.key = Core::Json::GetStringValue(v, "key");
+            r.versionId = Core::Json::GetStringValue(v, "versionId");
             return r;
         }
 
@@ -40,6 +46,7 @@ namespace Awsmock::Dto::S3 {
                     {"requestId", obj.requestId},
                     {"bucket", obj.bucket},
                     {"key", obj.bucket},
+                    {"versionId", obj.versionId},
             };
         }
     };

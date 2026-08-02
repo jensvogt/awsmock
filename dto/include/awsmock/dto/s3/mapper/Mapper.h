@@ -264,6 +264,7 @@ namespace Awsmock::Dto::S3 {
             d.size = e.size;
             d.metadata = e.metadata;
             d.storageClass = Database::Entity::S3::StorageClassToString(e.storageClass);
+            d.versionId = e.versionId;
             d.created = e.created;
             d.modified = e.modified;
             return d;
