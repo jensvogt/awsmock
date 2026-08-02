@@ -354,8 +354,15 @@ namespace Awsmock::Database {
         if (!bucket.empty()) {
             q = q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
         }
-        log_debug << "Object count, region: " << region << ", bucket: " << bucket << ", count: " << q.count();
-        return static_cast<long>(q.count());
+
+        // Count distinct bucket/key combinations, so a versioned bucket with several stored
+        // versions of the same key is still counted once.
+        std::set<std::pair<std::string, std::string>> distinctKeys;
+        for (const auto &object: q.to_vector()) {
+            distinctKeys.emplace(object.bucket, object.key);
+        }
+        log_debug << "Object count, region: " << region << ", bucket: " << bucket << ", count: " << distinctKeys.size();
+        return static_cast<long>(distinctKeys.size());
     }
 
     std::vector<Entity::S3::Object> S3MemoryRepository::listObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
@@ -370,8 +377,24 @@ namespace Awsmock::Database {
         if (!bucket.empty()) {
             q = q.where([bucket](const Entity::S3::Object &object) { return object.bucket == bucket; });
         }
+
+        // Reduce to the latest (highest 'modified') version per bucket/key, so a versioned bucket
+        // only ever shows one row per key - matching the behaviour of a non-versioned bucket.
+        std::map<std::pair<std::string, std::string>, Entity::S3::Object> latestByKey;
+        for (const auto &object: q.to_vector()) {
+            const auto mapKey = std::make_pair(object.bucket, object.key);
+            if (const auto it = latestByKey.find(mapKey); it == latestByKey.end() || object.modified > it->second.modified) {
+                latestByKey[mapKey] = object;
+            }
+        }
+        std::vector<Entity::S3::Object> objectList;
+        objectList.reserve(latestByKey.size());
+        for (auto &[mapKey, object]: latestByKey) {
+            objectList.push_back(object);
+        }
+
         if (!sortColumns.empty()) {
-            std::ranges::sort(q.to_vector(), [sortColumns](const Entity::S3::Object &a, const Entity::S3::Object &b) {
+            std::ranges::sort(objectList, [sortColumns](const Entity::S3::Object &a, const Entity::S3::Object &b) {
                 for (const auto &sc: sortColumns) {
                     if (sc.column == "bucket") {
                         return sc.sortDirection == 1 ? a.bucket < b.bucket : b.bucket < a.bucket;
@@ -389,8 +412,8 @@ namespace Awsmock::Database {
                 return false;
             });
         }
-        log_trace << "Objects list, prefix: " << prefix << ", count: " << q.count();
-        return Core::PageVector(q.to_vector(), pageSize, pageIndex);
+        log_trace << "Objects list, prefix: " << prefix << ", count: " << objectList.size();
+        return Core::PageVector(objectList, pageSize, pageIndex);
     }
 
     std::vector<Entity::S3::Object> S3MemoryRepository::listObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
@@ -407,6 +430,21 @@ namespace Awsmock::Database {
         }
         log_trace << "Versioned object list, region: " << region << ", bucket: " << bucket << ", size: " << q.count();
         return q.to_vector();
+    }
+
+    std::vector<Entity::S3::Object> S3MemoryRepository::listObjectsByKey(const std::string &region, const std::string &bucket, const std::string &key) const {
+        boost::mutex::scoped_lock lock(_objectMutex);
+
+        auto q = Core::from(_objects | std::views::values | std::ranges::to<std::vector>());
+        if (!region.empty()) {
+            q = q.where([region](const Entity::S3::Object &object) { return object.region == region; });
+        }
+        q = q.where([bucket, key](const Entity::S3::Object &object) { return object.bucket == bucket && object.key == key; });
+
+        std::vector<Entity::S3::Object> objectList = q.to_vector();
+        std::ranges::sort(objectList, [](const Entity::S3::Object &a, const Entity::S3::Object &b) { return a.modified > b.modified; });
+        log_trace << "Got object versions by key, key: " << key << ", size: " << objectList.size();
+        return objectList;
     }
 
     long S3MemoryRepository::deleteObject(const Entity::S3::Object &object) const {

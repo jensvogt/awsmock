@@ -628,6 +628,23 @@ namespace Awsmock::Database {
         return objectList;
     }
 
+    std::vector<Entity::S3::Object> S3MongoRepository::listObjectsByKey(const std::string &region, const std::string &bucket, const std::string &key) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_objects_by_key");
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
+
+        mongocxx::options::find opts;
+        opts.sort(make_document(kvp("modified", -1)));
+
+        std::vector<Entity::S3::Object> objectList;
+        for (auto objectCursor = _objectCollection.find(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)), opts); const auto &object: objectCursor) {
+            objectList.push_back(Entity::S3::Object::FromDocument(object));
+        }
+        log_trace << "Got object versions by key, key: " << key << ", size: " << objectList.size();
+        return objectList;
+    }
+
     long S3MongoRepository::objectCount(const std::string &region, const std::string &prefix, const std::string &bucket) const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "count_objects");
 
@@ -636,7 +653,6 @@ namespace Awsmock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
-            long count = 0;
             document query = {};
             if (!region.empty()) {
                 query.append(kvp("region", region));
@@ -648,7 +664,16 @@ namespace Awsmock::Database {
                 query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
             }
 
-            count = static_cast<long>(_objectCollection.count_documents(query.view()));
+            // Count distinct region/bucket/key combinations, so a versioned bucket with several
+            // stored versions of the same key is still counted once.
+            mongocxx::pipeline p{};
+            p.match(query.extract());
+            p.group(make_document(kvp("_id", make_document(kvp("bucket", "$bucket"), kvp("key", "$key")))));
+            p.count("count");
+
+            auto cursor = _objectCollection.aggregate(p);
+            const auto it = cursor.begin();
+            const long count = it != cursor.end() ? Core::Bson::BsonUtils::GetLongValue(*it, "count") : 0;
             log_trace << "Object count: " << count;
 
             return count;
@@ -665,21 +690,6 @@ namespace Awsmock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
-        mongocxx::options::find opts;
-        if (!sortColumns.empty()) {
-            document sort = {};
-            for (const auto &sortColumn: sortColumns) {
-                sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
-            }
-            opts.sort(sort.extract());
-        }
-        if (pageSize > 0) {
-            opts.limit(pageSize);
-            if (pageIndex > 0) {
-                opts.skip(pageIndex * pageSize);
-            }
-        }
-
         document query = {};
         if (!region.empty()) {
             query.append(kvp("region", region));
@@ -691,8 +701,31 @@ namespace Awsmock::Database {
             query.append(kvp("key", make_document(kvp("$regex", "^" + prefix))));
         }
 
+        // Reduce to the latest (highest 'modified') version per region/bucket/key, so a versioned
+        // bucket only ever shows one row per key - matching the behaviour of a non-versioned bucket.
+        mongocxx::pipeline p{};
+        p.match(query.extract());
+        p.sort(make_document(kvp("modified", -1)));
+        p.group(make_document(kvp("_id", make_document(kvp("bucket", "$bucket"), kvp("key", "$key"))),
+                              kvp("doc", make_document(kvp("$first", "$$ROOT")))));
+        p.replace_root(make_document(kvp("newRoot", "$doc")));
+
+        if (!sortColumns.empty()) {
+            document sort = {};
+            for (const auto &sortColumn: sortColumns) {
+                sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+            }
+            p.sort(sort.extract());
+        }
+        if (pageSize > 0) {
+            if (pageIndex > 0) {
+                p.skip(static_cast<std::int32_t>(pageIndex * pageSize));
+            }
+            p.limit(static_cast<std::int32_t>(pageSize));
+        }
+
         std::vector<Entity::S3::Object> objectList;
-        auto cursor = _objectCollection.find(query.extract(), opts);
+        auto cursor = _objectCollection.aggregate(p);
         std::transform(cursor.begin(), cursor.end(), std::back_inserter(objectList),
                        [](const auto &doc) {
                            return Entity::S3::Object::FromDocument(doc);

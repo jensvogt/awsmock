@@ -923,6 +923,40 @@ namespace Awsmock::Service {
         }
     }
 
+    Dto::S3::ListObjectVersionCountersResponse S3Service::ListObjectVersionCounters(const Dto::S3::ListObjectVersionCountersRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "list_object_version_counters");
+        log_trace << "List object version counters request, bucket: " << request.bucket << ", key: " << request.key;
+
+        try {
+            const std::vector<Database::Entity::S3::Object> objectList = _s3Database->listObjectsByKey(request.region, request.bucket, request.key);
+
+            Dto::S3::ListObjectVersionCountersResponse response;
+            response.total = static_cast<long>(objectList.size());
+
+            bool first = true;
+            for (const auto &object: objectList) {
+                Dto::S3::ObjectVersionCounter versionCounter;
+                versionCounter.oid = object.oid;
+                versionCounter.key = object.key;
+                versionCounter.versionId = object.versionId;
+                versionCounter.size = object.size;
+                versionCounter.storageClass = Database::Entity::S3::StorageClassToString(object.storageClass);
+                versionCounter.created = object.created;
+                versionCounter.modified = object.modified;
+                // objectList is sorted by 'modified' descending, so the first entry is the latest version
+                versionCounter.isLatest = first;
+                first = false;
+                response.versionCounters.emplace_back(versionCounter);
+            }
+            log_debug << "Listed object versions, key: " << request.key << ", size: " << objectList.size();
+
+            return response;
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 list object version counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::S3::GetObjectCounterResponse S3Service::GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_object_counters");
         log_trace << "Get objects counters request";

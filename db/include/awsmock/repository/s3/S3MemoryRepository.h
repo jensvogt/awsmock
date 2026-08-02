@@ -5,7 +5,9 @@
 #pragma once
 
 // C++ includes
+#include <map>
 #include <ranges>
+#include <set>
 #include <string>
 #include <unordered_set>
 
@@ -260,6 +262,18 @@ namespace Awsmock::Database {
          */
         [[nodiscard]]
         std::vector<Entity::S3::Object> listObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const override;
+
+        /**
+         * @brief Gets all stored versions of a single object key, ordered by most recently modified first
+         *
+         * @param region AWS S3 region name
+         * @param bucket object bucket
+         * @param key object key
+         * @return list of S3 object versions
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        std::vector<Entity::S3::Object> listObjectsByKey(const std::string &region, const std::string &bucket, const std::string &key) const override;
 
         /**
          * @brief Delete a bucket.

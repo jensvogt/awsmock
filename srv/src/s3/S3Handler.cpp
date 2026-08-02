@@ -771,6 +771,17 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, s3Response.ToJson());
                 }
 
+                case Dto::Common::S3CommandType::LIST_OBJECT_VERSION_COUNTERS: {
+                    log_debug << "S3 list object version counters request";
+
+                    // Build request
+                    Dto::S3::ListObjectVersionCountersRequest s3Request = Dto::S3::ListObjectVersionCountersRequest::FromJson(clientCommand);
+                    Dto::S3::ListObjectVersionCountersResponse s3Response = _s3Service.ListObjectVersionCounters(s3Request);
+
+                    log_info << "List object version counters, bucket: " << s3Request.bucket << ", key: " << s3Request.key << ", count: " << s3Response.total;
+                    return SendResponse(request, http::status::ok, s3Response.ToJson());
+                }
+
                 case Dto::Common::S3CommandType::UPLOAD_OBJECT_COUNTER: {
 
                     // Build request

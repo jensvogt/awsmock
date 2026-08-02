@@ -70,6 +70,8 @@
 #include <awsmock/dto/s3/internal/ListBucketCounterResponse.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterRequest.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
+#include <awsmock/dto/s3/internal/ListObjectVersionCountersRequest.h>
+#include <awsmock/dto/s3/internal/ListObjectVersionCountersResponse.h>
 #include <awsmock/dto/s3/internal/TouchObjectRequest.h>
 #include <awsmock/dto/s3/internal/UpdateObjectRequest.h>
 #include <awsmock/dto/s3/internal/UploadObjectCounterRequest.h>
@@ -347,6 +349,14 @@ namespace Awsmock::Service {
          * @return GetObjectCounterResponse
          */
         [[nodiscard]] Dto::S3::GetObjectCounterResponse GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const;
+
+        /**
+         * @brief Lists all stored versions of a single object key, most recently modified first
+         *
+         * @param request S3 list object version counters request
+         * @return ListObjectVersionCountersResponse
+         */
+        [[nodiscard]] Dto::S3::ListObjectVersionCountersResponse ListObjectVersionCounters(const Dto::S3::ListObjectVersionCountersRequest &request) const;
 
         /**
          * @brief Uploads a S3 object

@@ -355,6 +355,18 @@ namespace Awsmock::Database {
         virtual std::vector<Entity::S3::Object> listObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const = 0;
 
         /**
+         * @brief Gets all stored versions of a single object key, ordered by most recently modified first
+         *
+         * @param region AWS S3 region name
+         * @param bucket object bucket
+         * @param key object key
+         * @return list of S3 object versions
+         * @throws DatabaseException
+         */
+        [[nodiscard]]
+        virtual std::vector<Entity::S3::Object> listObjectsByKey(const std::string &region, const std::string &bucket, const std::string &key) const = 0;
+
+        /**
          * @brief Gets an object from a bucket
          *
          * @param oid object ID
