@@ -510,42 +510,40 @@ namespace Awsmock::Core {
     long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long count) {
         long copied = 0;
         char buffer[BUFFER_LEN];
-        if (count < BUFFER_LEN) {
-            istream.read(buffer, count);
-            ostream.write(buffer, count);
-            copied = count;
-        } else {
-            while (count > BUFFER_LEN) {
-                istream.read(buffer, BUFFER_LEN);
-                ostream.write(buffer, BUFFER_LEN);
-                count -= BUFFER_LEN;
-                copied += BUFFER_LEN;
+        while (copied < count) {
+            const long chunk = std::min<long>(BUFFER_LEN, count - copied);
+            istream.read(buffer, chunk);
+            const long got = istream.gcount();
+            if (got <= 0) {
+                break;
             }
-            istream.read(buffer, count);
-            ostream.write(buffer, count);
-            copied += count;
+            ostream.write(buffer, got);
+            copied += got;
+            if (got < chunk) {
+                // Short read, input stream is exhausted or failed
+                break;
+            }
         }
         return copied;
     }
 
     long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, const long start, long count) {
-        long copied = 0;
         istream.seekg(start, std::ios::beg);
+        long copied = 0;
         char buffer[BUFFER_LEN];
-        if (count < BUFFER_LEN) {
-            istream.read(buffer, count);
-            ostream.write(buffer, count);
-            copied = count;
-        } else {
-            while (count > BUFFER_LEN) {
-                istream.read(buffer, BUFFER_LEN);
-                ostream.write(buffer, BUFFER_LEN);
-                count -= BUFFER_LEN;
-                copied += BUFFER_LEN;
+        while (copied < count) {
+            const long chunk = std::min<long>(BUFFER_LEN, count - copied);
+            istream.read(buffer, chunk);
+            const long got = istream.gcount();
+            if (got <= 0) {
+                break;
             }
-            istream.read(buffer, count);
-            ostream.write(buffer, count);
-            copied += count;
+            ostream.write(buffer, got);
+            copied += got;
+            if (got < chunk) {
+                // Short read, input stream is exhausted or failed
+                break;
+            }
         }
         return copied;
     }

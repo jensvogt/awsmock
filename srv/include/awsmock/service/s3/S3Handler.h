@@ -105,7 +105,7 @@ namespace Awsmock::Service {
          * @param max maximum byte
          * @param size content length
          */
-        void GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size);
+        void GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size) const;
 
         /**
          * @brief Returns the metadata has string key/value map.
@@ -116,7 +116,7 @@ namespace Awsmock::Service {
          * @param request HTTP request
          * @return hash map of key/value pairs.
          */
-        std::map<std::string, std::string> GetMetadata(const http::request<http::dynamic_body> &request);
+        std::map<std::string, std::string> GetMetadata(const http::request<http::dynamic_body> &request) const;
 
         /**
          * @brief Prepare the body for further processing
@@ -126,7 +126,7 @@ namespace Awsmock::Service {
          * @param request HTTP request
          * @param sb prepared stream buffer
          */
-        long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
+        long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) const;
 
         /**
          * @brief Gets bucket and key from the source header
@@ -135,7 +135,17 @@ namespace Awsmock::Service {
          * @param bucket bucket name
          * @param key S3 object key
          */
-        void GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key);
+        void GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key) const;
+
+        /**
+         * @brief Gets bucket, key and versionId from the source header
+         *
+         * @param path path from source header
+         * @param bucket bucket name
+         * @param key S3 object key
+         * @param versionId S3 object version ID, if the copy-source referenced a specific version
+         */
+        void GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key, std::string &versionId) const;
 
         /**
          * S3 service

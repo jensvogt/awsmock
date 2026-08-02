@@ -82,7 +82,6 @@ namespace Awsmock::Dto::S3 {
                 root.add("CopyPartResult.ChecksumSHA1", checksumSHA1);
                 root.add("CopyPartResult.ChecksumSHA256", checksumSHA256);
                 root.add("CopyPartResult.LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
-                root.add("CopyPartResult.ETag", eTag);
                 return Core::XmlUtils::ToXmlString(root);
 
             } catch (std::exception &exc) {

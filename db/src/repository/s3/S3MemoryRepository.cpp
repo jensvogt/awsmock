@@ -311,14 +311,18 @@ namespace Awsmock::Database {
 
     Entity::S3::Object S3MemoryRepository::getObject(const std::string &region, const std::string &bucket, const std::string &key) const {
 
-        const auto it = std::ranges::find_if(_objects,
-                                             [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &object) {
-                                                 return object.second.region == region && object.second.bucket == bucket && object.second.key == key;
-                                             });
+        auto newest = _objects.end();
+        for (auto it = _objects.begin(); it != _objects.end(); ++it) {
+            if (it->second.region == region && it->second.bucket == bucket && it->second.key == key) {
+                if (newest == _objects.end() || it->second.modified > newest->second.modified) {
+                    newest = it;
+                }
+            }
+        }
 
-        if (it != _objects.end()) {
-            it->second.oid = it->first;
-            return it->second;
+        if (newest != _objects.end()) {
+            newest->second.oid = newest->first;
+            return newest->second;
         }
         return {};
     }

@@ -1518,14 +1518,18 @@ namespace Awsmock::FtpServer {
         request.contentLength = contentLength;
         request.metadata = metadata;
 
-        std::ifstream ifs(fileName, std::ios::binary);
-        _s3Service->PutObject(request, ifs);
-        ifs.close();
+        try {
+            std::ifstream ifs(fileName, std::ios::binary);
+            _s3Service->PutObject(request, ifs);
+            ifs.close();
 
-        //_metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);
-        //_metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(fileName)));
-        Core::EventBus::instance().sigFtpUpload(user, fileName, metadata);
-        log_debug << "File uploaded, fileName: " << fileName;
+            //_metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);
+            //_metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(fileName)));
+            Core::EventBus::instance().sigFtpUpload(user, fileName, metadata);
+            log_debug << "File uploaded, fileName: " << fileName;
+        } catch (std::exception &exc) {
+            log_error << "S3 put object failed after FTP upload, fileName: " << fileName << ", message: " << exc.what();
+        }
     }
 
     void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) const {

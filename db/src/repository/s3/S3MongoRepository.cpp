@@ -544,7 +544,10 @@ namespace Awsmock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
 
-            if (const auto mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)))) {
+            mongocxx::options::find opts;
+            opts.sort(make_document(kvp("modified", -1)));
+
+            if (const auto mResult = _objectCollection.find_one(make_document(kvp("region", region), kvp("bucket", bucket), kvp("key", key)), opts)) {
                 return Entity::S3::Object::FromDocument(mResult->view());
             }
             return {};

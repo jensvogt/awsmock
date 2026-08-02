@@ -16,6 +16,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseObject.h>
 #include <awsmock/entity/lambda/Instance.h>
+#include <awsmock/entity/lambda/LambdaResultStatus.h>
 
 namespace Awsmock::Dto::Lambda {
 
@@ -90,9 +91,9 @@ namespace Awsmock::Dto::Lambda {
         std::string httpStatusCode;
 
         /**
-         * Lambda status
+         * Lambda invocation result status (success/failed)
          */
-        Database::Entity::Lambda::RuntimeStatus lambdaStatus = Database::Entity::Lambda::RuntimeStatus::unknown;
+        Database::Entity::Lambda::LambdaResultStatus lambdaStatus = Database::Entity::Lambda::LambdaResultStatus::unknown;
 
         /**
          *
@@ -116,7 +117,7 @@ namespace Awsmock::Dto::Lambda {
             r.instanceId = Core::Json::GetStringValue(v, "instanceId");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.httpStatusCode = Core::Json::GetStringValue(v, "httpStatusCode");
-            // r.status = Database::Entity::Lambda::LambdaInstanceStatusFromString(Core::Json::GetStringValue(v, "lambdaStatus"));
+            r.lambdaStatus = Database::Entity::Lambda::LambdaResultStatusFromString(Core::Json::GetStringValue(v, "lambdaStatus"));
             r.timestamp = Core::DateTimeUtils::FromISO8601(v.at("timestamp").as_string().data());
             return r;
         }
@@ -135,7 +136,7 @@ namespace Awsmock::Dto::Lambda {
                     {"instanceId", obj.instanceId},
                     {"containerId", obj.containerId},
                     {"httpStatusCode", obj.httpStatusCode},
-                    // {"lambdaStatus", Database::Entity::Lambda::LambdaInstanceStatusToString(obj.lambdaStatus)},
+                    {"lambdaStatus", Database::Entity::Lambda::LambdaResultStatusToString(obj.lambdaStatus)},
                     {"timestamp", Core::DateTimeUtils::ToISO8601(obj.timestamp)},
             };
         }

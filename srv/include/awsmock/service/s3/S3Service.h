@@ -452,9 +452,11 @@ namespace Awsmock::Service {
          * @param bucket bucket name.
          * @param key S3 object key.
          * @param size S3 object size in bytes.
+         * @param etag S3 object ETag (MD5 checksum).
+         * @param versionId S3 object version ID, empty if the bucket is not versioned.
          * @param event S3 event type.
          */
-        void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) const;
+        void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &etag, const std::string &versionId, const std::string &event) const;
 
         /**
          * @brief Checks the encryption status and encrypt the internal file using the
@@ -524,25 +526,14 @@ namespace Awsmock::Service {
         void DeleteBucket(const std::string &bucket) const;
 
         /**
-         * @brief Save a versioned S3 object.
+         * @brief Save an S3 object, versioned or un-versioned depending on the bucket configuration.
          *
          * @param request put object request
          * @param bucket S3 bucket
          * @param stream input stream
-         * @return file name
+         * @return put object response
          */
-        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
-
-        /**
-         * @brief Save an un-versioned S3 object.
-         *
-         * @param request put object request
-         * @param bucket S3 bucket
-         * @param stream input stream
-         * @param size input stream size
-         * @return file name
-         */
-        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const;
+        Dto::S3::PutObjectResponse SaveObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
 
         /**
          * @brief Adds the queue notification configuration to the provided bucket.

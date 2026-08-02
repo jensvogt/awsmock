@@ -291,6 +291,7 @@ namespace Awsmock::Service {
         lambdaResult.lambdaName = lambda.function;
         lambdaResult.lambdaArn = lambda.arn;
         lambdaResult.duration = duration;
+        lambdaResult.lambdaStatus = http::to_status_class(response.statusCode) == http::status_class::successful ? Database::Entity::Lambda::LambdaResultStatus::success : Database::Entity::Lambda::LambdaResultStatus::failed;
         lambdaResult = _lambdaDatabase->createLambdaResult(lambdaResult);
 
         Core::EventBus::instance().sigMetricGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, duration);

@@ -12,6 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/lambda/Instance.h>
+#include <awsmock/entity/lambda/LambdaResultStatus.h>
 
 namespace Awsmock::Database::Entity::Lambda {
 
@@ -35,9 +36,9 @@ namespace Awsmock::Database::Entity::Lambda {
         std::string lambdaArn;
 
         /**
-         * Lambda runtime status
+         * Lambda invocation result status (success/failed)
          */
-        RuntimeStatus lambdaStatus;
+        LambdaResultStatus lambdaStatus = LambdaResultStatus::unknown;
 
         /**
          * Request body
@@ -78,11 +79,6 @@ namespace Awsmock::Database::Entity::Lambda {
          * Status code
          */
         boost::beast::http::status status;
-
-        /**
-         * Lambda status
-         */
-        // RuntimeStatus lambdaStatus = InstanceUnknown;
 
         /**
          * Duration in milliseconds

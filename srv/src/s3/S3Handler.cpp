@@ -352,7 +352,7 @@ namespace Awsmock::Service {
                         s3Request.metadata = metadata;
 
                         // Get S3 source bucket/key
-                        GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
+                        GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey, s3Request.sourceVersionId);
 
                         Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
 
@@ -422,7 +422,7 @@ namespace Awsmock::Service {
                     s3Request.targetKey = clientCommand.key;
 
                     // Get S3 source bucket/key
-                    GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
+                    GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey, s3Request.sourceVersionId);
 
                     // Get the user metadata
                     s3Request.metadata = GetMetadata(request);
@@ -436,12 +436,11 @@ namespace Awsmock::Service {
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
                     std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-                    long contentLength = std::stol(request.base()["x-amz-decoded-content-length"]);
-                    log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
-                    // If chunked, we take the content length from the decoded content length header field.
+                    // If chunked, PrepareBody takes the content length from the decoded content length header field.
                     beast::net::streambuf sb;
-                    contentLength = PrepareBody(request, sb);
+                    const long contentLength = PrepareBody(request, sb);
+                    log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
                     std::istream stream(&sb);
                     std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId, contentLength);
 
@@ -465,7 +464,7 @@ namespace Awsmock::Service {
                     s3Request.targetKey = clientCommand.key;
 
                     // Get S3 source bucket/key
-                    GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
+                    GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey, s3Request.sourceVersionId);
 
                     if (Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range")) {
                         std::string rangeStr = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source-range");
@@ -752,6 +751,7 @@ namespace Awsmock::Service {
 
                     // Build request
                     Dto::S3::UpdateBucketRequest s3Request = Dto::S3::UpdateBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+                    s3Request.region = clientCommand.region;
 
                     // Get object versions
                     _s3Service.UpdateBucket(s3Request);
@@ -1006,6 +1006,9 @@ namespace Awsmock::Service {
                 s3Request.region = clientCommand.region;
                 s3Request.bucket = clientCommand.bucket;
                 s3Request.key = clientCommand.key;
+                if (std::string versionId = Core::HttpUtils::GetStringParameter(request.target(), "versionId"); !versionId.empty()) {
+                    s3Request.versionId = versionId;
+                }
                 s3Response = _s3Service.GetObjectMetadata(s3Request);
             }
 
@@ -1018,6 +1021,7 @@ namespace Awsmock::Service {
             headers["x-amz-bucket-region"] = s3Response.region;
             headers["x-amz-location-name"] = s3Response.region;
             headers["x-amz-storage-class"] = s3Response.storageClass;
+            headers["x-amz-version-id"] = s3Response.versionId;
 
             // User supplied metadata
             if (!s3Response.metadata.empty()) {
@@ -1044,7 +1048,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Handler::GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size) {
+    void S3Handler::GetRange(const http::request<http::dynamic_body> &request, long &min, long &max, long &size) const {
         if (!Core::HttpUtils::HasHeader(request, "Range")) {
             return;
         }
@@ -1064,7 +1068,7 @@ namespace Awsmock::Service {
         }
     }
 
-    std::map<std::string, std::string> S3Handler::GetMetadata(const http::request<http::dynamic_body> &request) {
+    std::map<std::string, std::string> S3Handler::GetMetadata(const http::request<http::dynamic_body> &request) const {
         std::map<std::string, std::string> metadata;
         for (const auto &meta: request.base()) {
             if (Core::StringUtils::StartsWith(meta.name_string(), "x-amz-meta")) {
@@ -1076,7 +1080,7 @@ namespace Awsmock::Service {
         return metadata;
     }
 
-    long S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
+    long S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) const {
         sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
         if (Core::HttpUtils::HasHeaderValue(request, "content-encoding", "aws-chunked")) {
             // Get decoded length from the header.
@@ -1096,16 +1100,27 @@ namespace Awsmock::Service {
             log_trace << "Skipped count: " << count << " decodedContentLength: " << decodedContentLength;
 
             request.body().consume(count);
-            sb.commit(boost::beast::net::buffer_copy(sb.prepare(decodedContentLength), request.body().cdata()));
+            sb.commit(beast::net::buffer_copy(sb.prepare(decodedContentLength), request.body().cdata()));
             return decodedContentLength;
         }
-        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+        sb.commit(beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
         return static_cast<long>(request.body().size());
     }
 
-    void S3Handler::GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key) {
-        bucket = Core::StringUtils::SubStringUntil(path, "/");
-        key = Core::StringUtils::SubStringAfter(path, "/");
-        log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key;
+    void S3Handler::GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key) const {
+        std::string versionId;
+        GetBucketKeyFromHeader(path, bucket, key, versionId);
+    }
+
+    void S3Handler::GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key, std::string &versionId) const {
+        // The x-amz-copy-source header can carry a trailing '?versionId=...' query parameter when the
+        // source bucket is versioned. Strip it off before splitting bucket/key, otherwise the versionId
+        // ends up glued onto the key and every source object lookup fails.
+        const std::string sourcePath = Core::StringUtils::SubStringUntil(path, "?");
+        versionId = Core::StringUtils::Contains(path, "?versionId=") ? Core::StringUtils::SubStringAfter(path, "?versionId=") : std::string();
+
+        bucket = Core::StringUtils::UrlDecode(Core::StringUtils::SubStringUntil(sourcePath, "/"));
+        key = Core::StringUtils::UrlDecode(Core::StringUtils::SubStringAfter(sourcePath, "/"));
+        log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key << " versionId: " << versionId;
     }
 }// namespace Awsmock::Service

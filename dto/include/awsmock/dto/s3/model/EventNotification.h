@@ -174,13 +174,17 @@ namespace Awsmock::Dto::S3 {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Object const &obj) {
-            jv = {
+            boost::json::object o = {
                     {"key", obj.key},
                     {"size", obj.size},
                     {"eTag", obj.etag},
-                    {"versionId", obj.versionId},
                     {"sequencer", obj.sequencer},
             };
+            // AWS only includes the versionId key when the bucket has versioning enabled.
+            if (!obj.versionId.empty()) {
+                o["versionId"] = obj.versionId;
+            }
+            jv = o;
         }
     };
 

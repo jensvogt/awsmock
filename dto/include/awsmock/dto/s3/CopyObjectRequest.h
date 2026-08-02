@@ -22,6 +22,11 @@ namespace Awsmock::Dto::S3 {
         std::string sourceKey;
 
         /**
+         * Source version ID
+         */
+        std::string sourceVersionId;
+
+        /**
          * Target bucket
          */
         std::string targetBucket;
@@ -42,9 +47,9 @@ namespace Awsmock::Dto::S3 {
             CopyObjectRequest r;
             r.sourceBucket = Core::Json::GetStringValue(v, "sourceBucket");
             r.sourceKey = Core::Json::GetStringValue(v, "sourceKey");
+            r.sourceVersionId = Core::Json::GetStringValue(v, "sourceVersionId");
             r.targetBucket = Core::Json::GetStringValue(v, "targetBucket");
             r.targetKey = Core::Json::GetStringValue(v, "targetKey");
-            r.sourceKey = Core::Json::GetStringValue(v, "sourceKey");
             if (Core::Json::AttributeExists(v, "metadata")) {
                 r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
             }
@@ -60,6 +65,7 @@ namespace Awsmock::Dto::S3 {
                     {"targetBucket", obj.targetBucket},
                     {"targetKey", obj.targetKey},
                     {"sourceKey", obj.sourceKey},
+                    {"sourceVersionId", obj.sourceVersionId},
                     {"metadata", boost::json::value_from(obj.metadata)},
             };
         }

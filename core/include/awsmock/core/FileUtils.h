@@ -17,6 +17,7 @@
 #include <magic.h>
 
 // Standard C++ includes
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>

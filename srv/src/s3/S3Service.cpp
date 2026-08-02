@@ -64,7 +64,18 @@ namespace Awsmock::Service {
         }
 
         try {
-            const Database::Entity::S3::Object object = _s3Database->getObject(request.region, request.bucket, request.key);
+            const Database::Entity::S3::Bucket bucketEntity = _s3Database->getBucketByRegionName(request.region, request.bucket);
+
+            Database::Entity::S3::Object object;
+            if (bucketEntity.IsVersioned() && !request.versionId.empty()) {
+                object = _s3Database->getObjectVersion(request.region, request.bucket, request.key, request.versionId);
+                if (object.oid.empty()) {
+                    log_info << "Object version does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key << ", versionId: " << request.versionId;
+                    throw Core::NotFoundException("Object version does not exist, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
+                }
+            } else {
+                object = _s3Database->getObject(request.region, request.bucket, request.key);
+            }
 
             Dto::S3::GetObjectMetadataResponse response = Dto::S3::GetObjectMetadataResponseMapper::toDto(object);
             log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
@@ -386,6 +397,12 @@ namespace Awsmock::Service {
         ofs.close();
         log_trace << "Part uploaded, part: " << part << ", dir: " << uploadDir << ", count: " << count;
 
+        if (count != length) {
+            Core::FileUtils::RemoveFile(fileName);
+            log_error << "Upload part truncated, part: " << part << ", updateId: " << updateId << ", expected: " << length << ", received: " << count;
+            throw Core::ServiceException("Upload part truncated, expected: " + std::to_string(length) + ", received: " + std::to_string(count));
+        }
+
         // Get md5sum as ETag
         std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
         log_debug << "Upload part succeeded, part: " << part << ", filename: " << fileName << ", size: " << count;
@@ -396,9 +413,20 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "upload_part_copy");
         log_trace << "UploadPart copy request, part: " << request.partNumber << " updateId: " << request.uploadId;
 
-        const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
-        const Database::Entity::S3::Object sourceObject = _s3Database->getObject(request.region, request.sourceBucket, request.sourceKey);
+        const Database::Entity::S3::Bucket sourceBucket = _s3Database->getBucketByRegionName(request.region, request.sourceBucket);
 
+        Database::Entity::S3::Object sourceObject;
+        if (sourceBucket.IsVersioned() && !request.sourceVersionId.empty()) {
+            sourceObject = _s3Database->getObjectVersion(request.region, request.sourceBucket, request.sourceKey, request.sourceVersionId);
+        } else {
+            sourceObject = _s3Database->getObject(request.region, request.sourceBucket, request.sourceKey);
+        }
+        if (sourceObject.oid.empty()) {
+            log_error << "Upload part copy source not found, part: " << request.partNumber << ", uploadId: " << request.uploadId << ", sourceBucket: " << request.sourceBucket << ", sourceKey: " << request.sourceKey << ", sourceVersionId: " << request.sourceVersionId;
+            throw Core::NotFoundException("Upload part copy source not found, sourceBucket: " + request.sourceBucket + ", sourceKey: " + request.sourceKey);
+        }
+
+        const auto s3DataDir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
         const std::string sourceFile = Core::FileUtils::appendPath(s3DataDir, sourceObject.internalName);
         const std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
         log_trace << "Using uploadDir: " << uploadDir;
@@ -409,6 +437,12 @@ namespace Awsmock::Service {
 
         // Copy part of the file
         const long copied = Core::FileUtils::StreamCopier(sourceFile, destFile, start, length);
+
+        if (copied != length) {
+            Core::FileUtils::RemoveFile(destFile);
+            log_error << "Upload part copy truncated, part: " << request.partNumber << ", uploadId: " << request.uploadId << ", expected: " << length << ", received: " << copied;
+            throw Core::ServiceException("Upload part copy truncated, expected: " + std::to_string(length) + ", received: " + std::to_string(copied));
+        }
 
         // Get md5sum as ETag
         Dto::S3::UploadPartCopyResponse response;
@@ -458,6 +492,8 @@ namespace Awsmock::Service {
             // Update database object
             object.size = fileSize;
             object.md5sum = md5sum;
+            object.sha1sum = sha1sum;
+            object.sha256sum = sha256sum;
             object.internalName = filename;
             object.contentType = Core::MagicDetector::instance().fromFile(outFile);
             object = _s3Database->updateObject(object);
@@ -476,7 +512,7 @@ namespace Awsmock::Service {
             Core::DirUtils::DeleteDirectory(uploadDir);
 
             // Check notifications
-            CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
+            CheckNotifications(request.region, request.bucket, request.key, object.size, object.md5sum, object.versionId, "ObjectCreated");
             log_debug << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
 
             Dto::S3::CompleteMultipartUploadResult response;
@@ -585,12 +621,9 @@ namespace Awsmock::Service {
 
         try {
             // Get bucket
-            if (const Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
-                return SaveVersionedObject(request, bucket, stream);
-            } else {
-                return SaveUnversionedObject(request, bucket, stream, request.contentLength);
-            }
-        } catch (bsoncxx::exception &ex) {
+            const Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket);
+            return SaveObject(request, bucket, stream);
+        } catch (std::exception &ex) {
             log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
         }
@@ -626,12 +659,9 @@ namespace Awsmock::Service {
         try {
             // Get bucket
             std::ifstream ifs(filename, std::ios::binary);
-            if (const Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
-                SaveVersionedObject(request, bucket, ifs);
-            } else {
-                SaveUnversionedObject(request, bucket, ifs, request.contentLength);
-            }
-        } catch (bsoncxx::exception &ex) {
+            const Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket);
+            SaveObject(request, bucket, ifs);
+        } catch (std::exception &ex) {
             log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
         }
@@ -655,7 +685,7 @@ namespace Awsmock::Service {
             const Database::Entity::S3::Object object = _s3Database->getObject(request.region, request.bucket, request.key);
 
             // Check notification
-            CheckNotifications(object.region, object.bucket, object.key, object.size, "ObjectCreated");
+            CheckNotifications(object.region, object.bucket, object.key, object.size, object.md5sum, object.versionId, "ObjectCreated");
             log_info << "Touch object, bucket: " << request.bucket << ", key: " << request.key;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 touch object failed, message: " << ex.what() << " key: " << request.key;
@@ -706,7 +736,14 @@ namespace Awsmock::Service {
         CheckBucketExistence(request.region, request.sourceBucket);
 
         // Check the existence of the source key
-        if (!_s3Database->objectExists(request.region, request.sourceBucket, request.sourceKey)) {
+        const Database::Entity::S3::Bucket sourceBucketEntity = _s3Database->getBucketByRegionName(request.region, request.sourceBucket);
+        Database::Entity::S3::Object sourceObject;
+        if (sourceBucketEntity.IsVersioned() && !request.sourceVersionId.empty()) {
+            sourceObject = _s3Database->getObjectVersion(request.region, request.sourceBucket, request.sourceKey, request.sourceVersionId);
+        } else {
+            sourceObject = _s3Database->getObject(request.region, request.sourceBucket, request.sourceKey);
+        }
+        if (sourceObject.oid.empty()) {
             log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: " << request.sourceKey;
             throw Core::NotFoundException("Source object does not exist");
         }
@@ -722,9 +759,8 @@ namespace Awsmock::Service {
                 throw Core::NotFoundException("Target bucket does not exist");
             }
 
-            // Get the source object from the database
+            // Get the target bucket from the database
             const Database::Entity::S3::Bucket targetBucket = _s3Database->getBucketByRegionName(request.region, request.targetBucket);
-            const Database::Entity::S3::Object sourceObject = _s3Database->getObject(request.region, request.sourceBucket, request.sourceKey);
 
             // Copy the physical file
             const std::string targetFile = Core::AwsUtils::CreateS3FileName();
@@ -762,7 +798,7 @@ namespace Awsmock::Service {
             log_debug << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key;
 
             // Check notification
-            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
+            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, targetObject.md5sum, targetObject.versionId, "ObjectCreated");
             log_debug << "Copy object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: " << request.targetBucket << " targetKey: " << request.targetKey;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 copy object request failed, error: " << ex.what();
@@ -835,7 +871,7 @@ namespace Awsmock::Service {
             log_debug << "Database updated, bucket: " << targetObject.bucket << " key: " << targetObject.key;
 
             // Check notification
-            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
+            CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, targetObject.md5sum, targetObject.versionId, "ObjectCreated");
             log_debug << "Move object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: " << request.targetBucket << " targetKey: " << request.targetKey;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 copy object request failed, message: " << ex.what();
@@ -870,6 +906,7 @@ namespace Awsmock::Service {
                 objectCounter.oid = object.oid;
                 objectCounter.bucketName = object.bucket;
                 objectCounter.key = object.key;
+                objectCounter.versionId = object.versionId;
                 objectCounter.size = object.size;
                 objectCounter.contentType = object.contentType;
                 objectCounter.created = object.created;
@@ -907,6 +944,7 @@ namespace Awsmock::Service {
             objectCounter.oid = object.oid;
             objectCounter.bucketName = object.bucket;
             objectCounter.key = object.key;
+            objectCounter.versionId = object.versionId;
             objectCounter.owner = object.owner;
             objectCounter.size = object.size;
             objectCounter.contentType = object.contentType;
@@ -983,7 +1021,7 @@ namespace Awsmock::Service {
             log_debug << "Put object succeeded, bucket: " << request.bucketName << " key: " << request.objectKey;
 
             // Check notification
-            CheckNotifications(request.region, request.bucketName, request.objectKey, object.size, "ObjectCreated");
+            CheckNotifications(request.region, request.bucketName, request.objectKey, object.size, object.md5sum, object.versionId, "ObjectCreated");
             log_debug << "Notifications send, bucket: " << request.bucketName << " key: " << request.objectKey;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 Create Object failed, message: " << ex.what();
@@ -1011,7 +1049,7 @@ namespace Awsmock::Service {
                 DeleteObject(object.bucket, object.key, object.internalName);
 
                 // Check notifications
-                CheckNotifications(request.region, request.bucket, request.key, 0, "ObjectRemoved");
+                CheckNotifications(request.region, request.bucket, request.key, 0, object.md5sum, object.versionId, "ObjectRemoved");
 
                 log_debug << "Object deleted, bucket: " << request.bucket << " key: " << request.key;
             } catch (Core::JsonException &exc) {
@@ -1042,7 +1080,7 @@ namespace Awsmock::Service {
                     log_debug << "File system object deleted: " << key;
 
                     // Check notifications
-                    CheckNotifications(request.region, request.bucket, key, 0, "ObjectRemoved");
+                    CheckNotifications(request.region, request.bucket, key, 0, object.md5sum, object.versionId, "ObjectRemoved");
                 }
             }
 
@@ -1223,7 +1261,7 @@ namespace Awsmock::Service {
         log_debug << "Lambda invocation send";
     }
 
-    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) const {
+    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &etag, const std::string &versionId, const std::string &event) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "check_notifications");
         log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
 
@@ -1233,7 +1271,8 @@ namespace Awsmock::Service {
         Dto::S3::Object s3Object;
         s3Object.key = key;
         s3Object.size = size;
-        s3Object.etag = Core::StringUtils::CreateRandomUuid();
+        s3Object.etag = etag;
+        s3Object.versionId = versionId;
 
         Dto::S3::Bucket s3Bucket;
         s3Bucket.bucketName = bucketEntity.name;
@@ -1428,7 +1467,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const {
+    Dto::S3::PutObjectResponse S3Service::SaveObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const {
         // S3 data directory
         const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
         auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
@@ -1443,107 +1482,56 @@ namespace Awsmock::Service {
         ofs.close();
         log_debug << "File received, filePath: " << filePath << " size: " << count;
 
-        Database::Entity::S3::Object object;
-
-        // Check existence by
-        std::string md5sum = Core::Crypto::HexEncode(Core::Crypto::Base64Decode(request.md5Sum));
-        if (Database::Entity::S3::Object existingObject = _s3Database->getObjectMd5(request.region, request.bucket, request.key, md5sum); existingObject.oid.empty()) {
-            // Version ID
-            std::string versionId = Core::AwsUtils::CreateS3VersionId();
-
-            // Create a new version of the object
-            object.region = request.region;
-            object.bucket = request.bucket;
-            object.bucketArn = Core::AwsUtils::CreateS3BucketArn(request.region, accountId, request.bucket);
-            object.key = request.key;
-            object.owner = request.owner;
-            object.size = count;
-            object.contentType = request.contentType;
-            object.internalName = fileName;
-            object.versionId = versionId;
-            object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
-
-            // Metadata
-            if (bucket.defaultMetadata.empty()) {
-                object.metadata = bucket.defaultMetadata;
-            }
-            object.metadata.merge(request.metadata);
-
-            // Metadata
-            object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
-            log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
-            if (!request.checksumAlgorithm.empty()) {
-
-                Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object, this]() mutable {
-                    const std::vector algorithms = {request.checksumAlgorithm};
-                    S3HashCreator{}(algorithms, object);
-                    log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-                });
-            }
-
-            // Create a new version in the database
-            object = _s3Database->createObject(object);
-            log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
-
-            // Check encryption
-            CheckEncryption(bucket, object);
-            log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
-
-            // Check notification
-            CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-            log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
-        } else {
-            // Delete the local file
+        if (count != request.contentLength) {
             Core::FileUtils::RemoveFile(filePath);
+            log_error << "Put object truncated, bucket: " << request.bucket << ", key: " << request.key << ", expected: " << request.contentLength << ", received: " << count;
+            throw Core::ServiceException("Put object truncated, expected: " + std::to_string(request.contentLength) + ", received: " + std::to_string(count));
         }
 
-        Dto::S3::PutObjectResponse response;
-        response.bucket = request.bucket;
-        response.key = request.key;
-        response.etag = object.md5sum;
-        response.md5Sum = object.md5sum;
-        response.contentLength = object.size;
-        response.contentType = object.contentType;
-        response.sha1Sum = object.sha1sum;
-        response.sha256sum = object.sha256sum;
-        response.metadata = request.metadata;
-
-        return response;
-    }
-
-    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const {
-        const auto accountId = Core::Configuration::instance().get<std::string>("awsmock.access.account-id");
-        auto dataS3Dir = Core::Configuration::instance().get<std::string>("awsmock.modules.s3.data-dir");
-        Core::DirUtils::EnsureDirectoryExists(dataS3Dir);
-
-        // Write the file
-        std::string fileName = Core::AwsUtils::CreateS3FileName();
-        std::string filePath = Core::FileUtils::appendPath(dataS3Dir, fileName);
-
-        // Write the file in chunks
-        std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-        long count = Core::FileUtils::StreamCopier(stream, ofs, request.contentLength);
-        ofs.close();
-        log_debug << "File copied, count: " << count;
-
-        // Check file encoding
-        if (Core::FileUtils::IsBase64(filePath)) {
-            log_debug << "File is base64 encoded, file: " << filePath;
-            Core::FileUtils::Base64DecodeFile(filePath);
-        }
-
-        // Get content type
-        std::string contentType = SanitizeContentType(request.contentType, filePath);
-
-        // Create entity
         Database::Entity::S3::Object object;
+        const bool versioned = bucket.IsVersioned();
+
+        if (versioned) {
+
+            // For versioned buckets, skip creating a new version if the content is unchanged
+            std::string md5sum = Core::Crypto::HexEncode(Core::Crypto::Base64Decode(request.md5Sum));
+            if (Database::Entity::S3::Object existingObject = _s3Database->getObjectMd5(request.region, request.bucket, request.key, md5sum); !existingObject.oid.empty()) {
+                // Delete the local file
+                Core::FileUtils::RemoveFile(filePath);
+                Dto::S3::PutObjectResponse response;
+                response.bucket = request.bucket;
+                response.key = request.key;
+                response.etag = object.md5sum;
+                response.md5Sum = object.md5sum;
+                response.contentLength = object.size;
+                response.contentType = object.contentType;
+                response.sha1Sum = object.sha1sum;
+                response.sha256sum = object.sha256sum;
+                response.metadata = request.metadata;
+                return response;
+            }
+            object.versionId = Core::AwsUtils::CreateS3VersionId();
+            object.contentType = request.contentType;
+            object.size = count;
+
+        } else {
+
+            // Check file encoding
+            if (Core::FileUtils::IsBase64(filePath)) {
+                log_debug << "File is base64 encoded, file: " << filePath;
+                Core::FileUtils::Base64DecodeFile(filePath);
+            }
+
+            object.contentType = SanitizeContentType(request.contentType, filePath);
+            object.size = request.contentLength;
+        }
+
+        // Object entity
         object.region = request.region;
         object.bucket = request.bucket;
         object.bucketArn = Core::AwsUtils::CreateS3BucketArn(request.region, accountId, request.bucket);
         object.key = request.key;
         object.owner = request.owner;
-        object.size = size;
-        object.contentType = contentType;
         object.internalName = fileName;
         object.storageClass = Database::Entity::S3::StorageClassFromString(request.storageClass);
 
@@ -1553,37 +1541,36 @@ namespace Awsmock::Service {
         }
         object.metadata.merge(request.metadata);
 
-        // Metadata
+        // Checksum
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
-        log_debug << "Checksum, bucket: " << request.bucket << ", key: " << request.key << ", md5: " << object.md5sum;
-        // if (!request.checksumAlgorithm.empty()) {
-        //
-        //     Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object]() mutable {
-        //         const std::vector algorithms = {request.checksumAlgorithm};
-        //         S3HashCreator{}(algorithms, object);
-        //         log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-        //     });
-        // }
+        log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
+        if (versioned && !request.checksumAlgorithm.empty()) {
+
+            Core::Scheduler::instance().AddOneTimeTask("create-checksums", [request, object, this]() mutable {
+                const std::vector algorithms = {request.checksumAlgorithm};
+                S3HashCreator{}(algorithms, object);
+                log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
+            });
+        }
 
         // Update database
-        object = _s3Database->createOrUpdateObject(object);
+        object = versioned ? _s3Database->createObject(object) : _s3Database->createOrUpdateObject(object);
         log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
         // Check encryption
         CheckEncryption(bucket, object);
-        log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
 
         // Check notification
-        CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-        log_debug << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
+        CheckNotifications(request.region, request.bucket, request.key, object.size, object.md5sum, object.versionId, "ObjectCreated");
+        log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
 
         Dto::S3::PutObjectResponse response;
         response.bucket = request.bucket;
         response.key = request.key;
         response.etag = object.md5sum;
         response.md5Sum = object.md5sum;
-        response.contentLength = size;
-        response.contentType = contentType;
+        response.contentLength = object.size;
+        response.contentType = object.contentType;
         response.sha1Sum = object.sha1sum;
         response.sha256sum = object.sha256sum;
         response.metadata = request.metadata;
