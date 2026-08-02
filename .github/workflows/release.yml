@@ -176,6 +176,16 @@ jobs:
           cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DVCPKG_DISABLE_AUTO_PACKAGE_REGISTRATION=ON
           cmake --build ${{ env.BUILD_DIR }} --config Release --parallel 2
 
+      - name: Dump vcpkg failure logs
+        if: failure()
+        shell: bash
+        run: |
+          for f in $(find "${{ env.VCPKG_ROOT }}/buildtrees" -iname "*-out.log" -o -iname "*-err.log" -o -iname "*CMakeConfigureLog.yaml.log" 2>/dev/null); do
+            echo "===== $f ====="
+            tail -n 200 "$f"
+            echo
+          done
+
       - name: Build (Frontend)
         shell: bash
         run: |

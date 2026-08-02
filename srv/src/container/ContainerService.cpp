@@ -690,6 +690,11 @@ namespace Awsmock::Service {
         const bool isProvided = Core::StringUtils::StartsWithIgnoringCase(lambda.runtime, "provided") ||
                                 Core::StringUtils::StartsWithIgnoringCase(lambda.runtime, "go");
 
+        // Container lifetime is an independent resource-management setting for this mock, not the
+        // per-invocation Timeout: a function can legitimately set Timeout=3600 without its container
+        // being force-killed every hour regardless of activity.
+        const int containerLifetime = Core::Configuration::instance().get<int>("awsmock.modules.lambda.lifetime");
+
         if (!isAwsmockLrt) {
             // Standard AWS Lambda base image: CMD is the handler, with: handleRequest appended for Java.
             const std::string handler = isJava ? lambda.handler + "::handleRequest" : lambda.handler;
@@ -704,7 +709,7 @@ namespace Awsmock::Service {
                    appendCommandLine("--handler", lambda.handler + "::handleRequest") + "," +
                    appendCommandLine("--runtime", lambda.runtime) + "," +
                    appendCommandLine("--runtime-lib-dir", "/app/lib/java") + "," +
-                   appendCommandLine("--lifetime", std::to_string(lambda.timeout)) + "," +
+                   appendCommandLine("--lifetime", std::to_string(containerLifetime)) + "," +
                    appendCommandLine("--report-period", std::to_string(30)) + "," +
                    appendCommandLine("--jvm-arg", "-Xss8m") + "," +
                    appendCommandLine("--manager-host", "host.docker.internal") + "," +
@@ -720,7 +725,7 @@ namespace Awsmock::Service {
         return "CMD [" +
                appendCommandLine("--code-path", codePath) + "," +
                appendCommandLine("--function-name", lambda.function) + "," +
-               appendCommandLine("--lifetime", std::to_string(lambda.timeout)) + "," +
+               appendCommandLine("--lifetime", std::to_string(containerLifetime)) + "," +
                appendCommandLine("--handler", lambda.handler) + "," +
                appendCommandLine("--report-period", std::to_string(30)) + "," +
                appendCommandLine("--manager-host", "host.docker.internal") + "," +
