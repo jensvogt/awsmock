@@ -206,26 +206,8 @@ namespace Awsmock::Service {
         try {
             const std::vector<Database::Entity::S3::Object> objectList = _s3Database->listBucket(s3Request.name, s3Request.prefix);
 
-            // TODO: mapper implementation
-            Dto::S3::ListBucketResponse listBucketResponse;
-            //listBucketResponse.contents.bucketCounters = Dto::S3::BucketCounterMapper::toDtoList(objectList);
-            listBucketResponse.name = s3Request.name;
-            for (auto &it: objectList) {
-                Dto::S3::Owner owner;
-                owner.displayName = it.owner;
-                owner.id = it.owner;
-
-                Dto::S3::Content content;
-                content.key = it.key;
-                content.etag = it.md5sum;
-                content.size = it.size;
-                content.owner = owner;
-                content.storageClass = "STANDARD";
-                content.modified = system_clock::now();
-                listBucketResponse.contents.push_back(content);
-            }
+            const Dto::S3::ListBucketResponse listBucketResponse = Dto::S3::ListBucketResponseMapper::toDto(s3Request.name, objectList);
             log_debug << "Bucket list returned, count: " << objectList.size();
-            listBucketResponse.keyCount = objectList.size();
             return listBucketResponse;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 list bucket failed, message: " << ex.what();

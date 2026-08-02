@@ -1038,22 +1038,25 @@ namespace Awsmock::Service {
         }
 
         if (!found) {
-            // LRT reported an ID that doesn't match — adopt the first server-created instance
-            // that hasn't registered yet (status==unknown means no LRT contact so far).
-            for (auto &instance: lambda.instances) {
-                if (instance.status == Database::Entity::Lambda::unknown) {
-                    instance.instanceId = status.instanceId;
-                    instance.privatePort = status.port;
-                    instance.invocations = status.invocations;
-                    instance.avgDuration = status.avgDuration;
-                    instance.lastStart = status.lastStart;
-                    instance.lastStop = status.lastStop;
-                    instance.lastInvocation = status.lastInvocation;
-                    instance.status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
-                    found = true;
-                    log_info << "Lambda LRT adopted server instance, function: " << status.functionName << ", instanceId: " << status.instanceId;
-                    break;
-                }
+            // LRT reported an ID that doesn't match — adopt the most recently server-created
+            // instance that hasn't registered yet (status==unknown means no LRT contact so
+            // far). Instances are appended in creation order, so picking the *newest* unknown
+            // instance (rather than the first/oldest) avoids misattributing this report to a
+            // stale, never-reporting instance left over from an earlier timed-out start.
+            const auto adopted = std::ranges::max_element(lambda.instances, {}, [](const Database::Entity::Lambda::Instance &i) {
+                return i.status == Database::Entity::Lambda::unknown ? i.lastStart : system_clock::time_point::min();
+            });
+            if (adopted != lambda.instances.end() && adopted->status == Database::Entity::Lambda::unknown) {
+                adopted->instanceId = status.instanceId;
+                adopted->privatePort = status.port;
+                adopted->invocations = status.invocations;
+                adopted->avgDuration = status.avgDuration;
+                adopted->lastStart = status.lastStart;
+                adopted->lastStop = status.lastStop;
+                adopted->lastInvocation = status.lastInvocation;
+                adopted->status = Dto::Lambda::Mapper::mapRuntimeStatus(status.runtimeStatus);
+                found = true;
+                log_info << "Lambda LRT adopted server instance, function: " << status.functionName << ", instanceId: " << status.instanceId;
             }
         }
 

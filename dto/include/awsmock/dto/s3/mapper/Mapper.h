@@ -9,6 +9,7 @@
 #include <awsmock/dto/s3/CreateBucketRequest.h>
 #include <awsmock/dto/s3/CreateBucketResponse.h>
 #include <awsmock/dto/s3/GetObjectMetadataResponse.h>
+#include <awsmock/dto/s3/ListBucketResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/internal/GetBucketResponse.h>
 #include <awsmock/dto/s3/model/Bucket.h>
@@ -289,6 +290,36 @@ namespace Awsmock::Dto::S3 {
                 version.owner.id = object.owner;
                 d.versions.emplace_back(version);
             }
+            return d;
+        }
+    };
+
+    class ContentMapper : public StaticMapper<ContentMapper, Database::Entity::S3::Object, Content> {
+
+      public:
+
+        static Content toDto(const Database::Entity::S3::Object &e) {
+            Content d;
+            d.key = e.key;
+            d.etag = e.md5sum;
+            d.size = e.size;
+            d.owner.id = e.owner;
+            d.owner.displayName = e.owner;
+            d.storageClass = "STANDARD";
+            d.modified = e.modified;
+            return d;
+        }
+    };
+
+    class ListBucketResponseMapper : public StaticMapper<ListBucketResponseMapper, std::vector<Database::Entity::S3::Object>, ListBucketResponse> {
+
+      public:
+
+        static ListBucketResponse toDto(const std::string &name, const std::vector<Database::Entity::S3::Object> &e) {
+            ListBucketResponse d;
+            d.name = name;
+            d.contents = ContentMapper::toDtoList(e);
+            d.keyCount = static_cast<long>(e.size());
             return d;
         }
     };
