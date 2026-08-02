@@ -144,7 +144,7 @@ namespace Awsmock::Service {
                     instance = lambda.GetIdleInstance();
                     log_debug << "Idle instance found, function: " << functionName << ", instanceId: " << instance.instanceId;
 
-                } else if (static_cast<int>(lambda.instances.size()) < lambda.concurrency) {
+                } else if (static_cast<int>(lambda.countActiveInstances()) < lambda.concurrency) {
                     // Below maxConcurrency: start a new container
                     const std::string instanceId = Core::AwsUtils::CreateLambdaInstanceId();
                     lambda = _lambdaService.AddInstance(lambda, instanceId);
@@ -215,8 +215,9 @@ namespace Awsmock::Service {
             // Invoke outside the lock so other requests can claim their own instance in parallel
             InvokeInstance(lambda, instance, payload, promise);
 
-            // Reset instance to idle so it can accept further invocations
-            {
+            // Reset instance to idle so it can accept further invocations — unless InvokeInstance
+            // already found the container dead and marked it stopped; don't resurrect that back to idle.
+            if (instance.status != Database::Entity::Lambda::RuntimeStatus::stopped) {
                 boost::mutex::scoped_lock lock(*GetOrCreateMutex(functionName));
                 lambda = _lambdaDatabase->getLambdaByArn(lambdaArn);
                 if (const auto it = std::ranges::find_if(lambda.instances, [&](const Database::Entity::Lambda::Instance &i) { return i.instanceId == instance.instanceId; });
@@ -283,6 +284,23 @@ namespace Awsmock::Service {
     void LambdaController::InvokeInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, const std::string &payload,
                                           const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) const {
         Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
+
+        // Cheap local pre-flight check: an instance can die between being picked as 'idle' and
+        // being invoked (--lifetime expiry, OOM-kill, crash) without the manager having noticed
+        // yet. Catching that here avoids a doomed TCP round-trip that would otherwise log a
+        // connect-refused/end-of-stream error, and lets us mark the instance stopped immediately
+        // instead of waiting for the next health-check sweep.
+        if (const Dto::Docker::InspectContainerResponse inspection = _containerService.InspectContainer(instance.containerId);
+            inspection.status == http::status::ok && !inspection.state.running) {
+            log_warning << "Lambda instance container no longer running, skipping invoke, function: " << lambda.function << ", instanceId: " << instance.instanceId;
+            instance.status = Database::Entity::Lambda::RuntimeStatus::stopped;
+            _lambdaDatabase->updateLambdaInstance(lambda.region, lambda.function, lambda.runtime, instance);
+            if (promise) {
+                promise->set_value({503, "Lambda instance is no longer available, please retry"});
+            }
+            return;
+        }
+
         log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.publicPort;
 
         const system_clock::time_point start = system_clock::now();

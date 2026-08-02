@@ -256,6 +256,18 @@ namespace Awsmock::Database::Entity::Lambda {
         long countRunningInstances();
 
         /**
+         * @brief Returns the count of instances that still occupy a concurrency slot.
+         *
+         * @par
+         * Excludes 'stopped' and 'failed' instances: these will never accept another invocation,
+         * so they must not block starting a replacement container while awaiting the next
+         * container-health sweep.
+         *
+         * @return number of active (non-stopped, non-failed) instances
+         */
+        long countActiveInstances();
+
+        /**
          * @brief Returns the total number of invocations for all instances
          *
          * @return total number of invocations for all instances
@@ -382,6 +394,12 @@ namespace Awsmock::Database::Entity::Lambda {
     inline long Lambda::countRunningInstances() {
         return std::ranges::count_if(instances, [](const Instance &i) {
             return i.status == running;
+        });
+    }
+
+    inline long Lambda::countActiveInstances() {
+        return std::ranges::count_if(instances, [](const Instance &i) {
+            return i.status != stopped && i.status != failed;
         });
     }
 
