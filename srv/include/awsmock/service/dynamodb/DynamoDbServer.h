@@ -49,14 +49,6 @@ namespace Awsmock::Service {
         mutable logger_t _logger{boost::log::keywords::channel = "DynamoDB"};
 
         /**
-         * @brief Creates a local network.
-         *
-         * @par
-         * The lambda functions need to connect to a local bridged network, otherwise they cannot communicate with the awsmock manager.
-         */
-        void CreateLocalNetwork() const;
-
-        /**
          * @brief Update counters
          */
         void UpdateCounter() const;
