@@ -191,6 +191,79 @@ namespace Awsmock::Database {
         return createLambda(lambda);
     }
 
+    Entity::Lambda::Lambda LambdaMongoRepository::addLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
+
+        try {
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+
+            const auto update = make_document(
+                    kvp("$push", make_document(kvp("instances", instance.ToDocument()))),
+                    kvp("$set", make_document(kvp("modified", bsoncxx::types::b_date(system_clock::now())))));
+
+            auto mResult = _lambdaCollection.find_one_and_update(make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime)), update.view(), opts);
+            if (mResult.has_value()) {
+                Entity::Lambda::Lambda result;
+                result.FromDocument(mResult.value());
+                return result;
+            }
+            return {};
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    bool LambdaMongoRepository::updateLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
+
+        try {
+            const auto filter = make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime), kvp("instances.id", instance.instanceId));
+
+            const auto update = make_document(kvp("$set", make_document(
+                                                                  kvp("instances.$.status", Entity::Lambda::RuntimeStatusToString(instance.status)),
+                                                                  kvp("instances.$.runtimeVersion", instance.runtimeVersion),
+                                                                  kvp("instances.$.invocations", static_cast<bsoncxx::types::b_int64>(instance.invocations)),
+                                                                  kvp("instances.$.avgDuration", instance.avgDuration),
+                                                                  kvp("instances.$.lastStart", bsoncxx::types::b_date(instance.lastStart)),
+                                                                  kvp("instances.$.lastStop", bsoncxx::types::b_date(instance.lastStop)),
+                                                                  kvp("instances.$.lastInvocation", bsoncxx::types::b_date(instance.lastInvocation)),
+                                                                  kvp("modified", bsoncxx::types::b_date(system_clock::now())))));
+
+            const auto result = _lambdaCollection.update_one(filter.view(), update.view());
+            return result.has_value() && result->modified_count() > 0;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
+    bool LambdaMongoRepository::updateLambdaCounters(const std::string &region, const std::string &function, const std::string &runtime, const long invocations, const double avgDuration) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
+
+        try {
+            const auto filter = make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime));
+
+            const auto update = make_document(kvp("$set", make_document(
+                                                                  kvp("invocations", static_cast<bsoncxx::types::b_int64>(invocations)),
+                                                                  kvp("avgDuration", static_cast<bsoncxx::types::b_int64>(avgDuration)),
+                                                                  kvp("modified", bsoncxx::types::b_date(system_clock::now())))));
+
+            const auto result = _lambdaCollection.update_one(filter.view(), update.view());
+            return result.has_value() && result->modified_count() > 0;
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
     Entity::Lambda::Lambda LambdaMongoRepository::importLambda(Entity::Lambda::Lambda &lambda) const {
         if (lambdaExists(lambda)) {
             const Entity::Lambda::Lambda existing = getLambdaByArn(lambda.arn);

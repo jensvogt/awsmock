@@ -50,6 +50,11 @@ namespace Awsmock::Dto::Lambda {
         std::string instanceId;
 
         /**
+         * @brief Version of the LRT (Lambda Runtime) binary running inside the instance
+         */
+        std::string runtimeVersion;
+
+        /**
          * @brief Last start timestamp
          */
         system_clock::time_point lastStart;
@@ -71,6 +76,7 @@ namespace Awsmock::Dto::Lambda {
             r.runtimeStatus = runtimeStatusFromString(Core::Json::GetStringValue(v, "runtimeStatus"));
             r.pid = Core::Json::GetIntValue(v, "pid");
             r.instanceId = Core::Json::GetStringValue(v, "instanceId");
+            r.runtimeVersion = Core::Json::GetStringValue(v, "runtimeVersion");
             r.invocations = Core::Json::GetIntValue(v, "invocations");
             r.avgDuration = Core::Json::GetDoubleValue(v, "avgDuration");
             r.functionName = Core::Json::GetStringValue(v, "functionName");
@@ -86,6 +92,7 @@ namespace Awsmock::Dto::Lambda {
                     {"runtimeStatus", runtimeStatusToString(obj.runtimeStatus)},
                     {"pid", obj.pid},
                     {"instanceId", obj.instanceId},
+                    {"runtimeVersion", obj.runtimeVersion},
                     {"invocations", obj.invocations},
                     {"avgDuration", obj.avgDuration},
                     {"functionName", obj.functionName},

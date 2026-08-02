@@ -65,6 +65,11 @@ namespace Awsmock::Database::Entity::Lambda {
         RuntimeStatus status = unknown;
 
         /**
+         * @brief Version of the LRT (Lambda Runtime) binary running inside this instance
+         */
+        std::string runtimeVersion{};
+
+        /**
          * @brief Last invocation timestamp
          */
         long invocations{};

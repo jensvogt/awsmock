@@ -113,6 +113,56 @@ namespace Awsmock::Database {
         virtual Entity::Lambda::Lambda createOrUpdateLambda(Entity::Lambda::Lambda &lambda) const = 0;
 
         /**
+         * @brief Atomically appends a new instance to a lambda function's instance list.
+         *
+         * @par
+         * Unlike updateLambda(), which replaces the whole document, this performs an atomic
+         * array push so concurrent scale-out calls (e.g. several near-simultaneous invocations
+         * of a fast-starting runtime) cannot silently drop each other's instances.
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param instance instance to append
+         * @return updated lambda entity.
+         */
+        [[nodiscard]]
+        virtual Entity::Lambda::Lambda addLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const = 0;
+
+        /**
+         * @brief Atomically updates the status fields of a single existing instance.
+         *
+         * @par
+         * Matches the instance by instanceId and updates only that array element, so concurrent
+         * status reports from other instances of the same function cannot clobber each other.
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param instance instance holding the instanceId to match and the new status fields
+         * @return true if a matching instance was found and updated.
+         */
+        [[nodiscard]]
+        virtual bool updateLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const = 0;
+
+        /**
+         * @brief Atomically updates the aggregate invocation counters of a lambda function.
+         *
+         * @par
+         * Updates only the invocations/avgDuration fields, never the instances array, so it is
+         * safe to call concurrently with addLambdaInstance()/updateLambdaInstance().
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param invocations total invocation count
+         * @param avgDuration average invocation duration
+         * @return true if a matching lambda was found and updated.
+         */
+        [[nodiscard]]
+        virtual bool updateLambdaCounters(const std::string &region, const std::string &function, const std::string &runtime, long invocations, double avgDuration) const = 0;
+
+        /**
          * @brief Import a lambda function
          *
          * @param lambda lambda entity

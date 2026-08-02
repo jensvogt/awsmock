@@ -96,6 +96,43 @@ namespace Awsmock::Database {
         Entity::Lambda::Lambda createOrUpdateLambda(Entity::Lambda::Lambda &lambda) const override;
 
         /**
+         * @brief Atomically appends a new instance to a lambda function's instance list.
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param instance instance to append
+         * @return updated lambda entity.
+         */
+        [[nodiscard]]
+        Entity::Lambda::Lambda addLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const override;
+
+        /**
+         * @brief Atomically updates the status fields of a single existing instance.
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param instance instance holding the instanceId to match and the new status fields
+         * @return true if a matching instance was found and updated.
+         */
+        [[nodiscard]]
+        bool updateLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const override;
+
+        /**
+         * @brief Atomically updates the aggregate invocation counters of a lambda function.
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param invocations total invocation count
+         * @param avgDuration average invocation duration
+         * @return true if a matching lambda was found and updated.
+         */
+        [[nodiscard]]
+        bool updateLambdaCounters(const std::string &region, const std::string &function, const std::string &runtime, long invocations, double avgDuration) const override;
+
+        /**
          * @brief Returns a lambda entity by primary key
          *
          * @param oid lambda primary key
