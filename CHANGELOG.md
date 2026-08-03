@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.105](https://github.com/jensvogt/awsmock/compare/v1.18.104...v1.18.105) (2026-08-02)
+
+
+### Bug Fixes
+
+* add lambda runtime version to instance ([5d48997](https://github.com/jensvogt/awsmock/commit/5d489972f89f18fefc006d812d6ea20198c1744e))
+* add lambda runtime version to instance ([6c4d3df](https://github.com/jensvogt/awsmock/commit/6c4d3dfdbecbc21e66f7ae392528e341911ab2fd))
+
 ## [1.18.104](https://github.com/jensvogt/awsmock/compare/v1.18.103...v1.18.104) (2026-08-02)
 
 
