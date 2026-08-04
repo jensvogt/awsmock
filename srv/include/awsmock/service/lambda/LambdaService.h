@@ -679,7 +679,7 @@ namespace Awsmock::Service {
          * @return full path to base64 function code
          * @see Database::Entity::Lambda::Lambda
          */
-        std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
+        static std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * @brief Get the lambda code from a S3 bucket and key
