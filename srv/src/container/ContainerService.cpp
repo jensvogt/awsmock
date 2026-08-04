@@ -897,7 +897,7 @@ namespace Awsmock::Service {
     }
 
     std::string ContainerService::AddJavaRuntimeLibs(const std::string &codeDir) {
-        const auto hostLibDir = "/usr/local/awsmock/lib/java";
+        const auto hostLibDir = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.java-lib-dir");
         const auto destDir = Core::FileUtils::appendPath(codeDir, "lib/java");
         Core::DirUtils::MakeDirectory(destDir);
         for (const auto &jar: Core::DirUtils::ListFilesByExtension(hostLibDir, ".jar")) {

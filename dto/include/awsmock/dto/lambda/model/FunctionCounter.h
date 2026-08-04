@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 // C++ standard includes
 #include <chrono>
 #include <map>
@@ -96,7 +97,7 @@ namespace Awsmock::Dto::Lambda {
         /**
          * State
          */
-        bool active;
+        bool active{};
 
         /**
          * Timeout in minutes
@@ -133,8 +134,7 @@ namespace Awsmock::Dto::Lambda {
          */
         system_clock::time_point modified;
 
-      private:
-
+    private:
         friend FunctionCounter tag_invoke(boost::json::value_to_tag<FunctionCounter>, boost::json::value const &v) {
             FunctionCounter r;
             r.functionArn = Core::Json::GetStringValue(v, "lambdaArn");
@@ -147,7 +147,7 @@ namespace Awsmock::Dto::Lambda {
             r.version = Core::Json::GetStringValue(v, "version");
             r.codeSize = Core::Json::GetLongValue(v, "codeSize");
             r.deadLetterConfig = boost::json::value_to<DeadLetterConfig>(v.at("deadLetterConfig"));
-            r.architectures = boost::json::value_to<std::vector<std::string>>(v.at("architectures"));
+            r.architectures = boost::json::value_to<std::vector<std::string> >(v.at("architectures"));
             r.lastUpdateStatus = Core::Json::GetStringValue(v, "lastUpdateStatus");
             r.lastUpdateStatusReason = Core::Json::GetStringValue(v, "lastUpdateStatusReason");
             r.lastUpdateStatusReasonCode = Core::Json::GetStringValue(v, "lastUpdateStatusReasonCode");
@@ -165,34 +165,33 @@ namespace Awsmock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, FunctionCounter const &obj) {
             jv = {
-                    {"lambdaArn", obj.functionArn},
-                    {"functionName", obj.functionName},
-                    {"description", obj.description},
-                    {"codeSha256", obj.codeSha256},
-                    {"handler", obj.handler},
-                    {"runtime", obj.runtime},
-                    {"zipFile", obj.zipFile},
-                    {"version", obj.version},
-                    {"codeSize", obj.codeSize},
-                    {"deadLetterConfig", boost::json::value_from(obj.deadLetterConfig)},
-                    {"architectures", boost::json::value_from(obj.architectures)},
-                    {"lastUpdateStatus", obj.lastUpdateStatus},
-                    {"lastUpdateStatusReason", obj.lastUpdateStatusReason},
-                    {"lastUpdateStatusReasonCode", obj.lastUpdateStatusReasonCode},
-                    {"enabled", obj.enabled},
-                    {"active", obj.active},
-                    {"timeout", obj.timeout},
-                    {"environment", boost::json::value_from(obj.environment)},
-                    {"instances", obj.instances},
-                    {"invocations", obj.invocations},
-                    {"avgDuration", obj.averageRuntime},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                {"lambdaArn", obj.functionArn},
+                {"functionName", obj.functionName},
+                {"description", obj.description},
+                {"codeSha256", obj.codeSha256},
+                {"handler", obj.handler},
+                {"runtime", obj.runtime},
+                {"zipFile", obj.zipFile},
+                {"version", obj.version},
+                {"codeSize", obj.codeSize},
+                {"deadLetterConfig", boost::json::value_from(obj.deadLetterConfig)},
+                {"architectures", boost::json::value_from(obj.architectures)},
+                {"lastUpdateStatus", obj.lastUpdateStatus},
+                {"lastUpdateStatusReason", obj.lastUpdateStatusReason},
+                {"lastUpdateStatusReasonCode", obj.lastUpdateStatusReasonCode},
+                {"enabled", obj.enabled},
+                {"active", obj.active},
+                {"timeout", obj.timeout},
+                {"environment", boost::json::value_from(obj.environment)},
+                {"instances", obj.instances},
+                {"invocations", obj.invocations},
+                {"avgDuration", obj.averageRuntime},
+                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
 
     typedef std::vector<FunctionCounter> FunctionCounterList;
 
-}// namespace Awsmock::Dto::Lambda
-
+} // namespace Awsmock::Dto::Lambda

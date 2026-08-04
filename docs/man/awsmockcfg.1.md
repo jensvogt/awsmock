@@ -126,6 +126,7 @@ awsmock.modules.lambda.backup.active              AWSMOCK_MODULES_LAMBDA_BACKUP_
 awsmock.modules.lambda.backup.cron                AWSMOCK_MODULES_LAMBDA_BACKUP_CRON                backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.lambda.lifetime                   AWSMOCK_MODULES_LAMBDA_LIFETIME                   function lifetime perios in seconds, default: 3600
 awsmock.modules.lambda.data-dir                   AWSMOCK_MODULES_LAMBDA_DATA_DIR                   function data directory, default: /usr/local/awsmock/data/lambda
+awsmock.modules.lambda.java-lib-dir               AWSMOCK_MODULES_LAMBDA_JAVA_LIB_DIR               host directory with Java Lambda runtime jars (awsmock-lrt), default: /usr/local/awsmock/lib/java
 awsmock.modules.lambda.log-retention period       AWSMOCK_MODULES_LAMBDA_LOG_RETENTION_PERIOD       log file retention period days, default: 1
 awsmock.modules.lambda.remove.period              AWSMOCK_MODULES_LAMBDA_REMOVE_PERIOD              removal period in seconds, default: 3600
 awsmock.modules.lambda.counter.period             AWSMOCK_MODULES_LAMBDA_COUNTER_PERIOD             monitoring counter period in seconds, default: 300
