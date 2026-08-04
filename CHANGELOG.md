@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.18.105](https://github.com/jensvogt/awsmock/compare/v1.18.104...v1.18.105) (2026-08-02)
+
+
+### Bug Fixes
+
+* add lambda runtime version to instance ([5d48997](https://github.com/jensvogt/awsmock/commit/5d489972f89f18fefc006d812d6ea20198c1744e))
+* add lambda runtime version to instance ([6c4d3df](https://github.com/jensvogt/awsmock/commit/6c4d3dfdbecbc21e66f7ae392528e341911ab2fd))
+
+## [1.18.104](https://github.com/jensvogt/awsmock/compare/v1.18.103...v1.18.104) (2026-08-02)
+
+
+### Bug Fixes
+
+* add lambda runtime version to instance ([6c01b8e](https://github.com/jensvogt/awsmock/commit/6c01b8e70a6ec7e61302a7be44fbb80ca139863a))
+* add lambda runtime version to instance ([b6ce809](https://github.com/jensvogt/awsmock/commit/b6ce8096e8438c166cc7e24b94d551393a49f192))
+* add lambda runtime version to instance ([bbaec55](https://github.com/jensvogt/awsmock/commit/bbaec559457d2def8b1f6aa2a58a389edab7cf8c))
+* S3 versioning support ([1e039c8](https://github.com/jensvogt/awsmock/commit/1e039c8276c41176bdfdb77901cd38fe691c5212))
+* S3 versioning support ([b8c0861](https://github.com/jensvogt/awsmock/commit/b8c0861640e3755ec0cf3091adb63777d20d5611))
+* S3 versioning support ([c806b77](https://github.com/jensvogt/awsmock/commit/c806b77d0446d4010a55a3d905449dc773459460))
+* S3 versioning support ([36c3eed](https://github.com/jensvogt/awsmock/commit/36c3eed5f6b1d30f62de95f9cff7da2bff95013f))
+* S3 versioning support ([#2559](https://github.com/jensvogt/awsmock/issues/2559)) ([e47c758](https://github.com/jensvogt/awsmock/commit/e47c758643b119c3dedbaf0bced7dde42b3612ed))
+
 ## [1.18.103](https://github.com/jensvogt/awsmock/compare/v1.18.102...v1.18.103) (2026-08-02)
 
 

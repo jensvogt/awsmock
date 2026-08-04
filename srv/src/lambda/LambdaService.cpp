@@ -106,7 +106,7 @@ namespace Awsmock::Service {
             }
             log_debug << "Lambda list outcome: " << response.ToJson();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -125,7 +125,7 @@ namespace Awsmock::Service {
 
             log_trace << "Lambda list function counters, result: " << response.ToString();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -141,7 +141,8 @@ namespace Awsmock::Service {
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
             response.total = static_cast<long>(lambda.environment.variables.size());
 
-            std::vector<std::pair<std::string, std::string>> environments;
+            std::vector<std::pair<std::string, std::string> > environments;
+            environments.reserve(lambda.environment.variables.size());
             for (const auto &[fst, snd]: lambda.environment.variables) {
                 environments.emplace_back(fst, snd);
             }
@@ -175,7 +176,7 @@ namespace Awsmock::Service {
             }
             log_trace << "Lambda list environments counters, result: " << response.ToString();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -220,7 +221,7 @@ namespace Awsmock::Service {
 
             log_trace << "Lambda list event source counters, result: " << response.ToString();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -239,7 +240,7 @@ namespace Awsmock::Service {
             lambda.environment.variables[request.environmentKey] = request.environmentValue;
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda environments added, lambdaArn: " << lambda.arn;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -258,7 +259,7 @@ namespace Awsmock::Service {
             lambda.environment.variables[request.environmentKey] = request.environmentValue;
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda environments updated, lambdaArn: " << lambda.arn;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -282,7 +283,7 @@ namespace Awsmock::Service {
             });
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda environments deleted, lambdaArn: " << lambda.arn << " count: " << count;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -314,7 +315,7 @@ namespace Awsmock::Service {
                 startRequest.region = request.region;
                 StartLambda(startRequest);
             }
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -367,7 +368,7 @@ namespace Awsmock::Service {
             response.handler = lambda.handler;
             return response;
 
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -403,7 +404,7 @@ namespace Awsmock::Service {
                 log_trace << "Lambda event source added, lambdaArn: " << lambda.arn;
             }
             lambda = _lambdaDatabase->updateLambda(lambda);
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -426,7 +427,7 @@ namespace Awsmock::Service {
             });
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda event sources deleted, lambdaArn: " << lambda.arn << " count: " << count;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -442,7 +443,7 @@ namespace Awsmock::Service {
             Dto::Lambda::ListLambdaTagCountersResponse response;
             response.total = static_cast<long>(lambda.tags.size());
 
-            std::vector<std::pair<std::string, std::string>> tags;
+            std::vector<std::pair<std::string, std::string> > tags;
             for (const auto &[fst, snd]: lambda.tags) {
                 tags.emplace_back(fst, snd);
             }
@@ -473,7 +474,7 @@ namespace Awsmock::Service {
 
             log_trace << "Lambda list tags counters, result: " << response.ToString();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -542,7 +543,7 @@ namespace Awsmock::Service {
 
             log_trace << "Lambda list instances counters, result: " << response.ToString();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -581,7 +582,7 @@ namespace Awsmock::Service {
             log_trace << "Lambda get instance counter, result: " << response.ToString();
             return response;
 
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -596,7 +597,7 @@ namespace Awsmock::Service {
             lambda.tags[request.tagKey] = request.tagValue;
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda tags added, lambdaArn: " << lambda.arn;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -616,7 +617,7 @@ namespace Awsmock::Service {
             lambda.tags[request.tagKey] = request.tagValue;
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda tags updated, lambdaArn: " << lambda.arn;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -635,7 +636,7 @@ namespace Awsmock::Service {
             });
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_trace << "Lambda tags deleted, lambdaArn: " << lambda.arn << " count: " << count;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -650,9 +651,9 @@ namespace Awsmock::Service {
 
             Dto::Lambda::Function function;
             function.functionName = lambda.function,
-            function.handler = lambda.handler,
-            function.runtime = lambda.runtime,
-            function.lastUpdateStatus = "Successful";
+                    function.handler = lambda.handler,
+                    function.runtime = lambda.runtime,
+                    function.lastUpdateStatus = "Successful";
             // function.state = LambdaStateToString(lambda.state),
             // function.stateReason = lambda.stateReason,
             // function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
@@ -665,7 +666,7 @@ namespace Awsmock::Service {
 
             log_info << "Lambda function: " + response.ToJson();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -707,7 +708,7 @@ namespace Awsmock::Service {
             response.version = lambda.dockerTag;
             response.environment = lambda.environment.variables;
             return response;
-        } catch (bsoncxx::exception &ex) {
+        } catch (std::exception &ex) {
             log_error << "Lambda list request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
@@ -723,7 +724,7 @@ namespace Awsmock::Service {
             lambda.invocations = 0;
             lambda = _lambdaDatabase->updateLambda(lambda);
             log_info << "Reset lambda function counters, function: " << lambda.function;
-        } catch (bsoncxx::exception &ex) {
+        } catch (std::exception &ex) {
             log_error << "Reset function counters request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
@@ -735,7 +736,7 @@ namespace Awsmock::Service {
 
         // REQUEST_RESPONSE
         if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
-            const auto promise = std::make_shared<std::promise<std::pair<int, std::string>>>();
+            const auto promise = std::make_shared<std::promise<std::pair<int, std::string> > >();
             auto future = promise->get_future();
             Core::EventBus::instance().sigLambdaInvoke(region, functionName, payload, Dto::Lambda::LambdaInvocationTypeToString(invocationType), promise);
             // sigLambdaInvoke is synchronous — the signal handler runs before this line and
@@ -917,7 +918,8 @@ namespace Awsmock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
-            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase->listLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase->
+                    listLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::SortColumnMapper::map(request.sortColumns));
             const long count = _lambdaDatabase->lambdaResultsCount(request.lambdaArn);
 
             Dto::Lambda::ListLambdaResultCountersResponse response = Dto::Lambda::Mapper::map(lambdaResults);
@@ -925,7 +927,7 @@ namespace Awsmock::Service {
 
             log_trace << "Lambda list function counters, result: " << response.ToString();
             return response;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -939,7 +941,7 @@ namespace Awsmock::Service {
             const long count = _lambdaDatabase->deleteResultsCounter(request.oid);
             log_trace << "Lambda result counter deleted, count: " << count;
             return count;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -954,7 +956,7 @@ namespace Awsmock::Service {
             const long count = _lambdaDatabase->deleteResultsCounters(request.lambdaArn);
             log_trace << "Lambda result counter deleted, arn: " << request.lambdaArn;
             return count;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
@@ -1020,7 +1022,7 @@ namespace Awsmock::Service {
         log_debug << "Lambda runtime status update, function: " << status.functionName << ", status: " << Dto::Lambda::runtimeStatusToString(status.runtimeStatus) << ", instanceId: " << status.instanceId;
 
         if (!_lambdaDatabase->lambdaExists(status.functionName)) {
-            log_warning << "LRT status update: lambda not found, function: " << status.functionName;
+            log_warning << "GRT status update: lambda not found, function: " << status.functionName;
             return;
         }
 
@@ -1047,7 +1049,7 @@ namespace Awsmock::Service {
             // clobber a concurrently racing scale-out or status report either.
             Database::Entity::Lambda::Lambda refreshed = _lambdaDatabase->getLambdaByName(region, status.functionName);
             std::ignore = _lambdaDatabase->updateLambdaCounters(region, status.functionName, lambda.runtime, refreshed.getTotalInvocations(), refreshed.getAvgDuration());
-            log_debug << "LRT status applied, function: " << status.functionName << ", invocations: " << status.invocations;
+            log_debug << "Lambda runtime status applied, function: " << status.functionName << ", invocations: " << status.invocations;
             return;
         }
 
@@ -1102,7 +1104,10 @@ namespace Awsmock::Service {
             return;
         }
 
-        // Create the lambda function
+        // Update state
+        //lambda = _lambdaDatabase->updateLambda(lambda);
+
+        // Create the lambda function asynchronously
         const std::string instanceId = Core::AwsUtils::CreateLambdaInstanceId();
         CreateLambdaInstance(lambda, instanceId);
 
@@ -1370,8 +1375,8 @@ namespace Awsmock::Service {
             Database::Entity::S3::Bucket bucket = _s3Database->getBucketByArn(request.eventSourceArn);
 
             if (bucket.HasLambdaNotification(request.functionArn)) {
-                log_error << "S3 bucket has already notification to function: " << request.functionArn;
-                throw Core::ServiceException("S3 bucket has already notification to function: " + request.functionArn);
+                log_debug << "S3 bucket notification to function already exists, skipping, function: " << request.functionArn;
+                return;
             }
 
             // Convert filter rules
@@ -1644,10 +1649,10 @@ namespace Awsmock::Service {
             }
             Core::FileUtils::RemoveFile(zipFile);
             return codeDir;
-        } catch (bsoncxx::exception &exc) {
+        } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

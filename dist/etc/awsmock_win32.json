@@ -84,6 +84,7 @@
         },
         "lifetime": 3600,
         "data-dir": "C:\\Program Files\\awsmock\\data\\lambda",
+        "java-lib-dir": "C:\\Program Files\\awsmock\\lib\\java",
         "remove-period": 300,
         "counter-period": 300,
         "log-retention-period": 1,
