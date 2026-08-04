@@ -1020,7 +1020,7 @@ namespace Awsmock::Service {
         log_debug << "Lambda runtime status update, function: " << status.functionName << ", status: " << Dto::Lambda::runtimeStatusToString(status.runtimeStatus) << ", instanceId: " << status.instanceId;
 
         if (!_lambdaDatabase->lambdaExists(status.functionName)) {
-            log_warning << "GRT status update: lambda not found, function: " << status.functionName;
+            log_warning << "LRT status update: lambda not found, function: " << status.functionName;
             return;
         }
 
@@ -1046,8 +1046,8 @@ namespace Awsmock::Service {
             // independent atomic update (never touches the instances array), so it can't
             // clobber a concurrently racing scale-out or status report either.
             Database::Entity::Lambda::Lambda refreshed = _lambdaDatabase->getLambdaByName(region, status.functionName);
-            _lambdaDatabase->updateLambdaCounters(region, status.functionName, lambda.runtime, refreshed.getTotalInvocations(), refreshed.getAvgDuration());
-            log_debug << "Lambda runtime status applied, function: " << status.functionName << ", invocations: " << status.invocations;
+            std::ignore = _lambdaDatabase->updateLambdaCounters(region, status.functionName, lambda.runtime, refreshed.getTotalInvocations(), refreshed.getAvgDuration());
+            log_debug << "LRT status applied, function: " << status.functionName << ", invocations: " << status.invocations;
             return;
         }
 
@@ -1102,10 +1102,7 @@ namespace Awsmock::Service {
             return;
         }
 
-        // Update state
-        //lambda = _lambdaDatabase->updateLambda(lambda);
-
-        // Create the lambda function asynchronously
+        // Create the lambda function
         const std::string instanceId = Core::AwsUtils::CreateLambdaInstanceId();
         CreateLambdaInstance(lambda, instanceId);
 
