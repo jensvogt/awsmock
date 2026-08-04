@@ -33,7 +33,7 @@ namespace Awsmock::Core {
             stream.socket().set_option(boost::asio::ip::tcp::socket::keep_alive(false));
             if (ec) {
                 log_error << "Connect to " << host << ":" << port << " failed, error: " << ec.message();
-                return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+                return {.statusCode = http::status::internal_server_error, .body = ec.message(), .networkError = true};
             }
 
             // Prepare the message
@@ -43,7 +43,7 @@ namespace Awsmock::Core {
             http::write(stream, request, ec);
             if (ec) {
                 log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
-                return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+                return {.statusCode = http::status::internal_server_error, .body = ec.message(), .networkError = true};
             }
 
             // Read the response — eof/connection_reset are benign when server sends Connection: close
@@ -52,7 +52,7 @@ namespace Awsmock::Core {
             http::read(stream, buffer, response, ec);
             if (ec && ec != boost::asio::error::eof && ec != boost::asio::error::connection_reset) {
                 log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
-                return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+                return {.statusCode = http::status::internal_server_error, .body = ec.message(), .networkError = true};
             }
 
             // Cleanup
@@ -63,7 +63,7 @@ namespace Awsmock::Core {
         } catch (const boost::exception &e) {
             log_error << "Send JSON message failed, host: " << host << ", port: " << port << ", error: " << boost::diagnostic_information(e);
         }
-        return {.statusCode = http::status::internal_server_error};
+        return {.statusCode = http::status::internal_server_error, .networkError = true};
     }
 
     HttpSocketResponse HttpSocket::SendAuthorizedJson(http::verb method, const std::string &module, const std::string &host, int port, const std::string &path, const std::string &signedHeaders, std::map<std::string, std::string> &headers, const std::string &body) {

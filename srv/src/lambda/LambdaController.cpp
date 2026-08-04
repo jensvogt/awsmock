@@ -307,6 +307,27 @@ namespace Awsmock::Service {
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, instance.hostName, instance.publicPort, "/invoke", payload, {}, _invocationTimeout > 0 ? _invocationTimeout : 60);
         const long duration = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
 
+        // The container was running per Docker (pre-flight check above passed) but never
+        // answered on its HTTP port (hung/crashed runtime process). Docker's health check
+        // won't catch this on its own since the container itself stays "running" forever, so
+        // tear it down here and mark the instance stopped instead of letting it be reset to
+        // idle and picked again by the next invocation.
+        if (response.networkError) {
+            log_warning << "Lambda instance not responding, marking stopped, function: " << lambda.function << ", instanceId: " << instance.instanceId;
+            instance.status = Database::Entity::Lambda::RuntimeStatus::stopped;
+            _lambdaDatabase->updateLambdaInstance(lambda.region, lambda.function, lambda.runtime, instance);
+            try {
+                _containerService.StopContainer(instance.containerId);
+                _containerService.DeleteContainer(instance.containerId);
+            } catch (std::exception &e) {
+                log_warning << "Could not clean up unresponsive lambda container, containerId: " << instance.containerId << ", error: " << e.what();
+            }
+            if (promise) {
+                promise->set_value({503, "Lambda instance is not responding, please retry"});
+            }
+            return;
+        }
+
         // Fold the server-measured round-trip time into the instance's running average and
         // refresh the function-level aggregate. This makes lambda.avgDuration authoritative
         // regardless of whether the Lambda Runtime container self-reports its own status

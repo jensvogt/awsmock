@@ -28,6 +28,14 @@ namespace Awsmock::Core {
          * Headers
          */
         std::map<std::string, std::string> headers;
+
+        /**
+         * Set when the request failed at the socket/transport level (connect, write, or read
+         * error) rather than receiving a valid HTTP response. Callers can use this to
+         * distinguish "peer unreachable/unresponsive" from a legitimate application-level
+         * error status.
+         */
+        bool networkError = false;
     };
 
 }// namespace Awsmock::Core
