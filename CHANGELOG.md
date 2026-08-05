@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.108](https://github.com/jensvogt/awsmock/compare/1.18.107...v1.18.108) (2026-08-05)
+
+
+### Bug Fixes
+
+* bump vcpkg commit to newest baseline ([59f0c0f](https://github.com/jensvogt/awsmock/commit/59f0c0f43f825d80b2a5481570d0868e03e0c514))
+* bump vcpkg commit to newest baseline ([5505737](https://github.com/jensvogt/awsmock/commit/550573700d81e79c9bf0beb5fec43f42ab4e3cc4))
+
 ## [1.18.107](https://github.com/jensvogt/awsmock/compare/v1.18.106...v1.18.107) (2026-08-04)
 
 
