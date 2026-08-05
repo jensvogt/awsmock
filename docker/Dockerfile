@@ -1,9 +1,14 @@
 # syntax=docker/dockerfile:1
 FROM alpine:latest AS build
 
-RUN apk add --no-cache build-base cmake ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
+RUN apk add --no-cache build-base ninja git perl zip unzip curl tar pkgconfig linux-headers bash python3 autoconf \
      autoconf-archive automake libtool m4 make gettext-dev patch pkgconf ncurses-dev ncurses-terminfo-base doxygen pandoc \
      coreutils openssl-dev zlib-dev bzip2-dev readline-dev sqlite-dev xz-dev libffi-dev util-linux-dev musl-dev
+
+# Alpine's stable apk repo ships CMake 3.31, but vcpkg's SPDX/SBOM generation
+# (z_vcpkg_spdx.cmake) now uses string(JSON ... STRING_ENCODE ...), added in CMake 4.3.
+# Pull cmake from the edge repo instead, without touching the base image's repo list.
+RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main cmake
 
 # vcpkg needs this
 ENV VCPKG_FORCE_SYSTEM_BINARIES=1
