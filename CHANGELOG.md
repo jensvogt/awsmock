@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.18.108](https://github.com/jensvogt/awsmock/compare/1.18.107...v1.18.108) (2026-08-05)
+
+
+### Bug Fixes
+
+* bump vcpkg commit to newest baseline ([59f0c0f](https://github.com/jensvogt/awsmock/commit/59f0c0f43f825d80b2a5481570d0868e03e0c514))
+* bump vcpkg commit to newest baseline ([5505737](https://github.com/jensvogt/awsmock/commit/550573700d81e79c9bf0beb5fec43f42ab4e3cc4))
+
+## [1.18.107](https://github.com/jensvogt/awsmock/compare/v1.18.106...v1.18.107) (2026-08-04)
+
+
+### Bug Fixes
+
+* bump vcpkg commit to newest baseline ([2ac27ff](https://github.com/jensvogt/awsmock/commit/2ac27ff41a3b3d62fe8a5095570ad364560de066))
+* bump vcpkg commit to newest baseline ([ee75a56](https://github.com/jensvogt/awsmock/commit/ee75a5633a7a9ec36072688b8a16754d1238614d))
+
+## [1.18.106](https://github.com/jensvogt/awsmock/compare/v1.18.105...v1.18.106) (2026-08-04)
+
+
+### Bug Fixes
+
+* add lambda runtime version to instance ([e3b54d3](https://github.com/jensvogt/awsmock/commit/e3b54d3a55954e07020b0ead1b98dbdbaf57ca97))
+* bump vcpkg commit to newest baseline ([5ed9256](https://github.com/jensvogt/awsmock/commit/5ed92564b31d9e4d680eb1605b66d76df4c2b739))
+* bump vcpkg commit to newest baseline ([d4483fb](https://github.com/jensvogt/awsmock/commit/d4483fbf7c148dd962af9b76d5a7f83b0f202b90))
+* bump vcpkg commit to newest baseline ([a93c085](https://github.com/jensvogt/awsmock/commit/a93c0851d0cc89e493d16777566775bc4836478f))
+* bump vcpkg commit to newest baseline ([801c563](https://github.com/jensvogt/awsmock/commit/801c563dac594ff4d7e051b774c7d12981f55a04))
+* bump vcpkg commit to newest baseline ([1aafca6](https://github.com/jensvogt/awsmock/commit/1aafca6b1c139e0eb0c037dcfdbb45d4c7e7278c))
+* bump vcpkg commit to newest baseline ([7508b27](https://github.com/jensvogt/awsmock/commit/7508b274b847f5e323207c314eb77849d1e76948))
+* bump vcpkg commit to newest baseline ([cceb21e](https://github.com/jensvogt/awsmock/commit/cceb21ed157424524bac8a6b3bf37c72fed9362b))
+* lambda event sources ([6f941a3](https://github.com/jensvogt/awsmock/commit/6f941a363c952161e9454cd43d39221dcdd18e51))
+* lambda event sources ([8f8adb4](https://github.com/jensvogt/awsmock/commit/8f8adb432dffb2febf6102e28782862192f95d8a))
+
 ## [1.18.105](https://github.com/jensvogt/awsmock/compare/v1.18.104...v1.18.105) (2026-08-02)
 
 

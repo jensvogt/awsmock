@@ -122,7 +122,8 @@ namespace Awsmock::Service {
     }
 
     bool GatewaySession::IsLambdaInvocation(const http::request<http::dynamic_body> &request) {
-        return request.method() == http::verb::post && Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations";
+        return request.method() == http::verb::post && Core::HttpUtils::HasPathParameters(request.target(), 3) &&
+               Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations";
     }
 
     // Return a response for the given request. The concrete type of the response message (which depends on the request)

@@ -52,19 +52,25 @@ namespace Awsmock::Database::Entity::S3 {
 
     bool Bucket::HasLambdaNotificationEvent(const std::string &event) const {
         return std::ranges::find_if(lambdaNotifications, [event](const LambdaNotification &notification) {
-                   return std::ranges::find(notification.events, event) != notification.events.end();
+                   return std::ranges::any_of(notification.events, [event](const std::string &ev) {
+                       return Core::StringUtils::Contains(ev, event);
+                   });
                }) != lambdaNotifications.end();
     }
 
     bool Bucket::HasQueueNotificationEvent(const std::string &event) const {
         return std::ranges::find_if(queueNotifications, [event](const QueueNotification &notification) {
-                   return std::ranges::find(notification.events, event) != notification.events.end();
+                   return std::ranges::any_of(notification.events, [event](const std::string &ev) {
+                       return Core::StringUtils::Contains(ev, event);
+                   });
                }) != queueNotifications.end();
     }
 
     bool Bucket::HasTopicNotificationEvent(const std::string &event) const {
         return std::ranges::find_if(topicNotifications, [event](const TopicNotification &notification) {
-                   return std::ranges::find(notification.events, event) != notification.events.end();
+                   return std::ranges::any_of(notification.events, [event](const std::string &ev) {
+                       return Core::StringUtils::Contains(ev, event);
+                   });
                }) != topicNotifications.end();
     }
 
@@ -76,7 +82,7 @@ namespace Awsmock::Database::Entity::S3 {
         auto filtered = queueNotifications | std::views::filter([eventName](const auto &qn) {
                             // Check if any string in the inner vector matches 'eventName'
                             return std::ranges::any_of(qn.events, [eventName](const std::string &ev) {
-                                return Core::StringUtils::StartsWith(ev, eventName);
+                                return Core::StringUtils::Contains(ev, eventName);
                             });
                         });
         return {filtered.begin(), filtered.end()};
@@ -86,7 +92,7 @@ namespace Awsmock::Database::Entity::S3 {
         auto filtered = topicNotifications | std::views::filter([eventName](const auto &qn) {
                             // Check if any string in the inner vector matches 'eventName'
                             return std::ranges::any_of(qn.events, [eventName](const std::string &ev) {
-                                return Core::StringUtils::StartsWith(ev, eventName);
+                                return Core::StringUtils::Contains(ev, eventName);
                             });
                         });
         return {filtered.begin(), filtered.end()};
@@ -96,7 +102,7 @@ namespace Awsmock::Database::Entity::S3 {
         auto filtered = lambdaNotifications | std::views::filter([eventName](const auto &qn) {
                             // Check if any string in the inner vector matches 'eventName'
                             return std::ranges::any_of(qn.events, [eventName](const std::string &ev) {
-                                return Core::StringUtils::StartsWith(ev, eventName);
+                                return Core::StringUtils::Contains(ev, eventName);
                             });
                         });
         return {filtered.begin(), filtered.end()};
