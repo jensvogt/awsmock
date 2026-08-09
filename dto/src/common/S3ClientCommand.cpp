@@ -73,6 +73,8 @@ namespace Awsmock::Dto::Common {
                             command = S3CommandType::GET_BUCKET_PUBLIC_ACCESS_BLOCK;
                         } else if (Core::HttpUtils::HasQueryParameter(request.target(), "replication")) {
                             command = S3CommandType::GET_BUCKET_REPLICATION;
+                        } else if (notificationRequest) {
+                            command = S3CommandType::GET_BUCKET_NOTIFICATION_CONFIGURATION;
                         } else if (Core::HttpUtils::HasQueryParameter(request.target(), "versions")) {
                             prefix = Core::HttpUtils::GetStringParameter(request.target(), "prefix");
                             command = S3CommandType::LIST_OBJECT_VERSIONS;
@@ -180,6 +182,7 @@ namespace Awsmock::Dto::Common {
                 {"upload-part", S3CommandType::UPLOAD_PART},
                 {"complete-multipart-upload", S3CommandType::COMPLETE_MULTIPART_UPLOAD},
                 {"put-bucket-notification-configuration", S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION},
+                {"get-bucket-notification-configuration", S3CommandType::GET_BUCKET_NOTIFICATION_CONFIGURATION},
                 {"put-bucket-encryption", S3CommandType::PUT_BUCKET_ENCRYPTION},
                 {"put-bucket-versioning", S3CommandType::PUT_BUCKET_VERSIONING},
                 {"list-object-versions", S3CommandType::LIST_OBJECT_VERSIONS},

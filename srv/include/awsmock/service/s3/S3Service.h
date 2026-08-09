@@ -52,6 +52,7 @@
 #include <awsmock/dto/s3/PurgeBucketRequest.h>
 #include <awsmock/dto/s3/PutBucketEncryptionRequest.h>
 #include <awsmock/dto/s3/PutBucketLifecycleConfigurationRequest.h>
+#include <awsmock/dto/s3/GetBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationResponse.h>
 #include <awsmock/dto/s3/PutBucketVersioningRequest.h>
@@ -285,7 +286,7 @@ namespace Awsmock::Service {
          * @param stream input stream
          * @return PutObjectResponse
          */
-        Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream);
+        Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const;
 
         /**
          * @brief Put an object, reading a file path
@@ -294,7 +295,7 @@ namespace Awsmock::Service {
          * @param filename input file
          * @param serverId current server id
          */
-        void PutObject(const std::string &username, const std::string &filename, const std::string &serverId);
+        void PutObject(const std::string &username, const std::string &filename, const std::string &serverId) const;
 
         /**
          * @brief Touch an object
@@ -389,6 +390,16 @@ namespace Awsmock::Service {
          * @see PutBucketNotificationConfigurationResponse
          */
         [[nodiscard]] Dto::S3::PutBucketNotificationConfigurationResponse PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) const;
+
+        /**
+         * @brief Gets the bucket notification configuration
+         *
+         * @param request bucket notification configuration request.
+         * @return PutBucketNotificationConfigurationResponse,
+         * @see GetBucketNotificationConfigurationRequest
+         * @see PutBucketNotificationConfigurationResponse
+         */
+        [[nodiscard]] Dto::S3::PutBucketNotificationConfigurationResponse GetBucketNotificationConfiguration(const Dto::S3::GetBucketNotificationConfigurationRequest &request) const;
 
         /**
          * @brief Adds a bucket encryption configuration

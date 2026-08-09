@@ -13,6 +13,8 @@
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
 #include <boost/asio.hpp>
 #include <windows.h>
+// windows.h/WinUser.h macros collide with method names used throughout awsmock (e.g. SQSService::SendMessage)
+#undef SendMessage
 #endif
 #endif
 

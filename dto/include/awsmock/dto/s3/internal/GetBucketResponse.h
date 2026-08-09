@@ -91,8 +91,7 @@ namespace Awsmock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-      private:
-
+    private:
         friend GetBucketResponse tag_invoke(boost::json::value_to_tag<GetBucketResponse>, boost::json::value const &v) {
             GetBucketResponse r;
             r.id = Core::Json::GetStringValue(v, "id");
@@ -102,36 +101,36 @@ namespace Awsmock::Dto::S3 {
             r.versionStatus = Core::Json::GetStringValue(v, "versionStatus");
             r.size = Core::Json::GetLongValue(v, "size");
             r.keys = Core::Json::GetLongValue(v, "keys");
-            r.lambdaConfigurations = boost::json::value_to<std::vector<LambdaConfiguration>>(v.at("lambdaConfigurations"));
-            r.queueConfigurations = boost::json::value_to<std::vector<QueueConfiguration>>(v.at("queueConfigurations"));
-            r.topicConfigurations = boost::json::value_to<std::vector<TopicConfiguration>>(v.at("topicConfigurations"));
-            r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("defaultMetadata"));
-            r.lifecycleRules = boost::json::value_to<std::vector<LifecycleRule>>(v.at("lifecycleRules"));
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("lastStarted").as_string().data());
+            r.lambdaConfigurations = boost::json::value_to<std::vector<LambdaConfiguration> >(v.at("lambdaConfigurations"));
+            r.queueConfigurations = boost::json::value_to<std::vector<QueueConfiguration> >(v.at("queueConfigurations"));
+            r.topicConfigurations = boost::json::value_to<std::vector<TopicConfiguration> >(v.at("topicConfigurations"));
+            r.defaultMetadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("defaultMetadata"));
+            r.lifecycleRules = boost::json::value_to<std::vector<LifecycleRule> >(v.at("lifecycleRules"));
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetBucketResponse const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"id", obj.id},
-                    {"bucket", obj.bucket},
-                    {"arn", obj.arn},
-                    {"owner", obj.owner},
-                    {"versionStatus", obj.versionStatus},
-                    {"size", obj.size},
-                    {"keys", obj.keys},
-                    {"lambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
-                    {"queueConfigurations", boost::json::value_from(obj.queueConfigurations)},
-                    {"topicConfigurations", boost::json::value_from(obj.topicConfigurations)},
-                    {"defaultMetadata", boost::json::value_from(obj.defaultMetadata)},
-                    {"lifecycleRules", boost::json::value_from(obj.lifecycleRules)},
-                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
+                {"id", obj.id},
+                {"bucket", obj.bucket},
+                {"arn", obj.arn},
+                {"owner", obj.owner},
+                {"versionStatus", obj.versionStatus},
+                {"size", obj.size},
+                {"keys", obj.keys},
+                {"lambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
+                {"queueConfigurations", boost::json::value_from(obj.queueConfigurations)},
+                {"topicConfigurations", boost::json::value_from(obj.topicConfigurations)},
+                {"defaultMetadata", boost::json::value_from(obj.defaultMetadata)},
+                {"lifecycleRules", boost::json::value_from(obj.lifecycleRules)},
+                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
-}// namespace Awsmock::Dto::S3
+} // namespace Awsmock::Dto::S3

@@ -154,7 +154,7 @@ namespace Awsmock::Dto::Apps {
             r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
             r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
             r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStart"));
-            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStart"));
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             if (Core::Json::AttributeExists(v, "dependencies")) {
                 r.dependencies = boost::json::value_to<std::vector<std::string>>(v.at("dependencies"));
@@ -180,7 +180,7 @@ namespace Awsmock::Dto::Apps {
                     {"description", obj.description},
                     {"dockerFile", obj.dockerFile},
                     {"lastStart", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
-                    {"lastStart", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
                     {"environment", boost::json::value_from(obj.environment)},
                     {"dependencies", boost::json::value_from(obj.dependencies)},

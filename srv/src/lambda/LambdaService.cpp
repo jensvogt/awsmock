@@ -165,15 +165,7 @@ namespace Awsmock::Service {
             }
 
             // Paging
-            if (request.pageSize > 0) {
-                auto endArray = environments.begin() + request.pageSize * (request.pageIndex + 1);
-                if (request.pageSize * (request.pageIndex + 1) > environments.size()) {
-                    endArray = environments.end();
-                }
-                response.environmentCounters = std::vector(environments.begin() + request.pageIndex * request.pageSize, endArray);
-            } else {
-                response.environmentCounters = environments;
-            }
+            response.environmentCounters = Core::PageVector(environments, request.pageSize, request.pageIndex);
             log_trace << "Lambda list environments counters, result: " << response.ToString();
             return response;
         } catch (std::exception &exc) {
@@ -213,11 +205,7 @@ namespace Awsmock::Service {
             }
 
             // Paging
-            auto endArray = eventSources.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > eventSources.size()) {
-                endArray = eventSources.end();
-            }
-            response.eventSourceCounters = std::vector(eventSources.begin() + request.pageIndex * request.pageSize, endArray);
+            response.eventSourceCounters = Core::PageVector(eventSources, request.pageSize, request.pageIndex);
 
             log_trace << "Lambda list event source counters, result: " << response.ToString();
             return response;
@@ -466,11 +454,7 @@ namespace Awsmock::Service {
             }
 
             // Paging
-            auto endArray = tags.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > tags.size()) {
-                endArray = tags.end();
-            }
-            response.tagCounters = std::vector(tags.begin() + request.pageIndex * request.pageSize, endArray);
+            response.tagCounters = Core::PageVector(tags, request.pageSize, request.pageIndex);
 
             log_trace << "Lambda list tags counters, result: " << response.ToString();
             return response;
@@ -533,13 +517,7 @@ namespace Awsmock::Service {
             }
 
             // Paging
-            if (request.pageSize > 0) {
-                auto endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
-                if (request.pageSize * (request.pageIndex + 1) > response.instanceCounters.size()) {
-                    endArray = response.instanceCounters.end();
-                }
-                response.instanceCounters = std::vector(response.instanceCounters.begin() + request.pageIndex * request.pageSize, endArray);
-            }
+            response.instanceCounters = Core::PageVector(response.instanceCounters, request.pageSize, request.pageIndex);
 
             log_trace << "Lambda list instances counters, result: " << response.ToString();
             return response;

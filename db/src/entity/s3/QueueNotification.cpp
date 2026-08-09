@@ -6,7 +6,7 @@
 
 namespace Awsmock::Database::Entity::S3 {
 
-    logger_t _logger{boost::log::keywords::channel = "S3"};
+    static logger_t _logger{boost::log::keywords::channel = "S3"};
 
     bool QueueNotification::CheckFilter(const std::string &key) {
 
@@ -70,4 +70,4 @@ namespace Awsmock::Database::Entity::S3 {
         return n;
     }
 
-}// namespace Awsmock::Database::Entity::S3
+} // namespace Awsmock::Database::Entity::S3

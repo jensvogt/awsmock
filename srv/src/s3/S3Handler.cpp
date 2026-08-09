@@ -1,4 +1,3 @@
-
 #include <awsmock/service/s3/S3Handler.h>
 
 namespace Awsmock::Service {
@@ -246,7 +245,8 @@ namespace Awsmock::Service {
 
                 case Dto::Common::S3CommandType::GET_BUCKET_ACL: {
                     log_info << "GetBucketAcl, bucket: " << clientCommand.bucket;
-                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>000000000000</ID><DisplayName>owner</DisplayName></Owner><AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CanonicalUser"><ID>000000000000</ID><DisplayName>owner</DisplayName></Grantee><Permission>FULL_CONTROL</Permission></Grant></AccessControlList></AccessControlPolicy>)";
+                    const std::string xml =
+                            R"(<?xml version="1.0" encoding="UTF-8"?><AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>000000000000</ID><DisplayName>owner</DisplayName></Owner><AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CanonicalUser"><ID>000000000000</ID><DisplayName>owner</DisplayName></Grantee><Permission>FULL_CONTROL</Permission></Grant></AccessControlList></AccessControlPolicy>)";
                     return SendResponse(request, http::status::ok, xml);
                 }
 
@@ -294,13 +294,27 @@ namespace Awsmock::Service {
                 }
 
                 case Dto::Common::S3CommandType::GET_BUCKET_PUBLIC_ACCESS_BLOCK: {
-                    const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><PublicAccessBlockConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><BlockPublicAcls>true</BlockPublicAcls><IgnorePublicAcls>true</IgnorePublicAcls><BlockPublicPolicy>true</BlockPublicPolicy><RestrictPublicBuckets>true</RestrictPublicBuckets></PublicAccessBlockConfiguration>)";
+                    const std::string xml =
+                            R"(<?xml version="1.0" encoding="UTF-8"?><PublicAccessBlockConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><BlockPublicAcls>true</BlockPublicAcls><IgnorePublicAcls>true</IgnorePublicAcls><BlockPublicPolicy>true</BlockPublicPolicy><RestrictPublicBuckets>true</RestrictPublicBuckets></PublicAccessBlockConfiguration>)";
                     return SendResponse(request, http::status::ok, xml);
                 }
 
                 case Dto::Common::S3CommandType::GET_BUCKET_REPLICATION: {
                     const std::string xml = R"(<?xml version="1.0" encoding="UTF-8"?><Error><Code>ReplicationConfigurationNotFoundError</Code><Message>The replication configuration was not found</Message></Error>)";
                     return SendResponse(request, http::status::not_found, xml);
+                }
+
+                case Dto::Common::S3CommandType::GET_BUCKET_NOTIFICATION_CONFIGURATION: {
+                    log_debug << "Get bucket notification configuration request, bucket: " << clientCommand.bucket;
+
+                    Dto::S3::GetBucketNotificationConfigurationRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.user = clientCommand.user;
+                    s3Request.requestId = clientCommand.requestId;
+                    s3Request.bucket = clientCommand.bucket;
+
+                    Dto::S3::PutBucketNotificationConfigurationResponse s3Response = _s3Service.GetBucketNotificationConfiguration(s3Request);
+                    return SendResponse(request, http::status::ok, s3Response.ToXml());
                 }
 
                 default:
@@ -1132,4 +1146,4 @@ namespace Awsmock::Service {
         key = Core::StringUtils::UrlDecode(Core::StringUtils::SubStringAfter(sourcePath, "/"));
         log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key << " versionId: " << versionId;
     }
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
