@@ -217,6 +217,38 @@ namespace Awsmock::Database {
         }
     }
 
+    Entity::Lambda::Lambda LambdaMongoRepository::updateLambdaInstanceConnection(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
+
+        try {
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+
+            const auto filter = make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime), kvp("instances.id", instance.instanceId));
+
+            const auto update = make_document(kvp("$set", make_document(
+                                                                  kvp("instances.$.containerId", instance.containerId),
+                                                                  kvp("instances.$.containerName", instance.containerName),
+                                                                  kvp("instances.$.hostName", instance.hostName),
+                                                                  kvp("instances.$.publicPort", instance.publicPort),
+                                                                  kvp("instances.$.privatePort", instance.privatePort),
+                                                                  kvp("modified", bsoncxx::types::b_date(system_clock::now())))));
+
+            auto mResult = _lambdaCollection.find_one_and_update(filter.view(), update.view(), opts);
+            if (mResult.has_value()) {
+                Entity::Lambda::Lambda result;
+                result.FromDocument(mResult.value());
+                return result;
+            }
+            return {};
+        } catch (const mongocxx::exception &exc) {
+            log_error << "Database exception " << exc.what();
+            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+        }
+    }
+
     bool LambdaMongoRepository::updateLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
 
         const auto client = ConnectionPool::instance().GetConnection();

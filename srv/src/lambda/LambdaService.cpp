@@ -1479,6 +1479,18 @@ namespace Awsmock::Service {
 
         const auto privatePort = Core::Configuration::instance().get<std::string>("awsmock.modules.lambda.private-port");
 
+        // Register a placeholder instance (status 'unknown') before the container is ever
+        // started. The Lambda Runtime inside the container reads AWSMOCK_INSTANCE_ID and can
+        // call back with its status as soon as it's up; if that report arrives before this
+        // instance exists in the database, UpdateLambdaRuntimeStatus() has nothing to match (or
+        // adopt) it against and drops it, leaving the instance stuck at 'unknown' forever. Doing
+        // this $push up front — before the container can possibly be running — closes that race.
+        Database::Entity::Lambda::Instance instance;
+        instance.instanceId = instanceId;
+        instance.containerName = lambda.function + "-" + instanceId;
+        instance.lastStart = system_clock::now();
+        lambda = _lambdaDatabase->addLambdaInstance(lambda.region, lambda.function, lambda.runtime, instance);
+
         if (lambda.dockerTag.empty()) {
             lambda.dockerTag = GetDockerTag(lambda);
             lambda.tags["dockerTag"] = lambda.dockerTag;
@@ -1491,7 +1503,7 @@ namespace Awsmock::Service {
         }
 
         const int hostPort = Core::SystemUtils::GetNextFreePort();
-        const std::string containerName = lambda.function + "-" + instanceId;
+        const std::string containerName = instance.containerName;
         if (!ContainerService::instance().ContainerExists(containerName)) {
             CreateDockerContainer(lambda, instanceId, hostPort, lambda.dockerTag);
         }
@@ -1505,10 +1517,6 @@ namespace Awsmock::Service {
         }
 
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
-        Database::Entity::Lambda::Instance instance;
-        instance.instanceId = instanceId;
-        instance.containerName = containerName;
-        instance.lastStart = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostName = _dockerized ? containerName : std::string("localhost");
             instance.publicPort = _dockerized ? stoi(privatePort) : hostPort;
@@ -1516,13 +1524,11 @@ namespace Awsmock::Service {
             instance.containerId = inspectContainerResponse.id;
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
             lambda.codeSize = inspectContainerResponse.sizeRootFs;
-        }
 
-        // Append atomically (Mongo $push) rather than mutating this in-memory copy and relying
-        // on the caller's later full-document updateLambda(): fast-starting runtimes (e.g.
-        // nodejs) can trigger several near-simultaneous scale-out calls, and a full-document
-        // replace from one call silently drops instances appended by a concurrently racing call.
-        lambda = _lambdaDatabase->addLambdaInstance(lambda.region, lambda.function, lambda.runtime, instance);
+            // Atomically fill in the connection details on the already-registered instance
+            // (matched by instanceId), rather than pushing a new array element.
+            lambda = _lambdaDatabase->updateLambdaInstanceConnection(lambda.region, lambda.function, lambda.runtime, instance);
+        }
 
         return inspectContainerResponse.id;
     }

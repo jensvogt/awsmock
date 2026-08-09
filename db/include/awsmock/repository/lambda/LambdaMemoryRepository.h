@@ -108,6 +108,18 @@ namespace Awsmock::Database {
         Entity::Lambda::Lambda addLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const override;
 
         /**
+         * @brief Atomically fills in the container connection details of an already-registered instance.
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param instance instance holding the instanceId to match and the connection details
+         * @return updated lambda entity.
+         */
+        [[nodiscard]]
+        Entity::Lambda::Lambda updateLambdaInstanceConnection(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const override;
+
+        /**
          * @brief Atomically updates the status fields of a single existing instance.
          *
          * @param region AWS region

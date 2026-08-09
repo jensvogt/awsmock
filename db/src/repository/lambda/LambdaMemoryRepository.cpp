@@ -194,6 +194,30 @@ namespace Awsmock::Database {
         return it->second;
     }
 
+    Entity::Lambda::Lambda LambdaMemoryRepository::updateLambdaInstanceConnection(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
+        boost::mutex::scoped_lock lock(_lambdaMutex);
+
+        const auto it = std::ranges::find_if(_lambdas, [&region, &function, &runtime](const std::pair<std::string, Entity::Lambda::Lambda> &l) {
+            return l.second.region == region && l.second.function == function && l.second.runtime == runtime;
+        });
+
+        if (it == _lambdas.end()) {
+            log_error << "Update lambda instance connection failed, region: " << region << " function: " << function;
+            throw Core::DatabaseException("Update lambda instance connection failed, region: " + region + " function: " + function);
+        }
+
+        const auto instanceIt = std::ranges::find_if(it->second.instances, [&instance](const Entity::Lambda::Instance &i) { return i.instanceId == instance.instanceId; });
+        if (instanceIt != it->second.instances.end()) {
+            instanceIt->containerId = instance.containerId;
+            instanceIt->containerName = instance.containerName;
+            instanceIt->hostName = instance.hostName;
+            instanceIt->publicPort = instance.publicPort;
+            instanceIt->privatePort = instance.privatePort;
+            it->second.modified = system_clock::now();
+        }
+        return it->second;
+    }
+
     bool LambdaMemoryRepository::updateLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
