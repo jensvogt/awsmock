@@ -255,10 +255,10 @@ namespace Awsmock::Database::Entity::S3 {
         /**
          * @brief Returns a given lambda notification by function arn
          *
-         * @param bucketArn function ARN
+         * @param lambdaArn function ARN
          * @return found notification or notifications.end().
          */
-        LambdaNotification GetLambdaNotificationByArn(const std::string &bucketArn);
+        LambdaNotification GetLambdaNotificationByArn(const std::string &lambdaArn);
 
         /**
          * @brief Returns a boolean indicating the versioning state

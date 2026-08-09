@@ -530,9 +530,8 @@ namespace Awsmock::Service {
             log_debug << "Bucket returned, bucket: " << bucket.name;
 
             Dto::S3::GetEventSourceResponse response;
-            // TODO: fix, as it is now a vector, what to do with a vector?
-            //Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotifications(request.lambdaArn);
-            //response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
+            const Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotificationByArn(request.functionArn);
+            response.lambdaConfiguration = Dto::S3::LambdaConfigurationMapper::toDto(lambdaNotification);
             return response;
         } catch (bsoncxx::exception &ex) {
             log_warning << "S3 get event source failed, message: " << ex.what();
