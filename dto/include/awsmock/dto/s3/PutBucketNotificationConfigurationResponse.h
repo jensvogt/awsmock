@@ -63,16 +63,11 @@ namespace Awsmock::Dto::S3 {
 
                 boost::property_tree::ptree xmlQueueNotification;
                 xmlQueueNotification.add("Id", queueConfiguration.id);
-                xmlQueueNotification.add("QueueArn", queueConfiguration.queueArn);
+                xmlQueueNotification.add("Queue", queueConfiguration.queueArn);
 
                 // Events
-                if (!queueConfiguration.events.empty()) {
-                    boost::property_tree::ptree xmlEventArray;
-                    for (const auto &event: queueConfiguration.events) {
-                        std::string strEvent = EventTypeToString(event);
-                        xmlEventArray.push_back(boost::property_tree::basic_ptree<std::string, std::string>::value_type(std::make_pair("", strEvent)));
-                    }
-                    xmlQueueNotification.add_child("Events", xmlEventArray);
+                for (const auto &event: queueConfiguration.events) {
+                    xmlQueueNotification.add("Event", EventTypeToString(event));
                 }
                 root.add_child("NotificationConfiguration.QueueConfiguration", xmlQueueNotification);
             }
@@ -82,16 +77,11 @@ namespace Awsmock::Dto::S3 {
 
                 boost::property_tree::ptree xmlTopicNotification;
                 xmlTopicNotification.add("Id", topicConfiguration.id);
-                xmlTopicNotification.add("TopicArn", topicConfiguration.topicArn);
+                xmlTopicNotification.add("Topic", topicConfiguration.topicArn);
 
                 // Events
-                if (!topicConfiguration.events.empty()) {
-                    boost::property_tree::ptree xmlEventArray;
-                    for (const auto &event: topicConfiguration.events) {
-                        std::string strEvent = EventTypeToString(event);
-                        xmlEventArray.push_back(boost::property_tree::basic_ptree<std::string, std::string>::value_type(std::make_pair("", strEvent)));
-                    }
-                    xmlTopicNotification.add_child("Events", xmlEventArray);
+                for (const auto &event: topicConfiguration.events) {
+                    xmlTopicNotification.add("Event", EventTypeToString(event));
                 }
                 root.add_child("NotificationConfiguration.TopicConfiguration", xmlTopicNotification);
             }
@@ -101,18 +91,13 @@ namespace Awsmock::Dto::S3 {
 
                 boost::property_tree::ptree xmlLambdaNotification;
                 xmlLambdaNotification.add("Id", lambdaConfiguration.id);
-                xmlLambdaNotification.add("LambdaArn", lambdaConfiguration.lambdaArn);
+                xmlLambdaNotification.add("CloudFunction", lambdaConfiguration.lambdaArn);
 
                 // Events
-                if (!lambdaConfiguration.events.empty()) {
-                    boost::property_tree::ptree xmlEventArray;
-                    for (const auto &event: lambdaConfiguration.events) {
-                        std::string strEvent = EventTypeToString(event);
-                        xmlEventArray.push_back(boost::property_tree::basic_ptree<std::string, std::string>::value_type(std::make_pair("", strEvent)));
-                    }
-                    xmlLambdaNotification.add_child("Events", xmlEventArray);
+                for (const auto &event: lambdaConfiguration.events) {
+                    xmlLambdaNotification.add("Event", EventTypeToString(event));
                 }
-                root.add_child("NotificationConfiguration.LambdaConfiguration", xmlLambdaNotification);
+                root.add_child("NotificationConfiguration.CloudFunctionConfiguration", xmlLambdaNotification);
             }
             return Core::XmlUtils::ToXmlString(root);
         }

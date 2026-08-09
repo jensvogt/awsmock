@@ -808,7 +808,7 @@ namespace Awsmock::Service {
             }
             if (Core::StringUtils::EndsWith(handlerFile, ".mjs")) {
                 // Node.js require() does not resolve .mjs by extension.  Generate a tiny
-                // CJS shim so the GRT's require('/var/task/dist/app') finds a .js entry
+                // CJS shim so the LRT's require('/var/task/dist/app') finds a .js entry
                 // that re-exports the ESM module.  Node.js ≥22.12 supports require(esm)
                 // synchronously for modules without top-level await.
                 const std::string mjsName = handlerFile.substr(handlerFile.rfind('/') + 1);

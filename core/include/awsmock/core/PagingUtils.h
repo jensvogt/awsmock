@@ -5,6 +5,7 @@
 #pragma once
 
 // C++ includes
+#include <algorithm>
 #include <map>
 #include <vector>
 
@@ -33,13 +34,9 @@ namespace Awsmock::Core {
         if (pageSize <= 0) {
             return vec;
         }
-        typename std::vector<T>::iterator endArray;
-        if (pageSize * (pageIndex + 1) > vec.size()) {
-            endArray = vec.end();
-        } else {
-            endArray = vec.begin() + pageSize * (pageIndex + 1);
-        }
-        return std::vector(vec.begin() + pageSize * pageIndex, endArray);
+        const auto startIndex = std::min(static_cast<size_t>(pageSize * pageIndex), vec.size());
+        const auto endIndex = std::min(static_cast<size_t>(pageSize * (pageIndex + 1)), vec.size());
+        return std::vector(vec.begin() + startIndex, vec.begin() + endIndex);
     }
 
 }// namespace Awsmock::Core

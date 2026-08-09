@@ -1339,22 +1339,6 @@ static int process_close(sftp_client_message client_msg) {
 
     h = static_cast<struct sftp_handle *>(sftp_handle(sftp, handle));
 
-    // Send to S3
-    if (h->fd > 0) {
-        char filePath[PATH_MAX];
-        char realFilePath[PATH_MAX];
-        snprintf(filePath, PATH_MAX, "%s/%d", "/proc/self/fd", h->fd);
-#ifdef _WIN32
-        strncpy_s(realFilePath, reinterpret_cast<char const *>(std::filesystem::canonical(filePath).c_str()), PATH_MAX);
-        const int nBytes = strlen(realFilePath);
-#else
-        const int nBytes = readlink(filePath, realFilePath, PATH_MAX);
-#endif
-        realFilePath[nBytes] = '\0';
-        //const auto p = new AwsMock::Service::S3Service();
-        //p->PutObject(currentUser, realFilePath, currentServerId);
-    }
-
     if (h->type == SFTP_FILE_HANDLE) {
         const int fd = h->fd;
         close(fd);

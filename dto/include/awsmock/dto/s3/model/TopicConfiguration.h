@@ -84,8 +84,10 @@ namespace Awsmock::Dto::S3 {
                 filter.FromXml(pt.get_child("Filter"));
                 filterRules.emplace_back(filter);
             }
-            if (pt.get_optional<std::string>("Event")) {
-                events.emplace_back(EventTypeFromString(pt.get<std::string>("Event")));
+            for (const auto &[key, val]: pt) {
+                if (key == "Event") {
+                    events.emplace_back(EventTypeFromString(val.get_value<std::string>()));
+                }
             }
         }
 

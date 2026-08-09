@@ -404,7 +404,8 @@ namespace Awsmock::Service {
             sourceObject = _s3Database->getObject(request.region, request.sourceBucket, request.sourceKey);
         }
         if (sourceObject.oid.empty()) {
-            log_error << "Upload part copy source not found, part: " << request.partNumber << ", uploadId: " << request.uploadId << ", sourceBucket: " << request.sourceBucket << ", sourceKey: " << request.sourceKey << ", sourceVersionId: " << request.sourceVersionId;
+            log_error << "Upload part copy source not found, part: " << request.partNumber << ", uploadId: " << request.uploadId << ", sourceBucket: " << request.sourceBucket << ", sourceKey: " << request.sourceKey << ", sourceVersionId: " << request.
+sourceVersionId;
             throw Core::NotFoundException("Upload part copy source not found, sourceBucket: " + request.sourceBucket + ", sourceKey: " + request.sourceKey);
         }
 
@@ -594,7 +595,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
+    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "put_object");
         log_trace << "Put object request: " << request.ToString();
 
@@ -611,7 +612,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void S3Service::PutObject(const std::string &username, const std::string &filename, const std::string &serverId) {
+    void S3Service::PutObject(const std::string &username, const std::string &filename, const std::string &serverId) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "put_object");
         log_trace << "Put object request, username: " << username << ", filename: " << filename;
 
@@ -1155,6 +1156,23 @@ namespace Awsmock::Service {
         }
     }
 
+    Dto::S3::PutBucketNotificationConfigurationResponse S3Service::GetBucketNotificationConfiguration(const Dto::S3::GetBucketNotificationConfigurationRequest &request) const {
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "get_bucket_notification");
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        const Database::Entity::S3::Bucket bucket = _s3Database->getBucketByRegionName(request.region, request.bucket);
+
+        Dto::S3::PutBucketNotificationConfigurationResponse response;
+        response.queueConfigurations = Dto::S3::QueueConfigurationMapper::toDtoList(bucket.queueNotifications);
+        response.topicConfigurations = Dto::S3::TopicConfigurationMapper::toDtoList(bucket.topicNotifications);
+        response.lambdaConfigurations = Dto::S3::LambdaConfigurationMapper::toDtoList(bucket.lambdaNotifications);
+
+        log_debug << "Get bucket notification configuration, bucket: " << request.bucket;
+        return response;
+    }
+
     void S3Service::PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) const {
         Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER, S3_SERVICE_COUNTER, "action", "put_bucket_encryption");
         log_trace << "Put bucket encryption request, algorithm: " << request.sseAlgorithm;
@@ -1272,7 +1290,7 @@ namespace Awsmock::Service {
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
-        std::string payload = eventNotification.ToJson();
+        const std::string payload = eventNotification.ToJson();
         Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda invocation send";
     }
@@ -1301,6 +1319,7 @@ namespace Awsmock::Service {
 
                 // Check notification
                 if (notification.CheckFilter(key)) {
+
                     // Create the event record
                     Dto::S3::NotificationBucket notificationBucket;
                     notificationBucket.name = s3Bucket.bucketName;
@@ -1711,4 +1730,4 @@ namespace Awsmock::Service {
         _lambdaService.AddEventSource(request);
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
