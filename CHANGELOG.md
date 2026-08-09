@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18.109](https://github.com/jensvogt/awsmock/compare/1.18.108...v1.18.109) (2026-08-09)
+
+
+### Bug Fixes
+
+* bump vcpkg commit to newest baseline ([4388b47](https://github.com/jensvogt/awsmock/commit/4388b4738d4b4b390b13026d929819ca56db682f))
+* lambda race condition ([ccf35d4](https://github.com/jensvogt/awsmock/commit/ccf35d4110c46f7ddf0daf6edd56c5ef0867b08b))
+* SQS notification events ([6084c7c](https://github.com/jensvogt/awsmock/commit/6084c7cd2a86364f77681fbe7165f21983550789))
+* sychronous SQS notification lambda invocation ([077dd0c](https://github.com/jensvogt/awsmock/commit/077dd0cf0defd36cc76c36b35172be8d45e7bb49))
+
 ## [1.18.108](https://github.com/jensvogt/awsmock/compare/1.18.107...v1.18.108) (2026-08-05)
 
 
