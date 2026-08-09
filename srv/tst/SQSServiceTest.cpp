@@ -7,6 +7,10 @@
 #include <boost/test/unit_test.hpp>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/EventBus.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/service/sqs/SQSService.h>
 
@@ -18,6 +22,7 @@ namespace {
 #define TEST_QUEUE "test-queue"
 #define TEST_REGION "eu-central-1"
 #define TEST_MESSAGE_BODY "Hello, SQS!"
+#define TEST_LAMBDA_FUNCTION "test-lambda-trigger"
 
 namespace Awsmock::Database {
 
@@ -36,6 +41,27 @@ namespace Awsmock::Database {
         return sqsService.SendMessage(request);
     }
 
+    // Registers a lambda with an SQS event source mapping on queueArn, so SendMessage triggers
+    // the synchronous invocation path in SQSService::CheckLambdaNotifications.
+    void CreateLambdaWithSqsEventSource(const std::string &queueArn) {
+        Entity::Lambda::Lambda lambda;
+        lambda.region = TEST_REGION;
+        lambda.function = TEST_LAMBDA_FUNCTION;
+        lambda.runtime = "java21";
+        lambda.arn = Core::AwsUtils::CreateLambdaArn(TEST_REGION, TEST_ACCOUNT_ID, TEST_LAMBDA_FUNCTION);
+        lambda.role = "arn:aws:iam::000000000000:role/ignoreme";
+        lambda.handler = "org.springframework.cloud.function.adapter.aws.FunctionInvoker";
+
+        Entity::Lambda::EventSourceMapping eventSource;
+        eventSource.eventSourceArn = queueArn;
+        eventSource.type = "SQS";
+        eventSource.enabled = true;
+        eventSource.uuid = Core::StringUtils::CreateRandomUuid();
+        lambda.eventSources.emplace_back(eventSource);
+
+        RepositoryFactory::instance().lambdaRepository()->createLambda(lambda);
+    }
+
     struct SQSServiceFixture {
         SQSServiceFixture() = default;
         ~SQSServiceFixture() {
@@ -44,6 +70,8 @@ namespace Awsmock::Database {
                 log_debug << "Queues deleted, count: " << deletedQueues;
                 const long deletedMessages = RepositoryFactory::instance().sqsRepository()->deleteAllMessages();
                 log_debug << "Messages deleted, count: " << deletedMessages;
+                const long deletedLambdas = RepositoryFactory::instance().lambdaRepository()->deleteAllLambdas();
+                log_debug << "Lambdas deleted, count: " << deletedLambdas;
             } catch (const std::exception &exc) {
                 log_error << "SQS fixture cleanup failed: " << exc.what();
             }
@@ -152,6 +180,64 @@ namespace Awsmock::Database {
         // assert
         BOOST_CHECK_EQUAL(false, response.messageId.empty());
         BOOST_CHECK_EQUAL(false, response.md5Body.empty());
+    }
+
+    BOOST_AUTO_TEST_CASE(SendMessageLambdaTriggerSuccessTest) {
+
+        // arrange
+        const Service::SQSService sqsService;
+        const Dto::SQS::CreateQueueResponse createResponse = CreateDefaultQueue(sqsService);
+        CreateLambdaWithSqsEventSource(createResponse.queueArn);
+
+        // Simulate a successful synchronous lambda invocation, as LambdaController would do.
+        const boost::signals2::scoped_connection connection = Core::EventBus::instance().sigLambdaInvoke.connect(
+                [](const std::string &, const std::string &, const std::string &, const std::string &,
+                   const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) {
+                    if (promise) {
+                        promise->set_value({200, "\"OK\""});
+                    }
+                });
+
+        Dto::SQS::SendMessageRequest request;
+        request.region = TEST_REGION;
+        request.queueUrl = createResponse.queueUrl;
+        request.body = TEST_MESSAGE_BODY;
+
+        // act
+        const Dto::SQS::SendMessageResponse response = sqsService.SendMessage(request);
+
+        // assert: the lambda invocation succeeded, so the message must be removed from the queue
+        BOOST_CHECK_EQUAL(false, response.messageId.empty());
+        BOOST_CHECK_EQUAL(false, RepositoryFactory::instance().sqsRepository()->messageExistsByMessageId(response.messageId));
+    }
+
+    BOOST_AUTO_TEST_CASE(SendMessageLambdaTriggerFailureTest) {
+
+        // arrange
+        const Service::SQSService sqsService;
+        const Dto::SQS::CreateQueueResponse createResponse = CreateDefaultQueue(sqsService);
+        CreateLambdaWithSqsEventSource(createResponse.queueArn);
+
+        // Simulate a failed synchronous lambda invocation (unhandled exception in the function body).
+        const boost::signals2::scoped_connection connection = Core::EventBus::instance().sigLambdaInvoke.connect(
+                [](const std::string &, const std::string &, const std::string &, const std::string &,
+                   const std::shared_ptr<std::promise<std::pair<int, std::string>>> &promise) {
+                    if (promise) {
+                        promise->set_value({200, R"({"errorType":"Exception","errorMessage":"boom"})"});
+                    }
+                });
+
+        Dto::SQS::SendMessageRequest request;
+        request.region = TEST_REGION;
+        request.queueUrl = createResponse.queueUrl;
+        request.body = TEST_MESSAGE_BODY;
+
+        // act
+        const Dto::SQS::SendMessageResponse response = sqsService.SendMessage(request);
+
+        // assert: the lambda invocation failed, so the message must stay in the queue for a retry
+        BOOST_CHECK_EQUAL(false, response.messageId.empty());
+        BOOST_CHECK_EQUAL(true, RepositoryFactory::instance().sqsRepository()->messageExistsByMessageId(response.messageId));
     }
 
     BOOST_AUTO_TEST_CASE(ReceiveMessageTest) {
