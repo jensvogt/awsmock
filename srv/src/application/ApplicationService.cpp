@@ -303,6 +303,7 @@ namespace Awsmock::Service {
             inspectContainerResponse = ContainerService::instance().InspectContainer(container.id);
             if (inspectContainerResponse.status == http::status::ok) {
                 application.imageId = inspectContainerResponse.image;
+                application.lastStarted = system_clock::now();
                 application.containerId = inspectContainerResponse.id;
                 application.containerName = inspectContainerResponse.name.substr(1);
                 application.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));

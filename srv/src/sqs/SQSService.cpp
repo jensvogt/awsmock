@@ -1448,8 +1448,24 @@ namespace Awsmock::Service {
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
         std::string payload = eventNotification.ToJson();
-        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", sourceArn: " << eventSourceArn << ", result: " << result;
+
+        // Mirror the real SQS event-source-mapping poller: only remove the message once the
+        // Lambda has confirmed successful processing. A non-200 status or an unhandled
+        // exception in the function body leaves the message in the queue so it becomes
+        // visible again after the visibility timeout and gets retried.
+        if (result.status == 200 && !IsLambdaExecutionError(result.responseBody)) {
+            const long deleted = _sqsDatabase->deleteMessage(message.receiptHandle);
+            log_debug << "Message deleted after successful lambda invocation, function: " << lambda.function << ", receiptHandle: " << message.receiptHandle << ", deleted: " << deleted;
+        } else {
+            log_warning << "Lambda invocation failed, message kept in queue, function: " << lambda.function << ", status: " << result.status;
+        }
+    }
+
+    bool SQSService::IsLambdaExecutionError(const std::string &responseBody) {
+        return responseBody.find("\"errorType\"") != std::string::npos ||
+               responseBody.find("\"errorMessage\"") != std::string::npos;
     }
 
     std::string SQSService::SanitizeContentType(const std::string &contentType, const std::string &body) {

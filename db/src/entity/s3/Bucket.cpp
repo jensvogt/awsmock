@@ -108,9 +108,9 @@ namespace Awsmock::Database::Entity::S3 {
         return {filtered.begin(), filtered.end()};
     }
 
-    LambdaNotification Bucket::GetLambdaNotificationByArn(const std::string &bucketArn) {
-        const auto it = std::ranges::find_if(lambdaNotifications, [bucketArn](const LambdaNotification &eventNotification) {
-            return eventNotification.lambdaArn == bucketArn;
+    LambdaNotification Bucket::GetLambdaNotificationByArn(const std::string &lambdaArn) {
+        const auto it = std::ranges::find_if(lambdaNotifications, [lambdaArn](const LambdaNotification &eventNotification) {
+            return eventNotification.lambdaArn == lambdaArn;
         });
         if (it != lambdaNotifications.end()) {
             return *it;

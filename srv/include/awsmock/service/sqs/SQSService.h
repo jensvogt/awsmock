@@ -513,6 +513,18 @@ namespace Awsmock::Service {
         void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
 
         /**
+         * @brief Checks whether a synchronous lambda invocation response body represents an unhandled function error.
+         *
+         * @par
+         * The AWS Lambda runtime returns HTTP 200 even when the function throws; the error is only
+         * signalled via an 'errorType'/'errorMessage' field in the response body.
+         *
+         * @param responseBody lambda invocation response body.
+         * @return true if the response body represents an execution error.
+         */
+        static bool IsLambdaExecutionError(const std::string &responseBody);
+
+        /**
          * @brief Sanitize the content type
          *
          * @par
