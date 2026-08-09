@@ -1,4 +1,3 @@
-
 #include <awsmock/service/application/ApplicationHandler.h>
 
 namespace Awsmock::Service {
@@ -25,7 +24,7 @@ namespace Awsmock::Service {
 
                     Dto::Apps::GetApplicationRequest serviceRequest = Dto::Apps::GetApplicationRequest::FromJson(clientCommand);
                     Dto::Apps::GetApplicationResponse serviceResponse = _applicationService.GetApplication(serviceRequest);
-                    log_info << "Application retrieved, name: " << serviceRequest.name;
+                    log_info << "Application retrieved, region: " << serviceRequest.region << ", name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
@@ -33,7 +32,7 @@ namespace Awsmock::Service {
 
                     Dto::Apps::UpdateApplicationRequest serviceRequest = Dto::Apps::UpdateApplicationRequest::FromJson(clientCommand);
                     Dto::Apps::GetApplicationResponse serviceResponse = _applicationService.UpdateApplication(serviceRequest);
-                    log_info << "Application updated, name: " << serviceRequest.application.name;
+                    log_info << "Application updated, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
@@ -42,7 +41,7 @@ namespace Awsmock::Service {
                     Dto::Apps::UploadApplicationCodeRequest serviceRequest = Dto::Apps::UploadApplicationCodeRequest::FromJson(clientCommand);
                     Core::Scheduler::instance().AddOneTimeTask("upload-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.UploadApplicationCode(serviceRequest);
-                        log_info << "Applications uploaded, region: " << serviceRequest.region;
+                        log_info << "Applications uploaded, region: " << serviceRequest.region << ", name: " << serviceRequest.applicationName;
                     });
                     log_info << "Upload application code succeeded, name: " << serviceRequest.applicationName << ", version: " << serviceRequest.version;
                     return SendResponse(request, http::status::ok);
@@ -52,7 +51,7 @@ namespace Awsmock::Service {
 
                     Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.ListApplications(serviceRequest);
-                    log_info << "Applications counters list, count: " << serviceResponse.applications.size();
+                    log_info << "Applications counters list, region: " << serviceRequest.region << ", count: " << serviceResponse.applications.size();
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
@@ -70,7 +69,7 @@ namespace Awsmock::Service {
                     Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
                     Core::Scheduler::instance().AddOneTimeTask("restart-application", [serviceRequest, _logger = _logger]() mutable {
                         ApplicationService{}.RebuildApplication(serviceRequest);
-                        log_info << "Applications rebuild, region: " << serviceRequest.region;
+                        log_info << "Applications rebuild, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
                     });
                     return SendResponse(request, http::status::ok);
                 }
@@ -176,7 +175,7 @@ namespace Awsmock::Service {
 
                     Dto::Apps::DeleteApplicationRequest serviceRequest = Dto::Apps::DeleteApplicationRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.DeleteApplication(serviceRequest);
-                    log_info << "Application deleted, name: " << serviceRequest.name;
+                    log_info << "Application deleted, region: " << serviceRequest.region << ", name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
@@ -202,4 +201,4 @@ namespace Awsmock::Service {
         }
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

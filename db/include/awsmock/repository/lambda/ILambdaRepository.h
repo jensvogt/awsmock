@@ -130,6 +130,26 @@ namespace Awsmock::Database {
         virtual Entity::Lambda::Lambda addLambdaInstance(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const = 0;
 
         /**
+         * @brief Atomically fills in the container connection details of an already-registered instance.
+         *
+         * @par
+         * Used once the docker container backing a previously-registered (addLambdaInstance())
+         * placeholder instance has actually been started and inspected. Kept separate from
+         * addLambdaInstance() so the instance row can exist in the database (and therefore be
+         * matchable by UpdateLambdaRuntimeStatus()) before the container is started, closing the
+         * race where a fast-starting Lambda Runtime reports its status before the instance would
+         * otherwise have been persisted.
+         *
+         * @param region AWS region
+         * @param function lambda function name
+         * @param runtime lambda runtime
+         * @param instance instance holding the instanceId to match and the connection details
+         * @return updated lambda entity.
+         */
+        [[nodiscard]]
+        virtual Entity::Lambda::Lambda updateLambdaInstanceConnection(const std::string &region, const std::string &function, const std::string &runtime, const Entity::Lambda::Instance &instance) const = 0;
+
+        /**
          * @brief Atomically updates the status fields of a single existing instance.
          *
          * @par
