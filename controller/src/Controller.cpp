@@ -235,7 +235,7 @@ namespace Awsmock::Controller {
             }
 
             case CommandType::IMPORT:
-                ImportInfrastructure();
+                ImportInfrastructure(_vm.contains("file") ? _vm["file"].as<std::string>() : std::string{});
                 break;
 
             case CommandType::EXPORT: {
@@ -243,7 +243,8 @@ namespace Awsmock::Controller {
                 if (modules.empty()) {
                     modules = GetAllModules();
                 }
-                ExportInfrastructure(modules, _vm.contains("pretty"), _vm.contains("include-objects") ? Dto::Module::ExportType::BOTH : Dto::Module::ExportType::INFRA_STRUCTURE);
+                ExportInfrastructure(modules, _vm.contains("pretty"), _vm.contains("include-objects") ? Dto::Module::ExportType::BOTH : Dto::Module::ExportType::INFRA_STRUCTURE,
+                                      _vm.contains("file") ? _vm["file"].as<std::string>() : std::string{});
                 break;
             }
 
@@ -667,7 +668,7 @@ namespace Awsmock::Controller {
         std::cout << "  " << std::setw(16) << std::left << "Database: " << std::setw(32) << (gatewayConfig.databaseActive ? "true" : "false") << std::endl;
     }
 
-    void AwsMockCtl::ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, const bool pretty, const Dto::Module::ExportType &exportType) const {
+    void AwsMockCtl::ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, const bool pretty, const Dto::Module::ExportType &exportType, const std::string &filename) const {
         Dto::Module::ExportInfrastructureRequest moduleRequest;
         for (const auto &module: modules) {
             moduleRequest.modules.emplace_back(module.name);
@@ -679,14 +680,34 @@ namespace Awsmock::Controller {
             std::cerr << "Could not export objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
-        std::cout << response.body;
+        if (filename.empty()) {
+            std::cout << response.body;
+        } else {
+            std::ofstream ofs(filename, std::ios::out | std::ios::trunc);
+            if (!ofs.is_open()) {
+                std::cerr << "Could not open file for writing: " << filename << std::endl;
+                return;
+            }
+            ofs << response.body;
+        }
     }
 
-    void AwsMockCtl::ImportInfrastructure() const {
+    void AwsMockCtl::ImportInfrastructure(const std::string &filename) const {
         std::string line;
         std::stringstream jsonString;
-        while (std::getline(std::cin, line)) {
-            jsonString << line;
+        if (filename.empty()) {
+            while (std::getline(std::cin, line)) {
+                jsonString << line;
+            }
+        } else {
+            std::ifstream ifs(filename);
+            if (!ifs.is_open()) {
+                std::cerr << "Could not open file for reading: " << filename << std::endl;
+                return;
+            }
+            while (std::getline(ifs, line)) {
+                jsonString << line;
+            }
         }
         if (const auto response = SendPostCommand("module", "import", jsonString.str()); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not import objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;

@@ -12,6 +12,7 @@
 
 // C++ includes
 #include <cstdlib>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -350,18 +351,21 @@ namespace Awsmock::Controller {
         void GetConfig() const;
 
         /**
-         * @brief Dumps the current infrastructure as a JSON file to stdout.
+         * @brief Dumps the current infrastructure as a JSON file to stdout or a file.
          *
          * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
          * @param exportType export type: INFRA_STRUCTURE, OBJECTS, or BOTH
+         * @param filename optional output file name; if empty, writes to stdout
          */
-        void ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, bool pretty, const Dto::Module::ExportType &exportType) const;
+        void ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, bool pretty, const Dto::Module::ExportType &exportType, const std::string &filename = {}) const;
 
         /**
-         * @brief Imports the current infrastructure from stdin
+         * @brief Imports the current infrastructure from stdin or a file
+         *
+         * @param filename optional input file name; if empty, reads from stdin
          */
-        void ImportInfrastructure() const;
+        void ImportInfrastructure(const std::string &filename = {}) const;
 
         /**
          * @brief Cleans the current infrastructure.
