@@ -109,6 +109,22 @@ namespace Awsmock::Service::Frontend {
             });
             log_info << "Frontend signal handler installed";
 
+#ifdef _WIN32
+            // Separate thread watches the service stop event and stops ioc when signaled.
+            // Without this, ioc.run() below only returns via the SIGINT/SIGTERM handler
+            // above, which is never delivered when running as a Windows service, so the
+            // server (and the stack frame owning it) would outlive the caller and crash
+            // the process on service stop.
+            std::thread stopWatcher;
+            if (isService) {
+                stopWatcher = std::thread([&ioc, this] {
+                    WaitForSingleObject(g_ServiceStopEvent, INFINITE);
+                    log_info << "Frontend stop event received, stopping io_context.";
+                    ioc.stop();
+                });
+            }
+#endif
+
             auto endpoint = tcp::endpoint(boost::asio::ip::make_address(address), port);
             std::make_shared<listener>(ioc, endpoint)->run();
 
@@ -124,23 +140,20 @@ namespace Awsmock::Service::Frontend {
 
             log_info << "Frontend server started, endpoint: " << address << ":" << port << " workers: " << num_workers;
             ioc.run();
-#ifdef _WIN32
-            if (isService) {
-                while (true) {
-                    ioc.run_for(std::chrono::seconds(1));
-                    if (WaitForSingleObject(g_ServiceStopEvent, 0) == WAIT_OBJECT_0) {
-                        break;
-                    }
+
+            for (auto &t: pool) {
+                if (t.joinable()) {
+                    t.join();
                 }
+            }
 
-                // Stop io context
-                ioc.stop();
-                log_info << "Frontend server stopped";
-
-            } else {
-                ioc.run();
+#ifdef _WIN32
+            if (stopWatcher.joinable()) {
+                SetEvent(g_ServiceStopEvent);
+                stopWatcher.join();
             }
 #endif
+            log_info << "Frontend server stopped";
         } catch (const std::exception &e) {
             log_error << "Error: " << e.what() << std::endl;
         }

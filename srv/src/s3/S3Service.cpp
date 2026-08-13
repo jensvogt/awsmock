@@ -1261,7 +1261,7 @@ sourceVersionId;
         request.region = region;
         request.queueUrl = queueUrl;
         request.body = eventNotification.ToJson();
-        const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
+        const Dto::SQS::SendMessageResponse response = _sqsService.sendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
     }
 

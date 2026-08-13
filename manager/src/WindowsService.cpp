@@ -143,7 +143,7 @@ DWORD WINAPI RunService(LPVOID lpParam) {
     try {
         
         Awsmock::Service::Frontend::FrontendServer server;
-        boost::thread{boost::ref(server), true}.detach();
+        boost::thread frontendThread{boost::ref(server), true};
         log_info << "Frontend server started.";
         boost::asio::io_context ioc;
         Awsmock::Manager::Manager awsMockManager{ioc};
@@ -159,6 +159,13 @@ DWORD WINAPI RunService(LPVOID lpParam) {
         // Clean up any remaining allocations
         awsMockManager.Stop();
         log_info << "Backend server stopped gracefully.";
+
+        // Wait for the frontend server to shut down before the local `server`
+        // instance (and this thread's stack) goes out of scope.
+        if (frontendThread.joinable()) {
+            frontendThread.join();
+        }
+        log_info << "Frontend server stopped gracefully.";
 
     } catch (const std::exception &e) {
         LogWindowsEvent(std::string("RunService exception: ") + e.what());

@@ -3,19 +3,18 @@
 //
 
 #pragma once
+
 // C++ includes
 #include <string>
 
 // Boost includes
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/string_body.hpp>
-#include <boost/lexical_cast.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -76,59 +75,60 @@ namespace Awsmock::Dto::Common {
         RELOAD_COUNTERS,
         RELOAD_ALL_COUNTERS,
         IS_DLQ,
+        GET_MESSAGE_COUNT,
         UNKNOWN
     };
 
     static std::map<SqsCommandType, std::string> SqsCommandTypeNames{
-            // Queues
-            {SqsCommandType::CREATE_QUEUE, "create-queue"},
-            {SqsCommandType::PURGE_QUEUE, "purge-queue"},
-            {SqsCommandType::PURGE_ALL_QUEUES, "purge-all-queues"},
-            {SqsCommandType::GET_QUEUE_ATTRIBUTES, "get-queue-attributes"},
-            {SqsCommandType::SET_QUEUE_ATTRIBUTES, "set-queue-attributes"},
-            {SqsCommandType::GET_QUEUE_URL, "get-queue-url"},
-            {SqsCommandType::GET_QUEUE_DETAILS, "get-queue-details"},
-            {SqsCommandType::TAG_QUEUE, "tag-queue"},
-            {SqsCommandType::UNTAG_QUEUE, "untag-queue"},
-            {SqsCommandType::LIST_QUEUES, "list-queues"},
-            {SqsCommandType::LIST_QUEUE_TAGS, "list-queue-tags"},
-            {SqsCommandType::LIST_QUEUE_ARNS, "list-queue-arns"},
-            {SqsCommandType::UPDATE_QUEUE, "update-queue"},
-            {SqsCommandType::DELETE_QUEUE, "delete-queue"},
-            // Messages
-            {SqsCommandType::SEND_MESSAGE, "send-message"},
-            {SqsCommandType::SEND_MESSAGE_BATCH, "send-message-batch"},
-            {SqsCommandType::RECEIVE_MESSAGE, "receive-message"},
-            {SqsCommandType::CHANGE_MESSAGE_VISIBILITY, "change-message-visibility"},
-            {SqsCommandType::LIST_MESSAGES, "list-messages"},
-            {SqsCommandType::DELETE_MESSAGE, "delete-message"},
-            {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
-            // Awsmock
-            {SqsCommandType::LIST_QUEUE_COUNTERS, "list-queue-counters"},
-            {SqsCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
-            {SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS, "list-queue-attribute-counters"},
-            {SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS, "list-lambda-trigger-counters"},
-            {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
-            {SqsCommandType::LIST_MESSAGE_ATTRIBUTE_COUNTERS, "list-message-attribute-counters"},
-            {SqsCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
-            {SqsCommandType::UPDATE_MESSAGE, "update-message"},
-            {SqsCommandType::UPDATE_DLQ, "update-dlq"},
-            {SqsCommandType::REDRIVE_MESSAGE, "redrive-message"},
-            {SqsCommandType::REDRIVE_MESSAGES, "redrive-messages"},
-            {SqsCommandType::RESEND_MESSAGE, "resend-message"},
-            {SqsCommandType::GET_EVENT_SOURCE, "get-event-source"},
-            {SqsCommandType::ADD_ATTRIBUTE, "add-attribute"},
-            {SqsCommandType::LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS, "list-default-message-attribute-counters"},
-            {SqsCommandType::ADD_DEFAULT_MESSAGE_ATTRIBUTE, "add-default-message-attribute-counter"},
-            {SqsCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE, "update-default-message-attribute-counter"},
-            {SqsCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
-            {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
-            {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
-            {SqsCommandType::EXPORT_MESSAGES, "export-messages"},
-            {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
-            {SqsCommandType::RELOAD_COUNTERS, "reload-counters"},
-            {SqsCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
-            {SqsCommandType::IS_DLQ, "is-dlq"},
+        // Queues
+        {SqsCommandType::CREATE_QUEUE, "create-queue"},
+        {SqsCommandType::PURGE_QUEUE, "purge-queue"},
+        {SqsCommandType::PURGE_ALL_QUEUES, "purge-all-queues"},
+        {SqsCommandType::GET_QUEUE_ATTRIBUTES, "get-queue-attributes"},
+        {SqsCommandType::SET_QUEUE_ATTRIBUTES, "set-queue-attributes"},
+        {SqsCommandType::GET_QUEUE_URL, "get-queue-url"},
+        {SqsCommandType::GET_QUEUE_DETAILS, "get-queue-details"},
+        {SqsCommandType::TAG_QUEUE, "tag-queue"},
+        {SqsCommandType::UNTAG_QUEUE, "untag-queue"},
+        {SqsCommandType::LIST_QUEUES, "list-queues"},
+        {SqsCommandType::LIST_QUEUE_TAGS, "list-queue-tags"},
+        {SqsCommandType::LIST_QUEUE_ARNS, "list-queue-arns"},
+        {SqsCommandType::UPDATE_QUEUE, "update-queue"},
+        {SqsCommandType::DELETE_QUEUE, "delete-queue"},
+        // Messages
+        {SqsCommandType::SEND_MESSAGE, "send-message"},
+        {SqsCommandType::SEND_MESSAGE_BATCH, "send-message-batch"},
+        {SqsCommandType::RECEIVE_MESSAGE, "receive-message"},
+        {SqsCommandType::CHANGE_MESSAGE_VISIBILITY, "change-message-visibility"},
+        {SqsCommandType::LIST_MESSAGES, "list-messages"},
+        {SqsCommandType::DELETE_MESSAGE, "delete-message"},
+        {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
+        // Awsmock
+        {SqsCommandType::LIST_QUEUE_COUNTERS, "list-queue-counters"},
+        {SqsCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+        {SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS, "list-queue-attribute-counters"},
+        {SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS, "list-lambda-trigger-counters"},
+        {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
+        {SqsCommandType::LIST_MESSAGE_ATTRIBUTE_COUNTERS, "list-message-attribute-counters"},
+        {SqsCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
+        {SqsCommandType::UPDATE_MESSAGE, "update-message"},
+        {SqsCommandType::UPDATE_DLQ, "update-dlq"},
+        {SqsCommandType::REDRIVE_MESSAGE, "redrive-message"},
+        {SqsCommandType::REDRIVE_MESSAGES, "redrive-messages"},
+        {SqsCommandType::RESEND_MESSAGE, "resend-message"},
+        {SqsCommandType::GET_EVENT_SOURCE, "get-event-source"},
+        {SqsCommandType::ADD_ATTRIBUTE, "add-attribute"},
+        {SqsCommandType::LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS, "list-default-message-attribute-counters"},
+        {SqsCommandType::ADD_DEFAULT_MESSAGE_ATTRIBUTE, "add-default-message-attribute-counter"},
+        {SqsCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE, "update-default-message-attribute-counter"},
+        {SqsCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
+        {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
+        {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
+        {SqsCommandType::EXPORT_MESSAGES, "export-messages"},
+        {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
+        {SqsCommandType::RELOAD_COUNTERS, "reload-counters"},
+        {SqsCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
+        {SqsCommandType::IS_DLQ, "is-dlq"},
     };
 
     [[maybe_unused]]
@@ -201,10 +201,8 @@ namespace Awsmock::Dto::Common {
          */
         friend std::ostream &operator<<(std::ostream &os, const SQSClientCommand &i);
 
-      private:
-
+    private:
         mutable logger_t _logger{boost::log::keywords::channel = "Core"};
     };
 
-}// namespace Awsmock::Dto::Common
-
+} // namespace Awsmock::Dto::Common

@@ -1083,7 +1083,7 @@ namespace Awsmock::Service {
         sendMessageRequest.contentType = "application/json";
         sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
-        const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
+        const Dto::SQS::SendMessageResponse response = _sqsService.sendMessage(sendMessageRequest);
         log_trace << "SNS SendMessage response: " << sendMessageRequest.ToJson();
     }
 

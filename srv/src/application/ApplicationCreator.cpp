@@ -176,11 +176,4 @@ namespace Awsmock::Service {
         return environment;
     }
 
-    template<typename Out>
-    Out loadFile(std::string const &filename, Out out) {
-        std::ifstream ifs(filename, std::ios::binary);
-        ifs.exceptions(std::ios::failbit | std::ios::badbit);// we prefer exceptions
-        return std::copy(std::istreambuf_iterator(ifs), {}, out);
-    }
-
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

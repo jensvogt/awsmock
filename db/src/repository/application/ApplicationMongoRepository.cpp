@@ -169,11 +169,9 @@ namespace Awsmock::Database {
 
         try {
 
-            const auto mResult = applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts);
-
-            if (mResult) {
+            if (const auto mResult = applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts)) {
                 log_trace << "Application updated: " << application;
-                application.FromDocument(mResult.value());
+                application.FromDocument(mResult->view());
                 return application;
             }
             return {};
@@ -192,10 +190,10 @@ namespace Awsmock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
             applicationCollection.update_one(
-                    make_document(kvp("region", region), kvp("name", name)),
-                    make_document(kvp("$set", make_document(
-                                                      kvp("enabled", enabled),
-                                                      kvp("modified", bsoncxx::types::b_date(system_clock::now()))))));
+                make_document(kvp("region", region), kvp("name", name)),
+                make_document(kvp("$set", make_document(
+                                      kvp("enabled", enabled),
+                                      kvp("modified", bsoncxx::types::b_date(system_clock::now()))))));
             log_debug << "Application enabled flag set, region: " << region << ", name: " << name << ", enabled: " << enabled;
 
         } catch (const mongocxx::exception &exc) {
@@ -240,4 +238,4 @@ namespace Awsmock::Database {
         }
     }
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database
