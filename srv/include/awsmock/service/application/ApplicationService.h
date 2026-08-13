@@ -112,7 +112,6 @@ namespace Awsmock::Service {
          */
         [[nodiscard]] Dto::Apps::ListApplicationCountersResponse ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const;
 
-
         /**
          * @brief List all application names
          *
@@ -228,6 +227,9 @@ namespace Awsmock::Service {
         Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
     private:
+        /**
+         * Channeled logger
+         */
         mutable logger_t _logger{boost::log::keywords::channel = "Application"};
 
         /**

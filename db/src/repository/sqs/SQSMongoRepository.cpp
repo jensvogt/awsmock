@@ -634,7 +634,6 @@ namespace Awsmock::Database {
     void SQSMongoRepository::receiveMessages(const std::string &queueArn, const long visibility, const long maxResult, const std::string &dlQueueArn, const long maxRetries, Entity::SQS::MessageList &messageList) const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "receive_messages");
 
-        const auto reset = system_clock::now() + std::chrono::seconds(visibility);
         const auto client = ConnectionPool::instance().GetConnection();
         auto messageCollection = (*client)[_databaseName][_messageCollectionName];
 
@@ -645,15 +644,16 @@ namespace Awsmock::Database {
             while (maxResult <= 0 || static_cast<long>(messageList.size()) < maxResult) {
 
                 // Atomically claim one INITIAL message: increment retries and mark INVISIBLE
+                const auto reset = system_clock::now() + std::chrono::seconds(visibility);
                 const auto mResult = messageCollection.find_one_and_update(
-                        make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))),
-                        make_document(
-                                kvp("$set", make_document(
-                                                    kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                                                    kvp("reset", bsoncxx::types::b_date(reset)),
-                                                    kvp("receiptHandle", Core::AwsUtils::CreateSqsReceiptHandler()))),
-                                kvp("$inc", make_document(kvp("retries", 1)))),
-                        opts);
+                    make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))),
+                    make_document(
+                        kvp("$set", make_document(
+                                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+                                kvp("reset", bsoncxx::types::b_date(reset)),
+                                kvp("receiptHandle", Core::AwsUtils::CreateSqsReceiptHandler()))),
+                        kvp("$inc", make_document(kvp("retries", 1)))),
+                    opts);
 
                 if (!mResult) {
                     break;
@@ -664,11 +664,11 @@ namespace Awsmock::Database {
 
                 if (!dlQueueArn.empty() && maxRetries > 0 && result.retries >= maxRetries) {
                     messageCollection.update_one(
-                            make_document(kvp("_id", bsoncxx::oid{result.oid})),
-                            make_document(kvp("$set", make_document(
-                                                              kvp("queueArn", dlQueueArn),
-                                                              kvp("receiptHandle", ""),
-                                                              kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
+                        make_document(kvp("_id", bsoncxx::oid{result.oid})),
+                        make_document(kvp("$set", make_document(
+                                              kvp("queueArn", dlQueueArn),
+                                              kvp("receiptHandle", ""),
+                                              kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))))));
                     log_debug << "Message send to DLQ, id: " << result.oid << " queueArn: " << dlQueueArn;
                 } else {
                     messageList.push_back(result);
@@ -691,15 +691,15 @@ namespace Awsmock::Database {
 
         try {
             const auto filter = make_document(
-                    kvp("queueArn", queueArn),
-                    kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
-                    kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
+                kvp("queueArn", queueArn),
+                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)),
+                kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
 
             const auto update = make_document(
-                    kvp("$set", make_document(
-                                        kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
-                                        kvp("receiptHandle", ""),
-                                        kvp("reset", bsoncxx::types::b_date(system_clock::now() + std::chrono::seconds{visibility})))));
+                kvp("$set", make_document(
+                        kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)),
+                        kvp("receiptHandle", ""),
+                        kvp("reset", bsoncxx::types::b_date(system_clock::now() + std::chrono::seconds{visibility})))));
 
             const auto result = messageCollection.update_many(filter.view(), update.view());
 
@@ -720,13 +720,13 @@ namespace Awsmock::Database {
 
         try {
             const auto filter = make_document(
-                    kvp("arn", queueArn),
-                    kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
-                    kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
+                kvp("arn", queueArn),
+                kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)),
+                kvp("reset", make_document(kvp("$lt", bsoncxx::types::b_date(system_clock::now())))));
 
             const auto update = make_document(
-                    kvp("$set", make_document(
-                                        kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))));
+                kvp("$set", make_document(
+                        kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))));
 
             const auto result = messageCollection.update_many(filter.view(), update.view());
 
@@ -862,20 +862,20 @@ namespace Awsmock::Database {
 
             mongocxx::pipeline p{};
             p.group(make_document(
-                    kvp("_id", "$queueArn"),
-                    kvp("minCreated", make_document(kvp("$min", "$created"))),
-                    kvp("maxCreated", make_document(kvp("$max", "$created")))));
+                kvp("_id", "$queueArn"),
+                kvp("minCreated", make_document(kvp("$min", "$created"))),
+                kvp("maxCreated", make_document(kvp("$max", "$created")))));
             p.lookup(make_document(
-                    kvp("from", _queueCollectionName),
-                    kvp("localField", "_id"),
-                    kvp("foreignField", "arn"),
-                    kvp("as", "queue")));
+                kvp("from", _queueCollectionName),
+                kvp("localField", "_id"),
+                kvp("foreignField", "arn"),
+                kvp("as", "queue")));
             p.unwind(std::string("$queue"));
             p.project(make_document(
-                    kvp("_id", 0),
-                    kvp("queueName", "$queue.name"),
-                    kvp("minCreated", 1),
-                    kvp("maxCreated", 1)));
+                kvp("_id", 0),
+                kvp("queueName", "$queue.name"),
+                kvp("minCreated", 1),
+                kvp("maxCreated", 1)));
 
             for (auto cursor = messageCollection.aggregate(p); const auto &t: cursor) {
                 const auto queueName = Core::Bson::BsonUtils::GetStringValue(t, "queueName");
@@ -967,15 +967,15 @@ namespace Awsmock::Database {
         try {
             mongocxx::pipeline p{};
             p.group(make_document(
-                    kvp("_id", "$queueArn"),
-                    kvp("size", make_document(kvp("$sum", "$size"))),
-                    kvp("total", make_document(kvp("$sum", 1))),
-                    kvp("initial", make_document(kvp("$sum",
-                                                     make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))), 1, 0)))))),
-                    kvp("invisible", make_document(kvp("$sum",
-                                                       make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)))), 1, 0)))))),
-                    kvp("delayed", make_document(kvp("$sum",
-                                                     make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)))), 1, 0))))))));
+                kvp("_id", "$queueArn"),
+                kvp("size", make_document(kvp("$sum", "$size"))),
+                kvp("total", make_document(kvp("$sum", 1))),
+                kvp("initial", make_document(kvp("$sum",
+                                                 make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))), 1, 0)))))),
+                kvp("invisible", make_document(kvp("$sum",
+                                                   make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)))), 1, 0)))))),
+                kvp("delayed", make_document(kvp("$sum",
+                                                 make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)))), 1, 0))))))));
 
             document projectDocument;
             projectDocument.append(kvp("_id", 0),
@@ -994,12 +994,12 @@ namespace Awsmock::Database {
                 const auto queueArn = Core::Bson::BsonUtils::GetStringValue(t, "queueArn");
                 queuesWithMessages.insert(queueArn);
                 bulk.append(mongocxx::model::update_one(
-                        make_document(kvp("arn", queueArn)),
-                        make_document(kvp("$set", make_document(
-                                                          kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                          kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
-                                                          kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
-                                                          kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
+                    make_document(kvp("arn", queueArn)),
+                    make_document(kvp("$set", make_document(
+                                          kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                          kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                          kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
+                                          kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
             }
 
             // Zero out queues with no messages — single server-side update_many replaces N client-side update_ones
@@ -1008,12 +1008,12 @@ namespace Awsmock::Database {
                 arnsArray.append(arn);
             }
             bulk.append(mongocxx::model::update_many(
-                    make_document(kvp("arn", make_document(kvp("$nin", arnsArray.view())))),
-                    make_document(kvp("$set", make_document(
-                                                      kvp("size", bsoncxx::types::b_int64()),
-                                                      kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
-                                                      kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
-                                                      kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64()))))));
+                make_document(kvp("arn", make_document(kvp("$nin", arnsArray.view())))),
+                make_document(kvp("$set", make_document(
+                                      kvp("size", bsoncxx::types::b_int64()),
+                                      kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
+                                      kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
+                                      kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64()))))));
 
             if (!bulk.empty()) {
                 auto result = bulk.execute();
@@ -1026,4 +1026,4 @@ namespace Awsmock::Database {
         }
     }
 
-}// namespace Awsmock::Database
+} // namespace Awsmock::Database

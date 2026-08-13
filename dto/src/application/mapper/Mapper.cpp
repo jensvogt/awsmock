@@ -71,4 +71,4 @@ namespace Awsmock::Dto::Apps {
         }
         return applicationEntities;
     }
-}// namespace Awsmock::Dto::Apps
+} // namespace Awsmock::Dto::Apps

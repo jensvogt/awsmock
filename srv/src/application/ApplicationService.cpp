@@ -1,4 +1,3 @@
-
 //
 // Created by vogje01 on 30/05/2023.
 //
@@ -92,6 +91,7 @@ namespace Awsmock::Service {
 
             // Update database
             Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
+            application.region = request.region;
             application = _applicationDatabase->updateApplication(application);
 
             // Stop if not enabled anymore
@@ -586,4 +586,4 @@ namespace Awsmock::Service {
         log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service

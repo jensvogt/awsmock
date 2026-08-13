@@ -56,6 +56,8 @@
 #include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sqs/internal/GetMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/GetMessageCountersResponse.h>
+#include <awsmock/dto/sqs/internal/GetMessageCountRequest.h>
+#include <awsmock/dto/sqs/internal/GetMessageCountResponse.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/internal/ImportMessagesRequest.h>
@@ -117,7 +119,7 @@ namespace Awsmock::Service {
          * @param request create a queue request
          * @return CreateQueueResponse
          */
-        [[nodiscard]] Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request) const;
+        [[nodiscard]] Dto::SQS::CreateQueueResponse createQueue(const Dto::SQS::CreateQueueRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues
@@ -127,7 +129,7 @@ namespace Awsmock::Service {
          * @see ListQueuesRequest
          * @see ListQueuesResponse
          */
-        [[nodiscard]] Dto::SQS::ListQueuesResponse ListQueues(const Dto::SQS::ListQueuesRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListQueuesResponse listQueues(const Dto::SQS::ListQueuesRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues ARNs
@@ -135,7 +137,7 @@ namespace Awsmock::Service {
          * @return ListQueueArnsResponse
          * @see ListQueueArnsResponse
          */
-        [[nodiscard]] Dto::SQS::ListQueueArnsResponse ListQueueArns() const;
+        [[nodiscard]] Dto::SQS::ListQueueArnsResponse listQueueArns() const;
 
         /**
          * @brief Returns a list of all available queues counters
@@ -145,7 +147,7 @@ namespace Awsmock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListQueueCountersResponse listQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues tags
@@ -155,7 +157,7 @@ namespace Awsmock::Service {
          * @see ListQueueTagsRequest
          * @see ListQueueTagsResponse
          */
-        [[nodiscard]] Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListQueueTagsResponse listQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const;
 
         /**
          * @brief Returns a list of all default message attribute counters
@@ -165,7 +167,7 @@ namespace Awsmock::Service {
          * @see ListDefaultMessageAttributeCountersRequest
          * @see ListDefaultMessageAttributeCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse ListDefaultMessageAttributeCounters(const Dto::SQS::ListDefaultMessageAttributeCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse listDefaultMessageAttributeCounters(const Dto::SQS::ListDefaultMessageAttributeCountersRequest &request) const;
 
         /**
          * @brief Purge a queue.
@@ -174,7 +176,7 @@ namespace Awsmock::Service {
          * @return total number of deleted queues
          * @throws ServiceException
          */
-        [[nodiscard]] long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
+        [[nodiscard]] long purgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
 
         /**
          * @brief Purge all queues.
@@ -182,7 +184,7 @@ namespace Awsmock::Service {
          * @return total number of purged queues
          * @throws ServiceException
          */
-        [[nodiscard]] long PurgeAllQueues() const;
+        [[nodiscard]] long purgeAllQueues() const;
 
         /**
          * @brief Redrive a single messages in queue
@@ -191,7 +193,7 @@ namespace Awsmock::Service {
          * @return total number of redrive messages
          * @throws ServiceException
          */
-        void RedriveMessage(const Dto::SQS::RedriveMessageRequest &request) const;
+        void redriveMessage(const Dto::SQS::RedriveMessageRequest &request) const;
 
         /**
          * @brief Redrive messages in queue
@@ -200,7 +202,7 @@ namespace Awsmock::Service {
          * @return total number of redrive messages
          * @throws ServiceException
          */
-        [[nodiscard]] long RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const;
+        [[nodiscard]] long redriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes
@@ -209,7 +211,7 @@ namespace Awsmock::Service {
          * @return GetQueueAttributesResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const;
+        [[nodiscard]] Dto::SQS::GetQueueUrlResponse getQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes
@@ -218,7 +220,7 @@ namespace Awsmock::Service {
          * @return GetQueueAttributesResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::GetQueueDetailsResponse GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const;
+        [[nodiscard]] Dto::SQS::GetQueueDetailsResponse getQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const;
 
         /**
          * @brief Return the queue userAttributes
@@ -227,7 +229,7 @@ namespace Awsmock::Service {
          * @return GetQueueAttributesResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
+        [[nodiscard]] Dto::SQS::GetQueueAttributesResponse getQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
 
         /**
          * @brief Returns an event source as a lambda configuration
@@ -235,7 +237,7 @@ namespace Awsmock::Service {
          * @param request get event source request
          * @return Dto::S3::GetEventSourceResponse
          */
-        [[nodiscard]] Dto::SQS::GetEventSourceResponse GetEventSource(const Dto::SQS::GetEventSourceRequest &request) const;
+        [[nodiscard]] Dto::SQS::GetEventSourceResponse getEventSource(const Dto::SQS::GetEventSourceRequest &request) const;
 
         /**
          * @brief Set queue userAttributes
@@ -243,7 +245,7 @@ namespace Awsmock::Service {
          * @param request put queue sqs request
          * @throws ServiceException
          */
-        void SetQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const;
+        void setQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const;
 
         /**
          * @brief Adds a default attribute
@@ -252,7 +254,7 @@ namespace Awsmock::Service {
          * @return updated message attribute counters response
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse AddDefaultMessageAttribute(const Dto::SQS::AddDefaultMessageAttributeRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse addDefaultMessageAttribute(const Dto::SQS::AddDefaultMessageAttributeRequest &request) const;
 
         /**
          * @brief Updates a default attribute
@@ -261,7 +263,7 @@ namespace Awsmock::Service {
          * @return updated message attribute counters response
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse UpdateDefaultMessageAttribute(const Dto::SQS::UpdateDefaultMessageAttributeRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse updateDefaultMessageAttribute(const Dto::SQS::UpdateDefaultMessageAttributeRequest &request) const;
 
         /**
          * @brief Delete a default attribute
@@ -270,7 +272,7 @@ namespace Awsmock::Service {
          * @return updated message attribute counters response
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse DeleteDefaultMessageAttribute(const Dto::SQS::DeleteDefaultMessageAttributeRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse deleteDefaultMessageAttribute(const Dto::SQS::DeleteDefaultMessageAttributeRequest &request) const;
 
         /**
          * @brief Sets the message visibility timeout.
@@ -278,7 +280,7 @@ namespace Awsmock::Service {
          * @param request set visibility timeout request
          * @throws ServiceException
          */
-        void SetMessageVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const;
+        void setMessageVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const;
 
         /**
          * @brief Sets tags for a queue.
@@ -288,14 +290,14 @@ namespace Awsmock::Service {
          *
          * @param request tag resource request DTO
          */
-        void TagQueue(const Dto::SQS::TagQueueRequest &request) const;
+        void tagQueue(const Dto::SQS::TagQueueRequest &request) const;
 
         /**
          * @brief Removes a tag from a queue.
          *
          * @param request untag resource request DTO
          */
-        void UntagQueue(const Dto::SQS::UntagQueueRequest &request) const;
+        void untagQueue(const Dto::SQS::UntagQueueRequest &request) const;
 
         /**
          * @brief Returns a list of attribute counters for a queue
@@ -303,7 +305,7 @@ namespace Awsmock::Service {
          * @param request list attribute counters request DTO
          * @return ListAttributeCountersResponse DTO
          */
-        [[nodiscard]] Dto::SQS::ListQueueAttributeCountersResponse ListQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListQueueAttributeCountersResponse listQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const;
 
         /**
          * @brief Returns a list of lambda trigger counters for a queue
@@ -311,7 +313,7 @@ namespace Awsmock::Service {
          * @param request list lambda trigger counters request DTO
          * @return ListLambdaTriggerCountersResponse DTO
          */
-        [[nodiscard]] Dto::SQS::ListLambdaTriggerCountersResponse ListLambdaTriggerCounters(const Dto::SQS::ListLambdaTriggerCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListLambdaTriggerCountersResponse listLambdaTriggerCounters(const Dto::SQS::ListLambdaTriggerCountersRequest &request) const;
 
         /**
          * @brief Returns a list of tags counters for a queue
@@ -319,7 +321,7 @@ namespace Awsmock::Service {
          * @param request list tag counters request DTO
          * @return ListTagCountersResponse DTO
          */
-        [[nodiscard]] Dto::SQS::ListQueueTagCountersResponse ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListQueueTagCountersResponse listTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const;
 
         /**
          * @brief Updatea queue
@@ -327,7 +329,7 @@ namespace Awsmock::Service {
          * @param request update request DTO
          * @throws ServiceException
          */
-        void UpdateQueue(const Dto::SQS::UpdateQueueRequest &request) const;
+        void updateQueue(const Dto::SQS::UpdateQueueRequest &request) const;
 
         /**
          * @brief Delete a queue
@@ -336,7 +338,7 @@ namespace Awsmock::Service {
          * @return SQSQueueResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) const;
+        [[nodiscard]] Dto::SQS::DeleteQueueResponse deleteQueue(const Dto::SQS::DeleteQueueRequest &request) const;
 
         /**
          * @brief Send a message to the queue
@@ -345,7 +347,7 @@ namespace Awsmock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
+        [[nodiscard]] Dto::SQS::SendMessageResponse sendMessage(const Dto::SQS::SendMessageRequest &request) const;
 
         /**
          * @brief Creates a new queue
@@ -354,7 +356,7 @@ namespace Awsmock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
+        [[nodiscard]] Dto::SQS::SendMessageBatchResponse sendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
 
         /**
          * @brief Receive a list of resources
@@ -363,7 +365,7 @@ namespace Awsmock::Service {
          * @return ReceiveMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const;
+        [[nodiscard]] Dto::SQS::ReceiveMessageResponse receiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const;
 
         /**
          * @brief Returns a list SQS messages
@@ -373,7 +375,7 @@ namespace Awsmock::Service {
          * @throws ServiceException
          * @see ListMessagesResponse
          */
-        [[nodiscard]] Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListMessagesResponse listMessages(const Dto::SQS::ListMessagesRequest &request) const;
 
         /**
          * @brief Returns a list SQS messages
@@ -383,7 +385,7 @@ namespace Awsmock::Service {
          * @throws ServiceException
          * @see ListMessageCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListMessageCountersResponse listMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
 
         /**
          * @brief Returns a list SQS message attributes
@@ -393,7 +395,7 @@ namespace Awsmock::Service {
          * @throws ServiceException
          * @see ListMessageAttributeCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListMessageAttributeCountersResponse ListMessageAttributeCounters(const Dto::SQS::ListMessageAttributeCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListMessageAttributeCountersResponse listMessageAttributeCounters(const Dto::SQS::ListMessageAttributeCountersRequest &request) const;
 
         /**
          * @brief Get message counters
@@ -402,7 +404,7 @@ namespace Awsmock::Service {
          * @return GetMessageCountersResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::GetMessageCountersResponse GetMessageCounters(const Dto::SQS::GetMessageCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::GetMessageCountersResponse getMessageCounters(const Dto::SQS::GetMessageCountersRequest &request) const;
 
         /**
          * @brief Updates a message
@@ -410,7 +412,7 @@ namespace Awsmock::Service {
          * @param request update message request DTO
          * @throws ServiceException
          */
-        void UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const;
+        void updateMessage(const Dto::SQS::UpdateMessageRequest &request) const;
 
         /**
          * @brief Resend a message
@@ -419,7 +421,7 @@ namespace Awsmock::Service {
          * @throws ServiceException
          * @see ResendMessage
          */
-        void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
+        void resendMessage(const Dto::SQS::ResendMessageRequest &request) const;
 
         /**
          * @brief Export messages
@@ -428,7 +430,7 @@ namespace Awsmock::Service {
          * @return message list as BSON string
          * @throws ServiceException
          */
-        [[nodiscard]] std::string ExportMessages(const Dto::SQS::ExportMessagesRequest &request) const;
+        [[nodiscard]] std::string exportMessages(const Dto::SQS::ExportMessagesRequest &request) const;
 
         /**
          * @brief Import messages
@@ -436,7 +438,7 @@ namespace Awsmock::Service {
          * @param request import message request
          * @throws ServiceException
          */
-        void ImportMessages(const Dto::SQS::ImportMessagesRequest &request) const;
+        void importMessages(const Dto::SQS::ImportMessagesRequest &request) const;
 
         /**
          * @brief Updates a DQL subscription
@@ -444,7 +446,7 @@ namespace Awsmock::Service {
          * @param request update DQL subscription request DTO
          * @throws ServiceException
          */
-        void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
+        void updateDql(const Dto::SQS::UpdateDqlRequest &request) const;
 
         /**
          * @brief Return DLQ flag
@@ -452,12 +454,14 @@ namespace Awsmock::Service {
          * @param request is DLQ request
          * @return is DLQ response
          */
-        Dto::SQS::IsDlqResponse IsDlq(const Dto::SQS::IsDlqRequest &request) const;
+        Dto::SQS::IsDlqResponse isDlq(const Dto::SQS::IsDlqRequest &request) const;
+
+        Dto::SQS::GetMessageCountResponse getMessageCount(const Dto::SQS::GetMessageCountRequest &request) const;
 
         /**
          * @brief Reload all SQS queue counters
          */
-        void ReloadAllCounters() const;
+        void reloadAllCounters() const;
 
         /**
         * @brief Deletes a message
@@ -465,7 +469,7 @@ namespace Awsmock::Service {
         * @param request delete message request DTO
         * @throws ServiceException
         */
-        void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
+        void deleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
 
         /**
          * @brief Adds a message attribute
@@ -473,7 +477,7 @@ namespace Awsmock::Service {
          * @param request add message attribute request DTO
          * @throws ServiceException
          */
-        void AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const;
+        void addMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const;
 
         /**
          * @brief Deletes a message attribute
@@ -481,7 +485,7 @@ namespace Awsmock::Service {
          * @param request delete message attribute request DTO
          * @throws ServiceException
          */
-        void DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const;
+        void deleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const;
 
         /**
          * @brief Deletes a message in a batch
@@ -490,7 +494,7 @@ namespace Awsmock::Service {
          * @return DeleteMessageBatchResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
+        [[nodiscard]] Dto::SQS::DeleteMessageBatchResponse deleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
 
     private:
         mutable logger_t _logger{boost::log::keywords::channel = "SQS"};
@@ -501,7 +505,7 @@ namespace Awsmock::Service {
          * @param queueArn queue ARN
          * @param message SQS message.
          */
-        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
+        void checkLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
 
         /**
          * @brief Send a lambda invocation request for a message.
@@ -510,7 +514,7 @@ namespace Awsmock::Service {
          * @param message SQS message.
          * @param eventSourceArn event source ARN
          */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
+        void sendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
 
         /**
          * @brief Checks whether a synchronous lambda invocation response body represents an unhandled function error.
@@ -522,7 +526,7 @@ namespace Awsmock::Service {
          * @param responseBody lambda invocation response body.
          * @return true if the response body represents an execution error.
          */
-        static bool IsLambdaExecutionError(const std::string &responseBody);
+        static bool isLambdaExecutionError(const std::string &responseBody);
 
         /**
          * @brief Sanitize the content type
@@ -534,7 +538,7 @@ namespace Awsmock::Service {
          * @param body message body
          * @return content type
          */
-        static std::string SanitizeContentType(const std::string &contentType, const std::string &body);
+        static std::string sanitizeContentType(const std::string &contentType, const std::string &body);
 
         /**
          * @brief Checks the attributes for an entry with 'all'. The search is case-insensitive.
@@ -542,7 +546,7 @@ namespace Awsmock::Service {
          * @param attributes vector of attributes.
          * @param value value to check for.
          */
-        static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
+        static bool checkAttribute(const std::vector<std::string> &attributes, const std::string &value);
 
         /**
          * SQS database connection

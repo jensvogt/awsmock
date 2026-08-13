@@ -6,7 +6,7 @@
 
 namespace Awsmock::Service {
 
-    Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
+    Dto::SQS::CreateQueueResponse SQSService::createQueue(const Dto::SQS::CreateQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
 
@@ -35,7 +35,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListQueuesResponse SQSService::ListQueues(const Dto::SQS::ListQueuesRequest &request) const {
+    Dto::SQS::ListQueuesResponse SQSService::listQueues(const Dto::SQS::ListQueuesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_queues");
         log_trace << "List all queues request, region: " << request.region;
 
@@ -46,7 +46,7 @@ namespace Awsmock::Service {
                 const Database::Entity::SQS::QueueList queueList = _sqsDatabase->listQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
                 const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
 
-                listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string>>();
+                listQueueResponse.queueUrls = queueList | std::views::transform([](const Database::Entity::SQS::Queue &q) { return q.url; }) | std::ranges::to<std::vector<std::string> >();
                 listQueueResponse.nextToken = nextToken;
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
                 return listQueueResponse;
@@ -65,7 +65,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListQueueArnsResponse SQSService::ListQueueArns() const {
+    Dto::SQS::ListQueueArnsResponse SQSService::listQueueArns() const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_queue_arns");
         log_trace << "List all queues ARNs request";
 
@@ -83,7 +83,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListQueueCountersResponse SQSService::ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const {
+    Dto::SQS::ListQueueCountersResponse SQSService::listQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_queue_counters");
         log_trace << "List all queues counters request";
 
@@ -106,7 +106,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::GetQueueDetailsResponse SQSService::GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const {
+    Dto::SQS::GetQueueDetailsResponse SQSService::getQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "get_queue_details");
         log_trace << "Get queue details request, queueArn: " << request.queueArn;
 
@@ -146,7 +146,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListQueueTagsResponse SQSService::ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const {
+    Dto::SQS::ListQueueTagsResponse SQSService::listQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_queue_tags");
         log_trace << "List all queues tags request";
 
@@ -164,7 +164,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListQueueAttributeCountersResponse SQSService::ListQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
+    Dto::SQS::ListQueueAttributeCountersResponse SQSService::listQueueAttributeCounters(const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_queue_attribute_counters");
         log_trace << "List queue attribute counters request: " << request.ToString();
 
@@ -191,7 +191,7 @@ namespace Awsmock::Service {
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "approximateNumberOfMessagesNotVisible",
-            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
+                    attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "deadLetterTargetArn";
@@ -235,8 +235,8 @@ namespace Awsmock::Service {
                     endArray = response.attributeCounters.end();
                 }
                 response.attributeCounters = std::vector(
-                        response.attributeCounters.begin() + request.pageSize * request.pageIndex,
-                        endArray);
+                    response.attributeCounters.begin() + request.pageSize * request.pageIndex,
+                    endArray);
             }
             return response;
         } catch (Core::DatabaseException &ex) {
@@ -245,7 +245,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListLambdaTriggerCountersResponse SQSService::ListLambdaTriggerCounters(const Dto::SQS::ListLambdaTriggerCountersRequest &request) const {
+    Dto::SQS::ListLambdaTriggerCountersResponse SQSService::listLambdaTriggerCounters(const Dto::SQS::ListLambdaTriggerCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_lambda_trigger_counters");
         log_trace << "List lambda trigger counters request: " << request.ToString();
 
@@ -278,7 +278,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListQueueTagCountersResponse SQSService::ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const {
+    Dto::SQS::ListQueueTagCountersResponse SQSService::listTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_tag_counters");
         log_trace << "List tag counters request: " << request.ToString();
 
@@ -306,7 +306,7 @@ namespace Awsmock::Service {
         }
     }
 
-    long SQSService::PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const {
+    long SQSService::purgeQueue(const Dto::SQS::PurgeQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "purge_queue");
         log_trace << "Purge queue request, region: " << request.region << " queueUrl: " << request.queueUrl;
 
@@ -338,7 +338,7 @@ namespace Awsmock::Service {
         }
     }
 
-    long SQSService::PurgeAllQueues() const {
+    long SQSService::purgeAllQueues() const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "purge_all_queue");
 
         try {
@@ -347,7 +347,7 @@ namespace Awsmock::Service {
                 Dto::SQS::PurgeQueueRequest request;
                 request.region = queue.region;
                 request.queueUrl = queue.url;
-                deleted += PurgeQueue(request);
+                deleted += purgeQueue(request);
             }
             return deleted;
         } catch (Core::DatabaseException &ex) {
@@ -356,7 +356,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::RedriveMessage(const Dto::SQS::RedriveMessageRequest &request) const {
+    void SQSService::redriveMessage(const Dto::SQS::RedriveMessageRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "redrive_message");
         log_trace << "Redrive message request, queueArn: " << request.queueArn;
 
@@ -388,7 +388,7 @@ namespace Awsmock::Service {
         }
     }
 
-    long SQSService::RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const {
+    long SQSService::redriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "redrive_messages");
         log_trace << "Redrive messages request, queueArn: " << request.queueArn;
 
@@ -422,7 +422,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::GetQueueUrlResponse SQSService::GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const {
+    Dto::SQS::GetQueueUrlResponse SQSService::getQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "get_queue_url");
         log_debug << "Get queue URL request, region: " << request.region << " queueName: " << request.queueName;
 
@@ -449,7 +449,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::GetQueueAttributesResponse SQSService::GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const {
+    Dto::SQS::GetQueueAttributesResponse SQSService::getQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "get_queue_attributes");
         log_trace << "Get queue userAttributes request, request: " << request.ToString();
 
@@ -470,7 +470,7 @@ namespace Awsmock::Service {
             log_debug << "Got queue: " << queue.url;
 
             Dto::SQS::GetQueueAttributesResponse response;
-            if (CheckAttribute(request.attributeNames, "all")) {
+            if (checkAttribute(request.attributeNames, "all")) {
                 response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
                 response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
                 response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
@@ -484,43 +484,43 @@ namespace Awsmock::Service {
                 response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
                 response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
             } else {
-                if (CheckAttribute(request.attributeNames, "Policy")) {
+                if (checkAttribute(request.attributeNames, "Policy")) {
                     response.attributes.emplace_back("Policy", queue.attributes.policy);
                 }
-                if (CheckAttribute(request.attributeNames, "VisibilityTimeout")) {
+                if (checkAttribute(request.attributeNames, "VisibilityTimeout")) {
                     response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
                 }
-                if (CheckAttribute(request.attributeNames, "MaximumMessageSize")) {
+                if (checkAttribute(request.attributeNames, "MaximumMessageSize")) {
                     response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
                 }
-                if (CheckAttribute(request.attributeNames, "MessageRetentionPeriod")) {
+                if (checkAttribute(request.attributeNames, "MessageRetentionPeriod")) {
                     response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
                 }
-                if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessages")) {
+                if (checkAttribute(request.attributeNames, "ApproximateNumberOfMessages")) {
                     response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
                 }
-                if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
+                if (checkAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
                     response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
                 }
-                if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesDelayed")) {
+                if (checkAttribute(request.attributeNames, "ApproximateNumberOfMessagesDelayed")) {
                     response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
                 }
-                if (CheckAttribute(request.attributeNames, "CreatedTimestamp")) {
+                if (checkAttribute(request.attributeNames, "CreatedTimestamp")) {
                     response.attributes.emplace_back("CreatedTimestamp", Core::DateTimeUtils::HttpFormat(queue.created));
                 }
-                if (CheckAttribute(request.attributeNames, "LastModifiedTimestamp")) {
+                if (checkAttribute(request.attributeNames, "LastModifiedTimestamp")) {
                     response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
                 }
-                if (CheckAttribute(request.attributeNames, "DelaySeconds")) {
+                if (checkAttribute(request.attributeNames, "DelaySeconds")) {
                     response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
                 }
-                if (CheckAttribute(request.attributeNames, "ReceiveMessageWaitTimeSeconds")) {
+                if (checkAttribute(request.attributeNames, "ReceiveMessageWaitTimeSeconds")) {
                     response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
                 }
-                if (CheckAttribute(request.attributeNames, "RedrivePolicy")) {
+                if (checkAttribute(request.attributeNames, "RedrivePolicy")) {
                     response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
                 }
-                if (CheckAttribute(request.attributeNames, "QueueArn")) {
+                if (checkAttribute(request.attributeNames, "QueueArn")) {
                     response.attributes.emplace_back("QueueArn", queue.arn);
                 }
             }
@@ -531,7 +531,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::SetQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const {
+    void SQSService::setQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
 
@@ -539,7 +539,7 @@ namespace Awsmock::Service {
         if (!_sqsDatabase->queueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -579,7 +579,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::GetEventSourceResponse SQSService::GetEventSource(const Dto::SQS::GetEventSourceRequest &request) const {
+    Dto::SQS::GetEventSourceResponse SQSService::getEventSource(const Dto::SQS::GetEventSourceRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "get_event_source");
         log_trace << "Get event source request, sqsRequest: " << request.ToString();
 
@@ -605,7 +605,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::SetMessageVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
+    void SQSService::setMessageVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "set_message_visibility_timeout");
         log_trace << "Change message visibilityTimeout request, queue: " << request.queueUrl;
 
@@ -642,7 +642,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::TagQueue(const Dto::SQS::TagQueueRequest &request) const {
+    void SQSService::tagQueue(const Dto::SQS::TagQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "tag_queue");
         log_trace << "Tag queue request, queue: " << request.queueUrl;
 
@@ -669,7 +669,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::UntagQueue(const Dto::SQS::UntagQueueRequest &request) const {
+    void SQSService::untagQueue(const Dto::SQS::UntagQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "untag_queue");
         log_trace << "Untag queue request, queue: " << request.queueUrl;
 
@@ -706,7 +706,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::ListDefaultMessageAttributeCounters(const Dto::SQS::ListDefaultMessageAttributeCountersRequest &request) const {
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::listDefaultMessageAttributeCounters(const Dto::SQS::ListDefaultMessageAttributeCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_default_message_attribute_counters");
         log_trace << "List message counters request";
 
@@ -730,7 +730,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::AddDefaultMessageAttribute(const Dto::SQS::AddDefaultMessageAttributeRequest &request) const {
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::addDefaultMessageAttribute(const Dto::SQS::AddDefaultMessageAttributeRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "add_default_message_attribute");
         log_trace << "Add default message attribute request, queueArn: " << request.queueArn;
 
@@ -762,7 +762,7 @@ namespace Awsmock::Service {
         return response;
     }
 
-    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::UpdateDefaultMessageAttribute(const Dto::SQS::UpdateDefaultMessageAttributeRequest &request) const {
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::updateDefaultMessageAttribute(const Dto::SQS::UpdateDefaultMessageAttributeRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "update_default_message_attribute");
         log_trace << "Update default message attribute request, queueArn: " << request.queueArn;
 
@@ -792,7 +792,7 @@ namespace Awsmock::Service {
         return response;
     }
 
-    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::DeleteDefaultMessageAttribute(const Dto::SQS::DeleteDefaultMessageAttributeRequest &request) const {
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::deleteDefaultMessageAttribute(const Dto::SQS::DeleteDefaultMessageAttributeRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_default_message_attribute");
         log_trace << "Delete default message attribute request, queueArn: " << request.queueArn;
 
@@ -821,7 +821,7 @@ namespace Awsmock::Service {
         return response;
     }
 
-    void SQSService::UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const {
+    void SQSService::updateDql(const Dto::SQS::UpdateDqlRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "update_dlq");
         log_trace << "Update DQL subscription request, queueArn: " << request.queueArn;
 
@@ -854,7 +854,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::IsDlqResponse SQSService::IsDlq(const Dto::SQS::IsDlqRequest &request) const {
+    Dto::SQS::IsDlqResponse SQSService::isDlq(const Dto::SQS::IsDlqRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "is_dlq");
         log_trace << "Is DLQ request, queueArn: " << request.queueArn;
 
@@ -862,7 +862,7 @@ namespace Awsmock::Service {
 
             const std::vector<Database::Entity::SQS::Queue> mainQueues = _sqsDatabase->isDlq(request.queueArn);
             Dto::SQS::IsDlqResponse response;
-            response.isDlq = mainQueues.size() > 0;
+            response.isDlq = !mainQueues.empty();
             for (const auto &mainQueue: mainQueues) {
                 response.mainQueues.emplace_back(mainQueue.arn);
             }
@@ -874,7 +874,30 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::ReloadAllCounters() const {
+    Dto::SQS::GetMessageCountResponse SQSService::getMessageCount(const Dto::SQS::GetMessageCountRequest &request) const {
+        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "get_message_count");
+        log_trace << "Get message count request, queueArn: " << request.queueArn;
+
+        if (!_sqsDatabase->queueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        try {
+
+            const Database::Entity::SQS::Queue queue = _sqsDatabase->getQueueByArn(request.queueArn);
+            Dto::SQS::GetMessageCountResponse response;
+            response.queueArn = queue.arn;
+            response.count = queue.attributes.approximateNumberOfMessages;
+            return response;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::reloadAllCounters() const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "reload_all_counters");
         log_trace << "Reload all counters";
 
@@ -887,7 +910,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::UpdateQueue(const Dto::SQS::UpdateQueueRequest &request) const {
+    void SQSService::updateQueue(const Dto::SQS::UpdateQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "update_queue");
         log_trace << "Update queue request, request: " << request.ToString();
 
@@ -915,7 +938,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) const {
+    Dto::SQS::DeleteQueueResponse SQSService::deleteQueue(const Dto::SQS::DeleteQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_queue");
         log_trace << "Delete queue request, request: " << request.ToString();
 
@@ -923,7 +946,7 @@ namespace Awsmock::Service {
         if (!_sqsDatabase->queueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -948,7 +971,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) const {
+    Dto::SQS::SendMessageResponse SQSService::sendMessage(const Dto::SQS::SendMessageRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "send_message");
         log_trace << "Sending message request, queueUrl: " << request.queueUrl;
 
@@ -996,7 +1019,7 @@ namespace Awsmock::Service {
             // Set parameters
             message.queueArn = queue.arn;
             message.queueName = queue.name;
-            message.contentType = SanitizeContentType(request.contentType, request.body);
+            message.contentType = sanitizeContentType(request.contentType, request.body);
             message.size = static_cast<long>(request.body.size());
             message.created = system_clock::now();
             message.modified = system_clock::now();
@@ -1011,7 +1034,7 @@ namespace Awsmock::Service {
             log_debug << "Message send, queueName: " << queue.name;
 
             // Find Lambdas with this as an event source
-            CheckLambdaNotifications(queue.arn, message);
+            checkLambdaNotifications(queue.arn, message);
             log_debug << "Send message, queueArn: " << queue.arn;
             return Dto::SQS::SendMessageResponseMapper::toDto(message);
 
@@ -1021,7 +1044,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const {
+    Dto::SQS::SendMessageBatchResponse SQSService::sendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "send_message_batch");
         log_trace << "Send message batch request, queueUrl: " << request.queueUrl;
 
@@ -1046,7 +1069,7 @@ namespace Awsmock::Service {
                 entryRequest.body = entry.body;
 
                 // Send the message
-                const Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
+                const Dto::SQS::SendMessageResponse response = sendMessage(entryRequest);
 
                 Dto::SQS::MessageSuccessful s;
                 s.id = entry.id;
@@ -1063,7 +1086,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ReceiveMessageResponse SQSService::ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const {
+    Dto::SQS::ReceiveMessageResponse SQSService::receiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "receive_messages");
         log_trace << "Receive message request: " << request.ToString();
 
@@ -1104,7 +1127,7 @@ namespace Awsmock::Service {
             } else {
 
                 // Long polling period
-                long elapsed = 0;
+                long long elapsed = 0;
                 const auto begin = system_clock::now();
                 while (elapsed < waitTimeSeconds) {
 
@@ -1132,7 +1155,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListMessagesResponse SQSService::ListMessages(const Dto::SQS::ListMessagesRequest &request) const {
+    Dto::SQS::ListMessagesResponse SQSService::listMessages(const Dto::SQS::ListMessagesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_messages");
         log_trace << "List all messages request";
 
@@ -1163,7 +1186,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListMessageCountersResponse SQSService::ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const {
+    Dto::SQS::ListMessageCountersResponse SQSService::listMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_message_counters");
         log_trace << "List message counters request, queueArn: " << request.queueArn;
 
@@ -1183,7 +1206,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::GetMessageCountersResponse SQSService::GetMessageCounters(const Dto::SQS::GetMessageCountersRequest &request) const {
+    Dto::SQS::GetMessageCountersResponse SQSService::getMessageCounters(const Dto::SQS::GetMessageCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "get_message");
         log_trace << "Get message request, messageId: " << request.messageId;
 
@@ -1206,7 +1229,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const {
+    void SQSService::updateMessage(const Dto::SQS::UpdateMessageRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "update_message");
         log_trace << "Update message request, messageId: " << request.messageId;
 
@@ -1229,7 +1252,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::ResendMessage(const Dto::SQS::ResendMessageRequest &request) const {
+    void SQSService::resendMessage(const Dto::SQS::ResendMessageRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, "action", "resend_message");
         log_trace << "Resend message request, queueArn: " << request.queueArn;
 
@@ -1255,7 +1278,7 @@ namespace Awsmock::Service {
             log_debug << "Message resend, messageId: " << request.messageId;
 
             // Check lambda notification
-            CheckLambdaNotifications(request.queueArn, message);
+            checkLambdaNotifications(request.queueArn, message);
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -1263,7 +1286,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::ListMessageAttributeCountersResponse SQSService::ListMessageAttributeCounters(const Dto::SQS::ListMessageAttributeCountersRequest &request) const {
+    Dto::SQS::ListMessageAttributeCountersResponse SQSService::listMessageAttributeCounters(const Dto::SQS::ListMessageAttributeCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "list_message_attribute_counters");
         log_trace << "List message counters request";
 
@@ -1286,7 +1309,7 @@ namespace Awsmock::Service {
         }
     }
 
-    std::string SQSService::ExportMessages(const Dto::SQS::ExportMessagesRequest &request) const {
+    std::string SQSService::exportMessages(const Dto::SQS::ExportMessagesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "export_messages");
         log_trace << "Export all messages request";
 
@@ -1305,7 +1328,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::ImportMessages(const Dto::SQS::ImportMessagesRequest &request) const {
+    void SQSService::importMessages(const Dto::SQS::ImportMessagesRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "import_messages");
         log_trace << "Export all messages request";
 
@@ -1319,7 +1342,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const {
+    void SQSService::addMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "add_message_attribute");
         log_trace << "Delete message attribute request, messageId: " << request.messageId << ", name: " << request.name;
 
@@ -1345,7 +1368,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const {
+    void SQSService::deleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_message_attribute");
         log_trace << "Delete message attribute request, messageId: " << request.messageId << ", name: " << request.name;
 
@@ -1368,7 +1391,7 @@ namespace Awsmock::Service {
         }
     }
 
-    void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const {
+    void SQSService::deleteMessage(const Dto::SQS::DeleteMessageRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_message");
         log_trace << "Delete message request, url: " << request.receiptHandle;
 
@@ -1384,7 +1407,7 @@ namespace Awsmock::Service {
         }
     }
 
-    Dto::SQS::DeleteMessageBatchResponse SQSService::DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const {
+    Dto::SQS::DeleteMessageBatchResponse SQSService::deleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "delete_message_batch");
         log_trace << "Delete message batch request, size: " << request.entries.size();
 
@@ -1411,22 +1434,22 @@ namespace Awsmock::Service {
         }
     }
 
-    bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
+    bool SQSService::checkAttribute(const std::vector<std::string> &attributes, const std::string &value) {
         return std::ranges::find_if(attributes, [&value](const std::string &attribute) {
-                   return Core::StringUtils::EqualsIgnoreCase(attribute, value);
-               }) != attributes.end();
+            return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+        }) != attributes.end();
     }
 
-    void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
+    void SQSService::checkLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
         if (const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::RepositoryFactory::instance().lambdaRepository()->listLambdasWithEventSource(queueArn); !lambdas.empty()) {
             log_debug << "Found lambda notification events, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
-                SendLambdaInvocationRequest(lambda, message, queueArn);
+                sendLambdaInvocationRequest(lambda, message, queueArn);
             }
         }
     }
 
-    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
+    void SQSService::sendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
         log_debug << "Invoke lambda function request, function: " << lambda.function;
 
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
@@ -1455,7 +1478,7 @@ namespace Awsmock::Service {
         // Lambda has confirmed successful processing. A non-200 status or an unhandled
         // exception in the function body leaves the message in the queue so it becomes
         // visible again after the visibility timeout and gets retried.
-        if (result.status == 200 && !IsLambdaExecutionError(result.responseBody)) {
+        if (result.status == 200 && !isLambdaExecutionError(result.responseBody)) {
             const long deleted = _sqsDatabase->deleteMessage(message.receiptHandle);
             log_debug << "Message deleted after successful lambda invocation, function: " << lambda.function << ", receiptHandle: " << message.receiptHandle << ", deleted: " << deleted;
         } else {
@@ -1463,16 +1486,16 @@ namespace Awsmock::Service {
         }
     }
 
-    bool SQSService::IsLambdaExecutionError(const std::string &responseBody) {
+    bool SQSService::isLambdaExecutionError(const std::string &responseBody) {
         return responseBody.find("\"errorType\"") != std::string::npos ||
                responseBody.find("\"errorMessage\"") != std::string::npos;
     }
 
-    std::string SQSService::SanitizeContentType(const std::string &contentType, const std::string &body) {
+    std::string SQSService::sanitizeContentType(const std::string &contentType, const std::string &body) {
         if (contentType.empty() || contentType == "application/octet-stream" || contentType == "binary/octet-stream") {
             return Core::MagicDetector::instance().fromContent(body);
         }
         return contentType;
     }
 
-}// namespace Awsmock::Service
+} // namespace Awsmock::Service
