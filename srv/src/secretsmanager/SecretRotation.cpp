@@ -29,6 +29,12 @@ namespace Awsmock::Service {
             FinishSecret(secret, lambda, clientRequestToken);
             log_debug << "Secret rotation finished, arn: " << secret.arn;
 
+            // Re-fetch before this final write: `secret` is the pre-rotation snapshot captured
+            // when this detached thread was started, and UpdateSecret() replaces the whole
+            // document. Writing it back as-is would silently revert everything the 4 lambda
+            // steps just did (new secret value, promoted AWSCURRENT/AWSPREVIOUS) to their
+            // pre-rotation state.
+            secret = Database::RepositoryFactory::instance().secretsmanagerRepository()->GetSecretByArn(secret.arn);
             secret.nextRotatedDate = GetNextRotationDate(secret);
             secret = Database::RepositoryFactory::instance().secretsmanagerRepository()->UpdateSecret(secret);
             log_debug << "Secret updated, arn: " << secret.arn;
