@@ -83,15 +83,19 @@ namespace Awsmock::Dto::Lambda {
 
         friend EnvironmentVariables tag_invoke(boost::json::value_to_tag<EnvironmentVariables>, boost::json::value const &v) {
             EnvironmentVariables r;
-            r.variables = boost::json::value_to<std::map<std::string, std::string>>(v.at("variables"));
-            r.error = boost::json::value_to<Error>(v.at("error"));
+            if (Core::Json::AttributeExists(v, "Variables")) {
+                r.variables = boost::json::value_to<std::map<std::string, std::string>>(v.at("Variables"));
+            }
+            if (Core::Json::AttributeExists(v, "Error")) {
+                r.error = boost::json::value_to<Error>(v.at("Error"));
+            }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EnvironmentVariables const &obj) {
             jv = {
-                    {"variables", boost::json::value_from(obj.error)},
-                    {"error", boost::json::value_from(obj.error)},
+                    {"Variables", boost::json::value_from(obj.variables)},
+                    {"Error", boost::json::value_from(obj.error)},
             };
         }
     };

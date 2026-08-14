@@ -87,15 +87,18 @@ namespace Awsmock::Service {
         Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, SECRETSMANAGER_SERVICE_COUNTER, "action", "describe_secret");
         log_trace << "Describe secret request: " << request.ToString();
 
+        // Check whether we have a name of ARN
+        std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
+
         // Check bucket existence
-        if (!_secretsManagerDatabase->SecretExists(request.secretId)) {
-            log_warning << "Secret does not exist, secretId: " << request.secretId;
-            throw Core::NotFoundException("Secret does not exist, secretId: " + request.secretId);
+        if (!_secretsManagerDatabase->SecretExistsByArn(arn)) {
+            log_warning << "Secret does not exist, arn: " << arn;
+            throw Core::NotFoundException("Secret does not exist, arn: " + arn);
         }
 
         try {
             // Get the object from the database
-            const Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretBySecretId(request.secretId);
+            const Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretByArn(arn);
 
             // Convert to DTO
             Dto::SecretsManager::DescribeSecretResponse response;
@@ -144,7 +147,7 @@ namespace Awsmock::Service {
 
             if (!request.versionId.empty() && !secret.HasVersion(request.versionId)) {
                 log_warning << "Secret version does not exist, versionId: " << request.versionId;
-                throw Core::ServiceException("Secret version does not exist, versionId: " + request.versionId);
+                throw Core::NotFoundException("Secrets Manager can't find the specified secret value for VersionId: " + request.versionId);
             }
 
             std::string versionId;
@@ -155,7 +158,18 @@ namespace Awsmock::Service {
             } else {
                 versionId = secret.GetVersionIdByStage(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
             }
+            if (versionId.empty()) {
+                log_warning << "Secret version does not exist for stage: " << request.versionStage;
+                throw Core::NotFoundException("Secrets Manager can't find the specified secret value for staging label: " + request.versionStage);
+            }
             Database::Entity::SecretsManager::SecretVersion version = secret.versions[versionId];
+            if (version.secretString.empty() && version.secretBinary.empty()) {
+                // Matches real Secrets Manager: a version registered (e.g. a freshly-rotated
+                // AWSPENDING placeholder) but never given a value via PutSecretValue reads back
+                // as ResourceNotFoundException, not an empty value.
+                log_warning << "Secret version has no value set, versionId: " << versionId;
+                throw Core::NotFoundException("Secrets Manager can't find the specified secret value for staging label: " + request.versionStage);
+            }
 
             // Convert to DTO
             response.name = secret.name;
@@ -184,6 +198,16 @@ namespace Awsmock::Service {
         }
     }
 
+    Dto::SecretsManager::GetRandomPasswordResponse SecretsManagerService::GetRandomPassword(const Dto::SecretsManager::GetRandomPasswordRequest &request) const {
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, SECRETSMANAGER_SERVICE_COUNTER, "action", "get_random_password");
+        log_trace << "Get random password request: " << request.ToString();
+
+        Dto::SecretsManager::GetRandomPasswordResponse response;
+        response.randomPassword = Core::StringUtils::GenerateRandomString(static_cast<int>(request.passwordLength));
+        response.copyMetadata(request);
+        return response;
+    }
+
     Dto::SecretsManager::PutSecretValueResponse SecretsManagerService::PutSecretValue(const Dto::SecretsManager::PutSecretValueRequest &request) const {
         Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, SECRETSMANAGER_SERVICE_TIMER "action", "put_secret_value");
         log_trace << "Put secret value request: " << request.ToString();
@@ -206,12 +230,18 @@ namespace Awsmock::Service {
 
             const std::string versionId = request.clientRequestToken.empty() ? Core::StringUtils::CreateRandomUuid() : request.clientRequestToken;
 
-            std::string currentVersionId = secret.GetCurrentVersionId();
-            secret.versions[currentVersionId].stages.clear();
-            secret.versions[currentVersionId].stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPREVIOUS));
-
             Database::Entity::SecretsManager::SecretVersion newVersion;
-            newVersion.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
+            if (request.versionStage.empty()) {
+                // Per the AWS API: if VersionStages is not specified, AWSCURRENT is moved to
+                // the new version automatically.
+                std::string currentVersionId = secret.GetCurrentVersionId();
+                secret.versions[currentVersionId].stages.clear();
+                secret.versions[currentVersionId].stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPREVIOUS));
+                newVersion.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
+            } else {
+                // Explicit stages (e.g. AWSPENDING during a rotation): leave AWSCURRENT/AWSPREVIOUS alone.
+                newVersion.stages = request.versionStage;
+            }
 
             if (!secret.kmsKeyId.empty()) {
                 EncryptSecret(newVersion, secret.kmsKeyId, request.secretString);
@@ -230,7 +260,7 @@ namespace Awsmock::Service {
             response.arn = secret.arn;
             response.name = secret.name;
             response.versionId = versionId;
-            response.versionStages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
+            response.versionStages = newVersion.stages;
 
             log_debug << "Put secret value, secretId: " << request.secretId;
 
@@ -545,18 +575,21 @@ namespace Awsmock::Service {
             secret.rotationLambdaARN = request.rotationLambdaARN;
             secret.rotationEnabled = true;
 
-            // Create a copy of the current
-            std::string versionId = secret.GetCurrentVersionId();
-            Database::Entity::SecretsManager::SecretVersion version = secret.versions[versionId];
-            version.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPENDING));
-            secret.versions[request.clientRequestToken] = version;
+            // Per AWS docs: register the new version under AWSPENDING immediately, but leave its
+            // value unset. The rotation lambda's createSecret step is responsible for calling
+            // PutSecretValue to actually set the content; fetching an unset version's value
+            // returns ResourceNotFoundException (see GetSecretValue), which is exactly what the
+            // lambda's own "does AWSPENDING already have a value?" check relies on.
+            secret.versions[request.clientRequestToken].stages = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPENDING)};
             secret = _secretsManagerDatabase->UpdateSecret(secret);
 
             if (request.rotateImmediately) {
                 if (!secret.rotationLambdaARN.empty()) {
 
-                    SecretRotation secretRotation;
-                    boost::thread t(boost::ref(secretRotation), secret, request.clientRequestToken);
+                    // Passed by value (not boost::ref) so the detached thread owns an
+                    // independent copy: RotateSecret returns and this stack frame unwinds
+                    // long before the thread's lambda invocations finish.
+                    boost::thread t(SecretRotation(), secret, request.clientRequestToken);
                     t.detach();
                     log_debug << "Secret rotation started, secretId: " << request.secretId;
                 }
@@ -574,6 +607,63 @@ namespace Awsmock::Service {
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    Dto::SecretsManager::UpdateSecretVersionStageResponse SecretsManagerService::UpdateSecretVersionStage(const Dto::SecretsManager::UpdateSecretVersionStageRequest &request) const {
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, SECRETSMANAGER_SERVICE_COUNTER, "action", "update_secret_version_stage");
+        log_trace << "Update secret version stage request: " << request.ToString();
+
+        // Check whether we have a name of ARN
+        std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
+
+        // Check bucket existence
+        if (!_secretsManagerDatabase->SecretExistsByArn(arn)) {
+            log_warning << "Secret does not exist, arn: " << arn;
+            throw Core::NotFoundException("Secret does not exist, arn: " + arn);
+        }
+
+        try {
+
+            Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretByArn(arn);
+            if (!secret.HasVersion(request.moveToVersionId)) {
+                log_warning << "Secret version does not exist, versionId: " << request.moveToVersionId;
+                throw Core::ServiceException("Secret version does not exist, versionId: " + request.moveToVersionId);
+            }
+
+            if (request.versionStage == Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT)) {
+
+                // Moving AWSCURRENT completes the rotation: every other version becomes
+                // AWSPREVIOUS, and the target version stops being AWSPENDING.
+                secret.ResetVersions(request.moveToVersionId);
+                secret.versions[request.moveToVersionId].stages = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT)};
+
+            } else {
+
+                std::vector<std::string> &moveToStages = secret.versions[request.moveToVersionId].stages;
+                if (std::ranges::find(moveToStages, request.versionStage) == moveToStages.end()) {
+                    moveToStages.emplace_back(request.versionStage);
+                }
+
+                if (!request.removeFromVersionId.empty() && secret.HasVersion(request.removeFromVersionId)) {
+                    std::vector<std::string> &removeFromStages = secret.versions[request.removeFromVersionId].stages;
+                    std::erase(removeFromStages, request.versionStage);
+                }
+            }
+
+            secret.modified = system_clock::now();
+            secret = _secretsManagerDatabase->UpdateSecret(secret);
+
+            Dto::SecretsManager::UpdateSecretVersionStageResponse response;
+            response.region = secret.region;
+            response.arn = secret.arn;
+            response.name = secret.name;
+            response.copyMetadata(request);
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "Secret update version stage failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }
     }

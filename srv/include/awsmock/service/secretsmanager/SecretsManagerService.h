@@ -19,6 +19,8 @@
 #include <awsmock/dto/secretsmanager/DeleteSecretResponse.h>
 #include <awsmock/dto/secretsmanager/DescribeSecretRequest.h>
 #include <awsmock/dto/secretsmanager/DescribeSecretResponse.h>
+#include <awsmock/dto/secretsmanager/GetRandomPasswordRequest.h>
+#include <awsmock/dto/secretsmanager/GetRandomPasswordResponse.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueResponse.h>
 #include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
@@ -32,6 +34,8 @@
 #include <awsmock/dto/secretsmanager/RotateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
+#include <awsmock/dto/secretsmanager/UpdateSecretVersionStageRequest.h>
+#include <awsmock/dto/secretsmanager/UpdateSecretVersionStageResponse.h>
 #include <awsmock/dto/secretsmanager/internal/GetSecretDetailsRequest.h>
 #include <awsmock/dto/secretsmanager/internal/GetSecretDetailsResponse.h>
 #include <awsmock/dto/secretsmanager/internal/ListSecretCountersRequest.h>
@@ -87,6 +91,14 @@ namespace Awsmock::Service {
          * @return GetSecretValueResponse
          */
         [[nodiscard]] Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
+
+        /**
+         * @brief Generates a random password
+         *
+         * @param request get random password request
+         * @return GetRandomPasswordResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::GetRandomPasswordResponse GetRandomPassword(const Dto::SecretsManager::GetRandomPasswordRequest &request) const;
 
         /**
          * @brief Puts a secret value
@@ -159,6 +171,14 @@ namespace Awsmock::Service {
          * @return RotateSecretResponse
          */
         [[nodiscard]] Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const;
+
+        /**
+         * @brief Moves a staging label (e.g. AWSCURRENT) from one secret version to another
+         *
+         * @param request update secret version stage request
+         * @return UpdateSecretVersionStageResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::UpdateSecretVersionStageResponse UpdateSecretVersionStage(const Dto::SecretsManager::UpdateSecretVersionStageRequest &request) const;
 
         /**
          * @brief Deletes an existing secret

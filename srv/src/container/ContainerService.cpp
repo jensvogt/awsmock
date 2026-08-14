@@ -776,11 +776,17 @@ namespace Awsmock::Service {
             ofs << "RUN chmod 775 -R ${LAMBDA_TASK_ROOT}/bin\n";
             ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
         } else if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "python")) {
-            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}/\n";
-            ofs << "RUN pip install -r ${LAMBDA_TASK_ROOT}/requirements.txt\n";
+            // awsmock-lrt images do not define LAMBDA_TASK_ROOT, so always use the resolved
+            // path directly (matches the nodejs22 branch below).
+            const std::string taskRoot = isAwsmockLrt ? "/var/task" : "${LAMBDA_TASK_ROOT}";
+            if (isAwsmockLrt) {
+                ofs << "RUN mkdir -p " << taskRoot << "\n";
+            }
+            ofs << "COPY requirements.txt " << taskRoot << "/\n";
+            ofs << "RUN pip install -r " << taskRoot << "/requirements.txt\n";
             ofs << "RUN mkdir -p /root/.aws\n";
             ofs << credentialsCopy;
-            ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/\n";
+            ofs << "COPY *.py " << taskRoot << "/\n";
             ofs << GetDockerCmd(lambdaEntity, isAwsmockLrt);
         } else if (Core::StringUtils::StartsWithIgnoringCase(lambdaEntity.runtime, "nodejs22")) {
             // awsmock-lrt images are based on node:22-alpine and do not define LAMBDA_TASK_ROOT,

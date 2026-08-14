@@ -45,6 +45,14 @@ namespace Awsmock::Service {
                     return SendResponse(request, http::status::ok, secretsManagerResponse.ToJson());
                 }
 
+                case Dto::Common::SecretsManagerCommandType::GET_RANDOM_PASSWORD: {
+
+                    Dto::SecretsManager::GetRandomPasswordRequest secretsManagerRequest = Dto::SecretsManager::GetRandomPasswordRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::GetRandomPasswordResponse secretsManagerResponse = _secretsManagerService.GetRandomPassword(secretsManagerRequest);
+                    log_info << "Random password generated";
+                    return SendResponse(request, http::status::ok, secretsManagerResponse.ToJson());
+                }
+
                 case Dto::Common::SecretsManagerCommandType::PUT_SECRET_VALUE: {
 
                     Dto::SecretsManager::PutSecretValueRequest secretsManagerRequest = Dto::SecretsManager::PutSecretValueRequest::FromJson(clientCommand);
@@ -66,6 +74,14 @@ namespace Awsmock::Service {
                     Dto::SecretsManager::UpdateSecretDetailsRequest secretsManagerRequest = Dto::SecretsManager::UpdateSecretDetailsRequest::FromJson(clientCommand);
                     Dto::SecretsManager::UpdateSecretDetailsResponse secretsManagerResponse = _secretsManagerService.UpdateSecretDetails(secretsManagerRequest);
                     log_info << "Secret details updated, secretId: " << secretsManagerRequest.secretDetails.secretId;
+                    return SendResponse(request, http::status::ok, secretsManagerResponse.ToJson());
+                }
+
+                case Dto::Common::SecretsManagerCommandType::UPDATE_SECRET_VERSION_STAGE: {
+
+                    Dto::SecretsManager::UpdateSecretVersionStageRequest secretsManagerRequest = Dto::SecretsManager::UpdateSecretVersionStageRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::UpdateSecretVersionStageResponse secretsManagerResponse = _secretsManagerService.UpdateSecretVersionStage(secretsManagerRequest);
+                    log_info << "Secret version stage updated, name: " << secretsManagerResponse.name;
                     return SendResponse(request, http::status::ok, secretsManagerResponse.ToJson());
                 }
 
@@ -133,7 +149,12 @@ namespace Awsmock::Service {
             return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::NotFoundException &exc) {
             log_error << "NotFoundExcpetion: " << exc.message();
-            return SendResponse(request, http::status::not_found, exc.message());
+            // AWS JSON-1.1 error shape: clients (e.g. botocore) key off "__type" to raise the
+            // matching typed exception (ResourceNotFoundException) rather than a generic error.
+            boost::json::object errorBody;
+            errorBody["__type"] = "ResourceNotFoundException";
+            errorBody["message"] = exc.message();
+            return SendResponse(request, http::status::not_found, boost::json::serialize(errorBody));
         }
         log_error << "Unknown method";
         return SendResponse(request, http::status::bad_request, "Unknown method");
