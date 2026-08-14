@@ -3,13 +3,14 @@
 //
 
 #define BOOST_TEST_MODULE DatabaseTests
-#include <boost/test/included/unit_test.hpp>
 
 // Awsmock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/repository/RepositoryFactory.h>
 #include <awsmock/utils/ConnectionPool.h>
+
+#include <boost/test/included/unit_test.hpp>
 
 namespace {
     logger_t _logger{boost::log::keywords::channel = "Test"};

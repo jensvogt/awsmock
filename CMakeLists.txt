@@ -117,9 +117,8 @@ target_link_libraries(awsmockcore PRIVATE unofficial::libmagic::libmagic PCRE2::
 
 if (WIN32)
     target_link_libraries(awsmockcore PUBLIC Boost::system)
-else ()
-    add_subdirectory(core/tst)
 endif ()
+add_subdirectory(core/tst)
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
@@ -197,10 +196,10 @@ target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_stat
 target_link_libraries(awsmockdb PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockdb PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
 
-if (NOT WIN32)
-    add_subdirectory(db/tst/mongodb)
-    add_subdirectory(db/tst/memorydb)
-endif ()
+#if (NOT WIN32)
+add_subdirectory(db/tst/mongodb)
+add_subdirectory(db/tst/memorydb)
+#endif ()
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -245,9 +244,9 @@ target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_sta
 target_link_libraries(awsmocksrv PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmocksrv PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
 
-if (NOT WIN32)
-    add_subdirectory(srv/tst)
-endif ()
+#if (NOT WIN32)
+add_subdirectory(srv/tst)
+#endif ()
 
 # -------------------------------------------------------------------------
 # AWSMock Manager (main program)

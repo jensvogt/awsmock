@@ -17,8 +17,11 @@ namespace Awsmock::Core {
         }
 
         constexpr int port = 14566;
+#ifdef _WIN32
+        const std::string hostName = "localhost";
+#else
         const std::string hostName = SystemUtils::GetHostName();
-
+#endif
         // General
         Configuration::instance().set<std::string>("awsmock.region", "eu-central-1");
         Configuration::instance().set<std::string>("awsmock.user", "none");
@@ -117,4 +120,4 @@ namespace Awsmock::Core {
         return output;
     }
 
-}// namespace Awsmock::Core
+} // namespace Awsmock::Core
