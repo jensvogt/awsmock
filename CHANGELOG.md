@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18.110](https://github.com/jensvogt/awsmock/compare/1.18.109...v1.18.110) (2026-08-14)
+
+
+### Bug Fixes
+
+* add controller file option ([7ec72de](https://github.com/jensvogt/awsmock/commit/7ec72de1150fae4c3818f9eb6ada4028d5da21b5))
+* add controller file option ([655df29](https://github.com/jensvogt/awsmock/commit/655df29b7b6a043ffb849617f87b4eda9f1e3015))
+* fix application updates ([9874ab7](https://github.com/jensvogt/awsmock/commit/9874ab78c9ad855c4f18065f3fa4930a0b4275f3))
+* fix application updates ([842f5d5](https://github.com/jensvogt/awsmock/commit/842f5d5ba0a2aa512dbc2536cdf903168a2e0542))
+
 ## [1.18.109](https://github.com/jensvogt/awsmock/compare/1.18.108...v1.18.109) (2026-08-09)
 
 
