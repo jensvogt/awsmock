@@ -31,6 +31,9 @@ namespace Awsmock::Dto::SecretsManager {
      * }
      * @endcode
      *
+     * @note the AWS API field is plural "VersionStages" (a list) &mdash; unlike GetSecretValue /
+     * UpdateSecretVersionStage, which use the singular "VersionStage".
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct PutSecretValueRequest final : Common::BaseCounter<PutSecretValueRequest> {
@@ -74,8 +77,8 @@ namespace Awsmock::Dto::SecretsManager {
             r.clientRequestToken = Core::Json::GetStringValue(v, "ClientRequestToken");
             r.secretString = Core::Json::GetStringValue(v, "SecretString");
             r.secretBinary = Core::Json::GetStringValue(v, "SecretBinary");
-            if (Core::Json::AttributeExists(v, "VersionStage")) {
-                r.versionStage = boost::json::value_to<std::vector<std::string>>(v.at("VersionStage"));
+            if (Core::Json::AttributeExists(v, "VersionStages")) {
+                r.versionStage = boost::json::value_to<std::vector<std::string>>(v.at("VersionStages"));
             }
             return r;
         }
@@ -90,7 +93,7 @@ namespace Awsmock::Dto::SecretsManager {
                     {"ClientRequestToken", obj.clientRequestToken},
                     {"SecretString", obj.secretString},
                     {"SecretBinary", obj.secretBinary},
-                    {"VersionStage", boost::json::value_from(obj.versionStage)},
+                    {"VersionStages", boost::json::value_from(obj.versionStage)},
             };
         }
     };

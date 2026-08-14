@@ -15,9 +15,12 @@ namespace Awsmock::Service {
         // Create an entity and set ARN
         Database::Entity::Lambda::Lambda lambda = {};
         lambda.arn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
+        lambda.region = request.region;
         lambda.function = request.functionName;
         lambda.runtime = request.runtime;
         lambda.handler = request.handler;
+        lambda.environment.variables = request.environment.variables;
+        lambda.enabled = true;
 
         // Write the base64 file
         lambda.code.zipFile = request.functionName + "-" + request.version + ".b64";

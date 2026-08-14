@@ -10,21 +10,32 @@ namespace Awsmock::Service {
 
         log_debug << "Start rotation secret, arn: " << secret.arn;
 
-        // Get lambda function from database
-        const Database::Entity::Lambda::Lambda lambda = Database::RepositoryFactory::instance().lambdaRepository()->getLambdaByArn(secret.rotationLambdaARN);
+        // This runs detached from the request thread (see SecretsManagerService::RotateSecret), so
+        // an uncaught exception here would call std::terminate and take the whole process down.
+        try {
 
-        CreateSecret(secret, lambda, clientRequestToken);
-        log_debug << "Secret created, arn: " << secret.arn;
+            // Get lambda function from database
+            const Database::Entity::Lambda::Lambda lambda = Database::RepositoryFactory::instance().lambdaRepository()->getLambdaByArn(secret.rotationLambdaARN);
 
-        SetSecret(secret, lambda, clientRequestToken);
-        log_debug << "Secret set in resource, arn: " << secret.arn;
+            CreateSecret(secret, lambda, clientRequestToken);
+            log_debug << "Secret created, arn: " << secret.arn;
 
-        TestSecret(secret, lambda, clientRequestToken);
-        log_debug << "Secret testet, arn: " << secret.arn;
+            SetSecret(secret, lambda, clientRequestToken);
+            log_debug << "Secret set in resource, arn: " << secret.arn;
 
-        secret.nextRotatedDate = GetNextRotationDate(secret);
-        secret = Database::RepositoryFactory::instance().secretsmanagerRepository()->UpdateSecret(secret);
-        log_debug << "Secret updated, arn: " << secret.arn;
+            TestSecret(secret, lambda, clientRequestToken);
+            log_debug << "Secret testet, arn: " << secret.arn;
+
+            FinishSecret(secret, lambda, clientRequestToken);
+            log_debug << "Secret rotation finished, arn: " << secret.arn;
+
+            secret.nextRotatedDate = GetNextRotationDate(secret);
+            secret = Database::RepositoryFactory::instance().secretsmanagerRepository()->UpdateSecret(secret);
+            log_debug << "Secret updated, arn: " << secret.arn;
+
+        } catch (std::exception &exc) {
+            log_error << "Secret rotation failed, arn: " << secret.arn << ", error: " << exc.what();
+        }
     }
 
     void SecretRotation::CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
@@ -66,7 +77,7 @@ namespace Awsmock::Service {
         SendLambdaInvocationRequest(lambda, payload);
     }
 
-    void SecretRotation::FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
+    void SecretRotation::FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -83,10 +94,30 @@ namespace Awsmock::Service {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
         const auto region = Core::Configuration::instance().get<std::string>("awsmock.region");
-        // TODO: fix boost asio context
-        //LambdaService lambdaService;
-        //Dto::Lambda::LambdaResult result = lambdaService.InvokeLambdaFunction(region, lambda.function, body, Dto::Lambda::LambdaInvocationType::EVENT);
-        log_debug << "Lambda send invocation request finished, function: " << lambda.function;
+        const LambdaService lambdaService;
+        const Dto::Lambda::LambdaResult result = lambdaService.InvokeLambdaFunction(region, lambda.function, body, Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE);
+        if (result.status < 200 || result.status >= 300) {
+            log_error << "Lambda invocation failed, function: " << lambda.function << ", status: " << result.status << ", body: " << result.responseBody;
+            throw Core::ServiceException("Lambda invocation failed, function: " + lambda.function + ", status: " + std::to_string(result.status) + ", body: " + result.responseBody);
+        }
+
+        // A Lambda function that raises an unhandled exception still gets HTTP 200 back from the
+        // runtime (matching real AWS Lambda, which signals this via the invoke response rather
+        // than the HTTP status) - the awsmock-lrt runtime reports it as {"error": "..."} in the
+        // body instead of the X-Amz-Function-Error header. Without checking this, a failed
+        // rotation step would be treated as successful and the chain would march on regardless.
+        try {
+            const boost::json::value responseValue = boost::json::parse(result.responseBody);
+            if (responseValue.is_object() && responseValue.as_object().contains("error")) {
+                const std::string errorMessage = boost::json::serialize(responseValue.as_object().at("error"));
+                log_error << "Lambda function reported an error, function: " << lambda.function << ", error: " << errorMessage;
+                throw Core::ServiceException("Lambda function reported an error, function: " + lambda.function + ", error: " + errorMessage);
+            }
+        } catch (const boost::system::system_error &) {
+            // Response body is not JSON - not an error-shaped response, nothing to do.
+        }
+
+        log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", status: " << result.status;
     }
 
     system_clock::time_point SecretRotation::GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const {

@@ -103,7 +103,7 @@ namespace Awsmock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        void FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
+        void FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
 
         /**
          * @brief Send a lambda invocation request
