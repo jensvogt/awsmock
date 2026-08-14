@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.111](https://github.com/jensvogt/awsmock/compare/1.18.110...v1.18.111) (2026-08-14)
+
+
+### Bug Fixes
+
+* secrests manager password rotation. ([ed137f6](https://github.com/jensvogt/awsmock/commit/ed137f67bb8e811a4a3ebf7f90e5a26b7ca2796e))
+* secrests manager password rotation. ([fe456ea](https://github.com/jensvogt/awsmock/commit/fe456eab91b7750b443b1e09a88c1867f0bfdcf8))
+
 ## [1.18.110](https://github.com/jensvogt/awsmock/compare/1.18.109...v1.18.110) (2026-08-14)
 
 
