@@ -1,0 +1,39 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: AWSMock
+Label: AWSMock APT Repository
+Suite: stable
+Codename: stable
+Date: Sat, 15 Aug 2026 13:20:31 UTC
+Architectures: amd64
+Components: main
+Description: APT repository for AWSMock - local AWS API emulator
+MD5Sum:
+ b03401b405acc06855880b34166a4b94 489 main/binary-amd64/Packages
+ 68c4af609bc49e905330e571a5e78cf5 367 main/binary-amd64/Packages.gz
+ 766f7cc79fe4b8b5b2fe06b1403751ac 163 main/binary-amd64/Release
+SHA1:
+ 88a02720a1b6b1542cbdf267d9d1e3b7b242585c 489 main/binary-amd64/Packages
+ 9b3a2c4c32c6cefb72a8a09d7d2a98f57324bc32 367 main/binary-amd64/Packages.gz
+ 056541f7031fced3c8fead366c4b4e63765b931c 163 main/binary-amd64/Release
+SHA256:
+ 536efb635586076817c7db0e2fc08f160a2b3f1779724cb1b65f621e8e505f13 489 main/binary-amd64/Packages
+ c13d7a1a83e86bb18f7d3bbdaed8cf0dffb0ee42338af7f8a01ae824a1ad62e4 367 main/binary-amd64/Packages.gz
+ dd0f3dfb83a6dcc2eafb2543771ecd6273bdec50a9a009a7edb308639abc6808 163 main/binary-amd64/Release
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEoYbGf13M9hThyEVYJguwJNQlJpIFAmqAZ6EACgkQJguwJNQl
+JpJFXg/+IrK7nGCj0FmlQ9RQ4te/jOWNe+FbqI4hpJIMg2dJT/sDTWKwBDknba7Z
+f4lHuU5vdAUL0f9ac0TfuoFCkYwU7M3B8oSU+F1b8N1IuYaw2Tx15jx0NEAM5Uas
+Kgz0G1ZVOkwj/lMO/TUBGr6HFNnUsfyTR/yExwKLhNmGpXx8S9+ftWm6s3LyPFhl
+FM4Bm7CDmajwFW0D/zR+XkAhWrLh4MhKIs+no4n4NKMGJt00bOX1Q03iWd5XIJ9L
+XTJ7fHGj0NPG7UYnEXSFpn9LdFE9nJHOFUQRQn2CR9Lt/cZ5Bgq4i0BH7t4V7zfS
+TxFjMFkkh64laxLiBwv3mF4Ycyx/v56PrjSPDrSddi2qnZh4ydu93qrjOLy8UT0g
+Sq2wO9D1h03kqapKtywY7HbKt5ae6Jwe+IovXU+c8fe7Y4QzZ4KUyZWT1csYYlh6
+KbHs2i0et54eLX5OKmxFTMmispDx7rmMu/hcA434kf+LHmXFHPph9q9AEWZaFWuH
+ghVpfMNNUXXOLlIOEwgJqTwpB8tNboT5z9h05fErOiyRfT9XcdqDRU3PPxqsxPAI
+F7Pa/ZqEVRXnl8cj6xztG9uRFSXI9ZKgO6qVUoSI+TPanmE5WphwdjpWOpwlX2De
+YWZaWBdco3ffOs7exgtzy4KxTeXwX/XQnrnVUwsPBOwJys4uAvI=
+=kR1c
+-----END PGP SIGNATURE-----

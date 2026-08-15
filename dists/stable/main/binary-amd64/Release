@@ -1,0 +1,6 @@
+Archive: stable
+Component: main
+Origin: AWSMock
+Label: AWSMock APT Repository
+Architecture: amd64
+Description: APT repository for AWSMock - local AWS API emulator

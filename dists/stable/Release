@@ -1,0 +1,20 @@
+Origin: AWSMock
+Label: AWSMock APT Repository
+Suite: stable
+Codename: stable
+Date: Sat, 15 Aug 2026 13:20:31 UTC
+Architectures: amd64
+Components: main
+Description: APT repository for AWSMock - local AWS API emulator
+MD5Sum:
+ b03401b405acc06855880b34166a4b94 489 main/binary-amd64/Packages
+ 68c4af609bc49e905330e571a5e78cf5 367 main/binary-amd64/Packages.gz
+ 766f7cc79fe4b8b5b2fe06b1403751ac 163 main/binary-amd64/Release
+SHA1:
+ 88a02720a1b6b1542cbdf267d9d1e3b7b242585c 489 main/binary-amd64/Packages
+ 9b3a2c4c32c6cefb72a8a09d7d2a98f57324bc32 367 main/binary-amd64/Packages.gz
+ 056541f7031fced3c8fead366c4b4e63765b931c 163 main/binary-amd64/Release
+SHA256:
+ 536efb635586076817c7db0e2fc08f160a2b3f1779724cb1b65f621e8e505f13 489 main/binary-amd64/Packages
+ c13d7a1a83e86bb18f7d3bbdaed8cf0dffb0ee42338af7f8a01ae824a1ad62e4 367 main/binary-amd64/Packages.gz
+ dd0f3dfb83a6dcc2eafb2543771ecd6273bdec50a9a009a7edb308639abc6808 163 main/binary-amd64/Release

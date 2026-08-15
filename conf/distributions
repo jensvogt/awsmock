@@ -1,0 +1,8 @@
+Codename: stable
+Suite: stable
+Components: main
+Architectures: amd64
+SignWith: A186C67F5DCCF614E1C84558260BB024D4252692
+Origin: AWSMock
+Label: AWSMock APT Repository
+Description: APT repository for AWSMock - local AWS API emulator

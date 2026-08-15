@@ -1,0 +1,17 @@
+Package: awsmock
+Version: 1.18.112
+License: unknown
+Vendor: none
+Architecture: amd64
+Maintainer: <runner@runnervmzvulz>
+Installed-Size: 107847
+Homepage: http://example.com/no-uri-given
+Priority: optional
+Section: default
+Filename: pool/main/a/awsmock/awsmock_1.18.112_amd64.deb
+Size: 28183012
+SHA256: 21173d5ba72c596a365c87afdf44b97f4fd0e69c49d2a3c6c958aab1736a6c1d
+SHA1: caa606843c3d64324acccd84fdab0c01db87940f
+MD5sum: bc55ad6009b1547d5915484eedaff5df
+Description: no description given
+
