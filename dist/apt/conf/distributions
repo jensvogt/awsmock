@@ -1,0 +1,8 @@
+Codename: stable
+Suite: stable
+Components: main
+Architectures: amd64
+SignWith: __GPG_KEY_ID__
+Origin: AWSMock
+Label: AWSMock APT Repository
+Description: APT repository for AWSMock - local AWS API emulator

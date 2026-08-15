@@ -113,14 +113,13 @@ namespace Awsmock::Service {
         // body instead of the X-Amz-Function-Error header. Without checking this, a failed
         // rotation step would be treated as successful and the chain would march on regardless.
         try {
-            const boost::json::value responseValue = boost::json::parse(result.responseBody);
-            if (responseValue.is_object() && responseValue.as_object().contains("error")) {
+            if (const boost::json::value responseValue = boost::json::parse(result.responseBody); responseValue.is_object() && responseValue.as_object().contains("error")) {
                 const std::string errorMessage = boost::json::serialize(responseValue.as_object().at("error"));
                 log_error << "Lambda function reported an error, function: " << lambda.function << ", error: " << errorMessage;
                 throw Core::ServiceException("Lambda function reported an error, function: " + lambda.function + ", error: " + errorMessage);
             }
-        } catch (const boost::system::system_error &) {
-            // Response body is not JSON - not an error-shaped response, nothing to do.
+        } catch (const boost::system::system_error &e) {
+            log_error << "Error finishing the secrets manager password rotation, error: " << e.what();
         }
 
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", status: " << result.status;

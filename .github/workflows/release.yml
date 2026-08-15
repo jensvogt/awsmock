@@ -488,6 +488,74 @@ jobs:
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           overwrite: true
 
+  build-apt-repo:
+    name: "Build & Sign APT Repository"
+    runs-on: ubuntu-latest
+    needs: [ release-please, build-linux ]
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    env:
+      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Download .deb package
+        uses: actions/download-artifact@v7
+        with:
+          name: deb-package-linux
+          path: artifacts
+
+      - name: Import GPG signing key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.APT_GPG_PASSPHRASE }}
+
+      - name: Install reprepro
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y reprepro
+
+      - name: Restore persistent APT repo state
+        run: |
+          if git ls-remote --exit-code --heads origin apt-repo >/dev/null 2>&1; then
+            git fetch origin apt-repo:apt-repo
+            git worktree add apt-repo-work apt-repo
+          else
+            git worktree add --orphan -b apt-repo apt-repo-work
+          fi
+
+      - name: Configure reprepro distribution
+        run: |
+          mkdir -p apt-repo-work/conf
+          sed "s/__GPG_KEY_ID__/${{ steps.import_gpg.outputs.fingerprint }}/" dist/apt/conf/distributions > apt-repo-work/conf/distributions
+
+      - name: Add package to APT repo
+        run: reprepro -b apt-repo-work includedeb stable artifacts/*.deb
+
+      - name: Export public signing key
+        run: gpg --armor --export ${{ steps.import_gpg.outputs.fingerprint }} > apt-repo-work/awsmock-archive-keyring.asc
+
+      - name: Commit updated APT repo state
+        working-directory: apt-repo-work
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add conf dists pool db awsmock-archive-keyring.asc
+          git commit -m "chore(apt): add ${{ env.SEMVER }}" || echo "No changes to commit"
+          git push origin HEAD:apt-repo
+
+      - name: Upload APT repo artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: apt-repo-site
+          path: |
+            apt-repo-work/dists
+            apt-repo-work/pool
+            apt-repo-work/awsmock-archive-keyring.asc
+          overwrite: true
+
   build-docker:
     name: "Build & Package (Docker)"
     runs-on: ubuntu-latest
@@ -581,6 +649,7 @@ jobs:
   deploy:
     needs:
       - publish
+      - build-apt-repo
     runs-on: ubuntu-latest
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
@@ -605,6 +674,10 @@ jobs:
           cp ./artifacts/deb-package-linux/*.deb public/ || true
           cp ./artifacts/rpm-package-linux/*.rpm public/ || true
           cp .github/pages/index.html public/index.html || true
+          mkdir -p public/apt
+          cp -R ./artifacts/apt-repo-site/dists public/apt/
+          cp -R ./artifacts/apt-repo-site/pool public/apt/
+          cp ./artifacts/apt-repo-site/awsmock-archive-keyring.asc public/apt/
           find . -ls
 
       - name: Generate files.json
