@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.18.113](https://github.com/jensvogt/awsmock/compare/1.18.112...v1.18.113) (2026-08-15)
+
+
+### Bug Fixes
+
+* more tests ([2a2b7fd](https://github.com/jensvogt/awsmock/commit/2a2b7fd7e3ea3274363529f381ee46fcf79b934b))
+* more tests ([24c8453](https://github.com/jensvogt/awsmock/commit/24c8453b048617ac8de4adc0b7000f2f60656b62))
+
 ## [1.18.112](https://github.com/jensvogt/awsmock/compare/1.18.111...v1.18.112) (2026-08-15)
 
 
