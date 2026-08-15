@@ -2,6 +2,9 @@
 // Created by vogje01 on 7/7/26.
 //
 
+// C++ standard includes
+#include <algorithm>
+
 // Boost includes
 #include <boost/locale.hpp>
 #include <boost/test/unit_test.hpp>
@@ -210,6 +213,188 @@ namespace Awsmock::Database {
         descRequest.secretId = created.arn.substr(created.arn.rfind(':') + 1);
         const auto descResponse = svc.DescribeSecret(descRequest);
         BOOST_CHECK_EQUAL("updated description", descResponse.description);
+    }
+
+    BOOST_AUTO_TEST_CASE(GetRandomPasswordTest) {
+
+        // arrange
+        const Service::SecretsManagerService svc;
+        Dto::SecretsManager::GetRandomPasswordRequest request;
+        request.region = TEST_REGION;
+        request.passwordLength = 24;
+
+        // act
+        const auto response = svc.GetRandomPassword(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(24, response.randomPassword.length());
+    }
+
+    BOOST_AUTO_TEST_CASE(ListSecretCountersTest) {
+
+        // arrange
+        const Service::SecretsManagerService svc;
+        std::ignore = CreateDefaultSecret(svc);
+
+        Dto::SecretsManager::ListSecretCountersRequest request;
+        request.region = TEST_REGION;
+        request.pageSize = 10;
+        request.pageIndex = 0;
+
+        // act
+        const auto response = svc.ListSecretCounters(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(1, response.total);
+        BOOST_CHECK_EQUAL(1, response.secretCounters.size());
+        BOOST_CHECK_EQUAL(TEST_SECRET_NAME, response.secretCounters.front().secretName);
+    }
+
+    BOOST_AUTO_TEST_CASE(ListSecretVersionCountersTest) {
+
+        // arrange
+        const Service::SecretsManagerService svc;
+        const auto created = CreateDefaultSecret(svc);
+        BOOST_CHECK_EQUAL(false, created.arn.empty());
+        const std::string secretId = created.arn.substr(created.arn.rfind(':') + 1);
+
+        // put a second version
+        Dto::SecretsManager::PutSecretValueRequest putRequest;
+        putRequest.region = TEST_REGION;
+        putRequest.secretId = created.arn;
+        putRequest.secretString = TEST_SECRET_STRING_V2;
+        std::ignore = svc.PutSecretValue(putRequest);
+
+        Dto::SecretsManager::ListSecretVersionCountersRequest request;
+        request.region = TEST_REGION;
+        request.secretId = secretId;
+
+        // act
+        const auto response = svc.ListSecretVersionCounters(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(2, response.total);
+        BOOST_CHECK_EQUAL(2, response.secretVersionCounters.size());
+    }
+
+    BOOST_AUTO_TEST_CASE(GetSecretDetailsTest) {
+
+        // arrange
+        const Service::SecretsManagerService svc;
+        const auto created = CreateDefaultSecret(svc);
+        BOOST_CHECK_EQUAL(false, created.arn.empty());
+        const std::string secretId = created.arn.substr(created.arn.rfind(':') + 1);
+
+        Dto::SecretsManager::GetSecretDetailsRequest request;
+        request.region = TEST_REGION;
+        request.secretId = secretId;
+
+        // act
+        const auto response = svc.GetSecretDetails(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(TEST_SECRET_NAME, response.secretName);
+        BOOST_CHECK_EQUAL(false, response.secretArn.empty());
+        BOOST_CHECK_EQUAL(secretId, response.secretId);
+        BOOST_CHECK_EQUAL(TEST_SECRET_STRING, response.secretString);
+    }
+
+    BOOST_AUTO_TEST_CASE(UpdateSecretDetailsTest) {
+
+        // arrange
+        const Service::SecretsManagerService svc;
+        const auto created = CreateDefaultSecret(svc);
+        BOOST_CHECK_EQUAL(false, created.arn.empty());
+        const std::string secretId = created.arn.substr(created.arn.rfind(':') + 1);
+
+        Dto::SecretsManager::UpdateSecretDetailsRequest request;
+        request.region = TEST_REGION;
+        request.secretDetails.secretId = secretId;
+        request.secretDetails.rotationEnabled = true;
+        request.secretDetails.rotationLambdaARN = "arn:aws:lambda:eu-central-1:000000000000:function:test-rotation";
+        request.secretDetails.rotationRules.automaticallyAfterDays = 7;
+
+        // act
+        const auto response = svc.UpdateSecretDetails(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(true, response.secretDetails.rotationEnabled);
+        BOOST_CHECK_EQUAL("arn:aws:lambda:eu-central-1:000000000000:function:test-rotation", response.secretDetails.rotationLambdaARN);
+        BOOST_CHECK_EQUAL(7, response.secretDetails.rotationRules.automaticallyAfterDays);
+    }
+
+    BOOST_AUTO_TEST_CASE(RotateSecretTest) {
+
+        // arrange
+        const Service::SecretsManagerService svc;
+        const auto created = CreateDefaultSecret(svc);
+        BOOST_CHECK_EQUAL(false, created.arn.empty());
+
+        Dto::SecretsManager::RotateSecretRequest request;
+        request.region = TEST_REGION;
+        request.secretId = created.arn;
+        request.clientRequestToken = Core::StringUtils::CreateRandomUuid();
+        request.rotateImmediately = false;
+
+        // act
+        const auto response = svc.RotateSecret(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(TEST_SECRET_NAME, response.name);
+        BOOST_CHECK_EQUAL(false, response.arn.empty());
+
+        // verify a new AWSPENDING version was registered
+        Dto::SecretsManager::ListSecretVersionIdsRequest listRequest;
+        listRequest.region = TEST_REGION;
+        listRequest.secretId = created.arn.substr(created.arn.rfind(':') + 1);
+        const auto listResponse = svc.ListSecretVersionIds(listRequest);
+        BOOST_CHECK_EQUAL(2, listResponse.versions.size());
+        const bool hasPending = std::ranges::any_of(listResponse.versions, [&request](const Dto::SecretsManager::SecretVersion &v) {
+            return v.versionId == request.clientRequestToken &&
+                   std::ranges::find(v.versionStages, Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPENDING)) != v.versionStages.end();
+        });
+        BOOST_CHECK_EQUAL(true, hasPending);
+    }
+
+    BOOST_AUTO_TEST_CASE(UpdateSecretVersionStageTest) {
+
+        // arrange
+        const Service::SecretsManagerService svc;
+        const auto created = CreateDefaultSecret(svc);
+        BOOST_CHECK_EQUAL(false, created.arn.empty());
+        const std::string secretId = created.arn.substr(created.arn.rfind(':') + 1);
+
+        // register a pending version via rotation
+        Dto::SecretsManager::RotateSecretRequest rotateRequest;
+        rotateRequest.region = TEST_REGION;
+        rotateRequest.secretId = created.arn;
+        rotateRequest.clientRequestToken = Core::StringUtils::CreateRandomUuid();
+        rotateRequest.rotateImmediately = false;
+        std::ignore = svc.RotateSecret(rotateRequest);
+
+        Dto::SecretsManager::UpdateSecretVersionStageRequest request;
+        request.region = TEST_REGION;
+        request.secretId = created.arn;
+        request.versionStage = Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT);
+        request.moveToVersionId = rotateRequest.clientRequestToken;
+
+        // act
+        const auto response = svc.UpdateSecretVersionStage(request);
+
+        // assert
+        BOOST_CHECK_EQUAL(TEST_SECRET_NAME, response.name);
+        BOOST_CHECK_EQUAL(false, response.arn.empty());
+
+        // verify the pending version is now AWSCURRENT
+        Dto::SecretsManager::ListSecretVersionIdsRequest listRequest;
+        listRequest.region = TEST_REGION;
+        listRequest.secretId = secretId;
+        const auto listResponse = svc.ListSecretVersionIds(listRequest);
+        const auto it = std::ranges::find_if(listResponse.versions, [&rotateRequest](const Dto::SecretsManager::SecretVersion &v) {
+            return v.versionId == rotateRequest.clientRequestToken;
+        });
+        BOOST_CHECK(it != listResponse.versions.end());
+        BOOST_CHECK(std::ranges::find(it->versionStages, Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT)) != it->versionStages.end());
     }
 
     BOOST_AUTO_TEST_CASE(DeleteSecretTest) {
