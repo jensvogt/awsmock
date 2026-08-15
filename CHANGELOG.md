@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18.112](https://github.com/jensvogt/awsmock/compare/1.18.111...v1.18.112) (2026-08-15)
+
+
+### Bug Fixes
+
+* apt update ([1f52229](https://github.com/jensvogt/awsmock/commit/1f5222951577a729e1bfea314673b24faef717b3))
+* apt update ([874fdbf](https://github.com/jensvogt/awsmock/commit/874fdbfe8b8e72dac622284fff5a1bdd2ab6c05c))
+* secrets manager password rotation rules ([d87c252](https://github.com/jensvogt/awsmock/commit/d87c252f47e4ba6f133a3d5a41fff74eb76a6249))
+* secrets manager password rotation rules ([7757d79](https://github.com/jensvogt/awsmock/commit/7757d7974c45e6f06e2636c9b3e607af44e8cd79))
+
 ## [1.18.111](https://github.com/jensvogt/awsmock/compare/1.18.110...v1.18.111) (2026-08-14)
 
 
