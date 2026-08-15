@@ -49,6 +49,11 @@ namespace Awsmock::Dto::SecretsManager {
         std::string secretString;
 
         /**
+         * Rotation enabled
+         */
+        bool rotationEnabled = false;
+
+        /**
          * Rotation rules
          */
         RotationRules rotationRules;
@@ -92,6 +97,7 @@ namespace Awsmock::Dto::SecretsManager {
             r.secretArn = Core::Json::GetStringValue(v, "secretArn");
             r.secretId = Core::Json::GetStringValue(v, "secretId");
             r.secretString = Core::Json::GetStringValue(v, "secretString");
+            r.rotationEnabled = Core::Json::GetBoolValue(v, "rotationEnabled");
             r.rotationLambdaARN = Core::Json::GetStringValue(v, "rotationLambdaARN");
             r.rotationRules = boost::json::value_to<RotationRules>(v.at("rotationRules"));
             r.lastRotatedDate = Core::DateTimeUtils::FromISO8601(v.at("lastRotatedDate").as_string().data());
@@ -109,6 +115,7 @@ namespace Awsmock::Dto::SecretsManager {
                     {"secretArn", obj.secretArn},
                     {"secretId", obj.secretId},
                     {"secretString", obj.secretString},
+                    {"rotationEnabled", obj.rotationEnabled},
                     {"rotationLambdaARN", obj.rotationLambdaARN},
                     {"rotationRules", boost::json::value_from(obj.rotationRules)},
                     {"lastRotatedDate", Core::DateTimeUtils::ToISO8601(obj.lastRotatedDate)},

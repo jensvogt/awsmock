@@ -15,6 +15,7 @@ namespace Awsmock::Dto::SecretsManager {
         response.secretName = secret.name;
         response.secretArn = secret.arn;
         response.secretString = decryptedSecretString;
+        response.rotationEnabled = secret.rotationEnabled;
         response.rotationLambdaARN = secret.rotationLambdaARN;
         response.rotationRules = map(secret.rotationRules);
         response.lastRotatedDate = secret.lastRotatedDate;
@@ -33,7 +34,11 @@ namespace Awsmock::Dto::SecretsManager {
         response.secretDetails.secretName = secret.name;
         response.secretDetails.secretArn = secret.arn;
         response.secretDetails.secretString = decryptedSecretString;
+        response.secretDetails.rotationEnabled = secret.rotationEnabled;
+        response.secretDetails.rotationLambdaARN = secret.rotationLambdaARN;
         response.secretDetails.rotationRules = map(secret.rotationRules);
+        response.secretDetails.lastRotatedDate = secret.lastRotatedDate;
+        response.secretDetails.nextRotatedDate = secret.nextRotatedDate;
         response.secretDetails.created = secret.created;
         response.secretDetails.modified = secret.modified;
         return response;

@@ -167,6 +167,7 @@
           "count": 5
         },
         "monitoring-period": 300,
+        "rotation-check-period": 900,
         "worker-period": 300
       },
       "kms": {

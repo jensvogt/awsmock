@@ -7,7 +7,7 @@
 // C++ standard includes
 #include <string>
 
-// AwsMoc includes
+// Awsmock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
@@ -57,6 +57,11 @@ namespace Awsmock::Dto::SecretsManager {
          */
         std::string secretBinary;
 
+        /**
+         * Rotation enabled flag
+         */
+        bool rotationEnabled{};
+
       private:
 
         friend UpdateSecretRequest tag_invoke(boost::json::value_to_tag<UpdateSecretRequest>, boost::json::value const &v) {
@@ -66,6 +71,7 @@ namespace Awsmock::Dto::SecretsManager {
             r.description = Core::Json::GetStringValue(v, "Description");
             r.secretString = Core::Json::GetStringValue(v, "SecretString");
             r.secretBinary = Core::Json::GetStringValue(v, "SecretBinary");
+            r.rotationEnabled = Core::Json::GetBoolValue(v, "RotationEnabled");
             return r;
         }
 
@@ -79,6 +85,7 @@ namespace Awsmock::Dto::SecretsManager {
                     {"Description", obj.description},
                     {"SecretString", obj.secretString},
                     {"SecretBinary", obj.secretBinary},
+                    {"RotationEnabled", obj.rotationEnabled},
             };
         }
     };

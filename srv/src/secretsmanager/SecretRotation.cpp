@@ -126,8 +126,7 @@ namespace Awsmock::Service {
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", status: " << result.status;
     }
 
-    system_clock::time_point SecretRotation::GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const {
-        log_debug << "Get next rotation datetime, secret: " << secret.secretId;
+    system_clock::time_point SecretRotation::GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) {
         system_clock::time_point nextRotationDate = system_clock::now();
         if (secret.rotationRules.automaticallyAfterDays > 0) {
             nextRotationDate += std::chrono::days(secret.rotationRules.automaticallyAfterDays);
