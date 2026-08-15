@@ -158,10 +158,23 @@ docker pull jensvogt/awsmock:latest
 
 ### Debian / Ubuntu
 
+One-off install:
+
 ```bash
 wget https://jensvogt.github.io/awsmock/awsmock-<version>-amd64.deb
 sudo apt install ./awsmock-<version>-amd64.deb
 ```
+
+Or add the signed APT repository once, then install/upgrade via `apt` like any other package:
+
+```bash
+curl -fsSL https://jensvogt.github.io/awsmock/apt/awsmock-archive-keyring.asc | sudo gpg --dearmor -o /usr/share/keyrings/awsmock-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/awsmock-archive-keyring.gpg] https://jensvogt.github.io/awsmock/apt stable main" | sudo tee /etc/apt/sources.list.d/awsmock.list
+sudo apt update
+sudo apt install awsmock
+```
+
+Future releases are picked up by `sudo apt upgrade`.
 
 ### RPM (RHEL / Fedora)
 
