@@ -66,6 +66,14 @@ namespace Awsmock::Service {
          */
         void operator()(Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const;
 
+        /**
+         * @brief Calculates the next rotation date
+         *
+         * @param secret secret entity
+         * @return next rotation datetime
+         */
+        static system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret);
+
     private:
         mutable logger_t _logger{boost::log::keywords::channel = "SecretsManager"};
 
@@ -112,14 +120,6 @@ namespace Awsmock::Service {
          * @param body message body
          */
         void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body) const;
-
-        /**
-         * @brief Calculates the next rotation date
-         *
-         * @param secret secret entity
-         * @return next rotation datetime
-         */
-        system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret) const;
     };
 
 } // namespace Awsmock::Service

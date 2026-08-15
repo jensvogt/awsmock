@@ -200,9 +200,9 @@ namespace Awsmock::Database {
         static constexpr auto _databaseName = "awsmock";
 
         /**
-         * Bucket collection name
+         * Secret collection name
          */
-        static constexpr auto _parameterCollectionName = "secretsmanager_parameter";
+        static constexpr auto _secretCollectionName = "secretsmanager_secret";
     };
 
 } // namespace Awsmock::Database

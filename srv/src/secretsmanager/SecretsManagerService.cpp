@@ -499,6 +499,7 @@ namespace Awsmock::Service {
             secret.versions[versionId] = version;
             secret.description = request.description;
             secret.lastChangedDate = system_clock::now();
+            secret.rotationEnabled = request.rotationEnabled;
             secret.ResetVersions(versionId);
             secret = _secretsManagerDatabase->UpdateSecret(secret);
 
@@ -533,8 +534,19 @@ namespace Awsmock::Service {
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase->GetSecretBySecretId(request.secretDetails.secretId);
 
             // Updates are only possible on certain fields
-            secret.rotationRules = Dto::SecretsManager::Mapper::map(request.secretDetails.rotationRules);
+            Database::Entity::SecretsManager::RotationRules newRotationRules = Dto::SecretsManager::Mapper::map(request.secretDetails.rotationRules);
+            const bool rotationRulesChanged = newRotationRules.automaticallyAfterDays != secret.rotationRules.automaticallyAfterDays ||
+                                               newRotationRules.duration != secret.rotationRules.duration ||
+                                               newRotationRules.scheduleExpression != secret.rotationRules.scheduleExpression;
+
+            secret.rotationEnabled = request.secretDetails.rotationEnabled;
+            secret.rotationRules = newRotationRules;
             secret.rotationLambdaARN = request.secretDetails.rotationLambdaARN;
+
+            // If the rotation rules changed, the next rotation timestamp needs to be recalculated
+            if (rotationRulesChanged && secret.rotationEnabled) {
+                secret.nextRotatedDate = SecretRotation::GetNextRotationDate(secret);
+            }
             if (!request.secretDetails.secretString.empty()) {
                 Database::Entity::SecretsManager::SecretVersion version = secret.GetVersion(secret.GetCurrentVersionId());
                 EncryptSecret(version, secret.kmsKeyId, request.secretDetails.secretString);

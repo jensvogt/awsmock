@@ -11,7 +11,7 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
             // Set limit to 1 (Very important for performance!)
             mongocxx::options::count options;
@@ -30,7 +30,7 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
             // Set limit to 1 (Very important for performance!)
             mongocxx::options::count options;
@@ -53,7 +53,7 @@ namespace Awsmock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
             // Set limit to 1 (Very important for performance!)
             mongocxx::options::count options;
@@ -70,7 +70,7 @@ namespace Awsmock::Database {
     Entity::SecretsManager::Secret SecretsManagerMongoRepository::GetSecretById(bsoncxx::oid oid) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
         const auto mResult = _secretCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SecretsManager::Secret result;
@@ -86,7 +86,7 @@ namespace Awsmock::Database {
     Entity::SecretsManager::Secret SecretsManagerMongoRepository::GetSecretByRegionName(const std::string &region, const std::string &name) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _bucketCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _bucketCollection = (*client)[_databaseName][_secretCollectionName];
         const auto mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
         if (!mResult) {
             return {};
@@ -101,7 +101,7 @@ namespace Awsmock::Database {
     Entity::SecretsManager::Secret SecretsManagerMongoRepository::GetSecretBySecretId(const std::string &secretId) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _bucketCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _bucketCollection = (*client)[_databaseName][_secretCollectionName];
         const auto mResult = _bucketCollection.find_one(make_document(kvp("secretId", secretId)));
         if (mResult->empty()) {
             return {};
@@ -116,7 +116,7 @@ namespace Awsmock::Database {
     Entity::SecretsManager::Secret SecretsManagerMongoRepository::GetSecretByArn(const std::string &arn) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _bucketCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _bucketCollection = (*client)[_databaseName][_secretCollectionName];
         const auto mResult = _bucketCollection.find_one(make_document(kvp("arn", arn)));
         if (mResult->empty()) {
             return {};
@@ -131,7 +131,7 @@ namespace Awsmock::Database {
     Entity::SecretsManager::Secret SecretsManagerMongoRepository::CreateSecret(Entity::SecretsManager::Secret &secret) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
         try {
 
@@ -150,7 +150,7 @@ namespace Awsmock::Database {
     Entity::SecretsManager::Secret SecretsManagerMongoRepository::UpdateSecret(Entity::SecretsManager::Secret &secret) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
         mongocxx::options::find_one_and_update opts{};
         opts.return_document(mongocxx::options::return_document::k_after);
@@ -187,7 +187,7 @@ namespace Awsmock::Database {
 
         Entity::SecretsManager::SecretList secretList;
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
         for (auto secretCursor = _secretCollection.find({}); auto secret: secretCursor) {
             Entity::SecretsManager::Secret result;
@@ -201,7 +201,7 @@ namespace Awsmock::Database {
 
         try {
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _secretsCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection _secretsCollection = (*client)[_databaseName][_secretCollectionName];
 
             long count;
             if (region.empty()) {
@@ -221,7 +221,7 @@ namespace Awsmock::Database {
     void SecretsManagerMongoRepository::DeleteSecret(const Entity::SecretsManager::Secret &secret) const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _bucketCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _bucketCollection = (*client)[_databaseName][_secretCollectionName];
 
         try {
 
@@ -237,7 +237,7 @@ namespace Awsmock::Database {
     long SecretsManagerMongoRepository::DeleteAllSecrets() const {
 
         const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _secretCollection = (*client)[_databaseName][_parameterCollectionName];
+        mongocxx::collection _secretCollection = (*client)[_databaseName][_secretCollectionName];
 
         try {
 
