@@ -26,14 +26,14 @@ namespace {
 
 namespace Awsmock::Database {
 
-    Dto::ApiGateway::CreateRestApiResponse CreateDefaultRestApi(const Service::ApiGatewayService &svc) {
+    static Dto::ApiGateway::CreateRestApiResponse CreateDefaultRestApi(const Service::ApiGatewayService &svc) {
         Dto::ApiGateway::CreateRestApiRequest request;
         request.region = TEST_REGION;
         request.name = TEST_REST_API_NAME;
         return svc.createRestApi(request);
     }
 
-    Dto::ApiGateway::CreateApiKeyResponse CreateDefaultApiKey(const Service::ApiGatewayService &svc) {
+    static Dto::ApiGateway::CreateApiKeyResponse CreateDefaultApiKey(const Service::ApiGatewayService &svc) {
         Dto::ApiGateway::CreateApiKeyRequest request;
         request.region = TEST_REGION;
         request.name = TEST_API_KEY_NAME;
@@ -41,7 +41,7 @@ namespace Awsmock::Database {
         return svc.createApiKey(request);
     }
 
-    Dto::ApiGateway::CreateUsagePlanResponse CreateDefaultUsagePlan(const Service::ApiGatewayService &svc) {
+    static Dto::ApiGateway::CreateUsagePlanResponse CreateDefaultUsagePlan(const Service::ApiGatewayService &svc) {
         Dto::ApiGateway::CreateUsagePlanRequest request;
         request.region = TEST_REGION;
         request.name = TEST_USAGE_PLAN_NAME;
@@ -53,7 +53,7 @@ namespace Awsmock::Database {
         return svc.createUsagePlan(request);
     }
 
-    Dto::ApiGateway::CreateResourceResponse CreateDefaultResource(const Service::ApiGatewayService &svc, const std::string &restApiId, const std::string &parentId) {
+    static Dto::ApiGateway::CreateResourceResponse CreateDefaultResource(const Service::ApiGatewayService &svc, const std::string &restApiId, const std::string &parentId) {
         Dto::ApiGateway::CreateResourceRequest request;
         request.region = TEST_REGION;
         request.restApiId = restApiId;
@@ -62,24 +62,25 @@ namespace Awsmock::Database {
         return svc.createResource(request);
     }
 
-    struct ApiGatewayServiceFixture {
-        ApiGatewayServiceFixture() {
-            RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
-        }
-        ~ApiGatewayServiceFixture() {
-            try {
-                const auto apis = Database::RepositoryFactory::instance().apigatewayRepository()->listRestApis();
-                for (const auto &api: apis) {
-                    Database::RepositoryFactory::instance().apigatewayRepository()->deleteRestApi(api.id);
-                }
-                Database::RepositoryFactory::instance().apigatewayRepository()->deleteAllKeys();
-                Database::RepositoryFactory::instance().apigatewayRepository()->deleteAllUsagePlans();
-            } catch (const std::exception &exc) {
-                log_error << "ApiGateway fixture cleanup failed: " << exc.what();
+    namespace {
+        struct ApiGatewayServiceFixture {
+            ApiGatewayServiceFixture() {
+                RepositoryFactory::instance().initialize(BackendType::MONGODB, "test");
             }
-        }
-        boost::asio::io_context _ioc;
-    };
+            ~ApiGatewayServiceFixture() {
+                try {
+                    for (const auto apis = Database::RepositoryFactory::instance().apigatewayRepository()->listRestApis(); const auto &api: apis) {
+                        std::ignore = RepositoryFactory::instance().apigatewayRepository()->deleteRestApi(api.id);
+                    }
+                    std::ignore = RepositoryFactory::instance().apigatewayRepository()->deleteAllKeys();
+                    std::ignore = RepositoryFactory::instance().apigatewayRepository()->deleteAllUsagePlans();
+                } catch (const std::exception &exc) {
+                    log_error << "ApiGateway fixture cleanup failed: " << exc.what();
+                }
+            }
+            boost::asio::io_context _ioc;
+        };
+    }// namespace
 
     BOOST_FIXTURE_TEST_SUITE(ApiGatewayServiceTests, ApiGatewayServiceFixture)
 
@@ -224,7 +225,11 @@ namespace Awsmock::Database {
 
         // act / assert — no integration set, should throw NotFoundException
         bool threw = false;
-        try { std::ignore = svc.getIntegration(api.id, resource.id, "DELETE"); } catch (const Core::NotFoundException &) { threw = true; }
+        try {
+            std::ignore = svc.getIntegration(api.id, resource.id, "DELETE");
+        } catch (const Core::NotFoundException &) {
+            threw = true;
+        }
         BOOST_CHECK_EQUAL(true, threw);
     }
 

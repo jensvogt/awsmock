@@ -53,21 +53,22 @@ struct GlobalTestFixture {
     }
 
     ~GlobalTestFixture() {
-        auto &rf = Awsmock::Database::RepositoryFactory::instance();
-        rf.s3Repository()->deleteAllObjects();
-        rf.s3Repository()->deleteAllBuckets();
-        rf.sqsRepository()->deleteAllMessages();
-        rf.sqsRepository()->deleteAllQueues();
-        rf.snsRepository()->deleteAllMessages();
-        rf.snsRepository()->deleteAllTopics();
-        rf.dynamodbRepository()->deleteAllItems();
-        rf.dynamodbRepository()->deleteAllTables();
-        rf.lambdaRepository()->deleteAllLambdas();
-        rf.ssmRepository()->deleteAllParameters();
-        rf.apigatewayRepository()->deleteAllKeys();
-        rf.apigatewayRepository()->deleteAllUsagePlans();
-        rf.applicationRepository()->deleteAllApplications();
-        rf.secretsmanagerRepository()->DeleteAllSecrets();
+        const auto &rf = Awsmock::Database::RepositoryFactory::instance();
+        std::ignore = rf.s3Repository()->deleteAllObjects();
+        std::ignore = rf.s3Repository()->deleteAllBuckets();
+        std::ignore = rf.sqsRepository()->deleteAllMessages();
+        std::ignore = rf.sqsRepository()->deleteAllQueues();
+        std::ignore = rf.snsRepository()->deleteAllMessages();
+        std::ignore = rf.snsRepository()->deleteAllTopics();
+        std::ignore = rf.dynamodbRepository()->deleteAllItems();
+        std::ignore = rf.dynamodbRepository()->deleteAllTables();
+        std::ignore = rf.lambdaRepository()->deleteAllLambdas();
+        std::ignore = rf.ssmRepository()->deleteAllParameters();
+        std::ignore = rf.kmsRepository()->deleteAllKeys();
+        std::ignore = rf.apigatewayRepository()->deleteAllKeys();
+        std::ignore = rf.apigatewayRepository()->deleteAllUsagePlans();
+        std::ignore = rf.applicationRepository()->deleteAllApplications();
+        std::ignore = rf.secretsmanagerRepository()->DeleteAllSecrets();
     }
 };
 

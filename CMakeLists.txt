@@ -19,14 +19,6 @@ set(CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH OFF)
 enable_testing()
 
 # -------------------------------------------------------------------------
-# Include what you use
-# -------------------------------------------------------------------------
-#find_program(IWYU_PATH NAMES include-what-you-use iwyu)
-#if (IWYU_PATH)
-#    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "${IWYU_PATH};-Xiwyu;--mapping_file=${CMAKE_SOURCE_DIR}/.iwyu.imp")
-#endif ()
-
-# -------------------------------------------------------------------------
 # Current version
 # -------------------------------------------------------------------------
 configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/core/include/awsmock/core/Version.h)
@@ -41,16 +33,6 @@ if (WIN32)
     add_compile_options(/MP4 /FS /Zm200 "/Zc:__cplusplus" /EHsc "$<$<CONFIG:RELEASE>:/MT>" "$<$<CONFIG:DEBUG>:/MTd>"
             /D "_WIN32" "$<$<CONFIG:RELEASE>:/O2iy>" "$<$<CONFIG:DEBUG>:/Od>" /bigobj)
 endif ()
-
-# -------------------------------------------------------------------------
-# Linux debug build: reduce DWARF size to speed up debugger startup.
-# -gsplit-dwarf moves debug info into .dwo sidecar files loaded lazily.
-# -fno-var-tracking-assignments removes per-assignment location lists,
-# which are the main source of DWARF bloat from Boost/mongocxx templates.
-# -------------------------------------------------------------------------
-#if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-#    add_compile_options(-gsplit-dwarf -fno-var-tracking-assignments)
-#endif ()
 
 # -------------------------------------------------------------------------
 # Dependencies
@@ -99,21 +81,13 @@ set(CORE_SOURCES core/src/utils/StringUtils.cpp core/src/utils/FileUtils.cpp cor
         core/src/exception/JsonException.cpp core/src/exception/NotFoundException.cpp
         core/src/exception/ForbiddenException.cpp core/src/exception/UnauthorizedException.cpp
         core/src/exception/BadRequestException.cpp core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp
-        core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/include/awsmock/core/BsonConverter.h
-        core/include/awsmock/core/BsonCursorRange.h dto/include/awsmock/dto/common/mapper/Mapper.h
-        core/include/awsmock/core/MagicDetector.h core/src/exception/ContainerException.cpp
-        db/include/awsmock/entity/apigateway/Resource.h
-        dto/include/awsmock/dto/lambda/model/LambdaConfig.h
-        dto/include/awsmock/dto/lambda/model/LambdaStatus.h
-        dto/include/awsmock/dto/lambda/model/LambdaRuntimeStatus.h)
+        core/src/logging/LogStream.cpp core/src/logging/LogWebsocketSink.cpp core/src/exception/ContainerException.cpp)
 
 add_library(awsmockcore STATIC ${CORE_SOURCES})
 target_include_directories(awsmockcore PRIVATE ${CMAKE_SOURCE_DIR}/core/include)
-target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmockcore PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
 target_link_libraries(awsmockcore PUBLIC OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log Boost::log_setup
-        Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive)
-target_link_libraries(awsmockcore PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
+        Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono LibArchive::LibArchive
+        unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
 
 if (WIN32)
     target_link_libraries(awsmockcore PUBLIC Boost::system)
@@ -142,10 +116,8 @@ target_include_directories(awsmockdto PRIVATE ${CMAKE_SOURCE_DIR}/core/include $
         ${CMAKE_SOURCE_DIR}/db/include)
 target_link_libraries(awsmockdto PUBLIC awsmockcore awsmockdb OpenSSL::SSL OpenSSL::Crypto Boost::boost Boost::log
         Boost::log_setup Boost::thread Boost::process Boost::date_time Boost::url Boost::chrono Boost::json
-        LibArchive::LibArchive)
-target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>)
-target_link_libraries(awsmockdto PRIVATE $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>)
-target_link_libraries(awsmockdto PRIVATE unofficial::libmagic::libmagic PCRE2::8BIT PCRE2::POSIX)
+        LibArchive::LibArchive mongo::bsoncxx_static mongo::mongocxx_static unofficial::libmagic::libmagic PCRE2::8BIT
+        PCRE2::POSIX)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Database library
@@ -181,11 +153,10 @@ set(DB_SOURCES db/src/entity/sqs/MessageAttribute.cpp db/src/entity/sqs/Message.
         db/src/utils/ConnectionPool.cpp db/src/utils/SqsUtils.cpp db/src/entity/dynamodb/Tag.cpp
         db/src/repository/apigateway/ApiGatewayMongoRepository.cpp db/src/repository/apigateway/ApiGatewayMemoryRepository.cpp
         db/src/entity/apigateway/ApiKey.cpp db/src/entity/apigateway/RestApi.cpp db/src/entity/apigateway/Resource.cpp
-        db/src/entity/apigateway/Authorizer.cpp db/src/entity/apigateway/ResourceMethod.cpp db/src/entity/apigateway/UsagePlan.cpp db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp
-        db/src/repository/monitoring/MonitoringMongoRepository.cpp db/src/repository/monitoring/MonitoringMemoryRepository.cpp
-        db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp
-        db/src/repository/RepositoryFactory.cpp
-)
+        db/src/entity/apigateway/Authorizer.cpp db/src/entity/apigateway/ResourceMethod.cpp db/src/entity/apigateway/UsagePlan.cpp
+        db/src/entity/monitoring/Counter.cpp db/src/entity/dynamodb/KeySchema.cpp db/src/repository/monitoring/MonitoringMongoRepository.cpp
+        db/src/repository/monitoring/MonitoringMemoryRepository.cpp db/src/utils/TestUtils.cpp db/src/entity/dynamodb/AttributeDefinition.cpp
+        db/src/repository/RepositoryFactory.cpp)
 
 add_library(awsmockdb STATIC ${DB_SOURCES})
 target_include_directories(awsmockdb PRIVATE ${CMAKE_SOURCE_DIR}/core/include ${CMAKE_SOURCE_DIR}/dto/include
