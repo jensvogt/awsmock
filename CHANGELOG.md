@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18.113](https://github.com/jensvogt/awsmock/compare/1.18.112...v1.18.113) (2026-11-18)
+
+
+### Bug Fixes
+
+* more tests ([2a2b7fd](https://github.com/jensvogt/awsmock/commit/2a2b7fd7e3ea3274363529f381ee46fcf79b934b))
+* more tests ([24c8453](https://github.com/jensvogt/awsmock/commit/24c8453b048617ac8de4adc0b7000f2f60656b62))
+* new boost version 1.92 ([6b1382a](https://github.com/jensvogt/awsmock/commit/6b1382ac6c614999c783690a5fc6952a6560ee5b))
+* new boost version 1.92 ([278b317](https://github.com/jensvogt/awsmock/commit/278b317c8615392fb785ea90e60647edca090b40))
+
 ## [1.18.112](https://github.com/jensvogt/awsmock/compare/1.18.111...v1.18.112) (2026-08-15)
 
 
