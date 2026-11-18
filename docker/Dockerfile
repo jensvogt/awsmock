@@ -22,7 +22,7 @@ RUN mkdir -p /usr/share/aclocal && mkdir -p /vcpkg-cache
 WORKDIR /usr/local/vcpkg
 
 RUN git clone https://github.com/microsoft/vcpkg.git . && \
-    git checkout f1d4bbc72f183441403ba5107cb19d75a5abc2a2
+    git checkout 9eec002df1cd109f8f104cd966a763daf9751489
 RUN ./bootstrap-vcpkg.sh
 
 # Create build environment
